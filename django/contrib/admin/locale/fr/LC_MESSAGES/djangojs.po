@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 10:02+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/django/language/"
 "fr/)\n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "%s disponible(s)"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -34,39 +32,31 @@ msgstr ""
 "sélectionnant dans la zone ci-dessous, puis en cliquant sur la flèche "
 "« Choisir » entre les deux zones."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Écrivez dans cette zone pour filtrer la liste des « %s » disponibles."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filtrer"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Tout choisir"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Cliquez pour choisir tous les « %s » en une seule opération."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Choisir"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Enlever"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Choix des « %s »"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -75,24 +65,18 @@ msgstr ""
 "sélectionnant dans la zone ci-dessous, puis en cliquant sur la flèche « "
 "Enlever » entre les deux zones."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Tout enlever"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Cliquez pour enlever tous les « %s » en une seule opération."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s sur %(cnt)s sélectionné"
 msgstr[1] "%(sel)s sur %(cnt)s sélectionnés"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -100,8 +84,6 @@ msgstr ""
 "Vous avez des modifications non sauvegardées sur certains champs éditables. "
 "Si vous lancez une action, ces modifications vont être perdues."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -111,8 +93,6 @@ msgstr ""
 "certains champs modifiés. Cliquez sur OK pour sauver. Vous devrez "
 "réappliquer l'action."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -122,68 +102,51 @@ msgstr ""
 "sur des champs. Vous cherchez probablement le bouton Envoyer et non le "
 "bouton Sauvegarder."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Note : l'heure du serveur précède votre heure de %s heure."
 msgstr[1] "Note : l'heure du serveur précède votre heure de %s heures."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Note : votre heure précède l'heure du serveur de %s heure."
 msgstr[1] "Note : votre heure précède l'heure du serveur de %s heures."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "Maintenant"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "Horloge"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "Choisir une heure"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "Minuit"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "6:00"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "Midi"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "Annuler"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "Calendrier"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "Hier"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "Demain"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -191,17 +154,11 @@ msgstr ""
 "Janvier Février Mars Avril Mai Juin Juillet Août Septembre Octobre Novembre "
 "Décembre"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "D L M M J V S"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Afficher"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Masquer"

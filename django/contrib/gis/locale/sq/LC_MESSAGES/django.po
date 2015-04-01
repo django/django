@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
@@ -17,56 +17,46 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Fusha bazë GIS -- skiconi sipas llojit Gjeometri me Specifikime OpenGIS."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Pikë"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Varg vije"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Shumëkëndësh"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multi-pika"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Varg multi-vijë"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi shumëkëndësh"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Përmbledhje gjeometrie"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "Nuk u dha vlerë gjeometrie."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Vlerë e pavlefshme gjeometrie."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Lloj i pavlefshëm gjeometrie."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -74,26 +64,21 @@ msgstr ""
 "Ndodhi një gabim gjatë shndërrimit të gjeometrisë në fushë SRID formulari "
 "gjeometrie."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Nuk ka të passhme hartë site-i për ndarjen: %r"
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Faqe %s e zbrazët"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Nuk ka faqe '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "Nuk ka prurje të regjistruara."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Identifikuesi %r nuk është i regjistruar."

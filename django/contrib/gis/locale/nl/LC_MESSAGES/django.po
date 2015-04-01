@@ -5,13 +5,14 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011
+# Sander Steffann <sander@steffann.nl>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 22:56+0000\n"
+"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,57 +21,47 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Het basis GIS veld -- corresponderend met het OpenGIS Specificatie "
 "Geometrisch type"
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punt"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Lijn string"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polygoon"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multi-punt"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Multi-lijn string"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi-polygoon"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geometrie collectie"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Gebieds-aggregatieveld"
+
 msgid "No geometry value provided."
 msgstr "Geen geometrische waarde opgegeven."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Ongeldige geometrie waarde."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Ongeldig geometrie type."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -78,26 +69,21 @@ msgstr ""
 "Er is een fout opgetreden bij het omvormen van de geometrie naar de SRID van "
 "het geometrie veld."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Geen sitemap beschikbaar voor sectie: %r"
+msgid "Delete all Features"
+msgstr "Verwijder alle Kenmerken"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Pagina %s leeg"
+msgid "WKT debugging window:"
+msgstr "WKT debug-venster:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Geen pagina '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps via GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Debug-venster (geserialiseerde waarde)"
+
 msgid "No feeds are registered."
 msgstr "Er zijn geen feeds geregistreerd"
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r is niet geregistreerd."

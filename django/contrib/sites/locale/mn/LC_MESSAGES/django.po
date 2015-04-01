@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bayarbat.U <bayarbat@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Zorig <zorig_ezd@yahoo.com>, 2014
 # Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011,2013
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-10 10:42+0000\n"
-"Last-Translator: Zorig <zorig_ezd@yahoo.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-02-13 08:34+0000\n"
+"Last-Translator: Bayarbat.U <bayarbat@gmail.com>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +20,20 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "Вэб сайтууд"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr "домэйн нэр дотор таб болон хоосон зай агуулаж болохгүй."
+msgstr "Домэйн нэрэнд таб болон хоосон зай бичиж болохгүй."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "домэйн нэр"
 
-#: contrib/sites/models.py:69
 msgid "display name"
-msgstr "Харагдах нэр "
+msgstr "харагдах нэр"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "сайт"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "сайтууд"

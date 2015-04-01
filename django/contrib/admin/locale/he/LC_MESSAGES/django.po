@@ -3,13 +3,13 @@
 # Translators:
 # Alex Gaynor <alex.gaynor@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2011-2014
+# Meir Kriheli <mkriheli@gmail.com>, 2011-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 08:21+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-21 19:40+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
@@ -19,68 +19,51 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s  נמחקו בהצלחה."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "לא ניתן למחוק %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "האם את/ה בטוח/ה ?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "מחק %(verbose_name_plural)s שנבחרו"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "ניהול"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "הכל"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "כן"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "לא"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "לא ידוע"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "כל תאריך"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "היום"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "בשבוע האחרון"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "החודש"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "השנה"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -89,97 +72,80 @@ msgstr ""
 "נא להזין את %(username)s והסיסמה הנכונים לחשבון איש צוות. נא לשים לב כי שני "
 "השדות רגישים לאותיות גדולות/קטנות."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "פעולה"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "זמן פעולה"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "מזהה אובייקט"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "ייצוג אובייקט"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "דגל פעולה"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "הערה לשינוי"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "רישום יומן"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "רישומי יומן"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "בוצעה הוספת \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "בוצע שינוי \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "בוצעה מחיקת \"%(object)s\"."
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "אובייקט LogEntry"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "ללא"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"יש להחזיק את \"Control\", או \"Command\" על מק, לחוץ כדי לבחור יותר מאחד."
+
 #, python-format
 msgid "Changed %s."
 msgstr "%s שונה."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "ו"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "בוצעה הוספת %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "בוצע שינוי %(list)s עבור %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "בוצעה מחיקת %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "אף שדה לא השתנה."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן לערוך אותו שוב מתחת."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -187,96 +153,79 @@ msgid ""
 msgstr ""
 "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "הוספת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן לערוך שוב מתחת."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr "עדכון %(name)s \"%(obj)s\" בוצע בהצלחה. ניתן להוסיף עוד %(name)s מתחת."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "שינוי %(name)s \"%(obj)s\" בוצע בהצלחה."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "יש לסמן פריטים כדי לבצע עליהם פעולות. לא שונו פריטים."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "לא נבחרה פעולה."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "מחיקת %(name)s \"%(obj)s\" בוצעה בהצלחה."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "הוספת %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "שינוי %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "שגיאת בסיס נתונים"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "שינוי %(count)s %(name)s בוצע בהצלחה."
 msgstr[1] "שינוי %(count)s %(name)s בוצע בהצלחה."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s נבחר"
 msgstr[1] "כל ה־%(total_count)s נבחרו"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 מ %(cnt)s נבחרים"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "היסטוריית שינוי: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -285,99 +234,62 @@ msgstr ""
 "מחיקת %(class_name)s %(instance)s תדרוש מחיקת האובייקטים הקשורים והמוגנים "
 "הבאים: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "ניהול אתר Django"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "ניהול Django"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "ניהול אתר"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "כניסה"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "ניהול %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "דף לא קיים"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "אנו מצטערים, לא ניתן למצוא את הדף המבוקש."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "דף הבית"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "שגיאת שרת"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "שגיאת שרת (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "שגיאת שרת <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "התרחשה שגיאה. היא דווחה למנהלי האתר בדוא\"ל ותתוקן בקרוב. תודה על סבלנותך."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "הפעל את הפעולה שבחרת בה."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "בצע"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "לחיצה כאן תבחר את האובייקטים בכל העמודים"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "בחירת כל %(total_count)s ה־%(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "איפוס בחירה"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -385,112 +297,63 @@ msgstr ""
 "ראשית יש להזין שם משתמש וסיסמה. לאחר מכן יהיה ביכולתך לערוך אפשרויות נוספות "
 "עבור המשתמש."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "נא לשים שם משתמש וסיסמה."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "שינוי סיסמה"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "נא לתקן את השגיאות המופיעות מתחת."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "נא לתקן את השגיאות מתחת."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "יש להזין סיסמה חדשה עבור המשתמש <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "סיסמה"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "סיסמה (שוב)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "יש להזין את אותה סיסמה שוב,לאימות."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "שלום,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "צפיה באתר"
+
 msgid "Documentation"
 msgstr "תיעוד"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "יציאה"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "הוספה"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "היסטוריה"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "צפיה באתר"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "הוספת %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "סינון"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "הסרה ממיון"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "עדיפות מיון: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "החלף כיוון מיון"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "מחיקה"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -500,7 +363,6 @@ msgstr ""
 "מחיקת %(object_name)s '%(escaped_object)s' מצריכה מחיקת אובייקטים מקושרים, "
 "אך לחשבון שלך אין הרשאות למחיקת סוגי האובייקטים הבאים:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -509,7 +371,6 @@ msgstr ""
 "מחיקת ה%(object_name)s '%(escaped_object)s' תדרוש מחיקת האובייקטים הקשורים "
 "והמוגנים הבאים:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -518,16 +379,18 @@ msgstr ""
 "האם ברצונך למחוק את %(object_name)s \"%(escaped_object)s\"? כל הפריטים "
 "הקשורים הבאים יימחקו:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "אובייקטים"
+
 msgid "Yes, I'm sure"
 msgstr "כן, אני בטוח/ה"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr "לא, קח אותי חזרה."
+
 msgid "Delete multiple objects"
 msgstr "מחק כמה פריטים"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -537,7 +400,6 @@ msgstr ""
 "מחיקת ב%(objects_name)s הנבחרת תביא במחיקת אובייקטים קשורים, אבל החשבון שלך "
 "אינו הרשאה למחוק את הסוגים הבאים של אובייקטים:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -546,7 +408,6 @@ msgstr ""
 "מחיקת ה%(objects_name)s אשר סימנת תדרוש מחיקת האובייקטים הקשורים והמוגנים "
 "הבאים:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -555,56 +416,45 @@ msgstr ""
 "האם אתה בטוח שאתה רוצה למחוק את ה%(objects_name)s הנבחר? כל האובייקטים הבאים "
 "ופריטים הקשורים להם יימחקו:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "שינוי"
+
 msgid "Remove"
 msgstr "להסיר"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "הוספת %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "מחיקה ?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " לפי %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "סיכום"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "מודלים ביישום %(name)s"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "שינוי"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "אין לך הרשאות לעריכה."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "פעולות אחרונות"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "הפעולות שלי"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "לא נמצאו"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "תוכן לא ידוע"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -613,88 +463,76 @@ msgstr ""
 "משהו שגוי בהתקנת בסיס הנתונים שלך. נא לוודא שנוצרו טבלאות בסיס הנתונים "
 "המתאימות, ובסיס הנתונים ניתן לקריאה על ידי המשתמש המתאים."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "סיסמה:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "שכחת את שם המשתמש והסיסמה שלך ?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "תאריך/שעה"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "משתמש"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "פעולה"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
 "לאובייקט זה אין היסטוריית שינוי. כנראה לא השתמשו בממשק הניהול הזה להוספתו."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "הצג הכל"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "שמירה"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "שינוי  %(model)s הנבחר."
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "הוספת %(model)s נוסף."
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "מחיקת %(model)s הנבחר."
+
 msgid "Search"
 msgstr "חיפוש"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "תוצאה %(counter)s"
 msgstr[1] "%(counter)s תוצאות"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s סה\"כ"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "שמירה כחדש"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "שמירה והוספת אחר"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "שמירה והמשך עריכה"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "תודה על בילוי זמן איכות עם האתר."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "התחבר/י שוב"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "שינוי סיסמה"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "סיסמתך שונתה."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -702,48 +540,29 @@ msgstr ""
 "נא להזין את סיסמתך הישנה, לצרכי אבטחה, ולאחר מכן את סיסמתך החדשה פעמיים כדי "
 "שנוכל לוודא שהקלדת אותה כראוי."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "סיסמה ישנה"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "סיסמה חדשה"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "שנה את סיסמתי"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "איפוס סיסמה"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "ססמתך נשמרה. כעת ניתן להתחבר."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "אימות איפוס סיסמה"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr "נא להזין את סיסמתך החדשה פעמיים כדי שנוכל לוודא שהקלדת אותה כראוי."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "סיסמה חדשה:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "אימות סיסמה:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -751,14 +570,13 @@ msgstr ""
 "הקישור לאיפוס הסיסמה אינו חוקי. ייתכן והשתמשו בו כבר. נא לבקש איפוס סיסמה "
 "חדש."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"שלחנו אליך דוא\"ל עם הוראות לאיפוס הסיסמה. ההוראות אמורות להתקבל בקרוב."
+"שלחנו אליך דואר אלקטרוני עם הוראות לקביעת הסיסמה, אם קיים חשבון עם כתובת "
+"הדואר שהזנת. ההודעה אמור להגיע בקרוב."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -766,7 +584,6 @@ msgstr ""
 "אם הדוא\"ל לא הגיע, נא לוודא שהזנת כתובת נכונה בעת הרישום ולבדוק את תיקיית "
 "דואר הזבל."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -775,24 +592,19 @@ msgstr ""
 "הודעה זו נשלחה אליך עקב בקשתך לאיפוס הסיסמה עבור המשתמש שלך באתר "
 "%(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "נא להגיע לעמוד הבא ולבחור סיסמה חדשה:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "שם המשתמש שלך, במקרה ששכחת:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "תודה על השימוש באתר שלנו!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "צוות %(site_name)s"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -800,52 +612,37 @@ msgstr ""
 "שכחת את סיסמתך ? נא להזין את כתובת הדוא\"ל מתחת, ואנו נשלח הוראות לקביעת "
 "סיסמה חדשה."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "כתובת דוא\"ל:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "אפס את סיסמתי"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "כל התאריכים"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(אין)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "בחירת %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "בחירת %s לשינוי"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "תאריך:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "שעה:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "חפש"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "הוסף עוד אחת"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "נוכחי:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "שינוי:"

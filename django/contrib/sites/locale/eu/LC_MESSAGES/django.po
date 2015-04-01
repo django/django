@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Basque (http://www.transifex.com/projects/p/django/language/"
 "eu/)\n"
@@ -18,26 +18,20 @@ msgstr ""
 "Language: eu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr ""
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Domeinu izenak ezin du zuriunerik edo tabuladorerik eduki."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "dominio izena"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "erakusteko izena"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "web gunea"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "web guneak"

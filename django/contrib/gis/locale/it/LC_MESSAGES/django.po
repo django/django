@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# yakky <i.spalletti@nephila.it>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2012
+# Mattia Procopio <promat85@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-27 16:32+0000\n"
-"Last-Translator: Marco Bonetti\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-28 19:09+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -19,56 +21,46 @@ msgstr ""
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Il campo base GIS -- corrisponde al tipo Geometry delle specifiche OpenGIS."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Punto"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Stringa linea"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Poligono"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multipunto"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Stringa multilinea"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi poligono"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Raccolta Geometry"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Campo di aggregazione esteso"
+
 msgid "No geometry value provided."
 msgstr "Nessun valore geometrico fornito."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Valore geometrico non valido."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Tipo geometrico non valido."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -76,26 +68,21 @@ msgstr ""
 "Si è verificato un errore durante la trasformazione della geometria nello "
 "SRID del campo geometria della form."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Nessun sitemap disponibile per la sezione: %r"
+msgid "Delete all Features"
+msgstr "Cancella tutti gli oggetti"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Pagina %s vuota"
+msgid "WKT debugging window:"
+msgstr "Finestra di debug WKT:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Nessuna pagina '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps da GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Finestra di debug (valore serializzato)"
+
 msgid "No feeds are registered."
 msgstr "Non ci sono feed registrati."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Lo slug %r non è registrato."

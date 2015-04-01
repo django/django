@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-22 07:39+0000\n"
-"Last-Translator: Bayarkhuu Bataa\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +19,20 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
 msgstr "Сэшнүүд"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "session түлхүүр"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "session өгөгдөл"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "дуусах хугацаа"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "session"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "session-ууд"

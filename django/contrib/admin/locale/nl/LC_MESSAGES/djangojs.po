@@ -5,14 +5,15 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# Sander Steffann <sander@steffann.nl>, 2015
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-15 06:54+0000\n"
-"Last-Translator: Jeffrey Gelens <jeffrey@noppo.pro>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-20 22:32+0000\n"
+"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -21,13 +22,11 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "Beschikbare %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -36,39 +35,31 @@ msgstr ""
 "selecteren in het vak hieronder en vervolgens op de \"Kiezen\" pijl tussen "
 "de twee lijsten te klikken."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Type in dit vak om te filteren in de lijst met beschikbare %s."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filter"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Kies alle"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Klik om alle %s te kiezen."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Kiezen"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Gekozen %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -77,24 +68,18 @@ msgstr ""
 "selecteren in het vak hieronder en vervolgens op de \"Verwijderen\" pijl "
 "tussen de twee lijsten te klikken."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Verwijder alles"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klik om alle gekozen %s tegelijk te verwijderen."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s van de %(cnt)s geselecteerd"
 msgstr[1] "%(sel)s van de %(cnt)s geselecteerd"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -102,8 +87,6 @@ msgstr ""
 "U heeft niet opgeslagen wijzigingen op enkele indviduele velden. Als u nu "
 "een actie uitvoert zullen uw wijzigingen verloren gaan."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -113,8 +96,6 @@ msgstr ""
 "velden nog niet opgeslagen. Klik alstublieft op OK om op te slaan. U zult "
 "vervolgens de actie opnieuw moeten uitvoeren."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -124,68 +105,51 @@ msgstr ""
 "individuele velden. U zoekt waarschijnlijk naar de Gaan knop in plaats van "
 "de Opslaan knop."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Let op: U ligt %s uur voor ten opzichte van de server-tijd."
+msgstr[1] "Let op: U ligt %s uren voor ten opzichte van de server-tijd."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Let op: U ligt %s uur achter ten opzichte van de server-tijd."
+msgstr[1] "Let op: U ligt %s uren achter ten opzichte van de server-tijd."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "Nu"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "Klok"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "Kies een tijd"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "Middernacht"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "Zes uur 's ochtends"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "Twaalf uur 's middags"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "Annuleren"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "Vandaag"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "Kalender"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "Gisteren"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "Morgen"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -193,17 +157,11 @@ msgstr ""
 "januari februari maart april mei juni juli augustus september oktober "
 "november december"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "Z M D W D V Z"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Tonen"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Verbergen"

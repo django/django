@@ -3,13 +3,13 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011,2013
-# rodin <romihardiyanto@gmail.com>, 2013-2014
+# rodin <romihardiyanto@gmail.com>, 2013-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-06-26 19:57+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 11:43+0000\n"
 "Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
@@ -19,79 +19,47 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Informasi pribadi"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Hak akses"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Tanggal penting"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Sandi berhasil diubah."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Ganti sandi: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Autentikasi dan Otorisasi"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Belum ada sandi yang disetel."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format sandi tidak valid atau algoritma hash yang tidak dikenal."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Kedua bidang sandi tidak cocok."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Nama Pengguna"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka, dan karakter "
-"@/./+/-/_ ."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Nilai ini hanya boleh berisi huruf, angka, dan karakter @/./+/-/_ ."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Sandi"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Konfirmasi sandi"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Masukkan sandi yang sama dengan di atas, untuk verifikasi."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -101,7 +69,6 @@ msgstr ""
 "pengguna ini, namun Anda dapat mengganti sandi tersebut lewat <a href="
 "\"password/\">formulir ini</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -110,102 +77,72 @@ msgstr ""
 "Masukkan nama pengguna %(username)s dan sandi yang benar. Huruf besar/kecil "
 "pada bidang ini berpengaruh."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Akun ini tidak aktif."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Email"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Sandi baru"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Konfirmasi sandi baru"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Sandi lama Anda yang dimasukkan salah. Masukkan sekali lagi."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Sandi lama"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Sandi (ulangi)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritme"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterasi"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
-msgstr "garam"
+msgstr "salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "faktor kerja"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "ceksum"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "nama"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "namasandi"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "hak akses"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "hak akses"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grup"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "sandi"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "masuk terakhir"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "status superuser"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -213,55 +150,51 @@ msgstr ""
 "Menentukan apakah pengguna memiliki semua hak akses tanpa perlu diberikan "
 "secara manual."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Grup tempat pengguna ini dikelompokkan. Pengguna akan mendapatkan semua hak "
-"akses yang diberikan pada grupnya."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "hak akses pengguna"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Hak akses khusus untuk pengguna ini."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "nama pengguna"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Masukkan nama pengguna yang valid."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Wajib. 30 karakter atau kurang dalam kombinasi huruf, angka, dan karakter "
+"@/./+/-/_ ."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Seorang pengguna dengan nama pengguna tersebut sudah ada."
+
 msgid "first name"
 msgstr "nama depan"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "nama belakang"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "alamat email"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "status staf"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Menentukan apakah pengguna berhak masuk ke situs administrasi ini."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktif"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -269,55 +202,39 @@ msgstr ""
 "Menentukan apakah pengguna dianggap aktif. Hapus pilihan ini tanpa perlu "
 "menghapus akunnya."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "tanggal daftar"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "pengguna"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "pengguna"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Penyetelan ulang sandi di %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Masukkan alamat email yang valid."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Keluar"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Setel ulang sandi"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Penyetelan ulang sandi berhasil"
+msgid "Password reset sent"
+msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Masukkan sandi baru"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Penyetelan ulang sandi gagal"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Penyetelan ulang sandi selesai"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Ubah sandi"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Pengubahan sandi berhasil"

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-28 10:20+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -18,35 +18,28 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "コンテンツタイプ"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "Python モデルクラス名"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "コンテンツタイプ"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "コンテンツタイプ"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr ""
 "コンテンツタイプ %(ct_id)s のオブジェクトは、関連付けられたモデルを持っていま"
 "せん"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "コンテンツタイプ %(ct_id)s のオブジェクト %(obj_id)s は存在しません"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr ""

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-10 11:02+0000\n"
-"Last-Translator: Jeong Seongtae <magno79@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
 "MIME-Version: 1.0\n"
@@ -18,49 +18,21 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
 msgstr "관리 문서"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
-#: contrib/admindocs/templates/admin_doc/index.html:6
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
-#: contrib/admindocs/templates/admin_doc/model_detail.html:14
-#: contrib/admindocs/templates/admin_doc/model_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_detail.html:6
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
-#: contrib/admindocs/templates/admin_doc/view_detail.html:6
-#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "홈"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:10
-#: contrib/admindocs/templates/admin_doc/index.html:14
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
-#: contrib/admindocs/templates/admin_doc/model_detail.html:15
-#: contrib/admindocs/templates/admin_doc/model_index.html:9
-#: contrib/admindocs/templates/admin_doc/template_detail.html:7
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
-#: contrib/admindocs/templates/admin_doc/view_detail.html:7
-#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "문서"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "북마크릿"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "문서 북마크릿"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -77,73 +49,54 @@ msgstr ""
 "이제 사이트 내의 모든 페이지에서 북마크릿 선택이 가능합니다.\n"
 "북마크릿에 따라 내부 네트워크 상의 컴퓨터로부터 이 사이트를 참조해야하는 경우"
 "가 있습니다.\n"
-"(내부 네트워크가 있는지 불명확한 경우 시스템 관리자에게 확인하시기 바랍니다.)"
-"</p>\n"
+"(내부 네트워크가 있는지 불명확한 경우 시스템 관리자에게 확인하시기 바랍니"
+"다.)</p>\n"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "이 페이지의 문서"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "각 페이지로에서 해당 페이지를 생성한 뷰의 문서로 갑니다."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "오브젝트 아이디 표시"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr "단일 오브젝트 페이지의 고유 아이디와 컨텐츠 타입을 표시합니다."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "오브젝트 편집(현재 창)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "단일 오브젝트 페이지의 관리 페이지로 이동"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "오브젝트 편집(새로운 창)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "위와 동일하며, 새로운 창에서 관리 페이지를 엽니다."
 
-#: contrib/admindocs/templates/admin_doc/index.html:17
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "태그"
 
-#: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
 msgstr "모든 템플릿 태그와 함수의 "
 
-#: contrib/admindocs/templates/admin_doc/index.html:20
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "필터"
 
-#: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr "필터는 출력을 변경하는 템플릿의 변수에 적용 할 수 있는 동작다."
 
-#: contrib/admindocs/templates/admin_doc/index.html:23
-#: contrib/admindocs/templates/admin_doc/model_detail.html:16
-#: contrib/admindocs/templates/admin_doc/model_index.html:10
-#: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "모델"
 
-#: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
@@ -152,14 +105,9 @@ msgstr ""
 "모델은 모든 시스템에서 개체와 연관된 필드에 대한 설명입니다. 각 모델은 템플"
 "릿 변수로 액세스 할 수 있는 필드의 리스트를 가지고 있습니다."
 
-#: contrib/admindocs/templates/admin_doc/index.html:26
-#: contrib/admindocs/templates/admin_doc/view_detail.html:8
-#: contrib/admindocs/templates/admin_doc/view_index.html:9
-#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
 msgstr "뷰"
 
-#: contrib/admindocs/templates/admin_doc/index.html:27
 msgid ""
 "Each page on the public site is generated by a view. The view defines which "
 "template is used to generate the page and which objects are available to "
@@ -168,15 +116,12 @@ msgstr ""
 "일반 사이트의 각 페이지는 뷰에 의해 생성됩니다. 뷰는 페이지를 생성하는데 사용"
 "되는 템플릿과 그 템플릿을 사용할 수 있게해주는 개체를 정의합니다."
 
-#: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr "브라우저 도구는 신속하게 관리자 기능에 접근 할 수 있습니다."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
 msgstr "docutils를 설치해주세요."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
@@ -185,82 +130,63 @@ msgstr ""
 "관리자 문서 시스템은 파이썬의  <a href=\"%(link)s\">docutils</a> 라이브러리"
 "를 필요로합니다."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr "관리자에게 <a href=\"%(link)s\">docutils</a> 설치를 요청해주세요."
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:35
 msgid "Field"
 msgstr "필드"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
 msgstr "타입"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
 msgstr "설명"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
 msgstr "모델 문서로 돌아가기"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
 msgstr "모델 문서"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
 msgstr "모델 그룹"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "템플릿"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
 msgstr "템플릿 : %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
 msgstr "템플릿 : \"%(name)s\""
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "\"%(name)s\" 템플릿 검색 경로"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
 msgstr "(존재하지 않습니다)"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
 msgstr "문서로 "
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
 msgstr "템플릿 필터"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
 msgstr "템플릿 필터 문서"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
 msgstr "내장 필터"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
@@ -269,20 +195,15 @@ msgstr ""
 "이 필터를 사용하기위해서는 필터를 사용하기 전에  템플릿에 <code>%(code)s</"
 "code> 를 입력하세요."
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
 msgstr "템플릿 태그"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
 msgstr "템플릿 태그 문서"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
 msgstr "내장 태그"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
@@ -291,45 +212,35 @@ msgstr ""
 "이 태그를 사용하기 위해서는 태그를 사용하기 전에 템플릿에 <code>%(code)s</"
 "code> 를 입력하세요."
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
 msgstr "뷰: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
 msgstr "컨텍스트 :"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
 msgstr "템플릿 :"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
 msgstr "뷰 문서로 돌아가기"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
 msgstr "뷰 "
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
 msgstr "네임스페이스로"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
 msgstr "빈 네임스페이스"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
 msgstr "%(name)s 네임스페이스 뷰"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
 msgstr "빈 네임스페이스 뷰"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
 msgid ""
 "\n"
@@ -339,73 +250,49 @@ msgstr ""
 "\n"
 "뷰 함수: <code>%(full_name)s</code>. Name: <code>%(url_name)s</code>.\n"
 
-#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
 msgstr "boolean(참 또는 거짓)"
 
-#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "%(field_type)s 형식 필드"
 
-#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
-#: contrib/admindocs/views.py:80
 msgid "tag:"
 msgstr "태그:"
 
-#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
-#: contrib/admindocs/views.py:113
 msgid "filter:"
 msgstr "필터:"
 
-#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
-#: contrib/admindocs/views.py:164
 msgid "view:"
 msgstr "뷰:"
 
-#: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
 msgstr "어플리케이션 %(app_label)r 이/가 없습니다."
 
-#: contrib/admindocs/views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "모델 %(model_name)r 이/가 어플리케이션 %(app_label)r 에 없습니다."
 
-#: contrib/admindocs/views.py:208
+msgid "model:"
+msgstr "모델:"
+
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "`%(app_label)s.%(data_type)s` 관련 오브젝트"
 
-#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
-#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
-msgid "model:"
-msgstr "모델:"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "`%(app_label)s.%(object_name)s` 관련 오브젝트(들)"
 
-#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
 #, python-format
 msgid "all %s"
 msgstr "모든 %s"
 
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
 #, python-format
 msgid "number of %s"
 msgstr "%s 의 수"
 
-#. Translators: %s is an object type name
-#: contrib/admindocs/views.py:275
-#, python-format
-msgid "Attributes on %s objects"
-msgstr "%s 개체 "
-
-#: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s 은/는 url 패턴의 오브젝트가 아닙니다."

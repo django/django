@@ -3,14 +3,16 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
-# Vlada Macek <macek@sandbox.cz>, 2013-2014
+# Tomáš Ehrlich <tomas.ehrlich@gmail.com>, 2015
+# Vláďa Macek <macek@sandbox.cz>, 2013-2014
+# Vláďa Macek <macek@sandbox.cz>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-22 17:44+0000\n"
-"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-02-14 13:14+0000\n"
+"Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
 "MIME-Version: 1.0\n"
@@ -19,68 +21,51 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Úspěšně odstraněno: %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Nelze smazat %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Jste si jisti?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Odstranit vybrané položky typu %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Správa"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Vše"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Ano"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Neznámé"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Libovolné datum"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Dnes"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Posledních 7 dní"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Tento měsíc"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Tento rok"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -89,91 +74,76 @@ msgstr ""
 "Zadejte správné %(username)s a heslo pro personál. Obě pole mohou rozlišovat "
 "velká a malá písmena."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Operace:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "čas operace"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "id položky"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "reprez. položky"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "příznak operace"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "zpráva o změně"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "položka protokolu"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "položky protokolu"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Přidán objekt \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Změněn objekt \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Odstraněn objekt \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "Objekt záznam v protokolu"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Žádný"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Výběr více než jedné položky je možný přidržením klávesy \"Control\" (nebo "
+"\"Command\" na Macu)."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Změněno: %s"
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla přidána."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Změna polí: %(list)s pro položku \"%(object)s\" typu %(name)s."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Položka \"%(object)s\" typu %(name)s byla odstraněna."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Nebyla změněna žádná pole."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -181,7 +151,6 @@ msgstr ""
 "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána. Níže můžete v "
 "úpravách pokračovat."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -190,12 +159,10 @@ msgstr ""
 "Objekt \"%(obj)s\" typu %(name)s byl úspěšně přidán. Níže můžete přidat "
 "další %(name)s."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně přidána."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -204,7 +171,6 @@ msgstr ""
 "Objekt \"%(obj)s\" typu %(name)s byl úspěšně změněn. Níže ho můžete znovu "
 "upravovat."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -213,12 +179,10 @@ msgstr ""
 "Objekt \"%(obj)s\" typu %(name)s byl úspěšně změněn. Níže můžete přidat "
 "další %(name)s."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně změněna."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -226,35 +190,28 @@ msgstr ""
 "K provedení hromadných operací je třeba vybrat nějaké položky. Nedošlo k "
 "žádným změnám."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Nebyla vybrána žádná operace."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Položka \"%(obj)s\" typu %(name)s byla úspěšně odstraněna."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Položka \"%(name)s\" s primárním klíčem \"%(key)r\" neexistuje."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "%s: přidat"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "%s: změnit"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Chyba databáze"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -262,7 +219,6 @@ msgstr[0] "Položka %(name)s byla úspěšně změněna."
 msgstr[1] "%(count)s položky %(name)s byly úspěšně změněny."
 msgstr[2] "%(count)s položek %(name)s bylo úspěšně změněno."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -270,24 +226,20 @@ msgstr[0] "%(total_count)s položka vybrána."
 msgstr[1] "Všechny %(total_count)s položky vybrány."
 msgstr[2] "Vybráno všech %(total_count)s položek."
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Vybraných je 0 položek z celkem %(cnt)s."
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Historie změn: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s: %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -296,71 +248,40 @@ msgstr ""
 "Odstranění položky \"%(instance)s\" typu %(class_name)s by vyžadovalo "
 "odstranění těchto souvisejících chráněných položek: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Správa webu Django"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Správa systému Django"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Správa webu"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Přihlášení"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "Správa aplikace %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Stránka nenalezena"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Požadovaná stránka nebyla bohužel nalezena."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Domů"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Chyba serveru"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Chyba serveru (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Chyba serveru <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -368,141 +289,86 @@ msgstr ""
 "V systému došlo k chybě. Byla e-mailem nahlášena správcům, kteří by ji měli "
 "v krátké době opravit. Děkujeme za trpělivost."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Provést vybranou operaci"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Provést"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Klepnutím zde vyberete položky ze všech stránek."
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Vybrat všechny položky typu %(module_name)s, celkem %(total_count)s."
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Zrušit výběr"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr ""
-"Nejdříve vložte uživatelské jméno a heslo. Poté budete moci upravovat více "
+"Nejdříve zadejte uživatelské jméno a heslo. Poté budete moci upravovat více "
 "uživatelských nastavení."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
-msgstr "Vložte uživatelské jméno a heslo."
+msgstr "Zadejte uživatelské jméno a heslo."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Změnit heslo"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Opravte níže uvedené chyby."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Opravte níže uvedené chyby."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "Vložte nové heslo pro uživatele <strong>%(username)s</strong>."
+msgstr "Zadejte nové heslo pro uživatele <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Heslo"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Heslo (znovu)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Pro ověření vložte stejné heslo znovu."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Vítejte, uživateli"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "Zobrazení webu"
+
 msgid "Documentation"
 msgstr "Dokumentace"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Odhlásit se"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Přidat"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Historie"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Zobrazení na webu"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s: přidat"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtr"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Přestat řadit"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Priorita řazení: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Přehodit řazení"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Odstranit"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -513,7 +379,6 @@ msgstr ""
 "odstranění souvisejících položek. Nemáte však oprávnění k odstranění položek "
 "následujících typů:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -522,7 +387,6 @@ msgstr ""
 "Odstranění položky '%(escaped_object)s' typu %(object_name)s by vyžadovalo "
 "odstranění souvisejících chráněných položek:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -531,16 +395,18 @@ msgstr ""
 "Opravdu má být odstraněna položka \"%(escaped_object)s\" typu "
 "%(object_name)s? Následující související položky budou všechny odstraněny:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "Objekty"
+
 msgid "Yes, I'm sure"
 msgstr "Ano, jsem si jist(a)"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr "Ne, beru zpět"
+
 msgid "Delete multiple objects"
 msgstr "Odstranit vybrané položky"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -551,7 +417,6 @@ msgstr ""
 "souvisejících položek. Nemáte však oprávnění k odstranění položek "
 "následujících typů:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -560,7 +425,6 @@ msgstr ""
 "Odstranění vybrané položky typu %(objects_name)s by vyžadovalo odstranění "
 "následujících souvisejících chráněných položek:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -569,56 +433,45 @@ msgstr ""
 "Opravdu má být odstraněny vybrané položky typu %(objects_name)s? Všechny "
 "vybrané a s nimi související položky budou odstraněny:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Změnit"
+
 msgid "Remove"
 msgstr "Odebrat"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Přidat %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Odstranit?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " Dle: %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "Shrnutí"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modely v aplikaci %(name)s"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Změnit"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Nemáte oprávnění nic měnit."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Poslední operace"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Vaše operace"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Nic"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Neznámý obsah"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -628,27 +481,18 @@ msgstr ""
 "odpovídající tabulky a že databáze je přístupná pro čtení příslušným "
 "uživatelem."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Heslo:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Zapomněli jste heslo nebo uživatelské jméno?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Datum a čas"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Uživatel"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Operace"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -656,20 +500,27 @@ msgstr ""
 "Tato položka nemá historii změn. Pravděpodobně nebyla přidána tímto "
 "administračním rozhraním."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Zobrazit vše"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Uložit"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Změnit vybrané položky typu %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Přidat další %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Odstranit vybrané položky typu %(model)s"
+
 msgid "Search"
 msgstr "Hledat"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -677,90 +528,61 @@ msgstr[0] "%(counter)s výsledek"
 msgstr[1] "%(counter)s výsledky"
 msgstr[2] "%(counter)s výsledků"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "Celkem %(full_result_count)s"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Uložit jako novou položku"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Uložit a přidat další položku"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Uložit a pokračovat v úpravách"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Děkujeme za čas strávený s tímto webem."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Přihlaste se znovu"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Změna hesla"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Vaše heslo bylo změněno."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Vložte svoje současné heslo a poté vložte dvakrát heslo nové. Omezíme tak "
-"možnost překlepu."
+"Zadejte svoje současné heslo a poté dvakrát heslo nové. Omezíme tak možnost "
+"překlepu."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Současné heslo"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Nové heslo"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Změnit heslo"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Obnovení hesla"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Vaše heslo bylo nastaveno. Nyní se můžete přihlásit."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Potvrzení obnovy hesla"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Vložte dvakrát nové heslo. Tak ověříme, že bylo zadáno správně."
+msgstr "Zadejte dvakrát nové heslo. Tak ověříme, že bylo zadáno správně."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Nové heslo:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Potvrdit heslo:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -768,15 +590,13 @@ msgstr ""
 "Odkaz pro obnovení hesla byl neplatný, možná již byl použit. Požádejte o "
 "obnovení hesla znovu."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Návod na nastavení hesla byl odeslán na zadanou e-mailovou adresu. Měl by za "
-"okamžik dorazit."
+"Návod na nastavení hesla byl odeslán na zadanou e-mailovou adresu, pokud "
+"účet s takovou adresou existuje. Měl by za okamžik dorazit."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -785,7 +605,6 @@ msgstr ""
 "jako ta registrovaná u vašeho účtu a zkontrolujte složku nevyžádané pošty, "
 "tzv. spamu."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -794,24 +613,19 @@ msgstr ""
 "Tento e-mail vám byl zaslán na základě vyžádání obnovy hesla vašeho "
 "uživatelskému účtu na systému %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Přejděte na následující stránku a zadejte nové heslo:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Pro jistotu vaše uživatelské jméno:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Děkujeme za používání našeho webu!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Tým aplikace %(site_name)s"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -819,52 +633,37 @@ msgstr ""
 "Zapomněli jste heslo? Zadejte níže e-mailovou adresu a systém vám odešle "
 "instrukce k nastavení nového."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "E-mailová adresa:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Obnovit heslo"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Všechna data"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(nic)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "%s: vybrat"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Vyberte položku %s ke změně"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Datum:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Čas:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Hledat"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Přidat další"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Aktuálně:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Změna:"

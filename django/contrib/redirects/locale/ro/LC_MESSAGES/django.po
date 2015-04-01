@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
 "ro/)\n"
@@ -19,15 +19,12 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
 "2:1));\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr ""
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "redirecționat de la "
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -35,11 +32,9 @@ msgstr ""
 "Aceasta ar trebui să fie o cale absolută, excluzând numele de domeniu. "
 "Exemplu: '/evenimente/cautare/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "redirecționat către"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -47,10 +42,8 @@ msgstr ""
 "Aceasta poate fi o cale absolută (ca mai sus) sau un URL complet, începând "
 "cu 'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "redirecționare"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "redirecționări"

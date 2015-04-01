@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Xwybylty Soslan <soslanx@gmail.com>, 2013
+# Soslan Khubulov <soslanx@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
 "os/)\n"
@@ -17,78 +17,47 @@ msgstr ""
 "Language: os\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Персоналон инфо"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Бартӕ"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Ахсджиаг бонтӕ"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Пароль ивд ӕрцыд."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Фӕив пароль: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr ""
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Ницы пароль уыд ӕвӕрд."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Паролы формат раст нӕу, кӕнӕ хӕшты алгоритм бӕрӕг нӕу."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Ахӕм фӕсномыгимӕ архайӕг нырид ис."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Дыууӕ паролы ӕмхуызӕн не сты."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Фӕсномыг"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Ӕнӕмӕнг. 30 кӕнӕ цъусдӕр нысаны. Ӕрмӕст дамгъӕтӕ, нымӕцтӕ ӕмӕ @/./+/-/_."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Ам хъуамӕ уой ӕрмӕст дамгъӕтӕ, нымӕцтӕ ӕмӕ ахӕм нысӕнттӕ: @/./+/-/_."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Пароль"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Паролы бӕлвырдгӕнӕн"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Уӕлдӕр цы пароль бафыстай, уый бафысс, цӕмӕй бӕлвырд уа."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -98,7 +67,6 @@ msgstr ""
 "архайӕджы пароль, фӕлӕ дӕ бон у <a href=\"password/\">ацы формӕйы</a> "
 "ӕххуысӕй йӕ фӕивай."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -107,156 +75,121 @@ msgstr ""
 "Дӕ хорзӕхӕй, раст %(username)s ӕмӕ пароль бафысс. Дӕ сӕры дар уый, ӕмӕ дыууӕ "
 "дӕр гӕнӕн ис стыр ӕмӕ гыццыл дамгъӕтӕ ӕвзарой."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Ацы аккаунт ницы архайы."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Электрон пост"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Ног пароль"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Нӕуӕг паролы бӕлвырдгӕнӕн"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Дӕ зӕронд пароль раст амынд нӕу. Дӕ хорзӕхӕй, нӕуӕгӕй йӕ бафысс."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Зӕронд пароль"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Пароль (ногӕй)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "алгоритм"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "итерацитӕ"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "цӕхх"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "хӕш"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "куысты фактор"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "бӕлвырдсуммӕ"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "ном"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "кодном"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "бар"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "бартӕ"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "къорд"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "къордтӕ"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "пароль"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "фӕстаг бахызт"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "хистӕр архайӕджы статус"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Ацы архайӕгӕн алы бар дӕр дӕтты, цӕмӕй сӕ хицӕнӕй дӕттын ма хъӕуа."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Ацы архайӕг цы къордты ис. Архайӕг цы къордты ис, уыцы къордты бартӕ йын "
-"лӕвӕрд ӕрцӕудзысты."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "архайӕджы бартӕ"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr ""
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "фӕсномыг"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Раст фӕсномыг бафысс"
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Ӕнӕмӕнг. 30 кӕнӕ цъусдӕр нысаны. Ӕрмӕст дамгъӕтӕ, нымӕцтӕ ӕмӕ @/./+/-/_."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Ахӕм фӕсномыгимӕ архайӕг нырид ис."
+
 msgid "first name"
 msgstr "ном"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "мыггаг"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "электрон посты адрис"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "куысты уавӕр"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Бӕрӕг кӕны архайӕгӕн йӕ бон у ацы армдарӕн сайтмӕ хизын, ӕви нӕ."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "активон"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -264,55 +197,39 @@ msgstr ""
 "Бӕрӕг кӕны ацы архайӕгы хъӕуы нымайын активоныл, ӕви нӕ. Йӕ нысан ын сис "
 "хафыны бӕсты."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "баиуы бон"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "архайӕг"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "архайджытӕ"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s-ы нӕуӕг пароль ӕвӕрӕн"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Раст фӕсномыг бафысс"
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Рахизын"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr ""
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
+msgid "Password reset sent"
 msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr ""
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr ""
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr ""
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr ""

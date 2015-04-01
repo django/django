@@ -1,0 +1,104 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Sander Steffann <sander@steffann.nl>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 22:56+0000\n"
+"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
+"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
+"nl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: nl\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL uitbreidingen"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Item %(nth)s in de lijst werd niet gevalideerd:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Lijsten met meerdere lagen moeten allemaal dezelfde lengte hebben."
+
+msgid "Map of strings to strings"
+msgstr "Vertaling van strings naar strings"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "De waarde van \"%(key)s\" is geen string."
+
+msgid "Could not load JSON data."
+msgstr "Kon de JSON gegevens niet inlezen."
+
+msgid "Enter two valid values."
+msgstr "Geef twee geldige waarden op."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr ""
+"Het begin van het bereik mag niet groter zijn dan het eind van het bereik."
+
+msgid "Enter two whole numbers."
+msgstr "Geef twee gehele getallen op."
+
+msgid "Enter two numbers."
+msgstr "Geef twee getallen op."
+
+msgid "Enter two valid date/times."
+msgstr "Geef twee geldige datums/tijden op."
+
+msgid "Enter two valid dates."
+msgstr "Geef twee geldige datums op."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lijst bevat %(show_value)d element maar mag niet meer dan %(limit_value)d "
+"elementen bevatten."
+msgstr[1] ""
+"Lijst bevat %(show_value)d elementen maar mag niet meer dan %(limit_value)d "
+"elementen bevatten."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lijst bevat %(show_value)d element maar mag niet minder dan %(limit_value)d "
+"elementen bevatten."
+msgstr[1] ""
+"Lijst bevat %(show_value)d elementen maar mag niet minder dan "
+"%(limit_value)d elementen bevatten."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Sommige sleutels missen: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Een aantal onbekende sleutels werden opgegeven: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "Controleer dat dit bereik minder dan of gelijk is aan %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "Controleer dat dit bereik groter dan of gelijk is aan %(limit_value)s."

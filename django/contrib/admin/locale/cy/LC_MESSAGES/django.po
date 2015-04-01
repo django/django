@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-23 17:32+0000\n"
-"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -20,68 +20,51 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Dilëwyd %(count)d %(items)s yn llwyddiannus."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ni ellir dileu %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Ydych yn sicr?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Dileu y %(verbose_name_plural)s â ddewiswyd"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Gweinyddu"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Pob un"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Ie"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Na"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Anhysybys"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Unrhyw ddyddiad"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Heddiw"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "7 diwrnod diwethaf"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Mis yma"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Eleni"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -90,98 +73,80 @@ msgstr ""
 "Teipiwch yr %(username)s a chyfrinair cywir ar gyfer cyfrif staff.  Noder y "
 "gall y ddau faes fod yn sensitif i lythrennau bach a llythrennau bras."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Gweithred:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "amser y weithred"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "id gwrthrych"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "repr gwrthrych"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "fflag gweithred"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "neges y newid"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "cofnod"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "cofnodion"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Ychwanegwyd \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Newidwyd \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Dilëwyd  \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "Gwrthrych LogEntry"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Dim"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
 #, python-format
 msgid "Changed %s."
 msgstr "Newidiwyd %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "a"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Wedi ychwanegu  %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Wedi newid %(list)s ar gyfer %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Dilëwyd  %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Ni newidwyd unrhwy feysydd."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddianus. Gellir ei olygu eto isod."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -190,12 +155,10 @@ msgstr ""
 "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus. Gallwch ychwanegu %(name)s "
 "arall isod."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -203,7 +166,6 @@ msgid ""
 msgstr ""
 "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddianus. Gellir ei olygu eto isod."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -212,47 +174,38 @@ msgstr ""
 "Ychwanegwyd %(name)s \"%(obj)s\" yn llwyddiannus. Gallwch ychwanegu %(name)s "
 "arall isod."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Newidwyd %(name)s \"%(obj)s\" yn llwyddiannus."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
 "Rhaid dewis eitemau er mwyn gweithredu arnynt.  Ni ddewiswyd unrhyw eitemau."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Ni ddewiswyd gweithred."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Dilëwyd %(name)s \"%(obj)s\" yn llwyddiannus."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Nid ydy gwrthrych %(name)s gyda'r prif allwedd %(key)r yn bodoli."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Ychwanegu %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Newid %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Gwall cronfa ddata"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -261,7 +214,6 @@ msgstr[1] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 msgstr[2] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 msgstr[3] "Newidwyd %(count)s %(name)s yn llwyddiannus"
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -270,24 +222,20 @@ msgstr[1] "Dewiswyd %(total_count)s"
 msgstr[2] "Dewiswyd %(total_count)s"
 msgstr[3] "Dewiswyd %(total_count)s"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Dewiswyd 0 o %(cnt)s"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Hanes newid: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -296,71 +244,40 @@ msgstr ""
 "Byddai dileu %(class_name)s %(instance)s yn golygu dileu'r gwrthrychau "
 "gwarchodedig canlynol sy'n perthyn: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Adran weinyddol safle Django"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Gweinyddu Django"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Gweinyddu'r safle"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Mewngofnodi"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "Gweinyddu %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Ni ddarganfyddwyd y dudalen"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Mae'n ddrwg gennym, ond ni ddarganfuwyd y dudalen"
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Hafan"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Gwall gweinydd"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Gwall gweinydd (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Gwall Gweinydd <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -368,29 +285,23 @@ msgstr ""
 "Mae gwall ac gyrrwyd adroddiad ohono i weinyddwyr y wefan drwy ebost a dylai "
 "gael ei drwsio yn fuan.  Diolch am fod yn amyneddgar."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Rhedeg y weithred a ddewiswyd"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Ffwrdd â ni"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr ""
 "Cliciwch fan hyn i ddewis yr holl wrthrychau ar draws yr holl dudalennau"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Dewis y %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Clirio'r dewis"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -398,112 +309,63 @@ msgstr ""
 "Yn gyntaf, rhowch enw defnyddiwr a chyfrinair.  Yna byddwch yn gallu golygu "
 "mwy o ddewisiadau."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Rhowch enw defnyddiwr a chyfrinair."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Newid cyfrinair"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Cywirwch y gwall isod."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Cywirwch y gwallau isod."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Rhowch gyfrinair newydd i'r defnyddiwr <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Cyfrinair"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Cyfrinair (eto)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Rhowch yr un cyfrinair ag uchod, er mwyn ei wirio."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Croeso,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr ""
+
 msgid "Documentation"
 msgstr "Dogfennaeth"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Allgofnodi"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Ychwanegu"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Hanes"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Gweld ar y safle"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Ychwanegu %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Hidl"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Gwaredu o'r didoli"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Blaenoriaeth didoli: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Toglio didoli"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Dileu"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -514,7 +376,6 @@ msgstr ""
 "gwrthrychau sy'n perthyn, ond nid oes ganddoch ganiatâd i ddileu y mathau "
 "canlynol o wrthrychau:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -523,7 +384,6 @@ msgstr ""
 "Byddai dileu %(object_name)s '%(escaped_object)s' yn golygu dileu'r "
 "gwrthrychau gwarchodedig canlynol sy'n perthyn:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -532,16 +392,18 @@ msgstr ""
 "Ydych yn sicr eich bod am ddileu  %(object_name)s \"%(escaped_object)s\"?  "
 "Dilëir yr holl eitemau perthnasol canlynol:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr ""
+
 msgid "Yes, I'm sure"
 msgstr "Ydw, rwy'n sicr"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr ""
+
 msgid "Delete multiple objects"
 msgstr "Dileu mwy nag un gwrthrych"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -551,7 +413,6 @@ msgstr ""
 "Byddai dileu %(objects_name)s yn golygu dileu'r gwrthrychau sy'n perthyn, "
 "ond nid oes ganddoch ganiatâd i ddileu y mathau canlynol o wrthrychau:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -560,7 +421,6 @@ msgstr ""
 "Byddai dileu %(objects_name)s yn golygu dileu'r gwrthrychau gwarchodedig "
 "canlynol sy'n perthyn:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -569,56 +429,45 @@ msgstr ""
 "Ydych yn sicr eich bod am ddileu'r %(objects_name)s a ddewiswyd?  Dilëir yr "
 "holl wrthrychau canlynol a'u heitemau perthnasol:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Newid"
+
 msgid "Remove"
 msgstr "Gwaredu"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Ychwanegu %(verbose_name)s arall"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Dileu?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "Wrth %(filter_title)s"
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelau yn y rhaglen %(name)s "
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Newid"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Does gennych ddim hawl i olygu unrhywbeth."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Gweithredoedd Diweddar"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Fy Ngweithredoedd"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Dim ar gael"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Cynnwys anhysbys"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -628,27 +477,18 @@ msgstr ""
 "cronfa ddata priodol wedi eu creu, a sicrhewch fod y gronfa ddata yn "
 "ddarllenadwy gan y defnyddiwr priodol."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Cyfrinair:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Anghofioch eich cyfrinair neu enw defnyddiwr?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Dyddiad/amser"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Defnyddiwr"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Gweithred"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -656,20 +496,27 @@ msgstr ""
 "Does dim hanes newid gan y gwrthrych yma. Mae'n debyg nad ei ychwanegwyd "
 "drwy'r safle gweinydd yma."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Dangos pob canlyniad"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Cadw"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
 msgid "Search"
 msgstr "Chwilio"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -678,41 +525,31 @@ msgstr[1] "%(counter)s canlyniad"
 msgstr[2] "%(counter)s canlyniad"
 msgstr[3] "%(counter)s canlyniad"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "Cyfanswm o %(full_result_count)s"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Cadw fel newydd"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Cadw ac ychwanegu un arall"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Cadw a pharhau i olygu"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Diolch am dreulio amser o ansawdd gyda'r safle we yma heddiw."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Mewngofnodi eto"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Newid cyfrinair"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Newidwyd eich cyfrinair."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -720,49 +557,30 @@ msgstr ""
 "Rhowch eich hen gyfrinair, er mwyn diogelwch, ac yna rhowch eich cyfrinair "
 "newydd ddwywaith er mwyn gwirio y'i teipiwyd yn gywir."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Hen gyfrinair"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Cyfrinair newydd"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Newid fy nghyfrinair"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Ailosod cyfrinair"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Mae'ch cyfrinair wedi ei osod. Gallwch fewngofnodi nawr."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Cadarnhad ailosod cyfrinair"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
 "Rhowch eich cyfrinair newydd ddwywaith er mwyn gwirio y'i teipiwyd yn gywir."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Cyfrinair newydd:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Cadarnhewch y cyfrinair:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -770,15 +588,11 @@ msgstr ""
 "Roedd y ddolen i ailosod y cyfrinair yn annilys, o bosib oherwydd ei fod "
 "wedi ei ddefnyddio'n barod.  Gofynnwch i ailosod y cyfrinair eto."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Fe'ch ebostiwyd gyda cyfarwyddiadau ar osod eich cyfrinair. Dylech ei "
-"dderbyn yn fuan."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -786,7 +600,6 @@ msgstr ""
 "Os na dderbyniwch ebost, sicrhewych y rhoddwyd y cyfeiriad sydd wedi ei "
 "gofrestru gyda ni, ac edrychwch yn eich ffolder sbam."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -795,24 +608,19 @@ msgstr ""
 "Derbyniwch yr ebost hwn oherwydd i chi ofyn i ailosod y cyfrinair i'ch "
 "cyfrif yn %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ewch i'r dudalen olynol a dewsiwch gyfrinair newydd:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Eich enw defnyddiwr, rhag ofn eich bod wedi anghofio:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Diolch am ddefnyddio ein safle!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Tîm %(site_name)s"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -820,52 +628,37 @@ msgstr ""
 "Anghofioch eich cyfrinair? Rhowch eich cyfeiriad ebost isod ac fe ebostiwn "
 "gyfarwyddiadau ar osod un newydd."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Cyfeiriad ebost:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Ailosod fy nghyfrinair"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Holl ddyddiadau"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Dim)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Dewis %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Dewis %s i newid"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Dyddiad:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Amser:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Archwilio"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Ychwanegu Un Arall"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Cyfredol:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Newid:"

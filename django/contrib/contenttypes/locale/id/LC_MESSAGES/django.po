@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-23 08:31+0000\n"
+"Last-Translator: M Asep Indrayana <me@drayanaindra.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +19,26 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Tipe Konten"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "nama kelas model python"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "tipe konten"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "tipe konten"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Tipe konten objek %(ct_id)s tidak memiliki model yang terkait"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Tipe konten %(ct_id)s objek %(obj_id)s tidak ada"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Objek %(ct_name)s tidak memiliki metode get_absolute_url()"

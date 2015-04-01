@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Croatian (http://www.transifex.com/projects/p/django/language/"
 "hr/)\n"
@@ -24,80 +24,47 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Osobni podaci"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Privilegije"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Važni datumi"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Lozinka uspješno promijenjena."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Promijeni lozinku: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr ""
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Lozinka nije postavljena."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neispravan format lozinke ili nepoznati hashing algoritam."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Korisnik sa navedenim imenom već postoji."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Dva polja za lozinku nisu jednaka."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Korisničko ime"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Obavezan unos. 30 alfanumeričkih znakova ili manje. Samo slova, brojevi i "
-"@/./+/-/_ znakovi."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Ova vrijednost može sadržavati samo slova, brojeve i @/./+/-/_ znakove."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Lozinka"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Potvrda lozinke"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Unesite istu lozinku, za potvrdu."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -107,7 +74,6 @@ msgstr ""
 "lozinku ovog korisnika, ali je možete promjeniti koristeći <a href="
 "\"password/\">ovaj obrazac</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -116,102 +82,72 @@ msgstr ""
 "Unesite ispravno %(username)s i lozinku. Imajte na umu da oba polja mogu "
 "biti velika i mala slova."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Ovaj korisnički račun nije aktivan."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-mail"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Nova lozinka"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Potvrda nove lozinke"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Vaša stara lozinka je pogrešno unesena. Molim unesite ponovo."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Stara lozinka"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Lozinka (unesi ponovo)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritam"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteracije"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "slučajna vrijednost"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "količina rada"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "zbroj za provjeru"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "ime"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kodno ime"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "privilegija"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "privilegije"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupa"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupe"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "lozinka"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "posljednja prijava"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "superuser status"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -219,55 +155,51 @@ msgstr ""
 "Određuje da ovaj korisnik ima sve privilegije te uklanja potrebu da se "
 "privilegije unose eksplicitno/ručno."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Grupe kojima ovaj korisnik pripada. Korisnik će imati sve privilegije grupa "
-"kojima pripada."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "privilegije korisnika"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr ""
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "korisničko ime"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Unesite ispravno korisničko ime."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obavezan unos. 30 alfanumeričkih znakova ili manje. Samo slova, brojevi i "
+"@/./+/-/_ znakovi."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Korisnik sa navedenim imenom već postoji."
+
 msgid "first name"
 msgstr "ime"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "prezime"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-mail adresa"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "status osoblja"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Određuje može li se korisnik prijaviti na ove stranice administracije."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktivan"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -275,55 +207,39 @@ msgstr ""
 "Određuje treba li se ovaj korisnik tretirati kao aktivan korisnik. Koristite "
 "ovu opciju umjesto brisanja korisničkih računa."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "datum učlanjenja"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "korisnik"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "korisnici"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Resetiranje lozinke na %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Unesite ispravnu e-mail adresu."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Niste logirani"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr ""
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
+msgid "Password reset sent"
 msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr ""
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr ""
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr ""
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr ""

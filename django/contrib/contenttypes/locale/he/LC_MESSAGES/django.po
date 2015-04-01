@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 14:16+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +18,26 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "סוגי תוכן"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "שם ה־class של מודל פייתון"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "סוג תוכן"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "סוגי תוכן"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "לא משוייך מודל לאובייקט מסוג התוכן  %(ct_id)s"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "אובייקט %(obj_id)s מסוג תוכן %(ct_id)s אינו קיים"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "אובייקטי %(ct_name)s אינם כוללים מתודת get_absolute_url()"

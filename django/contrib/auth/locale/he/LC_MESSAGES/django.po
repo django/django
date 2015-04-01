@@ -3,13 +3,13 @@
 # Translators:
 # Alex Gaynor <alex.gaynor@gmail.com>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012-2014
+# Meir Kriheli <mkriheli@gmail.com>, 2012-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 11:05+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-21 19:42+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
@@ -19,77 +19,47 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "מידע אישי"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "הרשאות"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "תאריכים חשובים"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "הפריט %(name)s עם המפתח הראשי %(key)r אינו קיים."
+
 msgid "Password changed successfully."
 msgstr "הסיסמה שונתה בהצלחה."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "שינוי סיסמה: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "אימות והרשאות"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "לא נקבעה סיסמה."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "תחביר סיסמה בלתי-חוקי או אלגוריתם גיבוב לא ידוע."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "משתמש עם שם משתמש זה קיים כבר"
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "שני שדות הסיסמה אינם זהים."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "שם משתמש"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ בלבד."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "סיסמה"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "אימות סיסמה"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "יש להזין את אותה סיסמה שוב,לאימות."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -98,7 +68,6 @@ msgstr ""
 "הסיסמאות אינן נשמרות באופן חשוף, כך שאין דרך לראות את סיסמת המשתמש, ניתן "
 "לשנות את הסיסמה בעזרת  <a href=\"password/\">טופס זה</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -107,156 +76,124 @@ msgstr ""
 "נא להזין  %(username)s וסיסמה נכונים. נא לשים לב כי שני השדות רגישים לאותיות "
 "גדולות/קטנות."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "חשבון זה אינו פעיל."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "דוא\"ל"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "סיסמה חדשה"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "אימות סיסמה חדשה"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "סיסמתך הישנה הוזנה בצורה שגויה. נא להזינה שוב."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "סיסמה ישנה"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "סיסמה (שוב)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "אלגוריתם"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "חזרות"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "גיבוב"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "work factor"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "סיכום ביקורת"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "שם"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "שם קוד"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "הרשאה"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "הרשאות"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "קבוצה"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "קבוצות"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "סיסמה"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "כניסה אחרונה"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "סטטוס משתמש על"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "מציין שלמשתמש זה יש את כל ההרשאות ללא הצורך המפורש בהענקתן."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"הקבוצות שמשתמש זה שייך אליהן. משתמש יקבל את כל ההרשאות המוקצות לקבוצה שלו/"
-"שלה."
+"הקבוצות שמשתמש זה שייך אליהן. משתמש יקבל את כל ההרשאות המוקצות לכל אחת "
+"מהקבוצות שלו/שלה."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "הרשאות משתמש"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "הרשאות ספציפיות למשתמש זה."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "שם משתמש"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "נא להזין שם משתמש חוקי."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "שדה חובה. 30 תווים או פחות. אותיות, ספרות ו-@/./+/-/_ בלבד."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"יש להזין שם משתמש חוקי. ערך זה יכול להכיל אותיות, ספרות והתווים @/./+/-/_ "
+"בלבד."
+
+msgid "A user with that username already exists."
+msgstr "משתמש עם שם משתמש זה קיים כבר"
+
 msgid "first name"
 msgstr "שם פרטי"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "שם משפחה"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "כתובת דוא\"ל"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "סטטוס איש צוות"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "מציין האם המשתמש יכול להתחבר לאתר הניהול."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "פעיל"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -264,55 +201,39 @@ msgstr ""
 "מציין האם יש להתייחס למשתמש כפעיל. יש לבטל בחירה זו במקום למחוק חשבונות "
 "משתמשים."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "תאריך הצטרפות"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "משתמש"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "משתמשים"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "החלפת הסיסמה ב-%(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "נא להזין כתובת דואר אלקטרוני חוקית."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "יצאת מהמערכת"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "איפוס סיסמה"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "הסיסמה אופסה בהצלחה"
+msgid "Password reset sent"
+msgstr "איפוס הסיסמה נשלח."
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "הזנת סיסמה חדשה"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "איפוס הסיסמה נכשל"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "איפוס הסיסמה הושלם"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "שינוי סיסמה"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "הסיסמה שונתה בהצלחה"

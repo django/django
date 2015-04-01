@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jirka Vejrazka <Jirka.Vejrazka@gmail.com>, 2011
-# Vlada Macek <macek@sandbox.cz>, 2012,2014
+# Vláďa Macek <macek@sandbox.cz>, 2012,2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-23 09:13+0000\n"
-"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "Dostupné položky: %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -33,41 +31,33 @@ msgstr ""
 "Seznam dostupných položek %s. Jednotlivě je lze vybrat tak, že na ně v "
 "rámečku klepnete a pak klepnete na šipku \"Vybrat\" mezi rámečky."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 "Chcete-li filtrovat ze seznamu dostupných položek %s, začněte psát do tohoto "
 "pole."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Filtr"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Vybrat vše"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Chcete-li najednou vybrat všechny položky %s, klepněte sem."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Vybrat"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Odebrat"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Vybrané položky %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -75,25 +65,19 @@ msgstr ""
 "Seznam vybraných položek %s. Jednotlivě je lze odebrat tak, že na ně v "
 "rámečku klepnete a pak klepnete na šipku \"Odebrat mezi rámečky."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Odebrat vše"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Chcete-li najednou odebrat všechny vybrané položky %s, klepněte sem."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "Vybrána je %(sel)s položka z celkem %(cnt)s."
 msgstr[1] "Vybrány jsou %(sel)s položky z celkem %(cnt)s."
 msgstr[2] "Vybraných je %(sel)s položek z celkem %(cnt)s."
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -101,8 +85,6 @@ msgstr ""
 "V jednotlivých polích jsou neuložené změny, které budou ztraceny, pokud "
 "operaci provedete."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -111,8 +93,6 @@ msgstr ""
 "Byla vybrána operace, ale dosud nedošlo k uložení změn jednotlivých polí. "
 "Uložíte klepnutím na tlačítko OK. Pak bude třeba operaci spustit znovu."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -121,70 +101,53 @@ msgstr ""
 "Byla vybrána operace a jednotlivá pole nejsou změněná. Patrně hledáte "
 "tlačítko Provést spíše než Uložit."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Poznámka: Váš čas o %s hodinu předstihuje čas na serveru."
 msgstr[1] "Poznámka: Váš čas o %s hodiny předstihuje čas na serveru."
 msgstr[2] "Poznámka: Váš čas o %s hodin předstihuje čas na serveru."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Poznámka: Váš čas se o %s hodinu zpožďuje za časem na serveru."
 msgstr[1] "Poznámka: Váš čas se o %s hodiny zpožďuje za časem na serveru."
 msgstr[2] "Poznámka: Váš čas se o %s hodin zpožďuje za časem na serveru."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "Nyní"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "Hodiny"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "Vyberte čas"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "Půlnoc"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "6h ráno"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "Poledne"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "Storno"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "Dnes"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "Kalendář"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "Včera"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "Zítra"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -192,17 +155,11 @@ msgstr ""
 "leden únor březen duben květen červen červenec srpen září říjen listopad "
 "prosinec"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "n p ú s č p s"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Zobrazit"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Skrýt"

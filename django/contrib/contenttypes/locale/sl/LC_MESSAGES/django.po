@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
@@ -19,33 +19,26 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
 "%100==4 ? 2 : 3);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr ""
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "ime razreda modela python"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "vrsta vsebine"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "vrste vsebine"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Predmet vrste vsebine %(ct_id)s nima določenega povezanega modela"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Predmet %(obj_id)s vrste %(ct_id)s ne obstaja"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Predmeti vrste %(ct_name)s nimajo določila get_absolute_url()"

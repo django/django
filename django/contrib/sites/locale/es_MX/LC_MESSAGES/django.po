@@ -3,13 +3,14 @@
 # Translators:
 # Abraham Estrada <abraham.estrada@gmail.com>, 2011
 # Carlos  Castro <carmoicast@gmail.com>, 2011
+# zodman <zodman@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-26 18:31+0000\n"
+"Last-Translator: zodman <zodman@gmail.com>\n"
 "Language-Team: Spanish (Mexico) (http://www.transifex.com/projects/p/django/"
 "language/es_MX/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +19,20 @@ msgstr ""
 "Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
-msgstr ""
+msgstr "Sitios"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
-msgstr ""
+msgstr "El nombre de dominio no puede contener espacios o tabulaciones."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "nombre del dominio"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "nombre visible"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "sitio"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "sitios"

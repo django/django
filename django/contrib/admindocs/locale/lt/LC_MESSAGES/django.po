@@ -4,15 +4,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kostas <tamosiunas@gmail.com>, 2014
 # lauris <lauris@runbox.com>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 # Povilas Balzaravičius <pavvka@gmail.com>, 2014
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:38+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-12 14:58+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -22,49 +23,21 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "Administravimo dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
-#: contrib/admindocs/templates/admin_doc/index.html:6
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
-#: contrib/admindocs/templates/admin_doc/model_detail.html:14
-#: contrib/admindocs/templates/admin_doc/model_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_detail.html:6
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
-#: contrib/admindocs/templates/admin_doc/view_detail.html:6
-#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Pradinis"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:10
-#: contrib/admindocs/templates/admin_doc/index.html:14
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
-#: contrib/admindocs/templates/admin_doc/model_detail.html:15
-#: contrib/admindocs/templates/admin_doc/model_index.html:9
-#: contrib/admindocs/templates/admin_doc/template_detail.html:7
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
-#: contrib/admindocs/templates/admin_doc/view_detail.html:7
-#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "Greitosios žymės"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Doumentacijos greitosios žymės"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -85,11 +58,9 @@ msgstr ""
 "(pasitarkite su administratorium, jei nežinai ar tavo kompiuteris yra "
 "vidinis).</p>\n"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Šio puslapio dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -97,311 +68,248 @@ msgstr ""
 "Pereina iš bet kurio puslapio į jo view funkcijos dokumentaciją, kuri "
 "sukūria tą puslapį"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Parodyti objekto ID"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "Parodyti content-type ir unikalų puslapių ID, kuris parodo vieną objektą."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Redaguoti šį objektą (einamajame lange)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "Pereina į administravimo puslapį, kuris parodo vieną objektą."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Redaguoti šį objektą (naujame lange)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Kaip ir viršuje, bet administravimo puslapį atidaro naujame lange."
 
-#: contrib/admindocs/templates/admin_doc/index.html:17
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr "Gairės"
+msgstr "Žymenos"
 
-#: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Sąrašas visų šablono žymenų ir jų funkcijų."
 
-#: contrib/admindocs/templates/admin_doc/index.html:20
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Filtrai"
 
-#: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
 msgstr ""
+"Filtrai yra veiksmai, kurie gali būti pritaikyti šablono kintamiesiems, kad "
+"pakeisti jų išvestį."
 
-#: contrib/admindocs/templates/admin_doc/index.html:23
-#: contrib/admindocs/templates/admin_doc/model_detail.html:16
-#: contrib/admindocs/templates/admin_doc/model_index.html:10
-#: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "Modeliai"
 
-#: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
+"Modeliai yra visų sistemos objektų ir su jais susijusių laukų apibūdinimai. "
+"Kiekvienas modelis turi sąrašą laukų, kuriuos galima pasiekti kaip šablono "
+"kintamuosius."
 
-#: contrib/admindocs/templates/admin_doc/index.html:26
-#: contrib/admindocs/templates/admin_doc/view_detail.html:8
-#: contrib/admindocs/templates/admin_doc/view_index.html:9
-#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
 msgstr "Rodiniai"
 
-#: contrib/admindocs/templates/admin_doc/index.html:27
 msgid ""
 "Each page on the public site is generated by a view. The view defines which "
 "template is used to generate the page and which objects are available to "
 "that template."
 msgstr ""
+"Kiekvienas puslapis viešame tinklalapyje sugeneruojamas pagal rodmenis. "
+"Rodmuo apibūdina kuris šablonas yra naudojamas generuojant puslapį ir kurie "
+"objektai yra suteikiami tam šablonui."
 
-#: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
+"Įrankiai Jūsų naršyklėi, kad greitai pasiektumėte administravimo "
+"funkcionalumą."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
 msgstr "Įdiekite docutils"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
+"Administravimo dokumentacijos sistema reikalauja Python'o bibliotekos <a "
+"href=\"%(link)s\">docutils</a>."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
 msgstr ""
+"Prašykite kad administratorius įdiegtų <a href=\"%(link)s\">docutils</a>."
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Modelis: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:35
 msgid "Field"
-msgstr ""
+msgstr "Laukas"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
-msgstr ""
+msgstr "Tipas"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
-msgstr ""
+msgstr "Aprašymas"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "Grįžti į modelio dokumentaciją"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
-msgstr ""
+msgstr "Modelio dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
-msgstr ""
+msgstr "Modelio grupės"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Šablonai"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Šablonas: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Šablonas: \"%(name)s\""
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
-msgstr ""
+msgstr "Ieškoti kelio šablonui \"%(name)s\":"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
-msgstr ""
+msgstr "(neegzistuoja)"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Grįžti į dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
-msgstr ""
+msgstr "Šablono filtrai"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
-msgstr ""
+msgstr "Šablono filtro dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
-msgstr ""
+msgstr "Standartiniai filtrai"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
 "using the filter."
 msgstr ""
+"Kad panaudoti šiuos filtrus, prieš naudojant filtrą šablone įveskite <code>"
+"%(code)s</code>."
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
-msgstr ""
+msgstr "Šablono žymenos"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
-msgstr ""
+msgstr "Šablono žymenos dokumentacija"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
-msgstr ""
+msgstr "Standartinės žymenos"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
 "the tag."
 msgstr ""
+"Kad panaudoti šias žymenas, prieš naudojant žymeną šablone įveskite <code>"
+"%(code)s</code>."
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
-msgstr ""
+msgstr "Rodinys: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
-msgstr ""
+msgstr "Konstekstas:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
-msgstr ""
+msgstr "Šablonai:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
-msgstr ""
+msgstr "Grįžti į rodinių dokumentaciją"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
-msgstr ""
+msgstr "Žiūrėti dokumentaciją"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Eiti į vardų plotmę"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
-msgstr ""
+msgstr "Tuščia vardų plotmė"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
-msgstr ""
+msgstr "Rodiniai pagal vardų plotmes %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
-msgstr ""
+msgstr "Rodiniai pagal tuščias vardų plotmes."
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
 msgid ""
 "\n"
 "    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
 "code>.\n"
 msgstr ""
+"\n"
+"Rodinio funkcija: <code>%(full_name)s</code>. Pavadinimas: <code>"
+"%(url_name)s</code>.\n"
 
-#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
 msgstr "Loginė reikšmė (True arba False)"
 
-#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Lauko tipas: %(field_type)s "
 
-#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
-#: contrib/admindocs/views.py:80
 msgid "tag:"
 msgstr "žymė:"
 
-#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
-#: contrib/admindocs/views.py:113
 msgid "filter:"
 msgstr "filtras:"
 
-#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
-#: contrib/admindocs/views.py:164
 msgid "view:"
 msgstr "vaizdas:"
 
-#: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
-msgstr ""
+msgstr "%(app_label)r aplikacija nerasta"
 
-#: contrib/admindocs/views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Modelis %(model_name)r programoje %(app_label)r nerastas"
 
-#: contrib/admindocs/views.py:208
+msgid "model:"
+msgstr "modelis:"
+
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "susijęs `%(app_label)s.%(data_type)s` objektas"
 
-#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
-#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
-msgid "model:"
-msgstr "modelis:"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "susiję`%(app_label)s.%(object_name)s` objektai"
 
-#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
 #, python-format
 msgid "all %s"
 msgstr "visi %s"
 
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
 #, python-format
 msgid "number of %s"
 msgstr "%s skaičius"
 
-#. Translators: %s is an object type name
-#: contrib/admindocs/views.py:275
-#, python-format
-msgid "Attributes on %s objects"
-msgstr "Objektų %s atributai"
-
-#: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s neatrodo kaip urlpattern objektas"

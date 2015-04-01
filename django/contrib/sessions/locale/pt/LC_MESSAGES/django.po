@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-04 09:05+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
 "language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +18,20 @@ msgstr ""
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
 msgstr "Sessões"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "chave da sessão"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "dados da sessão"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "data de expiração"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "sessão"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "sessões"

@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:18+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
@@ -17,68 +17,51 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "U fshinë me sukses %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "S'mund të fshijë %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Jeni i sigurt?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Fshiji %(verbose_name_plural)s e përzgjdhur"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Administrim"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Krejt"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Po"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Jo"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "E panjohur"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Çfarëdo date"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Sot"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "7 ditët e shkuara"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Këtë muaj"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Këtë vit"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -88,98 +71,80 @@ msgstr ""
 "ekipi. Kini parasysh se që të dyja fushat mund të jenë të ndjeshme ndaj "
 "shkrimit me shkronja të mëdha ose të vogla."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Veprim:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "kohë veprimi"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "id objekti"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr ""
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "shenjë veprimi"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "mesazh ndryshimi"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "zë regjistrimi"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "zëra regjistrimi"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "U shtua \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "U ndryshua \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "U fshi \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
-msgstr ""
+msgstr "Objekt LogEntry"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Asnjë"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
 #, python-format
 msgid "Changed %s."
 msgstr "Ndryshoi %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr " dhe "
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "U shtua %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "U ndryshua %(list)s për %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "U fshi %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Nuk u ndryshuan fusha."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund ta përpunoni sërish më poshtë."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -188,12 +153,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund të shtoni një tjetër %(name)s  "
 "më poshtë."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" u shtua me sukses."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -201,7 +164,6 @@ msgid ""
 msgstr ""
 "%(name)s \"%(obj)s\" u shtua me sukses. Mund ta përpunoni sërish më poshtë."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -210,12 +172,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" u ndryshua me sukses. Mund të shtoni një tjetër "
 "%(name)s më poshtë."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" u ndryshua me sukses."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -223,66 +183,54 @@ msgstr ""
 "Duhen përzgjedhur objekte që të kryhen veprime mbi ta. Nuk u ndryshua ndonjë "
 "objekt."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Pa përzgjedhje veprimi."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" u fshi me sukses."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Objekti %(name)s me kyç parësor %(key)r nuk ekziston."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Shtoni %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Ndrysho %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Gabimi baze të dhënash"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s u ndryshua me sukses."
 msgstr[1] "%(count)s %(name)s u ndryshuan me sukses."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s të përzgjedhur"
 msgstr[1] "Krejt %(total_count)s të përzgjedhurat"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 nga %(cnt)s të përzgjedhur"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Ndryshoni historikun: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
-msgstr ""
+msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -291,71 +239,40 @@ msgstr ""
 "Fshirja e %(class_name)s %(instance)s do të lypte fshirjen e objekteve "
 "vijuese të mbrojtura që kanë lidhje me ta: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Përgjegjësi i site-it Django"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Administrim i Django-s"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Administrim site-i"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Hyni"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "Administrim %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Nuk u gjet faqe"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Na ndjeni, por faqja e kërkuar nuk gjendet dot."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Hyrje"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Gabim shërbyesi"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Gabim shërbyesi (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Gabim Shërbyesi <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -363,28 +280,22 @@ msgstr ""
 "Pati një gabim. Iu është njoftuar përgjegjësve të site-it përmes email-it "
 "dhe do të duhej të ndreqej shpejt. Faleminderit për durimin."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Xhironi veprimin e përzgjedhur"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Shko tek"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Klikoni këtu që të përzgjidhni objektet nëpër krejt faqet"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Përzgjidhni krejt %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Pastroje përzgjedhjen"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -392,113 +303,64 @@ msgstr ""
 "Së pari, jepni një emër përdoruesi dhe fjalëkalim. Mandej, do të jeni në "
 "gjendje të përpunoni më tepër mundësi përdoruesi."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Jepni emër përdoruesi dhe fjalëkalim."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
-msgstr "Ju lutem, ndreqini gabimet e mëposhtme."
+msgstr "Ju lutemi, ndreqini gabimet e mëposhtme."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Ju lutemi, ndreqni gabimet më poshtë."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Jepni një fjalëkalim të ri për përdoruesin <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Fjalëkalim"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Fjalëkalim (sërish)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Mirë se vini,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr ""
+
 msgid "Documentation"
 msgstr "Dokumentim"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Dilni"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Shtoni"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Historik"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Shiheni në site"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Shto %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtër"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Hiqe prej renditjeje"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Përparësi renditjesh: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Këmbe renditjen"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Fshije"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -509,7 +371,6 @@ msgstr ""
 "objekteve të lidhur me të, por llogaria juaj nuk ka leje për fshirje të "
 "objekteve të llojeve të mëposhtëm:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -518,7 +379,6 @@ msgstr ""
 "Fshirja e %(object_name)s '%(escaped_object)s' do të kërkonte fshirjen e "
 "objekteve vijues, të mbrojtur, të lidhur me të:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -527,16 +387,18 @@ msgstr ""
 "Jeni i sigurt se doni të fshihet %(object_name)s \"%(escaped_object)s\"? "
 "Krejt objektet vijues të lidhur me të do të fshihen:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr ""
+
 msgid "Yes, I'm sure"
 msgstr "Po, jam i sigurt"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr ""
+
 msgid "Delete multiple objects"
 msgstr "Fshini disa objekte njëherësh"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -547,7 +409,6 @@ msgstr ""
 "objekteve të lidhur me të, por llogaria juaj nuk ka leje të fshijë llojet "
 "vijuese të objekteve:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -556,7 +417,6 @@ msgstr ""
 "Fshirja e %(objects_name)s të përzgjedhur do të kërkonte fshirjen e "
 "objekteve vijues, të mbrojtur, të lidhur me të:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -565,56 +425,45 @@ msgstr ""
 "Jeni i sigurt se doni të fshihen e %(objects_name)s përzgjedhur? Krejt "
 "objektet vijues dhe gjëra të lidhura me ta do të fshihen:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Ndryshoje"
+
 msgid "Remove"
 msgstr "Hiqe"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Shtoni një tjetër %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Të fshihet?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "Nga %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modele te zbatimi %(name)s"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Ndryshoje"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Nuk keni leje për të përpunuar ndonjë gjë."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Veprime Së Fundi"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Veprimet e Mia"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Asnjë i passhëm"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Lëndë e panjohur"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -624,27 +473,18 @@ msgstr ""
 "që janë krijuar tabelat e duhura të bazës së të dhënave, dhe që baza e të "
 "dhënave është e lexueshme nga përdoruesi i duhur."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Fjalëkalim:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Harruat fjalëkalimin ose emrin tuaj të përdoruesit?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Datë/kohë"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Përdorues"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Veprim"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -652,61 +492,58 @@ msgstr ""
 "Ky objekt nuk ka historik ndryshimesh. Ndoshta nuk qe shtuar përmes këtij "
 "site-i administrimi."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Shfaqi krejt"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Ruaje"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
 msgid "Search"
 msgstr "Kërko"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s përfundim"
 msgstr[1] "%(counter)s përfundime"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s gjithsej"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Ruaje si të ri"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Ruajeni dhe shtoni një tjetër"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Ruajeni dhe vazhdoni përpunimin"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Faleminderit që shpenzoni pak kohë të çmuar me site-in Web sot."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Hyni sërish"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Ndryshim fjalëkalimi"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Fjalëkalimi juaj u ndryshua."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -715,35 +552,19 @@ msgstr ""
 "jepni dy herë fjalëkalimin tuaj të ri, që kështu të mund të verifikojmë se e "
 "shtypët saktë."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Fjalëkalim i vjetër"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Fjalëkalim i ri"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Ndrysho fjalëkalimin tim"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Ricaktim fjalëkalimi"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 "Fjakalimi juaj u caktua. Mund të vazhdoni më tej dhe të bëni hyrjen tani."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Ripohim ricaktimi fjalëkalimi"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -751,15 +572,12 @@ msgstr ""
 "Ju lutem, jepeni fjalëkalimin tuaj dy herë, që kështu të mund të verifikojmë "
 "që e shtypët saktë."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Fjalëkalim i ri:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Ripohoni fjalëkalimin:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -767,15 +585,11 @@ msgstr ""
 "Lidhja për ricaktimin e fjalëkalimit qe e pavlefshme, ndoshta ngaqë është "
 "përdorur tashmë një herë. Ju lutem, kërkoni një ricaktim të ri fjalëkalimi."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Ju kemi dërguar me email udhëzime për caktimin e fjalëkalimit tuaj. Do të "
-"duhej t'ju vinin pas pak."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -784,7 +598,6 @@ msgstr ""
 "saktë me të cilën u regjistruat, dhe kontrolloni dosjen tuaj të mesazheve "
 "hedhurinë."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -793,24 +606,19 @@ msgstr ""
 "Këtë email po e merrni ngaqë kërkuat ricaktim fjalëkalimi për llogarinë tuaj "
 "si përdorues te %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Ju lutem, shkoni te faqja vijuese dhe zgjidhni një fjalëkalim të ri:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Emri juaj i përdoruesit, në rast se e keni harruar:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Faleminderit që përdorni site-in tonë!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Ekipi i %(site_name)s"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -818,52 +626,37 @@ msgstr ""
 "Harruat fjalëkalimin tuaj? Jepni më poshtë adresën tuaj email, dhe do t'ju "
 "dërgojmë udhëzimet për të caktuar një të ri."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Adresë email:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Ricakto fjalëkalimin tim"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Krejt datat"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Asnjë)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Përzgjidhni %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Përzgjidhni %s për ta ndryshuar"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Datë:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Kohë:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Kërkim"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Shtoni Një Tjetër"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Tani:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Ndryshim:"

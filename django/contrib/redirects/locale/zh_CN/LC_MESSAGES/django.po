@@ -17,30 +17,24 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:9
 msgid "redirect from"
 msgstr "重定向自"
 
-#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "应该是一个绝对路径，不包括域名。例如：'/events/search/'。"
 
-#: models.py:11
 msgid "redirect to"
 msgstr "重定向到"
 
-#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr "可以是绝对路径（同上）或以'http://'起始的全URL。"
 
-#: models.py:15
 msgid "redirect"
 msgstr "重定向"
 
-#: models.py:16
 msgid "redirects"
 msgstr "重定向"

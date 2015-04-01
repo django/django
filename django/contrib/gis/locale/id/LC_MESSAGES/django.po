@@ -2,14 +2,17 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# M Asep Indrayana <me@drayanaindra.com>, 2015
 # rodin <romihardiyanto@gmail.com>, 2011-2012
+# rodin <romihardiyanto@gmail.com>, 2015
+# Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-23 10:14+0000\n"
+"Last-Translator: M Asep Indrayana <me@drayanaindra.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -18,82 +21,66 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
-"Bidang dasar GIS disesuaikan berdasarkan OpenGIS Specification Geometry."
+msgstr "Bidang dasar GIS berdasarkan OpenGIS Specification Geometry."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Point"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Line string"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Polygon"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Multi-point"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Multi-line string"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Multi polygon"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geometry collection"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr ""
+
 msgid "No geometry value provided."
 msgstr "Nilai geometri tidak disediakan."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Nilai geometri salah."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Tipe geometri salah."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 "Galat terjadi saat mentransformasi geometri ke SRID bidang formulir geometri."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Tidak ada peta situs tersedia untuk bagian: %r"
+msgid "Delete all Features"
+msgstr "Hapus semua Fitur"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Laman %s kosong"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Tidak ada laman '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr "Map Google melalui GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "Tidak ada umpan terdaftar."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r tidak terdaftar."

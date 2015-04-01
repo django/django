@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Bashar Al-Abdulhadi, 2015
 # Bashar Al-Abdulhadi, 2014
 # Eyad Toma <d.eyad.t@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -8,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 13:23+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -20,80 +21,65 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "نظم المعلومات الجغرافية GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "حقل GIS الأساسي -- مُرتبط بنوع مواصفات OpenGIS الهندسية."
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "نقطة إحداثية"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "سطر تسلسل أحرف"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "مُضلّع إحداثي"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "نقاط إحداثية"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "تسلسل أحرف متعدد الأسطر"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "مجموعة مُضلعات إحداثية"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "مجموعة إحداثية"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "حقل مجموع التحصيل"
+
 msgid "No geometry value provided."
 msgstr "لم تُدخل أي أحداثيات."
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "الإحداثيات غير صحيحة."
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "نوع الإحداثيات غير صحيح."
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "حدث خطأ أثناء تحويل geometry إلى حقل SRID."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "لا يوجد خريطة موقع للقسم: %r "
+msgid "Delete all Features"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "الصفحة %s فارغة"
+msgid "WKT debugging window:"
+msgstr ""
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "لا يوجد صفحة بالإسم '%s'"
+msgid "Google Maps via GeoDjango"
+msgstr ""
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr ""
+
 msgid "No feeds are registered."
 msgstr "لا موجز مسجّل"
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Slug %r غير مسجّل"
