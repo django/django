@@ -266,6 +266,17 @@ class SerializersTestBase(object):
             obj.save()
         self.assertEqual(Category.objects.all().count(), 5)
 
+    def test_deterministic_mapping_ordering(self):
+        """Mapping such as fields should be deterministically ordered. (#24558)"""
+        output = serializers.serialize(self.serializer_name, [self.a1], indent=2)
+        categories = self.a1.categories.values_list('pk', flat=True)
+        self.assertEqual(output, self.mapping_ordering_str % {
+            'article_pk': self.a1.pk,
+            'author_pk': self.a1.author_id,
+            'first_category_pk': categories[0],
+            'second_category_pk': categories[1],
+        })
+
 
 class SerializersTransactionTestBase(object):
 
@@ -302,6 +313,15 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     <object model="serializers.category">
         <field type="CharField" name="name">Non-fiction</field>
     </object>
+</django-objects>"""
+    mapping_ordering_str = """<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+  <object model="serializers.article" pk="%(article_pk)s">
+    <field name="author" rel="ManyToOneRel" to="serializers.author">%(author_pk)s</field>
+    <field name="headline" type="CharField">Poker has no place on ESPN</field>
+    <field name="pub_date" type="DateTimeField">2006-06-16T11:00:00</field>
+    <field name="categories" rel="ManyToManyRel" to="serializers.category"><object pk="%(first_category_pk)s"></object><object pk="%(second_category_pk)s"></object></field>
+  </object>
 </django-objects>"""
 
     @staticmethod
@@ -373,6 +393,22 @@ class JsonSerializerTestCase(SerializersTestBase, TestCase):
         "model": "serializers.category",
         "fields": {"name": "Non-fiction"}
     }]"""
+    mapping_ordering_str = """[
+{
+  "model": "serializers.article",
+  "pk": %(article_pk)s,
+  "fields": {
+    "author": %(author_pk)s,
+    "headline": "Poker has no place on ESPN",
+    "pub_date": "2006-06-16T11:00:00",
+    "categories": [
+      %(first_category_pk)s,
+      %(second_category_pk)s
+    ]
+  }
+}
+]
+"""
 
     @staticmethod
     def _validate_output(serial_str):
@@ -532,6 +568,15 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
 - fields:
     name: Non-fiction
   model: serializers.category"""
+
+    mapping_ordering_str = """- model: serializers.article
+  pk: %(article_pk)s
+  fields:
+    author: %(author_pk)s
+    headline: Poker has no place on ESPN
+    pub_date: 2006-06-16 11:00:00
+    categories: [%(first_category_pk)s, %(second_category_pk)s]
+"""
 
     @staticmethod
     def _validate_output(serial_str):

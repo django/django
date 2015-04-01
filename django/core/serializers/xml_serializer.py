@@ -4,6 +4,7 @@ XML serializer.
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -49,7 +50,7 @@ class Serializer(base.Serializer):
             raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
 
         self.indent(1)
-        attrs = {"model": smart_text(obj._meta)}
+        attrs = OrderedDict([("model", smart_text(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             obj_pk = obj._get_pk_val()
             if obj_pk is not None:
@@ -70,10 +71,10 @@ class Serializer(base.Serializer):
         ManyToManyFields)
         """
         self.indent(2)
-        self.xml.startElement("field", {
-            "name": field.name,
-            "type": field.get_internal_type()
-        })
+        self.xml.startElement("field", OrderedDict([
+            ("name", field.name),
+            ("type", field.get_internal_type()),
+        ]))
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
@@ -140,11 +141,11 @@ class Serializer(base.Serializer):
         Helper to output the <field> element for relational fields
         """
         self.indent(2)
-        self.xml.startElement("field", {
-            "name": field.name,
-            "rel": field.remote_field.__class__.__name__,
-            "to": smart_text(field.remote_field.model._meta),
-        })
+        self.xml.startElement("field", OrderedDict([
+            ("name", field.name),
+            ("rel", field.remote_field.__class__.__name__),
+            ("to", smart_text(field.remote_field.model._meta)),
+        ]))
 
 
 class Deserializer(base.Deserializer):

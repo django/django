@@ -5,6 +5,8 @@ other serializers.
 """
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django.apps import apps
 from django.conf import settings
 from django.core.serializers import base
@@ -28,20 +30,17 @@ class Serializer(base.Serializer):
         pass
 
     def start_object(self, obj):
-        self._current = {}
+        self._current = OrderedDict()
 
     def end_object(self, obj):
         self.objects.append(self.get_dump_object(obj))
         self._current = None
 
     def get_dump_object(self, obj):
-        data = {
-            "model": force_text(obj._meta),
-            "fields": self._current,
-        }
+        data = OrderedDict([('model', force_text(obj._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
-
+        data['fields'] = self._current
         return data
 
     def handle_field(self, obj, field):
