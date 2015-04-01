@@ -17,7 +17,7 @@ from django.core.management.utils import (
 )
 from django.utils import six
 from django.utils._os import upath
-from django.utils.encoding import force_str
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
 from django.utils.functional import cached_property, total_ordering
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
@@ -38,14 +38,13 @@ def gettext_popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding="u
     Makes sure text obtained from stdout of gettext utilities is Unicode.
     """
     stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type)
-    preferred_encoding = locale.getpreferredencoding(False)
-    if os.name == 'nt' and six.PY3 and stdout_encoding != preferred_encoding:
+    if os.name == 'nt' and six.PY3 and stdout_encoding != DEFAULT_LOCALE_ENCODING:
         # This looks weird because it's undoing what
         # subprocess.Popen(universal_newlines=True).communicate()
         # does when capturing PO files contents from stdout of gettext command
         # line programs. No need to do anything on Python 2 because it's
         # already a byte-string there (#23271).
-        stdout = stdout.encode(preferred_encoding).decode(stdout_encoding)
+        stdout = stdout.encode(DEFAULT_LOCALE_ENCODING).decode(stdout_encoding)
     if six.PY2:
         stdout = stdout.decode(stdout_encoding)
     return stdout, stderr, status_code
@@ -332,7 +331,7 @@ class Command(BaseCommand):
         # when looking up the version. It's especially a problem on Windows.
         out, err, status = gettext_popen_wrapper(
             ['xgettext', '--version'],
-            stdout_encoding=locale.getpreferredencoding(False),
+            stdout_encoding=DEFAULT_LOCALE_ENCODING,
         )
         m = re.search(r'(\d+)\.(\d+)\.?(\d+)?', out)
         if m:
