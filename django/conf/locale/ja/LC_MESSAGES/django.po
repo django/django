@@ -2,15 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012-2014
+# Shinya Okano <tokibito@gmail.com>, 2012-2015
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-23 14:10+0200\n"
-"PO-Revision-Date: 2014-08-24 08:52+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-29 08:50+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -19,413 +19,315 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: conf/global_settings.py:51
 msgid "Afrikaans"
 msgstr "アフリカーンス語"
 
-#: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "アラビア語"
 
-#: conf/global_settings.py:53
 msgid "Asturian"
-msgstr ""
+msgstr "アストゥリアス語"
 
-#: conf/global_settings.py:53
 msgid "Azerbaijani"
 msgstr "アゼルバイジャン語"
 
-#: conf/global_settings.py:54
 msgid "Bulgarian"
 msgstr "ブルガリア語"
 
-#: conf/global_settings.py:55
 msgid "Belarusian"
 msgstr "ベラルーシ語"
 
-#: conf/global_settings.py:56
 msgid "Bengali"
 msgstr "ベンガル語"
 
-#: conf/global_settings.py:57
 msgid "Breton"
 msgstr "ブルトン語"
 
-#: conf/global_settings.py:58
 msgid "Bosnian"
 msgstr "ボスニア語"
 
-#: conf/global_settings.py:59
 msgid "Catalan"
 msgstr "カタロニア語"
 
-#: conf/global_settings.py:60
 msgid "Czech"
 msgstr "チェコ語"
 
-#: conf/global_settings.py:61
 msgid "Welsh"
 msgstr "ウェールズ語"
 
-#: conf/global_settings.py:62
 msgid "Danish"
 msgstr "デンマーク語"
 
-#: conf/global_settings.py:63
 msgid "German"
 msgstr "ドイツ語"
 
-#: conf/global_settings.py:64
 msgid "Greek"
 msgstr "ギリシャ語"
 
-#: conf/global_settings.py:65
 msgid "English"
 msgstr "英語(米国)"
 
-#: conf/global_settings.py:66
 msgid "Australian English"
 msgstr "英語(オーストラリア)"
 
-#: conf/global_settings.py:67
 msgid "British English"
 msgstr "英語(英国)"
 
-#: conf/global_settings.py:68
 msgid "Esperanto"
 msgstr "エスペラント語"
 
-#: conf/global_settings.py:69
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: conf/global_settings.py:70
 msgid "Argentinian Spanish"
 msgstr "アルゼンチンスペイン語"
 
-#: conf/global_settings.py:71
 msgid "Mexican Spanish"
 msgstr "メキシコスペイン語"
 
-#: conf/global_settings.py:72
 msgid "Nicaraguan Spanish"
 msgstr "ニカラグアスペイン語"
 
-#: conf/global_settings.py:73
 msgid "Venezuelan Spanish"
 msgstr "ベネズエラスペイン語"
 
-#: conf/global_settings.py:74
 msgid "Estonian"
 msgstr "エストニア語"
 
-#: conf/global_settings.py:75
 msgid "Basque"
 msgstr "バスク語"
 
-#: conf/global_settings.py:76
 msgid "Persian"
 msgstr "ペルシア語"
 
-#: conf/global_settings.py:77
 msgid "Finnish"
 msgstr "フィンランド語"
 
-#: conf/global_settings.py:78
 msgid "French"
 msgstr "フランス語"
 
-#: conf/global_settings.py:79
 msgid "Frisian"
 msgstr "フリジア語"
 
-#: conf/global_settings.py:80
 msgid "Irish"
 msgstr "アイルランド語"
 
-#: conf/global_settings.py:81
 msgid "Galician"
 msgstr "ガリシア語"
 
-#: conf/global_settings.py:82
 msgid "Hebrew"
 msgstr "ヘブライ語"
 
-#: conf/global_settings.py:83
 msgid "Hindi"
 msgstr "ヒンディー語"
 
-#: conf/global_settings.py:84
 msgid "Croatian"
 msgstr "クロアチア語"
 
-#: conf/global_settings.py:85
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
-#: conf/global_settings.py:86
 msgid "Interlingua"
 msgstr "インターリングア"
 
-#: conf/global_settings.py:87
 msgid "Indonesian"
 msgstr "インドネシア語"
 
-#: conf/global_settings.py:88
 msgid "Ido"
-msgstr ""
+msgstr "イド語"
 
-#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "アイスランド語"
 
-#: conf/global_settings.py:89
 msgid "Italian"
 msgstr "イタリア語"
 
-#: conf/global_settings.py:90
 msgid "Japanese"
 msgstr "日本語"
 
-#: conf/global_settings.py:91
 msgid "Georgian"
 msgstr "グルジア語"
 
-#: conf/global_settings.py:92
 msgid "Kazakh"
 msgstr "カザフ語"
 
-#: conf/global_settings.py:93
 msgid "Khmer"
 msgstr "クメール語"
 
-#: conf/global_settings.py:94
 msgid "Kannada"
 msgstr "カンナダ語"
 
-#: conf/global_settings.py:95
 msgid "Korean"
 msgstr "韓国語"
 
-#: conf/global_settings.py:96
 msgid "Luxembourgish"
 msgstr "ルクセンブルグ語"
 
-#: conf/global_settings.py:97
 msgid "Lithuanian"
 msgstr "リトアニア語"
 
-#: conf/global_settings.py:98
 msgid "Latvian"
 msgstr "ラトビア語"
 
-#: conf/global_settings.py:99
 msgid "Macedonian"
 msgstr "マケドニア語"
 
-#: conf/global_settings.py:100
 msgid "Malayalam"
 msgstr "マラヤーラム語"
 
-#: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "モンゴル語"
 
-#: conf/global_settings.py:102
 msgid "Marathi"
-msgstr ""
+msgstr "マラーティー語"
 
-#: conf/global_settings.py:102
 msgid "Burmese"
 msgstr "ビルマ語"
 
-#: conf/global_settings.py:103
 msgid "Norwegian Bokmal"
 msgstr "ノルウェーのブークモール"
 
-#: conf/global_settings.py:104
 msgid "Nepali"
 msgstr "ネパール語"
 
-#: conf/global_settings.py:105
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: conf/global_settings.py:106
 msgid "Norwegian Nynorsk"
 msgstr "ノルウェーのニーノシュク"
 
-#: conf/global_settings.py:107
 msgid "Ossetic"
 msgstr "オセット語"
 
-#: conf/global_settings.py:108
 msgid "Punjabi"
 msgstr "パンジャブ語"
 
-#: conf/global_settings.py:109
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: conf/global_settings.py:110
 msgid "Portuguese"
 msgstr "ポルトガル語"
 
-#: conf/global_settings.py:111
 msgid "Brazilian Portuguese"
 msgstr "ブラジルポルトガル語"
 
-#: conf/global_settings.py:112
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: conf/global_settings.py:113
 msgid "Russian"
 msgstr "ロシア語"
 
-#: conf/global_settings.py:114
 msgid "Slovak"
 msgstr "スロバキア語"
 
-#: conf/global_settings.py:115
 msgid "Slovenian"
 msgstr "スロヴェニア語"
 
-#: conf/global_settings.py:116
 msgid "Albanian"
 msgstr "アルバニア語"
 
-#: conf/global_settings.py:117
 msgid "Serbian"
 msgstr "セルビア語"
 
-#: conf/global_settings.py:118
 msgid "Serbian Latin"
 msgstr "セルビア語ラテン文字"
 
-#: conf/global_settings.py:119
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: conf/global_settings.py:120
 msgid "Swahili"
 msgstr "スワヒリ語"
 
-#: conf/global_settings.py:121
 msgid "Tamil"
 msgstr "タミル語"
 
-#: conf/global_settings.py:122
 msgid "Telugu"
 msgstr "テルグ語"
 
-#: conf/global_settings.py:123
 msgid "Thai"
 msgstr "タイ語"
 
-#: conf/global_settings.py:124
 msgid "Turkish"
 msgstr "トルコ語"
 
-#: conf/global_settings.py:125
 msgid "Tatar"
 msgstr "タタール語"
 
-#: conf/global_settings.py:126
 msgid "Udmurt"
 msgstr "ウドムルト語"
 
-#: conf/global_settings.py:127
 msgid "Ukrainian"
 msgstr "ウクライナ語"
 
-#: conf/global_settings.py:128
 msgid "Urdu"
 msgstr "ウルドゥー語"
 
-#: conf/global_settings.py:129
 msgid "Vietnamese"
 msgstr "ベトナム語"
 
-#: conf/global_settings.py:130 conf/global_settings.py:131
 msgid "Simplified Chinese"
 msgstr "簡体字中国語"
 
-#: conf/global_settings.py:132 conf/global_settings.py:133
 msgid "Traditional Chinese"
 msgstr "繁体字中国語"
 
-#: contrib/sitemaps/apps.py:8
+msgid "Messages"
+msgstr "メッセージ"
+
 msgid "Site Maps"
 msgstr "サイトマップ"
 
-#: contrib/staticfiles/apps.py:8
 msgid "Static Files"
 msgstr "静的ファイル"
 
-#: contrib/syndication/apps.py:8
 msgid "Syndication"
 msgstr "シンジケーション"
 
-#: contrib/webdesign/apps.py:8
 msgid "Web Design"
 msgstr "ウェブデザイン"
 
-#: core/validators.py:21
 msgid "Enter a valid value."
 msgstr "値を正しく入力してください。"
 
-#: core/validators.py:77 forms/fields.py:675
 msgid "Enter a valid URL."
 msgstr "URLを正しく入力してください。"
 
-#: core/validators.py:115
 msgid "Enter a valid integer."
 msgstr "整数を正しく入力してください。"
 
-#: core/validators.py:120
 msgid "Enter a valid email address."
 msgstr "有効なメールアドレスを入力してください。"
 
-#: core/validators.py:185
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr "slug には半角の英数字、アンダースコア、ハイフン以外は使用できません。"
 
-#: core/validators.py:188 core/validators.py:207
 msgid "Enter a valid IPv4 address."
 msgstr "有効なIPアドレス (IPv4) を入力してください。"
 
-#: core/validators.py:193 core/validators.py:208
 msgid "Enter a valid IPv6 address."
 msgstr "IPv6の正しいアドレスを入力してください。"
 
-#: core/validators.py:203 core/validators.py:206
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "IPv4またはIPv6の正しいアドレスを入力してください。"
 
-#: core/validators.py:229 db/models/fields/__init__.py:1070
 msgid "Enter only digits separated by commas."
 msgstr "カンマ区切りの数字だけを入力してください。"
 
-#: core/validators.py:236
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 "この値は %(limit_value)s でなければなりません(実際には %(show_value)s でし"
 "た) 。"
 
-#: core/validators.py:255
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr "この値は %(limit_value)s 以下でなければなりません。"
 
-#: core/validators.py:262
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "この値は %(limit_value)s 以上でなければなりません。"
 
-#: core/validators.py:271
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -437,7 +339,6 @@ msgstr[0] ""
 "この値が少なくとも %(limit_value)d 文字以上であることを確認してください"
 "( %(show_value)d 文字になっています)。"
 
-#: core/validators.py:282
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -449,36 +350,29 @@ msgstr[0] ""
 "この値は %(limit_value)d 文字以下でなければなりません( %(show_value)d 文字に"
 "なっています)。"
 
-#: db/models/base.py:975 forms/models.py:718
 msgid "and"
 msgstr "と"
 
-#: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "この %(field_labels)s を持った %(model_name)s が既に存在します。"
 
-#: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r は有効な選択肢ではありません。"
 
-#: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
 msgstr "このフィールドには NULL を指定できません。"
 
-#: db/models/fields/__init__.py:106
 msgid "This field cannot be blank."
 msgstr "このフィールドは空ではいけません。"
 
-#: db/models/fields/__init__.py:107
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "この %(field_label)s を持った %(model_name)s が既に存在します。"
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
-#: db/models/fields/__init__.py:111
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -486,39 +380,31 @@ msgstr ""
 "%(date_field_label)s %(lookup_type)s では %(field_label)s がユニークである必"
 "要があります。"
 
-#: db/models/fields/__init__.py:116
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "タイプが %(field_type)s のフィールド"
 
-#: db/models/fields/__init__.py:847 db/models/fields/__init__.py:1573
 msgid "Integer"
 msgstr "整数"
 
-#: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr "'%(value)s' は整数値にしなければなりません。"
 
-#: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr "'%(value)s' は真偽値にしなければなりません。"
 
-#: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
 msgstr "ブール値 (真: True または偽: False)"
 
-#: db/models/fields/__init__.py:1004
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "文字列 ( %(max_length)s 字まで )"
 
-#: db/models/fields/__init__.py:1065
 msgid "Comma-separated integers"
 msgstr "カンマ区切りの整数"
 
-#: db/models/fields/__init__.py:1080
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
@@ -526,18 +412,15 @@ msgid ""
 msgstr ""
 "'%(value)s' は無効な日付形式です。YYYY-MM-DD形式にしなければなりません。"
 
-#: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr "'%(value)s' は有効な日付形式(YYYY-MM-DD)ですが、日付が不正です。"
 
-#: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
 msgstr "日付"
 
-#: db/models/fields/__init__.py:1187
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
@@ -546,7 +429,6 @@ msgstr ""
 "'%(value)s' は無効な形式の値です。 YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ] 形式で"
 "なければなりません。"
 
-#: db/models/fields/__init__.py:1191
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
@@ -555,79 +437,72 @@ msgstr ""
 "'%(value)s' は正しい形式(YYYY-MM-DD HH:MM[:ss[.uuuuuu]][TZ])の値ですが、無効"
 "な日時です。"
 
-#: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
 msgstr "日時"
 
-#: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
 msgstr "'%(value)s' は10進浮動小数値にしなければなりません。"
 
-#: db/models/fields/__init__.py:1299
 msgid "Decimal number"
 msgstr "10 進数 (小数可)"
 
-#: db/models/fields/__init__.py:1444
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"uuuuuu] format."
+msgstr ""
+"'%(value)s' は無効な形式の値です。 [DD] [HH:[MM:]]ss[.uuuuuu] 形式でなければ"
+"なりません。"
+
+msgid "Duration"
+msgstr "時間差分"
+
 msgid "Email address"
 msgstr "メールアドレス"
 
-#: db/models/fields/__init__.py:1470
 msgid "File path"
 msgstr "ファイルの場所"
 
-#: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
 msgstr "'%(value)s' は小数値にしなければなりません。"
 
-#: db/models/fields/__init__.py:1539
 msgid "Floating point number"
 msgstr "浮動小数点"
 
-#: db/models/fields/__init__.py:1623
 msgid "Big (8 byte) integer"
 msgstr "大きな(8バイト)整数"
 
-#: db/models/fields/__init__.py:1638
 msgid "IPv4 address"
 msgstr "IPv4アドレス"
 
-#: db/models/fields/__init__.py:1668
 msgid "IP address"
 msgstr "IP アドレス"
 
-#: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
 msgstr "'%(value)s' はNone、TrueまたはFalseの値でなければなりません。"
 
-#: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
 msgstr "ブール値 (真: True 、偽: False または None)"
 
-#: db/models/fields/__init__.py:1809
 msgid "Positive integer"
 msgstr "正の整数"
 
-#: db/models/fields/__init__.py:1821
 msgid "Positive small integer"
 msgstr "小さな正の整数"
 
-#: db/models/fields/__init__.py:1834
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr "スラグ(%(max_length)s文字以内)"
 
-#: db/models/fields/__init__.py:1863
 msgid "Small integer"
 msgstr "小さな整数"
 
-#: db/models/fields/__init__.py:1870
 msgid "Text"
 msgstr "テキスト"
 
-#: db/models/fields/__init__.py:1893
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
@@ -636,75 +511,63 @@ msgstr ""
 "'%(value)s' は無効な形式の値です。 HH:MM[:ss[.uuuuuu]] 形式でなければなりませ"
 "ん。"
 
-#: db/models/fields/__init__.py:1895
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr "'%(value)s' は正しい形式(HH:MM[:ss[.uuuuuu]])ですが、無効な時刻です。"
 
-#: db/models/fields/__init__.py:1898
 msgid "Time"
 msgstr "時刻"
 
-#: db/models/fields/__init__.py:1977
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/__init__.py:2000
 msgid "Raw binary data"
 msgstr "生のバイナリデータ"
 
-#: db/models/fields/files.py:225
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr "'%(value)s' は有効なUUIDではありません。"
+
 msgid "File"
 msgstr "ファイル"
 
-#: db/models/fields/files.py:375
 msgid "Image"
 msgstr "画像"
 
-#: db/models/fields/related.py:1580
 #, python-format
-msgid "%(model)s instance with pk %(pk)r does not exist."
-msgstr "主キーが %(pk)r である %(model)s インスタンスは存在しません。"
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr "%(field)s が %(value)r である %(model)s のインスタンスは存在しません。"
 
-#: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
 msgstr "外部キー(型は関連フィールドによって決まります)"
 
-#: db/models/fields/related.py:1773
 msgid "One-to-one relationship"
 msgstr "1対1の関連"
 
-#: db/models/fields/related.py:1843
 msgid "Many-to-many relationship"
 msgstr "多対多の関連"
 
-#: forms/fields.py:55
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: forms/fields.py:236
 msgid "Enter a whole number."
 msgstr "整数を入力してください。"
 
-#: forms/fields.py:279 forms/fields.py:316
 msgid "Enter a number."
 msgstr "整数を入力してください。"
 
-#: forms/fields.py:318
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "この値は合計 %(max)s 桁以内でなければなりません。"
 
-#: forms/fields.py:322
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "この値は小数点以下が合計 %(max)s 桁以内でなければなりません。"
 
-#: forms/fields.py:326
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
@@ -712,32 +575,28 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "この値は小数点より前が合計 %(max)s 桁以内でなければなりません。"
 
-#: forms/fields.py:437 forms/fields.py:1139
 msgid "Enter a valid date."
 msgstr "日付を正しく入力してください。"
 
-#: forms/fields.py:461 forms/fields.py:1140
 msgid "Enter a valid time."
 msgstr "時間を正しく入力してください。"
 
-#: forms/fields.py:483
 msgid "Enter a valid date/time."
 msgstr "日付/時間を正しく入力してください。"
 
-#: forms/fields.py:564
+msgid "Enter a valid duration."
+msgstr "時間差分を正しく入力してください。"
+
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "ファイルが取得できませんでした。formのencoding typeを確認してください。"
 
-#: forms/fields.py:565
 msgid "No file was submitted."
 msgstr "ファイルが送信されていません。"
 
-#: forms/fields.py:566
 msgid "The submitted file is empty."
 msgstr "入力されたファイルは空です。"
 
-#: forms/fields.py:568
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
@@ -746,13 +605,11 @@ msgstr[0] ""
 "このファイル名は %(max)d 文字以下でなければなりません( %(length)d 文字になっ"
 "ています)。"
 
-#: forms/fields.py:571
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 "ファイルを投稿するか、クリアチェックボックスをチェックするかどちらかを選択し"
 "てください。両方とも行ってはいけません。"
 
-#: forms/fields.py:632
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -760,25 +617,23 @@ msgstr ""
 "画像をアップロードしてください。アップロードしたファイルは画像でないか、また"
 "は壊れています。"
 
-#: forms/fields.py:782 forms/fields.py:871 forms/models.py:1192
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "正しく選択してください。 %(value)s は候補にありません。"
 
-#: forms/fields.py:872 forms/fields.py:987 forms/models.py:1191
 msgid "Enter a list of values."
 msgstr "リストを入力してください。"
 
-#: forms/fields.py:988
 msgid "Enter a complete value."
 msgstr "すべての値を入力してください。"
 
+msgid "Enter a valid UUID."
+msgstr "UUIDを正しく入力してください。"
+
 #. Translators: This is the default suffix added to form field labels
-#: forms/forms.py:122
 msgid ":"
 msgstr ":"
 
-#: forms/forms.py:192
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(隠しフィールド %(name)s) %(error)s"
@@ -786,47 +641,38 @@ msgstr "(隠しフィールド %(name)s) %(error)s"
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
 #. label
-#: forms/forms.py:620
 msgid ":?.!"
 msgstr ":?.!"
 
-#: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "ManagementFormデータが見つからないか、改竄されています。"
 
-#: forms/formsets.py:332
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] "%d 個またはそれより少ないフォームを送信してください。"
 
-#: forms/formsets.py:339
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] "%d 個またはそれより多いフォームを送信してください。"
 
-#: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
 msgstr "並び変え"
 
-#: forms/formsets.py:371
 msgid "Delete"
 msgstr "削除"
 
-#: forms/models.py:712
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "%(field)s の重複したデータを修正してください。"
 
-#: forms/models.py:716
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "%(field)s の重複したデータを修正してください。このフィールドはユニークである"
 "必要があります。"
 
-#: forms/models.py:722
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -835,31 +681,19 @@ msgstr ""
 "%(field_name)s の重複したデータを修正してください。%(date_field)s %(lookup)s "
 "では %(field_name)s がユニークである必要があります。"
 
-#: forms/models.py:730
 msgid "Please correct the duplicate values below."
 msgstr "下記の重複したデータを修正してください。"
 
-#: forms/models.py:1028
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "インライン外部キーが親インスタンスの主キーと一致しません。"
 
-#: forms/models.py:1094
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "正しく選択してください。選択したものは候補にありません。"
 
-#: forms/models.py:1194
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
 msgstr "\"%(pk)s\" は主キーとして無効な値です。"
 
-#: forms/models.py:1205
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"複数選択するときには Control キーを押したまま選択してください。Mac は "
-"Command キーを使ってください"
-
-#: forms/utils.py:148
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
@@ -868,429 +702,334 @@ msgstr ""
 "%(datetime)s は%(current_timezone)sのタイムゾーンでは解釈できませんでした。そ"
 "れは曖昧であるか、存在しない可能性があります。"
 
-#: forms/widgets.py:350
 msgid "Currently"
 msgstr "現在"
 
-#: forms/widgets.py:351
 msgid "Change"
 msgstr "変更"
 
-#: forms/widgets.py:352
 msgid "Clear"
 msgstr "クリア"
 
-#: forms/widgets.py:546
 msgid "Unknown"
 msgstr "不明"
 
-#: forms/widgets.py:547
 msgid "Yes"
 msgstr "はい"
 
-#: forms/widgets.py:548
 msgid "No"
 msgstr "いいえ"
 
-#: template/defaultfilters.py:855
 msgid "yes,no,maybe"
 msgstr "はい,いいえ,たぶん"
 
-#: template/defaultfilters.py:884 template/defaultfilters.py:896
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d バイト"
 
-#: template/defaultfilters.py:898
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:900
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:902
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:904
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:906
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:59
 msgid "p.m."
 msgstr "p.m."
 
-#: utils/dateformat.py:60
 msgid "a.m."
 msgstr "a.m."
 
-#: utils/dateformat.py:65
 msgid "PM"
 msgstr "PM"
 
-#: utils/dateformat.py:66
 msgid "AM"
 msgstr "AM"
 
-#: utils/dateformat.py:149
 msgid "midnight"
 msgstr "0時"
 
-#: utils/dateformat.py:151
 msgid "noon"
 msgstr "12時"
 
-#: utils/dates.py:6
 msgid "Monday"
 msgstr "月曜日"
 
-#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "火曜日"
 
-#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "水曜日"
 
-#: utils/dates.py:6
 msgid "Thursday"
 msgstr "木曜日"
 
-#: utils/dates.py:6
 msgid "Friday"
 msgstr "金曜日"
 
-#: utils/dates.py:7
 msgid "Saturday"
 msgstr "土曜日"
 
-#: utils/dates.py:7
 msgid "Sunday"
 msgstr "日曜日"
 
-#: utils/dates.py:10
 msgid "Mon"
 msgstr "月"
 
-#: utils/dates.py:10
 msgid "Tue"
 msgstr "火"
 
-#: utils/dates.py:10
 msgid "Wed"
 msgstr "水"
 
-#: utils/dates.py:10
 msgid "Thu"
 msgstr "木"
 
-#: utils/dates.py:10
 msgid "Fri"
 msgstr "金"
 
-#: utils/dates.py:11
 msgid "Sat"
 msgstr "土"
 
-#: utils/dates.py:11
 msgid "Sun"
 msgstr "日"
 
-#: utils/dates.py:18
 msgid "January"
 msgstr "1月"
 
-#: utils/dates.py:18
 msgid "February"
 msgstr "2月"
 
-#: utils/dates.py:18
 msgid "March"
 msgstr "3月"
 
-#: utils/dates.py:18
 msgid "April"
 msgstr "4月"
 
-#: utils/dates.py:18
 msgid "May"
 msgstr "5月"
 
-#: utils/dates.py:18
 msgid "June"
 msgstr "6月"
 
-#: utils/dates.py:19
 msgid "July"
 msgstr "7月"
 
-#: utils/dates.py:19
 msgid "August"
 msgstr "8月"
 
-#: utils/dates.py:19
 msgid "September"
 msgstr "9月"
 
-#: utils/dates.py:19
 msgid "October"
 msgstr "10月"
 
-#: utils/dates.py:19
 msgid "November"
 msgstr "11月"
 
-#: utils/dates.py:20
 msgid "December"
 msgstr "12月"
 
-#: utils/dates.py:23
 msgid "jan"
 msgstr "1月"
 
-#: utils/dates.py:23
 msgid "feb"
 msgstr "2月"
 
-#: utils/dates.py:23
 msgid "mar"
 msgstr "3月"
 
-#: utils/dates.py:23
 msgid "apr"
 msgstr "4月"
 
-#: utils/dates.py:23
 msgid "may"
 msgstr "5月"
 
-#: utils/dates.py:23
 msgid "jun"
 msgstr "6月"
 
-#: utils/dates.py:24
 msgid "jul"
 msgstr "7月"
 
-#: utils/dates.py:24
 msgid "aug"
 msgstr "8月"
 
-#: utils/dates.py:24
 msgid "sep"
 msgstr "9月"
 
-#: utils/dates.py:24
 msgid "oct"
 msgstr "10月"
 
-#: utils/dates.py:24
 msgid "nov"
 msgstr "11月"
 
-#: utils/dates.py:24
 msgid "dec"
 msgstr "12月"
 
-#: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "1月"
 
-#: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "2月"
 
-#: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "3月"
 
-#: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "4月"
 
-#: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "5月"
 
-#: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "6月"
 
-#: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "7月"
 
-#: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "8月"
 
-#: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "9月"
 
-#: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "10月"
 
-#: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "11月"
 
-#: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "12月"
 
-#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
 msgstr "1月"
 
-#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
 msgstr "2月"
 
-#: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
 msgstr "3月"
 
-#: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
 msgstr "4月"
 
-#: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
 msgstr "5月"
 
-#: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
 msgstr "6月"
 
-#: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
 msgstr "7月"
 
-#: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
 msgstr "8月"
 
-#: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
 msgstr "9月"
 
-#: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
 msgstr "10月"
 
-#: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
 msgstr "11月"
 
-#: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
 msgstr "12月"
 
-#: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
 msgstr "これは有効なIPv6アドレスではありません。"
 
-#: utils/text.py:76
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
 msgstr "%(truncated_text)s..."
 
-#: utils/text.py:245
 msgid "or"
 msgstr "または"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:264 utils/timesince.py:57
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:25
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d 年"
 
-#: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d ヶ月"
 
-#: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d 週間"
 
-#: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 日"
 
-#: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 時間"
 
-#: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分"
 
-#: utils/timesince.py:46
 msgid "0 minutes"
 msgstr "0 分"
 
-#: views/csrf.py:105
 msgid "Forbidden"
 msgstr "アクセス禁止"
 
-#: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
 msgstr "CSRF検証に失敗したため、リクエストは中断されました。"
 
-#: views/csrf.py:110
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
 "header' to be sent by your Web browser, but none was sent. This header is "
@@ -1302,7 +1041,6 @@ msgstr ""
 "す。このヘッダはセキュリティ上の理由(使用中のブラウザが第三者によってハイ"
 "ジャックされていないことを確認するため)で必要です。"
 
-#: views/csrf.py:115
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
@@ -1311,7 +1049,6 @@ msgstr ""
 "もしブラウザのリファラーヘッダを無効に設定しているならば、HTTPS接続やsame-"
 "originリクエストのために、少なくともこのサイトでは再度有効にしてください。"
 
-#: views/csrf.py:120
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
@@ -1321,7 +1058,6 @@ msgstr ""
 "キーを必須としているためです。このクッキーはセキュリティ上の理由(使用中のブラ"
 "ウザが第三者によってハイジャックされていないことを確認するため)で必要です。"
 
-#: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
@@ -1329,32 +1065,49 @@ msgstr ""
 "もしブラウザのクッキーを無効に設定しているならば、same-originリクエストのため"
 "に少なくともこのサイトでは再度有効にしてください。"
 
-#: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
 msgstr "詳細な情報は DEBUG=True を設定すると利用できます。"
 
-#: views/generic/dates.py:43
+msgid "Welcome to Django"
+msgstr "Djangoへようこそ"
+
+msgid "It worked!"
+msgstr "うまくいった！"
+
+msgid "Congratulations on your first Django-powered page."
+msgstr "おめでとうございます、Djangoで出力された最初のページです。"
+
+msgid ""
+"Of course, you haven't actually done any work yet. Next, start your first "
+"app by running <code>python manage.py startapp [app_label]</code>."
+msgstr ""
+"もちろん、実際にはまだ少しも作業をしていません。次は、 <code>python manage."
+"py startapp [app_label]</code> を実行して、最初のアプリを開始します。"
+
+msgid ""
+"You're seeing this message because you have <code>DEBUG = True</code> in "
+"your Django settings file and you haven't configured any URLs. Get to work!"
+msgstr ""
+"このメッセージは、Djangoのsettingsファイルに <code>DEBUG = True</code> が含ま"
+"れ、まだURLが何も設定されていないため表示されています。さあ、仕事に取り掛かり"
+"ましょう！"
+
 msgid "No year specified"
 msgstr "年が未指定です"
 
-#: views/generic/dates.py:99
 msgid "No month specified"
 msgstr "月が未指定です"
 
-#: views/generic/dates.py:158
 msgid "No day specified"
 msgstr "日が未指定です"
 
-#: views/generic/dates.py:214
 msgid "No week specified"
 msgstr "週が未指定です"
 
-#: views/generic/dates.py:369 views/generic/dates.py:397
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "%(verbose_name_plural)s は利用できません"
 
-#: views/generic/dates.py:650
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1363,40 +1116,32 @@ msgstr ""
 "%(class_name)s.allow_futureがFalseであるため、未来の%(verbose_name_plural)sは"
 "利用できません。"
 
-#: views/generic/dates.py:682
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr "指定された形式 '%(format)s' では '%(datestr)s' は無効な日付文字列です"
 
-#: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "クエリーに一致する %(verbose_name)s は見つかりませんでした"
 
-#: views/generic/list.py:62
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "ページは数値に変換できる値、または 'last' ではありません。"
 
-#: views/generic/list.py:67
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr "無効なページです (%(page_number)s): %(message)s"
 
-#: views/generic/list.py:158
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr "空の一覧かつ '%(class_name)s.allow_empty' がFalseです。"
 
-#: views/static.py:54
 msgid "Directory indexes are not allowed here."
 msgstr "Directory indexes are not allowed here."
 
-#: views/static.py:56
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr "\"%(path)s\" does not exist"
 
-#: views/static.py:97
 #, python-format
 msgid "Index of %(directory)s"
 msgstr "Index of %(directory)s"
