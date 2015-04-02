@@ -395,6 +395,13 @@ need to be done by the releaser.
    annotations in the documentation from two releases ago. For example, in
    Django 1.9, notes for 1.7 will be removed.
 
+#. Add the new branch to `Read the Docs
+   <https://readthedocs.org/projects/django/>`_. Since the automatically
+   generated version names ("stable-A.B.x") differ from the version numbers
+   we've used historically in Read the Docs ("A.B.x"), we currently ask Eric
+   Holscher to add the version for us. Someday the alias functionality may be
+   built-in to the Read the Docs UI.
+
 Notes on setting the VERSION tuple
 ==================================
 
