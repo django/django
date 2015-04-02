@@ -339,6 +339,11 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(FoodManager('a', 'b'))
         self.assertSerializedEqual(FoodManager('x', 'y', c=3, d=4))
 
+
+    def test_serialize_timedelta(self):
+        self.assertSerializedEqual(datetime.timedelta())
+        self.assertSerializedEqual(datetime.timedelta(minutes=42))
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
