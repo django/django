@@ -4331,6 +4331,26 @@ class PrePopulatedTest(TestCase):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpostlargeslug_add'))
         self.assertContains(response, "maxLength: 1000")  # instead of 1,000
 
+    def test_changeform_intial_data(self):
+        """
+        Regression test for #9739
+        Tests the prepopulation of fields within the admin site.
+        """
+        # Add sections for testing <select>.
+        s1 = Section.objects.create(name='Section 1')
+        # Prepopulate the Article add page with GET data.
+        querystring = '?title=TestTitle&content=Lorem%20Ipsum&date=2011-06-01,18:21:53&section=1'
+        response = self.client.get(
+            reverse('admin:admin_views_article_add') + querystring
+        )
+        self.assertEqual(response.status_code, 200)
+        # test if the prepopulated values are within the response and in the correct fields
+        self.assertContains(response, text='value="TestTitle"')
+        self.assertContains(response, text='Lorem Ipsum')
+        self.assertContains(response, text='value="2011-06-01"')
+        self.assertContains(response, text='value="18:21:53"')
+        self.assertContains(response, text='<option value="%s" selected="selected">' % (s1.pk))
+
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_views.urls")

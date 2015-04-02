@@ -1736,7 +1736,9 @@ templates used by the :class:`ModelAdmin` views:
     A hook for the initial data on admin change forms. By default, fields are
     given initial values from ``GET`` parameters. For instance,
     ``?name=initial_value`` will set the ``name`` field's initial value to be
-    ``initial_value``.
+    ``initial_value``. ManyToManyFields can be populated with a comma-separated
+    list of PKs, and DateTimeFields can be populated with comma-separated
+    date, time.
 
     This method should return a dictionary in the form
     ``{'fieldname': 'fieldval'}``::
