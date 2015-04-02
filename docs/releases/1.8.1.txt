@@ -9,4 +9,5 @@ Django 1.8.1 fixes several bugs in 1.8.
 Bugfixes
 ========
 
-* ...
+* Added support for serializing :class:`~datetime.timedelta` objects in
+  migrations (:ticket:`24566`).

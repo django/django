@@ -351,6 +351,10 @@ class WriterTests(TestCase):
         self.assertSerializedEqual(frozenset())
         self.assertSerializedEqual(frozenset("let it go"))
 
+    def test_serialize_timedelta(self):
+        self.assertSerializedEqual(datetime.timedelta())
+        self.assertSerializedEqual(datetime.timedelta(minutes=42))
+
     def test_simple_migration(self):
         """
         Tests serializing a simple migration.
