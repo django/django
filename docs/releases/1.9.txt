@@ -59,6 +59,12 @@ Minor features
 * The ``BCryptSHA256PasswordHasher`` will now update passwords if its
   ``rounds`` attribute is changed.
 
+* ``AbstractBaseUser`` and ``BaseUserManager`` were moved to a new
+  ``django.contrib.auth.base_user`` module so that they can be imported without
+  including ``django.contrib.auth`` in :setting:`INSTALLED_APPS` (this raised
+  a deprecation warning in older versions and is no longer supported in
+  Django 1.9).
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
