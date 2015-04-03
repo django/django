@@ -338,6 +338,23 @@ class MigrateTests(MigrationTestBase):
         """
         call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
 
+    def test_regression_24518_verbosity_int_vs_string(self):
+        """
+        Management commands should convert the verbosity to an int so that
+        Python 3 will not raise a TypeError.
+        """
+        try:
+            call_command('migrate', verbosity='0')
+        except TypeError:
+            self.fail('Migrate errored when passing a string for the verbosity')
+
+        with override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"}):
+            out = six.StringIO()
+            try:
+                call_command('showmigrations', format='plan', verbosity='0', stdout=out)
+            except TypeError:
+                self.fail('Showmigrations errored when passing a string for the verbosity')
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
@@ -813,6 +830,16 @@ class MakeMigrationsTests(MigrationTestBase):
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--exit", "migrations", verbosity=0)
 
+    def test_regression_24518_verbosity_int_vs_string(self):
+        """
+        Management commands should convert the verbosity to an int so that
+        Python 3 will not raise a TypeError.
+        """
+        try:
+            call_command("makemigrations", "migrations", verbosity='0')
+        except TypeError:
+            self.fail('Makemigrations errored when passing a string for the verbosity')
+
 
 class SquashMigrationsTest(MigrationTestBase):
     """
@@ -852,3 +879,14 @@ class SquashMigrationsTest(MigrationTestBase):
         call_command("squashmigrations", "migrations", "0002",
                      interactive=False, verbosity=1, no_optimize=True, stdout=out)
         self.assertIn("Skipping optimization", force_text(out.getvalue()))
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_regression_24518_verbosity_int_vs_string(self):
+        """
+        Management commands should convert the verbosity to an int so that
+        Python 3 will not raise a TypeError.
+        """
+        try:
+            call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity='0')
+        except TypeError:
+            self.fail('Squashmigrations errored when passing a string for the verbosity')

@@ -230,7 +230,7 @@ class Command(BaseCommand):
         locale = options.get('locale')
         exclude = options.get('exclude')
         self.domain = options.get('domain')
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
         process_all = options.get('all')
         extensions = options.get('extensions')
         self.symlinks = options.get('symlinks')

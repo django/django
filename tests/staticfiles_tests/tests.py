@@ -288,6 +288,16 @@ class TestCollection(CollectionTestCase, TestDefaults):
         self.assertFileNotFound('test/backup~')
         self.assertFileNotFound('test/CVS')
 
+    def test_regression_24518_verbosity_int_vs_string(self):
+        """
+        Management commands should convert the verbosity to an int so that
+        Python 3 will not raise a TypeError.
+        """
+        try:
+            call_command('collectstatic', verbosity='0')
+        except TypeError:
+            self.fail('Collectstatic errored when passing a string for the verbosity')
+
 
 class TestCollectionClear(CollectionTestCase):
     """

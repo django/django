@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
     def handle(self, *app_labels, **options):
 
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
         self.dry_run = options.get('dry_run', False)
         self.merge = options.get('merge', False)

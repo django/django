@@ -54,7 +54,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
         self.show_traceback = options.get('traceback')
         self.load_initial_data = options.get('load_initial_data')
