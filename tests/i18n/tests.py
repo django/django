@@ -26,10 +26,10 @@ from django.utils.safestring import SafeBytes, SafeString, SafeText, mark_safe
 from django.utils.six import PY3
 from django.utils.translation import (
     LANGUAGE_SESSION_KEY, activate, check_for_language, deactivate,
-    get_language, get_language_from_request, get_language_info, gettext,
-    gettext_lazy, ngettext_lazy, npgettext, npgettext_lazy, pgettext,
-    pgettext_lazy, string_concat, to_locale, trans_real, ugettext,
-    ugettext_lazy, ungettext, ungettext_lazy,
+    get_language, get_language_bidi, get_language_from_request,
+    get_language_info, gettext, gettext_lazy, ngettext_lazy, npgettext,
+    npgettext_lazy, pgettext, pgettext_lazy, string_concat, to_locale,
+    trans_real, ugettext, ugettext_lazy, ungettext, ungettext_lazy,
 )
 
 from .forms import CompanyForm, I18nForm, SelectDateForm, SelectDateWidget
@@ -400,6 +400,11 @@ class TranslationTests(TestCase):
         """
         self.assertEqual(trans_real.to_language('en_US'), 'en-us')
         self.assertEqual(trans_real.to_language('sr_Lat'), 'sr-lat')
+
+    def test_language_bidi(self):
+        self.assertEqual(get_language_bidi(), False)
+        with translation.override(None):
+            self.assertEqual(get_language_bidi(), False)
 
     @override_settings(LOCALE_PATHS=(os.path.join(here, 'other', 'locale'),))
     def test_bad_placeholder_1(self):
@@ -1446,6 +1451,7 @@ class CountrySpecificLanguageTests(TestCase):
         self.assertTrue(check_for_language('en-US'))
         self.assertFalse(check_for_language('en-ü'))
         self.assertFalse(check_for_language('en\x00'))
+        self.assertFalse(check_for_language(None))
 
     def test_get_language_from_request(self):
         # issue 19919
