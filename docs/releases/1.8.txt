@@ -271,7 +271,7 @@ Cryptography
 ^^^^^^^^^^^^
 
 * The ``max_age`` parameter of the
-  :meth:`django.core.signing.TimestampSigner.unsign` method now also accept a
+  :meth:`django.core.signing.TimestampSigner.unsign` method now also accepts a
   :py:class:`datetime.timedelta` object.
 
 Database backends
