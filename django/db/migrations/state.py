@@ -84,6 +84,9 @@ class ProjectState(object):
         del self.models[app_label, model_name]
         if 'apps' in self.__dict__:  # hasattr would cache the property
             self.apps.unregister_model(app_label, model_name)
+            # Need to do this explicitly since unregister_model() doesn't clear
+            # the cache automatically (#24513)
+            self.apps.clear_cache()
 
     def reload_model(self, app_label, model_name):
         if 'apps' in self.__dict__:  # hasattr would cache the property
@@ -105,29 +108,25 @@ class ProjectState(object):
                     rel_app_label, rel_model_name = _get_app_label_and_model_name(field.rel.to, app_label)
                     related_models.add((rel_app_label, rel_model_name.lower()))
 
+            # Include the model itself
+            related_models.add((app_label, model_name))
+
             # Unregister all related models
             for rel_app_label, rel_model_name in related_models:
                 self.apps.unregister_model(rel_app_label, rel_model_name)
+            # Need to do it once all models are unregistered to avoid corrupting
+            # existing models' _meta
+            self.apps.clear_cache()
 
-            # Unregister the current model
-            self.apps.unregister_model(app_label, model_name)
-
+            states_to_be_rendered = []
             # Gather all models states of those models that will be rerendered.
             # This includes:
-            # 1. The current model
-            try:
-                model_state = self.models[app_label, model_name]
-            except KeyError:
-                states_to_be_rendered = []
-            else:
-                states_to_be_rendered = [model_state]
-
-            # 2. All related models of unmigrated apps
+            # 1. All related models of unmigrated apps
             for model_state in self.apps.real_models:
                 if (model_state.app_label, model_state.name_lower) in related_models:
                     states_to_be_rendered.append(model_state)
 
-            # 3. All related models of migrated apps
+            # 2. All related models of migrated apps
             for rel_app_label, rel_model_name in related_models:
                 try:
                     model_state = self.models[rel_app_label, rel_model_name]
@@ -284,7 +283,6 @@ class StateApps(Apps):
             del self.app_configs[app_label].models[model_name]
         except KeyError:
             pass
-        self.clear_cache()
 
 
 class ModelState(object):
