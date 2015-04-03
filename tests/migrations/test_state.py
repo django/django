@@ -1,7 +1,7 @@
 from django.apps.registry import Apps
 from django.db import models
 from django.db.migrations.operations import (
-    AlterField, DeleteModel, RemoveField,
+    AddField, AlterField, DeleteModel, RemoveField,
 )
 from django.db.migrations.state import (
     InvalidBasesError, ModelState, ProjectState, get_related_models_recursive,
@@ -367,6 +367,57 @@ class StateTests(TestCase):
         project_state.add_model(ModelState.from_model(A))
         project_state.add_model(ModelState.from_model(B))
         self.assertEqual(len(project_state.apps.get_models()), 2)
+
+    def test_add_relations(self):
+        """
+        #24573 - Adding relations to existing models should reload the
+        referenced models too.
+        """
+        class A(models.Model):
+            class Meta:
+                app_label = 'something'
+
+        class B(A):
+            class Meta:
+                app_label = 'something'
+
+        class C(models.Model):
+            class Meta:
+                app_label = 'something'
+
+        project_state = ProjectState()
+        project_state.add_model(ModelState.from_model(A))
+        project_state.add_model(ModelState.from_model(B))
+        project_state.add_model(ModelState.from_model(C))
+
+        project_state.apps  # We need to work with rendered models
+
+        old_state = project_state.clone()
+        model_a_old = old_state.apps.get_model('something', 'A')
+        model_b_old = old_state.apps.get_model('something', 'B')
+        model_c_old = old_state.apps.get_model('something', 'C')
+        # Check that the relations between the old models are correct
+        self.assertIs(model_a_old._meta.get_field('b').related_model, model_b_old)
+        self.assertIs(model_b_old._meta.get_field('a_ptr').related_model, model_a_old)
+
+        operation = AddField('c', 'to_a', models.OneToOneField('something.A', related_name='from_c'))
+        operation.state_forwards('something', project_state)
+        model_a_new = project_state.apps.get_model('something', 'A')
+        model_b_new = project_state.apps.get_model('something', 'B')
+        model_c_new = project_state.apps.get_model('something', 'C')
+
+        # Check that all models have changed
+        self.assertIsNot(model_a_old, model_a_new)
+        self.assertIsNot(model_b_old, model_b_new)
+        self.assertIsNot(model_c_old, model_c_new)
+        # Check that the relations between the old models still hold
+        self.assertIs(model_a_old._meta.get_field('b').related_model, model_b_old)
+        self.assertIs(model_b_old._meta.get_field('a_ptr').related_model, model_a_old)
+        # Check that the relations between the new models correct
+        self.assertIs(model_a_new._meta.get_field('b').related_model, model_b_new)
+        self.assertIs(model_b_new._meta.get_field('a_ptr').related_model, model_a_new)
+        self.assertIs(model_a_new._meta.get_field('from_c').related_model, model_c_new)
+        self.assertIs(model_c_new._meta.get_field('to_a').related_model, model_a_new)
 
     def test_remove_relations(self):
         """

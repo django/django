@@ -101,12 +101,25 @@ class ProjectState(object):
 
             # Get all outgoing references from the model to be rendered
             model_state = self.models[(app_label, model_name)]
+            # Directly related models are the models pointed to by ForeignKeys,
+            # OneToOneFields, and ManyToManyFields.
+            direct_related_models = set()
             for name, field in model_state.fields:
                 if field.is_relation:
                     if field.rel.to == RECURSIVE_RELATIONSHIP_CONSTANT:
                         continue
                     rel_app_label, rel_model_name = _get_app_label_and_model_name(field.rel.to, app_label)
-                    related_models.add((rel_app_label, rel_model_name.lower()))
+                    direct_related_models.add((rel_app_label, rel_model_name.lower()))
+
+            # For all direct related models recursively get all related models.
+            related_models.update(direct_related_models)
+            for rel_app_label, rel_model_name in direct_related_models:
+                try:
+                    rel_model = self.apps.get_model(rel_app_label, rel_model_name)
+                except LookupError:
+                    pass
+                else:
+                    related_models.update(get_related_models_recursive(rel_model))
 
             # Include the model itself
             related_models.add((app_label, model_name))
