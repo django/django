@@ -11,3 +11,6 @@ Bugfixes
 
 * Added support for serializing :class:`~datetime.timedelta` objects in
   migrations (:ticket:`24566`).
+
+* Restored proper parsing of the :djadmin:`testserver` command's positional
+  arguments (fixture names) (:ticket:`24571`).

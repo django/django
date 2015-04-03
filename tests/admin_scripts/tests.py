@@ -1315,6 +1315,21 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
         self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
 
 
+class ManageTestserver(AdminScriptTestCase):
+    from django.core.management.commands.testserver import Command as TestserverCommand
+
+    @mock.patch.object(TestserverCommand, 'handle')
+    def test_testserver_handle_params(self, mock_handle):
+        out = StringIO()
+        call_command('testserver', 'blah.json', stdout=out)
+        mock_handle.assert_called_with(
+            'blah.json',
+            stdout=out, settings=None, pythonpath=None, verbosity=1,
+            traceback=False, addrport='', no_color=False, use_ipv6=False,
+            skip_checks=True, interactive=True,
+        )
+
+
 ##########################################################################
 # COMMAND PROCESSING TESTS
 # Check that user-space commands are correctly handled - in particular,
