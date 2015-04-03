@@ -626,8 +626,7 @@ performed.
 As a result of this change, you no longer need to set a transaction
 dirty explicitly when you execute raw SQL or use a data-modifying
 ``SELECT``. However, you *do* need to explicitly close any read-only
-transactions that are being managed using
-:func:`~django.db.transaction.commit_manually`. For example::
+transactions that are being managed using ``commit_manually()``. For example::
 
       @transaction.commit_manually
       def my_view(request, name):
