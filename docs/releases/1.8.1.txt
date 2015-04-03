@@ -14,3 +14,6 @@ Bugfixes
 
 * Restored proper parsing of the :djadmin:`testserver` command's positional
   arguments (fixture names) (:ticket:`24571`).
+
+* Prevented ``TypeError`` in translation functions ``check_for_language()`` and
+  ``get_language_bidi()`` when translations are deactivated (:ticket:`24569`).
