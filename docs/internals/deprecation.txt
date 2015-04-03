@@ -356,9 +356,6 @@ details on these changes.
     also defined in ``django.db.transaction``,
   - the ``TRANSACTIONS_MANAGED`` setting.
 
-  Upgrade paths are described in the :ref:`transaction management docs
-  <transactions-upgrading-from-1.5>`.
-
 * The :ttag:`cycle` and :ttag:`firstof` template tags will auto-escape their
   arguments. In 1.6 and 1.7, this behavior is provided by the version of these
   tags in the ``future`` template tag library.
