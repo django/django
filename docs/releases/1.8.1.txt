@@ -25,3 +25,6 @@ Bugfixes
 * Stripped microseconds from ``datetime`` values when using an older version of
   the MySQLdb DB API driver as it does not support fractional seconds
   (:ticket:`24584`).
+
+* Fixed a migration crash when altering
+  :class:`~django.db.models.ManyToManyField`\s (:ticket:`24513`).
