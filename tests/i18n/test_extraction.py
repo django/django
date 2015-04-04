@@ -410,6 +410,16 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = force_text(fp.read())
             self.assertMsgStr("Größe", po_contents)
 
+    def test_regression_24518_verbosity_int_vs_string(self):
+        """
+        Management commands should convert the verbosity to an int so that
+        Python 3 will not raise a TypeError.
+        """
+        try:
+            management.call_command('makemessages', verbosity='0')
+        except TypeError:
+            self.fail('Makemessages errored when passing a string for the verbosity')
+
 
 class JavascriptExtractorTests(ExtractorTests):
 

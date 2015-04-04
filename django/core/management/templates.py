@@ -63,7 +63,7 @@ class TemplateCommand(BaseCommand):
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
         self.paths_to_remove = []
-        self.verbosity = options['verbosity']
+        self.verbosity = int(options['verbosity'])
 
         self.validate_name(name, app_or_project)
 

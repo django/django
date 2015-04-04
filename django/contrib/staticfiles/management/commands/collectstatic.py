@@ -66,7 +66,7 @@ class Command(BaseCommand):
         Set instance variables based on an options dict
         """
         self.interactive = options['interactive']
-        self.verbosity = options['verbosity']
+        self.verbosity = int(options['verbosity'])
         self.symlink = options['link']
         self.clear = options['clear']
         self.dry_run = options['dry_run']

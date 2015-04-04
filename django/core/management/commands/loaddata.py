@@ -54,7 +54,7 @@ class Command(BaseCommand):
         self.using = options.get('database')
         self.app_label = options.get('app_label')
         self.hide_empty = options.get('hide_empty', False)
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
 
         with transaction.atomic(using=self.using):
             self.loaddata(fixture_labels)

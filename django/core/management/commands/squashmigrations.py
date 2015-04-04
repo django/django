@@ -25,7 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, **options):
 
-        self.verbosity = options.get('verbosity')
+        self.verbosity = int(options.get('verbosity'))
         self.interactive = options.get('interactive')
         app_label = options['app_label']
         migration_name = options['migration_name']
