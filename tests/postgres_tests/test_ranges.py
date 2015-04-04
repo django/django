@@ -2,23 +2,30 @@ import datetime
 import json
 import unittest
 
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
-
 from django import forms
-from django.contrib.postgres import fields as pg_fields, forms as pg_forms
-from django.contrib.postgres.validators import (
-    RangeMaxValueValidator, RangeMinValueValidator,
-)
 from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
 from django.utils import timezone
 
+from . import PostgresSQLTestCase
 from .models import RangesModel
+
+try:
+    from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
+    from django.contrib.postgres import fields as pg_fields, forms as pg_forms
+    from django.contrib.postgres.validators import (
+        RangeMaxValueValidator, RangeMinValueValidator,
+    )
+except ImportError:
+    pass
 
 
 def skipUnlessPG92(test):
-    PG_VERSION = connection.pg_version
+    try:
+        PG_VERSION = connection.pg_version
+    except AttributeError:
+        PG_VERSION = 0
     if PG_VERSION < 90200:
         return unittest.skip('PostgreSQL >= 9.2 required')(test)
     return test
@@ -215,7 +222,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.dates, None)
 
 
-class TestValidators(TestCase):
+class TestValidators(PostgresSQLTestCase):
 
     def test_max(self):
         validator = RangeMaxValueValidator(5)
@@ -234,7 +241,7 @@ class TestValidators(TestCase):
         self.assertEqual(cm.exception.code, 'min_value')
 
 
-class TestFormField(TestCase):
+class TestFormField(PostgresSQLTestCase):
 
     def test_valid_integer(self):
         field = pg_forms.IntegerRangeField()
@@ -493,7 +500,7 @@ class TestFormField(TestCase):
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
 
 
-class TestWidget(TestCase):
+class TestWidget(PostgresSQLTestCase):
     def test_range_widget(self):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(
