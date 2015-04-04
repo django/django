@@ -57,6 +57,7 @@ The current releasers are:
 
 - James Bennett
 - Jacob Kaplan-Moss
+- Tim Graham
 
 Ops team
 ========
