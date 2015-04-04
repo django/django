@@ -132,7 +132,6 @@ class ProjectState(object):
                     pass
                 else:
                     states_to_be_rendered.append(model_state)
-
             # Render all models
             self.apps.render_multiple(states_to_be_rendered)
 
