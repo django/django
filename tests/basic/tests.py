@@ -192,15 +192,30 @@ class ModelTest(TestCase):
 
     @skipIfDBFeature('supports_microsecond_precision')
     def test_microsecond_precision_not_supported(self):
-        # In MySQL, microsecond-level precision isn't available. You'll lose
-        # microsecond-level precision once the data is saved.
+        # In MySQL, microsecond-level precision isn't always available. You'll
+        # lose microsecond-level precision once the data is saved.
         a9 = Article(
             headline='Article 9',
             pub_date=datetime(2005, 7, 31, 12, 30, 45, 180),
         )
         a9.save()
-        self.assertEqual(Article.objects.get(id__exact=a9.id).pub_date,
-            datetime(2005, 7, 31, 12, 30, 45))
+        self.assertEqual(
+            Article.objects.get(id__exact=a9.id).pub_date,
+            datetime(2005, 7, 31, 12, 30, 45),
+        )
+
+    @skipIfDBFeature('supports_microsecond_precision')
+    def test_microsecond_precision_not_supported_edge_case(self):
+        # In MySQL, microsecond-level precision isn't always available. You'll
+        # lose microsecond-level precision once the data is saved.
+        a = Article.objects.create(
+            headline='Article',
+            pub_date=datetime(2008, 12, 31, 23, 59, 59, 999999),
+        )
+        self.assertEqual(
+            Article.objects.get(pk=a.pk).pub_date,
+            datetime(2008, 12, 31, 23, 59, 59),
+        )
 
     def test_manually_specify_primary_key(self):
         # You can manually specify the primary key when creating a new object.

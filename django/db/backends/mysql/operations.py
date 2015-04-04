@@ -77,7 +77,10 @@ class DatabaseOperations(BaseDatabaseOperations):
             timedelta.days, timedelta.seconds, timedelta.microseconds), []
 
     def format_for_duration_arithmetic(self, sql):
-        return 'INTERVAL %s MICROSECOND' % sql
+        if self.connection.features.supports_microsecond_precision:
+            return 'INTERVAL %s MICROSECOND' % sql
+        else:
+            return 'INTERVAL FLOOR(%s / 1000000) SECOND' % sql
 
     def drop_foreignkey_sql(self):
         return "DROP FOREIGN KEY"
@@ -145,6 +148,9 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = value.astimezone(timezone.utc).replace(tzinfo=None)
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
+
+        if not self.connection.features.supports_microsecond_precision:
+            value = value.replace(microsecond=0)
 
         return six.text_type(value)
 
