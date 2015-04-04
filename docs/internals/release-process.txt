@@ -77,7 +77,8 @@ Supported versions
 ==================
 
 At any moment in time, Django's developer team will support a set of releases to
-varying levels:
+varying levels. See `the download page`_ for the current state of support for
+each version.
 
 * The current development master will get new features and bug fixes
   requiring major refactoring.
@@ -132,13 +133,10 @@ to be "Long-term support" (LTS) releases. LTS releases will get security and
 data loss fixes applied for a guaranteed period of time, typically 3+ years,
 regardless of the pace of releases afterwards.
 
-The follow releases have been designated for long-term support:
+See `the download page`_ for the releases that have been designated for
+long-term support.
 
-* Django 1.8, supported for at least 3 years after its release (scheduled for
-  April 2015).
-* Django 1.4, supported for 6 months after the release of Django 1.8. As
-  Django 1.8 is scheduled to be released around April 2015, support for 1.4
-  will end around October 2015.
+.. _the download page: https://www.djangoproject.com/download/
 
 .. _release-process:
 
