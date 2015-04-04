@@ -2566,6 +2566,7 @@ class ManyToManyField(RelatedField):
                     (link_field_name is None or link_field_name == f.name)):
                 setattr(self, cache_attr, getattr(f, attr))
                 return getattr(self, cache_attr)
+        raise AttributeError('Failed to resolve m2m attribute %r', (attr,))
 
     def _get_m2m_reverse_attr(self, related, attr):
         """
