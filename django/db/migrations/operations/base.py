@@ -106,7 +106,7 @@ class Operation(object):
         This is a thin wrapper around router.allow_migrate_model() that
         preemptively rejects any proxy, swapped out, or unmanaged model.
         """
-        if model._meta.proxy or model._meta.swapped or not model._meta.managed:
+        if not model._meta.can_migrate(connection_alias):
             return False
 
         return router.allow_migrate_model(connection_alias, model)
