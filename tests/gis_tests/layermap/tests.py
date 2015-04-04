@@ -9,11 +9,12 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.geos import HAS_GEOS
 from django.db import connection
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 from django.utils._os import upath
 
-if HAS_GDAL:
+if HAS_GEOS and HAS_GDAL:
     from django.contrib.gis.utils.layermapping import (LayerMapping,
         LayerMapError, InvalidDecimal, InvalidString, MissingForeignKey)
     from django.contrib.gis.gdal import DataSource
