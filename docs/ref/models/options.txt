@@ -283,6 +283,31 @@ Django quotes column and table names behind the scenes.
     If ``proxy = True``, a model which subclasses another model will be treated as
     a :ref:`proxy model <proxy-models>`.
 
+``required_db_features``
+------------------------
+
+.. attribute:: Options.required_db_features
+
+    .. versionadded:: 1.9
+
+    List of database features that the current connection should have so that
+    the model is considered during the migration phase. For example, if you set
+    this list to ``['gis_enabled']``, the model will only be synchronized on
+    GIS-enabled databases. It's also useful to skip some models when testing
+    with several database backends.
+
+``required_db_vendor``
+----------------------
+
+.. attribute:: Options.required_db_vendor
+
+    .. versionadded:: 1.9
+
+    Name of a supported database vendor that this model is specific to. Current
+    built-in vendor names are: ``sqlite``, ``postgresql``, ``mysql``,
+    ``oracle``. If this attribute is not empty and the current connection vendor
+    doesn't match it, the model will not be synchronized.
+
 ``select_on_save``
 ------------------
 

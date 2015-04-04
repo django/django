@@ -8,6 +8,7 @@ from itertools import chain
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
+from django.db import connections
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import ManyToManyField
@@ -36,7 +37,8 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'order_with_respect_to', 'app_label', 'db_tablespace',
                  'abstract', 'managed', 'proxy', 'swappable', 'auto_created',
                  'index_together', 'apps', 'default_permissions',
-                 'select_on_save', 'default_related_name')
+                 'select_on_save', 'default_related_name',
+                 'required_db_features', 'required_db_vendor')
 
 
 class raise_deprecation(object):
@@ -111,6 +113,8 @@ class Options(object):
         self.get_latest_by = None
         self.order_with_respect_to = None
         self.db_tablespace = settings.DEFAULT_TABLESPACE
+        self.required_db_features = []
+        self.required_db_vendor = None
         self.meta = meta
         self.pk = None
         self.has_auto_field = False
@@ -336,6 +340,22 @@ class Options(object):
 
     def __str__(self):
         return "%s.%s" % (smart_text(self.app_label), smart_text(self.model_name))
+
+    def can_migrate(self, connection):
+        """
+        Return True if the model can/should be migrated on the `connection`.
+        `connection` can be either a real connection or a connection alias.
+        """
+        if self.proxy or self.swapped or not self.managed:
+            return False
+        if isinstance(connection, six.string_types):
+            connection = connections[connection]
+        if self.required_db_vendor:
+            return self.required_db_vendor == connection.vendor
+        if self.required_db_features:
+            return all(getattr(connection.features, feat, False)
+                       for feat in self.required_db_features)
+        return True
 
     @property
     def verbose_name_raw(self):

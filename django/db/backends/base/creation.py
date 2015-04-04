@@ -106,7 +106,7 @@ class BaseDatabaseCreation(object):
         # Make a function to iteratively return every object
         def get_objects():
             for model in serializers.sort_dependencies(app_list):
-                if (not model._meta.proxy and model._meta.managed and
+                if (model._meta.can_migrate(self.connection) and
                         router.allow_migrate_model(self.connection.alias, model)):
                     queryset = model._default_manager.using(self.connection.alias).order_by(model._meta.pk.name)
                     for obj in queryset.iterator():

@@ -268,7 +268,7 @@ class Command(BaseCommand):
                 deferred_sql = []
                 for app_name, model_list in manifest.items():
                     for model in model_list:
-                        if model._meta.proxy or not model._meta.managed:
+                        if not model._meta.can_migrate(connection):
                             continue
                         if self.verbosity >= 3:
                             self.stdout.write(
