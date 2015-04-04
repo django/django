@@ -1,15 +1,19 @@
 import json
 
-from django.contrib.postgres import forms
-from django.contrib.postgres.fields import HStoreField
-from django.contrib.postgres.validators import KeysValidator
 from django.core import exceptions, serializers
-from django.test import TestCase
 
+from . import PostgresSQLTestCase
 from .models import HStoreModel
 
+try:
+    from django.contrib.postgres import forms
+    from django.contrib.postgres.fields import HStoreField
+    from django.contrib.postgres.validators import KeysValidator
+except ImportError:
+    pass
 
-class SimpleTests(TestCase):
+
+class SimpleTests(PostgresSQLTestCase):
     apps = ['django.contrib.postgres']
 
     def test_save_load_success(self):
@@ -33,7 +37,7 @@ class SimpleTests(TestCase):
         self.assertEqual(reloaded.field, value)
 
 
-class TestQuerying(TestCase):
+class TestQuerying(PostgresSQLTestCase):
 
     def setUp(self):
         self.objs = [
@@ -111,7 +115,7 @@ class TestQuerying(TestCase):
         )
 
 
-class TestSerialization(TestCase):
+class TestSerialization(PostgresSQLTestCase):
     test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
 
     def test_dumping(self):
@@ -124,7 +128,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.field, {'a': 'b'})
 
 
-class TestValidation(TestCase):
+class TestValidation(PostgresSQLTestCase):
 
     def test_not_a_string(self):
         field = HStoreField()
@@ -134,7 +138,7 @@ class TestValidation(TestCase):
         self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string.')
 
 
-class TestFormField(TestCase):
+class TestFormField(PostgresSQLTestCase):
 
     def test_valid(self):
         field = forms.HStoreField()
@@ -164,7 +168,7 @@ class TestFormField(TestCase):
         self.assertIsInstance(form_field, forms.HStoreField)
 
 
-class TestValidator(TestCase):
+class TestValidator(PostgresSQLTestCase):
 
     def test_simple_valid(self):
         validator = KeysValidator(keys=['a', 'b'])

@@ -4,21 +4,26 @@ import unittest
 import uuid
 
 from django import forms
-from django.contrib.postgres.fields import ArrayField
-from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
 from django.core import exceptions, serializers, validators
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
-from django.test import TestCase, TransactionTestCase, override_settings
+from django.test import TransactionTestCase, override_settings
 from django.utils import timezone
 
+from . import PostgresSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
 )
 
+try:
+    from django.contrib.postgres.fields import ArrayField
+    from django.contrib.postgres.forms import SimpleArrayField, SplitArrayField
+except ImportError:
+    pass
 
-class TestSaveLoad(TestCase):
+
+class TestSaveLoad(PostgresSQLTestCase):
 
     def test_integer(self):
         instance = IntegerArrayModel(field=[1, 2, 3])
@@ -93,7 +98,7 @@ class TestSaveLoad(TestCase):
         self.assertEqual(instance.decimals, loaded.decimals)
 
 
-class TestQuerying(TestCase):
+class TestQuerying(PostgresSQLTestCase):
 
     def setUp(self):
         self.objs = [
@@ -224,7 +229,7 @@ class TestQuerying(TestCase):
         )
 
 
-class TestChecks(TestCase):
+class TestChecks(PostgresSQLTestCase):
 
     def test_field_checks(self):
         field = ArrayField(models.CharField())
@@ -241,6 +246,7 @@ class TestChecks(TestCase):
         self.assertEqual(errors[0].id, 'postgres.E002')
 
 
+@unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
 class TestMigrations(TransactionTestCase):
 
     available_apps = ['postgres_tests']
@@ -288,7 +294,7 @@ class TestMigrations(TransactionTestCase):
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
 
-class TestSerialization(TestCase):
+class TestSerialization(PostgresSQLTestCase):
     test_data = '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
 
     def test_dumping(self):
@@ -301,7 +307,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.field, [1, 2])
 
 
-class TestValidation(TestCase):
+class TestValidation(PostgresSQLTestCase):
 
     def test_unbounded(self):
         field = ArrayField(models.IntegerField())
@@ -339,7 +345,7 @@ class TestValidation(TestCase):
         self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.')
 
 
-class TestSimpleFormField(TestCase):
+class TestSimpleFormField(PostgresSQLTestCase):
 
     def test_valid(self):
         field = SimpleArrayField(forms.CharField())
@@ -411,7 +417,7 @@ class TestSimpleFormField(TestCase):
         self.assertEqual(form_field.max_length, 4)
 
 
-class TestSplitFormField(TestCase):
+class TestSplitFormField(PostgresSQLTestCase):
 
     def test_valid(self):
         class SplitForm(forms.Form):

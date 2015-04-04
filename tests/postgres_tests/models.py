@@ -1,39 +1,46 @@
-from django.contrib.postgres.fields import (
+from django.db import connection, models
+
+from .fields import (
     ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
     FloatRangeField, HStoreField, IntegerRangeField,
 )
-from django.db import connection, models
 
 
-class IntegerArrayModel(models.Model):
+class PostgreSQLModel(models.Model):
+    class Meta:
+        abstract = True
+        required_db_vendor = 'postgresql'
+
+
+class IntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField())
 
 
-class NullableIntegerArrayModel(models.Model):
+class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
 
 
-class CharArrayModel(models.Model):
+class CharArrayModel(PostgreSQLModel):
     field = ArrayField(models.CharField(max_length=10))
 
 
-class DateTimeArrayModel(models.Model):
+class DateTimeArrayModel(PostgreSQLModel):
     datetimes = ArrayField(models.DateTimeField())
     dates = ArrayField(models.DateField())
     times = ArrayField(models.TimeField())
 
 
-class NestedIntegerArrayModel(models.Model):
+class NestedIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(ArrayField(models.IntegerField()))
 
 
-class OtherTypesArrayModel(models.Model):
+class OtherTypesArrayModel(PostgreSQLModel):
     ips = ArrayField(models.GenericIPAddressField())
     uuids = ArrayField(models.UUIDField())
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
 
 
-class HStoreModel(models.Model):
+class HStoreModel(PostgreSQLModel):
     field = HStoreField(blank=True, null=True)
 
 
@@ -47,7 +54,7 @@ class TextFieldModel(models.Model):
 
 # Only create this model for databases which support it
 if connection.vendor == 'postgresql' and connection.pg_version >= 90200:
-    class RangesModel(models.Model):
+    class RangesModel(PostgreSQLModel):
         ints = IntegerRangeField(blank=True, null=True)
         bigints = BigIntegerRangeField(blank=True, null=True)
         floats = FloatRangeField(blank=True, null=True)

@@ -84,8 +84,6 @@ def get_test_modules():
                     os.path.isfile(f) or
                     not os.path.exists(os.path.join(dirpath, f, '__init__.py'))):
                 continue
-            if connection.vendor != 'postgresql' and f == 'postgres_tests':
-                continue
             modules.append((modpath, f))
     return modules
 
