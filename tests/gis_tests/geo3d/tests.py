@@ -17,8 +17,8 @@ if HAS_GEOS:
     from .models import (City3D, Interstate2D, Interstate3D, InterstateProj2D,
         InterstateProj3D, Point2D, Point3D, MultiPoint3D, Polygon2D, Polygon3D)
 
-if HAS_GDAL:
-    from django.contrib.gis.utils import LayerMapping, LayerMapError
+    if HAS_GDAL:
+        from django.contrib.gis.utils import LayerMapping, LayerMapError
 
 
 data_path = os.path.realpath(os.path.join(os.path.dirname(upath(__file__)), '..', 'data'))

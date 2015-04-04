@@ -1,12 +1,13 @@
 from unittest import skipUnless
 
 from django.contrib.gis.gdal import HAS_GDAL
+from django.contrib.gis.geos import HAS_GEOS
 from django.forms import ValidationError
 from django.test import SimpleTestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.html import escape
 
-if HAS_GDAL:
+if HAS_GEOS and HAS_GDAL:
     from django.contrib.gis import forms
     from django.contrib.gis.geos import GEOSGeometry
 

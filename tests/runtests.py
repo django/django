@@ -73,12 +73,9 @@ def get_test_modules():
     modules = []
     discovery_paths = [
         (None, RUNTESTS_DIR),
+        # GIS tests are in nested apps
+        ('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests')),
     ]
-    # GIS tests are in nested apps
-    if connection.features.gis_enabled:
-        discovery_paths.append(
-            ('gis_tests', os.path.join(RUNTESTS_DIR, 'gis_tests'))
-        )
 
     for modpath, dirpath in discovery_paths:
         for f in os.listdir(dirpath):

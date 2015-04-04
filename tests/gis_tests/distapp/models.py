@@ -1,6 +1,6 @@
-from django.contrib.gis.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+from ..models import models
 from ..utils import gisfield_may_be_null
 
 
@@ -12,6 +12,7 @@ class NamedModel(models.Model):
 
     class Meta:
         abstract = True
+        required_db_features = ['gis_enabled']
 
     def __str__(self):
         return self.name
