@@ -13,6 +13,7 @@ from importlib import import_module
 from django.apps import apps
 from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.operations.base import Operation
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -423,6 +424,10 @@ class MigrationWriter(object):
                 return "%s.as_manager()" % name, imports
             else:
                 return cls.serialize_deconstructed(manager_path, args, kwargs)
+        elif isinstance(value, Operation):
+            string, imports = OperationWriter(value, indentation=0).serialize()
+            # Nested operation, trailing comma is handled in upper OperationWriter._write()
+            return string.rstrip(','), imports
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
