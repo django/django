@@ -13,6 +13,7 @@ from importlib import import_module
 from django.apps import apps
 from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.operations.base import Operation
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -39,11 +40,10 @@ class SettingsReference(str):
 
 
 class OperationWriter(object):
-    indentation = 2
-
-    def __init__(self, operation):
+    def __init__(self, operation, indentation=2):
         self.operation = operation
         self.buff = []
+        self.indentation = indentation
 
     def serialize(self):
 
@@ -56,7 +56,14 @@ class OperationWriter(object):
                     for key, value in _arg_value.items():
                         key_string, key_imports = MigrationWriter.serialize(key)
                         arg_string, arg_imports = MigrationWriter.serialize(value)
-                        self.feed('%s: %s,' % (key_string, arg_string))
+                        args = arg_string.splitlines()
+                        if len(args) > 1:
+                            self.feed('%s: %s' % (key_string, args[0]))
+                            for arg in args[1:-1]:
+                                self.feed(arg)
+                            self.feed('%s,' % args[-1])
+                        else:
+                            self.feed('%s: %s,' % (key_string, arg_string))
                         imports.update(key_imports)
                         imports.update(arg_imports)
                     self.unindent()
@@ -66,13 +73,26 @@ class OperationWriter(object):
                     self.indent()
                     for item in _arg_value:
                         arg_string, arg_imports = MigrationWriter.serialize(item)
-                        self.feed('%s,' % arg_string)
+                        args = arg_string.splitlines()
+                        if len(args) > 1:
+                            for arg in args[:-1]:
+                                self.feed(arg)
+                            self.feed('%s,' % args[-1])
+                        else:
+                            self.feed('%s,' % arg_string)
                         imports.update(arg_imports)
                     self.unindent()
                     self.feed('],')
             else:
                 arg_string, arg_imports = MigrationWriter.serialize(_arg_value)
-                self.feed('%s=%s,' % (_arg_name, arg_string))
+                args = arg_string.splitlines()
+                if len(args) > 1:
+                    self.feed('%s=%s' % (_arg_name, args[0]))
+                    for arg in args[1:-1]:
+                        self.feed(arg)
+                    self.feed('%s,' % args[-1])
+                else:
+                    self.feed('%s=%s,' % (_arg_name, arg_string))
                 imports.update(arg_imports)
 
         imports = set()
@@ -404,6 +424,10 @@ class MigrationWriter(object):
                 return "%s.as_manager()" % name, imports
             else:
                 return cls.serialize_deconstructed(manager_path, args, kwargs)
+        elif isinstance(value, Operation):
+            string, imports = OperationWriter(value, indentation=0).serialize()
+            # Nested operation, trailing comma is handled in upper OperationWriter._write()
+            return string.rstrip(','), imports
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
