@@ -17,3 +17,7 @@ Bugfixes
 
 * Prevented ``TypeError`` in translation functions ``check_for_language()`` and
   ``get_language_bidi()`` when translations are deactivated (:ticket:`24569`).
+
+* Fixed :djadmin:`squashmigrations` command when using
+  :class:`~django.db.migrations.operations.SeparateDatabaseAndState`
+  (:ticket:`24278`).
