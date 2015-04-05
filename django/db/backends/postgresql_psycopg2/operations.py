@@ -89,11 +89,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def prepare_sql_script(self, sql):
         return [sql]
 
-    def quote_name(self, name):
-        if name.startswith('"') and name.endswith('"'):
-            return name  # Quoting once is enough.
-        return '"%s"' % name
-
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 

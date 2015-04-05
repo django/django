@@ -270,13 +270,12 @@ WHEN (new.%(col_name)s IS NULL)
         # not quoted, Oracle has case-insensitive behavior for identifiers, but
         # always defaults to uppercase.
         # We simplify things by making Oracle identifiers always uppercase.
-        if not name.startswith('"') and not name.endswith('"'):
-            name = '"%s"' % truncate_name(name.upper(), self.max_name_length())
+        name = truncate_name(name.upper(), self.max_name_length())
+        name = super(DatabaseOperations, self).quote_name(name)
         # Oracle puts the query text into a (query % args) construct, so % signs
         # in names need to be escaped. The '%%' will be collapsed back to '%' at
         # that stage so we aren't really making the name longer here.
-        name = name.replace('%', '%%')
-        return name.upper()
+        return name.replace('%', '%%')
 
     def random_function_sql(self):
         return "DBMS_RANDOM.RANDOM"
