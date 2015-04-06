@@ -10,6 +10,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
+    UnicodeModel,
 )
 
 
@@ -693,6 +694,21 @@ class ModelStateTests(TestCase):
         field.model = models.Model
         with self.assertRaisesMessage(ValueError,
                 'ModelState.fields cannot be bound to a model - "field" is.'):
+            ModelState('app', 'Model', [('field', field)])
+
+    def test_sanity_check_to(self):
+        field = models.ForeignKey(UnicodeModel)
+        with self.assertRaisesMessage(ValueError,
+                'ModelState.fields cannot refer to a model class - "field.to" does. '
+                'Use a string reference instead.'):
+            ModelState('app', 'Model', [('field', field)])
+
+    def test_sanity_check_through(self):
+        field = models.ManyToManyField('UnicodeModel')
+        field.remote_field.through = UnicodeModel
+        with self.assertRaisesMessage(ValueError,
+                'ModelState.fields cannot refer to a model class - "field.through" does. '
+                'Use a string reference instead.'):
             ModelState('app', 'Model', [('field', field)])
 
     def test_fields_immutability(self):

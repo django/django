@@ -402,7 +402,8 @@ You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they're
 easy to read and cover a lot of the example usage of semi-internal aspects
 of the migration framework like ``ProjectState`` and the patterns used to get
-historical models.
+historical models, as well as ``ModelState`` and the patterns used to mutate
+historical models in ``state_forwards()``.
 
 Some things to note:
 
@@ -420,6 +421,16 @@ Some things to note:
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for
   custom operations.
+
+.. warning::
+
+    For performance reasons, the :class:`~django.db.models.Field` instances in
+    ``ModelState.fields`` are reused across migrations. You must never change
+    the attributes on these instances. If you need to mutate a field in
+    ``state_forwards()``, you must remove the old instance from
+    ``ModelState.fields`` and add a new instance in its place. The same is true
+    for the :class:`~django.db.models.Manager` instances in
+    ``ModelState.managers``.
 
 As a simple example, let's make an operation that loads PostgreSQL extensions
 (which contain some of PostgreSQL's more exciting features). It's simple enough;
