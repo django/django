@@ -113,6 +113,13 @@ Cache
 * ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
   method.
 
+Database backends
+^^^^^^^^^^^^^^^^^
+
+* The MySQL backend will now strip microseconds from ``datetime`` values when
+  using an older version of MySQLdb DB API driver as it does not support
+  fractional seconds.
+
 Email
 ^^^^^
 
