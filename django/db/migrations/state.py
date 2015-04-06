@@ -39,66 +39,9 @@ class ProjectState(object):
             real_apps=self.real_apps,
         )
 
-    def render(self, include_real=None, ignore_swappable=False, skip_cache=False):
-        "Turns the project state into actual models in a new Apps"
-        if self.apps is None or skip_cache:
-            # Any apps in self.real_apps should have all their models included
-            # in the render. We don't use the original model instances as there
-            # are some variables that refer to the Apps object.
-            # FKs/M2Ms from real apps are also not included as they just
-            # mess things up with partial states (due to lack of dependencies)
-            real_models = []
-            for app_label in self.real_apps:
-                app = global_apps.get_app_config(app_label)
-                for model in app.get_models():
-                    real_models.append(ModelState.from_model(model, exclude_rels=True))
-            # Populate the app registry with a stub for each application.
-            app_labels = set(model_state.app_label for model_state in self.models.values())
-            self.apps = Apps([AppConfigStub(label) for label in sorted(self.real_apps + list(app_labels))])
-            # We keep trying to render the models in a loop, ignoring invalid
-            # base errors, until the size of the unrendered models doesn't
-            # decrease by at least one, meaning there's a base dependency loop/
-            # missing base.
-            unrendered_models = list(self.models.values()) + real_models
-            while unrendered_models:
-                new_unrendered_models = []
-                for model in unrendered_models:
-                    try:
-                        model.render(self.apps)
-                    except InvalidBasesError:
-                        new_unrendered_models.append(model)
-                if len(new_unrendered_models) == len(unrendered_models):
-                    raise InvalidBasesError(
-                        "Cannot resolve bases for %r\nThis can happen if you are inheriting models from an "
-                        "app with migrations (e.g. contrib.auth)\n in an app with no migrations; see "
-                        "https://docs.djangoproject.com/en/%s/topics/migrations/#dependencies "
-                        "for more" % (new_unrendered_models, get_docs_version())
-                    )
-                unrendered_models = new_unrendered_models
-            # make sure apps has no dangling references
-            if self.apps._pending_lookups:
-                # There's some lookups left. See if we can first resolve them
-                # ourselves - sometimes fields are added after class_prepared is sent
-                for lookup_model, operations in self.apps._pending_lookups.items():
-                    try:
-                        model = self.apps.get_model(lookup_model[0], lookup_model[1])
-                    except LookupError:
-                        app_label = "%s.%s" % (lookup_model[0], lookup_model[1])
-                        if app_label == settings.AUTH_USER_MODEL and ignore_swappable:
-                            continue
-                        # Raise an error with a best-effort helpful message
-                        # (only for the first issue). Error message should look like:
-                        # "ValueError: Lookup failed for model referenced by
-                        # field migrations.Book.author: migrations.Author"
-                        msg = "Lookup failed for model referenced by field {field}: {model[0]}.{model[1]}"
-                        raise ValueError(msg.format(field=operations[0][1], model=lookup_model))
-                    else:
-                        do_pending_lookups(model)
-        try:
-            return self.apps
-        finally:
-            if skip_cache:
-                self.apps = None
+    @cached_property
+    def apps(self):
+        return StateApps(self.real_apps, self.models)
 
     @classmethod
     def from_apps(cls, apps):
