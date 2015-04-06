@@ -255,6 +255,17 @@ class Apps(object):
                 "Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
+    @lru_cache.lru_cache(maxsize=None)
+    def get_swappable_setting(self, to_string):
+        # See if anything swapped/swappable matches
+        for model in self.get_models(include_swapped=True):
+            if model._meta.swapped:
+                if model._meta.swapped == to_string:
+                    return model._meta.swappable
+            if ("%s.%s" % (model._meta.app_label, model._meta.object_name)) == to_string and model._meta.swappable:
+                return model._meta.swappable
+        return None
+
     def set_available_apps(self, available):
         """
         Restricts the set of installed apps used by get_app_config[s].
