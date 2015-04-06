@@ -904,6 +904,13 @@ This decorator will cause a test case to be skipped if any User model other
 than the default Django user is in use. This decorator can be applied to a
 single test, or to an entire test class.
 
+.. deprecated:: 1.9
+
+    With the test discovery changes in Django 1.6, the tests for ``django.contrib``
+    apps are no longer run as part of the user's project. Therefore, the
+    ``@skipIfCustomUser`` decorator is no longer needed to decorate tests
+    in ``django.contrib.auth``.
+
 Depending on your application, tests may also be needed to be added to ensure
 that the application works with *any* user model, not just the default User
 model. To assist with this, Django provides two substitute user models that

@@ -401,6 +401,8 @@ Miscellaneous
 
 * Private API ``django.db.models.fields.add_lazy_relation()`` is deprecated.
 
+* ``django.contrib.auth.tests.utils.skipIfCustomUser`` decorator is deprecated.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
