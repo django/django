@@ -401,6 +401,12 @@ Miscellaneous
 
 * Private API ``django.db.models.fields.add_lazy_relation()`` is deprecated.
 
+* The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator is
+  deprecated. With the test discovery changes in Django 1.6, the tests for
+  ``django.contrib`` apps are no longer run as part of the user's project.
+  Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
+  decorate tests in ``django.contrib.auth``.
+
 .. removed-features-1.9:
 
 Features removed in 1.9

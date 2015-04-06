@@ -30,7 +30,10 @@ details on these changes.
 
 * ``Field.remote_field.to`` attribute will be removed.
 
-* ``django.db.models.fields.add_lazy_relation`` will be removed.
+* ``django.db.models.fields.add_lazy_relation()`` will be removed.
+
+* The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator will be
+  removed.
 
 .. _deprecation-removed-in-2.0:
 
