@@ -94,11 +94,6 @@ class DatabaseOperations(BaseDatabaseOperations):
     def pk_default_value(self):
         return "NULL"
 
-    def quote_name(self, name):
-        if name.startswith('"') and name.endswith('"'):
-            return name  # Quoting once is enough.
-        return '"%s"' % name
-
     def no_limit_value(self):
         return -1
 

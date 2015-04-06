@@ -107,8 +107,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         return 18446744073709551615
 
     def quote_name(self, name):
-        if name.startswith("`") and name.endswith("`"):
-            return name  # Quoting once is enough.
         return "`%s`" % name
 
     def random_function_sql(self):

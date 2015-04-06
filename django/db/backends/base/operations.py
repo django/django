@@ -307,7 +307,7 @@ class BaseDatabaseOperations(object):
         Returns a quoted version of the given table, index or column name. Does
         not quote the given name if it's already been quoted.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a quote_name() method')
+        return '"%s"' % name
 
     def random_function_sql(self):
         """
