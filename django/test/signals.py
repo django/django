@@ -178,10 +178,3 @@ def static_finders_changed(**kwargs):
     }:
         from django.contrib.staticfiles.finders import get_finder
         get_finder.cache_clear()
-
-
-@receiver(setting_changed)
-def auth_user_model_changed(**kwargs):
-    if kwargs['setting'] == 'AUTH_USER_MODEL':
-        from django.apps import apps
-        apps.get_swappable_setting.cache_clear()
