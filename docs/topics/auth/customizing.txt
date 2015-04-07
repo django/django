@@ -479,18 +479,21 @@ Specifying a custom User model
 
 Django expects your custom User model to meet some minimum requirements.
 
-1. Your model must have an integer primary key.
-
-2. Your model must have a single unique field that can be used for
+#. Your model must have a single unique field that can be used for
    identification purposes. This can be a username, an email address,
    or any other unique attribute.
 
-3. Your model must provide a way to address the user in a "short" and
+#. Your model must provide a way to address the user in a "short" and
    "long" form. The most common interpretation of this would be to use
    the user's given name as the "short" identifier, and the user's full
    name as the "long" identifier. However, there are no constraints on
    what these two methods return - if you want, they can return exactly
    the same value.
+
+.. versionchanged:: 1.8
+
+    Older versions of Django required your model to have an integer primary
+    key as well.
 
 The easiest way to construct a compliant custom User model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
