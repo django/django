@@ -28,3 +28,6 @@ Bugfixes
 
 * Fixed a migration crash when altering
   :class:`~django.db.models.ManyToManyField`\s (:ticket:`24513`).
+
+* Fixed a crash with ``QuerySet.update()`` on foreign keys to one-to-one fields
+  (:ticket:`24578`).
