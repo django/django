@@ -878,7 +878,7 @@ class Model(six.with_metaclass(ModelBase)):
     def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError("Unsaved model instance %r cannot be used in an ORM query." % self)
-        return getattr(self, field.remote_field.field_name)
+        return getattr(self, field.remote_field.get_related_field().attname)
 
     def clean(self):
         """
