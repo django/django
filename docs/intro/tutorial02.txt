@@ -128,7 +128,7 @@ the admin index page:
    :alt: Django admin index page, now with polls displayed
 
 Click "Questions". Now you're at the "change list" page for questions. This page
-displays all the question in the database and lets you choose one to change it.
+displays all the questions in the database and lets you choose one to change it.
 There's the "What's up?" question we created in the first tutorial:
 
 .. image:: _images/admin04t.png
