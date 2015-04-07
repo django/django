@@ -32,6 +32,9 @@ details on these changes.
 
 * ``django.db.models.fields.add_lazy_relation`` will be removed.
 
+* ``django.contrib.auth.tests.utils.skipIfCustomUser`` decorator
+  will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
