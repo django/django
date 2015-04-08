@@ -181,6 +181,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
     needs_multipart_form = False  # Determines does this widget need multipart form
     is_localized = False
     is_required = False
+    supports_microseconds = True
 
     def __init__(self, attrs=None):
         if attrs is not None:
