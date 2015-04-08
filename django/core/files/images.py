@@ -64,7 +64,7 @@ def get_image_dimensions(file_or_path, close=False):
                     pass
                 else:
                     raise
-            except struct.error as e:
+            except struct.error:
                 # Ignore PIL failing on a too short buffer when reads return
                 # less bytes than expected. Skip and feed more data to the
                 # parser (ticket #24544).
