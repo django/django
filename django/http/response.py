@@ -54,8 +54,9 @@ class HttpResponseBase(six.Iterator):
         self._reason_phrase = reason
         self._charset = charset
         if content_type is None:
-            content_type = '%s; charset=%s' % (settings.DEFAULT_CONTENT_TYPE,
-                                               self.charset)
+            content_type = getattr(self, 'default_content_type',
+                                   settings.DEFAULT_CONTENT_TYPE)
+            content_type = '%s; charset=%s' % (content_type, self.charset)
         self['Content-Type'] = content_type
 
     @property
@@ -470,11 +471,11 @@ class JsonResponse(HttpResponse):
     :param safe: Controls if only ``dict`` objects may be serialized. Defaults
       to ``True``.
     """
+    default_content_type = 'application/json'
 
     def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
         if safe and not isinstance(data, dict):
             raise TypeError('In order to allow non-dict objects to be '
                 'serialized set the safe parameter to False')
-        kwargs.setdefault('content_type', 'application/json')
         data = json.dumps(data, cls=encoder)
         super(JsonResponse, self).__init__(content=data, **kwargs)

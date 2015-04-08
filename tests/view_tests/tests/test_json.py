@@ -13,7 +13,7 @@ class JsonResponseTests(TestCase):
         response = self.client.get('/json/response/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            response['content-type'], 'application/json')
+            response['content-type'], 'application/json; charset=utf-8')
         self.assertEqual(json.loads(response.content.decode()), {
             'a': [1, 2, 3],
             'foo': {'bar': 'baz'},
