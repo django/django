@@ -48,6 +48,15 @@ Minor features
   changing the ``select_related()`` values used in the admin's changelist query
   based on the request.
 
+* :attr:`AdminSite.empty_value_display
+  <django.contrib.admin.AdminSite.empty_value_display>` was added to override
+  the display of empty values in ``admin change list``.
+
+* :attr:`ModelAdmin.empty_value_display
+  <django.contrib.admin.ModelAdmin.empty_value_display>` was added to have
+  ModelAdmin specific overrides for the display of empty values in ``admin
+  change list``. These overrides can also be set on a field level.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
