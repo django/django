@@ -410,7 +410,9 @@ dictionary syntax::
     'bar'
     >>> del c['foo']
     >>> c['foo']
-    ''
+    Traceback (most recent call last):
+    ...
+    KeyError: 'foo'
     >>> c['newvariable'] = 'hello'
     >>> c['newvariable']
     'hello'
