@@ -847,6 +847,15 @@ implementation details see :ref:`using-the-views`.
         <p>Your username and password didn't match. Please try again.</p>
         {% endif %}
 
+        {% if next %}
+            {% if user.is_authenticated %}
+            <p>You account doesn't have access to this page, please login with
+            an account that has access to it to proceed.</p>
+            {% else %}
+            <p>Please login to see this page.</p>
+            {% endif %}
+        {% endif %}
+
         <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
         {% csrf_token %}
         <table>
