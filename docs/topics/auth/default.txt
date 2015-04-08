@@ -873,6 +873,8 @@ implementation details see :ref:`using-the-views`.
         <input type="hidden" name="next" value="{{ next }}" />
         </form>
 
+        <p><a href="{% url 'password_reset' %}">Lost password</a>.</p>
+
         {% endblock %}
 
     If you have customized authentication (see
