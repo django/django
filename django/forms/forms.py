@@ -620,7 +620,7 @@ class BoundField(object):
                     # If this is an auto-generated default date, nix the
                     # microseconds for standardized handling. See #22502.
                     if (isinstance(data, (datetime.datetime, datetime.time)) and
-                            not getattr(self.field.widget, 'supports_microseconds', True)):
+                            not self.field.widget.supports_microseconds):
                         data = data.replace(microsecond=0)
                     self._initial_value = data
         else:
