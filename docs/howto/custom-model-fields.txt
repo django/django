@@ -333,10 +333,10 @@ incorporate arguments of the field. For example, the description for
 Useful methods
 --------------
 
-Once you've created your :class:`~django.db.models.Field` subclass and set up
-the ``__metaclass__``, you might consider overriding a few standard methods,
-depending on your field's behavior. The list of methods below is in
-approximately decreasing order of importance, so start from the top.
+Once you've created your :class:`~django.db.models.Field` subclass, you might
+consider overriding a few standard methods, depending on your field's behavior.
+The list of methods below is in approximately decreasing order of importance,
+so start from the top.
 
 .. _custom-database-types:
 
