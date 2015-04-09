@@ -38,3 +38,6 @@ Bugfixes
 
 * Prevented arbitrary file inclusions in :mod:`~django.contrib.admindocs`
   (:ticket:`24625`).
+
+* Fixed a crash with ``QuerySet.update()`` on foreign keys to instances with
+  ``uuid`` primary keys (:ticket:`24611`).
