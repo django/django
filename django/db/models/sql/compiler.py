@@ -1006,7 +1006,10 @@ class SQLUpdateCompiler(SQLCompiler):
                     raise FieldError("Aggregate functions are not allowed in this query")
             elif hasattr(val, 'prepare_database_save'):
                 if field.rel:
-                    val = val.prepare_database_save(field)
+                    val = field.get_db_prep_save(
+                        val.prepare_database_save(field),
+                        connection=self.connection,
+                    )
                 else:
                     raise TypeError("Database is trying to update a relational field "
                                     "of type %s with a value of type %s. Make sure "
