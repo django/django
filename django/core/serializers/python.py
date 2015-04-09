@@ -100,7 +100,10 @@ def Deserializer(object_list, **options):
                 raise
         data = {}
         if 'pk' in d:
-            data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
+            try:
+                data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get("pk", None))
+            except Exception as e:
+                raise base.DeserializationError.WithData(e, d['model'], d.get("pk", None), None)
         m2m_data = {}
         field_names = {f.name for f in Model._meta.get_fields()}
 
@@ -128,30 +131,42 @@ def Deserializer(object_list, **options):
                             return force_text(field.remote_field.model._meta.pk.to_python(value), strings_only=True)
                 else:
                     m2m_convert = lambda v: force_text(field.remote_field.model._meta.pk.to_python(v), strings_only=True)
-                m2m_data[field.name] = [m2m_convert(pk) for pk in field_value]
+
+                try:
+                    m2m_data[field.name] = []
+                    for pk in field_value:
+                        m2m_data[field.name].append(m2m_convert(pk))
+                except Exception as e:
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk', None), pk)
 
             # Handle FK fields
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
                 if field_value is not None:
-                    if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
-                        if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                            obj = field.remote_field.model._default_manager.db_manager(db).get_by_natural_key(*field_value)
-                            value = getattr(obj, field.remote_field.field_name)
-                            # If this is a natural foreign key to an object that
-                            # has a FK/O2O as the foreign key, use the FK value
-                            if field.remote_field.model._meta.pk.remote_field:
-                                value = value.pk
+                    try:
+                        if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
+                            if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
+                                obj = field.remote_field.model._default_manager.db_manager(db).get_by_natural_key(*field_value)
+                                value = getattr(obj, field.remote_field.field_name)
+                                # If this is a natural foreign key to an object that
+                                # has a FK/O2O as the foreign key, use the FK value
+                                if field.remote_field.model._meta.pk.remote_field:
+                                    value = value.pk
+                            else:
+                                value = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                            data[field.attname] = value
                         else:
-                            value = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
-                        data[field.attname] = value
-                    else:
-                        data[field.attname] = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                            data[field.attname] = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                    except Exception as e:
+                        raise base.DeserializationError.WithData(e, d['model'], d.get('pk', None), field_value)
                 else:
                     data[field.attname] = None
 
             # Handle all other fields
             else:
-                data[field.name] = field.to_python(field_value)
+                try:
+                    data[field.name] = field.to_python(field_value)
+                except Exception as e:
+                    raise base.DeserializationError.WithData(e, d['model'], d.get('pk', None), field_value)
 
         obj = base.build_instance(Model, data, db)
         yield base.DeserializedObject(obj, m2m_data)
