@@ -8,7 +8,6 @@ import os
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
-from django.db.migrations import questioner
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -535,36 +534,30 @@ class MakeMigrationsTests(MigrationTestBase):
         Makes sure that makemigrations enters and exits interactive mode properly.
         """
         # Monkeypatch interactive questioner to auto reject
-        old_input = questioner.input
-        questioner.input = lambda _: "N"
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
-                merge_file = os.path.join(migration_dir, '0003_merge.py')
-                self.assertFalse(os.path.exists(merge_file))
-        except CommandError:
-            self.fail("Makemigrations failed while running interactive questioner")
-        finally:
-            questioner.input = old_input
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+            try:
+                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                    call_command("makemigrations", "migrations", merge=True, interactive=True, verbosity=0)
+                    merge_file = os.path.join(migration_dir, '0003_merge.py')
+                    self.assertFalse(os.path.exists(merge_file))
+            except CommandError:
+                self.fail("Makemigrations failed while running interactive questioner")
 
     def test_makemigrations_interactive_accept(self):
         """
         Makes sure that makemigrations enters interactive mode and merges properly.
         """
         # Monkeypatch interactive questioner to auto accept
-        old_input = questioner.input
-        questioner.input = lambda _: "y"
-        out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
-                merge_file = os.path.join(migration_dir, '0003_merge.py')
-                self.assertTrue(os.path.exists(merge_file))
-        except CommandError:
-            self.fail("Makemigrations failed while running interactive questioner")
-        finally:
-            questioner.input = old_input
-        self.assertIn("Created new merge migration", force_text(out.getvalue()))
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
+            out = six.StringIO()
+            try:
+                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                    call_command("makemigrations", "migrations", merge=True, interactive=True, stdout=out)
+                    merge_file = os.path.join(migration_dir, '0003_merge.py')
+                    self.assertTrue(os.path.exists(merge_file))
+            except CommandError:
+                self.fail("Makemigrations failed while running interactive questioner")
+            self.assertIn("Created new merge migration", force_text(out.getvalue()))
 
     def test_makemigrations_non_interactive_not_null_addition(self):
         """
@@ -777,20 +770,17 @@ class MakeMigrationsTests(MigrationTestBase):
         behavior when --noinput is specified.
         """
         # Monkeypatch interactive questioner to auto reject
-        old_input = questioner.input
-        questioner.input = lambda _: "N"
         out = six.StringIO()
-        try:
-            with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
-                call_command("makemigrations", "migrations", merge=True, stdout=out)
-                merge_file = os.path.join(migration_dir, '0003_merge.py')
-                # This will fail if interactive is False by default
-                self.assertFalse(os.path.exists(merge_file))
-        except CommandError:
-            self.fail("Makemigrations failed while running interactive questioner")
-        finally:
-            questioner.input = old_input
-        self.assertNotIn("Created new merge migration", out.getvalue())
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+            try:
+                with self.temporary_migration_module(module="migrations.test_migrations_conflict") as migration_dir:
+                    call_command("makemigrations", "migrations", merge=True, stdout=out)
+                    merge_file = os.path.join(migration_dir, '0003_merge.py')
+                    # This will fail if interactive is False by default
+                    self.assertFalse(os.path.exists(merge_file))
+            except CommandError:
+                self.fail("Makemigrations failed while running interactive questioner")
+            self.assertNotIn("Created new merge migration", out.getvalue())
 
     @override_settings(
         INSTALLED_APPS=[
@@ -817,19 +807,16 @@ class MakeMigrationsTests(MigrationTestBase):
         unspecified app even if it has conflicting migrations.
         """
         # Monkeypatch interactive questioner to auto accept
-        old_input = questioner.input
-        questioner.input = lambda _: "y"
-        out = six.StringIO()
-        try:
-            with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
-                call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
-                merge_file = os.path.join(migration_dir, '0003_merge.py')
-                self.assertFalse(os.path.exists(merge_file))
-            self.assertIn("No conflicts detected to merge.", out.getvalue())
-        except CommandError:
-            self.fail("Makemigrations fails resolving conflicts in an unspecified app")
-        finally:
-            questioner.input = old_input
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='y')):
+            out = six.StringIO()
+            try:
+                with self.temporary_migration_module(app_label="migrated_app") as migration_dir:
+                    call_command("makemigrations", "migrated_app", merge=True, interactive=True, stdout=out)
+                    merge_file = os.path.join(migration_dir, '0003_merge.py')
+                    self.assertFalse(os.path.exists(merge_file))
+                self.assertIn("No conflicts detected to merge.", out.getvalue())
+            except CommandError:
+                self.fail("Makemigrations fails resolving conflicts in an unspecified app")
 
     def test_makemigrations_with_custom_name(self):
         """
