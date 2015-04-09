@@ -395,6 +395,9 @@ need to be done by the releaser.
    annotations in the documentation from two releases ago. For example, in
    Django 1.9, notes for 1.7 will be removed.
 
+#. Add the new branch to https://readthedocs.org/projects/django/ so that PDF
+   and ePub version of the docs can be built.
+
 Notes on setting the VERSION tuple
 ==================================
 
