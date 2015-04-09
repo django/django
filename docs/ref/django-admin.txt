@@ -189,6 +189,14 @@ The :djadminopt:`--database` option can be used to specify the database
 onto which the cache table will be installed, but since this information is
 pulled from your settings by default, it's typically not needed.
 
+The :djadminopt:`--dry-run` option will print the SQL that would be run without
+actually running it, so you can customize it or use the migrations framework.
+
+.. versionchanged:: 1.9
+
+    The ``--dry-run`` option was added.
+
+
 dbshell
 -------
 
