@@ -219,7 +219,7 @@ Requests and Responses
 
 * When no content_type argument is passed ``HttpResponseBase`` will now check
   for a ``default_content_type`` property, and fall back to
-  :settings:`DEFAULT_CONTENT_TYPE` if one is not defined.
+  :setting:`DEFAULT_CONTENT_TYPE` if one is not defined.
 
   This allows sub-classes (e.g.
   :class:`JsonResponse <django.http.JsonResponse>`) to override the default
