@@ -14,6 +14,3 @@ class WKTAdapter(object):
 
     def __str__(self):
         return self.wkt
-
-    def prepare_database_save(self, unused):
-        return self

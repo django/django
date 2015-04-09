@@ -42,6 +42,3 @@ class PostGISAdapter(object):
         "Returns a properly quoted string for use in PostgreSQL/PostGIS."
         # psycopg will figure out whether to use E'\\000' or '\000'
         return str('ST_GeomFromEWKB(%s)' % self._adapter.getquoted().decode())
-
-    def prepare_database_save(self, unused):
-        return self
