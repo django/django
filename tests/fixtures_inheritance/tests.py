@@ -2,9 +2,11 @@ from __future__ import unicode_literals
 
 import os
 import tempfile
-from django.test import TestCase
-from .models import User, Person, Customer
+
 from django.core import management
+from django.test import TestCase
+
+from .models import User, Person, Customer
 
 
 class TempJSONFile(object):
