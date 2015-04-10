@@ -4,8 +4,8 @@ import os
 import tempfile
 from django.test import TestCase
 from .models import User, Person, Customer
-from django.apps import apps
 from django.core import management
+
 
 class TempJSONFile(object):
 
@@ -28,8 +28,8 @@ class TestNaturalKeysAndInheritance(TestCase):
     def setUp(self):
         Customer.objects.create(username="toto", label="ping", num=23)
         Customer.objects.create(username="titi", label="pong", num=34)
-        Person  .objects.create(username="tata", label="pang"        )
-        User    .objects.create(username="tutu"                      )
+        Person  .objects.create(username="tata", label="pang")
+        User    .objects.create(username="tutu")
 
     def clear_tables(self):
         Customer.objects.all().delete()

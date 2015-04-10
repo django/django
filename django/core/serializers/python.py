@@ -43,11 +43,11 @@ class Serializer(base.Serializer):
         pk = obj._meta.pk
         if pk.remote_field:
             if self.use_natural_foreign_keys:
-                return self.get_dump_pk(getattr(obj, pk.remote_field.field.name), level+1)
+                return self.get_dump_pk(getattr(obj, pk.remote_field.field.name), level + 1)
             else:
                 return force_text(obj.pk, strings_only=True)
         elif self.use_natural_primary_keys and hasattr(obj, "natural_key"):
-            return _NONE if level==0 else obj.natural_key()
+            return _NONE if level == 0 else obj.natural_key()
         else:
             return force_text(obj.pk, strings_only=True)
 
@@ -126,7 +126,7 @@ def Deserializer(object_list, **options):
         data = {}
         if 'pk' in d:
             pk = d.get("pk", None)
-            if isinstance(pk, (list,tuple)):
+            if isinstance(pk, (list, tuple)):
                 pk = _get_by_natural_pk(Model, pk)
             else:
                 try:
