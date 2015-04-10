@@ -15,6 +15,9 @@ from django.utils import six
 from django.utils.encoding import force_text, is_protected_type
 
 
+_NONE = object()
+
+
 class Serializer(base.Serializer):
     """
     Serializes a QuerySet to basic Python objects.
@@ -36,10 +39,23 @@ class Serializer(base.Serializer):
         self.objects.append(self.get_dump_object(obj))
         self._current = None
 
+    def get_dump_pk(self, obj, level):
+        pk = obj._meta.pk
+        if pk.remote_field:
+            if self.use_natural_foreign_keys:
+                return self.get_dump_pk(getattr(obj, pk.remote_field.field.name), level+1)
+            else:
+                return force_text(obj.pk, strings_only=True)
+        elif self.use_natural_primary_keys and hasattr(obj, "natural_key"):
+            return _NONE if level==0 else obj.natural_key()
+        else:
+            return force_text(obj.pk, strings_only=True)
+
     def get_dump_object(self, obj):
         data = OrderedDict([('model', force_text(obj._meta))])
-        if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
-            data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
+        pk = self.get_dump_pk(obj, 0)
+        if pk is not _NONE:
+            data["pk"] = pk
         data['fields'] = self._current
         return data
 
@@ -79,6 +95,15 @@ class Serializer(base.Serializer):
         return self.objects
 
 
+def _get_by_natural_pk(model, npk):
+    while True:
+        pk = model._meta.pk
+        if pk.remote_field:
+            model = pk.remote_field.model
+        else:
+            return model._default_manager.get_by_natural_key(*npk).pk
+
+
 def Deserializer(object_list, **options):
     """
     Deserialize simple Python objects back into Django ORM instances.
@@ -100,10 +125,15 @@ def Deserializer(object_list, **options):
                 raise
         data = {}
         if 'pk' in d:
-            try:
-                data[Model._meta.pk.attname] = Model._meta.pk.to_python(d.get('pk'))
-            except Exception as e:
-                raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
+            pk = d.get("pk", None)
+            if isinstance(pk, (list,tuple)):
+                pk = _get_by_natural_pk(Model, pk)
+            else:
+                try:
+                    pk = Model._meta.pk.to_python(pk)
+                except Exception as e:
+                    raise base.DeserializationError.WithData(e, d['model'], pk, None)
+            data[Model._meta.pk.attname] = pk
         m2m_data = {}
         field_names = {f.name for f in Model._meta.get_fields()}
 
