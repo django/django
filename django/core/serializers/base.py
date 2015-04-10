@@ -46,6 +46,8 @@ class Serializer(object):
         self.selected_fields = options.pop("fields", None)
         self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
+        if self.use_natural_primary_keys:
+            self.use_natural_foreign_keys = True
 
         self.start_serialization()
         self.first = True
