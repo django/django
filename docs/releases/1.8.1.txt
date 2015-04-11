@@ -55,3 +55,6 @@ Bugfixes
   ``qs.annotate(foo=F('field')).values('pk').order_by('foo'))`` (:ticket:`24615`).
 
 * Fixed a database table name quoting regression (:ticket:`24605`).
+
+* Prevented the loss of ``null``/``not null`` column properties during field
+  alteration of MySQL databases (:ticket:`24595`).

@@ -61,3 +61,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     # index creation for FKs (index automatically created by MySQL)
                     field.db_index = False
         return super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
+
+    def _alter_column_type_sql(self, table, old_field, new_field, new_type):
+        # Keep null property of old field, if it has changed, it will be handled separately
+        if old_field.null:
+            new_type += " NULL"
+        else:
+            new_type += " NOT NULL"
+        return super(DatabaseSchemaEditor, self)._alter_column_type_sql(table, old_field, new_field, new_type)
