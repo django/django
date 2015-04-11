@@ -1,7 +1,7 @@
 from django.template import (
-    Context, Template, TemplateDoesNotExist, TemplateSyntaxError, engines,
+    Context, Engine, TemplateDoesNotExist, TemplateSyntaxError,
 )
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase
 
 from ..utils import setup
 from .test_basic import basic_templates
@@ -205,110 +205,69 @@ class IncludeTagTests(SimpleTestCase):
 
 class IncludeTests(SimpleTestCase):
 
-    # Test the base loader class via the app loader. load_template
-    # from base is used by all shipped loaders excepting cached,
-    # which has its own test.
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS': True,
-        'OPTIONS': {
-            # Enable debug, otherwise the exception raised during
-            # {% include %} processing will be suppressed.
-            'debug': True,
-        }
-    }])
     def test_include_missing_template(self):
         """
         Tests that the correct template is identified as not existing
         when {% include %} specifies a template that does not exist.
         """
-        template = engines['django'].get_template('test_include_error.html')
+        engine = Engine(app_dirs=True, debug=True)
+        template = engine.get_template('test_include_error.html')
         with self.assertRaises(TemplateDoesNotExist) as e:
-            template.render()
+            template.render(Context())
         self.assertEqual(e.exception.args[0], 'missing.html')
 
-    # Test the base loader class via the app loader. load_template
-    # from base is used by all shipped loaders excepting cached,
-    # which has its own test.
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS': True,
-        'OPTIONS': {
-            # Enable debug, otherwise the exception raised during
-            # {% include %} processing will be suppressed.
-            'debug': True,
-        }
-    }])
     def test_extends_include_missing_baseloader(self):
         """
         #12787 -- Tests that the correct template is identified as not existing
         when {% extends %} specifies a template that does exist, but that
         template has an {% include %} of something that does not exist.
         """
-        template = engines['django'].get_template('test_extends_error.html')
+        engine = Engine(app_dirs=True, debug=True)
+        template = engine.get_template('test_extends_error.html')
         with self.assertRaises(TemplateDoesNotExist) as e:
-            template.render()
+            template.render(Context())
         self.assertEqual(e.exception.args[0], 'missing.html')
 
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'OPTIONS': {
-            'debug': True,
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.app_directories.Loader',
-                ]),
-            ],
-        },
-    }])
     def test_extends_include_missing_cachedloader(self):
         """
         Test the cache loader separately since it overrides load_template.
         """
+        engine = Engine(debug=True, loaders=[
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ])
 
-        template = engines['django'].get_template('test_extends_error.html')
+        template = engine.get_template('test_extends_error.html')
         with self.assertRaises(TemplateDoesNotExist) as e:
-            template.render()
+            template.render(Context())
         self.assertEqual(e.exception.args[0], 'missing.html')
 
         # Repeat to ensure it still works when loading from the cache
-        template = engines['django'].get_template('test_extends_error.html')
+        template = engine.get_template('test_extends_error.html')
         with self.assertRaises(TemplateDoesNotExist) as e:
-            template.render()
+            template.render(Context())
         self.assertEqual(e.exception.args[0], 'missing.html')
 
     def test_include_template_argument(self):
         """
         Support any render() supporting object
         """
+        engine = Engine()
         ctx = Context({
-            'tmpl': Template('This worked!'),
+            'tmpl': engine.from_string('This worked!'),
         })
-        outer_tmpl = Template('{% include tmpl %}')
+        outer_tmpl = engine.from_string('{% include tmpl %}')
         output = outer_tmpl.render(ctx)
         self.assertEqual(output, 'This worked!')
 
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'OPTIONS': {
-            'debug': True,
-        },
-    }])
     def test_include_immediate_missing(self):
         """
         #16417 -- Include tags pointing to missing templates should not raise
         an error at parsing time.
         """
-        template = Template('{% include "this_does_not_exist.html" %}')
-        self.assertIsInstance(template, Template)
+        Engine(debug=True).from_string('{% include "this_does_not_exist.html" %}')
 
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'debug': True,
-        },
-    }])
     def test_include_recursive(self):
         comments = [
             {
@@ -322,9 +281,9 @@ class IncludeTests(SimpleTestCase):
                 ]
             }
         ]
-
-        t = engines['django'].get_template('recursive_include.html')
+        engine = Engine(app_dirs=True)
+        t = engine.get_template('recursive_include.html')
         self.assertEqual(
             "Recursion!  A1  Recursion!  B1   B2   B3  Recursion!  C1",
-            t.render({'comments': comments}).replace(' ', '').replace('\n', ' ').strip(),
+            t.render(Context({'comments': comments})).replace(' ', '').replace('\n', ' ').strip(),
         )

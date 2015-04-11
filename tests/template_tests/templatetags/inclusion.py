@@ -1,9 +1,9 @@
 import operator
 
-from django.template import Library
-from django.template.loader import get_template
+from django.template import Engine, Library
 from django.utils import six
 
+engine = Engine(app_dirs=True)
 register = Library()
 
 
@@ -14,7 +14,7 @@ def inclusion_no_params():
 inclusion_no_params.anything = "Expected inclusion_no_params __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_no_params_from_template():
     """Expected inclusion_no_params_from_template __doc__"""
     return {"result": "inclusion_no_params_from_template - Expected result"}
@@ -28,7 +28,7 @@ def inclusion_one_param(arg):
 inclusion_one_param.anything = "Expected inclusion_one_param __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_one_param_from_template(arg):
     """Expected inclusion_one_param_from_template __doc__"""
     return {"result": "inclusion_one_param_from_template - Expected result: %s" % arg}
@@ -42,7 +42,7 @@ def inclusion_explicit_no_context(arg):
 inclusion_explicit_no_context.anything = "Expected inclusion_explicit_no_context __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'), takes_context=False)
+@register.inclusion_tag(engine.get_template('inclusion.html'), takes_context=False)
 def inclusion_explicit_no_context_from_template(arg):
     """Expected inclusion_explicit_no_context_from_template __doc__"""
     return {"result": "inclusion_explicit_no_context_from_template - Expected result: %s" % arg}
@@ -56,7 +56,7 @@ def inclusion_no_params_with_context(context):
 inclusion_no_params_with_context.anything = "Expected inclusion_no_params_with_context __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'), takes_context=True)
+@register.inclusion_tag(engine.get_template('inclusion.html'), takes_context=True)
 def inclusion_no_params_with_context_from_template(context):
     """Expected inclusion_no_params_with_context_from_template __doc__"""
     return {"result": "inclusion_no_params_with_context_from_template - Expected result (context value: %s)" % context['value']}
@@ -70,7 +70,7 @@ def inclusion_params_and_context(context, arg):
 inclusion_params_and_context.anything = "Expected inclusion_params_and_context __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'), takes_context=True)
+@register.inclusion_tag(engine.get_template('inclusion.html'), takes_context=True)
 def inclusion_params_and_context_from_template(context, arg):
     """Expected inclusion_params_and_context_from_template __doc__"""
     return {"result": "inclusion_params_and_context_from_template - Expected result (context value: %s): %s" % (context['value'], arg)}
@@ -84,7 +84,7 @@ def inclusion_two_params(one, two):
 inclusion_two_params.anything = "Expected inclusion_two_params __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_two_params_from_template(one, two):
     """Expected inclusion_two_params_from_template __doc__"""
     return {"result": "inclusion_two_params_from_template - Expected result: %s, %s" % (one, two)}
@@ -98,7 +98,7 @@ def inclusion_one_default(one, two='hi'):
 inclusion_one_default.anything = "Expected inclusion_one_default __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_one_default_from_template(one, two='hi'):
     """Expected inclusion_one_default_from_template __doc__"""
     return {"result": "inclusion_one_default_from_template - Expected result: %s, %s" % (one, two)}
@@ -112,7 +112,7 @@ def inclusion_unlimited_args(one, two='hi', *args):
 inclusion_unlimited_args.anything = "Expected inclusion_unlimited_args __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_unlimited_args_from_template(one, two='hi', *args):
     """Expected inclusion_unlimited_args_from_template __doc__"""
     return {"result": "inclusion_unlimited_args_from_template - Expected result: %s" % (', '.join(six.text_type(arg) for arg in [one, two] + list(args)))}
@@ -126,7 +126,7 @@ def inclusion_only_unlimited_args(*args):
 inclusion_only_unlimited_args.anything = "Expected inclusion_only_unlimited_args __dict__"
 
 
-@register.inclusion_tag(get_template('inclusion.html'))
+@register.inclusion_tag(engine.get_template('inclusion.html'))
 def inclusion_only_unlimited_args_from_template(*args):
     """Expected inclusion_only_unlimited_args_from_template __doc__"""
     return {"result": "inclusion_only_unlimited_args_from_template - Expected result: %s" % (', '.join(six.text_type(arg) for arg in args))}

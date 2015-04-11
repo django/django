@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import os
 
-from django.template import Context, Engine, Template, TemplateSyntaxError
+from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import extend_sys_path
@@ -15,7 +15,7 @@ from .utils import ROOT
 class CustomFilterTests(SimpleTestCase):
 
     def test_filter(self):
-        t = Template("{% load custom %}{{ string|trim:5 }}")
+        t = Engine().from_string("{% load custom %}{{ string|trim:5 }}")
         self.assertEqual(
             t.render(Context({"string": "abcdefghijklmnopqrstuvwxyz"})),
             "abcde"
@@ -23,6 +23,11 @@ class CustomFilterTests(SimpleTestCase):
 
 
 class TagTestCase(SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine(app_dirs=True)
+        super(TagTestCase, cls).setUpClass()
 
     def verify_tag(self, tag, name):
         self.assertEqual(tag.__name__, name)
@@ -62,11 +67,11 @@ class SimpleTagTests(TagTestCase):
         ]
 
         for entry in templates:
-            t = Template(entry[0])
+            t = self.engine.from_string(entry[0])
             self.assertEqual(t.render(c), entry[1])
 
         for entry in templates:
-            t = Template("%s as var %%}Result: {{ var }}" % entry[0][0:-2])
+            t = self.engine.from_string("%s as var %%}Result: {{ var }}" % entry[0][0:-2])
             self.assertEqual(t.render(c), "Result: %s" % entry[1])
 
     def test_simple_tag_errors(self):
@@ -85,11 +90,11 @@ class SimpleTagTests(TagTestCase):
 
         for entry in errors:
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
-                Template(entry[1])
+                self.engine.from_string(entry[1])
 
         for entry in errors:
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
-                Template("%s as var %%}" % entry[1][0:-2])
+                self.engine.from_string("%s as var %%}" % entry[1][0:-2])
 
     def test_simple_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.
@@ -108,7 +113,7 @@ class SimpleTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            Template('{% load custom %}{% simple_tag_without_context_parameter 123 %}')
+            self.engine.from_string('{% load custom %}{% simple_tag_without_context_parameter 123 %}')
 
 
 class InclusionTagTests(TagTestCase):
@@ -147,7 +152,7 @@ class InclusionTagTests(TagTestCase):
         ]
 
         for entry in templates:
-            t = Template(entry[0])
+            t = self.engine.from_string(entry[0])
             self.assertEqual(t.render(c), entry[1])
 
     def test_inclusion_tag_errors(self):
@@ -173,7 +178,7 @@ class InclusionTagTests(TagTestCase):
 
         for entry in errors:
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
-                Template(entry[1])
+                self.engine.from_string(entry[1])
 
     def test_include_tag_missing_context(self):
         # The 'context' parameter must be present when takes_context is True
@@ -182,7 +187,7 @@ class InclusionTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            Template('{% load inclusion %}{% inclusion_tag_without_context_parameter 123 %}')
+            self.engine.from_string('{% load inclusion %}{% inclusion_tag_without_context_parameter 123 %}')
 
     def test_inclusion_tags_from_template(self):
         c = Context({'value': 42})
@@ -215,7 +220,7 @@ class InclusionTagTests(TagTestCase):
         ]
 
         for entry in templates:
-            t = Template(entry[0])
+            t = self.engine.from_string(entry[0])
             self.assertEqual(t.render(c), entry[1])
 
     def test_inclusion_tag_registration(self):
@@ -241,7 +246,7 @@ class InclusionTagTests(TagTestCase):
         Context of the included/rendered template as well.
         """
         c = Context({})
-        t = Template('{% load inclusion %}{% inclusion_tag_current_app %}')
+        t = self.engine.from_string('{% load inclusion %}{% inclusion_tag_current_app %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
         # That part produces the deprecation warning
@@ -254,7 +259,7 @@ class InclusionTagTests(TagTestCase):
         Context of the included/rendered template as well.
         """
         c = Context({})
-        t = Template('{% load inclusion %}{% inclusion_tag_use_l10n %}')
+        t = self.engine.from_string('{% load inclusion %}{% inclusion_tag_use_l10n %}')
         self.assertEqual(t.render(c).strip(), 'None')
 
         c.use_l10n = True
@@ -286,7 +291,7 @@ class AssignmentTagTests(TagTestCase):
     def test_assignment_tags(self):
         c = Context({'value': 42})
 
-        t = Template('{% load custom %}{% assignment_no_params as var %}The result is: {{ var }}')
+        t = self.engine.from_string('{% load custom %}{% assignment_no_params as var %}The result is: {{ var }}')
         self.assertEqual(t.render(c), 'The result is: assignment_no_params - Expected result')
 
     def test_assignment_tag_registration(self):
@@ -300,18 +305,21 @@ class AssignmentTagTests(TagTestCase):
             "takes_context=True so it must have a first argument of 'context'"
         )
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
-            Template('{% load custom %}{% assignment_tag_without_context_parameter 123 as var %}')
+            self.engine.from_string('{% load custom %}{% assignment_tag_without_context_parameter 123 as var %}')
 
 
 class TemplateTagLoadingTests(SimpleTestCase):
 
-    def setUp(self):
-        self.egg_dir = os.path.join(ROOT, 'eggs')
+    @classmethod
+    def setUpClass(cls):
+        cls.egg_dir = os.path.join(ROOT, 'eggs')
+        cls.engine = Engine()
+        super(TemplateTagLoadingTests, cls).setUpClass()
 
     def test_load_error(self):
         ttext = "{% load broken_tag %}"
         with self.assertRaises(TemplateSyntaxError) as e:
-            Template(ttext)
+            self.engine.from_string(ttext)
 
         self.assertIn('ImportError', e.exception.args[0])
         self.assertIn('Xtemplate', e.exception.args[0])
@@ -322,10 +330,10 @@ class TemplateTagLoadingTests(SimpleTestCase):
         with extend_sys_path(egg_name):
             with self.assertRaises(TemplateSyntaxError):
                 with self.settings(INSTALLED_APPS=['tagsegg']):
-                    Template(ttext)
+                    self.engine.from_string(ttext)
             try:
                 with self.settings(INSTALLED_APPS=['tagsegg']):
-                    Template(ttext)
+                    self.engine.from_string(ttext)
             except TemplateSyntaxError as e:
                 self.assertIn('ImportError', e.args[0])
                 self.assertIn('Xtemplate', e.args[0])
@@ -335,4 +343,4 @@ class TemplateTagLoadingTests(SimpleTestCase):
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         with extend_sys_path(egg_name):
             with self.settings(INSTALLED_APPS=['tagsegg']):
-                Template(ttext)
+                self.engine.from_string(ttext)

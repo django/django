@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.template import Template, Variable, VariableDoesNotExist
+from django.template import Engine, Variable, VariableDoesNotExist
 from django.test import SimpleTestCase
 
 
@@ -38,7 +38,7 @@ class VariableResolveLoggingTests(SimpleTestCase):
 
             @property
             def template(self):
-                return Template('')
+                return Engine().from_string('')
 
             @property
             def article(self):
