@@ -290,6 +290,20 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
             "all related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
         )
 
+    def test_model_with_many_to_one(self):
+        link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
+        response = self.client.get(
+            reverse('django-admindocs-models-detail', args=['admin_docs', 'company'])
+        )
+        self.assertContains(
+            response,
+            "number of related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+        )
+        self.assertContains(
+            response,
+            "all related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+        )
+
     def test_model_with_no_backward_relations_render_only_relevant_fields(self):
         """
         A model with ``related_name`` of `+` should not show backward relationship
