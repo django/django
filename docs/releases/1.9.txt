@@ -220,6 +220,15 @@ Requests and Responses
 
 * The debug view now shows details of chained exceptions on Python 3.
 
+* When no content_type argument is passed ``HttpResponseBase`` will now check
+  for a ``default_content_type`` property, and fall back to
+  :setting:`DEFAULT_CONTENT_TYPE` if one is not defined.
+
+  This allows sub-classes (e.g.
+  :class:`JsonResponse <django.http.JsonResponse>`) to override the default
+  content type without losing the automatic appending of
+  ``"; charset=encoding"``.
+
 Tests
 ^^^^^
 
