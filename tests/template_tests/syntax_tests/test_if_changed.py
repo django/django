@@ -1,4 +1,4 @@
-from django.template import Context, Template
+from django.template import Context, Engine
 from django.test import SimpleTestCase
 
 from ..utils import setup
@@ -157,11 +157,19 @@ class IfChangedTagTests(SimpleTestCase):
 
 class IfChangedTests(SimpleTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine()
+        super(IfChangedTests, cls).setUpClass()
+
     def test_ifchanged_concurrency(self):
         """
         #15849 -- ifchanged should be thread-safe.
         """
-        template = Template('[0{% for x in foo %},{% with var=get_value %}{% ifchanged %}{{ var }}{% endifchanged %}{% endwith %}{% endfor %}]')
+        template = self.engine.from_string(
+            '[0{% for x in foo %},{% with var=get_value %}{% ifchanged %}'
+            '{{ var }}{% endifchanged %}{% endwith %}{% endfor %}]'
+        )
 
         # Using generator to mimic concurrency.
         # The generator is not passed to the 'for' loop, because it does a list(values)
@@ -184,6 +192,6 @@ class IfChangedTests(SimpleTestCase):
         """
         #19890. The content of ifchanged template tag was rendered twice.
         """
-        template = Template('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
+        template = self.engine.from_string('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')

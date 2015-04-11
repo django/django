@@ -5,37 +5,33 @@ import sys
 
 from django.contrib.auth.models import Group
 from django.core import urlresolvers
-from django.template import (
-    Context, Engine, Template, TemplateSyntaxError, engines, loader,
-)
+from django.template import Context, Engine, TemplateSyntaxError
 from django.test import SimpleTestCase, override_settings
 
 
 class TemplateTests(SimpleTestCase):
 
-    @override_settings(DEBUG=True)
     def test_string_origin(self):
-        template = Template('string template')
+        template = Engine().from_string('string template')
         self.assertEqual(template.origin.source, 'string template')
 
-    @override_settings(SETTINGS_MODULE=None, DEBUG=True)
+    @override_settings(SETTINGS_MODULE=None)
     def test_url_reverse_no_settings_module(self):
-        # Regression test for #9005
-        t = Template('{% url will_not_match %}')
+        """
+        #9005 -- url tag shouldn't require settings.SETTINGS_MODULE to
+        be set.
+        """
+        t = Engine(debug=True).from_string('{% url will_not_match %}')
         c = Context()
         with self.assertRaises(urlresolvers.NoReverseMatch):
             t.render(c)
 
-    @override_settings(
-        TEMPLATES=[{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'OPTIONS': {'string_if_invalid': '%s is invalid'},
-        }],
-        SETTINGS_MODULE='also_something',
-    )
     def test_url_reverse_view_name(self):
-        # Regression test for #19827
-        t = Template('{% url will_not_match %}')
+        """
+        #19827 -- url tag should keep original strack trace when reraising
+        exception.
+        """
+        t = Engine().from_string('{% url will_not_match %}')
         c = Context()
         try:
             t.render(c)
@@ -107,9 +103,10 @@ class TemplateTests(SimpleTestCase):
         """
         #18169 -- NoReverseMatch should not be silence in block.super.
         """
-        t = loader.get_template('included_content.html')
+        engine = Engine(app_dirs=True)
+        t = engine.get_template('included_content.html')
         with self.assertRaises(urlresolvers.NoReverseMatch):
-            t.render()
+            t.render(Context())
 
     def test_debug_tag_non_ascii(self):
         """
@@ -117,7 +114,7 @@ class TemplateTests(SimpleTestCase):
         """
         Group.objects.create(name="清風")
         c1 = Context({"objs": Group.objects.all()})
-        t1 = Template('{% debug %}')
+        t1 = Engine().from_string('{% debug %}')
         self.assertIn("清風", t1.render(c1))
 
     def test_extends_generic_template(self):
@@ -125,8 +122,8 @@ class TemplateTests(SimpleTestCase):
         #24338 -- Allow extending django.template.backends.django.Template
         objects.
         """
-        parent = engines['django'].from_string(
-            '{% block content %}parent{% endblock %}')
-        child = engines['django'].from_string(
+        engine = Engine()
+        parent = engine.from_string('{% block content %}parent{% endblock %}')
+        child = engine.from_string(
             '{% extends parent %}{% block content %}child{% endblock %}')
-        self.assertEqual(child.render({'parent': parent}), 'child')
+        self.assertEqual(child.render(Context({'parent': parent})), 'child')

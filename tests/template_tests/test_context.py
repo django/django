@@ -2,10 +2,10 @@
 
 from django.http import HttpRequest
 from django.template import (
-    Context, RequestContext, Template, Variable, VariableDoesNotExist,
+    Context, Engine, RequestContext, Variable, VariableDoesNotExist,
 )
 from django.template.context import RenderContext
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase
 
 
 class ContextTests(SimpleTestCase):
@@ -131,25 +131,20 @@ class ContextTests(SimpleTestCase):
 
 class RequestContextTests(SimpleTestCase):
 
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'OPTIONS': {
-            'loaders': [
-                ('django.template.loaders.locmem.Loader', {
-                    'child': '{{ var|default:"none" }}',
-                }),
-            ],
-        },
-    }])
     def test_include_only(self):
         """
         #15721 -- ``{% include %}`` and ``RequestContext`` should work
         together.
         """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'child': '{{ var|default:"none" }}',
+            }),
+        ])
         request = RequestFactory().get('/')
         ctx = RequestContext(request, {'var': 'parent'})
-        self.assertEqual(Template('{% include "child" %}').render(ctx), 'parent')
-        self.assertEqual(Template('{% include "child" only %}').render(ctx), 'none')
+        self.assertEqual(engine.from_string('{% include "child" %}').render(ctx), 'parent')
+        self.assertEqual(engine.from_string('{% include "child" only %}').render(ctx), 'none')
 
     def test_stack_size(self):
         """
