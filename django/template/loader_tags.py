@@ -154,9 +154,9 @@ class IncludeNode(Node):
                 for name, var in six.iteritems(self.extra_context)
             }
             if self.isolated_context:
-                return template.render(context.new(values))
+                return template._render(context.new(values))
             with context.push(**values):
-                return template.render(context)
+                return template._render(context)
         except Exception:
             if context.template.engine.debug:
                 raise
