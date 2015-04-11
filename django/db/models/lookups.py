@@ -37,7 +37,7 @@ class RegisterLookupMixin(object):
         found = self._get_lookup(lookup_name)
         if found is None and hasattr(self, 'output_field'):
             return self.output_field.get_transform(lookup_name)
-        if found is not None and not issubclass(found, Transform):
+        if found is not None and not hasattr(found, 'transform'):
             return None
         return found
 
@@ -60,6 +60,7 @@ class RegisterLookupMixin(object):
 class Transform(RegisterLookupMixin):
 
     bilateral = False
+    transform = True
 
     def __init__(self, lhs, lookups):
         self.lhs = lhs

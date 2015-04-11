@@ -1,7 +1,7 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import IntegerField
+from django.db.models import CharField, IntegerField, TextField
 from django.db.models.expressions import Func, Value
 
 
@@ -86,6 +86,8 @@ class Concat(Func):
 class Length(Func):
     """Returns the number of characters in the expression"""
     function = 'LENGTH'
+    lookup_name = 'length'
+    transform = True
 
     def __init__(self, expression, **extra):
         output_field = extra.pop('output_field', IntegerField())
@@ -98,6 +100,8 @@ class Length(Func):
 
 class Lower(Func):
     function = 'LOWER'
+    lookup_name = 'lower'
+    transform = True
 
     def __init__(self, expression, **extra):
         super(Lower, self).__init__(expression, **extra)
@@ -134,6 +138,8 @@ class Substr(Func):
 
 class Upper(Func):
     function = 'UPPER'
+    lookup_name = 'upper'
+    transform = True
 
     def __init__(self, expression, **extra):
         super(Upper, self).__init__(expression, **extra)
