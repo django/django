@@ -17,7 +17,9 @@ from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils import six, timezone
-from django.utils.dateparse import parse_date, parse_duration, parse_time
+from django.utils.dateparse import (
+    parse_date, parse_datetime, parse_duration, parse_time,
+)
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
 
@@ -42,7 +44,6 @@ from .features import DatabaseFeatures                      # isort:skip
 from .introspection import DatabaseIntrospection            # isort:skip
 from .operations import DatabaseOperations                  # isort:skip
 from .schema import DatabaseSchemaEditor                    # isort:skip
-from .utils import parse_datetime_with_timezone_support     # isort:skip
 
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
@@ -71,9 +72,9 @@ def decoder(conv_func):
 Database.register_converter(str("bool"), decoder(lambda s: s == '1'))
 Database.register_converter(str("time"), decoder(parse_time))
 Database.register_converter(str("date"), decoder(parse_date))
-Database.register_converter(str("datetime"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("timestamp"), decoder(parse_datetime_with_timezone_support))
-Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime_with_timezone_support))
+Database.register_converter(str("datetime"), decoder(parse_datetime))
+Database.register_converter(str("timestamp"), decoder(parse_datetime))
+Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
 Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
 Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)

@@ -10,10 +10,8 @@ from django.db.backends import utils as backend_utils
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.models import aggregates, fields
 from django.utils import six, timezone
-from django.utils.dateparse import parse_date, parse_time
+from django.utils.dateparse import parse_date, parse_datetime, parse_time
 from django.utils.duration import duration_string
-
-from .utils import parse_datetime_with_timezone_support
 
 try:
     import pytz
@@ -157,18 +155,23 @@ class DatabaseOperations(BaseDatabaseOperations):
         return backend_utils.typecast_decimal(expression.output_field.format_number(value))
 
     def convert_datefield_value(self, value, expression, connection, context):
-        if value is not None and not isinstance(value, datetime.date):
-            value = parse_date(value)
+        if value is not None:
+            if not isinstance(value, datetime.date):
+                value = parse_date(value)
         return value
 
     def convert_datetimefield_value(self, value, expression, connection, context):
-        if value is not None and not isinstance(value, datetime.datetime):
-            value = parse_datetime_with_timezone_support(value)
+        if value is not None:
+            if not isinstance(value, datetime.datetime):
+                value = parse_datetime(value)
+            if settings.USE_TZ:
+                value = value.replace(tzinfo=timezone.utc)
         return value
 
     def convert_timefield_value(self, value, expression, connection, context):
-        if value is not None and not isinstance(value, datetime.time):
-            value = parse_time(value)
+        if value is not None:
+            if not isinstance(value, datetime.time):
+                value = parse_time(value)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection, context):

@@ -51,17 +51,6 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
-# It's impossible to import datetime_or_None directly from MySQLdb.times
-parse_datetime = conversions[FIELD_TYPE.DATETIME]
-
-
-def parse_datetime_with_timezone_support(value):
-    dt = parse_datetime(value)
-    # Confirm that dt is naive before overwriting its tzinfo.
-    if dt is not None and settings.USE_TZ and timezone.is_naive(dt):
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt
-
 
 def adapt_datetime_with_timezone_support(value, conv):
     # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
@@ -80,14 +69,11 @@ def adapt_datetime_with_timezone_support(value, conv):
 # and Django expects time, so we still need to override that. We also need to
 # add special handling for SafeText and SafeBytes as MySQLdb's type
 # checking is too tight to catch those (see Django ticket #6052).
-# Finally, MySQLdb always returns naive datetime objects. However, when
-# timezone support is active, Django expects timezone-aware datetime objects.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
     FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
-    FIELD_TYPE.DATETIME: parse_datetime_with_timezone_support,
     datetime.datetime: adapt_datetime_with_timezone_support,
 })
 
