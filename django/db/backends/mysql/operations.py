@@ -184,6 +184,8 @@ class DatabaseOperations(BaseDatabaseOperations):
         internal_type = expression.output_field.get_internal_type()
         if internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
+        if internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         if internal_type == 'UUIDField':
             converters.append(self.convert_uuidfield_value)
         if internal_type == 'TextField':
@@ -193,6 +195,12 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_booleanfield_value(self, value, expression, connection, context):
         if value in (0, 1):
             value = bool(value)
+        return value
+
+    def convert_datetimefield_value(self, value, expression, connection, context):
+        if value is not None:
+            if settings.USE_TZ:
+                value = value.replace(tzinfo=timezone.utc)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection, context):

@@ -163,6 +163,8 @@ WHEN (new.%(col_name)s IS NULL)
             converters.append(self.convert_binaryfield_value)
         elif internal_type in ['BooleanField', 'NullBooleanField']:
             converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
         elif internal_type == 'DateField':
             converters.append(self.convert_datefield_value)
         elif internal_type == 'TimeField':
@@ -202,6 +204,13 @@ WHEN (new.%(col_name)s IS NULL)
     # cx_Oracle always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
+
+    def convert_datetimefield_value(self, value, expression, connection, context):
+        if value is not None:
+            if settings.USE_TZ:
+                value = value.replace(tzinfo=timezone.utc)
+        return value
+
     def convert_datefield_value(self, value, expression, connection, context):
         if isinstance(value, Database.Timestamp):
             return value.date()

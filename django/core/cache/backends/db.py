@@ -74,6 +74,8 @@ class DatabaseCache(BaseDatabaseCache):
             # All core backends work without typecasting, so be careful about
             # changes here - test suite will NOT pick regressions here.
             expires = typecast_timestamp(str(expires))
+        if settings.USE_TZ:
+            expires = expires.replace(tzinfo=timezone.utc)
         if expires < now:
             db = router.db_for_write(self.cache_model_class)
             with connections[db].cursor() as cursor:
@@ -132,6 +134,8 @@ class DatabaseCache(BaseDatabaseCache):
                         if (connections[db].features.needs_datetime_string_cast and not
                                 isinstance(current_expires, datetime)):
                             current_expires = typecast_timestamp(str(current_expires))
+                        if settings.USE_TZ:
+                            current_expires = current_expires.replace(tzinfo=timezone.utc)
                     exp = connections[db].ops.value_to_db_datetime(exp)
                     if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
                         cursor.execute("UPDATE %s SET value = %%s, expires = %%s "

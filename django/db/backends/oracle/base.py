@@ -588,12 +588,6 @@ def _rowfactory(row, cursor):
                 value = decimal.Decimal(value)
             else:
                 value = int(value)
-        # datetimes are returned as TIMESTAMP, except the results
-        # of "dates" queries, which are returned as DATETIME.
-        elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
-            # Confirm that dt is naive before overwriting its tzinfo.
-            if settings.USE_TZ and value is not None and timezone.is_naive(value):
-                value = value.replace(tzinfo=timezone.utc)
         elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
                          Database.LONG_STRING):
             value = to_unicode(value)

@@ -10,6 +10,7 @@ from xml.dom.minidom import parseString
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.urlresolvers import reverse
+from django.db import connection
 from django.db.models import Max, Min
 from django.http import HttpRequest
 from django.template import (
@@ -264,6 +265,13 @@ class LegacyDatabaseTests(TestCase):
             Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
             [event],
             transform=lambda d: d)
+
+    def test_cursor_execute_returns_naive_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
+        Event.objects.create(dt=dt)
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [dt])
+            self.assertEqual(cursor.fetchall()[0][0], dt)
 
     def test_filter_date_field_with_aware_datetime(self):
         # Regression test for #17742
@@ -555,6 +563,23 @@ class NewDatabaseTests(TestCase):
             Event.objects.raw('SELECT * FROM timezones_event WHERE dt = %s', [dt]),
             [event],
             transform=lambda d: d)
+
+    @skipUnlessDBFeature('supports_timezones')
+    def test_cursor_execute_returns_aware_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        Event.objects.create(dt=dt)
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [dt])
+            self.assertEqual(cursor.fetchall()[0][0], dt)
+
+    @skipIfDBFeature('supports_timezones')
+    def test_cursor_execute_returns_naive_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        utc_naive_dt = timezone.make_naive(dt, timezone.utc)
+        Event.objects.create(dt=dt)
+        with connection.cursor() as cursor:
+            cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [dt])
+            self.assertEqual(cursor.fetchall()[0][0], utc_naive_dt)
 
     @requires_tz_support
     def test_filter_date_field_with_aware_datetime(self):
