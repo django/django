@@ -151,15 +151,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             converters.append(self.convert_uuidfield_value)
         return converters
 
-    def convert_decimalfield_value(self, value, expression, connection, context):
-        return backend_utils.typecast_decimal(expression.output_field.format_number(value))
-
-    def convert_datefield_value(self, value, expression, connection, context):
-        if value is not None:
-            if not isinstance(value, datetime.date):
-                value = parse_date(value)
-        return value
-
     def convert_datetimefield_value(self, value, expression, connection, context):
         if value is not None:
             if not isinstance(value, datetime.datetime):
@@ -168,10 +159,22 @@ class DatabaseOperations(BaseDatabaseOperations):
                 value = value.replace(tzinfo=timezone.utc)
         return value
 
+    def convert_datefield_value(self, value, expression, connection, context):
+        if value is not None:
+            if not isinstance(value, datetime.date):
+                value = parse_date(value)
+        return value
+
     def convert_timefield_value(self, value, expression, connection, context):
         if value is not None:
             if not isinstance(value, datetime.time):
                 value = parse_time(value)
+        return value
+
+    def convert_decimalfield_value(self, value, expression, connection, context):
+        if value is not None:
+            value = expression.output_field.format_number(value)
+            value = backend_utils.typecast_decimal(value)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection, context):

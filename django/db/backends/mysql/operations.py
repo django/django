@@ -182,15 +182,20 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super(DatabaseOperations, self).get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type in ['BooleanField', 'NullBooleanField']:
-            converters.append(self.convert_booleanfield_value)
-        if internal_type == 'DateTimeField':
-            converters.append(self.convert_datetimefield_value)
-        if internal_type == 'UUIDField':
-            converters.append(self.convert_uuidfield_value)
         if internal_type == 'TextField':
             converters.append(self.convert_textfield_value)
+        elif internal_type in ['BooleanField', 'NullBooleanField']:
+            converters.append(self.convert_booleanfield_value)
+        elif internal_type == 'DateTimeField':
+            converters.append(self.convert_datetimefield_value)
+        elif internal_type == 'UUIDField':
+            converters.append(self.convert_uuidfield_value)
         return converters
+
+    def convert_textfield_value(self, value, expression, connection, context):
+        if value is not None:
+            value = force_text(value)
+        return value
 
     def convert_booleanfield_value(self, value, expression, connection, context):
         if value in (0, 1):
@@ -206,9 +211,4 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_uuidfield_value(self, value, expression, connection, context):
         if value is not None:
             value = uuid.UUID(value)
-        return value
-
-    def convert_textfield_value(self, value, expression, connection, context):
-        if value is not None:
-            value = force_text(value)
         return value

@@ -174,18 +174,6 @@ WHEN (new.%(col_name)s IS NULL)
         converters.append(self.convert_empty_values)
         return converters
 
-    def convert_empty_values(self, value, expression, connection, context):
-        # Oracle stores empty strings as null. We need to undo this in
-        # order to adhere to the Django convention of using the empty
-        # string instead of null, but only if the field accepts the
-        # empty string.
-        field = expression.output_field
-        if value is None and field.empty_strings_allowed:
-            value = ''
-            if field.get_internal_type() == 'BinaryField':
-                value = b''
-        return value
-
     def convert_textfield_value(self, value, expression, connection, context):
         if isinstance(value, Database.LOB):
             value = force_text(value.read())
@@ -197,7 +185,7 @@ WHEN (new.%(col_name)s IS NULL)
         return value
 
     def convert_booleanfield_value(self, value, expression, connection, context):
-        if value in (1, 0):
+        if value in (0, 1):
             value = bool(value)
         return value
 
@@ -213,7 +201,8 @@ WHEN (new.%(col_name)s IS NULL)
 
     def convert_datefield_value(self, value, expression, connection, context):
         if isinstance(value, Database.Timestamp):
-            return value.date()
+            value = value.date()
+        return value
 
     def convert_timefield_value(self, value, expression, connection, context):
         if isinstance(value, Database.Timestamp):
@@ -223,6 +212,18 @@ WHEN (new.%(col_name)s IS NULL)
     def convert_uuidfield_value(self, value, expression, connection, context):
         if value is not None:
             value = uuid.UUID(value)
+        return value
+
+    def convert_empty_values(self, value, expression, connection, context):
+        # Oracle stores empty strings as null. We need to undo this in
+        # order to adhere to the Django convention of using the empty
+        # string instead of null, but only if the field accepts the
+        # empty string.
+        field = expression.output_field
+        if value is None and field.empty_strings_allowed:
+            value = ''
+            if field.get_internal_type() == 'BinaryField':
+                value = b''
         return value
 
     def deferrable_sql(self):
