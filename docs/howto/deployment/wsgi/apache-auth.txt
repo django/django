@@ -32,7 +32,7 @@ Authentication with mod_wsgi
 
     The use of ``WSGIApplicationGroup %{GLOBAL}`` in the configurations below
     presumes that your Apache instance is running only one Django application.
-    If you are running more than Django application, please refer to the
+    If you are running more than one Django application, please refer to the
     `Defining Application Groups`_ section of the mod_wsgi docs for more
     information about this setting.
 
