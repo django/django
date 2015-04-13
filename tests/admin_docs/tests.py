@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import captured_stderr
 
 from .models import Company, Person
 
@@ -210,9 +211,8 @@ class TestModelDetailView(AdminDocsTestCase):
 
     def setUp(self):
         self.client.login(username='super', password='secret')
-        self.response = self.client.get(
-            reverse('django-admindocs-models-detail',
-                    args=['admin_docs', 'person']))
+        with captured_stderr() as self.docutils_stderr:
+            self.response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'person']))
 
     def test_method_excludes(self):
         """
@@ -285,6 +285,9 @@ class TestModelDetailView(AdminDocsTestCase):
         self.assertContains(self.response, '.. raw:: html\n    :file: admin_docs/evilfile.txt')
         self.assertContains(self.response, '<p>&quot;include&quot; directive disabled.</p>',)
         self.assertContains(self.response, '.. include:: admin_docs/evilfile.txt')
+        out = self.docutils_stderr.getvalue()
+        self.assertIn('"raw" directive disabled', out)
+        self.assertIn('"include" directive disabled', out)
 
     def test_model_with_many_to_one(self):
         link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
