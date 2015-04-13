@@ -41,3 +41,6 @@ Bugfixes
 
 * Fixed a crash with ``QuerySet.update()`` on foreign keys to instances with
   ``uuid`` primary keys (:ticket:`24611`).
+
+* Fixed database introspection with SQLite 3.8.9 (released April 8, 2015)
+  (:ticket:`24637`).
