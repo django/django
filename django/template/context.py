@@ -171,8 +171,7 @@ class Context(BaseContext):
         "Pushes other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
-        self.dicts.append(other_dict)
-        return other_dict
+        return ContextDict(self, other_dict)
 
 
 class RenderContext(BaseContext):

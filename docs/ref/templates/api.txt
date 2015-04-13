@@ -497,6 +497,21 @@ the stack instead of an empty one.
     >>> c['foo']
     'first level'
 
+Like ``push()``, you can use ``update()`` as a context manager to ensure a
+matching ``pop()`` is called.
+
+    >>> c = Context()
+    >>> c['foo'] = 'first level'
+    >>> with c.update({'foo': 'second level'}):
+    ...     c['foo']
+    'second level'
+    >>> c['foo']
+    'first level'
+
+.. versionadded:: 1.9
+
+    The ability to use ``update()`` as a context manager was added.
+
 Using a ``Context`` as a stack comes in handy in :ref:`some custom template
 tags <howto-writing-custom-template-tags>`.
 

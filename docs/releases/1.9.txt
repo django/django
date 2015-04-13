@@ -211,6 +211,9 @@ Templates
 * The :ttag:`firstof` template tag supports storing the output in a variable
   using 'as'.
 
+* :meth:`Context.update() <django.template.Context.update>` can now be used as
+  a context manager.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
