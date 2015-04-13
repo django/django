@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from decimal import Decimal
 
 from django import forms
 from django.conf import settings
@@ -12,7 +13,7 @@ from django.contrib.admin.utils import (
 )
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.db import DEFAULT_DB_ALIAS, models
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
@@ -171,6 +172,27 @@ class UtilsTests(TestCase):
 
         display_value = display_for_field(None, models.FloatField())
         self.assertEqual(display_value, EMPTY_CHANGELIST_VALUE)
+
+    def test_number_formats_display_for_field(self):
+        """
+        test number values for display_for_field
+        """
+        display_value = display_for_field(12345.6789, models.FloatField())
+        self.assertEqual(display_value, '12345.6789')
+
+        display_value = display_for_field(Decimal('12345.6789'), models.DecimalField())
+        self.assertEqual(display_value, '12345.6789')
+
+    @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
+    def test_number_formats_with_thousand_seperator_display_for_field(self):
+        """
+        test number values for display_for_field
+        """
+        display_value = display_for_field(12345.6789, models.FloatField())
+        self.assertEqual(display_value, '12,345.6789')
+
+        display_value = display_for_field(Decimal('12345.6789'), models.DecimalField())
+        self.assertEqual(display_value, '12,345.6789')
 
     def test_label_for_field(self):
         """
