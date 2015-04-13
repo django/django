@@ -208,6 +208,9 @@ Templates
 * A warning will now be logged for missing context variables. These messages
   will be logged to the :ref:`django.template <django-template-logger>` logger.
 
+* The :ttag:`firstof` template tag supports storing the output in a variable
+  using 'as'.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 

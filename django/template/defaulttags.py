@@ -110,14 +110,19 @@ class FilterNode(Node):
 
 
 class FirstOfNode(Node):
-    def __init__(self, variables):
+    def __init__(self, variables, asvar=None):
         self.vars = variables
+        self.asvar = asvar
 
     def render(self, context):
         for var in self.vars:
             value = var.resolve(context, True)
             if value:
-                return render_value_in_context(value, context)
+                first = render_value_in_context(value, context)
+                if self.asvar:
+                    context[self.asvar] = first
+                    return ''
+                return first
         return ''
 
 
@@ -748,7 +753,7 @@ def firstof(parser, token):
 
     Sample usage::
 
-        {% firstof var1 var2 var3 %}
+        {% firstof var1 var2 var3 as myvar %}
 
     This is equivalent to::
 
@@ -779,9 +784,14 @@ def firstof(parser, token):
 
     """
     bits = token.split_contents()[1:]
+    asvar = None
     if len(bits) < 1:
         raise TemplateSyntaxError("'firstof' statement requires at least one argument")
-    return FirstOfNode([parser.compile_filter(bit) for bit in bits])
+
+    if len(bits) >= 2 and bits[-2] == 'as':
+        asvar = bits[-1]
+        bits = bits[:-2]
+    return FirstOfNode([parser.compile_filter(bit) for bit in bits], asvar)
 
 
 @register.tag('for')
