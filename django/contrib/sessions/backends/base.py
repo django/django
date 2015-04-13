@@ -58,9 +58,9 @@ class SessionBase(object):
     def get(self, key, default=None):
         return self._session.get(key, default)
 
-    def pop(self, key, *args):
+    def pop(self, key, default=None):
         self.modified = self.modified or key in self._session
-        return self._session.pop(key, *args)
+        return self._session.pop(key, default)
 
     def setdefault(self, key, value):
         if key in self._session:
