@@ -122,6 +122,7 @@ class Command(BaseCommand):
         """
         Loads fixtures files for a given label.
         """
+        show_progress = self.verbosity >= 3
         for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
             _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
             open_method, mode = self.compression_formats[cmp_fmt]
@@ -144,6 +145,11 @@ class Command(BaseCommand):
                         self.models.add(obj.object.__class__)
                         try:
                             obj.save(using=self.using)
+                            if show_progress:
+                                self.stdout.write(
+                                    '\rProcessed %i object(s).' % loaded_objects_in_fixture,
+                                    ending=''
+                                )
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
@@ -152,7 +158,8 @@ class Command(BaseCommand):
                                 'error_msg': force_text(e)
                             },)
                             raise
-
+                if objects and show_progress:
+                    self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
                 self.fixture_object_count += objects_in_fixture
             except Exception as e:
