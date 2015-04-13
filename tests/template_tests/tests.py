@@ -115,8 +115,8 @@ class TemplateTests(SimpleTestCase):
         """
         #23060 -- Test non-ASCII model representation in debug output.
         """
-        Group.objects.create(name="清風")
-        c1 = Context({"objs": Group.objects.all()})
+        group = Group(name="清風")
+        c1 = Context({"objs": [group]})
         t1 = Engine().from_string('{% debug %}')
         self.assertIn("清風", t1.render(c1))
 
