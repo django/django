@@ -1652,6 +1652,20 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Author")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Aardvark")
 
+    def test_model_with_only_relation_fields_is_removed(self):
+        """
+        Tests that a model with only relation fields is removed.
+        """
+        # Make state
+        before = self.make_project_state([self.aardvark_pk_fk_author, self.author_empty])
+        after = self.make_project_state([self.author_empty])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["DeleteModel"])
+        self.assertOperationAttributes(changes, 'testapp', 0, 0, name="Aardvark")
+
     def test_first_dependency(self):
         """
         Tests that a dependency to an app with no migrations uses __first__.

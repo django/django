@@ -636,6 +636,8 @@ class MigrationAutodetector(object):
                 # Skip here, no need to handle fields for unmanaged models
                 continue
 
+            local_field_count = len(model._meta.local_concrete_fields)
+
             # Gather related fields
             related_fields = {}
             for field in model._meta.local_fields:
@@ -672,6 +674,10 @@ class MigrationAutodetector(object):
                 )
             # Then remove each related field
             for name, field in sorted(related_fields.items()):
+                # don't remove the last field, since that produces an invalid table
+                # on some backends.
+                if local_field_count == 1:
+                    break
                 self.add_operation(
                     app_label,
                     operations.RemoveField(
@@ -679,6 +685,8 @@ class MigrationAutodetector(object):
                         name=name,
                     )
                 )
+                local_field_count -= 1
+
             # Finally, remove the model.
             # This depends on both the removal/alteration of all incoming fields
             # and the removal of all its own related fields, and if it's
