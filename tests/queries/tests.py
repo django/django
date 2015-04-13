@@ -440,6 +440,10 @@ class Queries1Tests(BaseQuerysetTest):
             ['<Item: four>']
         )
 
+    def test_error_raised_on_filter_with_dictionary(self):
+        with self.assertRaisesMessage(FieldError, 'Cannot parse keyword query as dict'):
+            Note.objects.filter({'note': 'n1', 'misc': 'foo'})
+
     def test_tickets_2076_7256(self):
         # Ordering on related tables should be possible, even if the table is
         # not otherwise involved.
