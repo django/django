@@ -342,6 +342,18 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             '<Article: Who needs more than one database?>',
         ])
 
+    def test_loaddata_verbose(self):
+        # Load db fixture 1 with high verbosity level
+        new_io = six.StringIO()
+        management.call_command('loaddata', 'fixture1.json', verbosity=3, stdout=new_io, stderr=new_io)
+        command_output = new_io.getvalue().strip()
+
+        # Check the output, that all objects were processed
+        self.assertIn("Processed 1 object(s).\nProcessed 2 object(s).\n"
+                      "Processed 3 object(s).\nProcessed 4 object(s).\n",
+                      command_output
+        )
+
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly
         management.call_command('loaddata', 'db_fixture_1', verbosity=0, using='default')
