@@ -5,16 +5,16 @@ Installing Geospatial libraries
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-========================  ====================================  ================================  ==========================
+========================  ====================================  ================================  ============================
 Program                   Description                           Required                          Supported Versions
-========================  ====================================  ================================  ==========================
+========================  ====================================  ================================  ============================
 :doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.4, 3.3, 3.2
-`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.8, 4.7, 4.6, 4.5, 4.4
+`PROJ.4`_                 Cartographic Projections library      Yes (PostgreSQL and SQLite only)  4.9, 4.8, 4.7, 4.6, 4.5, 4.4
 :doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes (SQLite only)                 1.10, 1.9, 1.8, 1.7
 :doc:`GeoIP <../geoip>`   IP-based geolocation library          No                                1.4
 `PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             2.1, 2.0, 1.5
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 4.1, 4.0, 3.0, 2.4
-========================  ====================================  ================================  ==========================
+========================  ====================================  ================================  ============================
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
@@ -168,14 +168,14 @@ reference systems.
 
 First, download the PROJ.4 source code and datum shifting files [#]_::
 
-    $ wget http://download.osgeo.org/proj/proj-4.8.0.tar.gz
+    $ wget http://download.osgeo.org/proj/proj-4.9.1.tar.gz
     $ wget http://download.osgeo.org/proj/proj-datumgrid-1.5.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``nad`` subdirectory.  This must be done *prior* to configuration::
 
-    $ tar xzf proj-4.8.0.tar.gz
-    $ cd proj-4.8.0/nad
+    $ tar xzf proj-4.9.1.tar.gz
+    $ cd proj-4.9.1/nad
     $ tar xzf ../../proj-datumgrid-1.5.tar.gz
     $ cd ..
 
