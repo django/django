@@ -1176,6 +1176,8 @@ class ``initial`` dictionary. This has been fixed to return a copy of this
 dictionary, so form instances can modify their initial data without messing
 with the class variable.
 
+.. _deprecated-features-1.4:
+
 Features deprecated in 1.4
 ==========================
 
