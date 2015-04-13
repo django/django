@@ -7,8 +7,9 @@ from unittest import skipUnless
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.db.models.fields import FieldDoesNotExist
 
-from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
+from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag, A, B
 
 
 class LookupTests(TestCase):
@@ -736,3 +737,24 @@ class LookupTransactionTests(TransactionTestCase):
             self.assertQuerysetEqual(
                 MyISAMArticle.objects.filter(headline__search='Reinhardt'),
                 [dr], lambda x: x)
+
+
+class Ticket21144(TestCase):
+    """
+    Unittests for https://code.djangoproject.com/ticket/21144 that were
+    fixed in commit c21e86ab9e3e5ebd6d245d038cb0cb352cd84c3a
+    """
+    def setUp(self):
+        self.a_foo = A.objects.create(x=21)
+        self.b_foo = B.objects.create(y=42, a=self.a_foo)
+        self.a_bar = A.objects.create(x=22)
+
+    def test_ticket_21144_raw_id_references_raw_id(self):
+        B.objects.filter(pk=self.b_foo.id).update(a_id=self.a_bar.id)
+        qs = B.objects.filter(pk=self.b_foo.id)
+        self.assertEqual(qs[0].a.id, self.a_bar.id)
+
+    def test_ticket_21144_field_references_raw_id(self):
+        B.objects.filter(pk=self.b_foo.id).update(a=self.a_bar.id)
+        qs = B.objects.filter(pk=self.b_foo.id)
+        self.assertEqual(qs[0].a.id, self.a_bar.id)

@@ -77,3 +77,12 @@ class MyISAMArticle(models.Model):
     class Meta:
         db_table = 'myisam_article'
         managed = False
+
+
+class A(models.Model):
+    x = models.IntegerField(default=10)
+
+
+class B(models.Model):
+    a = models.ForeignKey(A)
+    y = models.IntegerField(default=10)
