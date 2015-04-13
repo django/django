@@ -909,11 +909,31 @@ class ModelAdmin(BaseModelAdmin):
         """
         Construct a change message from a changed object.
         """
+        def convert_changed_list(obj, changed_data):
+            """ Add verbose names of models to changed data """
+            cls = type(obj)
+            verbose_names = []
+            for field in changed_data:
+                try:
+                    verbose_names.append(
+                        cls._meta.get_field_by_name(field)[0].verbose_name
+                    )
+                except FieldDoesNotExist:
+                    verbose_names.append(field)
+            return verbose_names
+
         change_message = []
         if add:
             change_message.append(_('Added.'))
         elif form.changed_data:
-            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            try:
+                changed_data = convert_changed_list(form.instance, form.changed_data)
+            except AttributeError:
+                changed_data = form.changed_data
+
+            change_message.append(_('Changed %s.') % get_text_list(
+                changed_data, _('and')
+            ))
 
         if formsets:
             for formset in formsets:
@@ -922,8 +942,9 @@ class ModelAdmin(BaseModelAdmin):
                                           % {'name': force_text(added_object._meta.verbose_name),
                                              'object': force_text(added_object)})
                 for changed_object, changed_fields in formset.changed_objects:
+                    changed_data = convert_changed_list(form.instance, form.changed_data)
                     change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
-                                          % {'list': get_text_list(changed_fields, _('and')),
+                                          % {'list': get_text_list(changed_data, _('and')),
                                              'name': force_text(changed_object._meta.verbose_name),
                                              'object': force_text(changed_object)})
                 for deleted_object in formset.deleted_objects:
