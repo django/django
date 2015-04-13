@@ -19,7 +19,9 @@ from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile, SimpleUploadedFile, TemporaryUploadedFile,
 )
-from django.test import LiveServerTestCase, SimpleTestCase, override_settings
+from django.test import (
+    LiveServerTestCase, SimpleTestCase, TestCase, override_settings,
+)
 from django.utils import six
 from django.utils._os import upath
 from django.utils.six.moves.urllib.request import urlopen
@@ -429,7 +431,7 @@ class CustomStorageTests(FileStorageTests):
         self.storage.delete(second)
 
 
-class FileFieldStorageTests(SimpleTestCase):
+class FileFieldStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
