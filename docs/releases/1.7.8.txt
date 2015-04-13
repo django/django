@@ -1,0 +1,8 @@
+==========================
+Django 1.7.7 release notes
+==========================
+
+*Under development*
+
+Django 1.7.8 fixes database introspection with SQLite 3.8.9 (released April 8,
+2015) (:ticket:`24637`).
