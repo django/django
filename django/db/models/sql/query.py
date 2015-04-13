@@ -1121,6 +1121,8 @@ class Query(object):
         query. However, if the filter isn't added to the query then the caller
         is responsible for unreffing the joins used.
         """
+        if isinstance(filter_expr, dict):
+            raise FieldError("Cannot parse keyword query as dict")
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
