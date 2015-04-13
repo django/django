@@ -81,3 +81,10 @@ class FirstOfTagTests(SimpleTestCase):
     def test_firstof14(self):
         output = self.engine.render_to_string('firstof14', {'a': '<'})
         self.assertEqual(output, '<')
+
+    @setup({'firstof15': '{% firstof a b c as myvar %}'})
+    def test_firstof15(self):
+        ctx = {'a': 0, 'b': 2, 'c': 3}
+        output = self.engine.render_to_string('firstof15', ctx)
+        self.assertEqual(ctx['myvar'], '2')
+        self.assertEqual(output, '')
