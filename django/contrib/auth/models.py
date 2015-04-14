@@ -415,6 +415,19 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
         abstract = True
 
+    def get_display_name(self):
+        """
+        Returns the full name if available, else returns email or else returns
+        the username.
+        """
+        if self.get_full_name() != ' ':
+            display_name = self.get_full_name()
+        elif self.email:
+            display_name = self.email
+        else:
+            display_name = self.username
+        return display_name
+
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.

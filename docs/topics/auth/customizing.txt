@@ -579,6 +579,13 @@ password resets. You must then provide some key implementation details:
         would be the full name of the user, but it can be any string that
         identifies the user.
 
+    .. method:: get_display_name()
+
+        An alternative to :meth:`django.contrib.auth.models.get_full_name().
+        Returns full name if available, else fallback to email and as the
+        last option to username. Can be used whenever a name/email/username
+        is required.
+
     .. method:: get_short_name()
 
         A short, informal identifier for the user. A common interpretation
