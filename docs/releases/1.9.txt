@@ -236,6 +236,9 @@ Validators
 * Added :func:`django.core.validators.int_list_validator` to generate
   validators of strings containing integers separated with a custom character.
 
+* :class:`validators.EmailValidator <django.core.validators.EmailValidator>` now
+  limits DNS labels and TLD length to 63 characters.
+
 Backwards incompatible changes in 1.9
 =====================================
 
