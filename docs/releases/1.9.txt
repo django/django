@@ -364,6 +364,13 @@ Miscellaneous
 * ``CommaSeparatedIntegerField`` validation has been refined to forbid values
   like ``','``, ``',1'``, and ``'1,,2'``.
 
+* Form initialization was moved from the :meth:`ProcessFormView.get()
+  <django.views.generic.edit.ProcessFormView.get>` method to the new
+  :meth:`FormMixin.get_context_data()
+  <django.views.generic.edit.FormMixin.get_context_data>` method. This may be
+  backwards incompatible if you have overridden the ``get_context_data()``
+  method without calling ``super()``.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
