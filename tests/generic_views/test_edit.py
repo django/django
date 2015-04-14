@@ -81,6 +81,13 @@ class FormMixinTests(TestCase):
             MissingDefaultValue().get_form(), forms.Form,
         )
 
+    def test_get_context_data(self):
+        class FormContext(FormMixin):
+            request = RequestFactory().get('/')
+            form_class = forms.Form
+
+        self.assertIsInstance(FormContext().get_context_data()['form'], forms.Form)
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class BasicFormTests(TestCase):

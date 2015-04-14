@@ -112,7 +112,14 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
-        return self.render_to_response(self.get_context_data(form=form))
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        """
+        Insert the form into the context dict.
+        """
+        kwargs.setdefault('form', self.get_form())
+        return super(FormMixin, self).get_context_data(**kwargs)
 
 
 class ModelFormMixin(FormMixin, SingleObjectMixin):
@@ -202,8 +209,7 @@ class ProcessFormView(View):
         """
         Handles GET requests and instantiates a blank version of the form.
         """
-        form = self.get_form()
-        return self.render_to_response(self.get_context_data(form=form))
+        return self.render_to_response(self.get_context_data())
 
     def post(self, request, *args, **kwargs):
         """
