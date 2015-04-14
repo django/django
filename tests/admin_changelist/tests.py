@@ -17,17 +17,17 @@ from django.test.client import RequestFactory
 from django.utils import formats, six
 
 from .admin import (
-    BandAdmin, ChildAdmin, ChordsBandAdmin, CustomPaginationAdmin,
-    CustomPaginator, DynamicListDisplayChildAdmin,
+    BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
+    CustomPaginationAdmin, CustomPaginator, DynamicListDisplayChildAdmin,
     DynamicListDisplayLinksChildAdmin, DynamicListFilterChildAdmin,
     DynamicSearchFieldsChildAdmin, FilteredChildAdmin, GroupAdmin,
     InvitationAdmin, NoListDisplayLinksParentAdmin, ParentAdmin, QuartetAdmin,
     SwallowAdmin, site as custom_site,
 )
 from .models import (
-    Band, Child, ChordsBand, ChordsMusician, CustomIdUser, Event, Genre, Group,
-    Invitation, Membership, Musician, OrderedObject, Parent, Quartet, Swallow,
-    UnorderedObject,
+    Band, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser, Event,
+    Genre, Group, Invitation, Membership, Musician, OrderedObject, Parent,
+    Quartet, Swallow, UnorderedObject,
 )
 
 
@@ -259,6 +259,30 @@ class ChangeListTests(TestCase):
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
 
+    def test_distinct_for_through_m2m_at_second_level_in_list_filter(self):
+        """
+        When using a ManyToMany in list_filter at the second level behind a ForeignKey,
+        distinct() must be called and results shouldn't appear more than once.
+        """
+        lead = Musician.objects.create(name='Vox')
+        band = Group.objects.create(name='The Hype')
+        Concert.objects.create(name='Woodstock', group=band)
+        Membership.objects.create(group=band, music=lead, role='lead voice')
+        Membership.objects.create(group=band, music=lead, role='bass player')
+
+        m = ConcertAdmin(Concert, admin.site)
+        request = self.factory.get('/concert/', data={'group__members': lead.pk})
+
+        cl = ChangeList(request, Concert, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+
+        cl.get_results(request)
+
+        # There's only one Concert instance
+        self.assertEqual(cl.result_count, 1)
+
     def test_distinct_for_inherited_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
@@ -346,6 +370,28 @@ class ChangeListTests(TestCase):
                         m.list_max_show_all, m.list_editable, m)
 
         # Make sure distinct() was called
+        self.assertEqual(cl.queryset.count(), 1)
+
+    def test_distinct_for_many_to_many_at_second_level_in_search_fields(self):
+        """
+        When using a ManyToMany in search_fields at the second level behind a ForeignKey,
+        distinct() must be called and results shouldn't appear more than once.
+        """
+        lead = Musician.objects.create(name='Vox')
+        band = Group.objects.create(name='The Hype')
+        Concert.objects.create(name='Woodstock', group=band)
+        Membership.objects.create(group=band, music=lead, role='lead voice')
+        Membership.objects.create(group=band, music=lead, role='bass player')
+
+        m = ConcertAdmin(Concert, admin.site)
+        request = self.factory.get('/concert/', data={SEARCH_VAR: 'vox'})
+
+        cl = ChangeList(request, Concert, m.list_display,
+                m.list_display_links, m.list_filter, m.date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
+
+        # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
 
     def test_pagination(self):
