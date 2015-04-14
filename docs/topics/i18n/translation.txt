@@ -976,21 +976,39 @@ To use the catalog, just pull in the dynamically generated script like this:
     <script type="text/javascript" src="{% url 'django.views.i18n.javascript_catalog' %}"></script>
 
 This uses reverse URL lookup to find the URL of the JavaScript catalog view.
-When the catalog is loaded, your JavaScript code can use the standard
-``gettext`` interface to access it::
+When the catalog is loaded, your JavaScript code can use the following methods:
+
+* ``gettext``
+* ``ngettext``
+* ``interpolate``
+* ``get_format``
+* ``gettext_noop``
+* ``pgettext``
+* ``npgettext``
+* ``pluralidx``
+
+``gettext``
+~~~~~~~~~~~
+
+The ``gettext`` function behaves similarly to the standard ``gettext``
+interface within your Python code::
 
     document.write(gettext('this is to be translated'));
 
-There is also an ``ngettext`` interface::
+``ngettext``
+~~~~~~~~~~~~
+
+The ``ngettext`` function provides an interface to pluralize words and
+phrases::
 
     var object_cnt = 1 // or 0, or 2, or 3, ...
     s = ngettext('literal for the singular case',
             'literal for the plural case', object_cnt);
 
-and even a string interpolation function::
+``interpolate``
+~~~~~~~~~~~~~~~
 
-    function interpolate(fmt, obj, named);
-
+The ``interpolate`` function supports dynamically populating a format string.
 The interpolation syntax is borrowed from Python, so the ``interpolate``
 function supports both positional and named interpolation:
 
@@ -1005,7 +1023,7 @@ function supports both positional and named interpolation:
     // s is 'There are 11 objects. Remaining: 20'
 
 * Named interpolation: This mode is selected by passing the optional
-  boolean ``named`` parameter as true. ``obj`` contains a JavaScript
+  boolean ``named`` parameter as ``true``. ``obj`` contains a JavaScript
   object or associative array. For example::
 
     d = {
@@ -1022,6 +1040,91 @@ JavaScript, so the code has to make repeated regular-expression substitutions.
 This isn't as fast as string interpolation in Python, so keep it to those
 cases where you really need it (for example, in conjunction with ``ngettext``
 to produce proper pluralizations).
+
+``get_format``
+~~~~~~~~~~~~~~
+
+The ``get_format`` function has access to the configured i18n formatting
+settings and can retrieve the format string for a given setting name::
+
+    document.write(get_format('DATE_FORMAT'));
+    // 'N j, Y'
+
+It has access to the following settings:
+
+* :setting:`DATE_FORMAT`
+* :setting:`DATE_INPUT_FORMATS`
+* :setting:`DATETIME_FORMAT`
+* :setting:`DATETIME_INPUT_FORMATS`
+* :setting:`DECIMAL_SEPARATOR`
+* :setting:`FIRST_DAY_OF_WEEK`
+* :setting:`MONTH_DAY_FORMAT`
+* :setting:`NUMBER_GROUPING`
+* :setting:`SHORT_DATE_FORMAT`
+* :setting:`SHORT_DATETIME_FORMAT`
+* :setting:`THOUSAND_SEPARATOR`
+* :setting:`TIME_FORMAT`
+* :setting:`TIME_INPUT_FORMATS`
+* :setting:`YEAR_MONTH_FORMAT`
+
+This is useful for maintaining formatting consistency with the Python-rendered
+values.
+
+``gettext_noop``
+~~~~~~~~~~~~~~~~
+
+This emulates the ``gettext`` function but does nothing, returning whatever
+is passed to it::
+
+    document.write(gettext_noop('this will not be translated'));
+
+This is useful for stubbing out portions of the code that will need translation
+in the future.
+
+``pgettext``
+~~~~~~~~~~~~
+
+The ``pgettext`` function behaves like the Python variant
+(:func:`~django.utils.translation.pgettext()`), providing a contextually
+translated word::
+
+    document.write(pgettext('month name', 'May'));
+
+``npgettext``
+~~~~~~~~~~~~~
+
+The ``npgettext`` function also behaves like the Python variant
+(:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
+contextually translated word::
+
+    document.write(npgettext('group', 'party', 1));
+    // party
+    document.write(npgettext('group', 'party', 2));
+    // parties
+
+``pluralidx``
+~~~~~~~~~~~~~
+
+The ``pluralidx`` function works in a similar way to the :tfilter:`pluralize`
+template filter, determining if a given ``count`` should use a plural form of
+a word or not::
+
+    document.write(pluralidx(0));
+    // true
+    document.write(pluralidx(1));
+    // false
+    document.write(pluralidx(2));
+    // true
+
+In the simplest case, if no custom pluralization is needed, this returns
+``false`` for the integer ``1`` and ``true`` for all other numbers.
+
+However, pluralization is not this simple in all languages. If the language does
+not support pluralization, an empty value is provided.
+
+Additionally, if there are complex rules around pluralization, the catalog view
+will render a conditional expression. This will evaluate to either a ``true``
+(should pluralize) or ``false`` (should **not** pluralize) value.
 
 Note on performance
 -------------------
