@@ -212,22 +212,52 @@ class MethodDecoratorTests(SimpleTestCase):
         self.assertEqual(getattr(func, 'myattr', False), True)
         self.assertEqual(getattr(func, 'myattr2', False), True)
 
-        # Now check method_decorator
-        class Test(object):
+        # Decorate using method_decorator() on the method.
+        class TestPlain(object):
             @myattr_dec_m
             @myattr2_dec_m
             def method(self):
                 "A method"
                 pass
 
-        self.assertEqual(getattr(Test().method, 'myattr', False), True)
-        self.assertEqual(getattr(Test().method, 'myattr2', False), True)
+        # Decorate using method_decorator() on both the class and the method.
+        # The decorators applied to the methods are applied before the ones
+        # applied to the class.
+        @method_decorator(myattr_dec_m, "method")
+        class TestMethodAndClass(object):
+            @method_decorator(myattr2_dec_m)
+            def method(self):
+                "A method"
+                pass
 
-        self.assertEqual(getattr(Test.method, 'myattr', False), True)
-        self.assertEqual(getattr(Test.method, 'myattr2', False), True)
+        # Decorate using an iterable of decorators.
+        decorators = (myattr_dec_m, myattr2_dec_m)
 
-        self.assertEqual(Test.method.__doc__, 'A method')
-        self.assertEqual(Test.method.__name__, 'method')
+        @method_decorator(decorators, "method")
+        class TestIterable(object):
+            def method(self):
+                "A method"
+                pass
+
+        for Test in (TestPlain, TestMethodAndClass, TestIterable):
+            self.assertEqual(getattr(Test().method, 'myattr', False), True)
+            self.assertEqual(getattr(Test().method, 'myattr2', False), True)
+
+            self.assertEqual(getattr(Test.method, 'myattr', False), True)
+            self.assertEqual(getattr(Test.method, 'myattr2', False), True)
+
+            self.assertEqual(Test.method.__doc__, 'A method')
+            self.assertEqual(Test.method.__name__, 'method')
+
+    def test_bad_iterable(self):
+        decorators = {myattr_dec_m, myattr2_dec_m}
+        # The rest of the exception message differs between Python 2 and 3.
+        with self.assertRaisesMessage(TypeError, "'set' object"):
+            @method_decorator(decorators, "method")
+            class TestIterable(object):
+                def method(self):
+                    "A method"
+                    pass
 
     # Test for argumented decorator
     def test_argumented(self):
@@ -290,6 +320,41 @@ class MethodDecoratorTests(SimpleTestCase):
                 return False
 
         self.assertTrue(Test().method())
+
+    def test_tuple_of_decorators(self):
+        """
+        @method_decorator can accept a tuple of decorators.
+        """
+        def add_question_mark(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "?"
+            return _wrapper
+
+        def add_exclamation_mark(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "!"
+            return _wrapper
+
+        # The order should be consistent with the usual order in which
+        # decorators are applied, e.g.
+        #    @add_exclamation_mark
+        #    @add_question_mark
+        #    def func():
+        #        ...
+        decorators = (add_exclamation_mark, add_question_mark)
+
+        @method_decorator(decorators, name="method")
+        class TestFirst(object):
+            def method(self):
+                return "hello world"
+
+        class TestSecond(object):
+            @method_decorator(decorators)
+            def method(self):
+                return "hello world"
+
+        self.assertEqual(TestFirst().method(), "hello world?!")
+        self.assertEqual(TestSecond().method(), "hello world?!")
 
     def test_invalid_non_callable_attribute_decoration(self):
         """

@@ -334,23 +334,12 @@ class FloatField(IntegerField):
 class DecimalField(IntegerField):
     default_error_messages = {
         'invalid': _('Enter a number.'),
-        'max_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit in total.',
-            'Ensure that there are no more than %(max)s digits in total.',
-            'max'),
-        'max_decimal_places': ungettext_lazy(
-            'Ensure that there are no more than %(max)s decimal place.',
-            'Ensure that there are no more than %(max)s decimal places.',
-            'max'),
-        'max_whole_digits': ungettext_lazy(
-            'Ensure that there are no more than %(max)s digit before the decimal point.',
-            'Ensure that there are no more than %(max)s digits before the decimal point.',
-            'max'),
     }
 
     def __init__(self, max_value=None, min_value=None, max_digits=None, decimal_places=None, *args, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(max_value, min_value, *args, **kwargs)
+        self.validators.append(validators.DecimalValidator(max_digits, decimal_places))
 
     def to_python(self, value):
         """
@@ -379,38 +368,6 @@ class DecimalField(IntegerField):
         # isn't equal to itself, so we can use this to identify NaN
         if value != value or value == Decimal("Inf") or value == Decimal("-Inf"):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
-        sign, digittuple, exponent = value.as_tuple()
-        decimals = abs(exponent)
-        # digittuple doesn't include any leading zeros.
-        digits = len(digittuple)
-        if decimals > digits:
-            # We have leading zeros up to or past the decimal point.  Count
-            # everything past the decimal point as a digit.  We do not count
-            # 0 before the decimal point as a digit since that would mean
-            # we would not allow max_digits = decimal_places.
-            digits = decimals
-        whole_digits = digits - decimals
-
-        if self.max_digits is not None and digits > self.max_digits:
-            raise ValidationError(
-                self.error_messages['max_digits'],
-                code='max_digits',
-                params={'max': self.max_digits},
-            )
-        if self.decimal_places is not None and decimals > self.decimal_places:
-            raise ValidationError(
-                self.error_messages['max_decimal_places'],
-                code='max_decimal_places',
-                params={'max': self.decimal_places},
-            )
-        if (self.max_digits is not None and self.decimal_places is not None
-                and whole_digits > (self.max_digits - self.decimal_places)):
-            raise ValidationError(
-                self.error_messages['max_whole_digits'],
-                code='max_whole_digits',
-                params={'max': (self.max_digits - self.decimal_places)},
-            )
-        return value
 
     def widget_attrs(self, widget):
         attrs = super(DecimalField, self).widget_attrs(widget)

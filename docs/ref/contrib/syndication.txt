@@ -298,9 +298,15 @@ Enclosures
 ----------
 
 To specify enclosures, such as those used in creating podcast feeds, use the
-``item_enclosure_url``, ``item_enclosure_length`` and
+``item_enclosures`` hook or, alternatively and if you only have a single
+enclosure per item, the ``item_enclosure_url``, ``item_enclosure_length``, and
 ``item_enclosure_mime_type`` hooks. See the ``ExampleFeed`` class below for
 usage examples.
+
+.. versionchanged:: 1.9
+
+    Support for multiple enclosures per feed item was added through the
+    ``item_enclosures`` hook.
 
 Language
 --------
@@ -742,8 +748,28 @@ This example illustrates all possible attributes and methods for a
 
         item_author_link = 'http://www.example.com/' # Hard-coded author URL.
 
+        # ITEM ENCLOSURES -- One of the following three is optional. The
+        # framework looks for them in this order. If one of them is defined,
+        # ``item_enclosure_url``, ``item_enclosure_length``, and
+        # ``item_enclosure_mime_type`` will have no effect.
+
+        def item_enclosures(self, item):
+            """
+            Takes an item, as returned by items(), and returns a list of
+            ``django.utils.feedgenerator.Enclosure`` objects.
+            """
+
+        def item_enclosure_url(self):
+            """
+            Returns the ``django.utils.feedgenerator.Enclosure`` list for every
+            item in the feed.
+            """
+
+        item_enclosures = []  # Hard-coded enclosure list
+
         # ITEM ENCLOSURE URL -- One of these three is required if you're
-        # publishing enclosures. The framework looks for them in this order.
+        # publishing enclosures and you're not using ``item_enclosures``. The
+        # framework looks for them in this order.
 
         def item_enclosure_url(self, item):
             """
@@ -759,9 +785,10 @@ This example illustrates all possible attributes and methods for a
         item_enclosure_url = "/foo/bar.mp3" # Hard-coded enclosure link.
 
         # ITEM ENCLOSURE LENGTH -- One of these three is required if you're
-        # publishing enclosures. The framework looks for them in this order.
-        # In each case, the returned value should be either an integer, or a
-        # string representation of the integer, in bytes.
+        # publishing enclosures and you're not using ``item_enclosures``. The
+        # framework looks for them in this order. In each case, the returned
+        # value should be either an integer, or a string representation of the
+        # integer, in bytes.
 
         def item_enclosure_length(self, item):
             """
@@ -777,7 +804,8 @@ This example illustrates all possible attributes and methods for a
         item_enclosure_length = 32000 # Hard-coded enclosure length.
 
         # ITEM ENCLOSURE MIME TYPE -- One of these three is required if you're
-        # publishing enclosures. The framework looks for them in this order.
+        # publishing enclosures and you're not using ``item_enclosures``. The
+        # framework looks for them in this order.
 
         def item_enclosure_mime_type(self, item):
             """
@@ -941,6 +969,7 @@ They share this interface:
     * ``comments``
     * ``unique_id``
     * ``enclosure``
+    * ``enclosures``
     * ``categories``
     * ``item_copyright``
     * ``ttl``
@@ -954,7 +983,14 @@ They share this interface:
     * ``updateddate`` should be a Python  :class:`~datetime.datetime` object.
     * ``enclosure`` should be an instance of
       :class:`django.utils.feedgenerator.Enclosure`.
+    * ``enclosures`` should be a list of
+      :class:`django.utils.feedgenerator.Enclosure` instances.
     * ``categories`` should be a sequence of Unicode objects.
+
+    .. deprecated:: 1.9
+
+        The ``enclosure`` keyword argument is deprecated in favor of the
+        ``enclosures`` keyword argument.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

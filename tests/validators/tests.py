@@ -10,11 +10,12 @@ from unittest import TestCase
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
-    BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
-    MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
-    int_list_validator, validate_comma_separated_integer_list, validate_email,
-    validate_integer, validate_ipv4_address, validate_ipv6_address,
-    validate_ipv46_address, validate_slug, validate_unicode_slug,
+    BaseValidator, DecimalValidator, EmailValidator, MaxLengthValidator,
+    MaxValueValidator, MinLengthValidator, MinValueValidator, RegexValidator,
+    URLValidator, int_list_validator, validate_comma_separated_integer_list,
+    validate_email, validate_integer, validate_ipv4_address,
+    validate_ipv6_address, validate_ipv46_address, validate_slug,
+    validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -399,5 +400,23 @@ class TestValidatorEquality(TestCase):
         )
         self.assertNotEqual(
             MinValueValidator(45),
+            MinValueValidator(11),
+        )
+
+    def test_decimal_equality(self):
+        self.assertEqual(
+            DecimalValidator(1, 2),
+            DecimalValidator(1, 2),
+        )
+        self.assertNotEqual(
+            DecimalValidator(1, 2),
+            DecimalValidator(1, 1),
+        )
+        self.assertNotEqual(
+            DecimalValidator(1, 2),
+            DecimalValidator(2, 2),
+        )
+        self.assertNotEqual(
+            DecimalValidator(1, 2),
             MinValueValidator(11),
         )
