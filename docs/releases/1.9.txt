@@ -208,6 +208,9 @@ Templates
 * A warning will now be logged for missing context variables. These messages
   will be logged to the :ref:`django.template <django-template-logger>` logger.
 
+* :meth:`Context.update() <django.template.Context.update>` can now be used as
+  a context manager.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
