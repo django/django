@@ -441,6 +441,20 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(Avg("num_authors"))
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
+    def test_sum_distinct_aggregate(self):
+        """
+        Sum on a distict() QuerySet should aggregate only the distinct items.
+        """
+        authors = Author.objects.filter(book__in=[5, 6])
+        self.assertEqual(authors.count(), 3)
+
+        distinct_authors = authors.distinct()
+        self.assertEqual(distinct_authors.count(), 2)
+
+        # Selected author ages are 57 and 46
+        age_sum = distinct_authors.aggregate(Sum('age'))
+        self.assertEqual(age_sum['age__sum'], 103)
+
     def test_filtering(self):
         p = Publisher.objects.create(name='Expensive Publisher', num_awards=0)
         Book.objects.create(
