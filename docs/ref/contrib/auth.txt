@@ -132,6 +132,13 @@ Methods
         the :attr:`~django.contrib.auth.models.User.last_name`, with a space in
         between.
 
+    .. method:: get_display_name()
+
+        Returns :meth:`~django.contrib.auth.models.User.get_full_name()` if it
+        exists or else returns :attr:`~django.contrib.auth.models.User.email`;
+        if both the above is not existing, it returns
+        :attr:`~django.contrib.auth.models.User.username`.
+
     .. method:: get_short_name()
 
         Returns the :attr:`~django.contrib.auth.models.User.first_name`.
