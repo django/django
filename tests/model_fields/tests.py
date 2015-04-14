@@ -165,6 +165,24 @@ class DecimalFieldTests(test.TestCase):
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
 
+    def test_max_digits_validation(self):
+        field = models.DecimalField(max_digits=2)
+        expected_message = validators.DecimalValidator.messages['max_digits'] % {'max': 2}
+        with self.assertRaisesMessage(ValidationError, expected_message):
+            field.clean(100, None)
+
+    def test_max_decimal_places_validation(self):
+        field = models.DecimalField(decimal_places=1)
+        expected_message = validators.DecimalValidator.messages['max_decimal_places'] % {'max': 1}
+        with self.assertRaisesMessage(ValidationError, expected_message):
+            field.clean(Decimal('0.99'), None)
+
+    def test_max_whole_digits_validation(self):
+        field = models.DecimalField(max_digits=3, decimal_places=1)
+        expected_message = validators.DecimalValidator.messages['max_whole_digits'] % {'max': 2}
+        with self.assertRaisesMessage(ValidationError, expected_message):
+            field.clean(Decimal('999'), None)
+
 
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):

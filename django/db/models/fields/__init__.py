@@ -1578,6 +1578,12 @@ class DecimalField(Field):
             ]
         return []
 
+    @cached_property
+    def validators(self):
+        return super(DecimalField, self).validators + [
+            validators.DecimalValidator(self.max_digits, self.decimal_places)
+        ]
+
     def deconstruct(self):
         name, path, args, kwargs = super(DecimalField, self).deconstruct()
         if self.max_digits is not None:
