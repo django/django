@@ -81,3 +81,34 @@ class FirstOfTagTests(SimpleTestCase):
     def test_firstof14(self):
         output = self.engine.render_to_string('firstof14', {'a': '<'})
         self.assertEqual(output, '<')
+
+    @setup({'firstof15': '{% firstof a b c as myvar %}'})
+    def test_firstof15(self):
+        ctx = {'a': 0, 'b': 2, 'c': 3}
+        output = self.engine.render_to_string('firstof15', ctx)
+        self.assertEqual(ctx['myvar'], '2')
+        self.assertEqual(output, '')
+    
+    @setup({'firstof15': '{% firstof a b c as myvar %}'})
+    def test_firstof15(self):
+        ctx = {'a': 1, 'b': 2, 'c': 3}
+        output = self.engine.render_to_string('firstof15', ctx)
+        self.assertEqual(ctx['myvar'], '1')
+        self.assertEqual(output, '')
+
+    @setup({'firstof16': '{% firstof a b c as myvar %}'})
+    def test_firstof16(self):
+        ctx = {'a': 0, 'b': 2, 'c': 3}
+        output = self.engine.render_to_string('firstof16', ctx)
+        self.assertEqual(ctx['myvar'], '2')
+        self.assertEqual(output, '')
+
+    @setup({'firstof17': '{% firstof a b c "empty" as myvar %}'})
+    def test_firstof17(self):
+        ctx = {'a': 0, 'b': 0, 'c': 0}
+        output = self.engine.render_to_string('firstof17', ctx)
+        self.assertEqual(ctx['myvar'], 'empty')
+        self.assertEqual(output, '')
+
+
+>>>>>>> 5a46693a36f00553b0388eb443c0127134a91b4a
