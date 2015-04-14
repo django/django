@@ -45,7 +45,12 @@ TEST_DATA = [
     (validate_email, 'email@localhost', None),
     (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
     (validate_email, '"test@test"@example.com', None),
+    (validate_email, 'example@atm.%s' % ('a' * 63), None),
+    (validate_email, 'example@%s.atm' % ('a' * 63), None),
+    (validate_email, 'example@%s.%s.atm' % ('a' * 63, 'b' * 10), None),
 
+    (validate_email, 'example@atm.%s' % ('a' * 64), ValidationError),
+    (validate_email, 'example@%s.atm.%s' % ('b' * 64, 'a' * 63), ValidationError),
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
@@ -69,9 +74,9 @@ TEST_DATA = [
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
     (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
-    # Max length of domain name in email is 249 (see validator for calculation)
-    (validate_email, 'a@%s.us' % ('a' * 249), None),
-    (validate_email, 'a@%s.us' % ('a' * 250), ValidationError),
+    # Max length of domain name labels is 63 characters per RFC 1034.
+    (validate_email, 'a@%s.us' % ('a' * 63), None),
+    (validate_email, 'a@%s.us' % ('a' * 64), ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
