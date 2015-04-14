@@ -635,7 +635,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             )
         elif value is not None and not isinstance(value, self.field.remote_field.model):
             raise ValueError(
-                'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
+                u'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
                     instance._meta.object_name,
                     self.field.name,
