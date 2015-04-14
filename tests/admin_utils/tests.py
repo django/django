@@ -180,6 +180,9 @@ class UtilsTests(TestCase):
         display_value = display_for_field(Decimal('12345.6789'), models.DecimalField())
         self.assertEqual(display_value, '12345.6789')
 
+        display_value = display_for_field(12345, models.IntegerField())
+        self.assertEqual(display_value, '12345')
+
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_number_formats_with_thousand_seperator_display_for_field(self):
         display_value = display_for_field(12345.6789, models.FloatField())
@@ -187,6 +190,9 @@ class UtilsTests(TestCase):
 
         display_value = display_for_field(Decimal('12345.6789'), models.DecimalField())
         self.assertEqual(display_value, '12,345.6789')
+
+        display_value = display_for_field(12345, models.IntegerField())
+        self.assertEqual(display_value, '12,345')
 
     def test_label_for_field(self):
         """
