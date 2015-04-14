@@ -462,8 +462,8 @@ is called.
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> with c.push():
-    >>>     c['foo'] = 'second level'
-    >>>     c['foo']
+    ...     c['foo'] = 'second level'
+    ...     c['foo']
     'second level'
     >>> c['foo']
     'first level'
@@ -474,12 +474,12 @@ used to build the new context level.
     >>> c = Context()
     >>> c['foo'] = 'first level'
     >>> with c.push(foo='second level'):
-    >>>     c['foo']
+    ...     c['foo']
     'second level'
     >>> c['foo']
     'first level'
 
-.. method:: update(other_dict)
+.. method:: Context.update(other_dict)
 
 In addition to ``push()`` and ``pop()``, the ``Context``
 object also defines an ``update()`` method. This works like ``push()``
