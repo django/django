@@ -385,6 +385,8 @@ def display_for_field(value, field):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
+    elif isinstance(field, models.IntegerField):
+        return formats.number_format(value)
     elif isinstance(field, models.FloatField):
         return formats.number_format(value)
     elif isinstance(field, models.FileField) and value:
