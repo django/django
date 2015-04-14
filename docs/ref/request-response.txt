@@ -147,8 +147,9 @@ All attributes should be considered read-only, unless stated otherwise below.
     Available headers depend on the client and server, but here are some
     examples:
 
-    * ``CONTENT_LENGTH`` -- the length of the request body (as a string).
-    * ``CONTENT_TYPE`` -- the MIME type of the request body.
+    * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
+    * ``CONTENT_TYPE`` -- The MIME type of the request body.
+    * ``HTTP_ACCEPT`` -- Acceptable content types for the response.
     * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
     * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
     * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
