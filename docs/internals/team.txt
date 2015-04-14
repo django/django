@@ -333,19 +333,6 @@ Jeremy Dunck
     .. _vlogger: https://youtube.com/bryanveloso/
     .. _shoutcaster: http://twitch.tv/vlogalonstar/
 
-`Preston Holmes`_
-    Preston is a recovering neuroscientist who originally discovered Django as
-    part of a sweeping move to Python from a grab bag of half a dozen
-    languages. He was drawn to Django's balance of practical batteries included
-    philosophy, care and thought in code design, and strong open source
-    community. Currently working for Amazon Web Services, he is always looking
-    for opportunities to volunteer for community oriented education projects,
-    such as for kids and scientists (e.g. Software Carpentry).
-
-    Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
-
-    .. _Preston Holmes: http://www.ptone.com/
-
 `Simon Charette`_
     Simon is a mathematics student who discovered Django while searching for a
     replacement framework to an in-house PHP entity. Since that faithful day
@@ -583,6 +570,20 @@ Malcolm Tredinnick
     He was an International Man of Mystery and lived in Sydney, Australia.
 
     *Malcolm passed away on March 17, 2013.*
+
+`Preston Holmes`_
+    Preston is a recovering neuroscientist who originally discovered Django as
+    part of a sweeping move to Python from a grab bag of half a dozen
+    languages. He was drawn to Django's balance of practical batteries included
+    philosophy, care and thought in code design, and strong open source
+    community. Currently working in the rent-your-infra space (aka Cloud), he
+    is always looking for opportunities to volunteer for community oriented
+    education projects, such as for kids and scientists (e.g. Software
+    Carpentry).
+
+    Preston lives with his family and animal menagerie in Santa Barbara, CA, USA.
+
+    .. _Preston Holmes: http://www.ptone.com/
 
 Matt Boersma
     Matt helped with Django's Oracle support.
