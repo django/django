@@ -58,7 +58,85 @@ independently. The Closure Compiler library requires `Java`_ 7 or higher.
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's JavaScript.
 
+JavaScript tests
+----------------
+
+Django's JavaScript tests can be run in a browser or from the command line.
+The tests are located in a top level ``js_tests`` directory.
+
+Writing tests
+~~~~~~~~~~~~~
+
+Django's JavaScript tests use `QUnit`_. Here is an example test module:
+
+.. code-block:: javascript
+
+    module('magicTricks', {
+        beforeEach: function() {
+            var $ = django.jQuery;
+            $('#qunit-fixture').append('<button class="button"></button>');
+        }
+    });
+
+    test('removeOnClick removes button on click', function(assert) {
+        var $ = django.jQuery;
+        removeOnClick('.button');
+        assert.equal($('.button').length === 1);
+        $('.button').click();
+        assert.equal($('.button').length === 0);
+    });
+
+    test('copyOnClick adds button on click', function(assert) {
+        var $ = django.jQuery;
+        copyOnClick('.button');
+        assert.equal($('.button').length === 1);
+        $('.button').click();
+        assert.equal($('.button').length === 2);
+    });
+
+
+Please consult the QUnit documentation for information on the types of
+`assertions supported by QUnit <https://api.qunitjs.com/category/assert/>`_.
+
+Running tests
+~~~~~~~~~~~~~
+
+The JavaScript tests may be run from a web browser or from the command line.
+
+Testing from a web browser
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To run the tests from a web browser, open up ``js_tests/tests.html`` in your
+browser.
+
+To measure code coverage when running the tests, you need to view that file
+over HTTP. To view code coverage:
+
+* Execute ``python -m http.server`` (or ``python -m SimpleHTTPServer`` on
+  Python 2) from the root directory (not from inside ``js_tests``).
+* Open http://localhost:8000/js_tests/tests.html in your web browser.
+
+Testing from the command line
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To run the tests from the command line, you need to have `Node.js`_ installed.
+
+After installing `Node.js`, install the JavaScript test dependencies by running
+the following from the root of your Django checkout:
+
+.. code-block:: console
+
+    $ npm install
+
+Then run the tests with:
+
+.. code-block:: console
+
+    $ npm test
+
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _EditorConfig: http://editorconfig.org/
 .. _Java: https://www.java.com
 .. _jshint: http://jshint.com/
+.. _node.js: https://nodejs.org/
+.. _qunit: https://qunitjs.com/
