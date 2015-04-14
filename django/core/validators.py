@@ -326,3 +326,22 @@ class MaxLengthValidator(BaseValidator):
         'Ensure this value has at most %(limit_value)d characters (it has %(show_value)d).',
         'limit_value')
     code = 'max_length'
+
+
+@deconstructible
+class DecimalValidator(object):
+    """
+    Validates that the input does not exceed the maximum number of digits
+    expected, otherwise raises ValidationError.
+    """
+    message = _("%(value)s exceeds the number of digits allowed.")
+
+    def __init__(self, max_digits, decimal_places):
+        self.max_digits = max_digits
+        self.decimal_places = decimal_places
+
+    def __call__(self, value):
+        if self.max_digits is not None and self.decimal_places is not None:
+            diff = self.max_digits - self.decimal_places
+            if value >= 10 ** diff:
+                raise ValidationError(self.message, params={'value': value})

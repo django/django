@@ -187,6 +187,14 @@ class GenericIPAddress(models.Model):
     ip = models.GenericIPAddressField(null=True, protocol='ipv4')
 
 
+class DecimalDigitsEqualDecimalPlaces(models.Model):
+    d = models.DecimalField(max_digits=2, decimal_places=2)
+
+
+class DecimalIntegerPartMax99(models.Model):
+    d = models.DecimalField(max_digits=4, decimal_places=2)
+
+
 ###############################################################################
 # These models aren't used in any test, just here to ensure they validate
 # successfully.

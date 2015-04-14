@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-
 import datetime
 import unittest
 from decimal import Decimal
@@ -23,10 +22,11 @@ from django.utils.functional import lazy
 
 from .models import (
     Bar, BigD, BigIntegerModel, BigS, BooleanModel, DataModel, DateTimeModel,
-    Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
-    IntegerModel, NullBooleanModel, PositiveIntegerModel,
-    PositiveSmallIntegerModel, Post, PrimaryKeyCharModel, RenamedField,
-    SmallIntegerModel, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    DecimalDigitsEqualDecimalPlaces, DecimalIntegerPartMax99, Document,
+    FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress, IntegerModel,
+    NullBooleanModel, PositiveIntegerModel, PositiveSmallIntegerModel, Post,
+    PrimaryKeyCharModel, RenamedField, SmallIntegerModel, VerboseNameField,
+    Whiz, WhizIter, WhizIterEmpty,
 )
 
 
@@ -162,6 +162,20 @@ class DecimalFieldTests(test.TestCase):
         """
         # This should not crash. That counts as a win for our purposes.
         Foo.objects.filter(d__gte=100000000000)
+
+    def test_max_digits_equals_decimal_places(self):
+        value = 1
+        a = DecimalDigitsEqualDecimalPlaces(d=value)
+        expected_msg = validators.DecimalValidator.message % {'value': value}
+        with self.assertRaisesMessage(ValidationError, expected_msg):
+            a.full_clean()
+
+    def test_digits_number_validation(self):
+        value = 100
+        a = DecimalIntegerPartMax99(d=value)
+        expected_msg = validators.DecimalValidator.message % {'value': value}
+        with self.assertRaisesMessage(ValidationError, expected_msg):
+            a.full_clean()
 
 
 class ForeignKeyTests(test.TestCase):

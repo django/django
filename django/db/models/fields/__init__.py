@@ -1500,6 +1500,8 @@ class DecimalField(Field):
                  decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(verbose_name, name, **kwargs)
+        self.validators.append(validators.DecimalValidator(self.max_digits,
+                                                           self.decimal_places))
 
     def check(self, **kwargs):
         errors = super(DecimalField, self).check(**kwargs)
