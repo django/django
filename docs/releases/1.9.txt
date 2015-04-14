@@ -223,7 +223,8 @@ Requests and Responses
 Tests
 ^^^^^
 
-* ...
+* The default value for :setting:`TEST_NON_SERIALIZED_APPS` has been changed to
+  include ``django.contrib.contenttypes``.
 
 URLs
 ^^^^

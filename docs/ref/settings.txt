@@ -2354,7 +2354,7 @@ The name of the class to use for starting the test suite. See
 TEST_NON_SERIALIZED_APPS
 ------------------------
 
-Default: ``[]``
+Default: ``['django.contrib.contenttypes']``
 
 In order to restore the database state between tests for
 ``TransactionTestCase``\s and database backends without transactions, Django
@@ -2363,9 +2363,8 @@ when it starts the test run so it can then reload from that copy before tests
 that need it.
 
 This slows down the startup time of the test runner; if you have apps that
-you know don't need this feature, you can add their full names in here (e.g.
-``'django.contrib.contenttypes'``) to exclude them from this serialization
-process.
+you know don't need this feature, you can add their full names in here to
+exclude them from this serialization process.
 
 .. setting:: THOUSAND_SEPARATOR
 
