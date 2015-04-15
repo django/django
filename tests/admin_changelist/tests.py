@@ -676,8 +676,8 @@ class ChangeListTests(TestCase):
         print("Test ran!")
         genre = Genre.objects.create(name='Rock')
         band = Band.objects.create(
-            name = "The Weatherthans",
-            nr_of_members = 5,
+            name="The Weatherthans",
+            nr_of_members=5,
         )
         band.genres.add(genre)
 
@@ -685,13 +685,12 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/band/', data={SEARCH_VAR: 'Rock'})
 
         try:
-            cl = ChangeList(request, Band, m.list_display, m.list_display_links,
-                            m.list_filter, m.date_hierarchy, m.search_fields,
-                            m.list_select_related, m.list_per_page,
-                            m.list_max_show_all, m.list_editable, m)
+            ChangeList(request, Band, m.list_display, m.list_display_links,
+                       m.list_filter, m.date_hierarchy, m.search_fields,
+                       m.list_select_related, m.list_per_page,
+                       m.list_max_show_all, m.list_editable, m)
         except ProgrammingError:
             self.fail("Searching over m2m field raised a ProgrammingError")
-
 
 
 class AdminLogNodeTestCase(TestCase):
