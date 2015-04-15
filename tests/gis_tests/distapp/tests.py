@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import HAS_GEOS, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import Q
@@ -383,3 +383,10 @@ class DistanceTest(TestCase):
         z = SouthTexasZipcode.objects.distance(htown.point).area().get(name='78212')
         self.assertIsNone(z.distance)
         self.assertIsNone(z.area)
+
+    @skipUnlessDBFeature("has_distance_method")
+    def test_distance_order_by(self):
+        qs = SouthTexasCity.objects.distance(Point(3, 3)).order_by(
+            'distance'
+        ).values_list('name', flat=True).filter(name__in=('San Antonio', 'Pearland'))
+        self.assertQuerysetEqual(qs, ['San Antonio', 'Pearland'], lambda x: x)
