@@ -836,11 +836,11 @@ appropriate entities.
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
-.. function:: slugify
+.. function:: slugify(allow_unicode=False)
 
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase. Also
-    strips leading and trailing whitespace.
+    Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
+    hyphens. Removes characters that aren't alphanumerics, underscores, or
+    hyphens. Converts to lowercase. Also strips leading and trailing whitespace.
 
     For example::
 
@@ -848,6 +848,17 @@ appropriate entities.
 
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
+
+    You can set the ``allow_unicode`` parameter to ``True``, if you want to
+    allow Unicode characters::
+
+        slugify(value, allow_unicode=True)
+
+    If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
+
+    .. versionchanged:: 1.9
+
+        The ``allow_unicode`` parameter was added.
 
 .. _time-zone-selection-functions:
 

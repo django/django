@@ -4412,11 +4412,13 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
         self.get_select_option('#id_status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšome')
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeııı')
         slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-and-its-awesome-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-and-its-awesome')
+        slug3 = self.selenium.find_element_by_css_selector('#id_slug3').get_attribute('value')
+        self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
+        self.assertEqual(slug3, 'main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
@@ -4463,11 +4465,11 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.wait_page_loaded()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=' this is the mAin nÀMë and it\'s awεšome',
+            name=' this is the mAin nÀMë and it\'s awεšomeııı',
             pubdate='2012-02-18',
             status='option two',
-            slug1='main-name-and-its-awesome-2012-02-18',
-            slug2='option-two-main-name-and-its-awesome',
+            slug1='main-name-and-its-awesomeiii-2012-02-18',
+            slug2='option-two-main-name-and-its-awesomeiii',
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(

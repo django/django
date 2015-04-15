@@ -1240,6 +1240,12 @@ class GenericIPAddressField(CharField):
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
+    def __init__(self, *args, **kwargs):
+        self.allow_unicode = kwargs.pop('allow_unicode', False)
+        if self.allow_unicode:
+            self.default_validators = [validators.validate_unicode_slug]
+        super(SlugField, self).__init__(*args, **kwargs)
+
 
 class UUIDField(CharField):
     default_error_messages = {
