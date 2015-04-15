@@ -1500,8 +1500,6 @@ class DecimalField(Field):
                  decimal_places=None, **kwargs):
         self.max_digits, self.decimal_places = max_digits, decimal_places
         super(DecimalField, self).__init__(verbose_name, name, **kwargs)
-        self.validators.append(validators.DecimalValidator(self.max_digits,
-                                                           self.decimal_places))
 
     def check(self, **kwargs):
         errors = super(DecimalField, self).check(**kwargs)
@@ -1577,6 +1575,11 @@ class DecimalField(Field):
                 )
             ]
         return []
+
+    @cached_property
+    def validators(self):
+        return super(DecimalField, self).validators + [
+            validators.DecimalValidator(self.max_digits, self.decimal_places)]
 
     def deconstruct(self):
         name, path, args, kwargs = super(DecimalField, self).deconstruct()
