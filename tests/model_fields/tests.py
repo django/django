@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import datetime
@@ -20,6 +21,7 @@ from django.db.models.fields import (
 from django.db.models.fields.files import FileField, ImageField
 from django.test.utils import requires_tz_support
 from django.utils import six, timezone
+from django.utils.encoding import force_str
 from django.utils.functional import lazy
 
 from .models import (
@@ -27,7 +29,8 @@ from .models import (
     Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
     IntegerModel, NullBooleanModel, PositiveIntegerModel,
     PositiveSmallIntegerModel, Post, PrimaryKeyCharModel, RenamedField,
-    SmallIntegerModel, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    SmallIntegerModel, UnicodeSlugField, VerboseNameField, Whiz, WhizIter,
+    WhizIterEmpty,
 )
 
 
@@ -113,7 +116,6 @@ class BasicFieldTests(test.TestCase):
         self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
     def test_field_str(self):
-        from django.utils.encoding import force_str
         f = Foo._meta.get_field('a')
         self.assertEqual(force_str(f), "model_fields.Foo.a")
 
@@ -514,6 +516,14 @@ class SlugFieldTests(test.TestCase):
         bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug' * 50)
+
+    def test_slugfield_unicode_max_length(self):
+        """
+        Make sure SlugField  with unicode=True honors max_length (#9706)
+        """
+        bs = UnicodeSlugField.objects.create(s='你好你好' * 50)
+        bs = UnicodeSlugField.objects.get(pk=bs.pk)
+        self.assertEqual(bs.s, '你好你好' * 50)
 
 
 class ValidationTest(test.SimpleTestCase):

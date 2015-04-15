@@ -1509,6 +1509,18 @@ class FieldsTests(SimpleTestCase):
         f = SlugField()
         self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
 
+    def test_slugfield_unicode_normalization(self):
+        f = SlugField(allow_unicode=True)
+        self.assertEqual(f.clean('a'), 'a')
+        self.assertEqual(f.clean('1'), '1')
+        self.assertEqual(f.clean('a1'), 'a1')
+        self.assertEqual(f.clean('你好'), '你好')
+        self.assertEqual(f.clean('  你-好  '), '你-好')
+        self.assertEqual(f.clean('ıçğüş'), 'ıçğüş')
+        self.assertEqual(f.clean('foo-ıç-bar'), 'foo-ıç-bar')
+        # Suggested in pull request, but questions remain
+        # self.assertEqual(f.clean('4×4-cars-cost-many-€s'), '4-4-cars-cost-many--s')
+
     # UUIDField ###################################################################
 
     def test_uuidfield_1(self):

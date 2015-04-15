@@ -571,6 +571,7 @@ class ModelAdmin(BaseModelAdmin):
             'actions%s.js' % extra,
             'urlify.js',
             'prepopulate%s.js' % extra,
+            'xregexp.min.js',
         ]
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
@@ -1760,8 +1761,6 @@ class InlineModelAdmin(BaseModelAdmin):
     def media(self):
         extra = '' if settings.DEBUG else '.min'
         js = ['jquery%s.js' % extra, 'jquery.init.js', 'inlines%s.js' % extra]
-        if self.filter_vertical or self.filter_horizontal:
-            js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):

@@ -179,6 +179,8 @@ Forms
 
 * You can now :ref:`specify keyword arguments <custom-formset-form-kwargs>`
   that you want to pass to the constructor of forms in a formset.
+* :class:`~django.forms.SlugField` now accepts a
+  :attr:`~django.forms.SlugField.allow_unicode` argument to create unicode slugs.
 
 Generic Views
 ^^^^^^^^^^^^^
@@ -268,6 +270,11 @@ Models
 
 * Added the :class:`~django.db.models.functions.Now` database function, which
   returns the current date and time.
+* :class:`~django.db.models.SlugField` now accepts a
+  :attr:`~django.db.models.SlugField.allow_unicode` argument to create unicode slugs.
+
+* :class:`~django.db.models.SlugField` now accepts a
+  :attr:`~django.db.models.SlugField.allow_unicode` argument to create unicode slugs.
 
 CSRF
 ^^^^
@@ -351,6 +358,8 @@ Validators
 
 * :class:`~django.core.validators.EmailValidator` now limits the length of
   domain name labels to 63 characters per :rfc:`1034`.
+* :mod:`~django.core.validators` module now has a
+  :func:`~django.core.validators.validate_unicode_slug` validator.
 
 Backwards incompatible changes in 1.9
 =====================================
