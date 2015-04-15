@@ -54,6 +54,7 @@ class FilteredChildAdmin(admin.ModelAdmin):
 
 class BandAdmin(admin.ModelAdmin):
     list_filter = ['genres']
+    search_fields = ['genres__name']
 
 
 class GroupAdmin(admin.ModelAdmin):

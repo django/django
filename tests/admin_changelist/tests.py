@@ -11,6 +11,7 @@ from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
+from django.db import ProgrammingError
 from django.template import Context, Template
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
@@ -666,6 +667,31 @@ class ChangeListTests(TestCase):
                 expected_page_range,
                 list(real_page_range),
             )
+
+    def test_search_over_m2m_field(self):
+        '''
+        Regression test for #11028:  Searching in the admin across a
+        Many2ManyField relationship generated a ProgrammingError.
+        '''
+        print("Test ran!")
+        genre = Genre.objects.create(name='Rock')
+        band = Band.objects.create(
+            name = "The Weatherthans",
+            nr_of_members = 5,
+        )
+        band.genres.add(genre)
+
+        m = BandAdmin(Band, admin.site)
+        request = self.factory.get('/band/', data={SEARCH_VAR: 'Rock'})
+
+        try:
+            cl = ChangeList(request, Band, m.list_display, m.list_display_links,
+                            m.list_filter, m.date_hierarchy, m.search_fields,
+                            m.list_select_related, m.list_per_page,
+                            m.list_max_show_all, m.list_editable, m)
+        except ProgrammingError:
+            self.fail("Searching over m2m field raised a ProgrammingError")
+
 
 
 class AdminLogNodeTestCase(TestCase):
