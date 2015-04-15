@@ -199,11 +199,6 @@ class DecimalIntegerPartMax99(models.Model):
 # These models aren't used in any test, just here to ensure they validate
 # successfully.
 
-# See ticket #16570.
-class DecimalLessThanOne(models.Model):
-    d = models.DecimalField(max_digits=3, decimal_places=3)
-
-
 # See ticket #18389.
 class FieldClassAttributeModel(models.Model):
     field_class = models.CharField
