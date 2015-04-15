@@ -940,6 +940,11 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* Template text that is translated and uses two or more consecutive percent
+  signs, e.g. ``"%%"``, may have a new `msgid` after ``makemessages`` is run
+  (most likely the translation will be marked fuzzy). The new ``msgid`` will be
+  marked ``"#, python-format"``.
+
 * If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
   nor :class:`Context.current_app <django.template.Context>` are set, the
   :ttag:`url` template tag will now use the namespace of the current request.
