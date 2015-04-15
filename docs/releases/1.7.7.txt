@@ -2,7 +2,7 @@
 Django 1.7.7 release notes
 ==========================
 
-*Under development*
+*March 18, 2015*
 
 Django 1.7.7 fixes several bugs and security issues in 1.7.6.
 
@@ -51,4 +51,4 @@ Bugfixes
 
 * Stopped writing migration files in dry run mode when merging migration
   conflicts. When ``makemigrations --merge`` is called with ``verbosity=3`` the
-  migration file is written to ``stdout`` (:ticket: `24427`).
+  migration file is written to ``stdout`` (:ticket:`24427`).
