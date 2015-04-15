@@ -28,6 +28,9 @@ class PostGISAdapter(object):
             return False
         return (self.ewkb == other.ewkb) and (self.srid == other.srid)
 
+    def __hash__(self):
+        return hash((self.ewkb, self.srid))
+
     def __str__(self):
         return self.getquoted()
 
