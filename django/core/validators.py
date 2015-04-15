@@ -215,6 +215,13 @@ validate_slug = RegexValidator(
     'invalid'
 )
 
+slug_unicode_re = re.compile(r'^[-\w]+\Z', re.U)
+validate_unicode_slug = RegexValidator(
+    slug_unicode_re,
+    _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
+    'invalid'
+)
+
 ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\Z')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
 

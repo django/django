@@ -1,3 +1,4 @@
+/*global XRegExp*/
 var LATIN_MAP = {
     'À': 'A', 'Á': 'A', 'Â': 'A', 'Ã': 'A', 'Ä': 'A', 'Å': 'A', 'Æ': 'AE', 'Ç':
     'C', 'È': 'E', 'É': 'E', 'Ê': 'E', 'Ë': 'E', 'Ì': 'I', 'Í': 'I', 'Î': 'I',
@@ -132,10 +133,12 @@ function downcode(slug) {
 }
 
 
-function URLify(s, num_chars) {
+function URLify(s, num_chars, allowUnicode) {
     // changes, e.g., "Petty theft" to "petty_theft"
     // remove all these words from the string before urlifying
-    s = downcode(s);
+    if (!allowUnicode) {
+        s = downcode(s);
+    }
     var removelist = [
         "a", "an", "as", "at", "before", "but", "by", "for", "from", "is",
         "in", "into", "like", "of", "off", "on", "onto", "per", "since",
@@ -144,7 +147,13 @@ function URLify(s, num_chars) {
     var r = new RegExp('\\b(' + removelist.join('|') + ')\\b', 'gi');
     s = s.replace(r, '');
     // if downcode doesn't hit, the char will be stripped here
-    s = s.replace(/[^-\w\s]/g, '');  // remove unneeded chars
+    if (allowUnicode) {
+        // Keep Unicode letters including both lowercase and uppercase
+        // characters, whitespace, and dash; remove other characters.
+        s = XRegExp.replace(s, XRegExp('[^-_\\p{L}\\p{N}\\s]', 'g'), '');
+    } else {
+        s = s.replace(/[^-\w\s]/g, '');  // remove unneeded chars
+    }
     s = s.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
     s = s.replace(/[-\s]+/g, '-');   // convert spaces to hyphens
     s = s.toLowerCase();             // convert to lowercase
