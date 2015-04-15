@@ -132,7 +132,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 
     * ``CONTENT_LENGTH`` -- The length of the request body (as a string).
     * ``CONTENT_TYPE`` -- The MIME type of the request body.
-    * ``HTTP_ACCEPT`` -- The HTTP Accept header sent by the client.
+    * ``HTTP_ACCEPT`` -- Acceptable format(s) for the response.
     * ``HTTP_ACCEPT_ENCODING`` -- Acceptable encodings for the response.
     * ``HTTP_ACCEPT_LANGUAGE`` -- Acceptable languages for the response.
     * ``HTTP_HOST`` -- The HTTP Host header sent by the client.
