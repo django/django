@@ -262,9 +262,16 @@ class SQLCompiler(object):
             descending = True if order == 'DESC' else False
 
             if col in self.query.annotation_select:
+                # Reference to expression in SELECT clause
                 order_by.append((
                     OrderBy(Ref(col, self.query.annotation_select[col]), descending=descending),
                     True))
+                continue
+            if col in self.query.annotations:
+                # References to an expression which is masked out of the SELECT clause
+                order_by.append((
+                    OrderBy(self.query.annotations[col], descending=descending),
+                    False))
                 continue
 
             if '.' in field:
