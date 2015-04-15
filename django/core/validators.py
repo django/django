@@ -341,7 +341,6 @@ class DecimalValidator(object):
         self.decimal_places = decimal_places
 
     def __call__(self, value):
-        if self.max_digits is not None and self.decimal_places is not None:
-            diff = self.max_digits - self.decimal_places
-            if value >= 10 ** diff:
-                raise ValidationError(self.message, params={'value': value})
+        diff = self.max_digits - self.decimal_places
+        if value >= 10 ** diff:
+            raise ValidationError(self.message, params={'value': value})
