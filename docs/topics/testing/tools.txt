@@ -606,6 +606,17 @@ features like:
 then you should use :class:`~django.test.TransactionTestCase` or
 :class:`~django.test.TestCase` instead.
 
+.. attribute:: SimpleTestCase.allow_database_queries
+
+    .. versionadded:: 1.9
+
+    :class:`~SimpleTestCase` disallows database queries by default. This
+    helps to avoid executing write queries which will affect other tests
+    since each ``SimpleTestCase`` test isn't run in a transaction. If you
+    aren't concerned about this problem, you can disable this behavior by
+    setting the ``allow_database_queries`` class attribute to ``True`` on
+    your test class.
+
 ``SimpleTestCase`` inherits from ``unittest.TestCase``.
 
 .. warning::

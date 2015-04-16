@@ -505,6 +505,12 @@ Miscellaneous
 * The ``django.contrib.sites.models.Site.domain`` field was changed to be
   :attr:`~django.db.models.Field.unique`.
 
+* In order to enforce test isolation, database queries are not allowed
+  by default in :class:`~django.test.SimpleTestCase` tests anymore. You
+  can disable this behavior by setting the
+  :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
+  to ``True`` on your test class.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
