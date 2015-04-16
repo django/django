@@ -144,6 +144,8 @@ class Command(BaseCommand):
                         self.models.add(obj.object.__class__)
                         try:
                             obj.save(using=self.using)
+                            if self.verbosity == 3:
+                                self.stdout.write('Processed %i object(s).' % loaded_objects_in_fixture)
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
