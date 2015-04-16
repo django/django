@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import HAS_GEOS, Point
+from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import Q
@@ -9,7 +9,7 @@ from django.test import TestCase, skipUnlessDBFeature
 from ..utils import no_oracle, oracle, postgis, spatialite
 
 if HAS_GEOS:
-    from django.contrib.gis.geos import GEOSGeometry, LineString
+    from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 
     from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
         SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
