@@ -56,7 +56,8 @@ class SQLCompiler(object):
         if name in self.quote_cache:
             return self.quote_cache[name]
         if ((name in self.query.alias_map and name not in self.query.table_map) or
-                name in self.query.extra_select or name in self.query.external_aliases):
+                name in self.query.extra_select or (
+                    name in self.query.external_aliases and name not in self.query.table_map)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
