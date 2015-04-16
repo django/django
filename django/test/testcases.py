@@ -140,6 +140,19 @@ class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
         return '%s was rendered.' % self.template_name
 
 
+class _CursorFailure(object):
+    def __init__(self, cls_name, wrapped):
+        self.cls_name = cls_name
+        self.wrapped = wrapped
+
+    def __call__(self):
+        raise AssertionError(
+            "Database queries aren't allowed in SimpleTestCase. "
+            "Either use TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set %s.allow_database_queries to True to silence this failure." % self.cls_name
+        )
+
+
 class SimpleTestCase(unittest.TestCase):
 
     # The class we'll use for the test client self.client.
@@ -147,6 +160,10 @@ class SimpleTestCase(unittest.TestCase):
     client_class = Client
     _overridden_settings = None
     _modified_settings = None
+
+    # Tests shouldn't be allowed to query the database since
+    # this base class doesn't enforce any isolation.
+    allow_database_queries = False
 
     @classmethod
     def setUpClass(cls):
@@ -157,9 +174,17 @@ class SimpleTestCase(unittest.TestCase):
         if cls._modified_settings:
             cls._cls_modified_context = modify_settings(cls._modified_settings)
             cls._cls_modified_context.enable()
+        if not cls.allow_database_queries:
+            for alias in connections:
+                connection = connections[alias]
+                connection.cursor = _CursorFailure(cls.__name__, connection.cursor)
 
     @classmethod
     def tearDownClass(cls):
+        if not cls.allow_database_queries:
+            for alias in connections:
+                connection = connections[alias]
+                connection.cursor = connection.cursor.wrapped
         if hasattr(cls, '_cls_modified_context'):
             cls._cls_modified_context.disable()
             delattr(cls, '_cls_modified_context')
@@ -776,6 +801,10 @@ class TransactionTestCase(SimpleTestCase):
     # during teardown (as flush does not restore data from migrations).
     # This can be slow; this flag allows enabling on a per-case basis.
     serialized_rollback = False
+
+    # Since tests will be wrapped in a transaction, or serialized if they
+    # are not available, we allow queries to be run.
+    allow_database_queries = True
 
     def _pre_setup(self):
         """Performs any pre-test setup. This includes:

@@ -914,3 +914,21 @@ class OverrideSettingsTests(TestCase):
         with self.settings(STATICFILES_DIRS=[test_path]):
             finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
             self.assertIn(expected_location, finder.locations)
+
+
+class DisallowedDatabaseQueriesTests(SimpleTestCase):
+    def test_disallowed_database_queries(self):
+        expected_message = (
+            "Database queries aren't allowed in SimpleTestCase. "
+            "Either use TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set DisallowedDatabaseQueriesTests.allow_database_queries to True to silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            Car.objects.first()
+
+
+class AllowedDatabaseQueriesTests(SimpleTestCase):
+    allow_database_queries = True
+
+    def test_allowed_database_queries(self):
+        Car.objects.first()
