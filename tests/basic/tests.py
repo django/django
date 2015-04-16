@@ -597,6 +597,7 @@ class ConcurrentSaveTests(TransactionTestCase):
 class ManagerTest(TestCase):
     QUERYSET_PROXY_METHODS = [
         'none',
+        'comment',
         'count',
         'dates',
         'datetimes',

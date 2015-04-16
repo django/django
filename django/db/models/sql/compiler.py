@@ -395,6 +395,9 @@ class SQLCompiler(object):
             if self.query.distinct:
                 result.append(self.connection.ops.distinct_sql(distinct_fields))
 
+            if self.query.comment:
+                result.append('/*%s*/' % self.query.comment)
+
             out_cols = []
             col_idx = 1
             for _, (s_sql, s_params), alias in self.select + extra_select:
@@ -917,7 +920,11 @@ class SQLInsertCompiler(SQLCompiler):
         # going to be column names (so we can avoid the extra overhead).
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
-        result = ['INSERT INTO %s' % qn(opts.db_table)]
+        result = ['INSERT ']
+        if self.query.comment:
+            result.append('/*%s*/' % self.query.comment)
+        result.append('INTO')
+        result.append(qn(opts.db_table))
 
         has_fields = bool(self.query.fields)
         fields = self.query.fields if has_fields else [opts.pk]
@@ -1010,7 +1017,10 @@ class SQLUpdateCompiler(SQLCompiler):
             return '', ()
         table = self.query.tables[0]
         qn = self.quote_name_unless_alias
-        result = ['UPDATE %s' % qn(table)]
+        result = ['UPDATE']
+        if self.query.comment:
+            result.append('/*%s*/' % self.query.comment)
+        result.append(qn(table))
         result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:

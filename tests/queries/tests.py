@@ -3714,3 +3714,23 @@ class TestTicket24605(TestCase):
             ).order_by('pk'),
             [i1, i2, i3], lambda x: x
         )
+
+
+class TestComment(TestCase):
+    def test_simple(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(NamedCategory.objects.comment("complicated module"))
+        sql = captured_queries[0]['sql']
+        self.assertIn("SELECT /*complicated module*/ ", sql)
+
+    def test_mysql_only_hint_syntax(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            list(NamedCategory.objects.comment("! STRAIGHT_JOIN"))
+        sql = captured_queries[0]['sql']
+        self.assertIn("SELECT /*! STRAIGHT_JOIN*/ ", sql)
+
+    def test_update_queries(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.comment("difficult code").update(name="monty")
+        sql = captured_queries[0]['sql']
+        self.assertIn("UPDATE /*difficult code*/ ", sql)

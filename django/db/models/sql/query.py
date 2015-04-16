@@ -132,10 +132,13 @@ class Query(object):
         # The select is used for cases where we want to set up the select
         # clause to contain other than default fields (values(), subqueries...)
         # Note that annotations go to annotations dictionary.
+        # The comment is for a single SQL comment inserted where some databases
+        # have optimizer hints
         self.select = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
+        self.comment = ''
         # The group_by attribute can have one of the following forms:
         #  - None: no group by at all in the query
         #  - A list of expressions: group by (at least) those expressions.
@@ -260,6 +263,7 @@ class Query(object):
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
         obj.select = self.select[:]
+        obj.comment = self.comment
         obj.tables = self.tables[:]
         obj.where = self.where.clone()
         obj.where_class = self.where_class
