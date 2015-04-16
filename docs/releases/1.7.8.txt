@@ -4,5 +4,9 @@ Django 1.7.8 release notes
 
 *Under development*
 
-Django 1.7.8 fixes database introspection with SQLite 3.8.9 (released April 8,
-2015) (:ticket:`24637`).
+Django 1.7.8 fixes:
+
+* Database introspection with SQLite 3.8.9 (released April 8, 2015)
+  (:ticket:`24637`).
+
+* A database table name quoting regression in 1.7.2 (:ticket:`24605`).
