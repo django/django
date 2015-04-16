@@ -1497,6 +1497,54 @@ See the :doc:`/topics/db/sql` for more information.
   filtering. As such, it should generally be called from the ``Manager`` or
   from a fresh ``QuerySet`` instance.
 
+comment
+~~~~~~~
+
+.. method:: comment(string)
+
+Sets a raw comment to be inserted into the resultant SQL query, after
+``SELECT``/``UPDATE``, and if applicable, ``DISTINCT``. The string is added
+verbatim as an SQL comment with no spaces. For example::
+
+    Entry.objects.comment("blog/views.py:50").all()
+
+...translates (roughly) into the following SQL::
+
+    SELECT /*blog/views.py:50*/ blog_entry.* FROM blog_entry
+
+Comments do not accumulate - further calls replace any existing comment. For
+example::
+
+    Entry.objects.comment("blog/views.py:50").comment("blog/views.py:75").all()
+
+...translates into::
+
+    SELECT /*blog/views.py:75*/ blog_entry.* FROM blog_entry
+
+This method is intended for:
+
+1. Adding custom tracking code so you can find where a query is generated when,
+   for example, it turns up in your database's slow query log.
+
+2. Adding query hints to problematic queries using the special comment syntax
+   that some databases support. Of the built-in backends, MySQL and Oracle are
+   the two which have such syntaxes.
+
+   For example, on MySQL you can force the join order by setting the
+   ``STRAIGHT_JOIN`` hint with ``comment()`` like so::
+
+       Entry.objects.select_related('blog').comment("! STRAIGHT_JOIN").all()
+
+   This results in the specially interpreted 'non-comment' comment::
+
+       SELECT /*! STRAIGHT_JOIN */ blog_entry.*, blog_blog.* FROM ...
+
+.. warning::
+
+  ``comment()`` does no validation of the given string and is thus vulnerable
+  to SQL injection.
+
+
 Methods that do not return QuerySets
 ------------------------------------
 
