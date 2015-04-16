@@ -351,6 +351,40 @@ class ListFiltersTests(TestCase):
             )
         )
 
+        request = self.request_factory.get('/', {
+            'date_registered__isnull': str(1),
+        })
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(queryset.count(), 1)
+        self.assertEqual(queryset[0], self.bio_book)
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][4]
+        self.assertEqual(force_text(filterspec.title), 'date registered')
+        choice = select_by(filterspec.choices(changelist), "display", "No Date")
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=1')
+
+        request = self.request_factory.get('/', {
+            'date_registered__isnull': str(0),
+        })
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Make sure the correct queryset is returned
+        queryset = changelist.get_queryset(request)
+        self.assertEqual(queryset.count(), 3)
+        self.assertEqual(list(queryset), [self.gipsy_book, self.django_book, self.djangonaut_book])
+
+        # Make sure the correct choice is selected
+        filterspec = changelist.get_filters(request)[0][4]
+        self.assertEqual(force_text(filterspec.title), 'date registered')
+        choice = select_by(filterspec.choices(changelist), "display", "Has Date")
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?date_registered__isnull=0')
+
     @override_settings(USE_TZ=True)
     def test_datefieldlistfilter_with_time_zone_support(self):
         # Regression for #17830
