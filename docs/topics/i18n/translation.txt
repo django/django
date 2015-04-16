@@ -1583,6 +1583,11 @@ which you ran :djadmin:`django-admin makemessages <makemessages>`, run
 
 That's it. Your translations are ready for use.
 
+.. versionchanged:: 1.9
+
+    ``compilemessages`` now matches the operation of :djadmin:`makemessages`,
+    scanning the project tree for ``.po`` files to compile.
+
 .. admonition:: Working on Windows?
 
    If you're using Windows and need to install the GNU gettext utilities so

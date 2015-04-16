@@ -161,6 +161,11 @@ are excluded.
 You can pass ``--use-fuzzy`` option (or ``-f``) to include fuzzy translations
 into compiled files.
 
+.. versionchanged:: 1.9
+
+    ``compilemessages`` now matches the operation of :djadmin:`makemessages`,
+    scanning the project tree for ``.po`` files to compile.
+
 .. versionchanged:: 1.8
 
     Added ``--exclude`` and ``--use-fuzzy`` options.

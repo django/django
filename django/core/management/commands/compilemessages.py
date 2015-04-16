@@ -61,6 +61,12 @@ class Command(BaseCommand):
             from django.conf import settings
             basedirs.extend(upath(path) for path in settings.LOCALE_PATHS)
 
+        # Walk entire tree, looking for locale directories
+        for dirpath, dirnames, filenames in os.walk('.', topdown=True):
+            for dirname in dirnames:
+                if dirname == 'locale':
+                    basedirs.append(os.path.join(dirpath, dirname))
+
         # Gather existing directories.
         basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
 

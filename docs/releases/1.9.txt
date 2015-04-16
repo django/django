@@ -193,6 +193,10 @@ Internationalization
   :ttag:`get_language_info` template tag. Also added a corresponding template
   filter: :tfilter:`language_name_translated`.
 
+* You can now run :djadmin:`compilemessages` from the root directory of your
+  project and it will find all the app message files that were created by
+  :djadmin:`makemessages`.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
