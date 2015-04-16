@@ -18,6 +18,7 @@ class TemplateStringsTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TemplateStringsTests, cls).setUpClass()
         params = {
             'DIRS': [],
             'APP_DIRS': True,
