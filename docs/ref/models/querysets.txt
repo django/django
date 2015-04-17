@@ -1544,6 +1544,10 @@ This method is intended for:
   ``comment()`` does no validation of the given string and is thus vulnerable
   to SQL injection.
 
+.. versionadded:: 1.9
+
+    ``comment()`` was added.
+
 
 Methods that do not return QuerySets
 ------------------------------------
