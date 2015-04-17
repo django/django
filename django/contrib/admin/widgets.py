@@ -272,7 +272,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
     @property
     def media(self):
-        media = Media(js=['admin/js/related-widget-wrapper.js'])
+        media = Media(js=[static('admin/js/related-widget-wrapper.js')])
         return self.widget.media + media
 
     def get_related_url(self, info, action, *args):
