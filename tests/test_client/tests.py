@@ -27,7 +27,9 @@ import datetime
 from django.contrib.auth.models import User
 from django.core import mail
 from django.http import HttpResponse
-from django.test import Client, RequestFactory, TestCase, override_settings
+from django.test import (
+    Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 
 from .views import get_view, post_view, trace_view
 
@@ -542,7 +544,7 @@ class ClientTest(TestCase):
     MIDDLEWARE_CLASSES=['django.middleware.csrf.CsrfViewMiddleware'],
     ROOT_URLCONF='test_client.urls',
 )
-class CSRFEnabledClientTests(TestCase):
+class CSRFEnabledClientTests(SimpleTestCase):
 
     def test_csrf_enabled_client(self):
         "A client can be instantiated with CSRF checks enabled"
@@ -561,7 +563,7 @@ class CustomTestClient(Client):
     i_am_customized = "Yes"
 
 
-class CustomTestClientTest(TestCase):
+class CustomTestClientTest(SimpleTestCase):
     client_class = CustomTestClient
 
     def test_custom_test_client(self):
@@ -573,7 +575,7 @@ _generic_view = lambda request: HttpResponse(status=200)
 
 
 @override_settings(ROOT_URLCONF='test_client.urls')
-class RequestFactoryTest(TestCase):
+class RequestFactoryTest(SimpleTestCase):
     """Tests for the request factory."""
 
     # A mapping between names of HTTP/1.1 methods and their test views.

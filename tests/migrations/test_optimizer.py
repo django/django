@@ -2,12 +2,12 @@
 
 from django.db import migrations, models
 from django.db.migrations.optimizer import MigrationOptimizer
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .models import CustomModelBase, EmptyManager
 
 
-class OptimizerTests(TestCase):
+class OptimizerTests(SimpleTestCase):
     """
     Tests the migration autodetector.
     """

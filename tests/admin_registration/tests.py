@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin.decorators import register
 from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .models import Location, Person, Place, Traveler
 
@@ -18,7 +18,7 @@ class CustomSite(admin.AdminSite):
     pass
 
 
-class TestRegistration(TestCase):
+class TestRegistration(SimpleTestCase):
     def setUp(self):
         self.site = admin.AdminSite()
 
@@ -80,7 +80,7 @@ class TestRegistration(TestCase):
         self.assertFalse(self.site.is_registered(Person))
 
 
-class TestRegistrationDecorator(TestCase):
+class TestRegistrationDecorator(SimpleTestCase):
     """
     Tests the register decorator in admin.decorators
 

@@ -15,7 +15,7 @@ from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.template import TemplateDoesNotExist
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
@@ -33,7 +33,7 @@ if six.PY3:
     from .py3_test_debug import Py3ExceptionReporterTests  # NOQA
 
 
-class CallableSettingWrapperTests(TestCase):
+class CallableSettingWrapperTests(SimpleTestCase):
     """ Unittests for CallableSettingWrapper
     """
     def test_repr(self):
@@ -49,7 +49,7 @@ class CallableSettingWrapperTests(TestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
-class DebugViewTests(LoggingCaptureMixin, TestCase):
+class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
     def test_files(self):
         response = self.client.get('/raises/')
@@ -202,7 +202,7 @@ class DebugViewTests(LoggingCaptureMixin, TestCase):
         'BACKEND': 'django.template.backends.dummy.TemplateStrings',
     }],
 )
-class NonDjangoTemplatesDebugViewTests(TestCase):
+class NonDjangoTemplatesDebugViewTests(SimpleTestCase):
 
     def test_400(self):
         # Ensure that when DEBUG=True, technical_500_template() is called.
@@ -224,7 +224,7 @@ class NonDjangoTemplatesDebugViewTests(TestCase):
         self.assertContains(response, '<div class="context" id="', status_code=500)
 
 
-class ExceptionReporterTests(TestCase):
+class ExceptionReporterTests(SimpleTestCase):
     rf = RequestFactory()
 
     def test_request_and_exception(self):
@@ -417,7 +417,7 @@ class ExceptionReporterTests(TestCase):
         )
 
 
-class PlainTextReportTests(TestCase):
+class PlainTextReportTests(SimpleTestCase):
     rf = RequestFactory()
 
     def test_request_and_exception(self):
@@ -644,7 +644,7 @@ class ExceptionReportTestMixin(object):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin, TestCase):
+class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
     Ensure that sensitive information can be filtered out of error reports.
     Refs #14614.
@@ -835,7 +835,7 @@ class ExceptionReporterFilterTests(ExceptionReportTestMixin, LoggingCaptureMixin
                 self.assertNotContains(response, 'should not be displayed', status_code=500)
 
 
-class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, TestCase):
+class AjaxResponseExceptionReporterFilter(ExceptionReportTestMixin, LoggingCaptureMixin, SimpleTestCase):
     """
     Ensure that sensitive information can be filtered out of error reports.
 

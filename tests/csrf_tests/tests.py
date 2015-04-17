@@ -10,7 +10,7 @@ from django.middleware.csrf import (
 )
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.views.decorators.csrf import (
     csrf_exempt, ensure_csrf_cookie, requires_csrf_token,
 )
@@ -56,7 +56,7 @@ class TestingHttpRequest(HttpRequest):
         return getattr(self, '_is_secure_override', False)
 
 
-class CsrfViewMiddlewareTest(TestCase):
+class CsrfViewMiddlewareTest(SimpleTestCase):
     # The csrf token is potentially from an untrusted source, so could have
     # characters that need dealing with.
     _csrf_id_cookie = b"<1>\xc2\xa1"

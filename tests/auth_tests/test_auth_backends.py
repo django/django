@@ -12,7 +12,9 @@ from django.contrib.auth.tests.custom_user import CustomUser, ExtensionUser
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http import HttpRequest
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, modify_settings, override_settings,
+)
 
 from .models import CustomPermissionsUser, UUIDUser
 
@@ -394,7 +396,7 @@ class RowlevelBackendTest(TestCase):
 @override_settings(
     AUTHENTICATION_BACKENDS=['auth_tests.test_auth_backends.SimpleRowlevelBackend'],
 )
-class AnonymousUserBackendTest(TestCase):
+class AnonymousUserBackendTest(SimpleTestCase):
     """
     Tests for AnonymousUser delegating to backend.
     """

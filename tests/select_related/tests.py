@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     Bookmark, Domain, Family, Genus, HybridSpecies, Kingdom, Klass, Order,
@@ -164,7 +164,7 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_2, parent_2)
 
 
-class SelectRelatedValidationTests(TestCase):
+class SelectRelatedValidationTests(SimpleTestCase):
     """
     select_related() should thrown an error on fields that do not exist and
     non-relational fields.

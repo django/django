@@ -1,4 +1,4 @@
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.test.utils import require_jinja2
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -6,7 +6,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 @override_settings(
     ROOT_URLCONF='shortcuts.urls',
 )
-class ShortcutTests(TestCase):
+class ShortcutTests(SimpleTestCase):
 
     def test_render_to_response(self):
         response = self.client.get('/render_to_response/')

@@ -7,7 +7,7 @@ from django.db.migrations.operations import (
 from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import six
 
 from .models import (
@@ -16,7 +16,7 @@ from .models import (
 )
 
 
-class StateTests(TestCase):
+class StateTests(SimpleTestCase):
     """
     Tests state construction, rendering and modification by operations.
     """
@@ -750,7 +750,7 @@ class StateTests(TestCase):
         self.assertEqual(list(choices_field.choices), choices)
 
 
-class ModelStateTests(TestCase):
+class ModelStateTests(SimpleTestCase):
     def test_custom_model_base(self):
         state = ModelState.from_model(ModelWithCustomBase)
         self.assertEqual(state.bases, (models.Model,))

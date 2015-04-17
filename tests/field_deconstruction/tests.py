@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import six
 
 
-class FieldDeconstructionTests(TestCase):
+class FieldDeconstructionTests(SimpleTestCase):
     """
     Tests the deconstruct() method on all core fields.
     """

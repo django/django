@@ -4,7 +4,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 
 from .models import Album, Book, City, Influence, Song, State, TwoAlbumFKAndAnE
 
@@ -41,7 +41,7 @@ class MyAdmin(admin.ModelAdmin):
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
     INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'admin_checks']
 )
-class SystemChecksTestCase(TestCase):
+class SystemChecksTestCase(SimpleTestCase):
 
     @override_settings(DEBUG=True)
     def test_checks_are_performed(self):

@@ -3,11 +3,11 @@
 from __future__ import unicode_literals
 
 from django.contrib.flatpages.models import FlatPage
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_script_prefix
 
 
-class FlatpageModelTests(TestCase):
+class FlatpageModelTests(SimpleTestCase):
 
     def test_get_absolute_url_urlencodes(self):
         pf = FlatPage(title="Café!", url='/café/')

@@ -9,7 +9,7 @@ from django.forms import (
 )
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 
 
@@ -57,7 +57,7 @@ class SplitDateTimeForm(Form):
 SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
-class FormsFormsetTestCase(TestCase):
+class FormsFormsetTestCase(SimpleTestCase):
 
     def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
             total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
@@ -1117,7 +1117,7 @@ class Choice(Form):
 ChoiceFormSet = formset_factory(Choice)
 
 
-class FormsetAsFooTests(TestCase):
+class FormsetAsFooTests(SimpleTestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertHTMLEqual(formset.as_table(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
@@ -1145,7 +1145,7 @@ class ArticleForm(Form):
 ArticleFormSet = formset_factory(ArticleForm)
 
 
-class TestIsBoundBehavior(TestCase):
+class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_raises_validation_error(self):
         with self.assertRaises(ValidationError):
             ArticleFormSet({}).is_valid()
@@ -1200,7 +1200,7 @@ class TestIsBoundBehavior(TestCase):
         self.assertHTMLEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
 
 
-class TestEmptyFormSet(TestCase):
+class TestEmptyFormSet(SimpleTestCase):
     def test_empty_formset_is_valid(self):
         """Test that an empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)

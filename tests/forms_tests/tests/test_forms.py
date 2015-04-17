@@ -20,7 +20,7 @@ from django.forms import (
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
@@ -41,7 +41,7 @@ class PersonNew(Form):
     birthday = DateField()
 
 
-class FormsTestCase(TestCase):
+class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
     # You can pass it data in __init__(), as a dictionary.

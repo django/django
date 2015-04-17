@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from unittest import skipUnless
 
 from django.contrib.gis.geos import HAS_GEOS
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import modify_settings, override_settings
 from django.utils.encoding import force_text
 
@@ -15,7 +15,7 @@ GOOGLE_MAPS_API_KEY = 'XXXX'
 @modify_settings(
     INSTALLED_APPS={'append': 'django.contrib.gis'},
 )
-class GoogleMapsTest(TestCase):
+class GoogleMapsTest(SimpleTestCase):
 
     @override_settings(GOOGLE_MAPS_API_KEY=GOOGLE_MAPS_API_KEY)
     def test_google_map_scripts(self):

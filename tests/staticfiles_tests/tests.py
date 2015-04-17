@@ -18,7 +18,7 @@ from django.core.cache.backends.base import BaseCache
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import six
 from django.utils._os import symlinks_supported, upath
 from django.utils.encoding import force_text
@@ -85,7 +85,7 @@ class BaseStaticFilesTestCase(object):
 
 
 @override_settings(**TEST_SETTINGS)
-class StaticFilesTestCase(BaseStaticFilesTestCase, TestCase):
+class StaticFilesTestCase(BaseStaticFilesTestCase, SimpleTestCase):
     pass
 
 
@@ -596,7 +596,7 @@ class TestHashedFiles(object):
     DEBUG=False,
 ))
 class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
-        BaseStaticFilesTestCase, TestCase):
+        BaseStaticFilesTestCase, SimpleTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -633,7 +633,7 @@ class TestCollectionCachedStorage(TestHashedFiles, BaseCollectionTestCase,
     DEBUG=False,
 ))
 class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
-        BaseStaticFilesTestCase, TestCase):
+        BaseStaticFilesTestCase, SimpleTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -701,7 +701,7 @@ class TestCollectionManifestStorage(TestHashedFiles, BaseCollectionTestCase,
     DEBUG=False,
 ))
 class TestCollectionSimpleCachedStorage(BaseCollectionTestCase,
-        BaseStaticFilesTestCase, TestCase):
+        BaseStaticFilesTestCase, SimpleTestCase):
     """
     Tests for the Cache busting storage
     """
@@ -863,7 +863,7 @@ class TestDefaultStorageFinder(StaticFilesTestCase, FinderTestCase):
     STATICFILES_FINDERS=['django.contrib.staticfiles.finders.FileSystemFinder'],
     STATICFILES_DIRS=[os.path.join(TEST_ROOT, 'project', 'documents')],
 )
-class TestMiscFinder(TestCase):
+class TestMiscFinder(SimpleTestCase):
     """
     A few misc finder tests.
     """

@@ -17,7 +17,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import checks, exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, override_settings, override_system_checks
+from django.test import (
+    SimpleTestCase, TestCase, override_settings, override_system_checks,
+)
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.translation import ugettext_lazy as _
@@ -415,7 +417,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         test(self)
 
 
-class CustomUserModelValidationTestCase(TestCase):
+class CustomUserModelValidationTestCase(SimpleTestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
     @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):

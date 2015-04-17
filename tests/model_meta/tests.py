@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import (
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import CharField, Field, related
 from django.db.models.options import EMPTY_RELATION_TREE, IMMUTABLE_WARNING
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .models import (
     AbstractPerson, BasePerson, Child, CommonAncestor, FirstParent, Person,
@@ -14,7 +14,7 @@ from .models import (
 from .results import TEST_RESULTS
 
 
-class OptionsBaseTests(TestCase):
+class OptionsBaseTests(SimpleTestCase):
 
     def _map_related_query_names(self, res):
         return tuple((o.name, m) for o, m in res)
@@ -205,7 +205,7 @@ class GetFieldByNameTests(OptionsBaseTests):
             opts.apps.models_ready = True
 
 
-class RelationTreeTests(TestCase):
+class RelationTreeTests(SimpleTestCase):
     all_models = (Relation, AbstractPerson, BasePerson, Person, ProxyPerson, Relating)
 
     def setUp(self):
@@ -260,7 +260,7 @@ class RelationTreeTests(TestCase):
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])
 
 
-class ParentListTests(TestCase):
+class ParentListTests(SimpleTestCase):
     def test_get_parent_list(self):
         self.assertEqual(CommonAncestor._meta.get_parent_list(), [])
         self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])

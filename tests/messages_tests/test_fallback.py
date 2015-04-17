@@ -2,14 +2,14 @@ from django.contrib.messages import constants
 from django.contrib.messages.storage.fallback import (
     CookieStorage, FallbackStorage,
 )
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from .base import BaseTests
 from .test_cookie import set_cookie_data, stored_cookie_messages_count
 from .test_session import set_session_data, stored_session_messages_count
 
 
-class FallbackTest(BaseTests, TestCase):
+class FallbackTest(BaseTests, SimpleTestCase):
     storage_class = FallbackStorage
 
     def get_request(self):

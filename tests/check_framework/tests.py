@@ -10,7 +10,7 @@ from django.core.checks.registry import CheckRegistry
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
@@ -23,7 +23,7 @@ class DummyObj(object):
         return "obj"
 
 
-class SystemCheckFrameworkTests(TestCase):
+class SystemCheckFrameworkTests(SimpleTestCase):
 
     def test_register_and_run_checks(self):
 
@@ -69,7 +69,7 @@ class SystemCheckFrameworkTests(TestCase):
         self.assertEqual(sorted(errors), [4, 5])
 
 
-class MessageTests(TestCase):
+class MessageTests(SimpleTestCase):
 
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
@@ -126,7 +126,7 @@ def deployment_system_check(**kwargs):
 deployment_system_check.tags = ['deploymenttag']
 
 
-class CheckCommandTests(TestCase):
+class CheckCommandTests(SimpleTestCase):
 
     def setUp(self):
         simple_system_check.kwargs = None
@@ -213,7 +213,7 @@ def custom_warning_system_check(app_configs, **kwargs):
     ]
 
 
-class SilencingCheckTests(TestCase):
+class SilencingCheckTests(SimpleTestCase):
 
     def setUp(self):
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
@@ -266,7 +266,7 @@ class IsolateModelsMixin(object):
         apps.clear_cache()
 
 
-class CheckFrameworkReservedNamesTests(IsolateModelsMixin, TestCase):
+class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
     @override_settings(
         SILENCED_SYSTEM_CHECKS=['models.E20', 'fields.W342'],  # ForeignKey(unique=True)
         INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes', 'check_framework']

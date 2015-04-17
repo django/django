@@ -9,7 +9,7 @@ from django.forms import (
     CharField, FileField, Form, ModelChoiceField, ModelForm,
 )
 from django.forms.models import ModelFormMetaclass
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from ..models import (
@@ -222,7 +222,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
 
-class RelatedModelFormTests(TestCase):
+class RelatedModelFormTests(SimpleTestCase):
     def test_invalid_loading_order(self):
         """
         Test for issue 10405

@@ -10,7 +10,7 @@ from .models import BasePerson, Person
 from .results import TEST_RESULTS
 
 
-class OptionsBaseTests(test.TestCase):
+class OptionsBaseTests(test.SimpleTestCase):
 
     def _map_related_query_names(self, res):
         return tuple((o.field.related_query_name(), m) for o, m in res)

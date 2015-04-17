@@ -30,7 +30,8 @@ from django.template import engines
 from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.test import (
-    RequestFactory, TestCase, TransactionTestCase, override_settings,
+    RequestFactory, SimpleTestCase, TestCase, TransactionTestCase,
+    override_settings,
 )
 from django.test.signals import setting_changed
 from django.utils import six, timezone, translation
@@ -69,7 +70,7 @@ class Unpickable(object):
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 })
-class DummyCacheTests(TestCase):
+class DummyCacheTests(SimpleTestCase):
     # The Dummy cache backend doesn't really behave like a test backend,
     # so it has its own test case.
 
@@ -1235,7 +1236,7 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         'BACKEND': 'cache.liberal_backend.CacheClass',
     },
 })
-class CustomCacheKeyValidationTests(TestCase):
+class CustomCacheKeyValidationTests(SimpleTestCase):
     """
     Tests for the ability to mixin a custom ``validate_key`` method to
     a custom cache backend that otherwise inherits from a builtin
@@ -1257,7 +1258,7 @@ class CustomCacheKeyValidationTests(TestCase):
         }
     }
 )
-class CacheClosingTests(TestCase):
+class CacheClosingTests(SimpleTestCase):
 
     def test_close(self):
         self.assertFalse(cache.closed)
@@ -1275,7 +1276,7 @@ NEVER_EXPIRING_CACHES_SETTINGS = copy.deepcopy(DEFAULT_MEMORY_CACHES_SETTINGS)
 NEVER_EXPIRING_CACHES_SETTINGS['default']['TIMEOUT'] = None
 
 
-class DefaultNonExpiringCacheKeyTests(TestCase):
+class DefaultNonExpiringCacheKeyTests(SimpleTestCase):
     """Tests that verify that settings having Cache arguments with a TIMEOUT
     set to `None` will create Caches that will set non-expiring keys.
 
@@ -1351,7 +1352,7 @@ class DefaultNonExpiringCacheKeyTests(TestCase):
     },
     USE_I18N=False,
 )
-class CacheUtils(TestCase):
+class CacheUtils(SimpleTestCase):
     """TestCase for django.utils.cache functions."""
 
     def setUp(self):
@@ -1500,7 +1501,7 @@ class PrefixedCacheUtils(CacheUtils):
         },
     },
 )
-class CacheHEADTest(TestCase):
+class CacheHEADTest(SimpleTestCase):
 
     def setUp(self):
         self.path = '/cache/test/'
@@ -1820,7 +1821,7 @@ def csrf_view(request):
         },
     },
 )
-class CacheMiddlewareTest(TestCase):
+class CacheMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         super(CacheMiddlewareTest, self).setUp()
@@ -2001,7 +2002,7 @@ class CacheMiddlewareTest(TestCase):
     },
     USE_I18N=False,
 )
-class TestWithTemplateResponse(TestCase):
+class TestWithTemplateResponse(SimpleTestCase):
     """
     Tests various headers w/ TemplateResponse.
 
@@ -2097,7 +2098,7 @@ class TestWithTemplateResponse(TestCase):
         self.assertTrue(response.has_header('ETag'))
 
 
-class TestMakeTemplateFragmentKey(TestCase):
+class TestMakeTemplateFragmentKey(SimpleTestCase):
     def test_without_vary_on(self):
         key = make_template_fragment_key('a.fragment')
         self.assertEqual(key, 'template.cache.a.fragment.d41d8cd98f00b204e9800998ecf8427e')
@@ -2118,7 +2119,7 @@ class TestMakeTemplateFragmentKey(TestCase):
             'template.cache.spam.f27688177baec990cdf3fbd9d9c3f469')
 
 
-class CacheHandlerTest(TestCase):
+class CacheHandlerTest(SimpleTestCase):
     def test_same_instance(self):
         """
         Attempting to retrieve the same alias should yield the same instance.

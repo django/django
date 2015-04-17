@@ -3,7 +3,7 @@ import uuid
 
 from django.core import exceptions, serializers
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     NullableUUIDModel, PrimaryKeyUUIDModel, RelatedToUUIDModel, UUIDGrandchild,
@@ -47,7 +47,7 @@ class TestSaveLoad(TestCase):
             UUIDModel.objects.create, field='not-a-uuid')
 
 
-class TestMigrations(TestCase):
+class TestMigrations(SimpleTestCase):
 
     def test_deconstruct(self):
         field = models.UUIDField()
@@ -76,7 +76,7 @@ class TestQuerying(TestCase):
         )
 
 
-class TestSerialization(TestCase):
+class TestSerialization(SimpleTestCase):
     test_data = '[{"fields": {"field": "550e8400-e29b-41d4-a716-446655440000"}, "model": "model_fields.uuidmodel", "pk": null}]'
 
     def test_dumping(self):
@@ -89,7 +89,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.field, uuid.UUID('550e8400-e29b-41d4-a716-446655440000'))
 
 
-class TestValidation(TestCase):
+class TestValidation(SimpleTestCase):
     def test_invalid_uuid(self):
         field = models.UUIDField()
         with self.assertRaises(exceptions.ValidationError) as cm:

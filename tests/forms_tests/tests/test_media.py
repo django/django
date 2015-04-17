@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.forms import CharField, Form, Media, MultiWidget, TextInput
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils.encoding import force_text
 
 
@@ -9,7 +9,7 @@ from django.utils.encoding import force_text
     STATIC_URL=None,
     MEDIA_URL='http://media.example.com/media/',
 )
-class FormsMediaTestCase(TestCase):
+class FormsMediaTestCase(SimpleTestCase):
     """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):
@@ -466,7 +466,7 @@ class FormsMediaTestCase(TestCase):
     STATIC_URL='http://media.example.com/static/',
     MEDIA_URL='http://media.example.com/media/',
 )
-class StaticFormsMediaTestCase(TestCase):
+class StaticFormsMediaTestCase(SimpleTestCase):
     """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):

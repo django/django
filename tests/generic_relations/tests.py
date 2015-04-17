@@ -5,7 +5,7 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.db.models import Q
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from .models import (
@@ -618,7 +618,7 @@ class ProxyRelatedModelTest(TestCase):
         self.assertEqual(base, newrel.bases.get())
 
 
-class TestInitWithNoneArgument(TestCase):
+class TestInitWithNoneArgument(SimpleTestCase):
     def test_none_not_allowed(self):
         # TaggedItem requires a content_type, initializing with None should
         # raise a ValueError.

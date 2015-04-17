@@ -11,7 +11,9 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.core.urlresolvers import reverse
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media
@@ -313,7 +315,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
 
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
-class NoInlineDeletionTest(TestCase):
+class NoInlineDeletionTest(SimpleTestCase):
 
     def test_no_deletion(self):
         inline = MediaPermanentInline(EpisodePermanent, admin_site)
@@ -335,7 +337,7 @@ request.user = MockSuperUser()
 
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
-class GenericInlineModelAdminTest(TestCase):
+class GenericInlineModelAdminTest(SimpleTestCase):
 
     def setUp(self):
         self.site = AdminSite()

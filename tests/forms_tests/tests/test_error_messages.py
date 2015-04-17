@@ -9,7 +9,7 @@ from django.forms import (
     ModelMultipleChoiceField, MultipleChoiceField, RegexField,
     SplitDateTimeField, TimeField, URLField, ValidationError, utils,
 )
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
@@ -23,7 +23,7 @@ class AssertFormErrorsMixin(object):
             self.assertEqual(e.messages, expected)
 
 
-class FormsErrorMessagesTestCase(TestCase, AssertFormErrorsMixin):
+class FormsErrorMessagesTestCase(SimpleTestCase, AssertFormErrorsMixin):
     def test_charfield(self):
         e = {
             'required': 'REQUIRED',

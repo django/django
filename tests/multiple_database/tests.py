@@ -11,7 +11,7 @@ from django.core import management
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
@@ -862,7 +862,7 @@ class QueryTestCase(TestCase):
                                   extra_arg=True)
 
 
-class ConnectionRouterTestCase(TestCase):
+class ConnectionRouterTestCase(SimpleTestCase):
     @override_settings(DATABASE_ROUTERS=[
         'multiple_database.tests.TestRouter',
         'multiple_database.tests.WriteRouter'])

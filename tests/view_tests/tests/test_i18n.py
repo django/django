@@ -10,7 +10,8 @@ from os import path
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.test import (
-    LiveServerTestCase, TestCase, modify_settings, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
+    override_settings,
 )
 from django.utils import six
 from django.utils._os import upath
@@ -106,7 +107,7 @@ class I18NTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTests(TestCase):
+class JsI18NTests(SimpleTestCase):
     """
     Tests django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE.
@@ -184,7 +185,7 @@ class JsI18NTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JsI18NTestsMultiPackage(TestCase):
+class JsI18NTestsMultiPackage(SimpleTestCase):
     """
     Tests for django views in django/views/i18n.py that need to change
     settings.LANGUAGE_CODE and merge JS translation from several packages.
