@@ -68,6 +68,12 @@ It contains lots of great information and is a must read for anyone who'd like
 to become a regular contributor to Django. If you've got questions, it's
 probably got the answers.
 
+Conduct
+=======
+
+As a contributor, you can help us keep the Django community open and inclusive.
+Please read and follow our `Code of Conduct <https://www.djangoproject.com/conduct/>`_.
+
 Installing Git
 ==============
 
