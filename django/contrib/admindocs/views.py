@@ -17,7 +17,6 @@ from django.template.base import (
     libraries,
 )
 from django.template.engine import Engine
-from django.utils import six
 from django.utils._os import upath
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -64,7 +63,7 @@ class TemplateTagIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         tags = []
-        app_libs = list(six.iteritems(libraries))
+        app_libs = list(libraries.items())
         builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for tag_name, tag_func in library.tags.items():
@@ -97,7 +96,7 @@ class TemplateFilterIndexView(BaseAdminDocsView):
         load_all_installed_template_libraries()
 
         filters = []
-        app_libs = list(six.iteritems(libraries))
+        app_libs = list(libraries.items())
         builtin_libs = [(None, lib) for lib in builtins]
         for module_name, library in builtin_libs + app_libs:
             for filter_name, filter_func in library.filters.items():
