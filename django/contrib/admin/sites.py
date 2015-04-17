@@ -271,7 +271,7 @@ class AdminSite(object):
         # Add in each model's views, and create a list of valid URLS for the
         # app_index
         valid_app_labels = []
-        for model, model_admin in six.iteritems(self._registry):
+        for model, model_admin in self._registry.items():
             urlpatterns += [
                 url(r'^%s/%s/' % (model._meta.app_label, model._meta.model_name), include(model_admin.urls)),
             ]
@@ -470,8 +470,7 @@ class AdminSite(object):
         app_dict = self._build_app_dict(request)
 
         # Sort the apps alphabetically.
-        app_list = list(six.itervalues(app_dict))
-        app_list.sort(key=lambda x: x['name'].lower())
+        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
 
         # Sort the models alphabetically within each app.
         for app in app_list:

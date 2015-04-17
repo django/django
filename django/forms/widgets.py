@@ -988,7 +988,7 @@ class SelectDateWidget(Widget):
         html = {}
         choices = [(i, i) for i in self.years]
         html['year'] = self.create_select(name, self.year_field, value, year_val, choices, self.year_none_value)
-        choices = list(six.iteritems(self.months))
+        choices = list(self.months.items())
         html['month'] = self.create_select(name, self.month_field, value, month_val, choices, self.month_none_value)
         choices = [(i, i) for i in range(1, 32)]
         html['day'] = self.create_select(name, self.day_field, value, day_val, choices, self.day_none_value)
