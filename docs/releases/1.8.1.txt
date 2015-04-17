@@ -58,3 +58,6 @@ Bugfixes
 
 * Prevented the loss of ``null``/``not null`` column properties during field
   alteration of MySQL databases (:ticket:`24595`).
+
+* Fixed JavaScript path of ``contrib.admin``’s related field widget when using
+  alternate static file storages (:ticket:`24655`).
