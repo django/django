@@ -1150,7 +1150,12 @@ class SQLAggregateCompiler(SQLCompiler):
         sql = ', '.join(sql)
         params = tuple(params)
 
-        sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
+        if self.query.comment:
+            comment = '/*%s*/ ' % self.query.comment
+        else:
+            comment = ''
+
+        sql = 'SELECT %s%s FROM (%s) subquery' % (comment, sql, self.query.subquery)
         params = params + self.query.sub_params
         return sql, params
 

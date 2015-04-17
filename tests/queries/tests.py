@@ -3717,20 +3717,20 @@ class TestTicket24605(TestCase):
 
 
 class TestComment(TestCase):
-    def test_simple(self):
-        with CaptureQueriesContext(connection) as captured_queries:
-            list(NamedCategory.objects.comment("complicated module"))
-        sql = captured_queries[0]['sql']
-        self.assertIn("SELECT /*complicated module*/ ", sql)
-
-    def test_mysql_only_hint_syntax(self):
+    def test_select(self):
         with CaptureQueriesContext(connection) as captured_queries:
             list(NamedCategory.objects.comment("! STRAIGHT_JOIN"))
         sql = captured_queries[0]['sql']
         self.assertIn("SELECT /*! STRAIGHT_JOIN*/ ", sql)
 
-    def test_update_queries(self):
+    def test_update(self):
         with CaptureQueriesContext(connection) as captured_queries:
-            NamedCategory.objects.comment("difficult code").update(name="monty")
+            NamedCategory.objects.comment("! LOW_PRIORITY").update(name="monty")
         sql = captured_queries[0]['sql']
-        self.assertIn("UPDATE /*difficult code*/ ", sql)
+        self.assertIn("UPDATE /*! LOW_PRIORITY*/ ", sql)
+
+    def test_select_aggregate(self):
+        with CaptureQueriesContext(connection) as captured_queries:
+            NamedCategory.objects.comment("! SQL_CACHE").aggregate(Count('tag'))
+        sql = captured_queries[0]['sql']
+        self.assertIn("SELECT /*! SQL_CACHE*/ ", sql)
