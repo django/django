@@ -4,7 +4,7 @@ from importlib import import_module
 
 from django import conf
 from django.contrib import admin
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
 from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
@@ -12,7 +12,7 @@ from django.utils.autoreload import gen_filenames
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
 
-class TestFilenameGenerator(TestCase):
+class TestFilenameGenerator(SimpleTestCase):
     def setUp(self):
         # Empty cached variables
         from django.utils import autoreload

@@ -18,7 +18,7 @@ from django.forms.models import (
     modelform_factory,
 )
 from django.template import Context, Template
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils._os import upath
 
@@ -551,7 +551,7 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
         }
 
 
-class TestFieldOverridesByFormMeta(TestCase):
+class TestFieldOverridesByFormMeta(SimpleTestCase):
     def test_widget_overrides(self):
         form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
@@ -633,7 +633,7 @@ class IncompleteCategoryFormWithExclude(forms.ModelForm):
         model = Category
 
 
-class ValidationTest(TestCase):
+class ValidationTest(SimpleTestCase):
     def test_validates_with_replaced_field_not_specified(self):
         form = IncompleteCategoryFormWithFields(data={'name': 'some name', 'slug': 'some-slug'})
         assert form.is_valid()
@@ -2117,7 +2117,7 @@ class FileAndImageFieldTests(TestCase):
         instance.delete()
 
 
-class ModelOtherFieldTests(TestCase):
+class ModelOtherFieldTests(SimpleTestCase):
     def test_big_integer_field(self):
         bif = BigIntForm({'biggie': '-9223372036854775808'})
         self.assertTrue(bif.is_valid())
@@ -2326,7 +2326,7 @@ class OtherModelFormTests(TestCase):
         self.assertFalse(bound_form.has_changed())
 
 
-class ModelFormCustomErrorTests(TestCase):
+class ModelFormCustomErrorTests(SimpleTestCase):
     def test_custom_error_messages(self):
         data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
         errors = CustomErrorMessageForm(data).errors
@@ -2402,7 +2402,7 @@ class CustomCleanTests(TestCase):
         self.assertEqual(category.name, 'TEST')
 
 
-class ModelFormInheritanceTests(TestCase):
+class ModelFormInheritanceTests(SimpleTestCase):
     def test_form_subclass_inheritance(self):
         class Form(forms.Form):
             age = forms.IntegerField()
@@ -2513,7 +2513,7 @@ class LimitChoicesToTest(TestCase):
         self.assertEqual(f.fields['custom'].queryset, 42)
 
 
-class FormFieldCallbackTests(TestCase):
+class FormFieldCallbackTests(SimpleTestCase):
 
     def test_baseform_with_widgets_in_meta(self):
         """Regression for #13095: Using base forms with widgets defined in Meta should not raise errors."""
@@ -2631,7 +2631,7 @@ class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
     pass
 
 
-class CustomMetaclassTestCase(TestCase):
+class CustomMetaclassTestCase(SimpleTestCase):
     def test_modelform_factory_metaclass(self):
         new_cls = modelform_factory(Person, fields="__all__", form=CustomMetaclassForm)
         self.assertEqual(new_cls.base_fields, {})

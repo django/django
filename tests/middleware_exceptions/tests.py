@@ -6,7 +6,7 @@ from django.core.signals import got_request_exception
 from django.http import HttpResponse
 from django.template import engines
 from django.template.response import TemplateResponse
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import patch_logger
 
 
@@ -116,7 +116,7 @@ class NoResponseMiddleware(TestMiddleware):
 
 
 @override_settings(ROOT_URLCONF='middleware_exceptions.urls')
-class BaseMiddlewareExceptionTest(TestCase):
+class BaseMiddlewareExceptionTest(SimpleTestCase):
 
     def setUp(self):
         self.exceptions = []
@@ -827,7 +827,7 @@ _missing = object()
 
 
 @override_settings(ROOT_URLCONF='middleware_exceptions.urls')
-class RootUrlconfTests(TestCase):
+class RootUrlconfTests(SimpleTestCase):
 
     @override_settings(ROOT_URLCONF=None)
     def test_missing_root_urlconf(self):
@@ -859,7 +859,7 @@ class MyMiddlewareWithExceptionMessage(object):
     DEBUG=True,
     ROOT_URLCONF='middleware_exceptions.urls',
 )
-class MiddlewareNotUsedTests(TestCase):
+class MiddlewareNotUsedTests(SimpleTestCase):
 
     rf = RequestFactory()
 

@@ -17,7 +17,7 @@ from django.db import migrations, models
 from django.db.migrations.writer import (
     MigrationWriter, OperationWriter, SettingsReference,
 )
-from django.test import SimpleTestCase, TestCase, ignore_warnings
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
@@ -152,7 +152,7 @@ class OperationWriterTests(SimpleTestCase):
         )
 
 
-class WriterTests(TestCase):
+class WriterTests(SimpleTestCase):
     """
     Tests the migration writer (makes migration files from Migration instances)
     """

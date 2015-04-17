@@ -27,7 +27,8 @@ from django.forms.utils import ErrorList
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
-    TestCase, modify_settings, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, modify_settings, override_settings,
+    skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.utils import formats, six, translation
@@ -6150,7 +6151,7 @@ class InlineAdminViewOnSiteTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
-class TestEtagWithAdminView(TestCase):
+class TestEtagWithAdminView(SimpleTestCase):
     # See https://code.djangoproject.com/ticket/16003
 
     def test_admin(self):

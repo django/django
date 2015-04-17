@@ -19,7 +19,7 @@ from django.middleware.common import (
 )
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str
@@ -28,7 +28,7 @@ from django.utils.six.moves.urllib.parse import quote
 
 
 @override_settings(ROOT_URLCONF='middleware.urls')
-class CommonMiddlewareTest(TestCase):
+class CommonMiddlewareTest(SimpleTestCase):
 
     rf = RequestFactory()
 
@@ -289,7 +289,7 @@ class CommonMiddlewareTest(TestCase):
     IGNORABLE_404_URLS=[re.compile(r'foo')],
     MANAGERS=['PHB@dilbert.com'],
 )
-class BrokenLinkEmailsMiddlewareTest(TestCase):
+class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
 
     rf = RequestFactory()
 
@@ -353,7 +353,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='middleware.cond_get_urls')
-class ConditionalGetMiddlewareTest(TestCase):
+class ConditionalGetMiddlewareTest(SimpleTestCase):
 
     def setUp(self):
         self.req = RequestFactory().get('/')
@@ -492,7 +492,7 @@ class ConditionalGetMiddlewareTest(TestCase):
         self.assertEqual(self.resp.status_code, 400)
 
 
-class XFrameOptionsMiddlewareTest(TestCase):
+class XFrameOptionsMiddlewareTest(SimpleTestCase):
     """
     Tests for the X-Frame-Options clickjacking prevention middleware.
     """
@@ -610,7 +610,7 @@ class XFrameOptionsMiddlewareTest(TestCase):
             self.assertEqual(r['X-Frame-Options'], 'DENY')
 
 
-class GZipMiddlewareTest(TestCase):
+class GZipMiddlewareTest(SimpleTestCase):
     """
     Tests the GZip middleware.
     """
@@ -717,7 +717,7 @@ class GZipMiddlewareTest(TestCase):
 
 
 @override_settings(USE_ETAGS=True)
-class ETagGZipMiddlewareTest(TestCase):
+class ETagGZipMiddlewareTest(SimpleTestCase):
     """
     Tests if the ETag middleware behaves correctly with GZip middleware.
     """

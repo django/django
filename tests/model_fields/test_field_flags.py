@@ -72,7 +72,7 @@ FLAG_PROPERTIES_FOR_RELATIONS = (
 )
 
 
-class FieldFlagsTests(test.TestCase):
+class FieldFlagsTests(test.SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super(FieldFlagsTests, cls).setUpClass()

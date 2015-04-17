@@ -152,7 +152,7 @@ class ChildDecoratedTestCase(ParentDecoratedTestCase):
         self.assertEqual(settings.TEST, 'override-child')
 
 
-class SettingsTests(TestCase):
+class SettingsTests(SimpleTestCase):
     def setUp(self):
         self.testvalue = None
         signals.setting_changed.connect(self.signal_callback)
@@ -279,7 +279,7 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
 
-class TestComplexSettingOverride(TestCase):
+class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
         self.old_warn_override_settings = signals.COMPLEX_OVERRIDE_SETTINGS.copy()
         signals.COMPLEX_OVERRIDE_SETTINGS.add('TEST_WARN')
@@ -304,7 +304,7 @@ class TestComplexSettingOverride(TestCase):
                 'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
-class TrailingSlashURLTests(TestCase):
+class TrailingSlashURLTests(SimpleTestCase):
     """
     Tests for the MEDIA_URL and STATIC_URL settings.
 
@@ -386,7 +386,7 @@ class TrailingSlashURLTests(TestCase):
                          self.settings_module.STATIC_URL)
 
 
-class SecureProxySslHeaderTest(TestCase):
+class SecureProxySslHeaderTest(SimpleTestCase):
     settings_module = settings
 
     def setUp(self):
@@ -418,7 +418,7 @@ class SecureProxySslHeaderTest(TestCase):
         self.assertEqual(req.is_secure(), True)
 
 
-class IsOverriddenTest(TestCase):
+class IsOverriddenTest(SimpleTestCase):
     def test_configure(self):
         s = LazySettings()
         s.configure(SECRET_KEY='foo')

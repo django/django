@@ -5,7 +5,7 @@ import gettext
 import os
 from datetime import datetime, timedelta
 from importlib import import_module
-from unittest import TestCase, skipIf
+from unittest import skipIf
 
 from django import forms
 from django.conf import settings
@@ -17,7 +17,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.db.models import CharField, DateField
-from django.test import TestCase as DjangoTestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import six, translation
 
 from . import models
@@ -59,7 +59,7 @@ class SeleniumDataMixin(object):
         )
 
 
-class AdminFormfieldForDBFieldTests(TestCase):
+class AdminFormfieldForDBFieldTests(SimpleTestCase):
     """
     Tests for correct behavior of ModelAdmin.formfield_for_dbfield
     """
@@ -194,7 +194,7 @@ class AdminFormfieldForDBFieldTests(TestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
-class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, DjangoTestCase):
+class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
 
     def test_filter_choices_by_request_user(self):
         """
@@ -208,7 +208,7 @@ class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, DjangoTestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
-class AdminForeignKeyWidgetChangeList(TestDataMixin, DjangoTestCase):
+class AdminForeignKeyWidgetChangeList(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -220,7 +220,7 @@ class AdminForeignKeyWidgetChangeList(TestDataMixin, DjangoTestCase):
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
-class AdminForeignKeyRawIdWidget(TestDataMixin, DjangoTestCase):
+class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
 
     def setUp(self):
         self.client.login(username="super", password="secret")
@@ -262,7 +262,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, DjangoTestCase):
         self.assertEqual(lookup1, lookup2)
 
 
-class FilteredSelectMultipleWidgetTest(DjangoTestCase):
+class FilteredSelectMultipleWidgetTest(SimpleTestCase):
     def test_render(self):
         # Backslash in verbose_name to ensure it is JavaScript escaped.
         w = widgets.FilteredSelectMultiple('test\\', False)
@@ -284,7 +284,7 @@ class FilteredSelectMultipleWidgetTest(DjangoTestCase):
         )
 
 
-class AdminDateWidgetTest(DjangoTestCase):
+class AdminDateWidgetTest(SimpleTestCase):
     def test_attrs(self):
         """
         Ensure that user-supplied attrs are used.
@@ -303,7 +303,7 @@ class AdminDateWidgetTest(DjangoTestCase):
         )
 
 
-class AdminTimeWidgetTest(DjangoTestCase):
+class AdminTimeWidgetTest(SimpleTestCase):
     def test_attrs(self):
         """
         Ensure that user-supplied attrs are used.
@@ -322,7 +322,7 @@ class AdminTimeWidgetTest(DjangoTestCase):
         )
 
 
-class AdminSplitDateTimeWidgetTest(DjangoTestCase):
+class AdminSplitDateTimeWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
@@ -341,7 +341,7 @@ class AdminSplitDateTimeWidgetTest(DjangoTestCase):
             )
 
 
-class AdminURLWidgetTest(DjangoTestCase):
+class AdminURLWidgetTest(SimpleTestCase):
     def test_render(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
@@ -382,7 +382,7 @@ class AdminURLWidgetTest(DjangoTestCase):
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls',
 )
-class AdminFileWidgetTests(TestDataMixin, DjangoTestCase):
+class AdminFileWidgetTests(TestDataMixin, TestCase):
 
     @classmethod
     def setUpTestData(cls):
@@ -436,7 +436,7 @@ class AdminFileWidgetTests(TestDataMixin, DjangoTestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
-class ForeignKeyRawIdWidgetTest(DjangoTestCase):
+class ForeignKeyRawIdWidgetTest(TestCase):
 
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -519,7 +519,7 @@ class ForeignKeyRawIdWidgetTest(DjangoTestCase):
 
 
 @override_settings(ROOT_URLCONF='admin_widgets.urls')
-class ManyToManyRawIdWidgetTest(DjangoTestCase):
+class ManyToManyRawIdWidgetTest(TestCase):
 
     def test_render(self):
         band = models.Band.objects.create(name='Linkin Park')
@@ -566,7 +566,7 @@ class ManyToManyRawIdWidgetTest(DjangoTestCase):
         )
 
 
-class RelatedFieldWidgetWrapperTests(DjangoTestCase):
+class RelatedFieldWidgetWrapperTests(SimpleTestCase):
     def test_no_can_add_related(self):
         rel = models.Individual._meta.get_field('parent').remote_field
         w = widgets.AdminRadioSelect()

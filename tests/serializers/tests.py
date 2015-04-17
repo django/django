@@ -11,7 +11,8 @@ from xml.dom import minidom
 from django.core import management, serializers
 from django.db import connection, transaction
 from django.test import (
-    TestCase, TransactionTestCase, override_settings, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+    skipUnlessDBFeature,
 )
 from django.test.utils import Approximate
 from django.utils import six
@@ -34,7 +35,7 @@ except ImportError:
         "json2": "django.core.serializers.json",
     }
 )
-class SerializerRegistrationTests(TestCase):
+class SerializerRegistrationTests(SimpleTestCase):
     def setUp(self):
         self.old_serializers = serializers._serializers
         serializers._serializers = {}
@@ -664,7 +665,7 @@ class YamlImportModuleMock(object):
         return self._import_module(module_path)
 
 
-class NoYamlSerializerTestCase(TestCase):
+class NoYamlSerializerTestCase(SimpleTestCase):
     """Not having pyyaml installed provides a misleading error
 
     Refs: #12756

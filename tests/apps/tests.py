@@ -10,7 +10,7 @@ from django.apps.registry import Apps
 from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
 from django.utils import six
 from django.utils._os import upath
@@ -38,7 +38,7 @@ SOME_INSTALLED_APPS_NAMES = [
 HERE = os.path.dirname(upath(__file__))
 
 
-class AppsTests(TestCase):
+class AppsTests(SimpleTestCase):
 
     def test_singleton_master(self):
         """
@@ -303,7 +303,7 @@ class Stub(object):
         self.__dict__.update(kwargs)
 
 
-class AppConfigTests(TestCase):
+class AppConfigTests(SimpleTestCase):
     """Unit tests for AppConfig class."""
     def test_path_set_explicitly(self):
         """If subclass sets path as class attr, no module attributes needed."""
@@ -366,7 +366,7 @@ class AppConfigTests(TestCase):
 @skipUnless(
     sys.version_info > (3, 3, 0),
     "Namespace packages sans __init__.py were added in Python 3.3")
-class NamespacePackageAppTests(TestCase):
+class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another
     # location for it (if its inside a normal package with an __init__.py that
     # isn't possible). In order to avoid cluttering the already-full tests/ dir

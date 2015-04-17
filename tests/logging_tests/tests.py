@@ -8,7 +8,7 @@ from admin_scripts.tests import AdminScriptTestCase
 
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
@@ -39,7 +39,7 @@ OLD_LOGGING = {
 }
 
 
-class LoggingFiltersTest(TestCase):
+class LoggingFiltersTest(SimpleTestCase):
     def test_require_debug_false_filter(self):
         """
         Test the RequireDebugFalse filter class.
@@ -65,7 +65,7 @@ class LoggingFiltersTest(TestCase):
             self.assertEqual(filter_.filter("record is not used"), False)
 
 
-class DefaultLoggingTest(LoggingCaptureMixin, TestCase):
+class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
 
     def test_django_logger(self):
         """
@@ -79,7 +79,7 @@ class DefaultLoggingTest(LoggingCaptureMixin, TestCase):
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
 
 
-class WarningLoggerTests(TestCase):
+class WarningLoggerTests(SimpleTestCase):
     """
     Tests that warnings output for RemovedInDjangoXXWarning (XX being the next
     Django version) is enabled and captured to the logging system
@@ -137,7 +137,7 @@ class WarningLoggerTests(TestCase):
                 warnings.warn('Foo Deprecated', RemovedInNextVersionWarning)
 
 
-class CallbackFilterTest(TestCase):
+class CallbackFilterTest(SimpleTestCase):
     def test_sense(self):
         f_false = CallbackFilter(lambda r: False)
         f_true = CallbackFilter(lambda r: True)
@@ -158,7 +158,7 @@ class CallbackFilterTest(TestCase):
         self.assertEqual(collector, ["a record"])
 
 
-class AdminEmailHandlerTest(TestCase):
+class AdminEmailHandlerTest(SimpleTestCase):
     logger = logging.getLogger('django')
 
     def get_admin_email_handler(self, logger):
@@ -385,7 +385,7 @@ def dictConfig(config):
 dictConfig.called = False
 
 
-class SetupConfigureLogging(TestCase):
+class SetupConfigureLogging(SimpleTestCase):
     """
     Test that calling django.setup() initializes the logging configuration.
     """
@@ -398,7 +398,7 @@ class SetupConfigureLogging(TestCase):
 
 
 @override_settings(DEBUG=True, ROOT_URLCONF='logging_tests.urls')
-class SecurityLoggerTest(TestCase):
+class SecurityLoggerTest(SimpleTestCase):
 
     def test_suspicious_operation_creates_log_message(self):
         with patch_logger('django.security.SuspiciousOperation', 'error') as calls:

@@ -223,7 +223,7 @@ class ForeignKeyTests(test.TestCase):
         )
 
 
-class ManyToManyFieldTests(test.TestCase):
+class ManyToManyFieldTests(test.SimpleTestCase):
     def test_abstract_model_pending_operations(self):
         """
         Many-to-many fields declared on abstract models should not add lazy relations to
@@ -425,7 +425,7 @@ class BooleanFieldTests(test.TestCase):
         nb.save()           # no error
 
 
-class ChoicesTests(test.TestCase):
+class ChoicesTests(test.SimpleTestCase):
     def test_choices_and_field_display(self):
         """
         Check that get_choices and get_flatchoices interact with
@@ -466,7 +466,7 @@ class SlugFieldTests(test.TestCase):
         self.assertEqual(bs.s, 'slug' * 50)
 
 
-class ValidationTest(test.TestCase):
+class ValidationTest(test.SimpleTestCase):
     def test_charfield_raises_error_on_empty_string(self):
         f = models.CharField()
         self.assertRaises(ValidationError, f.clean, "", None)
@@ -738,7 +738,7 @@ class GenericIPAddressFieldTests(test.TestCase):
         self.assertEqual(loaded.ip, instance.ip)
 
 
-class PromiseTest(test.TestCase):
+class PromiseTest(test.SimpleTestCase):
     def test_AutoField(self):
         lazy_func = lazy(lambda: 1, int)
         self.assertIsInstance(

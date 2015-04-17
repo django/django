@@ -11,7 +11,8 @@ from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
-    TestCase, TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.utils import six
 from django.utils.translation import ugettext_lazy
@@ -594,7 +595,7 @@ class ConcurrentSaveTests(TransactionTestCase):
         self.assertEqual(Article.objects.get(pk=a.pk).headline, 'foo')
 
 
-class ManagerTest(TestCase):
+class ManagerTest(SimpleTestCase):
     QUERYSET_PROXY_METHODS = [
         'none',
         'count',
@@ -772,7 +773,7 @@ class ModelRefreshTests(TestCase):
             a.refresh_from_db(fields=[])
 
 
-class TestRelatedObjectDeprecation(TestCase):
+class TestRelatedObjectDeprecation(SimpleTestCase):
     def test_field_related_deprecation(self):
         field = SelfRef._meta.get_field('selfref')
         with warnings.catch_warnings(record=True) as warns:

@@ -5,7 +5,7 @@ from django.contrib.auth.context_processors import PermLookupDict, PermWrapper
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from .settings import AUTH_MIDDLEWARE_CLASSES, AUTH_TEMPLATES
 
@@ -22,7 +22,7 @@ class MockUser(object):
         return False
 
 
-class PermWrapperTests(TestCase):
+class PermWrapperTests(SimpleTestCase):
     """
     Test some details of the PermWrapper implementation.
     """

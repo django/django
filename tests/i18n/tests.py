@@ -14,7 +14,9 @@ from unittest import skipUnless
 from django import forms
 from django.conf import settings
 from django.template import Context, Template, TemplateSyntaxError
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, TestCase, override_settings,
+)
 from django.utils import six, translation
 from django.utils._os import upath
 from django.utils.formats import (
@@ -54,7 +56,7 @@ def patch_formats(lang, **settings):
         reset_format_cache()
 
 
-class TranslationTests(TestCase):
+class TranslationTests(SimpleTestCase):
 
     @translation.override('fr')
     def test_plural(self):
@@ -427,7 +429,7 @@ class TranslationTests(TestCase):
             self.assertEqual(rendered, 'My other name is James.')
 
 
-class TranslationThreadSafetyTests(TestCase):
+class TranslationThreadSafetyTests(SimpleTestCase):
 
     def setUp(self):
         self._old_language = get_language()
@@ -459,7 +461,7 @@ class TranslationThreadSafetyTests(TestCase):
 
 
 @override_settings(USE_L10N=True)
-class FormattingTests(TestCase):
+class FormattingTests(SimpleTestCase):
 
     def setUp(self):
         super(FormattingTests, self).setUp()
@@ -906,7 +908,7 @@ class FormattingTests(TestCase):
             )
 
 
-class MiscTests(TestCase):
+class MiscTests(SimpleTestCase):
 
     def setUp(self):
         super(MiscTests, self).setUp()
@@ -1136,7 +1138,7 @@ class MiscTests(TestCase):
             self.assertNotEqual('pt-br', g(r))
 
 
-class ResolutionOrderI18NTests(TestCase):
+class ResolutionOrderI18NTests(SimpleTestCase):
 
     def setUp(self):
         super(ResolutionOrderI18NTests, self).setUp()
@@ -1205,7 +1207,7 @@ class TestModels(TestCase):
         c.save()
 
 
-class TestLanguageInfo(TestCase):
+class TestLanguageInfo(SimpleTestCase):
     def test_localized_language_info(self):
         li = get_language_info('de')
         self.assertEqual(li['code'], 'de')
@@ -1237,7 +1239,7 @@ class TestLanguageInfo(TestCase):
         self.assertEqual(li['code'], 'zh-hans')
 
 
-class MultipleLocaleActivationTests(TestCase):
+class MultipleLocaleActivationTests(SimpleTestCase):
     """
     Tests for template rendering behavior when multiple locales are activated
     during the lifetime of the same process.
@@ -1409,7 +1411,7 @@ class LocaleMiddlewareTests(TestCase):
     ],
     ROOT_URLCONF='i18n.urls'
 )
-class CountrySpecificLanguageTests(TestCase):
+class CountrySpecificLanguageTests(SimpleTestCase):
 
     def setUp(self):
         super(CountrySpecificLanguageTests, self).setUp()
@@ -1459,7 +1461,7 @@ class CountrySpecificLanguageTests(TestCase):
         self.assertEqual('pt-br', lang)
 
 
-class TranslationFilesMissing(TestCase):
+class TranslationFilesMissing(SimpleTestCase):
 
     def setUp(self):
         super(TranslationFilesMissing, self).setUp()

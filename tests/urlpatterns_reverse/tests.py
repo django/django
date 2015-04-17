@@ -183,7 +183,7 @@ test_data = (
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.no_urls')
-class NoURLPatternsTests(TestCase):
+class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
@@ -201,7 +201,7 @@ class NoURLPatternsTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
-class URLPatternReverse(TestCase):
+class URLPatternReverse(SimpleTestCase):
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_urlpattern_reverse(self):
@@ -399,7 +399,7 @@ LOGIN_URL = reverse_lazy('login')""")
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
-class ReverseShortcutTests(TestCase):
+class ReverseShortcutTests(SimpleTestCase):
 
     def test_redirect_to_object(self):
         # We don't really need a model; just something with a get_absolute_url
@@ -458,7 +458,7 @@ class ReverseShortcutTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
-class NamespaceTests(TestCase):
+class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
         "Names deployed via dynamic URL objects that require namespaces can't be resolved"
@@ -576,7 +576,7 @@ class NamespaceTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF=urlconf_outer.__name__)
-class RequestURLconfTests(TestCase):
+class RequestURLconfTests(SimpleTestCase):
     def test_urlconf(self):
         response = self.client.get('/test/me/')
         self.assertEqual(response.status_code, 200)
@@ -670,7 +670,7 @@ class RequestURLconfTests(TestCase):
             b''.join(self.client.get('/second_test/'))
 
 
-class ErrorHandlerResolutionTests(TestCase):
+class ErrorHandlerResolutionTests(SimpleTestCase):
     """Tests for handler400, handler404 and handler500"""
 
     def setUp(self):
@@ -693,7 +693,7 @@ class ErrorHandlerResolutionTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')
-class DefaultErrorHandlerTests(TestCase):
+class DefaultErrorHandlerTests(SimpleTestCase):
 
     def test_default_handler(self):
         "If the urls.py doesn't specify handlers, the defaults are used"
@@ -710,7 +710,7 @@ class DefaultErrorHandlerTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF=None)
-class NoRootUrlConfTests(TestCase):
+class NoRootUrlConfTests(SimpleTestCase):
     """Tests for handler404 and handler500 if urlconf is None"""
 
     def test_no_handler_exception(self):
@@ -718,7 +718,7 @@ class NoRootUrlConfTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
-class ResolverMatchTests(TestCase):
+class ResolverMatchTests(SimpleTestCase):
 
     def test_urlpattern_resolve(self):
         for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
@@ -755,7 +755,7 @@ class ResolverMatchTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
-class ErroneousViewTests(TestCase):
+class ErroneousViewTests(SimpleTestCase):
 
     def test_erroneous_resolve(self):
         self.assertRaises(ImportError, self.client.get, '/erroneous_inner/')
@@ -777,7 +777,7 @@ class ErroneousViewTests(TestCase):
         self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
 
 
-class ViewLoadingTests(TestCase):
+class ViewLoadingTests(SimpleTestCase):
     def test_view_loading(self):
         self.assertEqual(get_callable('urlpatterns_reverse.views.empty_view'), empty_view)
 
@@ -803,7 +803,7 @@ class IncludeTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
-class LookaheadTests(TestCase):
+class LookaheadTests(SimpleTestCase):
     def test_valid_resolve(self):
         test_urls = [
             '/lookahead-/a-city/',

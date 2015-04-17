@@ -4,11 +4,11 @@ from django.db.migrations.exceptions import (
     CircularDependencyError, NodeNotFoundError,
 )
 from django.db.migrations.graph import RECURSION_DEPTH_WARNING, MigrationGraph
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.encoding import force_text
 
 
-class GraphTests(TestCase):
+class GraphTests(SimpleTestCase):
     """
     Tests the digraph structure.
     """

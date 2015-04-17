@@ -14,7 +14,7 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.text import capfirst
@@ -553,7 +553,7 @@ class PasswordResetFormTest(TestDataMixin, TestCase):
         )
 
 
-class ReadOnlyPasswordHashTest(TestCase):
+class ReadOnlyPasswordHashTest(SimpleTestCase):
 
     def test_bug_19349_render_with_none_value(self):
         # Rendering the widget with value set to None

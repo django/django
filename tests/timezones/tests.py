@@ -18,8 +18,8 @@ from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
 )
 from django.test import (
-    TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+    skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.utils import six, timezone
@@ -656,7 +656,7 @@ class UnsupportedTimeZoneDatabaseTests(TestCase):
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi')
-class SerializationTests(TestCase):
+class SerializationTests(SimpleTestCase):
 
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.

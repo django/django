@@ -24,7 +24,7 @@ from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
-class SkippingTestCase(TestCase):
+class SkippingTestCase(SimpleTestCase):
     def _assert_skipping(self, func, expected_exc):
         # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
         try:
@@ -92,7 +92,7 @@ class SkippingTestCase(TestCase):
         self._assert_skipping(test_func5, ValueError)
 
 
-class SkippingClassTestCase(TestCase):
+class SkippingClassTestCase(SimpleTestCase):
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
         class NotSkippedTests(unittest.TestCase):
@@ -306,7 +306,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
-class AssertTemplateUsedContextManagerTests(TestCase):
+class AssertTemplateUsedContextManagerTests(SimpleTestCase):
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -403,7 +403,7 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             self.assertTemplateNotUsed(response, 'template.html')
 
 
-class HTMLEqualTests(TestCase):
+class HTMLEqualTests(SimpleTestCase):
     def test_html_parser(self):
         element = parse_html('<div><p>Hello</p></div>')
         self.assertEqual(len(element.children), 1)
@@ -645,7 +645,7 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
-class JSONEqualTests(TestCase):
+class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
         json2 = '{"attr1": "foo", "attr2":"baz"}'
@@ -690,7 +690,7 @@ class JSONEqualTests(TestCase):
             self.assertJSONNotEqual(valid_json, invalid_json)
 
 
-class XMLEqualTests(TestCase):
+class XMLEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
         xml2 = "<elem attr1='a' attr2='b' />"
@@ -784,7 +784,7 @@ class SecondUrls:
     urlpatterns = [url(r'second/$', empty_response, name='second')]
 
 
-class OverrideSettingsTests(TestCase):
+class OverrideSettingsTests(SimpleTestCase):
 
     # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or

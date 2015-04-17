@@ -25,7 +25,9 @@ from django.core.management import (
 from django.db import ConnectionHandler
 from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import LiveServerTestCase, TestCase, mock, override_settings
+from django.test import (
+    LiveServerTestCase, SimpleTestCase, mock, override_settings,
+)
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
@@ -1695,7 +1697,7 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
 
-class Discovery(TestCase):
+class Discovery(SimpleTestCase):
 
     def test_precedence(self):
         """

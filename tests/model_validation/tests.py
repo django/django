@@ -1,7 +1,7 @@
 from django.core import management
 from django.core.checks import Error, run_checks
 from django.db.models.signals import post_init
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils import six
 
@@ -19,7 +19,7 @@ def on_post_init(**kwargs):
     INSTALLED_APPS=['django.contrib.auth', 'django.contrib.contenttypes'],
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
 )
-class ModelValidationTest(TestCase):
+class ModelValidationTest(SimpleTestCase):
     def test_models_validate(self):
         # All our models should validate properly
         # Validation Tests:

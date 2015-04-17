@@ -17,7 +17,7 @@ from django.http import (
     HttpResponseRedirect, JsonResponse, QueryDict, SimpleCookie,
     StreamingHttpResponse, parse_cookie,
 )
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import force_text, smart_str
@@ -425,7 +425,7 @@ class HttpResponseTests(unittest.TestCase):
                               HttpResponsePermanentRedirect, url)
 
 
-class HttpResponseSubclassesTests(TestCase):
+class HttpResponseSubclassesTests(SimpleTestCase):
     def test_redirect(self):
         response = HttpResponseRedirect('/redirected/')
         self.assertEqual(response.status_code, 302)
@@ -460,7 +460,7 @@ class HttpResponseSubclassesTests(TestCase):
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
 
 
-class JsonResponseTests(TestCase):
+class JsonResponseTests(SimpleTestCase):
     def test_json_response_non_ascii(self):
         data = {'key': 'łóżko'}
         response = JsonResponse(data)
@@ -489,7 +489,7 @@ class JsonResponseTests(TestCase):
         self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
 
 
-class StreamingHttpResponseTests(TestCase):
+class StreamingHttpResponseTests(SimpleTestCase):
     def test_streaming_response(self):
         r = StreamingHttpResponse(iter(['hello', 'world']))
 
@@ -554,7 +554,7 @@ class StreamingHttpResponseTests(TestCase):
         self.assertEqual(r.getvalue(), b'helloworld')
 
 
-class FileCloseTests(TestCase):
+class FileCloseTests(SimpleTestCase):
 
     def setUp(self):
         # Disable the request_finished signal during this test

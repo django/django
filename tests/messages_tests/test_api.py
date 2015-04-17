@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase
 
 
 class DummyStorage(object):
@@ -14,7 +14,7 @@ class DummyStorage(object):
         self.store.append(message)
 
 
-class ApiTest(TestCase):
+class ApiTest(SimpleTestCase):
     def setUp(self):
         self.rf = RequestFactory()
         self.request = self.rf.request()

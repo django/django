@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core import signing
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import freeze_time
 from django.utils import six
 from django.utils.encoding import force_str
 
 
-class TestSigner(TestCase):
+class TestSigner(SimpleTestCase):
 
     def test_signature(self):
         "signature() method should generate a signature"
@@ -113,7 +113,7 @@ class TestSigner(TestCase):
         self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
 
 
-class TestTimestampSigner(TestCase):
+class TestTimestampSigner(SimpleTestCase):
 
     def test_timestamp_signer(self):
         value = 'hello'

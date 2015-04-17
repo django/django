@@ -25,8 +25,8 @@ from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
 from django.db.utils import ConnectionHandler
 from django.test import (
-    TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
+    skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import str_prefix
 from django.utils import six
@@ -35,7 +35,7 @@ from django.utils.six.moves import range
 from . import models
 
 
-class DummyBackendTest(TestCase):
+class DummyBackendTest(SimpleTestCase):
 
     def test_no_databases(self):
         """
@@ -1096,7 +1096,7 @@ class DBConstraintTestCase(TestCase):
         self.assertEqual(intermediary_model.objects.count(), 2)
 
 
-class BackendUtilTests(TestCase):
+class BackendUtilTests(SimpleTestCase):
 
     def test_format_number(self):
         """

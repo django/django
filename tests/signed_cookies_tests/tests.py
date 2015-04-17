@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 from django.core import signing
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import freeze_time
 
 
-class SignedCookieTest(TestCase):
+class SignedCookieTest(SimpleTestCase):
 
     def test_can_set_and_read_signed_cookies(self):
         response = HttpResponse()

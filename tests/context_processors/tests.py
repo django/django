@@ -1,7 +1,7 @@
 """
 Tests for Django's bundled context processors.
 """
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 
 @override_settings(
@@ -16,7 +16,7 @@ from django.test import TestCase, override_settings
         },
     }],
 )
-class RequestContextProcessorTests(TestCase):
+class RequestContextProcessorTests(SimpleTestCase):
     """
     Tests for the ``django.template.context_processors.request`` processor.
     """

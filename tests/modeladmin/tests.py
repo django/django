@@ -12,7 +12,7 @@ from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
 from django.core.checks import Error
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from .models import (
@@ -536,7 +536,7 @@ class ModelAdminTests(TestCase):
             ['extra', 'transport', 'id', 'DELETE', 'main_band'])
 
 
-class CheckTestCase(TestCase):
+class CheckTestCase(SimpleTestCase):
 
     def assertIsInvalid(self, model_admin, model, msg,
             id=None, hint=None, invalid_obj=None):
@@ -1526,7 +1526,7 @@ class ListDisplayEditableTests(CheckTestCase):
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
 
-class ModelAdminPermissionTests(TestCase):
+class ModelAdminPermissionTests(SimpleTestCase):
 
     class MockUser(object):
         def has_module_perms(self, app_label):

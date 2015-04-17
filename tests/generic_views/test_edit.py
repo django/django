@@ -5,7 +5,9 @@ import warnings
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, ignore_warnings, override_settings,
+)
 from django.test.client import RequestFactory
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.views.generic.base import View
@@ -16,7 +18,7 @@ from .models import Artist, Author
 from .test_forms import AuthorForm
 
 
-class FormMixinTests(TestCase):
+class FormMixinTests(SimpleTestCase):
     def test_initial_data(self):
         """ Test instance independence of initial data dict (see #16138) """
         initial_1 = FormMixin().get_initial()
@@ -97,7 +99,7 @@ class BasicFormTests(TestCase):
         self.assertRedirects(res, '/list/authors/')
 
 
-class ModelFormMixinTests(TestCase):
+class ModelFormMixinTests(SimpleTestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
         self.assertEqual(form_class._meta.model, Author)

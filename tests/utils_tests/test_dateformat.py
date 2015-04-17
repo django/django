@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from datetime import date, datetime
 
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import TZ_SUPPORT, requires_tz_support
 from django.utils import dateformat, translation
 from django.utils.dateformat import format
@@ -12,7 +12,7 @@ from django.utils.timezone import (
 
 
 @override_settings(TIME_ZONE='Europe/Copenhagen')
-class DateFormatTests(TestCase):
+class DateFormatTests(SimpleTestCase):
 
     def setUp(self):
         self._orig_lang = translation.get_language()
