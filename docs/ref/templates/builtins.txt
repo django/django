@@ -676,9 +676,11 @@ The variable may also be any object with a ``render()`` method that accepts a
 context. This allows you to reference a compiled ``Template`` in your context.
 
 An included template is rendered within the context of the template that
-includes it. This example produces the output ``"Hello, John"``:
+includes it. This example produces the output ``"Hello, John!"``:
 
-* Context: variable ``person`` is set to ``"john"``.
+* Context: variable ``person`` is set to ``"John"`` and variable ``greeting``
+  is set to ``"Hello"``.
+
 * Template::
 
     {% include "name_snippet.html" %}
