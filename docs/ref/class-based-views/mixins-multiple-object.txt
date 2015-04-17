@@ -176,6 +176,15 @@ MultipleObjectMixin
 
         Returns context data for displaying the list of objects.
 
+        If the ``object_list`` attribute is not set, ``get_queryset()`` will be
+        used to get the object list.
+
+        .. versionchanged:: 1.9
+
+            In order to reduce interdependencies of different methods, this
+            method no longer requires ``object_list`` attribute to be set in
+            the ``get()`` method.
+
     **Context**
 
     * ``object_list``: The list of objects that this view is displaying. If
@@ -224,3 +233,10 @@ MultipleObjectTemplateResponseMixin
 
         * the value of ``template_name`` on the view (if provided)
         * ``<app_label>/<model_name><template_name_suffix>.html``
+
+        .. versionchanged:: 1.9
+
+            In order to reduce interdependencies of different methods, this
+            method no longer requires ``object_list`` attribute to be set in
+            the ``get()`` method.
+

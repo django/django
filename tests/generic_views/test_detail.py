@@ -7,7 +7,9 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 from django.views.generic.base import View
-from django.views.generic.detail import SingleObjectTemplateResponseMixin
+from django.views.generic.detail import (
+    DetailView, SingleObjectTemplateResponseMixin,
+)
 from django.views.generic.edit import ModelFormMixin
 
 from .models import Artist, Author, Book, Page
@@ -169,3 +171,14 @@ class DetailViewTest(TestCase):
         res = self.client.get('/detail/nonmodel/1/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.context['object'].id, "non_model_1")
+
+    def test_methods_do_not_depend_on_self_object(self):
+        class TestDetailView(DetailView):
+            model = Artist
+            request = RequestFactory().get('/')
+            kwargs = {'pk': 1}
+        try:
+            TestDetailView().get_context_data()
+            TestDetailView().get_template_names()
+        except AttributeError as e:
+            self.fail("DetailView method raised AttributeError unexpectedly: %s !" % e)

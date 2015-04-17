@@ -100,6 +100,11 @@ class SingleObjectMixin(ContextMixin):
         Insert the single object into the context dict.
         """
         context = {}
+        # when self.object value is None, we should NOT run get_object()
+        # method; this value means object will be created by ModelForm (in
+        # CreateView)
+        if not hasattr(self, "object"):
+            self.object = self.get_object()
         if self.object:
             context['object'] = self.object
             context_object_name = self.get_context_object_name(self.object)
@@ -143,14 +148,14 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # If self.template_name_field is set, grab the value of the field
             # of that name from the object; this is the most specific template
             # name, if given.
-            if self.object and self.template_name_field:
+            if hasattr(self, "object") and self.object and self.template_name_field:
                 name = getattr(self.object, self.template_name_field, None)
                 if name:
                     names.insert(0, name)
 
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
-            if isinstance(self.object, models.Model):
+            if hasattr(self, "object") and isinstance(self.object, models.Model):
                 object_meta = self.object._meta
                 if self.object._deferred:
                     object_meta = self.object._meta.proxy_for_model._meta

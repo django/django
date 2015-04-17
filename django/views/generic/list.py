@@ -127,6 +127,8 @@ class MultipleObjectMixin(ContextMixin):
         """
         Get the context for this view.
         """
+        self.object_list = getattr(self, "object_list", self.get_queryset())
+
         queryset = kwargs.pop('object_list', self.object_list)
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
@@ -197,7 +199,7 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
         # app and model name. This name gets put at the end of the template
         # name list so that user-supplied names override the automatically-
         # generated ones.
-        if hasattr(self.object_list, 'model'):
+        if hasattr(self, "object_list") and hasattr(self.object_list, 'model'):
             opts = self.object_list.model._meta
             names.append("%s/%s%s.html" % (opts.app_label, opts.model_name, self.template_name_suffix))
 

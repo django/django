@@ -5,8 +5,10 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from django.utils.encoding import force_str
 from django.views.generic.base import View
+from django.views.generic.list import ListView
 
 from .models import Artist, Author, Book, Page
 
@@ -244,3 +246,13 @@ class ListViewTests(TestCase):
         Author.objects.all().delete()
         for i in range(n):
             Author.objects.create(name='Author %02i' % i, slug='a%s' % i)
+
+    def test_methods_do_not_depend_on_self_objectlist(self):
+        class TestListView(ListView):
+            model = Artist
+            request = RequestFactory().get('/')
+        try:
+            TestListView().get_context_data()
+            TestListView().get_template_names()
+        except AttributeError as e:
+            self.fail("ListView method raised AttributeError unexpectedly: %s !" % e)
