@@ -80,10 +80,9 @@ def find_command(cmd, path=None, pathext=None):
     return None
 
 
-def get_random_secret_key()
+def get_random_secret_key():
     """
     Reusable logic to create a valid random SECRET_KEY value.
-    
     Returns a 50 characters long random string usable as a SECRET_KEY setting
     value.
     """
