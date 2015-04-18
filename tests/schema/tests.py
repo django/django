@@ -1,10 +1,10 @@
 import datetime
 import unittest
 
-from django.test import TransactionTestCase
+from django.test import TransactionTestCase, skipIfDBFeature
 from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import (BinaryField, BooleanField, CharField, IntegerField,
-    PositiveIntegerField, SlugField, TextField)
+from django.db.models.fields import (BigIntegerField, BinaryField, BooleanField, CharField,
+    IntegerField, PositiveIntegerField, SlugField, TextField)
 from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField
 from django.db.transaction import atomic
 from .fields import CustomManyToManyField, InheritedManyToManyField
@@ -439,7 +439,8 @@ class SchemaTests(TransactionTestCase):
                 strict=True,
             )
 
-    def test_alter_field_keep_null_status(self):
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
+    def test_alter_textual_field_keep_null_status(self):
         """
         Changing a field type shouldn't affect the not null status.
         """
@@ -454,6 +455,22 @@ class SchemaTests(TransactionTestCase):
             editor.alter_field(Note, old_field, new_field, strict=True)
         with self.assertRaises(IntegrityError):
             Note.objects.create(info=None)
+
+    def test_alter_numeric_field_keep_null_status(self):
+        """
+        Changing a field type shouldn't affect the not null status.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(UniqueTest)
+        with self.assertRaises(IntegrityError):
+            UniqueTest.objects.create(year=None, slug='aaa')
+        old_field = UniqueTest._meta.get_field("year")
+        new_field = BigIntegerField()
+        new_field.set_attributes_from_name("year")
+        with connection.schema_editor() as editor:
+            editor.alter_field(UniqueTest, old_field, new_field, strict=True)
+        with self.assertRaises(IntegrityError):
+            UniqueTest.objects.create(year=None, slug='bbb')
 
     def test_alter_null_to_not_null(self):
         """
