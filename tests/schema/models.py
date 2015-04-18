@@ -83,6 +83,9 @@ class BookWithSlug(models.Model):
 class Note(models.Model):
     info = models.TextField()
 
+    class Meta:
+        apps = new_apps
+
 
 class Tag(models.Model):
     title = models.CharField(max_length=255)
