@@ -1,5 +1,7 @@
+import functools
 from django.apps import apps
-from django.dispatch import Signal
+from django.db import transaction
+from django.dispatch import Signal, _make_id
 from django.utils import six
 
 
@@ -8,8 +10,12 @@ class_prepared = Signal(providing_args=["class"])
 
 class ModelSignal(Signal):
     """
-    Signal subclass that allows the sender to be lazily specified as a string
-    of the `app_label.ModelName` form.
+    Subclass of `Signal` that differs in a few respects:
+    1. Allows the sender to be lazily specified as a string of the
+       `app_label.ModelName` form.
+    2. When connecting receivers, takes `after_commit` which will set
+       state to defer execution of `receiver` until the transaction
+       has committed.
     """
 
     def __init__(self, *args, **kwargs):
@@ -30,7 +36,7 @@ class ModelSignal(Signal):
                     receiver, sender=sender, weak=weak, dispatch_uid=dispatch_uid
                 )
 
-    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None):
+    def connect(self, receiver, sender=None, weak=True, dispatch_uid=None, after_commit=False):
         if isinstance(sender, six.string_types):
             try:
                 app_label, model_name = sender.split('.')
@@ -46,6 +52,15 @@ class ModelSignal(Signal):
                 refs = self.unresolved_references.setdefault(ref, [])
                 refs.append((receiver, weak, dispatch_uid))
                 return
+        if after_commit:
+            wrapped_receiver = receiver
+            @functools.wraps(wrapped_receiver)
+            def _wrapper(*args, **kwargs):
+                transaction.add_callback_after_commit(wrapped_receiver, args, kwargs)
+            receiver = _wrapper
+            # Make sure the lookup id matches the wrapped function, not _wrapper.
+            if not dispatch_uid:
+                dispatch_uid = _make_id(wrapped_receiver)
         super(ModelSignal, self).connect(
             receiver, sender=sender, weak=weak, dispatch_uid=dispatch_uid
         )

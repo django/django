@@ -6,4 +6,4 @@ See license.txt for original license.
 Heavily modified for Django's purposes.
 """
 
-from django.dispatch.dispatcher import Signal, receiver  # NOQA
+from django.dispatch.dispatcher import Signal, receiver, _make_id  # NOQA
