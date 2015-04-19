@@ -1189,9 +1189,6 @@ provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields.
 
-Proxy models inherit any ``Meta`` options that they don't define from their
-non-abstract model parent (the model they are proxying for).
-
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
 
