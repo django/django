@@ -25,6 +25,7 @@ class Author(models.Model):
 @python_2_unicode_compatible
 class Article(models.Model):
     author = models.ForeignKey(Author, null=True)
+    second_author = models.ForeignKey(Author, null=True)
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
 
@@ -33,3 +34,16 @@ class Article(models.Model):
 
     def __str__(self):
         return self.headline
+
+
+class OrderedByAuthorArticle(Article):
+    class Meta:
+        proxy = True
+        ordering = ('author', 'second_author')
+
+
+class Reference(models.Model):
+    article = models.ForeignKey(OrderedByAuthorArticle)
+
+    class Meta:
+        ordering = ('article',)
