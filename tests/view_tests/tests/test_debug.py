@@ -14,13 +14,16 @@ from unittest import skipIf
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
+from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import LoggingCaptureMixin
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
-from django.views.debug import CallableSettingWrapper, ExceptionReporter
+from django.views.debug import (
+    CallableSettingWrapper, ExceptionReporter, technical_500_response,
+)
 
 from .. import BrokenException, except_args
 from ..views import (
@@ -192,6 +195,26 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
             "Page not found <span>(404)</span>",
             status_code=404
         )
+
+
+class DebugViewQueriesAllowedTests(SimpleTestCase):
+    # May need a query to initialize MySQL connection
+    allow_database_queries = True
+
+    def test_handle_db_exception(self):
+        """
+        Ensure the debug view works when a database exception is raised by
+        performing an invalid query and passing the exception to the debug view.
+        """
+        with connection.cursor() as cursor:
+            try:
+                cursor.execute('INVALID SQL')
+            except DatabaseError:
+                exc_info = sys.exc_info()
+
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info)
+        self.assertContains(response, 'OperationalError at /', status_code=500)
 
 
 @override_settings(
