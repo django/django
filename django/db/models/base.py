@@ -346,6 +346,9 @@ class ModelState(object):
         # Necessary for correct validation of new instances of objects with explicit (non-auto) PKs.
         # This impacts validation only; it has no effect on the actual save.
         self.adding = True
+        # Field observers that are being kept alive for the lifetime of this
+        # instance.
+        self.field_observers = list()
 
 
 class Model(six.with_metaclass(ModelBase)):
@@ -1612,6 +1615,7 @@ class Model(six.with_metaclass(ModelBase)):
                     )
 
         return errors
+
 
 
 ############################################
