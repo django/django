@@ -409,7 +409,7 @@ class ExceptionReporter(object):
         # sometimes in Python 3), take the traceback from self.tb (Python 2
         # doesn't have a __traceback__ attribute on Exception)
         exc_value = exceptions.pop()
-        tb = self.tb if not exceptions else exc_value.__traceback__
+        tb = self.tb if sys.version_info < (3,) else exc_value.__traceback__
 
         while tb is not None:
             # Support for __traceback_hide__ which is used by a few libraries
@@ -444,7 +444,9 @@ class ExceptionReporter(object):
 
             # If the traceback for current exception is consumed, try the
             # other exception.
-            if not tb.tb_next and exceptions:
+            if sys.version_info < (3,):
+                tb = tb.tb_next
+            elif not tb.tb_next and exceptions:
                 exc_value = exceptions.pop()
                 tb = exc_value.__traceback__
             else:
