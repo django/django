@@ -496,7 +496,7 @@ class ModelState(object):
         return self.__class__(
             app_label=self.app_label,
             name=self.name,
-            fields=list(self.construct_fields()),
+            fields=[(name, copy.deepcopy(field)) for name, field in self.fields],
             options=dict(self.options),
             bases=self.bases,
             managers=list(self.construct_managers()),
