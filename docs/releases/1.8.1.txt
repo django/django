@@ -78,6 +78,8 @@ Bugfixes
 * Removed flushing of the test database with :djadminopt:`--keepdb`, which
   prevented apps with data migrations from using the option (:ticket:`24729`).
 
+* Fixed ``makemessages`` crash in some locales (:ticket:`23271`).
+
 Optimizations
 =============
 
