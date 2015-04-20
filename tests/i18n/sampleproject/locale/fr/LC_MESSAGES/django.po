@@ -40,12 +40,13 @@ msgstr ""
 "plus disponible"
 
 #: templates/percents.html:11
-msgid "1 percent sign %%, 2 percent signs %%, 3 percent signs %%%"
+#, python-format
+msgid "1 percent sign %%, 2 percent signs %%%%, 3 percent signs %%%%%%"
 msgstr ""
 "1 %% signe pour cent, signes %%%% 2 pour cent, trois signes de pourcentage %%"
 "%%%%"
 
 #: templates/percents.html:12
 #, python-format
-msgid "%(name)s says: 1 percent sign %%, 2 percent signs %%"
+msgid "%(name)s says: 1 percent sign %%, 2 percent signs %%%%"
 msgstr "%(name)s dit: 1 pour cent signe %%, deux signes de pourcentage %%%%"
