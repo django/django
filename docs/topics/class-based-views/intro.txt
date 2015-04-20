@@ -251,10 +251,9 @@ more of the methods (or both!).
 Decorating class-based views
 ============================
 
-The extension of class-based views isn't limited to using mixins. You
-can use also use decorators. Since class-based views aren't functions,
-decorating them works differently depending on if you're using ``as_view`` or
-creating a subclass.
+The extension of class-based views isn't limited to using mixins. You can also
+use decorators. Since class-based views aren't functions, decorating them works
+differently depending on if you're using ``as_view()`` or creating a subclass.
 
 Decorating in URLconf
 ---------------------
