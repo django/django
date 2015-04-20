@@ -146,10 +146,10 @@ class FieldFlagsTests(test.TestCase):
                 self.assertEqual(1, true_cardinality_flags)
 
     def test_cardinality_m2m(self):
-        m2m_type_fields = (
+        m2m_type_fields = [
             f for f in self.all_fields
             if f.is_relation and f.many_to_many
-        )
+        ]
         # Test classes are what we expect
         self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
 
