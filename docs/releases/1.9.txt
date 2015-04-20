@@ -184,6 +184,10 @@ Models
 * Added a system check to prevent defining both ``Meta.ordering`` and
   ``order_with_respect_to`` on the same model.
 
+* Added the :meth:`QuerySet.comment()
+  <django.db.models.query.QuerySet.comment()>` method to allow injecting a
+  comment or optimizer hint into the SQL query.
+
 CSRF
 ^^^^
 

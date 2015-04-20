@@ -936,6 +936,14 @@ class QuerySet(object):
         clone.query.add_extra(select, select_params, where, params, tables, order_by)
         return clone
 
+    def comment(self, comment):
+        """
+        Adds a comment to be inserted into the query.
+        """
+        clone = self._clone()
+        clone.query.comment = comment
+        return clone
+
     def reverse(self):
         """
         Reverses the ordering of the QuerySet.
