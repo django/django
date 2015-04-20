@@ -279,12 +279,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return conn
 
     def init_connection_state(self):
-        with self.cursor() as cursor:
-            # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
-            # on a recently-inserted row will return when the field is tested for
-            # NULL.  Disabling this value brings this aspect of MySQL in line with
-            # SQL standards.
-            cursor.execute('SET SQL_AUTO_IS_NULL = 0')
+        if getattr(settings, 'SET_MYSQL_AUTO_IS_NULL', True):
+            with self.cursor() as cursor:
+                # SQL_AUTO_IS_NULL in MySQL controls whether an AUTO_INCREMENT column
+                # on a recently-inserted row will return when the field is tested for
+                # NULL.  Disabling this value brings this aspect of MySQL in line with
+                # SQL standards.
+                # The default from MySQL 5.6 is 0, so this can be disabled in
+                # settings if using MySQL>5.6 or having it set in server
+                # variables to avoid unnecessary database queries
+                cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
     def create_cursor(self):
         cursor = self.connection.cursor()
