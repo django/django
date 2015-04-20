@@ -139,11 +139,11 @@ class TemporaryFileUploadHandler(FileUploadHandler):
     def __init__(self, *args, **kwargs):
         super(TemporaryFileUploadHandler, self).__init__(*args, **kwargs)
 
-    def new_file(self, file_name, *args, **kwargs):
+    def new_file(self, *args, **kwargs):
         """
         Create the file object to append to as data is coming in.
         """
-        super(TemporaryFileUploadHandler, self).new_file(file_name, *args, **kwargs)
+        super(TemporaryFileUploadHandler, self).new_file(*args, **kwargs)
         self.file = TemporaryUploadedFile(self.file_name, self.content_type, 0, self.charset, self.content_type_extra)
 
     def receive_data_chunk(self, raw_data, start):
