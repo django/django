@@ -11,6 +11,8 @@ class PasswordResetTokenGenerator(object):
     Strategy object used to generate and check tokens for the password
     reset mechanism.
     """
+    key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
+
     def make_token(self, user):
         """
         Returns a token that can be used once to do a password reset
@@ -54,15 +56,20 @@ class PasswordResetTokenGenerator(object):
         # last_login will also change), we produce a hash that will be
         # invalid as soon as it is used.
         # We limit the hash to 20 chars to keep URL short
-        key_salt = "django.contrib.auth.tokens.PasswordResetTokenGenerator"
 
+        hash = salted_hmac(
+            self.key_salt,
+            self._make_hash_value(user, timestamp),
+        ).hexdigest()[::2]
+        return "%s-%s" % (ts_b36, hash)
+
+    def _make_hash_value(self, user, timestamp):
         # Ensure results are consistent across DB backends
         login_timestamp = '' if user.last_login is None else user.last_login.replace(microsecond=0, tzinfo=None)
-
-        value = (six.text_type(user.pk) + user.password +
-                six.text_type(login_timestamp) + six.text_type(timestamp))
-        hash = salted_hmac(key_salt, value).hexdigest()[::2]
-        return "%s-%s" % (ts_b36, hash)
+        return (
+            six.text_type(user.pk) + user.password +
+            six.text_type(login_timestamp) + six.text_type(timestamp)
+        )
 
     def _num_days(self, dt):
         return (dt - date(2001, 1, 1)).days
