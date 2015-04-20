@@ -96,7 +96,7 @@ Model field                         Form field
 :class:`ManyToManyField`            :class:`~django.forms.ModelMultipleChoiceField`
                                     (see below)
 
-:class:`NullBooleanField`           :class:`~django.forms.CharField`
+:class:`NullBooleanField`           :class:`~django.forms.NullBooleanField`
 
 :class:`PositiveIntegerField`       :class:`~django.forms.IntegerField`
 
