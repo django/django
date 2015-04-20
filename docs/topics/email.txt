@@ -450,12 +450,19 @@ SMTP backend
 .. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
 
     This is the default backend. Email will be sent through a SMTP server.
-    The server address and authentication credentials are set in the
-    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
-    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
-    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
-    in your settings file.
+
+    The value for each argument is retrieved from the matching setting if the
+    argument is ``None``:
+
+    * ``host``: :setting:`EMAIL_HOST`
+    * ``port``: :setting:`EMAIL_PORT`
+    * ``username``: :setting:`EMAIL_HOST_USER`
+    * ``password``: :setting:`EMAIL_HOST_PASSWORD`
+    * ``use_tls``: :setting:`EMAIL_USE_TLS`
+    * ``use_ssl``: :setting:`EMAIL_USE_SSL`
+    * ``timeout``: :setting:`EMAIL_TIMEOUT`
+    * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
+    * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
