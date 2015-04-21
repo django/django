@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import signals
 from django.dispatch import receiver
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.utils import six
 
 from .models import Author, Book, Car, Person
@@ -255,6 +255,41 @@ class SignalTests(BaseSignalTest):
         self.assertTrue(a._run)
         self.assertTrue(b._run)
         self.assertEqual(signals.post_save.receivers, [])
+
+
+class ModelSignalAfterCommitTest(TransactionTestCase):
+    available_apps = ['signals']
+
+    def setUp(self):
+        # Save up the number of connected signals so that we can check at the
+        # end that all the signals we register get properly unregistered (#9989)
+        self.pre_signals = (
+            len(signals.post_save.receivers),
+            len(signals.post_delete.receivers),
+        )
+        self.received = []
+
+    def tearDown(self):
+        # Check that all our signals got disconnected properly.
+        post_signals = (
+            len(signals.post_save.receivers),
+            len(signals.post_delete.receivers),
+        )
+        self.assertEqual(self.pre_signals, post_signals)
+
+    def receiver(self, **kwargs):
+        self.received.append((kwargs['signal'], kwargs['instance']))
+
+    def test_post_save_defer_until_commit(self):
+        signals.post_save.connect(self.receiver, weak=False, after_commit=True)
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1 = Person.objects.create(first_name="John", last_name="Smith")
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [(signals.post_save, p1)])
+        finally:
+            signals.post_save.disconnect(self.receiver)
 
 
 class LazyModelRefTest(BaseSignalTest):
