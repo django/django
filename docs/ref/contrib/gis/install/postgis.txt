@@ -63,10 +63,13 @@ spatial functionality::
     $ createdb  <db name>
     $ psql <db name>
     > CREATE EXTENSION postgis;
-    > CREATE EXTENSION postgis_topology;
 
-No PostGIS topology functionalities are yet available from GeoDjango, so the
-creation of the ``postgis_topology`` extension is entirely optional.
+GeoDjango does not currently leverage any `PostGIS topology functionality`__.
+If you plan to use those features at some point, you can also install the
+``postgis_topology`` extension by issuing ``CREATE EXTENSION
+postgis_topology;``.
+
+__ http://postgis.net/docs/Topology.html
 
 .. versionchanged:: 1.8
 
