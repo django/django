@@ -1882,9 +1882,9 @@ Attributes for fields with relations
 ====================================
 
 These attributes are used to query for the cardinality and other details of a
-relation. These attribute are present on all fields; however, they will only
-have meaningful values if the field is a relation type
-(:attr:`Field.is_relation=True <Field.is_relation>`).
+relation. These attributes are present on all fields and are ``False``
+by default; however, the values in these attributes are useful only if the field
+is a relation type (:attr:`Field.is_relation=True <Field.is_relation>`).
 
 .. attribute:: Field.many_to_many
 
