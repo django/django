@@ -79,7 +79,8 @@ class DefaultsTests(TestCase):
         'OPTIONS': {
             'loaders': [
                 ('django.template.loaders.locmem.Loader', {
-                    '404.html': 'This is a test template for a 404 error.',
+                    '404.html': 'This is a test template for a 404 error '
+                                '(path: {{ request_path }}, exception: {{ exception }}).',
                     '500.html': 'This is a test template for a 500 error.',
                 }),
             ],
@@ -90,10 +91,13 @@ class DefaultsTests(TestCase):
         Test that 404.html and 500.html templates are picked by their respective
         handler.
         """
-        for code, url in ((404, '/non_existing_url/'), (500, '/server_error/')):
-            response = self.client.get(url)
-            self.assertContains(response, "test template for a %d error" % code,
-                status_code=code)
+        response = self.client.get('/server_error/')
+        self.assertContains(response, "test template for a 500 error", status_code=500)
+        response = self.client.get('/no_such_url/')
+        self.assertContains(response, 'path: /no_such_url/', status_code=404)
+        self.assertContains(response, 'exception: Resolver404', status_code=404)
+        response = self.client.get('/technical404/')
+        self.assertContains(response, 'exception: Testing technical 404.', status_code=404)
 
     def test_get_absolute_url_attributes(self):
         "A model can set attributes on the get_absolute_url method"

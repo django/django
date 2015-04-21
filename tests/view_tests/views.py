@@ -52,7 +52,7 @@ def raises400(request):
 
 
 def raises403(request):
-    raise PermissionDenied
+    raise PermissionDenied("Insufficient Permissions")
 
 
 def raises404(request):
