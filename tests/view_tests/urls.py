@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 from os import path
 
 from django.conf.urls import include, url
@@ -57,7 +58,7 @@ urlpatterns = [
     url(r'^$', views.index_page),
 
     # Default views
-    url(r'^non_existing_url/', defaults.page_not_found),
+    url(r'^non_existing_url/', partial(defaults.page_not_found, exception=None)),
     url(r'^server_error/', defaults.server_error),
 
     # a view that raises an exception for the debug view

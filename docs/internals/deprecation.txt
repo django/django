@@ -58,6 +58,9 @@ details on these changes.
 * The ``django.template.loaders.base.Loader.__call__()`` method will be
   removed.
 
+* Support for custom error views with a single positional parameter will be
+  dropped.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

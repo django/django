@@ -81,7 +81,7 @@ class DebugViewTests(LoggingCaptureMixin, TestCase):
         'OPTIONS': {
             'loaders': [
                 ('django.template.loaders.locmem.Loader', {
-                    '403.html': 'This is a test template for a 403 error.',
+                    '403.html': 'This is a test template for a 403 error ({{ exception }}).',
                 }),
             ],
         },
@@ -89,6 +89,7 @@ class DebugViewTests(LoggingCaptureMixin, TestCase):
     def test_403_template(self):
         response = self.client.get('/raises403/')
         self.assertContains(response, 'test template', status_code=403)
+        self.assertContains(response, '(Insufficient Permissions).', status_code=403)
 
     def test_404(self):
         response = self.client.get('/raises404/')

@@ -269,6 +269,9 @@ Requests and Responses
 
 * The debug view now shows details of chained exceptions on Python 3.
 
+* The default 40x error views now accept a second positional parameter, the
+  exception that triggered the view.
+
 Tests
 ^^^^^
 
@@ -519,6 +522,10 @@ Miscellaneous
   ``django.contrib`` apps are no longer run as part of the user's project.
   Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
   decorate tests in ``django.contrib.auth``.
+
+* If you customized some :ref:`error handlers <error-views>`, the view
+  signatures with only one request parameter are deprecated. The views should
+  now also accept a second ``exception`` positional parameter.
 
 .. removed-features-1.9:
 
