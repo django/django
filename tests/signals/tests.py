@@ -330,6 +330,22 @@ class ModelSignalAfterCommitTest(TransactionTestCase):
         finally:
             signals.m2m_changed.disconnect(self.receiver)
 
+    def test_decorator_form(self):
+        data = []
+
+        @receiver(signals.post_save, weak=False, after_commit=True)
+        def decorated_handler(signal, instance, **kwargs):
+            data.append(instance)
+
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1 = Person.objects.create(first_name="John", last_name="Smith")
+                self.assertFalse(data)
+            self.assertEqual(data, [p1])
+        finally:
+            signals.post_save.disconnect(decorated_handler)
+
 
 class LazyModelRefTest(BaseSignalTest):
     def setUp(self):
