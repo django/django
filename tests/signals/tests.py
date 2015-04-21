@@ -266,6 +266,7 @@ class ModelSignalAfterCommitTest(TransactionTestCase):
         self.pre_signals = (
             len(signals.post_save.receivers),
             len(signals.post_delete.receivers),
+            len(signals.m2m_changed.receivers),
         )
         self.received = []
 
@@ -274,11 +275,17 @@ class ModelSignalAfterCommitTest(TransactionTestCase):
         post_signals = (
             len(signals.post_save.receivers),
             len(signals.post_delete.receivers),
+            len(signals.m2m_changed.receivers),
         )
         self.assertEqual(self.pre_signals, post_signals)
 
     def receiver(self, **kwargs):
-        self.received.append((kwargs['signal'], kwargs['instance']))
+        another = {'signal': kwargs['signal'],
+                   'instance': kwargs['instance'],
+                   }
+        if 'action' in kwargs:
+            another.update({'action': kwargs['action']})
+        self.received.append(another)
 
     def test_post_save_defer_until_commit(self):
         signals.post_save.connect(self.receiver, weak=False, after_commit=True)
@@ -287,9 +294,41 @@ class ModelSignalAfterCommitTest(TransactionTestCase):
             with transaction.atomic():
                 p1 = Person.objects.create(first_name="John", last_name="Smith")
                 self.assertFalse(self.received)
-            self.assertEqual(self.received, [(signals.post_save, p1)])
+            self.assertEqual(self.received, [
+                {'signal': signals.post_save, 'instance': p1}
+            ])
         finally:
             signals.post_save.disconnect(self.receiver)
+
+    def test_post_delete_defer_until_commit(self):
+        signals.post_delete.connect(self.receiver, weak=False, after_commit=True)
+        p1 = Person.objects.create(first_name="Delete", last_name="Me")
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1.delete()
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [
+                {'signal': signals.post_delete, 'instance': p1}
+            ])
+        finally:
+            signals.post_delete.disconnect(self.receiver)
+
+    def test_m2m_changed_defer_until_commit(self):
+        signals.m2m_changed.connect(self.receiver, weak=False, after_commit=True)
+        a1 = Author.objects.create(name='Neal Stephenson')
+        b1 = Book.objects.create(name='Snow Crash')
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                b1.authors.add(a1)
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [
+                {'signal': signals.m2m_changed, 'instance': b1, 'action': "pre_add"},
+                {'signal': signals.m2m_changed, 'instance': b1, 'action': "post_add"},
+            ])
+        finally:
+            signals.m2m_changed.disconnect(self.receiver)
 
 
 class LazyModelRefTest(BaseSignalTest):
