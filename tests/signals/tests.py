@@ -346,6 +346,17 @@ class ModelSignalAfterCommitTest(TransactionTestCase):
         finally:
             signals.post_save.disconnect(decorated_handler)
 
+    def test_autocommit_not_deferred(self):
+        signals.post_save.connect(self.receiver, weak=False, after_commit=True)
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            p1 = Person.objects.create(first_name="John", last_name="Smith")
+            self.assertEqual(self.received, [
+                {'signal': signals.post_save, 'instance': p1}
+            ])
+        finally:
+            signals.post_save.disconnect(self.receiver)
+
 
 class LazyModelRefTest(BaseSignalTest):
     def setUp(self):

@@ -56,7 +56,11 @@ class ModelSignal(Signal):
             wrapped_receiver = receiver
             @functools.wraps(wrapped_receiver)
             def _wrapper(*args, **kwargs):
-                transaction.add_callback_after_commit(wrapped_receiver, args, kwargs)
+                if transaction.get_autocommit():
+                    # Commit already happened, in this case.
+                    wrapped_receiver(*args, **kwargs)
+                else:
+                    transaction.add_callback_after_commit(wrapped_receiver, args, kwargs)
             receiver = _wrapper
             # Make sure the lookup id matches the wrapped function, not _wrapper.
             if not dispatch_uid:
