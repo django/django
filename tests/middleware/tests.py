@@ -328,7 +328,7 @@ class BrokenLinkEmailsMiddlewareTest(TestCase):
         self.req.META['HTTP_USER_AGENT'] = b'\xd0\xbb\xd0\xb8\xff\xff'
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue(u'User agent: \u043b\u0438\ufffd\ufffd\n' in mail.outbox[0].body)
+        self.assertIn('User agent: \u043b\u0438\ufffd\ufffd\n', mail.outbox[0].body)
 
     def test_custom_request_checker(self):
         class SubclassedMiddleware(BrokenLinkEmailsMiddleware):
