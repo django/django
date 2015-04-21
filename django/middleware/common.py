@@ -127,7 +127,7 @@ class BrokenLinkEmailsMiddleware(object):
             referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
 
             if not self.is_ignorable_request(request, path, domain, referer):
-                ua = request.META.get('HTTP_USER_AGENT', '<none>')
+                ua = force_text(request.META.get('HTTP_USER_AGENT', '<none>'), errors='replace')
                 ip = request.META.get('REMOTE_ADDR', '<none>')
                 mail_managers(
                     "Broken %slink on %s" % (
