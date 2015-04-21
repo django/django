@@ -196,12 +196,14 @@ class Atomic(ContextDecorator):
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
         commit_successful = False
+        toplevel_of_transaction = False
 
         if connection.savepoint_ids:
             sid = connection.savepoint_ids.pop()
         else:
             # Prematurely unset this flag to allow using commit or rollback.
             connection.in_atomic_block = False
+            toplevel_of_transaction = True
 
         try:
             if connection.closed_in_transaction:
@@ -286,10 +288,11 @@ class Atomic(ContextDecorator):
                 else:
                     connection.in_atomic_block = False
 
-        if commit_successful:
-            connection.invoke_callbacks_after_commit()
-        else:
-            connection.remove_all_callbacks()
+        if toplevel_of_transaction:
+            if commit_successful:
+                connection.invoke_callbacks_after_commit()
+            else:
+                connection.remove_all_callbacks()
 
 
 def atomic(using=None, savepoint=True):
