@@ -852,10 +852,14 @@ creating a test user). The exact privileges required now are detailed in
 
 The :attr:`AbstractUser.last_login <django.contrib.auth.models.User.last_login>`
 field now allows null values. Previously, it defaulted to the time when the user
-was created which was misleading if the user never logged in. Please run the
-database migration. If your custom user inherits from ``AbstractUser`` and you
-wish to set ``last_login`` to ``NULL`` for users who haven't logged in, you can
-run this query::
+was created which was misleading if the user never logged in. If you are using
+the default user (:class:`django.contrib.auth.models.User`), run the database
+migration included in ``contrib.auth``.
+
+If you are using a custom user model that inherits from ``AbstractUser``,
+you'll need to run :djadmin:`makemigrations` and generate a migration for your
+app that contains that model. Also, if wish to set ``last_login`` to ``NULL``
+for users who haven't logged in, you can run this query::
 
     from django.db import models
     from django.contrib.auth import get_user_model
