@@ -697,7 +697,7 @@ and values from an attached model instance. For example::
     >>> article = Article.objects.get(pk=1)
     >>> article.headline
     'My headline'
-    >>> form = ArticleForm(initial={'headline': 'Initial headline'), instance=article)
+    >>> form = ArticleForm(initial={'headline': 'Initial headline'}, instance=article)
     >>> form['headline'].value()
     'Initial headline'
 
