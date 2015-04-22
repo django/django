@@ -68,3 +68,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     def introspected_boolean_field_type(self, *args, **kwargs):
         return 'IntegerField'
+
+    @cached_property
+    def sql_auto_is_null(self):
+        "Return if server global variable sql_auto_is_null is set to True"
+        with self.connection.cursor() as cursor:
+            cursor.execute("SHOW GLOBAL VARIABLES LIKE 'sql_auto_is_null'")
+            return cursor.fetchone()[1] == 'ON'
