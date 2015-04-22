@@ -1354,6 +1354,34 @@ one, doing so will result in an error.
     reader, is slightly faster and consumes a little less memory in the Python
     process.
 
+    For example::
+
+         # Both these models use the same underlying database table
+         # However, you would use an unmanaged model with fewer fields if they
+         # were the fields most often used.
+         class CommonlyUsedModal(models.Model):
+             # If many fields need to be duplicated in the unmanaged model, it
+             # may be best to create an abstract Model with all shared fields
+             # and have an unmanaged and managed models inheriting from the
+             # abstract model.
+             f1 = models.CharField(max_length=10)
+             f2 = models.CharField(max_length=10)
+
+             class Meta:
+                 managed = False
+                 db_table = 'app_largetable'
+
+         class ManagedModel(models.Model):
+             f1 = models.CharField(max_length=10)
+             f2 = models.CharField(max_length=10)
+             f3 = models.CharField(max_length=10)
+
+             class Meta:
+                 db_table = 'app_largetable'
+
+         # Same as `ManagedModel.objects.all().defer("f3")` but more succinct
+         CommonlyUsedModal.objects.all()
+
 .. note::
 
     When calling :meth:`~django.db.models.Model.save()` for instances with
