@@ -81,7 +81,7 @@ class FileStorageDeconstructionTests(unittest.TestCase):
         self.assertEqual(kwargs, kwargs_orig)
 
 
-class FileStorageTestsBase(unittest.TestCase):
+class FileStorageTestsBase(SimpleTestCase):
 
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp()
@@ -415,14 +415,20 @@ class FileStorageTests(FileStorageTestsBase):
     def test_copy_file_no_suspicious_operation(self):
         f = ContentFile('content content')
         src_name = self.storage.save('initial.file', f)
-        with self.assertRaises(SuspiciousOperation):
+        with self.assertRaisesMessage(
+                SuspiciousOperation,
+                'The joined path (/tmp/passwd) is located '
+                'outside of the base path '
+                'component ({})'.format(self.storage.location)):
             self.storage.copy(src_name, '/tmp/passwd')
 
     def test_copy_raise_on_overwrite(self):
         f = ContentFile('content content')
         existing_name = self.storage.save('existing.file', f)
         src_name = self.storage.save('src.file', f)
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(
+                ValueError,
+                'Destination already exists'):
             self.storage.copy(src_name, existing_name)
 
     def test_move_file(self):
@@ -436,13 +442,21 @@ class FileStorageTests(FileStorageTestsBase):
     def test_move_file_no_suspicious_operation(self):
         f = ContentFile('content content')
         src_name = self.storage.save('initial.file', f)
-        with self.assertRaises(SuspiciousOperation):
+        with self.assertRaisesMessage(
+                SuspiciousOperation,
+                'The joined path (/tmp/passwd) is located '
+                'outside of the base path '
+                'component ({})'.format(self.storage.location)):
             self.storage.move(src_name, '/tmp/passwd')
 
     def test_move_file_no_directory_traversal(self):
         f = ContentFile('content content')
         src_name = self.storage.save('initial.file', f)
-        with self.assertRaises(SuspiciousOperation):
+        with self.assertRaisesMessage(
+                SuspiciousOperation,
+                'The joined path (/tmp/passwd) is located '
+                'outside of the base path '
+                'component ({})'.format(self.storage.location)):
             self.storage.move(src_name, '../../../../../../../../tmp/passwd')
 
 
