@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from django.contrib.auth.models import User, Permission
 from models import UserRole
+
+from django.contrib.auth.models import Permission, User
 
 
 class UserRoleBackend(object):
@@ -63,4 +64,3 @@ class UserRoleBackend(object):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
-

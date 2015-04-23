@@ -1,9 +1,12 @@
-from django.contrib import admin
 from models import UserRole
+
+from django.contrib import admin
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
+
 # Register your models here.
+
 
 class UserRoleAdmin(admin.ModelAdmin):
     filter_horizontal = ('users', 'admins', 'permissions', 'groups',)
@@ -45,8 +48,8 @@ class UserRoleAdmin(admin.ModelAdmin):
         perms = Permission.objects.filter(content_type=content_type, codename=codename)
         if not perms:
             raise Exception('failed to get permission: %s, %s' % (content_type, codename))
-        for admin in obj.admins.all():
-            admin.user_permissions.add(perms[0])
+        for role_admin in obj.admins.all():
+            role_admin.user_permissions.add(perms[0])
 
 
 admin.site.register(UserRole, UserRoleAdmin)

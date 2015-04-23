@@ -1,8 +1,10 @@
+from django.contrib.auth.models import Group, Permission, User
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import User, Group, Permission
+
 
 # Create your models here.
+
 
 class UserRole(models.Model):
     '''
