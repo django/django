@@ -285,7 +285,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         # SQL standards.
         # Check the sql_auto_is_null status on the MySQL server and if necessary
         # set it to False.
-        if self.features.sql_auto_is_null:
+        if self.features.sql_auto_is_null():
             with self.cursor() as cursor:
                 cursor.execute('SET SQL_AUTO_IS_NULL = 0')
 
