@@ -80,19 +80,23 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'distance_lte': SpatialOperator(func='Distance', op='<='),
     }
 
-    function_names = {
-        'Length': 'ST_Length',
-        'Reverse': 'ST_Reverse',
-        'Scale': 'ScaleCoords',
-        'Translate': 'ST_Translate',
-        'Union': 'ST_Union',
-    }
+    @cached_property
+    def function_names(self):
+        return {
+            'Length': 'ST_Length',
+            'Reverse': 'ST_Reverse',
+            'Scale': 'ScaleCoords',
+            'Translate': 'ST_Translate' if self.spatial_version >= (3, 1, 0) else 'ShiftCoords',
+            'Union': 'ST_Union',
+        }
 
     @cached_property
     def unsupported_functions(self):
         unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
+        if self.spatial_version < (3, 1, 0):
+            unsupported.add('SnapToGrid')
         if self.spatial_version < (4, 0, 0):
-            unsupported.add('Reverse')
+            unsupported.update({'Perimeter', 'Reverse'})
         return unsupported
 
     @cached_property
