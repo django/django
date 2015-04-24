@@ -4,13 +4,10 @@ import binascii
 import unittest
 from unittest import skipUnless
 
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import (
+    HAS_GEOS, GEOSGeometry, WKBReader, WKBWriter, WKTReader, WKTWriter,
+)
 from django.utils.six import memoryview
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import (
-        GEOSGeometry, WKTReader, WKTWriter, WKBReader, WKBWriter,
-    )
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
