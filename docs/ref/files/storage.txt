@@ -84,6 +84,15 @@ The Storage Class
         able to return the last accessed time this will raise
         ``NotImplementedError`` instead.
 
+    .. method:: copy(src_name, dst_name)
+
+        .. versionadded:: 1.9
+
+        Copies the file specified by ``src_name`` to ``dst_name``. If
+        ``dst_name`` already exists ``ValueError`` should be raised. For
+        storage systems that don't support copy this will raise
+        ``NotImplementedError`` instead.
+
     .. method:: created_time(name)
 
         Returns a naive ``datetime`` object containing the creation
@@ -140,6 +149,15 @@ The Storage Class
         modified time. For storage systems that aren't able to return
         the last modified time, this will raise
         ``NotImplementedError`` instead.
+
+    .. method:: move(src_name, dst_name)
+
+        .. versionadded:: 1.9
+
+        Moves the file specified by ``src_name`` to ``dst_name``. If
+        ``dst_name`` already exists ``ValueError`` should be raised. For storage
+        systems that don't support move this will raise ``NotImplementedError``
+        instead.
 
     .. method:: open(name, mode='rb')
 
