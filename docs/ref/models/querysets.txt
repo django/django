@@ -2802,12 +2802,19 @@ by the aggregate.
 Avg
 ~~~
 
-.. class:: Avg(expression, output_field=None, **extra)
+.. class:: Avg(expression, output_field=FloatField(), **extra)
 
-    Returns the mean value of the given expression, which must be numeric.
+    Returns the mean value of the given expression, which must be numeric
+    unless you specify a different ``output_field``.
 
     * Default alias: ``<field>__avg``
-    * Return type: ``float``
+    * Return type: ``float`` (or the type of whatever ``output_field`` is
+      specified)
+
+    .. versionchanged:: 1.9
+
+        The ``output_field`` parameter was added to allow aggregating over
+        non-numeric columns, such as ``DurationField``.
 
 Count
 ~~~~~

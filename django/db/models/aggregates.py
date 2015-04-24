@@ -75,12 +75,8 @@ class Avg(Aggregate):
     name = 'Avg'
 
     def __init__(self, expression, **extra):
-        super(Avg, self).__init__(expression, output_field=FloatField(), **extra)
-
-    def convert_value(self, value, expression, connection, context):
-        if value is None:
-            return value
-        return float(value)
+        output_field = extra.pop('output_field', FloatField())
+        super(Avg, self).__init__(expression, output_field=output_field, **extra)
 
 
 class Count(Aggregate):
