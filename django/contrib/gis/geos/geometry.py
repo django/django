@@ -6,10 +6,10 @@ from __future__ import unicode_literals
 
 from ctypes import addressof, byref, c_double
 
-from django.contrib.gis.gdal.error import SRSException
+from django.contrib.gis import gdal
 from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
 from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.base import GEOSBase, gdal
+from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import GEOM_PTR
@@ -449,7 +449,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.srid:
             try:
                 return gdal.OGRGeometry(self.wkb, self.srid)
-            except SRSException:
+            except gdal.SRSException:
                 pass
         return gdal.OGRGeometry(self.wkb)
 
@@ -461,7 +461,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
-            except SRSException:
+            except gdal.SRSException:
                 pass
         return None
 

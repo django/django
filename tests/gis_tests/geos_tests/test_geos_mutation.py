@@ -5,18 +5,14 @@
 import unittest
 from unittest import skipUnless
 
-from django.contrib.gis.geos import HAS_GEOS
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import (
-        fromstr, LinearRing, LineString, MultiPoint, Point, Polygon,
-    )
-    from django.contrib.gis.geos.error import GEOSIndexError
+from django.contrib.gis.geos import (
+    HAS_GEOS, LinearRing, LineString, MultiPoint, Point, Polygon, fromstr,
+)
+from django.contrib.gis.geos.error import GEOSIndexError
 
 
-if HAS_GEOS:
-    def api_get_distance(x):
-        return x.distance(Point(-200, -200))
+def api_get_distance(x):
+    return x.distance(Point(-200, -200))
 
 
 def api_get_buffer(x):

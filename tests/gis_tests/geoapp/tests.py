@@ -4,7 +4,11 @@ import re
 import tempfile
 
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.db.models import Extent, MakeLine, Union
+from django.contrib.gis.geos import (
+    GeometryCollection, GEOSGeometry, LinearRing, LineString, Point, Polygon,
+    fromstr,
+)
 from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
@@ -14,12 +18,10 @@ from django.utils.deprecation import (
 )
 
 from ..utils import no_oracle, oracle, postgis, spatialite
-
-if HAS_GEOS:
-    from django.contrib.gis.db.models import Extent, MakeLine, Union
-    from django.contrib.gis.geos import (fromstr, GEOSGeometry,
-        Point, LineString, LinearRing, Polygon, GeometryCollection)
-    from .models import Country, City, PennsylvaniaCity, State, Track, NonConcreteModel, Feature, MinusOneSRID
+from .models import (
+    City, Country, Feature, MinusOneSRID, NonConcreteModel, PennsylvaniaCity,
+    State, Track,
+)
 
 
 def postgis_bug_version():

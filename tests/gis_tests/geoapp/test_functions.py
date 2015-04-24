@@ -2,21 +2,17 @@ from __future__ import unicode_literals
 
 import re
 from decimal import Decimal
-from unittest import skipUnless
 
 from django.contrib.gis.db.models import functions
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import (
+    LineString, Point, Polygon, fromstr, geos_version_info,
+)
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from ..utils import mysql, oracle, postgis, spatialite
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import (
-        LineString, Point, Polygon, fromstr, geos_version_info,
-    )
-    from .models import Country, City, State, Track
+from .models import City, Country, State, Track
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -385,8 +381,9 @@ class GISFunctionsTests(TestCase):
         )
 
     @skipUnlessDBFeature("has_SymDifference_function")
-    @skipUnless(HAS_GEOS and geos_version_info()['version'] >= '3.3.0', "GEOS >= 3.3 required")
     def test_sym_difference(self):
+        if geos_version_info()['version'] < '3.3.0':
+            self.skipTest("GEOS >= 3.3 required")
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
         for country in qs:

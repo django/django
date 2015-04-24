@@ -8,22 +8,20 @@ from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import skipUnless
 
+from django.contrib.gis import gdal
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import (
+    HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, GEOSIndexError,
+    LinearRing, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
+    Polygon, fromfile, fromstr, geos_version_info,
+)
+from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.utils import six
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
 from ..test_data import TestDataMixin
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import (
-        GEOSException, GEOSIndexError, GEOSGeometry, GeometryCollection, Point,
-        MultiPoint, Polygon, MultiPolygon, LinearRing, LineString,
-        MultiLineString, fromfile, fromstr, geos_version_info,
-    )
-    from django.contrib.gis.geos.base import gdal, GEOSBase
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
