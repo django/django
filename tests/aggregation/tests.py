@@ -7,10 +7,10 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Aggregate, Avg, Count, DecimalField, FloatField, Func, IntegerField,
-    Max, Min, Sum, Value,
+    F, Aggregate, Avg, Count, DecimalField, DurationField, FloatField, Func,
+    IntegerField, Max, Min, Sum, Value,
 )
-from django.test import TestCase, ignore_warnings
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -40,8 +40,8 @@ class AggregateTestCase(TestCase):
         cls.a8.friends.add(cls.a9)
         cls.a9.friends.add(cls.a8)
 
-        cls.p1 = Publisher.objects.create(name='Apress', num_awards=3)
-        cls.p2 = Publisher.objects.create(name='Sams', num_awards=1)
+        cls.p1 = Publisher.objects.create(name='Apress', num_awards=3, duration=datetime.timedelta(days=1))
+        cls.p2 = Publisher.objects.create(name='Sams', num_awards=1, duration=datetime.timedelta(days=2))
         cls.p3 = Publisher.objects.create(name='Prentice Hall', num_awards=7)
         cls.p4 = Publisher.objects.create(name='Morgan Kaufmann', num_awards=9)
         cls.p5 = Publisher.objects.create(name="Jonno's House of Books", num_awards=0)
@@ -441,6 +441,13 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(Avg("num_authors"))
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
+    @skipUnlessDBFeature('can_avg_on_durationfield')
+    def test_avg_duration_field(self):
+        self.assertEqual(
+            Publisher.objects.aggregate(Avg('duration', output_field=DurationField())),
+            {'duration__avg': datetime.timedelta(1, 43200)}  # 1.5 days
+        )
+
     def test_sum_distinct_aggregate(self):
         """
         Sum on a distict() QuerySet should aggregate only the distinct items.
@@ -620,7 +627,14 @@ class AggregateTestCase(TestCase):
         self.assertEqual(vals, {"rating__avg": 4.25})
 
     def test_even_more_aggregate(self):
-        publishers = Publisher.objects.annotate(earliest_book=Min("book__pubdate")).exclude(earliest_book=None).order_by("earliest_book").values()
+        publishers = Publisher.objects.annotate(
+            earliest_book=Min("book__pubdate"),
+        ).exclude(earliest_book=None).order_by("earliest_book").values(
+            'earliest_book',
+            'num_awards',
+            'id',
+            'name',
+        )
         self.assertEqual(
             list(publishers), [
                 {
@@ -835,6 +849,11 @@ class AggregateTestCase(TestCase):
         self.assertEqual(a1, {'av_age': 37})
         self.assertEqual(a2, {'av_age': 37})
         self.assertEqual(a3, {'av_age': Approximate(37.4, places=1)})
+
+    def test_avg_decimal_field(self):
+        v = Book.objects.filter(rating=4).aggregate(avg_price=(Avg('price')))['avg_price']
+        self.assertIsInstance(v, float)
+        self.assertEqual(v, Approximate(47.39, places=2))
 
     def test_order_of_precedence(self):
         p1 = Book.objects.filter(rating=4).aggregate(avg_price=(Avg('price') + 2) * 3)
