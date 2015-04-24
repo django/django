@@ -5,7 +5,9 @@ import logging
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse
-from django.middleware.csrf import CSRF_KEY_LENGTH, CsrfViewMiddleware
+from django.middleware.csrf import (
+    CSRF_KEY_LENGTH, CsrfViewMiddleware, get_token,
+)
 from django.template import RequestContext, Template
 from django.template.context_processors import csrf
 from django.test import TestCase, override_settings
@@ -237,7 +239,10 @@ class CsrfViewMiddlewareTest(TestCase):
         """
         req = self._get_GET_no_csrf_cookie_request()
         resp = token_view(req)
-        self.assertEqual(resp.content, b'')
+
+        token = get_token(req)
+        self.assertIsNotNone(token)
+        self._check_token_present(resp, token)
 
     def test_token_node_empty_csrf_cookie(self):
         """
@@ -248,7 +253,9 @@ class CsrfViewMiddlewareTest(TestCase):
         CsrfViewMiddleware().process_view(req, token_view, (), {})
         resp = token_view(req)
 
-        self.assertNotEqual("", resp.content)
+        token = get_token(req)
+        self.assertIsNotNone(token)
+        self._check_token_present(resp, token)
 
     def test_token_node_with_csrf_cookie(self):
         """

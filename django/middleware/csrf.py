@@ -40,15 +40,17 @@ def _get_new_csrf_key():
 def get_token(request):
     """
     Returns the CSRF token required for a POST form. The token is an
-    alphanumeric value.
+    alphanumeric value. A new token is created if one is not already set.
 
     A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
+    if "CSRF_COOKIE" not in request.META:
+        request.META["CSRF_COOKIE"] = _get_new_csrf_key()
     request.META["CSRF_COOKIE_USED"] = True
-    return request.META.get("CSRF_COOKIE", None)
+    return request.META["CSRF_COOKIE"]
 
 
 def rotate_token(request):
@@ -112,9 +114,6 @@ class CsrfViewMiddleware(object):
             request.META['CSRF_COOKIE'] = csrf_token
         except KeyError:
             csrf_token = None
-            # Generate token and store it in the request, so it's
-            # available to the view.
-            request.META["CSRF_COOKIE"] = _get_new_csrf_key()
 
         # Wait until request.META["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
@@ -192,12 +191,6 @@ class CsrfViewMiddleware(object):
 
     def process_response(self, request, response):
         if getattr(response, 'csrf_processing_done', False):
-            return response
-
-        # If CSRF_COOKIE is unset, then CsrfViewMiddleware.process_view was
-        # never called, probably because a request middleware returned a response
-        # (for example, contrib.auth redirecting to a login page).
-        if request.META.get("CSRF_COOKIE") is None:
             return response
 
         if not request.META.get("CSRF_COOKIE_USED", False):

@@ -23,7 +23,7 @@ from django.core import mail
 from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.db import connection
 from django.http import HttpRequest, QueryDict
-from django.middleware.csrf import CsrfViewMiddleware
+from django.middleware.csrf import CsrfViewMiddleware, get_token
 from django.test import (
     TestCase, ignore_warnings, modify_settings, override_settings,
 )
@@ -606,7 +606,8 @@ class LoginTest(AuthViewsTestCase):
         # TestClient isn't used here as we're testing middleware, essentially.
         req = HttpRequest()
         CsrfViewMiddleware().process_view(req, login_view, (), {})
-        req.META["CSRF_COOKIE_USED"] = True
+        # get_token() triggers CSRF token inclusion in the response
+        get_token(req)
         resp = login_view(req)
         resp2 = CsrfViewMiddleware().process_response(req, resp)
         csrf_cookie = resp2.cookies.get(settings.CSRF_COOKIE_NAME, None)
