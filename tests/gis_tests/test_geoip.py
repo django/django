@@ -7,14 +7,11 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip import HAS_GEOIP
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
 from django.utils import six
 
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import GEOSGeometry
 
 
 # Note: Requires use of both the GeoIP country and city datasets.

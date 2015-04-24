@@ -2,13 +2,11 @@ from __future__ import unicode_literals
 
 import json
 
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import LinearRing, Point, Polygon
 from django.core import serializers
 from django.test import TestCase, skipUnlessDBFeature
 
-if HAS_GEOS:
-    from django.contrib.gis.geos import LinearRing, Point, Polygon
-    from .models import City, MultiFields, PennsylvaniaCity
+from .models import City, MultiFields, PennsylvaniaCity
 
 
 @skipUnlessDBFeature("gis_enabled")

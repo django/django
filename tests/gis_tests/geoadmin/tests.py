@@ -1,14 +1,11 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis import admin
+from django.contrib.gis.geos import Point
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 
-if HAS_GEOS:
-    from django.contrib.gis import admin
-    from django.contrib.gis.geos import Point
-
-    from .admin import UnmodifiableAdmin
-    from .models import site, City
+from .admin import UnmodifiableAdmin
+from .models import City, site
 
 
 @skipUnlessDBFeature("gis_enabled")

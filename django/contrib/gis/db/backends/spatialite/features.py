@@ -1,8 +1,7 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
-from django.contrib.gis.geos import geos_version
+from django.contrib.gis.geos import geos_version_info
 from django.db.backends.sqlite3.features import \
     DatabaseFeatures as SQLiteDatabaseFeatures
-from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 
 
@@ -20,4 +19,4 @@ class DatabaseFeatures(BaseSpatialFeatures, SQLiteDatabaseFeatures):
 
     @cached_property
     def supports_3d_storage(self):
-        return force_text(geos_version()) >= '3.3'
+        return geos_version_info()['version'] >= '3.3'

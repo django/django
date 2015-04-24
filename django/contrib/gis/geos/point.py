@@ -10,6 +10,7 @@ from django.utils.six.moves import range
 class Point(GEOSGeometry):
     _minlength = 2
     _maxlength = 3
+    has_cs = True
 
     def __init__(self, x, y=None, z=None, srid=None):
         """

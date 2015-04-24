@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform,
 )
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import Q
@@ -11,26 +11,24 @@ from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango21Warning
 
 from ..utils import no_oracle, oracle, postgis, spatialite
-
-if HAS_GEOS:
-    from django.contrib.gis.geos import GEOSGeometry, LineString, Point
-
-    from .models import (AustraliaCity, Interstate, SouthTexasInterstate,
-        SouthTexasCity, SouthTexasCityFt, CensusZipcode, SouthTexasZipcode)
+from .models import (
+    AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
+    SouthTexasInterstate, SouthTexasZipcode,
+)
 
 
 @skipUnlessDBFeature("gis_enabled")
 class DistanceTest(TestCase):
     fixtures = ['initial']
 
-    if HAS_GEOS:
+    def setUp(self):
         # A point we are testing distances with -- using a WGS84
         # coordinate that'll be implicitly transformed to that to
         # the coordinate system of the field, EPSG:32140 (Texas South Central
         # w/units in meters)
-        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        self.stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
         # Another one for Australia
-        au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
+        self.au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
 
     def get_names(self, qs):
         cities = [c.name for c in qs]

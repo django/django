@@ -8,16 +8,13 @@ from unittest import skipUnless
 
 from django.contrib.gis.db.models.functions import Area, Distance
 from django.contrib.gis.gdal import HAS_GDAL
-from django.contrib.gis.geos import HAS_GEOS
 from django.contrib.gis.measure import D
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango21Warning
 
 from ..utils import oracle, postgis
-
-if HAS_GEOS:
-    from .models import City, County, Zipcode
+from .models import City, County, Zipcode
 
 
 @skipUnlessDBFeature("gis_enabled")
