@@ -73,6 +73,14 @@ class DataTests(OptionsBaseTests):
             for f in fields:
                 self.assertIsNotNone(f.column)
 
+    def test_composite_fields(self):
+        for model, expected_result in TEST_RESULTS['composite_fields'].items():
+            fields = model._meta.composite_fields
+            self.assertEqual([f.attname for f in fields], expected_result)
+            for f in fields:
+                subfields = TEST_RESULTS['composite_field_subfields'][f.name]
+                self.assertEqual(sorted(f.subfields), subfields)
+
 
 class M2MTests(OptionsBaseTests):
 

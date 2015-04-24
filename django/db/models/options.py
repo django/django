@@ -195,7 +195,7 @@ class Options(object):
             in self.managers if not abstract
         ]
 
-    def contribute_to_class(self, cls, name):
+    def contribute_to_class(self, cls, name, deferred=False):
         from django.db import connection
         from django.db.backends.utils import truncate_name
 
@@ -249,6 +249,7 @@ class Options(object):
         if not self.db_table:
             self.db_table = "%s_%s" % (self.app_label, self.model_name)
             self.db_table = truncate_name(self.db_table, connection.ops.max_name_length())
+        return True
 
     def _prepare(self, model):
         if self.order_with_respect_to:
@@ -467,6 +468,14 @@ class Options(object):
             "related_objects",
             (obj for obj in all_related_fields
             if not obj.hidden or obj.field.many_to_many)
+        )
+
+    @cached_property
+    def composite_fields(self):
+        return make_immutable_fields_list(
+            "composite_fields",
+            (f for f in self.virtual_fields if f.is_composite)
+
         )
 
     @raise_deprecation(suggested_alternative="get_fields()")

@@ -1,7 +1,6 @@
 import warnings
 
 from django import test
-from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import CharField, related
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -133,11 +132,6 @@ class GetFieldByNameTests(OptionsBaseTests):
         field_info = Person._meta.get_field_by_name('relating_people')
         self.assertEqual(field_info[1:], (None, False, True))
         self.assertTrue(field_info[0].auto_created)
-
-    def test_get_generic_relation(self):
-        field_info = Person._meta.get_field_by_name('generic_relation_base')
-        self.assertEqual(field_info[1:], (None, True, False))
-        self.assertIsInstance(field_info[0], GenericRelation)
 
     def test_get_m2m_field_invalid(self):
         with warnings.catch_warnings(record=True) as warning:

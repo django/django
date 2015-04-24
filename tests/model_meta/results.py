@@ -5,6 +5,9 @@ TEST_RESULTS = {
         Person: [
             'baseperson_ptr',
             'baseperson_ptr_id',
+            'constrain_abstract',
+            'constrain_base',
+            'constrain_concrete',
             'content_type_abstract',
             'content_type_abstract_id',
             'content_type_base',
@@ -48,6 +51,8 @@ TEST_RESULTS = {
             'relating_person',
         ],
         BasePerson: [
+            'constrain_abstract',
+            'constrain_base',
             'content_type_abstract',
             'content_type_abstract_id',
             'content_type_base',
@@ -78,6 +83,7 @@ TEST_RESULTS = {
             'relating_baseperson'
         ],
         AbstractPerson: [
+            'constrain_abstract',
             'content_type_abstract',
             'content_type_abstract_id',
             'data_abstract',
@@ -129,6 +135,9 @@ TEST_RESULTS = {
             'data_not_concrete_inherited',
             'content_type_concrete_id',
             'object_id_concrete',
+            'constrain_concrete',
+            'constrain_base',
+            'constrain_abstract',
         ],
         BasePerson: [
             'id',
@@ -142,6 +151,8 @@ TEST_RESULTS = {
             'data_not_concrete_base',
             'content_type_base_id',
             'object_id_base',
+            'constrain_base',
+            'constrain_abstract',
         ],
         AbstractPerson: [
             'data_abstract',
@@ -149,6 +160,7 @@ TEST_RESULTS = {
             'data_not_concrete_abstract',
             'content_type_abstract_id',
             'object_id_abstract',
+            'constrain_abstract',
         ],
         Relating: [
             'id',
@@ -265,6 +277,25 @@ TEST_RESULTS = {
             'people',
             'people_hidden',
         ],
+    },
+    'composite_fields': {
+        Person: [
+            'constrain_concrete',
+            'constrain_base',
+            'constrain_abstract',
+        ],
+        BasePerson: [
+            'constrain_base',
+            'constrain_abstract',
+        ],
+        AbstractPerson: [
+            'constrain_abstract'
+        ]
+    },
+    'composite_field_subfields': {
+        'constrain_abstract': ['data_abstract'],
+        'constrain_base': ['data_abstract', 'data_base'],
+        'constrain_concrete': ['data_abstract', 'data_base', 'data_inherited']
     },
     'many_to_many_with_model': {
         Person: [
@@ -773,16 +804,22 @@ TEST_RESULTS = {
     },
     'virtual_fields': {
         AbstractPerson: [
+            'constrain_abstract',
             'generic_relation_abstract',
             'content_object_abstract',
         ],
         BasePerson: [
+            'constrain_abstract',
+            'constrain_base',
             'generic_relation_base',
             'content_object_base',
             'generic_relation_abstract',
             'content_object_abstract',
         ],
         Person: [
+            'constrain_abstract',
+            'constrain_base',
+            'constrain_concrete',
             'content_object_concrete',
             'generic_relation_concrete',
             'generic_relation_base',

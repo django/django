@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.utils.observables import ObservableList, ChangeRecord
+from django.utils.observables import ChangeRecord, ObservableList
 
 
 class Observer(object):
@@ -268,11 +268,3 @@ class TestObservableList(TestCase):
                 ChangeRecord.item(self.list, 0, old=0, new=2),
                 ChangeRecord.item(self.list, 2, old=2, new=0),
             ])
-
-
-
-
-
-
-
-

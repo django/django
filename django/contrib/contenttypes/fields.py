@@ -32,6 +32,7 @@ class GenericForeignKey(object):
     concrete = False
     editable = False
     hidden = False
+    is_composite = False
 
     is_relation = True
     many_to_many = False

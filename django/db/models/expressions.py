@@ -125,6 +125,8 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    # The number of result cols that the field takes up in a result row
+    width = 1
 
     def __init__(self, output_field=None):
         self._output_field = output_field

@@ -27,6 +27,9 @@ class AbstractPerson(models.Model):
         related_name='fo_abstract_rel',
     )
 
+    # COMPOSITE fields
+    constrain_abstract = models.constrain(data_abstract)
+
     # GFK fields
     content_type_abstract = models.ForeignKey(ContentType, related_name='+')
     object_id_abstract = models.PositiveIntegerField()
@@ -57,6 +60,9 @@ class BasePerson(AbstractPerson):
         related_name='fo_base_rel',
     )
 
+    # COMPOSITE fields
+    constrain_base = models.constrain('data_abstract', data_base)
+
     # GFK fields
     content_type_base = models.ForeignKey(ContentType, related_name='+')
     object_id_base = models.PositiveIntegerField()
@@ -82,6 +88,11 @@ class Person(BasePerson):
         from_fields=['model_non_concrete_id'],
         to_fields=['id'],
         related_name='fo_concrete_rel',
+    )
+
+    # COMPOSITE fields
+    constrain_concrete = models.constrain(
+        data_inherited, 'data_base', 'data_abstract'
     )
 
     # GFK fields

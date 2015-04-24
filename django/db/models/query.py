@@ -50,10 +50,11 @@ class ModelIterator(BaseIterator):
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql()
-        select, klass_info, annotation_col_map = (compiler.select, compiler.klass_info,
-                                                  compiler.annotation_col_map)
+        select, klass_info = (compiler.select, compiler.klass_info)
+
         if klass_info is None:
             return
+
         model_cls = klass_info['model']
         select_fields = klass_info['select_fields']
         model_fields_start, model_fields_end = select_fields[0], select_fields[-1] + 1
@@ -65,14 +66,23 @@ class ModelIterator(BaseIterator):
                     if f.attname not in init_set]
             model_cls = deferred_class_factory(model_cls, skip)
         related_populators = get_related_populators(klass_info, select, db)
+
         for row in compiler.results_iter(results):
             obj = model_cls.from_db(db, init_list, row[model_fields_start:model_fields_end])
             if related_populators:
                 for rel_populator in related_populators:
                     rel_populator.populate(row, obj)
-            if annotation_col_map:
-                for attr_name, col_pos in annotation_col_map.items():
-                    setattr(obj, attr_name, row[col_pos])
+
+            # Composite fields are never included in queries with a model
+            # (the subfields are selected instead), so we can zip the selection
+            # with the results iter safely
+            annotated_row = zip(
+                (selection.annotation for selection in compiler.select),
+                row
+            )
+            for annotation, value in annotated_row:
+                if annotation is not None:
+                    setattr(obj, annotation, value)
 
             # Add the known related objects to the model, if there are any
             if queryset._known_related_objects:

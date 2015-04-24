@@ -1,6 +1,7 @@
-import weakref
 import collections
 import inspect
+import weakref
+
 from django.utils import six
 
 

@@ -44,7 +44,7 @@ class Serializer(base.Serializer):
         return data
 
     def handle_field(self, obj, field):
-        value = field._get_val_from_obj(obj)
+        value = getattr(obj, field.attname)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.

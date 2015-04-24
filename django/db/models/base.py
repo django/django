@@ -348,7 +348,7 @@ class ModelState(object):
         self.adding = True
         # Field observers that are being kept alive for the lifetime of this
         # instance.
-        self.field_observers = list()
+        self.field_observers = dict()
 
 
 class Model(six.with_metaclass(ModelBase)):
@@ -1615,7 +1615,6 @@ class Model(six.with_metaclass(ModelBase)):
                     )
 
         return errors
-
 
 
 ############################################

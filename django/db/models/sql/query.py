@@ -17,6 +17,7 @@ from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
+from django.db.models.fields.composite_lookups import CompositeCol
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.query_utils import Q, PathInfo, refs_expression
 from django.db.models.sql.constants import (
@@ -1170,6 +1171,12 @@ class Query(object):
                 lhs = targets[0].get_col(alias, field)
             else:
                 lhs = MultiColSource(alias, targets, sources, field)
+            condition = lookup_class(lhs, value)
+            lookup_type = lookup_class.lookup_name
+        elif field.is_composite and field.get_lookup(lookups[0]):
+            # A lookup directly on the field
+            lookup_class = field.get_lookup(lookups[0])
+            lhs = CompositeCol(alias, field)
             condition = lookup_class(lhs, value)
             lookup_type = lookup_class.lookup_name
         else:

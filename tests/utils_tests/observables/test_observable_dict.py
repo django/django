@@ -1,5 +1,5 @@
 from django.test import TestCase
-from django.utils.observables import ObservableDict, ChangeRecord
+from django.utils.observables import ChangeRecord, ObservableDict
 
 
 class Observer(object):
