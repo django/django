@@ -37,8 +37,9 @@ class TemplateStringsTests(SimpleTestCase):
         self.assertEqual(content, "Hello world!\n")
 
     def test_get_template_non_existing(self):
-        with self.assertRaises(TemplateDoesNotExist):
+        with self.assertRaises(TemplateDoesNotExist) as e:
             self.engine.get_template('template_backends/non_existing.html')
+        self.assertEqual(e.exception.backend, self.engine)
 
     def test_get_template_syntax_error(self):
         # There's no way to trigger a syntax error with the dummy backend.

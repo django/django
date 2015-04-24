@@ -17,7 +17,7 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
-    tried = []
+    chain = []
     engines = _engine_list(using)
     for engine in engines:
         try:
@@ -33,9 +33,9 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
             else:
                 return engine.get_template(template_name)
         except TemplateDoesNotExist as e:
-            tried.extend(e.tried)
+            chain.append(e)
 
-    raise TemplateDoesNotExist(template_name, tried=tried)
+    raise TemplateDoesNotExist(template_name, chain=chain)
 
 
 def select_template(template_name_list, dirs=_dirs_undefined, using=None):
@@ -46,7 +46,7 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
-    tried = []
+    chain = []
     engines = _engine_list(using)
     for template_name in template_name_list:
         for engine in engines:
@@ -63,10 +63,10 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
                 else:
                     return engine.get_template(template_name)
             except TemplateDoesNotExist as e:
-                tried.extend(e.tried)
+                chain.append(e)
 
     if template_name_list:
-        raise TemplateDoesNotExist(', '.join(template_name_list), tried=tried)
+        raise TemplateDoesNotExist(', '.join(template_name_list), chain=chain)
     else:
         raise TemplateDoesNotExist("No template names provided")
 
@@ -92,7 +92,7 @@ def render_to_string(template_name, context=None,
         return template.render(context, request)
 
     else:
-        tried = []
+        chain = []
         # Some deprecated arguments were passed - use the legacy code path
         for engine in _engine_list(using):
             try:
@@ -124,13 +124,13 @@ def render_to_string(template_name, context=None,
                         "method doesn't support the dictionary argument." %
                         engine.name, stacklevel=2)
             except TemplateDoesNotExist as e:
-                tried.extend(e.tried)
+                chain.append(e)
                 continue
 
         if template_name:
             if isinstance(template_name, (list, tuple)):
                 template_name = ', '.join(template_name)
-            raise TemplateDoesNotExist(template_name, tried=tried)
+            raise TemplateDoesNotExist(template_name, chain=chain)
         else:
             raise TemplateDoesNotExist("No template names provided")
 

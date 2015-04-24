@@ -1,11 +1,14 @@
 # Since this package contains a "django" module, this is required on Python 2.
 from __future__ import absolute_import
 
+import sys
 import warnings
 
 from django.conf import settings
+from django.template import TemplateDoesNotExist
 from django.template.context import Context, RequestContext, make_context
 from django.template.engine import Engine, _dirs_undefined
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import BaseEngine
@@ -24,21 +27,23 @@ class DjangoTemplates(BaseEngine):
         self.engine = Engine(self.dirs, self.app_dirs, **options)
 
     def from_string(self, template_code):
-        return Template(self.engine.from_string(template_code))
+        return Template(self.engine.from_string(template_code), self)
 
     def get_template(self, template_name, dirs=_dirs_undefined):
-        return Template(self.engine.get_template(template_name, dirs))
+        try:
+            return Template(self.engine.get_template(template_name, dirs), self)
+        except TemplateDoesNotExist as exc:
+            reraise(exc, self)
 
 
 class Template(object):
 
-    def __init__(self, template):
+    def __init__(self, template, backend):
         self.template = template
+        self.backend = backend
 
     @property
     def origin(self):
-        # TODO: define the Origin API. For now simply forwarding to the
-        #       underlying Template preserves backwards-compatibility.
         return self.template.origin
 
     def render(self, context=None, request=None):
@@ -71,4 +76,17 @@ class Template(object):
         else:
             context = make_context(context, request)
 
-        return self.template.render(context)
+        try:
+            return self.template.render(context)
+        except TemplateDoesNotExist as exc:
+            reraise(exc, self.backend)
+
+
+def reraise(exc, backend):
+    """
+    Reraise TemplateDoesNotExist while maintaining template debug information.
+    """
+    new = exc.__class__(*exc.args, tried=exc.tried, backend=backend)
+    if hasattr(exc, 'template_debug'):
+        new.template_debug = exc.template_debug
+    six.reraise(exc.__class__, new, sys.exc_info()[2])
