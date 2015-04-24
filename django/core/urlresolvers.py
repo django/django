@@ -94,6 +94,11 @@ def get_callable(lookup_view, can_fail=False):
     if callable(lookup_view):
         return lookup_view
 
+    if not isinstance(lookup_view, six.string_types):
+        raise ViewDoesNotExist(
+            "'%s' is not a callable or a dot-notation path" % lookup_view
+        )
+
     mod_name, func_name = get_mod_func(lookup_view)
     if not func_name:  # No '.' in lookup_view
         if can_fail:
