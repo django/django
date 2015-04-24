@@ -1,11 +1,13 @@
 import warnings
 
 from django.http import HttpResponse
-from django.template import Context, RequestContext, Template, loader
-from django.template.backends.django import Template as BackendTemplate
-from django.template.context import _current_app_undefined
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+
+from .backends.django import Template as BackendTemplate
+from .base import Template
+from .context import Context, RequestContext, _current_app_undefined
+from .loader import get_template, select_template
 
 
 class ContentNotRenderedError(Exception):
@@ -75,9 +77,9 @@ class SimpleTemplateResponse(HttpResponse):
     def resolve_template(self, template):
         "Accepts a template object, path-to-template or list of paths"
         if isinstance(template, (list, tuple)):
-            return loader.select_template(template, using=self.using)
+            return select_template(template, using=self.using)
         elif isinstance(template, six.string_types):
-            return loader.get_template(template, using=self.using)
+            return get_template(template, using=self.using)
         else:
             return template
 

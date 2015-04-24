@@ -54,9 +54,9 @@ __all__ = ('Engine', 'engines')
 # Django Template Language
 
 # Public exceptions
-from .base import (TemplateDoesNotExist, TemplateSyntaxError,           # NOQA
-                   VariableDoesNotExist)
+from .base import VariableDoesNotExist                                  # NOQA
 from .context import ContextPopException                                # NOQA
+from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA
 
 # Template parts
 from .base import (Context, Node, NodeList, Origin, RequestContext,     # NOQA

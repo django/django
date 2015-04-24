@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import warnings
 
 from django.apps import apps
-from django.template.base import Origin, TemplateDoesNotExist
+from django.template import Origin, TemplateDoesNotExist
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
 
