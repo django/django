@@ -320,10 +320,10 @@ prefix is used repeatedly. For example, consider this URLconf::
     from . import views
 
     urlpatterns = [
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/history/$', views.history),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/edit/$', views.edit),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/discuss/$', views.discuss),
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/permissions/$', views.permissions),
+        url(r'^(?P<page_slug>[\w-]+)-(?P<page_id>\w+)/history/$', views.history),
+        url(r'^(?P<page_slug>[\w-]+)-(?P<page_id>\w+)/edit/$', views.edit),
+        url(r'^(?P<page_slug>[\w-]+)-(?P<page_id>\w+)/discuss/$', views.discuss),
+        url(r'^(?P<page_slug>[\w-]+)-(?P<page_id>\w+)/permissions/$', views.permissions),
     ]
 
 We can improve this by stating the common path prefix only once and grouping
@@ -333,7 +333,7 @@ the suffixes that differ::
     from . import views
 
     urlpatterns = [
-        url(r'^(?P<page_slug>\w+)-(?P<page_id>\w+)/', include([
+        url(r'^(?P<page_slug>[\w-]+)-(?P<page_id>\w+)/', include([
             url(r'^history/$', views.history),
             url(r'^edit/$', views.edit),
             url(r'^discuss/$', views.discuss),
