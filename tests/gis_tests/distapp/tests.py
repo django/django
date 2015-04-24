@@ -23,14 +23,14 @@ if HAS_GEOS:
 class DistanceTest(TestCase):
     fixtures = ['initial']
 
-    if HAS_GEOS:
+    def setUp(self):
         # A point we are testing distances with -- using a WGS84
         # coordinate that'll be implicitly transformed to that to
         # the coordinate system of the field, EPSG:32140 (Texas South Central
         # w/units in meters)
-        stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
+        self.stx_pnt = GEOSGeometry('POINT (-95.370401017314293 29.704867409475465)', 4326)
         # Another one for Australia
-        au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
+        self.au_pnt = GEOSGeometry('POINT (150.791 -34.4919)', 4326)
 
     def get_names(self, qs):
         cities = [c.name for c in qs]
