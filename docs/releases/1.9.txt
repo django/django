@@ -249,6 +249,9 @@ Templates
 * The debug page template postmortem now include output from each engine that
   is installed.
 
+* :ref:`Debug page integration <template-debug-integration>` for custom
+  template engines was added.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 

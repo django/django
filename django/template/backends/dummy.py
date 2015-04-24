@@ -1,12 +1,13 @@
 # Since this package contains a "django" module, this is required on Python 2.
 from __future__ import absolute_import
 
+import errno
 import io
 import string
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateDoesNotExist
+from django.template import Origin, TemplateDoesNotExist
 from django.utils.html import conditional_escape
 
 from .base import BaseEngine
@@ -29,17 +30,24 @@ class TemplateStrings(BaseEngine):
         return Template(template_code)
 
     def get_template(self, template_name):
+        tried = []
         for template_file in self.iter_template_filenames(template_name):
             try:
                 with io.open(template_file, encoding=settings.FILE_CHARSET) as fp:
                     template_code = fp.read()
-            except IOError:
-                continue
+            except IOError as e:
+                if e.errno == errno.ENOENT:
+                    tried.append((
+                        Origin(template_file, template_name, self),
+                        'Source does not exist',
+                    ))
+                    continue
+                raise
 
             return Template(template_code)
 
         else:
-            raise TemplateDoesNotExist(template_name)
+            raise TemplateDoesNotExist(template_name, tried=tried, backend=self)
 
 
 class Template(string.Template):

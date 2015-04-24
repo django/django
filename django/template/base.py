@@ -135,13 +135,27 @@ class TemplateSyntaxError(Exception):
 
 class TemplateDoesNotExist(Exception):
     """
-    This exception is used when template loaders are unable to find a
-    template. The tried argument is an optional list of tuples containing
-    (origin, status), where origin is an Origin object and status is a string
-    with the reason the template wasn't found.
+    The exception used by backends when a template does not exist. Accepts the
+    following optional arguments:
+
+    backend
+        The template backend class used when raising this exception.
+
+    tried
+        A list of sources that were tried when finding the template. This
+        is formatted as a list of tuples containing (origin, status), where
+        origin is an Origin object and status is a string with the reason the
+        template wasn't found.
+
+    chain
+        A list of intermediate TemplateDoesNotExist exceptions. This is used to
+        encapsulate multiple exceptions when loading templates from multiple
+        engines.
     """
-    def __init__(self, msg, tried=None):
+    def __init__(self, msg, tried=None, backend=None, chain=None):
+        self.backend = backend
         self.tried = tried or []
+        self.chain = chain or []
         super(TemplateDoesNotExist, self).__init__(msg)
 
 

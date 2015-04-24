@@ -9,7 +9,7 @@ from django.core.urlresolvers import Resolver404, resolve
 from django.http import (
     HttpRequest, HttpResponse, HttpResponseNotFound, build_request_repr,
 )
-from django.template import Context, Engine, TemplateDoesNotExist, engines
+from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
@@ -276,25 +276,7 @@ class ExceptionReporter(object):
         """Return a dictionary containing traceback information."""
         if self.exc_type and issubclass(self.exc_type, TemplateDoesNotExist):
             self.template_does_not_exist = True
-            postmortem = []
-
-            # TODO: add support for multiple template engines (#24120).
-            # TemplateDoesNotExist should carry all the information, including
-            # the backend, rather than looping through engines.all.
-            for engine in engines.all():
-                if hasattr(engine, 'engine'):
-                    e = engine.engine
-                else:
-                    e = engine
-
-                postmortem.append(dict(
-                    engine=engine,
-                    tried=[
-                        entry for entry in self.exc_value.tried if
-                        entry[0].loader.engine == e
-                    ],
-                ))
-            self.postmortem = postmortem
+            self.postmortem = self.exc_value.chain or [self.exc_value]
 
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
@@ -751,7 +733,7 @@ TECHNICAL_500_TEMPLATE = ("""
     {% if postmortem %}
         <p class="append-bottom">Django tried loading these templates, in this order:</p>
         {% for entry in postmortem %}
-            <p class="postmortem-section">Using engine <code>{{ entry.engine.name }}</code>:</p>
+            <p class="postmortem-section">Using engine <code>{{ entry.backend.name }}</code>:</p>
             <ul>
                 {% if entry.tried %}
                     {% for attempt in entry.tried %}
@@ -890,7 +872,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
-Using engine {{ entry.engine.name }}:
+Using engine {{ entry.backend.name }}:
 {% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
@@ -1083,7 +1065,7 @@ Installed Middleware:
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
-Using engine {{ entry.engine.name }}:
+Using engine {{ entry.backend.name }}:
 {% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}

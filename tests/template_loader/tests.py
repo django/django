@@ -36,9 +36,10 @@ class TemplateLoaderTests(SimpleTestCase):
         with self.assertRaises(TemplateDoesNotExist) as e:
             get_template("template_loader/unknown.html")
         self.assertEqual(
-            e.exception.tried[-1][0].template_name,
+            e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
+        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
 
     def test_select_template_first_engine(self):
         template = select_template(["template_loader/unknown.html",
@@ -64,13 +65,15 @@ class TemplateLoaderTests(SimpleTestCase):
             select_template(["template_loader/unknown.html",
                              "template_loader/missing.html"])
         self.assertEqual(
-            e.exception.tried[0][0].template_name,
+            e.exception.chain[0].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
+        self.assertEqual(e.exception.chain[0].backend.name, 'dummy')
         self.assertEqual(
-            e.exception.tried[-1][0].template_name,
+            e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/missing.html',
         )
+        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
 
     def test_select_template_tries_all_engines_before_names(self):
         template = select_template(["template_loader/goodbye.html",
@@ -98,9 +101,10 @@ class TemplateLoaderTests(SimpleTestCase):
         with self.assertRaises(TemplateDoesNotExist) as e:
             render_to_string("template_loader/unknown.html")
         self.assertEqual(
-            e.exception.tried[-1][0].template_name,
+            e.exception.chain[-1].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
+        self.assertEqual(e.exception.chain[-1].backend.name, 'django')
 
     def test_render_to_string_with_list_first_engine(self):
         content = render_to_string(["template_loader/unknown.html",
@@ -126,13 +130,25 @@ class TemplateLoaderTests(SimpleTestCase):
             render_to_string(["template_loader/unknown.html",
                               "template_loader/missing.html"])
         self.assertEqual(
-            e.exception.tried[0][0].template_name,
+            e.exception.chain[0].tried[0][0].template_name,
             'template_loader/unknown.html',
         )
+        self.assertEqual(e.exception.chain[0].backend.name, 'dummy')
         self.assertEqual(
-            e.exception.tried[-1][0].template_name,
+            e.exception.chain[1].tried[0][0].template_name,
+            'template_loader/unknown.html',
+        )
+        self.assertEqual(e.exception.chain[1].backend.name, 'django')
+        self.assertEqual(
+            e.exception.chain[2].tried[0][0].template_name,
             'template_loader/missing.html',
         )
+        self.assertEqual(e.exception.chain[2].backend.name, 'dummy')
+        self.assertEqual(
+            e.exception.chain[3].tried[0][0].template_name,
+            'template_loader/missing.html',
+        )
+        self.assertEqual(e.exception.chain[3].backend.name, 'django')
 
     def test_render_to_string_with_list_tries_all_engines_before_names(self):
         content = render_to_string(["template_loader/goodbye.html",
