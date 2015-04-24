@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import HAS_GEOS
+from django.contrib.gis.db.models import F, Collect, Count, Extent, Union
+from django.contrib.gis.geometry.backend import Geometry
+from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import override_settings
@@ -8,13 +10,9 @@ from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import no_oracle
-
-if HAS_GEOS:
-    from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
-    from django.contrib.gis.geometry.backend import Geometry
-    from django.contrib.gis.geos import GEOSGeometry, Point, MultiPoint
-
-    from .models import City, Location, DirectoryEntry, Parcel, Book, Author, Article, Event
+from .models import (
+    Article, Author, Book, City, DirectoryEntry, Event, Location, Parcel,
+)
 
 
 @skipUnlessDBFeature("gis_enabled")
