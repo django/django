@@ -19,8 +19,10 @@ with warnings.catch_warnings():
         url(r'erroneous_unqualified/$', 'unqualified_view'),
         # View does not exist
         url(r'missing_inner/$', 'urlpatterns_reverse.views.missing_view'),
-        # View is not callable
-        url(r'uncallable/$', 'urlpatterns_reverse.views.uncallable'),
+        # View is not a callable (string import; arbitrary Python object)
+        url(r'uncallable-dotted/$', 'urlpatterns_reverse.views.uncallable'),
+        # View is not a callable (explicit import; arbitrary Python object)
+        url(r'uncallable-object/$', views.uncallable),
         # Module does not exist
         url(r'missing_outer/$', 'urlpatterns_reverse.missing_module.missing_view'),
         # Regex contains an error (refs #6170)
