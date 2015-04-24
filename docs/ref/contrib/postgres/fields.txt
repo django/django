@@ -251,11 +251,15 @@ HStoreField
     A field for storing mappings of strings to strings. The Python data type
     used is a ``dict``.
 
-    To use this field, you'll need to setup the hstore extension in PostgreSQL
-    by adding a migration with the
-    :class:`~django.contrib.postgres.operations.HStoreExtension` operation.
-    You'll see an error like ``'type "hstore" does not exist'`` if you skip
-    this step.
+    To use this field, you'll need to:
+
+    1. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
+    2. Setup the hstore extension in PostgreSQL before the first ``CreateModel``
+       or ``AddField`` operation by adding a migration with the
+       :class:`~django.contrib.postgres.operations.HStoreExtension` operation.
+
+    You'll see an error like ``can't adapt type 'dict'`` if you skip the first
+    step, or ``type "hstore" does not exist`` if you skip the second.
 
 .. note::
 
