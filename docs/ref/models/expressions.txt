@@ -26,6 +26,9 @@ Some examples
 
 .. code-block:: python
 
+    from django.db.models import F, Count
+    from django.db.models.functions import Length
+
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
 
@@ -62,6 +65,12 @@ Some examples
 Built-in Expressions
 ====================
 
+.. note::
+
+    These expressions are defined in ``django.db.models.expressions`` and
+    ``django.db.models.aggregates``, but for convenience they're available and
+    usually imported from :mod:`django.db.models`.
+
 ``F()`` expressions
 -------------------
 
@@ -88,6 +97,7 @@ into memory and manipulated it using familiar Python operators, and then saved
 the object back to the database. But instead we could also have done::
 
     from django.db.models import F
+
     reporter = Reporters.objects.get(name='Tintin')
     reporter.stories_filed = F('stories_filed') + 1
     reporter.save()
@@ -194,6 +204,8 @@ directly support ``output_field`` you will need to wrap the expression with
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
 
+    from django.db.models import Func, F
+
     queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
 
 or they can be used to build a library of database functions::
@@ -259,6 +271,8 @@ like ``Sum()`` and ``Count()``, inherit from ``Aggregate()``.
 Since ``Aggregate``\s are expressions and wrap expressions, you can represent
 some complex computations::
 
+    from django.db.models import Count
+
     Company.objects.annotate(
         managers_required=(Count('num_employees') / 4) + Count('num_managers'))
 
@@ -313,6 +327,8 @@ Creating your own Aggregate Functions
 Creating your own aggregate is extremely easy. At a minimum, you need
 to define ``function``, but you can also completely customize the
 SQL that is generated. Here's a brief example::
+
+    from django.db.models import Aggregate
 
     class Count(Aggregate):
         # supports COUNT(distinct field)
@@ -578,6 +594,7 @@ to play nice with other query expressions::
 
 Let's see how it works::
 
+    >>> from django.db.models import F, Value, CharField
     >>> qs = Company.objects.annotate(
     ...    tagline=Coalesce([
     ...        F('motto'),
