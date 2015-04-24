@@ -593,7 +593,7 @@ DateDetailView
         from django.views.generic.dates import DateDetailView
 
         urlpatterns = [
-            url(r'^(?P<year>[0-9]+)/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
                 DateDetailView.as_view(model=Article, date_field="pub_date"),
                 name="archive_date_detail"),
         ]
