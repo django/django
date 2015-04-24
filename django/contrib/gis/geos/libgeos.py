@@ -135,6 +135,9 @@ lgeos = SimpleLazyObject(load_geos)
 
 
 class GEOSFuncFactory(object):
+    """
+    Lazy loading of GEOS functions.
+    """
     argtypes = None
     restype = None
     errcheck = None
