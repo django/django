@@ -1,3 +1,4 @@
+from django.contrib.gis.gdal import HAS_GDAL
 from django.utils.encoding import python_2_unicode_compatible
 
 from ..admin import admin
@@ -19,4 +20,5 @@ class City(models.Model):
         return self.name
 
 site = admin.AdminSite(name='admin_gis')
-site.register(City, admin.OSMGeoAdmin)
+if HAS_GDAL:
+    site.register(City, admin.OSMGeoAdmin)
