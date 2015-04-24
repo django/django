@@ -4,10 +4,10 @@ from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import engines
 from .backends.django import DjangoTemplates
-from .base import TemplateDoesNotExist
 from .engine import (
     _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
 )
+from .exceptions import TemplateDoesNotExist
 from .loaders import base
 
 

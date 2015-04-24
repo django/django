@@ -9,7 +9,6 @@ from functools import wraps
 from pprint import pformat
 
 from django.conf import settings
-from django.template.base import Library, Variable, VariableDoesNotExist
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -25,6 +24,8 @@ from django.utils.text import (
 )
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
+
+from .base import Library, Variable, VariableDoesNotExist
 
 register = Library()
 

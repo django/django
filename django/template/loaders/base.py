@@ -1,7 +1,7 @@
 import warnings
 from inspect import getargspec
 
-from django.template.base import Origin, Template, TemplateDoesNotExist
+from django.template import Origin, Template, TemplateDoesNotExist
 from django.utils.deprecation import RemovedInDjango21Warning
 
 

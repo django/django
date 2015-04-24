@@ -6,8 +6,9 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-from .base import Context, Template, TemplateDoesNotExist
+from .base import Context, Template
 from .context import _builtin_context_processors
+from .exceptions import TemplateDoesNotExist
 
 _context_instance_undefined = object()
 _dictionary_undefined = object()

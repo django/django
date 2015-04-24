@@ -7,7 +7,7 @@ import io
 import warnings
 
 from django.core.exceptions import SuspiciousFileOperation
-from django.template.base import Origin, TemplateDoesNotExist
+from django.template import Origin, TemplateDoesNotExist
 from django.utils._os import safe_join
 from django.utils.deprecation import RemovedInDjango21Warning
 

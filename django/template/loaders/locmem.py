@@ -4,7 +4,7 @@ Wrapper for loading templates from a plain Python dict.
 
 import warnings
 
-from django.template.base import Origin, TemplateDoesNotExist
+from django.template import Origin, TemplateDoesNotExist
 from django.utils.deprecation import RemovedInDjango21Warning
 
 from .base import Loader as BaseLoader

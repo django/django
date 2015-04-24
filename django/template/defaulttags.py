@@ -9,7 +9,14 @@ from datetime import datetime
 from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
-from django.template.base import (
+from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text, smart_text
+from django.utils.html import format_html
+from django.utils.lorem_ipsum import paragraphs, words
+from django.utils.safestring import mark_safe
+
+from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     SINGLE_BRACE_END, SINGLE_BRACE_START, VARIABLE_ATTRIBUTE_SEPARATOR,
     VARIABLE_TAG_END, VARIABLE_TAG_START, Context, InvalidTemplateLibrary,
@@ -17,14 +24,8 @@ from django.template.base import (
     VariableDoesNotExist, get_library, kwarg_re, render_value_in_context,
     token_kwargs,
 )
-from django.template.defaultfilters import date
-from django.template.smartif import IfParser, Literal
-from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text, smart_text
-from django.utils.html import format_html
-from django.utils.lorem_ipsum import paragraphs, words
-from django.utils.safestring import mark_safe
+from .defaultfilters import date
+from .smartif import IfParser, Literal
 
 register = Library()
 

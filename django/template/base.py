@@ -82,6 +82,8 @@ from django.utils.text import (
 from django.utils.timezone import template_localtime
 from django.utils.translation import pgettext_lazy, ugettext_lazy
 
+from .exceptions import TemplateSyntaxError
+
 TOKEN_TEXT = 0
 TOKEN_VAR = 1
 TOKEN_BLOCK = 2
@@ -127,36 +129,6 @@ libraries = {}
 builtins = []
 
 logger = logging.getLogger('django.template')
-
-
-class TemplateSyntaxError(Exception):
-    pass
-
-
-class TemplateDoesNotExist(Exception):
-    """
-    The exception used by backends when a template does not exist. Accepts the
-    following optional arguments:
-
-    backend
-        The template backend class used when raising this exception.
-
-    tried
-        A list of sources that were tried when finding the template. This
-        is formatted as a list of tuples containing (origin, status), where
-        origin is an Origin object and status is a string with the reason the
-        template wasn't found.
-
-    chain
-        A list of intermediate TemplateDoesNotExist exceptions. This is used to
-        encapsulate multiple exceptions when loading templates from multiple
-        engines.
-    """
-    def __init__(self, msg, tried=None, backend=None, chain=None):
-        self.backend = backend
-        self.tried = tried or []
-        self.chain = chain or []
-        super(TemplateDoesNotExist, self).__init__(msg)
 
 
 class TemplateEncodingError(Exception):

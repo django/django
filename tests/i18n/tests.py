@@ -13,8 +13,7 @@ from unittest import skipUnless
 
 from django import forms
 from django.conf import settings
-from django.template import Context, Template
-from django.template.base import TemplateSyntaxError
+from django.template import Context, Template, TemplateSyntaxError
 from django.test import RequestFactory, TestCase, override_settings
 from django.utils import six, translation
 from django.utils._os import upath
