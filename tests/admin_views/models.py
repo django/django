@@ -10,6 +10,7 @@ from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -311,10 +312,18 @@ class Vodcast(Media):
 class Parent(models.Model):
     name = models.CharField(max_length=128)
 
+    def clean(self):
+        if self.name == '_invalid':
+            raise ValidationError('invalid')
+
 
 class Child(models.Model):
     parent = models.ForeignKey(Parent, editable=False)
     name = models.CharField(max_length=30, blank=True)
+
+    def clean(self):
+        if self.name == '_invalid':
+            raise ValidationError('invalid')
 
 
 @python_2_unicode_compatible

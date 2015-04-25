@@ -1342,9 +1342,8 @@ class ModelAdmin(BaseModelAdmin):
                     'name': force_text(opts.verbose_name), 'key': escape(object_id)})
 
             if request.method == 'POST' and "_saveasnew" in request.POST:
-                return self.add_view(request, form_url=reverse('admin:%s_%s_add' % (
-                    opts.app_label, opts.model_name),
-                    current_app=self.admin_site.name))
+                object_id = None
+                obj = None
 
         ModelForm = self.get_form(request, obj)
         if request.method == 'POST':
@@ -1366,6 +1365,8 @@ class ModelAdmin(BaseModelAdmin):
                 else:
                     self.log_change(request, new_object, change_message)
                     return self.response_change(request, new_object)
+            else:
+                form_validated = False
         else:
             if add:
                 initial = self.get_changeform_initial_data(request)
@@ -1400,6 +1401,12 @@ class ModelAdmin(BaseModelAdmin):
             errors=helpers.AdminErrorList(form, formsets),
             preserved_filters=self.get_preserved_filters(request),
         )
+
+        # Hide the "Save" and "Save and continue" buttons if "Save as New" was
+        # previously chosen to prevent the interface from getting confusing.
+        if request.method == 'POST' and not form_validated and "_saveasnew" in request.POST:
+            context['show_save'] = False
+            context['show_save_and_continue'] = False
 
         context.update(extra_context or {})
 
