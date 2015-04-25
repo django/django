@@ -66,6 +66,9 @@ Bugfixes
 * Fixed a migration crash when adding new relations to models
   (:ticket:`24573`).
 
+* Fixed a migration crash when applying migrations with model managers on
+  Python 3 that were generated on Python 2 (:ticket:`24701`).
+
 Optimizations
 =============
 
