@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
-from django.db.migrations.executor import MigrationExecutor
-from django.db.migrations.loader import AmbiguityError
+from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.writer import MigrationWriter
@@ -32,14 +31,14 @@ class Command(BaseCommand):
         no_optimize = options['no_optimize']
 
         # Load the current graph state, check the app and migration they asked for exists
-        executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-        if app_label not in executor.loader.migrated_apps:
+        loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
+        if app_label not in loader.migrated_apps:
             raise CommandError(
                 "App '%s' does not have migrations (so squashmigrations on "
                 "it makes no sense)" % app_label
             )
         try:
-            migration = executor.loader.get_migration_by_prefix(app_label, migration_name)
+            migration = loader.get_migration_by_prefix(app_label, migration_name)
         except AmbiguityError:
             raise CommandError(
                 "More than one migration matches '%s' in app '%s'. Please be "
@@ -53,8 +52,8 @@ class Command(BaseCommand):
 
         # Work out the list of predecessor migrations
         migrations_to_squash = [
-            executor.loader.get_migration(al, mn)
-            for al, mn in executor.loader.graph.forwards_plan((migration.app_label, migration.name))
+            loader.get_migration(al, mn)
+            for al, mn in loader.graph.forwards_plan((migration.app_label, migration.name))
             if al == migration.app_label
         ]
 
