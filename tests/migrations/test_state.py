@@ -7,6 +7,7 @@ from django.db.migrations.state import (
     InvalidBasesError, ModelState, ProjectState, get_related_models_recursive,
 )
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils import six
 
 from .models import (
     FoodManager, FoodQuerySet, ModelWithCustomBase, NoMigrationFoodManager,
@@ -144,6 +145,7 @@ class StateTests(TestCase):
 
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
+        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_state.managers))
         self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
 
         # No explicit managers defined. Migrations will fall back to the default
@@ -153,11 +155,13 @@ class StateTests(TestCase):
         # default
         self.assertEqual([name for name, mgr in food_no_default_manager_state.managers],
                          ['food_no_mgr', 'food_mgr'])
+        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_no_default_manager_state.managers))
         self.assertEqual(food_no_default_manager_state.managers[0][1].__class__, models.Manager)
         self.assertIsInstance(food_no_default_manager_state.managers[1][1], FoodManager)
 
         self.assertEqual([name for name, mgr in food_order_manager_state.managers],
                          ['food_mgr1', 'food_mgr2'])
+        self.assertTrue(all(isinstance(name, six.text_type) for name, mgr in food_order_manager_state.managers))
         self.assertEqual([mgr.args for name, mgr in food_order_manager_state.managers],
                          [('a', 'b', 1, 2), ('x', 'y', 3, 4)])
 
@@ -220,7 +224,7 @@ class StateTests(TestCase):
                 # The ordering we really want is objects, mgr1, mgr2
                 ('default', base_mgr),
                 ('food_mgr2', mgr2),
-                ('food_mgr1', mgr1),
+                (b'food_mgr1', mgr1),
             ]
         ))
 
@@ -234,6 +238,7 @@ class StateTests(TestCase):
         managers = sorted(Food._meta.managers)
         self.assertEqual([mgr.name for _, mgr, _ in managers],
                          ['default', 'food_mgr1', 'food_mgr2'])
+        self.assertTrue(all(isinstance(mgr.name, six.text_type) for _, mgr, _ in managers))
         self.assertEqual([mgr.__class__ for _, mgr, _ in managers],
                          [models.Manager, FoodManager, FoodManager])
         self.assertIs(managers[0][1], Food._default_manager)
