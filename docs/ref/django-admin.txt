@@ -891,9 +891,9 @@ reduction.
     ``pyinotify`` support was added.
 
 When you start the server, and each time you change Python code while the
-server is running, the server will check your entire Django project for errors (see
-the :djadmin:`check` command). If any errors are found, they will be printed
-to standard output, but it won't stop the server.
+server is running, the system check framework will check your entire Django
+project for some common errors (see the :djadmin:`check` command). If any
+errors are found, they will be printed to standard output.
 
 You can run as many servers as you want, as long as they're on separate ports.
 Just execute ``django-admin.py runserver`` more than once.
