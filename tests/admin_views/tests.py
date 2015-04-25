@@ -1151,18 +1151,59 @@ class SaveAsTests(TestCase):
         self.assertEqual(len(Person.objects.filter(name='John M')), 1)
         self.assertEqual(len(Person.objects.filter(id=self.per1.pk)), 1)
 
-    def test_save_as_display(self):
+    def test_save_as_new_with_validation_errors(self):
         """
-        Ensure that 'save as' is displayed when activated and after submitting
-        invalid data aside save_as_new will not show us a form to overwrite the
-        initial model.
+        Ensure that when you click "Save as new" and have a validation error,
+        you only see the "Save as new" button and not the other save buttons,
+        and that only the "Save as" button is visible.
         """
-        change_url = reverse('admin:admin_views_person_change', args=(self.per1.pk,))
-        response = self.client.get(change_url)
-        self.assertTrue(response.context['save_as'])
-        post_data = {'_saveasnew': '', 'name': 'John M', 'gender': 3, 'alive': 'checked'}
-        response = self.client.post(change_url, post_data)
-        self.assertEqual(response.context['form_url'], reverse('admin:admin_views_person_add'))
+        response = self.client.post(reverse('admin:admin_views_person_change', args=(self.per1.pk,)), {
+            '_saveasnew': '',
+            'gender': 'invalid',
+            '_addanother': 'fail',
+        })
+        self.assertContains(response, 'Please correct the errors below.')
+        self.assertFalse(response.context['show_save_and_add_another'])
+        self.assertFalse(response.context['show_save_and_continue'])
+        self.assertTrue(response.context['show_save_as_new'])
+
+    def test_save_as_new_with_validation_errors_with_inlines(self):
+        parent = Parent.objects.create(name='Father')
+        child = Child.objects.create(parent=parent, name='Child')
+        response = self.client.post(reverse('admin:admin_views_parent_change', args=(parent.pk,)), {
+            '_saveasnew': 'Save as new',
+            'child_set-0-parent': parent.pk,
+            'child_set-0-id': child.pk,
+            'child_set-0-name': 'Child',
+            'child_set-INITIAL_FORMS': 1,
+            'child_set-MAX_NUM_FORMS': 1000,
+            'child_set-MIN_NUM_FORMS': 0,
+            'child_set-TOTAL_FORMS': 4,
+            'name': '_invalid',
+        })
+        self.assertContains(response, 'Please correct the error below.')
+        self.assertFalse(response.context['show_save_and_add_another'])
+        self.assertFalse(response.context['show_save_and_continue'])
+        self.assertTrue(response.context['show_save_as_new'])
+
+    def test_save_as_new_with_inlines_with_validation_errors(self):
+        parent = Parent.objects.create(name='Father')
+        child = Child.objects.create(parent=parent, name='Child')
+        response = self.client.post(reverse('admin:admin_views_parent_change', args=(parent.pk,)), {
+            '_saveasnew': 'Save as new',
+            'child_set-0-parent': parent.pk,
+            'child_set-0-id': child.pk,
+            'child_set-0-name': '_invalid',
+            'child_set-INITIAL_FORMS': 1,
+            'child_set-MAX_NUM_FORMS': 1000,
+            'child_set-MIN_NUM_FORMS': 0,
+            'child_set-TOTAL_FORMS': 4,
+            'name': 'Father',
+        })
+        self.assertContains(response, 'Please correct the error below.')
+        self.assertFalse(response.context['show_save_and_add_another'])
+        self.assertFalse(response.context['show_save_and_continue'])
+        self.assertTrue(response.context['show_save_as_new'])
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
