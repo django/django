@@ -5,7 +5,10 @@ import datetime
 
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.test import TestCase, override_settings
+from django.test.client import RequestFactory
 from django.views.generic.base import View
+from django.views.generic.detail import SingleObjectTemplateResponseMixin
+from django.views.generic.edit import ModelFormMixin
 
 from .models import Artist, Author, Book, Page
 
@@ -136,6 +139,25 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['object'], self.author1)
         self.assertNotIn('author', res.context)
         self.assertTemplateUsed(res, 'generic_views/author_detail.html')
+
+    def test_deferred_queryset_template_name(self):
+        class FormContext(SingleObjectTemplateResponseMixin):
+            request = RequestFactory().get('/')
+            model = Author
+            object = Author.objects.defer('name').get(pk=self.author1.pk)
+
+        self.assertEqual(FormContext().get_template_names()[0], 'generic_views/author_detail.html')
+
+    def test_deferred_queryset_context_object_name(self):
+        class FormContext(ModelFormMixin):
+            request = RequestFactory().get('/')
+            model = Author
+            object = Author.objects.defer('name').get(pk=self.author1.pk)
+            fields = ('name',)
+
+        form_context_data = FormContext().get_context_data()
+        self.assertEqual(form_context_data['object'], self.author1)
+        self.assertEqual(form_context_data['author'], self.author1)
 
     def test_invalid_url(self):
         self.assertRaises(AttributeError, self.client.get, '/detail/author/invalid/url/')
