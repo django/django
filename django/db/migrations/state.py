@@ -419,7 +419,7 @@ class ModelState(object):
             bases = (models.Model,)
 
         # Constructs all managers on the model
-        managers = {}
+        managers_mapping = {}
 
         def reconstruct_manager(mgr):
             as_manager, manager_path, qs_path, args, kwargs = mgr.deconstruct()
@@ -431,16 +431,17 @@ class ModelState(object):
                 instance = manager_class(*args, **kwargs)
             # We rely on the ordering of the creation_counter of the original
             # instance
-            managers[mgr.name] = (mgr.creation_counter, instance)
+            name = force_text(mgr.name)
+            managers_mapping[name] = (mgr.creation_counter, instance)
 
         if hasattr(model, "_default_manager"):
-            default_manager_name = model._default_manager.name
+            default_manager_name = force_text(model._default_manager.name)
             # Make sure the default manager is always the first
             if model._default_manager.use_in_migrations:
                 reconstruct_manager(model._default_manager)
             else:
                 # Force this manager to be the first and thus default
-                managers[default_manager_name] = (0, models.Manager())
+                managers_mapping[default_manager_name] = (0, models.Manager())
             # Sort all managers by their creation counter
             for _, manager, _ in sorted(model._meta.managers):
                 if manager.name == "_base_manager" or not manager.use_in_migrations:
@@ -450,7 +451,7 @@ class ModelState(object):
             # instance for further processing
             managers = [
                 (name, instance) for name, (cc, instance) in
-                sorted(managers.items(), key=lambda v: v[1])
+                sorted(managers_mapping.items(), key=lambda v: v[1])
             ]
             if managers == [(default_manager_name, models.Manager())]:
                 managers = []
@@ -496,6 +497,7 @@ class ModelState(object):
         # Sort all managers by their creation counter
         sorted_managers = sorted(self.managers, key=lambda v: v[1].creation_counter)
         for mgr_name, manager in sorted_managers:
+            mgr_name = force_text(mgr_name)
             as_manager, manager_path, qs_path, args, kwargs = manager.deconstruct()
             if as_manager:
                 qs_class = import_string(qs_path)
