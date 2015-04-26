@@ -791,4 +791,16 @@ TEST_RESULTS = {
             'content_object_abstract',
         ],
     },
+    'labels': {
+        AbstractPerson: 'model_meta.AbstractPerson',
+        BasePerson: 'model_meta.BasePerson',
+        Person: 'model_meta.Person',
+        Relating: 'model_meta.Relating',
+    },
+    'lower_labels': {
+        AbstractPerson: 'model_meta.abstractperson',
+        BasePerson: 'model_meta.baseperson',
+        Person: 'model_meta.person',
+        Relating: 'model_meta.relating',
+    },
 }

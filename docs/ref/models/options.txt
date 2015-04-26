@@ -29,6 +29,12 @@ Available ``Meta`` options
 
         app_label = 'myapp'
 
+    .. versionadded:: 1.9
+
+    If you want to represent a model with the format ``app_label.object_name``
+    or ``app_label.model_name`` you can use ``model._meta.label``
+    or ``model._meta.label_lower`` respectively.
+
 ``db_table``
 ------------
 
@@ -397,3 +403,26 @@ Django quotes column and table names behind the scenes.
         verbose_name_plural = "stories"
 
     If this isn't given, Django will use :attr:`~Options.verbose_name` + ``"s"``.
+
+Read-only ``Meta`` attributes
+=============================
+
+``label``
+---------
+
+.. attribute:: Options.label
+
+    .. versionadded:: 1.9
+
+    Representation of the object, returns ``app_label.object_name``, e.g.
+    ``'polls.Question'``.
+
+``label_lower``
+---------------
+
+.. attribute:: Options.label_lower
+
+    .. versionadded:: 1.9
+
+    Representation of the model, returns ``app_label.model_name``, e.g.
+    ``'polls.question'``.

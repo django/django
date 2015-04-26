@@ -973,12 +973,12 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
                     (fk.remote_field.model != parent_model and
                      fk.remote_field.model not in parent_model._meta.get_parent_list()):
                 raise ValueError(
-                    "fk_name '%s' is not a ForeignKey to '%s.%s'."
-                    % (fk_name, parent_model._meta.app_label, parent_model._meta.object_name))
+                    "fk_name '%s' is not a ForeignKey to '%s'." % (fk_name, parent_model._meta.label)
+                )
         elif len(fks_to_parent) == 0:
             raise ValueError(
-                "'%s.%s' has no field named '%s'."
-                % (model._meta.app_label, model._meta.object_name, fk_name))
+                "'%s' has no field named '%s'." % (model._meta.label, fk_name)
+            )
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         fks_to_parent = [
@@ -993,20 +993,16 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
             if can_fail:
                 return
             raise ValueError(
-                "'%s.%s' has no ForeignKey to '%s.%s'." % (
-                    model._meta.app_label,
-                    model._meta.object_name,
-                    parent_model._meta.app_label,
-                    parent_model._meta.object_name,
+                "'%s' has no ForeignKey to '%s'." % (
+                    model._meta.label,
+                    parent_model._meta.label,
                 )
             )
         else:
             raise ValueError(
-                "'%s.%s' has more than one ForeignKey to '%s.%s'." % (
-                    model._meta.app_label,
-                    model._meta.object_name,
-                    parent_model._meta.app_label,
-                    parent_model._meta.object_name,
+                "'%s' has more than one ForeignKey to '%s'." % (
+                    model._meta.label,
+                    parent_model._meta.label,
                 )
             )
     return fk

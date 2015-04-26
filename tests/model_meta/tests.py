@@ -49,6 +49,17 @@ class GetFieldsTests(OptionsBaseTests):
                 fields += ["errors"]
 
 
+class LabelTests(OptionsBaseTests):
+
+    def test_label(self):
+        for model, expected_result in TEST_RESULTS['labels'].items():
+            self.assertEqual(model._meta.label, expected_result)
+
+    def test_label_lower(self):
+        for model, expected_result in TEST_RESULTS['lower_labels'].items():
+            self.assertEqual(model._meta.label_lower, expected_result)
+
+
 class DataTests(OptionsBaseTests):
 
     def test_fields(self):
