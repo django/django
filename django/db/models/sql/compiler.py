@@ -1,5 +1,6 @@
 import re
 import warnings
+from collections import namedtuple
 from itertools import chain
 
 from django.core.exceptions import FieldError
@@ -17,6 +18,41 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import zip
 
 
+class Selection(namedtuple(
+    'Selection',
+    ('expression', 'sql', 'alias', 'annotation')
+)):
+    """
+     expression: The selected expression
+     sql: The (sql, params) is what the expression will produce
+     alias: the "AS alias" for the column (possibly None).
+     annotation: A marker applied to the return value, which indicates that
+        the selection return value should be treated specially
+
+        e.g. Multiple `Selections` can share the same annotation, which indicates
+        the items in the result row should be grouped together as the value
+        of a composite field.
+    """
+    @classmethod
+    def of(cls, expression, alias=None, annotation=None):
+        """
+        A new, uncompiled selection. The sql will be `None`, until the selection
+        is compiled.
+        """
+        return cls(expression, None, alias, annotation)
+
+    def compile(self, compiler):
+        """
+        Returns
+        """
+        return Selection(
+            self.expression,
+            compiler.compile(self.expression, select_format=True),
+            self.alias,
+            self.annotation
+        )
+
+
 class SQLCompiler(object):
     def __init__(self, query, connection, using):
         self.query = query
@@ -28,7 +64,7 @@ class SQLCompiler(object):
         # separately a list of extra select columns needed for grammatical correctness
         # of the query, but these columns are not included in self.select.
         self.select = None
-        self.annotation_col_map = None
+
         self.klass_info = None
         self.ordering_parts = re.compile(r'(.*)\s(ASC|DESC)(.*)')
         self.subquery = False
@@ -36,8 +72,33 @@ class SQLCompiler(object):
     def setup_query(self):
         if all(self.query.alias_refcount[a] == 0 for a in self.query.tables):
             self.query.get_initial_alias()
-        self.select, self.klass_info, self.annotation_col_map = self.get_select()
-        self.col_count = len(self.select)
+        self.select, self.klass_info = self.get_select()
+
+    @property
+    def col_count(self):
+        return sum(selection.expression.width for selection in self.select)
+
+    @property
+    def annotation_col_map(self):
+        """
+        A map of annotations to their indices into the select clause
+        Annotations that are not unique amongst the result set
+        (ie. composite field grouping annotations) are not included
+        in the output.
+
+        Included for backwards compatibility purposes (could be removed?)
+        """
+        annos = dict()
+        non_unique = set()
+
+        for select_idx, selection in enumerate(self.select):
+            if selection.annotation in annos:
+                non_unique.add(selection.annotation)
+            annos[selection.annotation] = select_idx
+
+        for anno in non_unique:
+            del annos[anno]
+        return annos
 
     def pre_sql_setup(self):
         """
@@ -106,8 +167,8 @@ class SQLCompiler(object):
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
-        for expr, _, _ in select:
-            cols = expr.get_group_by_cols()
+        for selection in select:
+            cols = selection.expression.get_group_by_cols()
             for col in cols:
                 expressions.append(col)
         for expr, (sql, params, is_ref) in order_by:
@@ -163,50 +224,40 @@ class SQLCompiler(object):
 
     def get_select(self):
         """
-        Returns three values:
-        - a list of 3-tuples of (expression, (sql, params), alias)
+        Returns two values:
+        - a list of `Selection`s
         - a klass_info structure,
-        - a dictionary of annotations
-
-        The (sql, params) is what the expression will produce, and alias is the
-        "AS alias" for the column (possibly None).
 
         The klass_info structure contains the following information:
         - Which model to instantiate
         - Which columns for that model are present in the query (by
           position of the select clause).
         - related_klass_infos: [f, klass_info] to descent into
-
-        The annotations is a dictionary of {'attname': column position} values.
         """
         select = []
         klass_info = None
-        annotations = {}
-        select_idx = 0
         for alias, (sql, params) in self.query.extra_select.items():
-            annotations[alias] = select_idx
-            select.append((RawSQL(sql, params), alias))
-            select_idx += 1
+            select.append(Selection.of(
+                RawSQL(sql, params), alias, annotation=alias
+            ))
         assert not (self.query.select and self.query.default_cols)
         if self.query.default_cols:
             select_list = []
             for c in self.get_default_columns():
-                select_list.append(select_idx)
-                select.append((c, None))
-                select_idx += 1
+                select_list.append(len(select))
+                select.append(Selection.of(c))
             klass_info = {
                 'model': self.query.model,
                 'select_fields': select_list,
             }
+
         # self.query.select is a special case. These columns never go to
         # any model.
         for col in self.query.select:
-            select.append((col, None))
-            select_idx += 1
+            select.append(Selection.of(col))
+
         for alias, annotation in self.query.annotation_select.items():
-            annotations[alias] = select_idx
-            select.append((annotation, alias))
-            select_idx += 1
+            select.append(Selection.of(annotation, alias, annotation=alias))
 
         if self.query.select_related:
             related_klass_infos = self.get_related_selections(select)
@@ -220,10 +271,7 @@ class SQLCompiler(object):
                     get_select_from_parent(ki)
             get_select_from_parent(klass_info)
 
-        ret = []
-        for col, alias in select:
-            ret.append((col, self.compile(col, select_format=True), alias))
-        return ret, klass_info, annotations
+        return [selection.compile(self) for selection in select], klass_info
 
     def get_order_by(self):
         """
@@ -324,7 +372,9 @@ class SQLCompiler(object):
             for expr, (sql, params, is_ref) in order_by:
                 without_ordering = self.ordering_parts.search(sql).group(1)
                 if not is_ref and (without_ordering, params) not in select_sql:
-                    extra_select.append((expr, (without_ordering, params), None))
+                    extra_select.append(
+                        Selection(expr, (without_ordering, params), None, None)
+                    )
         return extra_select
 
     def __call__(self, name):
@@ -397,9 +447,13 @@ class SQLCompiler(object):
 
             out_cols = []
             col_idx = 1
-            for _, (s_sql, s_params), alias in self.select + extra_select:
-                if alias:
-                    s_sql = '%s AS %s' % (s_sql, self.connection.ops.quote_name(alias))
+            for selection in self.select + extra_select:
+                s_sql, s_params = selection.sql
+                if selection.alias:
+                    s_sql = '%s AS %s' % (
+                        s_sql,
+                        self.connection.ops.quote_name(selection.alias)
+                    )
                 elif with_col_aliases:
                     s_sql = '%s AS %s' % (s_sql, 'Col%d' % col_idx)
                     col_idx += 1
@@ -629,8 +683,8 @@ class SQLCompiler(object):
                 result.append(', %s' % self.quote_name_unless_alias(alias))
         return result, params
 
-    def get_related_selections(self, select, opts=None, root_alias=None, cur_depth=1,
-                               requested=None, restricted=None):
+    def get_related_selections(self, select, opts=None, root_alias=None,
+                               cur_depth=1, requested=None, restricted=None):
         """
         Fill in the information needed for a select_related query. The current
         depth is measured as the number of connections away from the root model
@@ -705,7 +759,7 @@ class SQLCompiler(object):
             columns = self.get_default_columns(start_alias=alias, opts=f.remote_field.model._meta)
             for col in columns:
                 select_fields.append(len(select))
-                select.append((col, None))
+                select.append(Selection.of(col))
             klass_info['select_fields'] = select_fields
             next_klass_infos = self.get_related_selections(
                 select, f.remote_field.model._meta, alias, cur_depth + 1, next, restricted)
@@ -740,7 +794,7 @@ class SQLCompiler(object):
                     start_alias=alias, opts=model._meta, from_parent=opts.model)
                 for col in columns:
                     select_fields.append(len(select))
-                    select.append((col, None))
+                    select.append(Selection.of(col))
                 klass_info['select_fields'] = select_fields
                 next = requested.get(f.related_query_name(), {})
                 next_klass_infos = self.get_related_selections(
@@ -788,6 +842,20 @@ class SQLCompiler(object):
             row[pos] = value
         return tuple(row)
 
+    def group_row_values(self, row):
+        """
+        Collect items with the same annotation value as a single item in the
+        same row.
+        """
+        pos = 0
+        for selection in self.select:
+            width = selection.expression.width
+            if width > 1:
+                yield tuple(row[pos:pos + width])
+            else:
+                yield row[pos]
+            pos += width
+
     def results_iter(self, results=None):
         """
         Returns an iterator over the results from executing this query.
@@ -799,6 +867,7 @@ class SQLCompiler(object):
         converters = self.get_converters(fields)
         for rows in results:
             for row in rows:
+                row = list(self.group_row_values(row))
                 if converters:
                     row = self.apply_converters(row, converters)
                 yield row
@@ -1136,13 +1205,16 @@ class SQLAggregateCompiler(SQLCompiler):
             ann_sql, ann_params = self.compile(annotation, select_format=True)
             sql.append(ann_sql)
             params.extend(ann_params)
-        self.col_count = len(self.query.annotation_select)
         sql = ', '.join(sql)
         params = tuple(params)
 
         sql = 'SELECT %s FROM (%s) subquery' % (sql, self.query.subquery)
         params = params + self.query.sub_params
         return sql, params
+
+    @property
+    def col_count(self):
+        return len(self.query.annotation_select)
 
 
 def cursor_iter(cursor, sentinel, col_count):

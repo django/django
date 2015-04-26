@@ -97,11 +97,26 @@ class Field(RegisterLookupMixin):
     empty_strings_allowed = True
     empty_values = list(validators.EMPTY_VALUES)
 
-    # These track each time a Field instance is created. Used to retain order.
-    # The auto_creation_counter is used for fields that Django implicitly
-    # creates, creation_counter is used for all user-specified fields.
+    # Fields are ordered by the execution time of their `__init__` method.
+    # Inside a class definition, statements are executed in order, so a field
+    # that appears later inside the same class definition will appear later
+    # in the list of fields.
+    #
+    # Virtual fields are not created by executing statements inside a the class
+    # definition and are unordered. The auto_creation_counter is used to track
+    # the creation of virtual fields
+    #
+    # The subfield_creation_counter is always `0` for fields which appear
+    # directly on the field definition and is overridden for fields which
+    # appear on the class definition of a composite field.
+    #
+    # If django was limited to supporting python 3.0 and greater, this would
+    # be better handled by making the class dict of a model an `OrderedDict`,
+    # but changing the type of a class dict is not supported in py2
     creation_counter = 0
     auto_creation_counter = -1
+    subfield_creation_counter = 0
+
     default_validators = []  # Default set of validators
     default_error_messages = {
         'invalid_choice': _('Value %(value)r is not a valid choice.'),
@@ -109,7 +124,7 @@ class Field(RegisterLookupMixin):
         'blank': _('This field cannot be blank.'),
         'unique': _('%(model_name)s with this %(field_label)s '
                     'already exists.'),
-        # Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+        # Translators: The 'lookup_type' is oof 'date', 'year' or 'month'.
         # Eg: "Title must be unique for pub_date year"
         'unique_for_date': _("%(field_label)s must be unique for "
                              "%(date_field_label)s %(lookup_type)s."),
@@ -126,6 +141,8 @@ class Field(RegisterLookupMixin):
     one_to_many = None
     one_to_one = None
     related_model = None
+
+    is_composite = False
 
     # Generic field type description, usually overridden by subclasses
     def _description(self):
@@ -460,17 +477,23 @@ class Field(RegisterLookupMixin):
     def __eq__(self, other):
         # Needed for @total_ordering
         if isinstance(other, Field):
-            return self.creation_counter == other.creation_counter
+            return (self.creation_counter == other.creation_counter
+                    and self.subfield_creation_counter == other.subfield_creation_counter)
         return NotImplemented
 
     def __lt__(self, other):
         # This is needed because bisect does not take a comparison function.
         if isinstance(other, Field):
-            return self.creation_counter < other.creation_counter
+            lt = self.creation_counter < other.creation_counter
+            if not lt and self.creation_counter == other.creation_counter:
+                lt = self.subfield_creation_counter < other.subfield_creation_counter
+            return lt
         return NotImplemented
 
     def __hash__(self):
-        return hash(self.creation_counter)
+        # tuples have a relatively good implementation of __hash__
+        hash_components = self.creation_counter, self.subfield_creation_counter
+        return hash(hash_components)
 
     def __deepcopy__(self, memodict):
         # We don't have to deepcopy very much here, since most things are not
@@ -828,18 +851,12 @@ class Field(RegisterLookupMixin):
         first_choice = blank_choice if include_blank else []
         return first_choice + list(self.flatchoices)
 
-    def _get_val_from_obj(self, obj):
-        if obj is not None:
-            return getattr(obj, self.attname)
-        else:
-            return self.get_default()
-
     def value_to_string(self, obj):
         """
         Returns a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return smart_text(self._get_val_from_obj(obj))
+        return smart_text(getattr(obj, self.attname))
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -1298,7 +1315,7 @@ class DateField(DateTimeCheckMixin, Field):
         return connection.ops.value_to_db_date(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -1458,7 +1475,7 @@ class DateTimeField(DateField):
         return connection.ops.value_to_db_datetime(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -1664,7 +1681,7 @@ class DurationField(Field):
         return converters + super(DurationField, self).get_db_converters(connection)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else duration_string(val)
 
     def formfield(self, **kwargs):
@@ -2264,7 +2281,7 @@ class TimeField(DateTimeCheckMixin, Field):
         return connection.ops.value_to_db_time(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -2331,7 +2348,7 @@ class BinaryField(Field):
 
     def value_to_string(self, obj):
         """Binary data is serialized as base64"""
-        return b64encode(force_bytes(self._get_val_from_obj(obj))).decode('ascii')
+        return b64encode(force_bytes(getattr(obj, self.attname))).decode('ascii')
 
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data

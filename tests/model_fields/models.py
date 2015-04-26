@@ -188,6 +188,23 @@ class GenericIPAddress(models.Model):
 
 
 ###############################################################################
+# Composite fields
+
+class ConstraintField(models.Model):
+    x = models.IntegerField()
+    y = models.IntegerField()
+
+    point = models.constrain(x, y)
+
+
+class UnnamedConstraintField(models.Model):
+    x = models.IntegerField()
+    y = models.IntegerField()
+
+    _ = models.constrain(x, y)
+
+
+###############################################################################
 # These models aren't used in any test, just here to ensure they validate
 # successfully.
 
