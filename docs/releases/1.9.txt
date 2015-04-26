@@ -1001,6 +1001,9 @@ Miscellaneous
 * :class:`~django.core.signing.Signer` now issues a warning if an invalid
   separator is used. This will become an exception in Django 1.10.
 
+* ``django.db.models.Field._get_val_from_obj()`` is deprecated in favor of
+  ``Field.value_from_object()``.
+
 .. removed-features-1.9:
 
 Features removed in 1.9

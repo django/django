@@ -141,7 +141,7 @@ class TeamField(models.CharField):
         return Team(value)
 
     def value_to_string(self, obj):
-        return self._get_val_from_obj(obj).to_string()
+        return self.value_from_object(obj).to_string()
 
     def deconstruct(self):
         name, path, args, kwargs = super(TeamField, self).deconstruct()

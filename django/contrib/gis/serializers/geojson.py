@@ -60,7 +60,7 @@ class Serializer(JSONSerializer):
 
     def handle_field(self, obj, field):
         if field.name == self.geometry_field:
-            self._geometry = field._get_val_from_obj(obj)
+            self._geometry = field.value_from_object(obj)
         else:
             super(Serializer, self).handle_field(obj, field)
 

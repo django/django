@@ -79,6 +79,9 @@ details on these changes.
 * Support for setting a URL instance namespace without an application
   namespace will be removed.
 
+* ``Field._get_val_from_obj()`` will be removed in favor of
+  ``Field.value_from_object()``.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
