@@ -58,6 +58,8 @@ details on these changes.
 * The ``django.template.loaders.base.Loader.__call__()`` method will be
   removed.
 
+* ``Field._get_val_from_obj()`` will be renamed to ``Field.value_from_object()``
+
 .. _deprecation-removed-in-2.0:
 
 2.0

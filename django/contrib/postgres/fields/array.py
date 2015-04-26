@@ -93,7 +93,7 @@ class ArrayField(Field):
 
     def value_to_string(self, obj):
         values = []
-        vals = self._get_val_from_obj(obj)
+        vals = getattr(obj, self.attname)
         base_field = self.base_field
 
         for val in vals:
