@@ -177,6 +177,14 @@ class Options(object):
         return link, model, direct, m2m
 
     @property
+    def label(self):
+        return '%s.%s' % (self.app_label, self.object_name)
+
+    @property
+    def label_lower(self):
+        return '%s.%s' % (self.app_label, self.model_name)
+
+    @property
     def app_config(self):
         # Don't go through get_app_config to avoid triggering imports.
         return self.apps.app_configs.get(self.app_label)
@@ -377,7 +385,6 @@ class Options(object):
         case insensitive, so we make sure we are case insensitive here.
         """
         if self.swappable:
-            model_label = '%s.%s' % (self.app_label, self.model_name)
             swapped_for = getattr(settings, self.swappable, None)
             if swapped_for:
                 try:
@@ -389,7 +396,7 @@ class Options(object):
                     # or as part of validation.
                     return swapped_for
 
-                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, model_label):
+                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, self.label_lower):
                     return swapped_for
         return None
 

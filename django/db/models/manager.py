@@ -76,9 +76,7 @@ class BaseManager(object):
 
     def __str__(self):
         """ Return "app_label.model_label.manager_name". """
-        model = self.model
-        app = model._meta.app_label
-        return '%s.%s.%s' % (app, model._meta.object_name, self.name)
+        return '%s.%s' % (self.model._meta.label, self.name)
 
     def deconstruct(self):
         """
