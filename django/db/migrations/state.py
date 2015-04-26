@@ -362,10 +362,9 @@ class ModelState(object):
             try:
                 fields.append((name, field_class(*args, **kwargs)))
             except TypeError as e:
-                raise TypeError("Couldn't reconstruct field %s on %s.%s: %s" % (
+                raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
                     name,
-                    model._meta.app_label,
-                    model._meta.object_name,
+                    model._meta.label,
                     e,
                 ))
         if not exclude_rels:
@@ -423,7 +422,7 @@ class ModelState(object):
         # Make our record
         bases = tuple(
             (
-                "%s.%s" % (base._meta.app_label, base._meta.model_name)
+                base._meta.label_lower
                 if hasattr(base, "_meta") else
                 base
             )
