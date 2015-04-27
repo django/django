@@ -256,8 +256,8 @@ class DeferRegressionTest(TestCase):
         deferred_item1 = deferred_class_factory(Item, ('name',))
         deferred_item2 = deferred_class_factory(deferred_item1, ('value',))
         self.assertIs(deferred_item2._meta.proxy_for_model, Item)
-        self.assertFalse(isinstance(deferred_item2.__dict__.get('name'), DeferredAttribute))
-        self.assertTrue(isinstance(deferred_item2.__dict__.get('value'), DeferredAttribute))
+        self.assertNotIsInstance(deferred_item2.__dict__.get('name'), DeferredAttribute)
+        self.assertIsInstance(deferred_item2.__dict__.get('value'), DeferredAttribute)
 
     def test_deferred_class_factory_no_attrs(self):
         deferred_cls = deferred_class_factory(Item, ())

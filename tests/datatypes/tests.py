@@ -93,4 +93,5 @@ class DataTypesTestCase(TestCase):
         self.assertIsInstance(b.baked_timestamp, datetime.datetime)
         # We need to test this way because datetime.datetime inherits
         # from datetime.date:
-        self.assertIsInstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime)
+        self.assertIsInstance(b.baked_date, datetime.date)
+        self.assertNotIsInstance(b.baked_date, datetime.datetime)
