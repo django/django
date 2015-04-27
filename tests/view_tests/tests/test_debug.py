@@ -20,7 +20,7 @@ from django.test.utils import LoggingCaptureMixin
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import SimpleLazyObject
-from django.views.debug import CallableSettingWrapper, ExceptionReporter
+from django.views.debug import CallableSettingWrapper, ExceptionReporter, technical_500_response
 
 from .. import BrokenException, except_args
 from ..views import (
@@ -192,6 +192,77 @@ class DebugViewTests(LoggingCaptureMixin, TestCase):
             status_code=404
         )
 
+    def test_regression_23643_by_hand(self):
+        """
+        Regression test for bug #23643.
+
+        The debug view does not work when an Integrity error is raised.
+
+        Here I create an IntegrityError with a __cause__ attribute
+        and call the debug view with it and a generic traceback
+        """
+
+        from django.db.utils import IntegrityError
+        import sys, copy
+
+        i_exc = IntegrityError('NOT NULL constraint failed: bla bla bla',)
+
+        #NOTE: django/db/utils.py sets __cause__ when database exception occurs
+        i_exc.__cause__ = copy.copy(i_exc)
+        # as weird as I can... ;)
+        try:
+            raise
+        except Exception as e:
+            tb = sys.exc_info()[2]
+            pass
+
+        exc_info_rv = [IntegrityError, i_exc, tb]
+
+        #-- call the debug view with the DB exception forged by hand
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info_rv)
+        self.assertContains(
+            response,
+            "IntegrityError at /",
+            status_code=500
+        )
+
+    def test_regression_23643_handling_dbexception_in_the_debugview(self):
+        """
+        Regression test for bug #23643.
+
+        The debug view does not work when a DBException is raised.
+
+        Here I perform a wrong SQL query to let the DBWrapper raise an Exception
+        and set the __cause__ attribute. Then call the debug view with the catched exception
+        and its traceback to simulate the error
+
+        SQL syntax used does not matter, OperationalError is raised anyway.
+        """
+        from django.db import connection 
+        import sys
+
+        cu = connection.cursor()
+
+        try:
+            cu.execute('INSERT INTAO "pippo" VALUES (1,2)')
+        except Exception as e:
+            exc_info_rv = sys.exc_info()
+            # print("EXCEPTION INFO %s" % list(exc_info_rv))
+            cu.close()
+            connection.close()
+
+            #--- Saved exc_info to be used in the debug view
+            pass
+
+        #-- call the debug view with the DB exception
+        rf = RequestFactory()
+        response = technical_500_response(rf.get('/'), *exc_info_rv)
+        self.assertContains(
+            response,
+            "OperationalError at /",
+            status_code=500
+        )
 
 @override_settings(
     DEBUG=True,
