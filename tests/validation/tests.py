@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import TestCase
+from django.utils.functional import lazy
 
 from . import ValidationTestCase
 from .models import (
@@ -129,6 +130,10 @@ class GenericIPAddressFieldTests(ValidationTestCase):
     def test_correct_generic_ip_passes(self):
         giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4")
         self.assertIsNone(giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip=" 1.2.3.4 ")
+        self.assertIsNone(giptm.full_clean())
+        giptm = GenericIPAddressTestModel(generic_ip="1.2.3.4\n")
+        self.assertIsNone(giptm.full_clean())
         giptm = GenericIPAddressTestModel(generic_ip="2001::2")
         self.assertIsNone(giptm.full_clean())
 
@@ -136,6 +141,10 @@ class GenericIPAddressFieldTests(ValidationTestCase):
         giptm = GenericIPAddressTestModel(generic_ip="294.4.2.1")
         self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
         giptm = GenericIPAddressTestModel(generic_ip="1:2")
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
+        giptm = GenericIPAddressTestModel(generic_ip=1)
+        self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
+        giptm = GenericIPAddressTestModel(generic_ip=lazy(lambda: 1, int))
         self.assertFailsValidation(giptm.full_clean, ['generic_ip'])
 
     def test_correct_v4_ip_passes(self):
