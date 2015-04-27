@@ -8,7 +8,7 @@ all about the internals of models in order to get the information it needs.
 """
 import copy
 import warnings
-from collections import Mapping, OrderedDict
+from collections import Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1167,6 +1167,9 @@ class Query(object):
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
 
+            # Prevent iterator from being consumed by check_related_objects()
+            if isinstance(value, Iterator):
+                value = list(value)
             self.check_related_objects(field, value, opts)
 
             # split_exclude() needs to know which joins were generated for the
