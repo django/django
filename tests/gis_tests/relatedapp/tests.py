@@ -291,7 +291,7 @@ class RelatedGeoModelTest(TestCase):
         Book.objects.create(title='Without Author')
         b = Book.objects.select_related('author').get(title='Without Author')
         # Should be `None`, and not a 'dummy' model.
-        self.assertEqual(None, b.author)
+        self.assertIsNone(b.author)
 
     @skipUnlessDBFeature("supports_collect_aggr")
     @ignore_warnings(category=RemovedInDjango20Warning)

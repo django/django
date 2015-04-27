@@ -35,16 +35,16 @@ class GeoIPTest(unittest.TestCase):
         g3 = GeoIP.open(path, 0)  # MaxMind Python API syntax.
 
         for g in (g1, g2, g3):
-            self.assertEqual(True, bool(g._country))
-            self.assertEqual(True, bool(g._city))
+            self.assertTrue(g._country)
+            self.assertTrue(g._city)
 
         # Only passing in the location of one database.
         city = os.path.join(path, 'GeoLiteCity.dat')
         cntry = os.path.join(path, 'GeoIP.dat')
         g4 = GeoIP(city, country='')
-        self.assertEqual(None, g4._country)
+        self.assertIsNone(g4._country)
         g5 = GeoIP(cntry, city='')
-        self.assertEqual(None, g5._city)
+        self.assertIsNone(g5._city)
 
         # Improper parameters.
         bad_params = (23, 'foo', 15.23)

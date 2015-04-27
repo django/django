@@ -478,7 +478,7 @@ class ValidationTest(test.TestCase):
 
     def test_nullable_integerfield_cleans_none_on_null_and_blank_true(self):
         f = models.IntegerField(null=True, blank=True)
-        self.assertEqual(None, f.clean(None, None))
+        self.assertIsNone(f.clean(None, None))
 
     def test_integerfield_raises_error_on_empty_input(self):
         f = models.IntegerField(null=False)
