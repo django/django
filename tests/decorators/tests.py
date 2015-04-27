@@ -317,3 +317,15 @@ class XFrameOptionsDecoratorsTests(TestCase):
         # the middleware's functionality, let's make sure it actually works...
         r = XFrameOptionsMiddleware().process_response(req, resp)
         self.assertEqual(r.get('X-Frame-Options', None), None)
+
+
+class NeverCacheDecoratorTest(TestCase):
+    def test_never_cache_decorator(self):
+        @never_cache
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(
+            set(r['Cache-Control'].split(', ')),
+            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate'},
+        )

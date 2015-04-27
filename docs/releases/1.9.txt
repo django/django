@@ -118,6 +118,10 @@ Cache
 * ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
   method.
 
+* :func:`django.views.decorators.cache.never_cache` now sends more persuasive
+  headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
+  to better prevent caching.
+
 Email
 ^^^^^
 
