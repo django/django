@@ -85,6 +85,7 @@ class Site(models.Model):
     domain = models.CharField(_('domain name'), max_length=100,
         validators=[_simple_domain_name_validator], unique=True)
     name = models.CharField(_('display name'), max_length=50)
+    urlconf = models.CharField(_('URLconf'), max_length=100, blank=True)
     objects = SiteManager()
 
     class Meta:
