@@ -40,3 +40,11 @@ Bugfixes
 
 * Fixed a regression which prevented using a language not in Django's default
   language list (:setting:`LANGUAGES`) (:ticket:`25915`).
+
+* ``django.views.decorators.cache.never_cache()`` now sends more persuasive
+  headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
+  to better prevent caching (:ticket:`13008`). This fixes a problem where a
+  page refresh in Firefox cleared the selected entries in the admin's
+  ``filter_horizontal`` and ``filter_vertical`` widgets, which could result
+  in inadvertent data loss if a user didn't notice that and then submitted the
+  form (:ticket:`22955`).
