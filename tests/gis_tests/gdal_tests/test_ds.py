@@ -109,7 +109,7 @@ class DataSourceTest(unittest.TestCase):
                     #  http://trac.osgeo.org/gdal/ticket/3783
                     pass
                 else:
-                    self.assertEqual(True, isinstance(layer.extent, Envelope))
+                    self.assertIsInstance(layer.extent, Envelope)
                     self.assertAlmostEqual(source.extent[0], layer.extent.min_x, 5)
                     self.assertAlmostEqual(source.extent[1], layer.extent.min_y, 5)
                     self.assertAlmostEqual(source.extent[2], layer.extent.max_x, 5)
@@ -195,7 +195,7 @@ class DataSourceTest(unittest.TestCase):
                     for k, v in source.fields.items():
                         # Making sure we get the proper OGR Field instance, using
                         # a string value index for the feature.
-                        self.assertEqual(True, isinstance(feat[k], v))
+                        self.assertIsInstance(feat[k], v)
 
                     # Testing Feature.__iter__
                     for fld in feat:
