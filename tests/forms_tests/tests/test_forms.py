@@ -775,7 +775,7 @@ class FormsTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
         # Check that update_error_dict didn't lose track of the ErrorDict type.
-        self.assertTrue(isinstance(form._errors, forms.ErrorDict))
+        self.assertIsInstance(form._errors, forms.ErrorDict)
 
         self.assertEqual(dict(form.errors), {
             'code': ['Code error 1.', 'Code error 2.', 'Code error 3.'],
