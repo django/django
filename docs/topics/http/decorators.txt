@@ -97,3 +97,22 @@ caching based on specific request headers.
     into account when building its cache key.
 
     See :ref:`using vary headers <using-vary-headers>`.
+
+.. module:: django.views.decorators.cache
+
+Caching
+=======
+
+The decorators in :mod:`django.views.decorators.cache` control server and
+client-side caching.
+
+.. function:: never_cache(view_func)
+
+    This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
+    must-revalidate`` header to a response to indicate that a page should never
+    be cached.
+
+    .. versionchanged:: 1.9
+
+        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
+        reliably prevent caching in all browsers.

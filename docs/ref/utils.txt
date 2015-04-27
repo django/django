@@ -65,7 +65,13 @@ need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
-    Adds headers to a response to indicate that a page should never be cached.
+    Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
+    header to a response to indicate that a page should never be cached.
+
+    .. versionchanged:: 1.9
+
+        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
+        reliably prevent caching in all browsers.
 
 .. function:: patch_vary_headers(response, newheaders)
 

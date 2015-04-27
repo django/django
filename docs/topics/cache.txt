@@ -1209,7 +1209,7 @@ the value of the :setting:`CACHE_MIDDLEWARE_SECONDS` setting. If you use a custo
 precedence, and the header values will be merged correctly.)
 
 If you want to use headers to disable caching altogether,
-``django.views.decorators.cache.never_cache`` is a view decorator that adds
+:func:`django.views.decorators.cache.never_cache` is a view decorator that adds
 headers to ensure the response won't be cached by browsers or other caches.
 Example::
 
