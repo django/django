@@ -2104,9 +2104,9 @@ class FormsTestCase(TestCase):
         # Empty values for fields will NOT raise a `required` error on an
         # optional `MultiValueField`
         f = PhoneField(required=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
-        self.assertEqual(None, f.clean([]))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
+        self.assertIsNone(f.clean([]))
         self.assertEqual('+61. ext.  (label: )', f.clean(['+61']))
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
@@ -2131,9 +2131,9 @@ class FormsTestCase(TestCase):
         # For an optional `MultiValueField` with `require_all_fields=False`, we
         # don't get any `required` error but we still get `incomplete` errors.
         f = PhoneField(required=False, require_all_fields=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
-        self.assertEqual(None, f.clean([]))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
+        self.assertIsNone(f.clean([]))
         self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(self, ValidationError,

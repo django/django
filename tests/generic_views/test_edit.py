@@ -35,7 +35,7 @@ class FormMixinTests(TestCase):
             request = get_request
 
         default_kwargs = TestFormMixin().get_form_kwargs()
-        self.assertEqual(None, default_kwargs.get('prefix'))
+        self.assertIsNone(default_kwargs.get('prefix'))
 
         set_mixin = TestFormMixin()
         set_mixin.prefix = test_string

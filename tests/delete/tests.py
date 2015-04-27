@@ -37,7 +37,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setnull')
         a.setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setnull)
+        self.assertIsNone(a.setnull)
 
     def test_setdefault(self):
         a = create_a('setdefault')
@@ -49,7 +49,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setdefault_none')
         a.setdefault_none.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setdefault_none)
+        self.assertIsNone(a.setdefault_none)
 
     def test_cascade(self):
         a = create_a('cascade')
@@ -119,7 +119,7 @@ class OnDeleteTests(TestCase):
         self.assertFalse(R.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_setnull_from_parent(self):
         a = create_a('child_setnull')
@@ -127,13 +127,13 @@ class OnDeleteTests(TestCase):
         self.assertFalse(RChild.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_o2o_setnull(self):
         a = create_a('o2o_setnull')
         a.o2o_setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.o2o_setnull)
+        self.assertIsNone(a.o2o_setnull)
 
 
 class DeletionTests(TestCase):
@@ -197,11 +197,11 @@ class DeletionTests(TestCase):
         a.cascade.delete()
 
         for obj in deleted:
-            self.assertEqual(None, obj.pk)
+            self.assertIsNone(obj.pk)
 
         for pk_list in related_setnull_sets:
             for a in A.objects.filter(id__in=pk_list):
-                self.assertEqual(None, a.setnull)
+                self.assertIsNone(a.setnull)
 
         models.signals.pre_delete.disconnect(pre_delete)
 
