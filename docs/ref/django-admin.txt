@@ -310,8 +310,11 @@ flush
 
 .. django-admin:: flush
 
-Removes all data from the database, re-executes any post-synchronization
-handlers, and reinstalls any initial data fixtures.
+Removes all data from the database and re-executes any post-synchronization
+handlers. The table of which migrations have been applied is not cleared.
+
+If you would rather start from an empty database and re-run all migrations, you
+should drop and recreate the database and then run :djadmin:`migrate` instead.
 
 The :djadminopt:`--noinput` option may be provided to suppress all user
 prompts.
