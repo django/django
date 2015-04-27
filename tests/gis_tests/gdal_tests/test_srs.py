@@ -255,4 +255,4 @@ class SpatialRefTest(unittest.TestCase):
         self.assertEqual('WGS_1984', s1['DATUM'])
         self.assertEqual('EPSG', s1['AUTHORITY'])
         self.assertEqual(4326, int(s1['AUTHORITY', 1]))
-        self.assertEqual(None, s1['FOOBAR'])
+        self.assertIsNone(s1['FOOBAR'])

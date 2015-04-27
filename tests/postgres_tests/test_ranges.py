@@ -90,7 +90,7 @@ class TestSaveLoad(TestCase):
         instance = RangesModel(ints=None)
         instance.save()
         loaded = RangesModel.objects.get()
-        self.assertEqual(None, loaded.ints)
+        self.assertIsNone(loaded.ints)
 
 
 @skipUnlessPG92
