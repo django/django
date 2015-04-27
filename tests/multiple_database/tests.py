@@ -536,7 +536,7 @@ class QueryTestCase(TestCase):
         "ForeignKey.validate() uses the correct database"
         mickey = Person.objects.using('other').create(name="Mickey")
         pluto = Pet.objects.using('other').create(name="Pluto", owner=mickey)
-        self.assertEqual(None, pluto.full_clean())
+        self.assertIsNone(pluto.full_clean())
 
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"

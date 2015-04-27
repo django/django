@@ -131,13 +131,13 @@ class TranslationTests(TestCase):
 
         # It should be possible to compare *_lazy objects.
         s1 = ugettext_lazy('Add %(name)s')
-        self.assertEqual(True, s == s1)
+        self.assertEqual(s, s1)
         s2 = gettext_lazy('Add %(name)s')
         s3 = gettext_lazy('Add %(name)s')
-        self.assertEqual(True, s2 == s3)
-        self.assertEqual(True, s == s2)
+        self.assertEqual(s2, s3)
+        self.assertEqual(s, s2)
         s4 = ugettext_lazy('Some other string')
-        self.assertEqual(False, s == s4)
+        self.assertNotEqual(s, s4)
 
     @skipUnless(six.PY2, "No more bytestring translations on PY3")
     def test_lazy_and_bytestrings(self):
@@ -540,7 +540,7 @@ class FormattingTests(TestCase):
                 'time_field': '20:50',
                 'integer_field': '1.234',
             })
-            self.assertEqual(False, form.is_valid())
+            self.assertFalse(form.is_valid())
             self.assertEqual(['Introdu\xefu un n\xfamero.'], form.errors['float_field'])
             self.assertEqual(['Introdu\xefu un n\xfamero.'], form.errors['decimal_field'])
             self.assertEqual(['Introdu\xefu una data v\xe0lida.'], form.errors['date_field'])
@@ -552,7 +552,7 @@ class FormattingTests(TestCase):
                 'date_field_day': '31',
                 'date_field_year': '2009'
             })
-            self.assertEqual(True, form2.is_valid())
+            self.assertTrue(form2.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form2.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
@@ -627,7 +627,7 @@ class FormattingTests(TestCase):
                     'time_field': '20:50',
                     'integer_field': '1.234',
                 })
-                self.assertEqual(True, form3.is_valid())
+                self.assertTrue(form3.is_valid())
                 self.assertEqual(decimal.Decimal('66666.666'), form3.cleaned_data['decimal_field'])
                 self.assertEqual(99999.999, form3.cleaned_data['float_field'])
                 self.assertEqual(datetime.date(2009, 12, 31), form3.cleaned_data['date_field'])
@@ -657,7 +657,7 @@ class FormattingTests(TestCase):
                     'time_field': '20:50',
                     'integer_field': '1234',
                 })
-                self.assertEqual(True, form4.is_valid())
+                self.assertTrue(form4.is_valid())
                 self.assertEqual(decimal.Decimal('66666.666'), form4.cleaned_data['decimal_field'])
                 self.assertEqual(99999.999, form4.cleaned_data['float_field'])
                 self.assertEqual(datetime.date(2009, 12, 31), form4.cleaned_data['date_field'])
@@ -670,7 +670,7 @@ class FormattingTests(TestCase):
                 'date_field_day': '31',
                 'date_field_year': '2009'
             })
-            self.assertEqual(True, form5.is_valid())
+            self.assertTrue(form5.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">gener</option>\n<option value="2">febrer</option>\n<option value="3">mar\xe7</option>\n<option value="4">abril</option>\n<option value="5">maig</option>\n<option value="6">juny</option>\n<option value="7">juliol</option>\n<option value="8">agost</option>\n<option value="9">setembre</option>\n<option value="10">octubre</option>\n<option value="11">novembre</option>\n<option value="12" selected="selected">desembre</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
@@ -729,7 +729,7 @@ class FormattingTests(TestCase):
                 'time_field': '20:50',
                 'integer_field': '1234',
             })
-            self.assertEqual(True, form5.is_valid())
+            self.assertTrue(form5.is_valid())
             self.assertEqual(decimal.Decimal('66666.666'), form5.cleaned_data['decimal_field'])
             self.assertEqual(99999.999, form5.cleaned_data['float_field'])
             self.assertEqual(datetime.date(2009, 12, 31), form5.cleaned_data['date_field'])
@@ -742,7 +742,7 @@ class FormattingTests(TestCase):
                 'date_field_day': '31',
                 'date_field_year': '2009'
             })
-            self.assertEqual(True, form6.is_valid())
+            self.assertTrue(form6.is_valid())
             self.assertEqual(datetime.date(2009, 12, 31), form6.cleaned_data['date_field'])
             self.assertHTMLEqual(
                 '<select name="mydate_month" id="id_mydate_month">\n<option value="0">---</option>\n<option value="1">January</option>\n<option value="2">February</option>\n<option value="3">March</option>\n<option value="4">April</option>\n<option value="5">May</option>\n<option value="6">June</option>\n<option value="7">July</option>\n<option value="8">August</option>\n<option value="9">September</option>\n<option value="10">October</option>\n<option value="11">November</option>\n<option value="12" selected="selected">December</option>\n</select>\n<select name="mydate_day" id="id_mydate_day">\n<option value="0">---</option>\n<option value="1">1</option>\n<option value="2">2</option>\n<option value="3">3</option>\n<option value="4">4</option>\n<option value="5">5</option>\n<option value="6">6</option>\n<option value="7">7</option>\n<option value="8">8</option>\n<option value="9">9</option>\n<option value="10">10</option>\n<option value="11">11</option>\n<option value="12">12</option>\n<option value="13">13</option>\n<option value="14">14</option>\n<option value="15">15</option>\n<option value="16">16</option>\n<option value="17">17</option>\n<option value="18">18</option>\n<option value="19">19</option>\n<option value="20">20</option>\n<option value="21">21</option>\n<option value="22">22</option>\n<option value="23">23</option>\n<option value="24">24</option>\n<option value="25">25</option>\n<option value="26">26</option>\n<option value="27">27</option>\n<option value="28">28</option>\n<option value="29">29</option>\n<option value="30">30</option>\n<option value="31" selected="selected">31</option>\n</select>\n<select name="mydate_year" id="id_mydate_year">\n<option value="0">---</option>\n<option value="2009" selected="selected">2009</option>\n<option value="2010">2010</option>\n<option value="2011">2011</option>\n<option value="2012">2012</option>\n<option value="2013">2013</option>\n<option value="2014">2014</option>\n<option value="2015">2015</option>\n<option value="2016">2016</option>\n<option value="2017">2017</option>\n<option value="2018">2018</option>\n</select>',
@@ -771,7 +771,7 @@ class FormattingTests(TestCase):
                 'cents_paid': decimal.Decimal('59.47'),
                 'products_delivered': 12000,
             })
-            self.assertEqual(True, form6.is_valid())
+            self.assertTrue(form6.is_valid())
             self.assertHTMLEqual(
                 form6.as_ul(),
                 '<li><label for="id_name">Name:</label> <input id="id_name" type="text" name="name" value="acme" maxlength="50" /></li>\n<li><label for="id_date_added">Date added:</label> <input type="text" name="date_added" value="31.12.2009 06:00:00" id="id_date_added" /></li>\n<li><label for="id_cents_paid">Cents paid:</label> <input type="text" name="cents_paid" value="59,47" id="id_cents_paid" /></li>\n<li><label for="id_products_delivered">Products delivered:</label> <input type="text" name="products_delivered" value="12000" id="id_products_delivered" /></li>'

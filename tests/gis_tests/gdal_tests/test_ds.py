@@ -118,7 +118,7 @@ class DataSourceTest(unittest.TestCase):
                 # Now checking the field names.
                 flds = layer.fields
                 for f in flds:
-                    self.assertEqual(True, f in source.fields)
+                    self.assertIn(f, source.fields)
 
                 # Negative FIDs are not allowed.
                 self.assertRaises(OGRIndexError, layer.__getitem__, -1)
@@ -199,7 +199,7 @@ class DataSourceTest(unittest.TestCase):
 
                     # Testing Feature.__iter__
                     for fld in feat:
-                        self.assertEqual(True, fld.name in source.fields.keys())
+                        self.assertIn(fld.name, source.fields.keys())
 
     def test05_geometries(self):
         "Testing Geometries from Data Source Features."
@@ -229,7 +229,7 @@ class DataSourceTest(unittest.TestCase):
         lyr = ds[0]
 
         # When not set, it should be None.
-        self.assertEqual(None, lyr.spatial_filter)
+        self.assertIsNone(lyr.spatial_filter)
 
         # Must be set a/an OGRGeometry or 4-tuple.
         self.assertRaises(TypeError, lyr._set_spatial_filter, 'foo')

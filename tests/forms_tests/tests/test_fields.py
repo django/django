@@ -186,9 +186,9 @@ class FieldsTests(SimpleTestCase):
 
     def test_integerfield_2(self):
         f = IntegerField(required=False)
-        self.assertEqual(None, f.clean(''))
+        self.assertIsNone(f.clean(''))
         self.assertEqual('None', repr(f.clean('')))
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
         self.assertEqual(1, f.clean('1'))
         self.assertIsInstance(f.clean('1'), int)
@@ -301,8 +301,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_floatfield_2(self):
         f = FloatField(required=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
         self.assertEqual(1.0, f.clean('1'))
         self.assertEqual(f.max_value, None)
         self.assertEqual(f.min_value, None)
@@ -379,8 +379,8 @@ class FieldsTests(SimpleTestCase):
 
     def test_decimalfield_2(self):
         f = DecimalField(max_digits=4, decimal_places=2, required=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
         self.assertEqual(f.clean('1'), Decimal("1"))
         self.assertEqual(f.max_digits, 4)
         self.assertEqual(f.decimal_places, 2)
@@ -483,9 +483,9 @@ class FieldsTests(SimpleTestCase):
 
     def test_datefield_2(self):
         f = DateField(required=False)
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
-        self.assertEqual(None, f.clean(''))
+        self.assertIsNone(f.clean(''))
         self.assertEqual('None', repr(f.clean('')))
 
     def test_datefield_3(self):
@@ -604,9 +604,9 @@ class FieldsTests(SimpleTestCase):
 
     def test_datetimefield_3(self):
         f = DateTimeField(required=False)
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(None))
         self.assertEqual('None', repr(f.clean(None)))
-        self.assertEqual(None, f.clean(''))
+        self.assertIsNone(f.clean(''))
         self.assertEqual('None', repr(f.clean('')))
 
     def test_datetimefield_4(self):
@@ -1075,7 +1075,7 @@ class FieldsTests(SimpleTestCase):
 
     def test_typedchoicefield_6(self):
         f = TypedChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
-        self.assertEqual(None, f.clean(''))
+        self.assertIsNone(f.clean(''))
 
     def test_typedchoicefield_has_changed(self):
         # has_changed should not trigger required validation
@@ -1104,15 +1104,15 @@ class FieldsTests(SimpleTestCase):
 
     def test_nullbooleanfield_1(self):
         f = NullBooleanField()
-        self.assertEqual(None, f.clean(''))
+        self.assertIsNone(f.clean(''))
         self.assertEqual(True, f.clean(True))
         self.assertEqual(False, f.clean(False))
-        self.assertEqual(None, f.clean(None))
+        self.assertIsNone(f.clean(None))
         self.assertEqual(False, f.clean('0'))
         self.assertEqual(True, f.clean('1'))
-        self.assertEqual(None, f.clean('2'))
-        self.assertEqual(None, f.clean('3'))
-        self.assertEqual(None, f.clean('hello'))
+        self.assertIsNone(f.clean('2'))
+        self.assertIsNone(f.clean('3'))
+        self.assertIsNone(f.clean('hello'))
         self.assertEqual(True, f.clean('true'))
         self.assertEqual(False, f.clean('false'))
 
@@ -1129,7 +1129,7 @@ class FieldsTests(SimpleTestCase):
             hidden_nullbool1 = NullBooleanField(widget=HiddenInput, initial=True)
             hidden_nullbool2 = NullBooleanField(widget=HiddenInput, initial=False)
         f = HiddenNullBooleanForm({'hidden_nullbool1': 'True', 'hidden_nullbool2': 'False'})
-        self.assertEqual(None, f.full_clean())
+        self.assertIsNone(f.full_clean())
         self.assertEqual(True, f.cleaned_data['hidden_nullbool1'])
         self.assertEqual(False, f.cleaned_data['hidden_nullbool2'])
 
@@ -1143,10 +1143,10 @@ class FieldsTests(SimpleTestCase):
             nullbool1 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
             nullbool2 = NullBooleanField(widget=RadioSelect(choices=NULLBOOL_CHOICES))
         f = MySQLNullBooleanForm({'nullbool0': '1', 'nullbool1': '0', 'nullbool2': ''})
-        self.assertEqual(None, f.full_clean())
+        self.assertIsNone(f.full_clean())
         self.assertEqual(True, f.cleaned_data['nullbool0'])
         self.assertEqual(False, f.cleaned_data['nullbool1'])
-        self.assertEqual(None, f.cleaned_data['nullbool2'])
+        self.assertIsNone(f.cleaned_data['nullbool2'])
 
     def test_nullbooleanfield_changed(self):
         f = NullBooleanField()
@@ -1249,7 +1249,7 @@ class FieldsTests(SimpleTestCase):
     def test_typedmultiplechoicefield_7(self):
         # If you want cleaning an empty value to return a different type, tell the field
         f = TypedMultipleChoiceField(choices=[(1, "+1"), (-1, "-1")], coerce=int, required=False, empty_value=None)
-        self.assertEqual(None, f.clean([]))
+        self.assertIsNone(f.clean([]))
 
     def test_typedmultiplechoicefield_has_changed(self):
         # has_changed should not trigger required validation
@@ -1402,10 +1402,10 @@ class FieldsTests(SimpleTestCase):
         f = SplitDateTimeField(required=False)
         self.assertEqual(datetime.datetime(2006, 1, 10, 7, 30), f.clean([datetime.date(2006, 1, 10), datetime.time(7, 30)]))
         self.assertEqual(datetime.datetime(2006, 1, 10, 7, 30), f.clean(['2006-01-10', '07:30']))
-        self.assertEqual(None, f.clean(None))
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(['']))
-        self.assertEqual(None, f.clean(['', '']))
+        self.assertIsNone(f.clean(None))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(['']))
+        self.assertIsNone(f.clean(['', '']))
         self.assertRaisesMessage(ValidationError, "'Enter a list of values.'", f.clean, 'hello')
         six.assertRaisesRegex(self, ValidationError, "'Enter a valid date\.', u?'Enter a valid time\.'", f.clean, ['hello', 'there'])
         self.assertRaisesMessage(ValidationError, "'Enter a valid time.'", f.clean, ['2006-01-10', 'there'])

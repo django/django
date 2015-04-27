@@ -334,7 +334,7 @@ class EmptyLabelTestCase(TestCase):
 
     def test_get_display_value_on_none(self):
         m = ChoiceModel.objects.create(name='test', choice='', choice_integer=None)
-        self.assertEqual(None, m.choice_integer)
+        self.assertIsNone(m.choice_integer)
         self.assertEqual('No Preference', m.get_choice_integer_display())
 
     def test_html_rendering_of_prepopulated_models(self):
