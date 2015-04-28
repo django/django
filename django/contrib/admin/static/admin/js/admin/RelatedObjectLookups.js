@@ -1,3 +1,4 @@
+/*global SelectBox, interpolate*/
 // Handles related-objects functionality: lookup link for raw_id_fields
 // and Add Another links.
 
@@ -32,7 +33,7 @@ function showAdminPopup(triggeringLink, name_regexp, add_popup) {
     name = id_to_windowname(name);
     var href = triggeringLink.href;
     if (add_popup) {
-        if (href.indexOf('?') == -1) {
+        if (href.indexOf('?') === -1) {
             href += '?_popup=1';
         } else {
             href += '&_popup=1';
@@ -50,7 +51,7 @@ function showRelatedObjectLookupPopup(triggeringLink) {
 function dismissRelatedLookupPopup(win, chosenId) {
     var name = windowname_to_id(win.name);
     var elem = document.getElementById(name);
-    if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
+    if (elem.className.indexOf('vManyToManyRawIdAdminField') !== -1 && elem.value) {
         elem.value += ',' + chosenId;
     } else {
         document.getElementById(name).value = chosenId;
@@ -86,10 +87,10 @@ function dismissAddRelatedObjectPopup(win, newId, newRepr) {
     var elem = document.getElementById(name);
     if (elem) {
         var elemName = elem.nodeName.toUpperCase();
-        if (elemName == 'SELECT') {
+        if (elemName === 'SELECT') {
             elem.options[elem.options.length] = new Option(newRepr, newId, true, true);
-        } else if (elemName == 'INPUT') {
-            if (elem.className.indexOf('vManyToManyRawIdAdminField') != -1 && elem.value) {
+        } else if (elemName === 'INPUT') {
+            if (elem.className.indexOf('vManyToManyRawIdAdminField') !== -1 && elem.value) {
                 elem.value += ',' + newId;
             } else {
                 elem.value = newId;
@@ -113,13 +114,13 @@ function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
     var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
     var selects = django.jQuery(selectsSelector);
     selects.find('option').each(function() {
-        if (this.value == objId) {
+        if (this.value === objId) {
             this.innerHTML = newRepr;
             this.value = newId;
         }
     });
     win.close();
-};
+}
 
 function dismissDeleteRelatedObjectPopup(win, objId) {
     objId = html_unescape(objId);
@@ -127,13 +128,13 @@ function dismissDeleteRelatedObjectPopup(win, objId) {
     var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
     var selects = django.jQuery(selectsSelector);
     selects.find('option').each(function() {
-        if (this.value == objId) {
+        if (this.value === objId) {
             django.jQuery(this).remove();
         }
     }).trigger('change');
     win.close();
-};
+}
 
 // Kept for backward compatibility
-showAddAnotherPopup = showRelatedObjectPopup;
-dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
+var showAddAnotherPopup = showRelatedObjectPopup;
+var dismissAddAnotherPopup = dismissAddRelatedObjectPopup;

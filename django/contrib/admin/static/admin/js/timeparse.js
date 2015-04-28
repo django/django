@@ -2,7 +2,7 @@ var timeParsePatterns = [
     // 9
     {   re: /^\d{1,2}$/i,
         handler: function(bits) {
-            if (bits[0].length == 1) {
+            if (bits[0].length === 1) {
                 return '0' + bits[0] + ':00';
             } else {
                 return bits[0] + ':00';
@@ -25,11 +25,11 @@ var timeParsePatterns = [
     {   re: /^(\d+)\s*([ap])(?:.?m.?)?$/i,
         handler: function(bits) {
             var hour = parseInt(bits[1]);
-            if (hour == 12) {
+            if (hour === 12) {
                 hour = 0;
             }
-            if (bits[2].toLowerCase() == 'p') {
-                if (hour == 12) {
+            if (bits[2].toLowerCase() === 'p') {
+                if (hour === 12) {
                     hour = 0;
                 }
                 return (hour + 12) + ':00';
@@ -50,11 +50,11 @@ var timeParsePatterns = [
             if (mins < 10) {
                 mins = '0' + mins;
             }
-            if (hour == 12) {
+            if (hour === 12) {
                 hour = 0;
             }
-            if (bits[3].toLowerCase() == 'p') {
-                if (hour == 12) {
+            if (bits[3].toLowerCase() === 'p') {
+                if (hour === 12) {
                     hour = 0;
                 }
                 return (hour + 12) + ':' + mins;

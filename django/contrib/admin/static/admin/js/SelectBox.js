@@ -1,9 +1,10 @@
+/*eslint no-cond-assign:1*/
 var SelectBox = {
-    cache: new Object(),
+    cache: {},
     init: function(id) {
         var box = document.getElementById(id);
         var node;
-        SelectBox.cache[id] = new Array();
+        SelectBox.cache[id] = [];
         var cache = SelectBox.cache[id];
         for (var i = 0; (node = box.options[i]); i++) {
             cache.push({value: node.value, text: node.text, displayed: 1});
@@ -31,7 +32,7 @@ var SelectBox = {
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
             node.displayed = 1;
             for (var j = 0; (token = tokens[j]); j++) {
-                if (node.text.toLowerCase().indexOf(token) == -1) {
+                if (node.text.toLowerCase().indexOf(token) === -1) {
                     node.displayed = 0;
                 }
             }
@@ -41,13 +42,13 @@ var SelectBox = {
     delete_from_cache: function(id, value) {
         var node, delete_index = null;
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
-            if (node.value == value) {
+            if (node.value === value) {
                 delete_index = i;
                 break;
             }
         }
         var j = SelectBox.cache[id].length - 1;
-        for (var i = delete_index; i < j; i++) {
+        for (i = delete_index; i < j; i++) {
             SelectBox.cache[id][i] = SelectBox.cache[id][i+1];
         }
         SelectBox.cache[id].length--;
@@ -59,7 +60,7 @@ var SelectBox = {
         // Check if an item is contained in the cache
         var node;
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
-            if (node.value == value) {
+            if (node.value === value) {
                 return true;
             }
         }
@@ -67,7 +68,6 @@ var SelectBox = {
     },
     move: function(from, to) {
         var from_box = document.getElementById(from);
-        var to_box = document.getElementById(to);
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (option.selected && SelectBox.cache_contains(from, option.value)) {
@@ -80,7 +80,6 @@ var SelectBox = {
     },
     move_all: function(from, to) {
         var from_box = document.getElementById(from);
-        var to_box = document.getElementById(to);
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (SelectBox.cache_contains(from, option.value)) {
@@ -111,4 +110,4 @@ var SelectBox = {
             box.options[i].selected = 'selected';
         }
     }
-}
+};

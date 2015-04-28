@@ -1,0 +1,37 @@
+# http://editorconfig.org
+
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line = lf
+charset = utf-8
+
+# Use 2 spaces for the HTML files
+[*.html]
+indent_size = 2
+
+# The JSON files contain newlines inconsistently
+[*.json]
+indent_size = 2
+insert_final_newline = ignore
+
+[**/admin/js/vendor/**]
+indent_style = ignore
+indent_size = ignore
+
+# Minified JavaScript files shouldn't be changed
+[**.min.js]
+indent_style = ignore
+insert_final_newline = ignore
+
+# Makefiles always use tabs for indentation
+[Makefile]
+indent_style = tab
+
+# Batch files use tabs for indentation
+[*.bat]
+indent_style = tab
