@@ -7,7 +7,8 @@ import warnings
 
 from django.core.files.temp import NamedTemporaryFile
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
-from django.test import TestCase
+from django.test import TestCase, mock
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.version import get_version
 
@@ -84,19 +85,16 @@ print(article.headline)"""
         with NamedTemporaryFile(mode='w+', suffix=".py") as script:
             script.write(script_template % pickle.dumps(a))
             script.flush()
-            pythonpath = [os.path.dirname(script.name)] + sys.path
-            env = {
-                # Needed to run test outside of tests directory
-                str('PYTHONPATH'): os.pathsep.join(pythonpath),
-                # Needed on Windows because http://bugs.python.org/issue8557
-                str('PATH'): os.environ['PATH'],
-                str('TMPDIR'): os.environ['TMPDIR'],
-                str('LANG'): os.environ.get('LANG', ''),
-            }
-            if 'SYSTEMROOT' in os.environ:  # Windows http://bugs.python.org/issue20614
-                env[str('SYSTEMROOT')] = os.environ['SYSTEMROOT']
-            try:
-                result = subprocess.check_output([sys.executable, script.name], env=env)
-            except subprocess.CalledProcessError:
-                self.fail("Unable to reload model pickled data")
+            # A path to model_regress must be set in PYTHONPATH
+            model_regress_dir = os.path.dirname(upath(__file__))
+            model_regress_path = os.path.abspath(model_regress_dir)
+            tests_path = os.path.split(model_regress_path)[0]
+            pythonpath = os.environ.get('PYTHONPATH', '')
+            pythonpath = os.pathsep.join([tests_path, pythonpath])
+
+            with mock.patch.dict('os.environ', {'PYTHONPATH': pythonpath}):
+                try:
+                    result = subprocess.check_output([sys.executable, script.name])
+                except subprocess.CalledProcessError:
+                    self.fail("Unable to reload model pickled data")
         self.assertEqual(result.strip().decode(), "Some object")
