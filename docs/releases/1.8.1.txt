@@ -69,7 +69,7 @@ Bugfixes
 * Fixed a migration crash when applying migrations with model managers on
   Python 3 that were generated on Python 2 (:ticket:`24701`).
 
-* Restored the ability to use interators as queryset filter arguments
+* Restored the ability to use iterators as queryset filter arguments
   (:ticket:`24719`).
 
 Optimizations
