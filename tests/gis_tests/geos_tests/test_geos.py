@@ -228,7 +228,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(p.x, pnt.x)
             self.assertEqual(p.y, pnt.y)
             self.assertEqual(pnt, fromstr(p.wkt))
-            self.assertEqual(False, pnt == prev)
+            self.assertEqual(False, pnt == prev)  # Use assertEqual to test __eq__
 
             # Making sure that the point's X, Y components are what we expect
             self.assertAlmostEqual(p.x, pnt.tuple[0], 9)
@@ -306,7 +306,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(l.tup, ls.tuple)
 
             self.assertEqual(ls, fromstr(l.wkt))
-            self.assertEqual(False, ls == prev)
+            self.assertEqual(False, ls == prev)  # Use assertEqual to test __eq__
             self.assertRaises(GEOSIndexError, ls.__getitem__, len(ls))
             prev = ls
 
@@ -331,7 +331,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
 
             self.assertEqual(ml, fromstr(l.wkt))
-            self.assertEqual(False, ml == prev)
+            self.assertEqual(False, ml == prev)  # Use assertEqual to test __eq__
             prev = ml
 
             for ls in ml:
@@ -395,8 +395,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing the geometry equivalence
             self.assertEqual(poly, fromstr(p.wkt))
-            self.assertEqual(False, poly == prev)  # Should not be equal to previous geometry
-            self.assertEqual(True, poly != prev)
+            # Should not be equal to previous geometry
+            self.assertEqual(False, poly == prev)  # Use assertEqual to test __eq__
+            self.assertNotEqual(poly, prev)  # Use assertNotEqual to test __ne__
 
             # Testing the exterior ring
             ring = poly.exterior_ring
