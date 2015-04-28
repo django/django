@@ -86,7 +86,8 @@ class ExtendsBehaviorTests(SimpleTestCase):
 
         cache = engine.template_loaders[0].get_template_cache
         self.assertEqual(len(cache), 3)
-        self.assertTrue(cache['recursive.html'].origin.name.endswith('fs/recursive.html'))
+        expected_path = os.path.join('fs', 'recursive.html')
+        self.assertTrue(cache['recursive.html'].origin.name.endswith(expected_path))
 
         # Render another path that uses the same templates from the cache
         template = engine.get_template('other-recursive.html')
@@ -95,7 +96,8 @@ class ExtendsBehaviorTests(SimpleTestCase):
 
         # Template objects should not be duplicated.
         self.assertEqual(len(cache), 4)
-        self.assertTrue(cache['other-recursive.html'].origin.name.endswith('fs/other-recursive.html'))
+        expected_path = os.path.join('fs', 'other-recursive.html')
+        self.assertTrue(cache['other-recursive.html'].origin.name.endswith(expected_path))
 
     def test_unique_history_per_loader(self):
         """
