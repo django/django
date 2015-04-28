@@ -39,7 +39,7 @@ class CommonMiddlewareTest(TestCase):
         """
         request = self.rf.get('/slash/')
         self.assertEqual(CommonMiddleware().process_request(request), None)
-        response = HttpResponseNotFound
+        response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
     @override_settings(APPEND_SLASH=True)
@@ -162,7 +162,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/customurlconf/slash/')
         request.urlconf = 'middleware.extra_urls'
         self.assertEqual(CommonMiddleware().process_request(request), None)
-        response = HttpResponseNotFound
+        response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
     @override_settings(APPEND_SLASH=True)
@@ -184,7 +184,7 @@ class CommonMiddlewareTest(TestCase):
         request = self.rf.get('/customurlconf/unknown')
         request.urlconf = 'middleware.extra_urls'
         self.assertEqual(CommonMiddleware().process_request(request), None)
-        response = HttpResponseNotFound
+        response = HttpResponseNotFound()
         self.assertEqual(CommonMiddleware().process_response(request, response), response)
 
     @override_settings(APPEND_SLASH=True)
