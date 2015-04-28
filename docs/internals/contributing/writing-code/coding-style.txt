@@ -7,6 +7,11 @@ Please follow these coding standards when writing code for inclusion in Django.
 Python style
 ------------
 
+* Please conform to the indentation style dictated in the ``.editorconfig``
+  file. We recommend using a text editor with `EditorConfig`_ support to avoid
+  indentation and whitespace issues. The Python files use 4 spaces for
+  indentation and the HTML files use 2 spaces.
+
 * Unless otherwise specified, follow :pep:`8`.
 
   Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
@@ -286,4 +291,11 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
+JavaScript style
+----------------
+
+For details about the JavaScript code style used by Django, see
+:doc:`javascript`.
+
+.. _editorconfig: http://editorconfig.org/
 .. _flake8: https://pypi.python.org/pypi/flake8
