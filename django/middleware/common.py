@@ -55,47 +55,68 @@ class CommonMiddleware(object):
                     )
                     return http.HttpResponseForbidden('<h1>Forbidden</h1>')
 
-        # Check for a redirect based on settings.APPEND_SLASH
-        # and settings.PREPEND_WWW
+        # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
-        old_url = [host, request.get_full_path()]
-        new_url = old_url[:]
 
-        if (settings.PREPEND_WWW and old_url[0] and
-                not old_url[0].startswith('www.')):
-            new_url[0] = 'www.' + old_url[0]
+        if (settings.PREPEND_WWW and host and not host.startswith('www.')):
+            newhost = 'www.' + host
 
-        # Append a slash if APPEND_SLASH is set and the URL doesn't have a
-        # trailing slash and there is no pattern for the current path
-        if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
+            # Check if we also need to append a slash so we can do it all
+            # with a single redirect.
+            if self.should_redirect_with_slash(request):
+                newpath = self.full_path_with_slash(request)
+            else:
+                newpath = request.get_full_path()
+
+            newurl = "%s://%s%s" % (request.scheme, newhost, newpath)
+
+            return self.response_redirect_class(newurl)
+
+        return
+
+    def should_redirect_with_slash(self, request):
+        """
+        Returns true if settings.APPEND_SLASH is true and by appending a slash
+        to the request path we can turn an invalid path into a valid path.
+        """
+        if settings.APPEND_SLASH and (not request.get_full_path().endswith('/')):
             urlconf = getattr(request, 'urlconf', None)
-            if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
-                    urlresolvers.is_valid_path("%s/" % request.path_info, urlconf)):
-                new_url[1] = request.get_full_path(force_append_slash=True)
-                if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
-                    raise RuntimeError((""
-                    "You called this URL via %(method)s, but the URL doesn't end "
-                    "in a slash and you have APPEND_SLASH set. Django can't "
-                    "redirect to the slash URL while maintaining %(method)s data. "
-                    "Change your form to point to %(url)s (note the trailing "
-                    "slash), or set APPEND_SLASH=False in your Django "
-                    "settings.") % {'method': request.method, 'url': ''.join(new_url)})
+            if (not urlresolvers.is_valid_path(request.path_info, urlconf)) and \
+               urlresolvers.is_valid_path("%s/" % request.path_info, urlconf):
+                return True
+        return False
 
-        if new_url == old_url:
-            # No redirects required.
-            return
-        if new_url[0] != old_url[0]:
-            newurl = "%s://%s%s" % (
-                request.scheme,
-                new_url[0], new_url[1])
-        else:
-            newurl = new_url[1]
-        return self.response_redirect_class(newurl)
+    def full_path_with_slash(self, request):
+        """
+        Returns the full_path of the request with a trailing slash appended.
+
+        Raises a RuntimeError if settings.DEBUG is true and the
+        request.method is GET, PUT, or PATCH
+        """
+        newpath = request.get_full_path(force_append_slash=True)
+        if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
+            raise RuntimeError((""
+                                "You called this URL via %(method)s, but the URL doesn't end "
+                                "in a slash and you have APPEND_SLASH set. Django can't "
+                                "redirect to the slash URL while maintaining %(method)s data. "
+                                "Change your form to point to %(url)s (note the trailing "
+                                "slash), or set APPEND_SLASH=False in your Django "
+                                "settings.") % {'method': request.method, 'url': request.get_host() + newpath})
+        return newpath
 
     def process_response(self, request, response):
         """
         Calculate the ETag, if needed.
+
+        When the status code of the response is 404 it may redirect to a path
+        with an appended slash if should_redirect_with_slash returns True.
         """
+        # If the givin url is "Not Found" then check if we should redirect
+        # to a path with a slash appended.
+        if response.status_code == 404:
+            if self.should_redirect_with_slash(request):
+                return self.response_redirect_class(self.full_path_with_slash(request))
+
         if settings.USE_ETAGS:
             if response.has_header('ETag'):
                 etag = response['ETag']
