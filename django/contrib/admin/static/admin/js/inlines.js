@@ -107,12 +107,13 @@
           }
           // Also, update names and ids for all remaining form controls
           // so they remain in sequence:
+          var updateElementCallback = function() {
+            updateElementIndex(this, options.prefix, i);
+          };
           for (var i=0, formCount=forms.length; i<formCount; i++)
           {
             updateElementIndex($(forms).get(i), options.prefix, i);
-            $(forms.get(i)).find("*").each(function() {
-              updateElementIndex(this, options.prefix, i);
-            });
+            $(forms.get(i)).find("*").each(updateElementCallback);
           }
         });
         // If a post-add callback was supplied, call it with the added form:

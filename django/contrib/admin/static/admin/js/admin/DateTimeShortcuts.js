@@ -17,7 +17,7 @@ var DateTimeShortcuts = {
     timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
     timezoneOffset: 0,
     init: function() {
-        if (window.__admin_utc_offset__ != undefined) {
+        if (window.__admin_utc_offset__ !== undefined) {
             var serverOffset = window.__admin_utc_offset__;
             var localOffset = new Date().getTimezoneOffset() * -60;
             DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
@@ -38,7 +38,7 @@ var DateTimeShortcuts = {
     },
     // Return the current time while accounting for the server timezone.
     now: function() {
-        if (window.__admin_utc_offset__ != undefined) {
+        if (window.__admin_utc_offset__ !== undefined) {
             var serverOffset = window.__admin_utc_offset__;
             var localNow = new Date();
             var localOffset = localNow.getTimezoneOffset() * -60;
@@ -71,7 +71,7 @@ var DateTimeShortcuts = {
             );
         }
         else {
-            timezoneOffset *= -1
+            timezoneOffset *= -1;
             message = ngettext(
                 'Note: You are %s hour behind server time.',
                 'Note: You are %s hours behind server time.',
@@ -86,7 +86,7 @@ var DateTimeShortcuts = {
 
         $(inp).parent()
             .append($('<br>'))
-            .append($warning)
+            .append($warning);
     },
     // Add clock widget to a given field
     addClock: function(inp) {
@@ -156,8 +156,8 @@ var DateTimeShortcuts = {
         });
     },
     openClock: function(num) {
-        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num)
-        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName+num)
+        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num);
+        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName+num);
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
@@ -187,7 +187,7 @@ var DateTimeShortcuts = {
            d = DateTimeShortcuts.now();
        }
        else {
-           d = new Date(1970, 1, 1, val, 0, 0, 0)
+           d = new Date(1970, 1, 1, val, 0, 0, 0);
        }
        DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
        DateTimeShortcuts.clockInputs[num].focus();
@@ -280,8 +280,8 @@ var DateTimeShortcuts = {
         });
     },
     openCalendar: function(num) {
-        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num)
-        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num)
+        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num);
+        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num);
         var inp = DateTimeShortcuts.calendarInputs[num];
 
         // Determine if the current value in the input has a valid date.
@@ -291,7 +291,7 @@ var DateTimeShortcuts = {
             var selected = inp.value.strptime(format);
             var year = selected.getFullYear();
             var month = selected.getMonth() + 1;
-            var re = /\d{4}/
+            var re = /\d{4}/;
             if (re.test(year.toString()) && month >= 1 && month <= 12) {
                 DateTimeShortcuts.calendars[num].drawDate(month, year, selected);
             }
@@ -344,11 +344,11 @@ var DateTimeShortcuts = {
     },
     handleCalendarQuickLink: function(num, offset) {
        var d = DateTimeShortcuts.now();
-       d.setDate(d.getDate() + offset)
+       d.setDate(d.getDate() + offset);
        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
        DateTimeShortcuts.calendarInputs[num].focus();
        DateTimeShortcuts.dismissCalendar(num);
     }
-}
+};
 
 addEvent(window, 'load', DateTimeShortcuts.init);

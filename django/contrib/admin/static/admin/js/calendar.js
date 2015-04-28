@@ -9,7 +9,7 @@ var CalendarNamespace = {
     daysOfWeek: gettext('S M T W T F S').split(' '),
     firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
     isLeapYear: function(year) {
-        return (((year % 4)==0) && ((year % 100)!=0) || ((year % 400)==0));
+        return (((year % 4)===0) && ((year % 100)!==0) || ((year % 400)===0));
     },
     getDaysInMonth: function(month,year) {
         var days;
@@ -67,17 +67,19 @@ var CalendarNamespace = {
         var startingPos = new Date(year, month-1, 1 - CalendarNamespace.firstDayOfWeek).getDay();
         var days = CalendarNamespace.getDaysInMonth(month, year);
 
+        var _cell;
+
         // Draw blanks before first of month
         tableRow = quickElement('tr', tableBody);
-        for (var i = 0; i < startingPos; i++) {
-            var _cell = quickElement('td', tableRow, ' ');
+        for (i = 0; i < startingPos; i++) {
+            _cell = quickElement('td', tableRow, ' ');
             _cell.className = "nonday";
         }
 
         // Draw days of month
         var currentDay = 1;
-        for (var i = startingPos; currentDay <= days; i++) {
-            if (i%7 == 0 && currentDay != 1) {
+        for (i = startingPos; currentDay <= days; i++) {
+            if (i%7 === 0 && currentDay !== 1) {
                 tableRow = quickElement('tr', tableBody);
             }
             if ((currentDay==todayDay) && (month==todayMonth) && (year==todayYear)) {
@@ -88,7 +90,7 @@ var CalendarNamespace = {
 
             // use UTC function; see above for explanation.
             if (isSelectedMonth && currentDay == selected.getUTCDate()) {
-                if (todayClass != '') todayClass += " ";
+                if (todayClass !== '') todayClass += " ";
                 todayClass += "selected";
             }
 
@@ -100,13 +102,13 @@ var CalendarNamespace = {
 
         // Draw blanks after end of month (optional, but makes for valid code)
         while (tableRow.childNodes.length < 7) {
-            var _cell = quickElement('td', tableRow, ' ');
+            _cell = quickElement('td', tableRow, ' ');
             _cell.className = "nonday";
         }
 
         calDiv.appendChild(calTable);
     }
-}
+};
 
 // Calendar -- A calendar instance
 function Calendar(div_id, callback, selected) {
@@ -166,4 +168,4 @@ Calendar.prototype = {
         this.currentYear++;
         this.drawCurrent();
     }
-}
+};

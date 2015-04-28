@@ -1,0 +1,16 @@
+{
+  "name": "Django",
+  "private": true,
+  "scripts": {
+    "pretest": "jshint --exclude '**/{*.min,jquery}.js' django/contrib/admin/static/admin/js"
+  },
+  "devDependencies": {
+    "jshint": "^2.7.0"
+  },
+  "jshintConfig": {
+    "browser": true,
+    "jquery": true,
+    "scripturl": true,
+    "strict": false
+  }
+}
