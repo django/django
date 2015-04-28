@@ -447,7 +447,7 @@ integer as the ``number`` argument. Then ``number`` will be looked up in the
 dictionary under that key during string interpolation. Here's example::
 
     from django import forms
-    from django.utils.translation import ugettext_lazy
+    from django.utils.translation import ungettext_lazy
 
     class MyForm(forms.Form):
         error_message = ungettext_lazy("You only provided %(num)d argument",
