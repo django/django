@@ -121,10 +121,10 @@ class Field(RegisterLookupMixin):
     # Field flags
     hidden = False
 
-    many_to_many = None
-    many_to_one = None
-    one_to_many = None
-    one_to_one = None
+    many_to_many = False
+    many_to_one = False
+    one_to_many = False
+    one_to_one = False
     related_model = None
 
     # Generic field type description, usually overridden by subclasses
