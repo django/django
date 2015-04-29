@@ -377,6 +377,14 @@ class ClearableFileInput(FileInput):
         """
         Return whether value is considered to be initial value.
         """
+        # hasattr() masks exceptions on Python 2.
+        if six.PY2:
+            try:
+                getattr(value, 'url')
+            except AttributeError:
+                return False
+            else:
+                return bool(value)
         return bool(value and hasattr(value, 'url'))
 
     def get_template_substitution_values(self, value):
