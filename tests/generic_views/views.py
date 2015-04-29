@@ -62,7 +62,7 @@ class BookList(generic.ListView):
 
 
 class CustomPaginator(Paginator):
-    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
+    def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True, *args, **kwargs):
         super(CustomPaginator, self).__init__(
             queryset,
             page_size,
@@ -73,7 +73,7 @@ class CustomPaginator(Paginator):
 class AuthorListCustomPaginator(AuthorList):
     paginate_by = 5
 
-    def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
+    def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True, *args, **kwargs):
         return super(AuthorListCustomPaginator, self).get_paginator(
             queryset,
             page_size,
