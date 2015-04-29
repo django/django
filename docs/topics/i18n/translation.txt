@@ -1021,9 +1021,9 @@ interface within your Python code::
 The ``ngettext`` function provides an interface to pluralize words and
 phrases::
 
-    var object_cnt = 1 // or 0, or 2, or 3, ...
+    var object_count = 1 // or 0, or 2, or 3, ...
     s = ngettext('literal for the singular case',
-            'literal for the plural case', object_cnt);
+            'literal for the plural case', object_count);
 
 ``interpolate``
 ~~~~~~~~~~~~~~~
