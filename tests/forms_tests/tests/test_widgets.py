@@ -1345,6 +1345,25 @@ class ClearableFileInputTests(TestCase):
         self.assertIn('my&lt;div&gt;file', output)
         self.assertNotIn('my<div>file', output)
 
+    def test_html_does_not_mask_exceptions(self):
+        """
+        A ClearableFileInput should not mask exceptions produced while
+        checking that it has a value.
+        """
+        @python_2_unicode_compatible
+        class FailingURLFieldFile(object):
+            def _get_url(self):
+                raise RuntimeError("Something went wrong")
+            url = property(_get_url)
+
+            def __str__(self):
+                return "value"
+
+        widget = ClearableFileInput()
+        field = FailingURLFieldFile()
+        with self.assertRaises(RuntimeError):
+            widget.render('myfile', field)
+
     def test_clear_input_renders_only_if_not_required(self):
         """
         A ClearableFileInput with is_required=False does not render a clear
