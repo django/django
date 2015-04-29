@@ -72,6 +72,9 @@ Bugfixes
 * Restored the ability to use iterators as queryset filter arguments
   (:ticket:`24719`).
 
+* Fixed a migration crash when renaming the target model of a many-to-many
+  relation (:ticket:`24725`).
+
 Optimizations
 =============
 
