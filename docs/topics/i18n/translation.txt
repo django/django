@@ -1774,6 +1774,15 @@ which returns the language used in the current thread,
 for the current thread, and ``django.utils.translation.check_for_language()``
 which checks if the given language is supported by Django.
 
+For your convenience there is a context manager
+``django.utils.translation.override()`` that stores the current language on
+enter and restores it on exit. With it, the above example becomes::
+
+    from django.utils import tranlations
+    def welcome_translated(language):
+        with translation.override(language):
+            return translation.ugettext('welcome')
+
 Language cookie
 ---------------
 
