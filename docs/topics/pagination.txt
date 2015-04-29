@@ -162,7 +162,7 @@ Optional arguments
     ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
 
 ``request``
-    An :class:`HttpRequest` object, used for creating pagination query strings.
+    An ``HttpRequest`` object, used for creating pagination query strings.
 
 ``page_kwarg``
     A string specifying the name to use for the page parameter in the
@@ -275,7 +275,7 @@ Methods
     .. admonition:: Where's my query string?
 
         If the :class:`Page`'s associated :class:`Paginator` was not passed an
-        :class:`HttpRequest` object when it was instantiated, this method will
+        ``HttpRequest`` object when it was instantiated, this method will
         only return the ``page`` parameter. In order to return the whole
         query string the :class:`Paginator` must have been constructed with a
         valid ``request`` argument.
