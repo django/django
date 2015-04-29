@@ -131,7 +131,7 @@ pages along with any interesting information from the objects themselves::
 
 The :class:`Paginator` class has this constructor:
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, request=None)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, request=None, page_kwarg=None)
 
 Required arguments
 ------------------
@@ -163,6 +163,10 @@ Optional arguments
 
 ``request``
     An :class:`HttpRequest` object, used for creating pagination query strings.
+
+``page_kwarg``
+    A string specifying the name to use for the page parameter in the
+    pagination query strings.
 
 Methods
 -------
@@ -266,8 +270,7 @@ Methods
     for there to be other parameters in the query string that need to remain
     intact on the the next page e.g, paginated search results.
 
-    Note that this is "dumb" and will return the next query string regardless
-    of whether a subsequent page exists.
+    Raises :exc:`InvalidPage` if next page doesn't exist.
 
     .. admonition:: Where's my query string?
 
@@ -279,10 +282,11 @@ Methods
 
 .. method:: Page.previous_page_querystring()
 
-    Returns the query string for the previous page. See :meth:`~Page.next_page_querystring`.
+    Returns the query string for the previous page.
 
-    Note that this is "dumb" and will return the previous query string
-    regardless of whether a previous page exists.
+    Raises :exc:`InvalidPage` if previous page doesn't exist.
+
+    See :meth:`~Page.next_page_querystring`.
 
 .. method:: Page.start_index()
 
