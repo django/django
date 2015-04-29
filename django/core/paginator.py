@@ -17,13 +17,14 @@ class EmptyPage(InvalidPage):
 
 
 class Paginator(object):
-    def __init__(self, object_list, per_page, orphans=0, 
-                 allow_empty_first_page=True, request=None):
+    def __init__(self, object_list, per_page, orphans=0,
+                 allow_empty_first_page=True, request=None, page_kwarg=None):
         self.object_list = object_list
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
         self.request = request
+        self.page_kwarg = page_kwarg or 'page'
         self._num_pages = self._count = None
 
     def validate_number(self, number):
