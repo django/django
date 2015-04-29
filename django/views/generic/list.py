@@ -63,8 +63,13 @@ class MultipleObjectMixin(ContextMixin):
         Paginate the queryset, if needed.
         """
         paginator = self.get_paginator(
-            queryset, page_size, orphans=self.get_paginate_orphans(),
-            allow_empty_first_page=self.get_allow_empty())
+            queryset,
+            page_size,
+            orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty(),
+            request=self.request,
+            page_kwarg=self.page_kwarg
+        )
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1
         try:
@@ -89,14 +94,11 @@ class MultipleObjectMixin(ContextMixin):
         """
         return self.paginate_by
 
-    def get_paginator(self, queryset, per_page, orphans=0,
-                      allow_empty_first_page=True, **kwargs):
+    def get_paginator(self, *args, **kwargs):
         """
         Return an instance of the paginator for this view.
         """
-        return self.paginator_class(
-            queryset, per_page, orphans=orphans,
-            allow_empty_first_page=allow_empty_first_page, **kwargs)
+        return self.paginator_class(*args, **kwargs)
 
     def get_paginate_orphans(self):
         """
