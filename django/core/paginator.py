@@ -17,13 +17,13 @@ class EmptyPage(InvalidPage):
 
 
 class Paginator(object):
-
-    def __init__(self, object_list, per_page, orphans=0,
-                 allow_empty_first_page=True):
+    def __init__(self, object_list, per_page, orphans=0, 
+                 allow_empty_first_page=True, request=None):
         self.object_list = object_list
         self.per_page = int(per_page)
         self.orphans = int(orphans)
         self.allow_empty_first_page = allow_empty_first_page
+        self.request = request
         self._num_pages = self._count = None
 
     def validate_number(self, number):
@@ -139,6 +139,25 @@ class Page(collections.Sequence):
 
     def previous_page_number(self):
         return self.paginator.validate_number(self.number - 1)
+
+    def _other_page_querystring(self, page_number):
+        """
+        Returns a query string for the given page, preserving any
+        GET parameters present.
+        """
+        try:
+            querydict = self.paginator.request.GET.copy()
+            querydict['page'] = page_number
+            querystring = querydict.urlencode()
+        except AttributeError:
+            querystring = 'page=%s' % page_number
+        return querystring
+
+    def next_page_querystring(self):
+        return self._other_page_querystring(self.next_page_number())
+
+    def previous_page_querystring(self):
+        return self._other_page_querystring(self.previous_page_number())
 
     def start_index(self):
         """

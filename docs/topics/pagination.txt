@@ -131,7 +131,7 @@ pages along with any interesting information from the objects themselves::
 
 The :class:`Paginator` class has this constructor:
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, request=None)
 
 Required arguments
 ------------------
@@ -160,6 +160,9 @@ Optional arguments
 ``allow_empty_first_page``
     Whether or not the first page is allowed to be empty.  If ``False`` and
     ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
+
+``request``
+    An :class:`HttpRequest` object, used for creating pagination query strings.
 
 Methods
 -------
@@ -255,6 +258,31 @@ Methods
 
     Returns the previous page number. Raises :exc:`InvalidPage` if previous
     page doesn't exist.
+
+.. method:: Page.next_page_querystring()
+
+    Returns the query string for the next page. This is useful when pagination
+    is handled with a query string (as opposed to a URL pattern). It is common
+    for there to be other parameters in the query string that need to remain
+    intact on the the next page e.g, paginated search results.
+
+    Note that this is "dumb" and will return the next query string regardless
+    of whether a subsequent page exists.
+
+    .. admonition:: Where's my query string?
+
+        If the :class:`Page`'s associated :class:`Paginator` was not passed an
+        :class:`HttpRequest` object when it was instantiated, this method will
+        only return the ``page`` parameter. In order to return the whole
+        query string the :class:`Paginator` must have been constructed with a
+        valid ``request`` argument.
+
+.. method:: Page.previous_page_querystring()
+
+    Returns the query string for the previous page. See :meth:`~Page.next_page_querystring`.
+
+    Note that this is "dumb" and will return the previous query string
+    regardless of whether a previous page exists.
 
 .. method:: Page.start_index()
 
