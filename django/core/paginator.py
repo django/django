@@ -1,6 +1,7 @@
 import collections
 from math import ceil
 
+from django.http import QueryDict
 from django.utils import six
 
 
@@ -54,6 +55,15 @@ class Paginator(object):
         if top + self.orphans >= self.count:
             top = self.count
         return self._get_page(self.object_list[bottom:top], number, self)
+
+    def page_querystring(self, page_number):
+        """
+        Returns a query string for the given page number, preserving any
+        GET parameters present.
+        """
+        params = self.request.GET.copy() if self.request else QueryDict('')
+        params[self.page_kwarg] = page_number
+        return params.urlencode()
 
     def _get_page(self, *args, **kwargs):
         """
@@ -141,24 +151,11 @@ class Page(collections.Sequence):
     def previous_page_number(self):
         return self.paginator.validate_number(self.number - 1)
 
-    def _other_page_querystring(self, page_number):
-        """
-        Returns a query string for the given page, preserving any
-        GET parameters present.
-        """
-        try:
-            querydict = self.paginator.request.GET.copy()
-            querydict['page'] = page_number
-            querystring = querydict.urlencode()
-        except AttributeError:
-            querystring = 'page=%s' % page_number
-        return querystring
-
     def next_page_querystring(self):
-        return self._other_page_querystring(self.next_page_number())
+        return self.paginator.page_querystring(self.next_page_number())
 
     def previous_page_querystring(self):
-        return self._other_page_querystring(self.previous_page_number())
+        return self.paginator.page_querystring(self.previous_page_number())
 
     def start_index(self):
         """
