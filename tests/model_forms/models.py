@@ -453,3 +453,24 @@ class Photo(models.Model):
 class UUIDPK(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30)
+
+
+# Models for #24706
+class StrictAssignmentFieldSpecific(models.Model):
+    title = models.CharField(max_length=30)
+    _should_error = False
+
+    def __setattr__(self, key, value):
+        if self._should_error is True:
+            raise ValidationError(message={key: "Cannot set attribute"}, code='invalid')
+        super(StrictAssignmentFieldSpecific, self).__setattr__(key, value)
+
+
+class StrictAssignmentAll(models.Model):
+    title = models.CharField(max_length=30)
+    _should_error = False
+
+    def __setattr__(self, key, value):
+        if self._should_error is True:
+            raise ValidationError(message="Cannot set attribute", code='invalid')
+        super(StrictAssignmentAll, self).__setattr__(key, value)
