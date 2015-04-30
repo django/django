@@ -7,7 +7,7 @@ Cross Site Request Forgery protection
 
 The CSRF middleware and template tag provides easy-to-use protection against
 `Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
-Web site contains a link, a form button or some javascript that is intended to
+Web site contains a link, a form button or some JavaScript that is intended to
 perform some action on your Web site, using the credentials of a logged-in user
 who visits the malicious site in their browser.  A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
@@ -80,7 +80,7 @@ While the above method can be used for AJAX POST requests, it has some
 inconveniences: you have to remember to pass the CSRF token in as POST data with
 every POST request. For this reason, there is an alternative method: on each
 XMLHttpRequest, set a custom ``X-CSRFToken`` header to the value of the CSRF
-token. This is often easier, because many javascript frameworks provide hooks
+token. This is often easier, because many JavaScript frameworks provide hooks
 that allow headers to be set on every request.
 
 As a first step, you must get the CSRF token itself. The recommended source for
