@@ -8,7 +8,7 @@ import warnings
 from django.core.files.temp import NamedTemporaryFile
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.test import TestCase, mock
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.encoding import force_text
 from django.utils.version import get_version
 
@@ -90,7 +90,7 @@ print(article.headline)"""
             model_regress_path = os.path.abspath(model_regress_dir)
             tests_path = os.path.split(model_regress_path)[0]
             pythonpath = os.environ.get('PYTHONPATH', '')
-            pythonpath = os.pathsep.join([tests_path, pythonpath])
+            pythonpath = npath(os.pathsep.join([tests_path, pythonpath]))
 
             with mock.patch.dict('os.environ', {'PYTHONPATH': pythonpath}):
                 try:
