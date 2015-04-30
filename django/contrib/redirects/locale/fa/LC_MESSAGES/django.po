@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-12 14:20+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Redirects"
-msgstr ""
+msgstr "باز-ارسال‌ها"
 
 msgid "redirect from"
 msgstr "فرم ارسال به نشانی جدید"

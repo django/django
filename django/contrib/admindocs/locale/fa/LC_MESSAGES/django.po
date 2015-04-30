@@ -2,6 +2,7 @@
 #
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2011-2012
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-11 14:08+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "Administrative Documentation"
-msgstr ""
+msgstr "مستندات مدیریت"
 
 msgid "Home"
 msgstr "آغازه"
@@ -85,10 +86,10 @@ msgid "As above, but opens the admin page in a new window."
 msgstr "مانند بالا، اما صفحهٔ مدیر را در پنجرهٔ جدیدی باز می‌کند."
 
 msgid "Tags"
-msgstr "تگ ها"
+msgstr "برچسب‌ها"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "لیست همه برچسب‌های قالب‌ها و توابعشان"
 
 msgid "Filters"
 msgstr "فیلترها"
@@ -135,7 +136,7 @@ msgstr ""
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "مدل: %(name)s"
 
 msgid "Field"
 msgstr "فیلد"
@@ -147,7 +148,7 @@ msgid "Description"
 msgstr "توضیحات"
 
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "برگشت به مستندات مدل"
 
 msgid "Model documentation"
 msgstr "مستندات مدل"
@@ -177,7 +178,7 @@ msgid "Back to Documentation"
 msgstr "برگشت به مستندات"
 
 msgid "Template filters"
-msgstr ""
+msgstr "فیلترهای قالب"
 
 msgid "Template filter documentation"
 msgstr ""
@@ -192,13 +193,13 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr ""
+msgstr "برچسب‌های قالب"
 
 msgid "Template tag documentation"
-msgstr ""
+msgstr "مستندات برچسب قالب"
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "برچسب‌های از اول موجود"
 
 #, python-format
 msgid ""

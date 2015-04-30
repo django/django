@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
@@ -13,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-11 14:04+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -276,7 +277,7 @@ msgid "Traditional Chinese"
 msgstr "چینی سنتی"
 
 msgid "Messages"
-msgstr ""
+msgstr "پیغام‌ها"
 
 msgid "Site Maps"
 msgstr "نقشه‌های وب‌گاه"
@@ -532,7 +533,7 @@ msgstr "دادهٔ دودویی خام"
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' یک UUID معتبر نیست."
 
 msgid "File"
 msgstr "پرونده"
@@ -628,7 +629,7 @@ msgid "Enter a complete value."
 msgstr "یک مقدار کامل وارد کنید."
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "یک UUID معتبر وارد کنید."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"

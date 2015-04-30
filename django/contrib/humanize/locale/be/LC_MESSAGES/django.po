@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-04 16:27+0000\n"
+"PO-Revision-Date: 2015-04-07 19:36+0000\n"
 "Last-Translator: Viktar Palstsiuk <vipals@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
@@ -19,19 +19,19 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Humanize"
-msgstr ""
+msgstr "Ачалавечваньне"
 
 msgid "th"
-msgstr "ы"
+msgstr "-ы"
 
 msgid "st"
-msgstr "ы"
+msgstr "-ы"
 
 msgid "nd"
-msgstr "і"
+msgstr "-і"
 
 msgid "rd"
-msgstr "і"
+msgstr "-і"
 
 #, python-format
 msgid "%(value).1f million"
@@ -258,30 +258,30 @@ msgstr "зараз"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(count)s сэкунду таму"
+msgstr[1] "%(count)s сэкунды таму"
+msgstr[2] "%(count)s сэкундаў таму"
+msgstr[3] "%(count)s сэкундаў таму"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(count)s хвіліну таму"
+msgstr[1] "%(count)s хвіліны таму"
+msgstr[2] "%(count)s хвілінаў таму"
+msgstr[3] "%(count)s хвілінаў таму"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(count)s гадзіну таму"
+msgstr[1] "%(count)s гадзіны таму"
+msgstr[2] "%(count)s гадзінаў таму"
+msgstr[3] "%(count)s гадзінаў таму"
 
 #, python-format
 msgctxt "naturaltime"
@@ -293,27 +293,27 @@ msgstr "праз %(delta)s"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "праз %(count)s сэкунду"
+msgstr[1] "праз %(count)s сэкунды"
+msgstr[2] "праз %(count)s сэкундаў"
+msgstr[3] "праз %(count)s сэкундаў"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "праз %(count)s хвіліну"
+msgstr[1] "праз %(count)s хвіліны"
+msgstr[2] "праз %(count)s хвілінаў"
+msgstr[3] "праз %(count)s хвілінаў"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "праз %(count)s гадзіну"
+msgstr[1] "праз %(count)s гадзіны"
+msgstr[2] "праз %(count)s гадзінаў"
+msgstr[3] "праз %(count)s гадзінаў"

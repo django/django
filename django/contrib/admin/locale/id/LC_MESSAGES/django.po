@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-24 15:38+0000\n"
-"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"PO-Revision-Date: 2015-04-04 15:40+0000\n"
+"Last-Translator: Sutrisno Efendi <kangfend@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -120,6 +120,7 @@ msgstr "None"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Tekan \"Control\", atau \"Command\" pada Mac, untuk memilih lebih dari satu."
 
 #, python-format
 msgid "Changed %s."
@@ -501,7 +502,7 @@ msgstr "Simpan"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Ubah %(model)s yang dipilih"
 
 #, python-format
 msgid "Add another %(model)s"

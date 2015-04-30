@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
@@ -9,8 +10,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-12 12:11+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +118,8 @@ msgstr "هیچ"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"برای انتخاب بیش از یکی \"Control\"، یا \"Command\" روی Mac، را پایین نگه "
+"دارید."
 
 #, python-format
 msgid "Changed %s."
@@ -323,7 +326,7 @@ msgid "Welcome,"
 msgstr "خوش آمدید،"
 
 msgid "View site"
-msgstr ""
+msgstr "نمایش وبگاه"
 
 msgid "Documentation"
 msgstr "مستندات"
@@ -386,13 +389,13 @@ msgstr ""
 "کلیهٔ اشیای مرتبط زیر حذف خواهند شد:"
 
 msgid "Objects"
-msgstr ""
+msgstr "اشیاء"
 
 msgid "Yes, I'm sure"
 msgstr "بله، مطمئن هستم."
 
 msgid "No, take me back"
-msgstr ""
+msgstr "نه، من را برگردان"
 
 msgid "Delete multiple objects"
 msgstr "حذف اشیاء متعدد"
@@ -440,7 +443,7 @@ msgid " By %(filter_title)s "
 msgstr "براساس %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "خلاصه"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -497,15 +500,15 @@ msgstr "ذخیره"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "تغییر دادن %(model)s انتخاب شده"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "افزدون %(model)s دیگر"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "حذف کردن %(model)s انتخاب شده"
 
 msgid "Search"
 msgstr "جستجو"
@@ -583,6 +586,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"دستورالعمل تنظیم گذرواژه را برایتان ایمیل کردیم. اگر با ایمیلی که وارد کردید "
+"اکانتی وجود داشت باشد باید به زودی این دستورالعمل‌ها  را دریافت کنید."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
