@@ -857,7 +857,7 @@ Miscellaneous
   :meth:`~django.db.models.query.QuerySet.none` has been called:
   ``isinstance(qs.none(), EmptyQuerySet)``
 
-* If your CSS/Javascript code used to access HTML input widgets by type, you
+* If your CSS/JavaScript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as
   ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
   corresponding field type.

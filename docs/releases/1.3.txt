@@ -101,7 +101,7 @@ Extended static files handling
 
 Django 1.3 ships with a new contrib app --
 ``django.contrib.staticfiles`` -- to help developers handle the static
-media files (images, CSS, Javascript, etc.) that are needed to render
+media files (images, CSS, JavaScript, etc.) that are needed to render
 a complete web page.
 
 In previous versions of Django, it was common to place static assets
@@ -589,7 +589,7 @@ gettext domain):
   translations). See the `corresponding deprecated features section`_
   of this document.
 
-For translatable literals found in Javascript code (``'djangojs'`` gettext
+For translatable literals found in JavaScript code (``'djangojs'`` gettext
 domain):
 
 * Similarly to the ``'django'`` domain translations: Overriding of

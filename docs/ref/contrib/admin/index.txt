@@ -1872,7 +1872,7 @@ definitions on forms <form-asset-paths>`.
 jQuery
 ~~~~~~
 
-Django admin Javascript makes use of the `jQuery`_ library.
+Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 1.11.2) is namespaced as ``django.jQuery``. If you want to use jQuery
@@ -2725,7 +2725,7 @@ Index                      ``index``
 Logout                     ``logout``
 Password change            ``password_change``
 Password change done       ``password_change_done``
-i18n javascript            ``jsi18n``
+i18n JavaScript            ``jsi18n``
 Application index page     ``app_list``              ``app_label``
 Redirect to object's page  ``view_on_site``          ``content_type_id``, ``object_id``
 =========================  ========================  ==================================
