@@ -141,6 +141,8 @@ class DatabaseCache(BaseDatabaseCache):
                         cursor.execute("INSERT INTO %s (cache_key, value, expires) "
                                        "VALUES (%%s, %%s, %%s)" % table,
                                        [key, b64encoded, exp])
+                    else:
+                        return False
             except DatabaseError:
                 # To be threadsafe, updates/inserts are allowed to fail silently
                 return False
