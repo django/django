@@ -137,7 +137,7 @@ class DatabaseCache(BaseDatabaseCache):
                         cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
                                        "WHERE cache_key = %%s" % table,
                                        [b64encoded, exp, key])
-                    else:
+                    elif not result:
                         cursor.execute("INSERT INTO %s (cache_key, value, expires) "
                                        "VALUES (%%s, %%s, %%s)" % table,
                                        [key, b64encoded, exp])
