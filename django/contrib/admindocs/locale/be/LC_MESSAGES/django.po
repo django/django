@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Viktar Palstsiuk <vipals@gmail.com>, 2014
+# Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-08 13:16+0000\n"
+"Last-Translator: Viktar Palstsiuk <vipals@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgid "Tags"
 msgstr "Цэтлікі"
 
 msgid "List of all the template tags and their functions."
-msgstr ""
+msgstr "Спіс усіх тэгаў шаблонаў і іх функцый."
 
 msgid "Filters"
 msgstr "Сіты"
@@ -117,7 +117,7 @@ msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 
 msgid "Please install docutils"
-msgstr ""
+msgstr "Калі ласка, усталюйце Docutils"
 
 #, python-format
 msgid ""
@@ -132,7 +132,7 @@ msgstr ""
 
 #, python-format
 msgid "Model: %(name)s"
-msgstr ""
+msgstr "Мадэль: %(name)s"
 
 msgid "Field"
 msgstr "Поле"
@@ -144,24 +144,24 @@ msgid "Description"
 msgstr "Апісаньне"
 
 msgid "Back to Model Documentation"
-msgstr ""
+msgstr "Вярнуцца да дакументацыі мадэлі"
 
 msgid "Model documentation"
-msgstr ""
+msgstr "Дакументацыя мадэлі"
 
 msgid "Model groups"
-msgstr ""
+msgstr "Групы мадэлі"
 
 msgid "Templates"
 msgstr "Шаблёны"
 
 #, python-format
 msgid "Template: %(name)s"
-msgstr ""
+msgstr "Шаблон: %(name)s"
 
 #, python-format
 msgid "Template: \"%(name)s\""
-msgstr ""
+msgstr "Шаблон: \"%(name)s\""
 
 #, python-format
 msgid "Search path for template \"%(name)s\":"
@@ -171,16 +171,16 @@ msgid "(does not exist)"
 msgstr "(не існуе)"
 
 msgid "Back to Documentation"
-msgstr ""
+msgstr "Вярнуцца да дакументацыі"
 
 msgid "Template filters"
-msgstr ""
+msgstr "Фільтры шаблону"
 
 msgid "Template filter documentation"
 msgstr ""
 
 msgid "Built-in filters"
-msgstr ""
+msgstr "Убудаваныя фільтры"
 
 #, python-format
 msgid ""
@@ -189,13 +189,13 @@ msgid ""
 msgstr ""
 
 msgid "Template tags"
-msgstr ""
+msgstr "Тэгі шаблону"
 
 msgid "Template tag documentation"
 msgstr ""
 
 msgid "Built-in tags"
-msgstr ""
+msgstr "Убудаваныя тэгі"
 
 #, python-format
 msgid ""
@@ -208,22 +208,22 @@ msgid "View: %(name)s"
 msgstr ""
 
 msgid "Context:"
-msgstr ""
+msgstr "Кантэкст:"
 
 msgid "Templates:"
-msgstr ""
+msgstr "Шаблоны:"
 
 msgid "Back to Views Documentation"
 msgstr ""
 
 msgid "View documentation"
-msgstr ""
+msgstr "Паглядзець дакументацыю"
 
 msgid "Jump to namespace"
-msgstr ""
+msgstr "Перайсці да прасторы імёнаў"
 
 msgid "Empty namespace"
-msgstr ""
+msgstr "Ачысціць прастору імёнаў"
 
 #, python-format
 msgid "Views by namespace %(name)s"

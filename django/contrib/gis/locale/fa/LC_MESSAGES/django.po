@@ -3,6 +3,7 @@
 # Translators:
 # Ali Nikneshan <ali@nikneshan.com>, 2012-2013
 # Alireza Savand <alireza.savand@gmail.com>, 2013
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Saeed <sd.javadi@gmail.com>, 2011
 msgid ""
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-12 14:18+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "جی‌آی‌اس"
 
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "فیلد  GIS  پایه -- نقشه‌ها برای مشخصه‌های هندسی OpenGIS"

@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Viktar Palstsiuk <vipals@gmail.com>, 2014
+# Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-08 12:56+0000\n"
+"Last-Translator: Viktar Palstsiuk <vipals@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -65,13 +65,13 @@ msgid ""
 msgstr "Не ўдалося ператварыць ґеамэтрыю ў SRID."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Выдаліць усе аб’екты"
 
 msgid "WKT debugging window:"
 msgstr ""
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Мапы Google праз GeoDjango"
 
 msgid "Debugging window (serialized value)"
 msgstr ""
