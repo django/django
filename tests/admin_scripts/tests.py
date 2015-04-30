@@ -2037,3 +2037,12 @@ class Dumpdata(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(err, "You can only use --pks option with one model")
         self.assertNoOutput(out)
+
+
+class MainModule(AdminScriptTestCase):
+    """python -m django works like django-admin."""
+
+    def test_runs_django_admin(self):
+        cmd_out, _ = self.run_django_admin(['--version'])
+        mod_out, _ = self.run_test('-m', ['django', '--version'])
+        self.assertEqual(mod_out, cmd_out)
