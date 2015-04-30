@@ -415,6 +415,9 @@ Management Commands
   to the database using the password from your settings file (instead of
   requiring it to be manually entered).
 
+* The ``django`` package may be run as a script, i.e. ``python -m django``,
+  which will behave the same as ``django-admin``.
+
 Migrations
 ^^^^^^^^^^
 
