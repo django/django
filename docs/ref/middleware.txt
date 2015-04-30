@@ -252,7 +252,7 @@ sites with improperly configured servers, it can also pose a security
 risk.
 
 If your site serves user-uploaded files, a malicious user could upload a
-specially-crafted file that would be interpreted as HTML or Javascript by
+specially-crafted file that would be interpreted as HTML or JavaScript by
 the browser when you expected it to be something harmless.
 
 To learn more about this header and how the browser treats it, you can
@@ -280,8 +280,8 @@ setting will be useful.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for Javascript content in the GET or POST
-parameters of a page. If the Javascript is replayed in the server's response,
+attack`_. They work by looking for JavaScript content in the GET or POST
+parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
 The `X-XSS-Protection header`_ is used to control the operation of the

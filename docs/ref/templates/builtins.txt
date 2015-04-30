@@ -1146,7 +1146,7 @@ verbatim
 
 Stops the template engine from rendering the contents of this block tag.
 
-A common use is to allow a Javascript template layer that collides with
+A common use is to allow a JavaScript template layer that collides with
 Django's syntax. For example::
 
     {% verbatim %}
