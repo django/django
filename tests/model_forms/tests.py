@@ -29,8 +29,8 @@ from .models import (
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
     FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
     Inventory, Person, Photo, Post, Price, Product, Publication,
-    PublicationDefaults, Student, StumpJoke, TextFile, Triple, Writer,
-    WriterProfile, test_images,
+    PublicationDefaults, StrictAssignmentAll, StrictAssignmentFieldSpecific,
+    Student, StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
 )
 
 if test_images:
@@ -2635,3 +2635,46 @@ class CustomMetaclassTestCase(SimpleTestCase):
     def test_modelform_factory_metaclass(self):
         new_cls = modelform_factory(Person, fields="__all__", form=CustomMetaclassForm)
         self.assertEqual(new_cls.base_fields, {})
+
+
+class StrictAssignmentTests(TestCase):
+    """
+    Tests for ticket #24706
+
+    Should a Model do anything special with __setattr__ or descriptors which
+    could raise a ValidationError, testing the validation state of the
+    form should not cause an uncaught exception.
+    """
+
+    def test_setattr_raises_validation_error_field_specific(self):
+        """
+        A model ValidationError using the dict form should put the error message
+        into the correct key of form.errors
+        """
+        form_class = modelform_factory(model=StrictAssignmentFieldSpecific,
+                                       fields=['title'])
+        form = form_class(data={'title': 'testing setattr'}, files=None)
+        # this line turns on the ValidationError; this avoids the model
+        # erroring when it's own __init__ is called when creating form.instance
+        form.instance._should_error = True
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {
+            'title': ['Cannot set attribute', 'This field cannot be blank.']
+        })
+
+    def test_setattr_raises_validation_error_non_field(self):
+        """
+        A model ValidationError not using the dict form should put the error message
+        into __all__ (ie: non-field errors) on the form
+        """
+        form_class = modelform_factory(model=StrictAssignmentAll,
+                                       fields=['title'])
+        form = form_class(data={'title': 'testing setattr'}, files=None)
+        # this line turns on the ValidationError; this avoids the model
+        # erroring when it's own __init__ is called when creating form.instance
+        form.instance._should_error = True
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {
+            '__all__': ['Cannot set attribute'],
+            'title': ['This field cannot be blank.']
+        })
