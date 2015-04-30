@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-04-08 12:49+0000\n"
+"Last-Translator: Viktar Palstsiuk <vipals@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -114,6 +114,8 @@ msgstr "Няма"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Утрымлівайце націснутай кнопку \"Control\", або \"Command\" на Mac, каб "
+"вылучыць больш за адзін."
 
 #, python-format
 msgid "Changed %s."
@@ -271,6 +273,9 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Адбылася памылка. Паведамленне пра памылку было адаслана адміністратарам "
+"сайту па электроннай пошце і яна павінна быць выпраўлена ў бліжэйшы час. "
+"Дзякуй за ваша цярпенне."
 
 msgid "Run the selected action"
 msgstr "Выканаць абранае дзеяньне"
@@ -315,7 +320,7 @@ msgid "Welcome,"
 msgstr "Вітаем,"
 
 msgid "View site"
-msgstr ""
+msgstr "Адкрыць сайт"
 
 msgid "Documentation"
 msgstr "Дакумэнтацыя"
@@ -378,13 +383,13 @@ msgstr ""
 "складнікі выдаляцца:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Аб'екты"
 
 msgid "Yes, I'm sure"
 msgstr "Так, дакладна"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Не, вярнуцца назад"
 
 msgid "Delete multiple objects"
 msgstr "Выдаліць некалькі аб’ектаў"
@@ -432,7 +437,7 @@ msgid " By %(filter_title)s "
 msgstr " %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Рэзюмэ"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -488,15 +493,15 @@ msgstr "Захаваць"
 
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Змяніць абраныя %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Дадаць яшчэ %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Выдаліць абраныя %(model)s"
 
 msgid "Search"
 msgstr "Шукаць"
@@ -575,6 +580,9 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Мы адаслалі па электроннай пошце інструкцыі па ўстаноўцы пароля. Калі існуе "
+"рахунак з электроннай поштай, што вы ўвялі, то Вы павінны атрымаць іх у "
+"бліжэйшы час."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -588,6 +596,8 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
+"Вы атрымалі гэты ліст, таму што вы прасілі скінуць пароль для ўліковага "
+"запісу карыстальніка на %(site_name)s."
 
 msgid "Please go to the following page and choose a new password:"
 msgstr "Перайдзіце да наступнае бачыны ды абярыце новы пароль:"

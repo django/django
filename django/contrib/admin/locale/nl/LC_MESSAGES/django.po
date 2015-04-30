@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-20 22:29+0000\n"
+"PO-Revision-Date: 2015-04-13 15:01+0000\n"
 "Last-Translator: Sander Steffann <sander@steffann.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
@@ -195,7 +195,7 @@ msgstr "Geen actie geselecteerd."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "De gebruiker %(name)s \"%(obj)s\" is verwijderd."
+msgstr "\"%(obj)s\" van type %(name)s is verwijderd."
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."

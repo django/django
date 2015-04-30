@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # rodin <romihardiyanto@gmail.com>, 2011-2012
 # rodin <romihardiyanto@gmail.com>, 2014
+# Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-24 15:39+0000\n"
-"Last-Translator: rodin <romihardiyanto@gmail.com>\n"
+"PO-Revision-Date: 2015-04-04 15:44+0000\n"
+"Last-Translator: Sutrisno Efendi <kangfend@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
 "MIME-Version: 1.0\n"
@@ -193,21 +194,21 @@ msgstr "sekarang"
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
-msgstr[0] ""
+msgstr[0] "%(count)s detik yang lalu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
-msgstr[0] ""
+msgstr[0] "%(count)s menit yang lalu"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
-msgstr[0] ""
+msgstr[0] "%(count)s jam yang lalu"
 
 #, python-format
 msgctxt "naturaltime"
@@ -219,18 +220,18 @@ msgstr "%(delta)s dari sekarang"
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
-msgstr[0] ""
+msgstr[0] "%(count)s detik dari sekarang"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
-msgstr[0] ""
+msgstr[0] "%(count)s menit dari sekarang"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
-msgstr[0] ""
+msgstr[0] "%(count)s jam dari sekarang"
