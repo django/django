@@ -2862,7 +2862,7 @@ protected cookie data.
 Turning it on makes it less trivial for an attacker to escalate a cross-site
 scripting vulnerability into full hijacking of a user's session. There's not
 much excuse for leaving this off, either: if your code depends on reading
-session cookies from Javascript, you're probably doing it wrong.
+session cookies from JavaScript, you're probably doing it wrong.
 
 .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
 

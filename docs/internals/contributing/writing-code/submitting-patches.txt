@@ -242,16 +242,16 @@ Once you have completed these steps, you are finished with the deprecation.
 In each major release, all ``RemovedInDjangoXXWarning``\s matching the new
 version are removed.
 
-Javascript patches
+JavaScript patches
 ------------------
 
 Django's admin system leverages the jQuery framework to increase the
 capabilities of the admin interface. In conjunction, there is an emphasis on
-admin javascript performance and minimizing overall admin media file size.
-Serving compressed or "minified" versions of javascript files is considered
+admin JavaScript performance and minimizing overall admin media file size.
+Serving compressed or "minified" versions of JavaScript files is considered
 best practice in this regard.
 
-To that end, patches for javascript files should include both the original
+To that end, patches for JavaScript files should include both the original
 code for future development (e.g. ``foo.js``), and a compressed version for
 production use (e.g. ``foo.min.js``). Any links to the file in the codebase
 should point to the compressed version.
@@ -259,7 +259,7 @@ should point to the compressed version.
 Compressing JavaScript
 ~~~~~~~~~~~~~~~~~~~~~~
 
-To simplify the process of providing optimized javascript code, Django
+To simplify the process of providing optimized JavaScript code, Django
 includes a handy python script which should be used to create a "minified"
 version. To run it::
 
@@ -268,11 +268,11 @@ version. To run it::
 Behind the scenes, ``compress.py`` is a front-end for Google's
 `Closure Compiler`_ which is written in Java. However, the Closure Compiler
 library is not bundled with Django directly, so those wishing to contribute
-complete javascript patches will need to download and install the library
+complete JavaScript patches will need to download and install the library
 independently. The Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's javascript.
+minified scripts when submitting patches for Django's JavaScript.
 
 .. _Closure Compiler: https://developers.google.com/closure/compiler/
 .. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority

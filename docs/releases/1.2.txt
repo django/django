@@ -686,7 +686,7 @@ other browsers, our encoding of cookie values was changed so that the
 comma and semicolon are treated as non-safe characters, and are
 therefore encoded as ``\054`` and ``\073`` respectively.  This could
 produce backwards incompatibilities, especially if you are storing
-comma or semi-colon in cookies and have javascript code that parses
+comma or semi-colon in cookies and have JavaScript code that parses
 and manipulates cookie values client-side.
 
 ``ModelForm.is_valid()`` and ``ModelForm.errors``

@@ -1187,7 +1187,7 @@ whenever you restart your application server.
     def cached_javascript_catalog(request, domain='djangojs', packages=None):
         return javascript_catalog(request, domain, packages)
 
-You can even pre-generate the javascript catalog as part of your deployment
+You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
 in django-statici18n_.
 

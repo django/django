@@ -1747,7 +1747,7 @@ whose implementation was changed to make use of ``json.dumps()`` instead.
 If you were relying on this function to provide safe output from untrusted
 strings, you should use ``django.utils.html.escapejs`` or the
 :tfilter:`escapejs` template filter.
-If all you need is to generate valid javascript strings, you can simply use
+If all you need is to generate valid JavaScript strings, you can simply use
 ``json.dumps()``.
 
 ``fix_ampersands`` utils method and template filter
