@@ -578,6 +578,9 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 }
 
 /* RELATED WIDGET WRAPPER */
+.related-widget-wrapper {
+    overflow: hidden;  /* clear floated contents */
+}
 
 .related-widget-wrapper-link {
     opacity: 0.3;
