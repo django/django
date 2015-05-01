@@ -80,6 +80,10 @@ Bugfixes
 
 * Fixed ``makemessages`` crash in some locales (:ticket:`23271`).
 
+* Fixed help text positioning of ``contrib.admin`` fields that use the
+  ``ModelAdmin.filter_horizontal`` and ``filter_vertical`` options
+  (:ticket:`24676`).
+
 Optimizations
 =============
 
