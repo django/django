@@ -265,12 +265,17 @@ Methods
 
 .. method:: Page.next_page_querystring()
 
-    Returns the query string for the next page. This is useful when pagination
-    is handled with a query string (as opposed to a URL pattern). It is common
-    for there to be other parameters in the query string that need to remain
-    intact on the the next page e.g, paginated search results.
-
+    Returns the query string for the next page.
     Raises :exc:`InvalidPage` if next page doesn't exist.
+
+    Use this instead of :meth:`~Page.next_page_number` in your templates.::
+
+        {% if contacts.has_next %}
+            <a href="?{{ contacts.next_page_querystring }}">next</a>
+        {% endif %}
+
+    This is useful when there are other parameters in the query string that
+    need to remain intact on the the next page e.g, paginated search results.
 
     .. admonition:: Where's my query string?
 
@@ -283,7 +288,6 @@ Methods
 .. method:: Page.previous_page_querystring()
 
     Returns the query string for the previous page.
-
     Raises :exc:`InvalidPage` if previous page doesn't exist.
 
     See :meth:`~Page.next_page_querystring`.
