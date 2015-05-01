@@ -2673,7 +2673,7 @@ Index                      ``index``
 Logout                     ``logout``
 Password change            ``password_change``
 Password change done       ``password_change_done``
-i18n javascript            ``jsi18n``
+i18n JavaScript            ``jsi18n``
 Application index page     ``app_list``              ``app_label``
 Redirect to object's page  ``view_on_site``          ``content_type_id``, ``object_id``
 =========================  ========================  ==================================
