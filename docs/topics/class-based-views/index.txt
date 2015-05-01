@@ -18,6 +18,7 @@ reusable views which suits your use case. For full details, see the
    generic-display
    generic-editing
    mixins
+   advanced
 
 Basic examples
 ==============
