@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from unittest import skipIf
 
 from django.db import connection, connections
-from django.db.migrations.graph import NodeNotFoundError
-from django.db.migrations.loader import AmbiguityError, MigrationLoader
+from django.db.migrations.exceptions import AmbiguityError, NodeNotFoundError
+from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import TestCase, modify_settings, override_settings
 from django.utils import six

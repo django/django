@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.db.transaction import atomic
 from django.utils.encoding import python_2_unicode_compatible
 
+from .exceptions import IrreversibleError
+
 
 @python_2_unicode_compatible
 class Migration(object):
@@ -38,10 +40,6 @@ class Migration(object):
     # non-empty, this migration will only be applied if all these migrations
     # are not applied.
     replaces = []
-
-    # Error class which is raised when a migration is irreversible
-    class IrreversibleError(RuntimeError):
-        pass
 
     def __init__(self, name, app_label):
         self.name = name
@@ -138,7 +136,7 @@ class Migration(object):
         for operation in self.operations:
             # If it's irreversible, error out
             if not operation.reversible:
-                raise Migration.IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
+                raise IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
             # Preserve new state from previous run to not tamper the same state
             # over all operations
             new_state = new_state.clone()

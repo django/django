@@ -8,6 +8,8 @@ from django.utils.datastructures import OrderedSet
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import total_ordering
 
+from .exceptions import CircularDependencyError, NodeNotFoundError
+
 RECURSION_DEPTH_WARNING = (
     "Maximum recursion depth exceeded while generating migration graph, "
     "falling back to iterative approach. If you're experiencing performance issues, "
@@ -276,27 +278,3 @@ class MigrationGraph(object):
 
     def __contains__(self, node):
         return node in self.nodes
-
-
-class CircularDependencyError(Exception):
-    """
-    Raised when there's an impossible-to-resolve circular dependency.
-    """
-    pass
-
-
-@python_2_unicode_compatible
-class NodeNotFoundError(LookupError):
-    """
-    Raised when an attempt on a node is made that is not available in the graph.
-    """
-
-    def __init__(self, message, node):
-        self.message = message
-        self.node = node
-
-    def __str__(self):
-        return self.message
-
-    def __repr__(self):
-        return "NodeNotFoundError(%r)" % self.node

@@ -18,9 +18,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
-
-class InvalidBasesError(ValueError):
-    pass
+from .exceptions import InvalidBasesError
 
 
 def _get_app_label_and_model_name(model, app_label=''):
