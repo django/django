@@ -272,7 +272,7 @@ Methods
     Returns the query string for the next page.
     Raises :exc:`InvalidPage` if next page doesn't exist.
 
-    Use this instead of :meth:`~Page.next_page_number` in your templates.::
+    Use this instead of :meth:`~Page.next_page_number` in your templates::
 
         {% if contacts.has_next %}
             <a href="?{{ contacts.next_page_querystring }}">next</a>
