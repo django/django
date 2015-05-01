@@ -2,7 +2,7 @@
 Django 1.7.8 release notes
 ==========================
 
-*Under development*
+*May 1, 2015*
 
 Django 1.7.8 fixes:
 
@@ -11,5 +11,5 @@ Django 1.7.8 fixes:
 
 * A database table name quoting regression in 1.7.2 (:ticket:`24605`).
 
-* Prevented the loss of ``null``/``not null`` column properties during field
-  alteration of MySQL databases (:ticket:`24595`).
+* The loss of ``null``/``not null`` column properties during field alteration
+  of MySQL databases (:ticket:`24595`).
