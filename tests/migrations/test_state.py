@@ -1,10 +1,11 @@
 from django.apps.registry import Apps
 from django.db import models
+from django.db.migrations.exceptions import InvalidBasesError
 from django.db.migrations.operations import (
     AddField, AlterField, DeleteModel, RemoveField,
 )
 from django.db.migrations.state import (
-    InvalidBasesError, ModelState, ProjectState, get_related_models_recursive,
+    ModelState, ProjectState, get_related_models_recursive,
 )
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import six

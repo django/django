@@ -1,9 +1,9 @@
 import warnings
 
-from django.db.migrations.graph import (
-    RECURSION_DEPTH_WARNING, CircularDependencyError, MigrationGraph,
-    NodeNotFoundError,
+from django.db.migrations.exceptions import (
+    CircularDependencyError, NodeNotFoundError,
 )
+from django.db.migrations.graph import RECURSION_DEPTH_WARNING, MigrationGraph
 from django.test import TestCase
 from django.utils.encoding import force_text
 

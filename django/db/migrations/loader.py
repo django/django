@@ -6,9 +6,11 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.db.migrations.graph import MigrationGraph, NodeNotFoundError
+from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
+
+from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
 
 MIGRATIONS_MODULE_NAME = 'migrations'
 
@@ -324,17 +326,3 @@ class MigrationLoader(object):
         See graph.make_state for the meaning of "nodes" and "at_end"
         """
         return self.graph.make_state(nodes=nodes, at_end=at_end, real_apps=list(self.unmigrated_apps))
-
-
-class BadMigrationError(Exception):
-    """
-    Raised when there's a bad migration (unreadable/bad format/etc.)
-    """
-    pass
-
-
-class AmbiguityError(Exception):
-    """
-    Raised when more than one migration matches a name prefix
-    """
-    pass
