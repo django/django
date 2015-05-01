@@ -164,9 +164,13 @@ Optional arguments
 ``request``
     An ``HttpRequest`` object, used for creating pagination query strings.
 
+    See :meth:`~Page.next_page_querystring`.
+
 ``page_kwarg``
     A string specifying the name to use for the page parameter in the
     pagination query strings.
+
+    See :meth:`~Page.next_page_querystring`.
 
 Methods
 -------
