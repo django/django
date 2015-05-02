@@ -4,7 +4,6 @@ from django.db.utils import InterfaceError
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     allows_group_by_selected_pks = True
-    needs_datetime_string_cast = False
     can_return_id_from_insert = True
     has_real_datatype = True
     has_native_uuid_field = True
