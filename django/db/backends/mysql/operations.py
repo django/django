@@ -138,7 +138,7 @@ class DatabaseOperations(BaseDatabaseOperations):
                              'value for AutoField.')
         return value
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         if value is None:
             return None
 
@@ -154,7 +154,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
         return six.text_type(value)
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         if value is None:
             return None
 

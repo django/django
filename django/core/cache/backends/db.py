@@ -136,7 +136,7 @@ class DatabaseCache(BaseDatabaseCache):
                             current_expires = typecast_timestamp(str(current_expires))
                         if settings.USE_TZ:
                             current_expires = current_expires.replace(tzinfo=timezone.utc)
-                    exp = connections[db].ops.value_to_db_datetime(exp)
+                    exp = connections[db].ops.adapt_datetimefield_value(exp)
                     if result and (mode == 'set' or (mode == 'add' and current_expires < now)):
                         cursor.execute("UPDATE %s SET value = %%s, expires = %%s "
                                        "WHERE cache_key = %%s" % table,
@@ -177,7 +177,7 @@ class DatabaseCache(BaseDatabaseCache):
         with connections[db].cursor() as cursor:
             cursor.execute("SELECT cache_key FROM %s "
                            "WHERE cache_key = %%s and expires > %%s" % table,
-                           [key, connections[db].ops.value_to_db_datetime(now)])
+                           [key, connections[db].ops.adapt_datetimefield_value(now)])
             return cursor.fetchone() is not None
 
     def _cull(self, db, cursor, now):
@@ -188,7 +188,7 @@ class DatabaseCache(BaseDatabaseCache):
             now = now.replace(tzinfo=None)
             table = connections[db].ops.quote_name(self._table)
             cursor.execute("DELETE FROM %s WHERE expires < %%s" % table,
-                           [connections[db].ops.value_to_db_datetime(now)])
+                           [connections[db].ops.adapt_datetimefield_value(now)])
             cursor.execute("SELECT COUNT(*) FROM %s" % table)
             num = cursor.fetchone()[0]
             if num > self._max_entries:

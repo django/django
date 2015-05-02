@@ -323,6 +323,10 @@ Database backend API
   in ``DatabaseOperations.get_db_converters()``.
 
 
+* The ``DatabaseOperations.value_to_db_<type>()`` methods were renamed to
+  ``adapt_<type>field_value()`` to mirror the ``convert_<type>field_value()``
+  methods.
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

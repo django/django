@@ -433,7 +433,7 @@ class BaseDatabaseOperations(object):
         """
         return value
 
-    def value_to_db_unknown(self, value):
+    def adapt_unknown_value(self, value):
         """
         Transforms a value to something compatible with the backend driver.
 
@@ -442,17 +442,17 @@ class BaseDatabaseOperations(object):
         As a consequence it may not work perfectly in all circumstances.
         """
         if isinstance(value, datetime.datetime):   # must be before date
-            return self.value_to_db_datetime(value)
+            return self.adapt_datetimefield_value(value)
         elif isinstance(value, datetime.date):
-            return self.value_to_db_date(value)
+            return self.adapt_datefield_value(value)
         elif isinstance(value, datetime.time):
-            return self.value_to_db_time(value)
+            return self.adapt_timefield_value(value)
         elif isinstance(value, decimal.Decimal):
-            return self.value_to_db_decimal(value)
+            return self.adapt_decimalfield_value(value)
         else:
             return value
 
-    def value_to_db_date(self, value):
+    def adapt_datefield_value(self, value):
         """
         Transforms a date value to an object compatible with what is expected
         by the backend driver for date columns.
@@ -461,7 +461,7 @@ class BaseDatabaseOperations(object):
             return None
         return six.text_type(value)
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         """
         Transforms a datetime value to an object compatible with what is expected
         by the backend driver for datetime columns.
@@ -470,7 +470,7 @@ class BaseDatabaseOperations(object):
             return None
         return six.text_type(value)
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         """
         Transforms a time value to an object compatible with what is expected
         by the backend driver for time columns.
@@ -481,14 +481,14 @@ class BaseDatabaseOperations(object):
             raise ValueError("Django does not support timezone-aware times.")
         return six.text_type(value)
 
-    def value_to_db_decimal(self, value, max_digits, decimal_places):
+    def adapt_decimalfield_value(self, value, max_digits, decimal_places):
         """
         Transforms a decimal.Decimal value to an object compatible with what is
         expected by the backend driver for decimal (numeric) columns.
         """
         return utils.format_number(value, max_digits, decimal_places)
 
-    def value_to_db_ipaddress(self, value):
+    def adapt_ipaddressfield_value(self, value):
         """
         Transforms a string representation of an IP address into the expected
         type for the backend driver.
@@ -505,8 +505,8 @@ class BaseDatabaseOperations(object):
         """
         first = datetime.date(value, 1, 1)
         second = datetime.date(value, 12, 31)
-        first = self.value_to_db_date(first)
-        second = self.value_to_db_date(second)
+        first = self.adapt_datefield_value(first)
+        second = self.adapt_datefield_value(second)
         return [first, second]
 
     def year_lookup_bounds_for_datetime_field(self, value):
@@ -523,8 +523,8 @@ class BaseDatabaseOperations(object):
             tz = timezone.get_current_timezone()
             first = timezone.make_aware(first, tz)
             second = timezone.make_aware(second, tz)
-        first = self.value_to_db_datetime(first)
-        second = self.value_to_db_datetime(second)
+        first = self.adapt_datetimefield_value(first)
+        second = self.adapt_datetimefield_value(second)
         return [first, second]
 
     def get_db_converters(self, expression):

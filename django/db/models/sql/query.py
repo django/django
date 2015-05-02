@@ -99,7 +99,7 @@ class RawQuery(object):
         # Adapt parameters to the database, as much as possible considering
         # that the target type isn't known. See #17755.
         params_type = self.params_type
-        adapter = connection.ops.value_to_db_unknown
+        adapter = connection.ops.adapt_unknown_value
         if params_type is tuple:
             params = tuple(adapter(val) for val in self.params)
         elif params_type is dict:
