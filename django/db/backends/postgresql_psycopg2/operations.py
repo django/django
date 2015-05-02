@@ -225,16 +225,16 @@ class DatabaseOperations(BaseDatabaseOperations):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
 
-    def value_to_db_date(self, value):
+    def adapt_datefield_value(self, value):
         return value
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         return value
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         return value
 
-    def value_to_db_ipaddress(self, value):
+    def adapt_ipaddressfield_value(self, value):
         if value:
             return Inet(value)
         return None

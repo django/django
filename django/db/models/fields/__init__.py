@@ -1295,7 +1295,7 @@ class DateField(DateTimeCheckMixin, Field):
         # Casts dates into the format expected by the backend
         if not prepared:
             value = self.get_prep_value(value)
-        return connection.ops.value_to_db_date(value)
+        return connection.ops.adapt_datefield_value(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
@@ -1455,7 +1455,7 @@ class DateTimeField(DateField):
         # Casts datetimes into the format expected by the backend
         if not prepared:
             value = self.get_prep_value(value)
-        return connection.ops.value_to_db_datetime(value)
+        return connection.ops.adapt_datetimefield_value(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)
@@ -1598,7 +1598,7 @@ class DecimalField(Field):
         return utils.format_number(value, self.max_digits, self.decimal_places)
 
     def get_db_prep_save(self, value, connection):
-        return connection.ops.value_to_db_decimal(self.to_python(value),
+        return connection.ops.adapt_decimalfield_value(self.to_python(value),
                 self.max_digits, self.decimal_places)
 
     def get_prep_value(self, value):
@@ -1976,7 +1976,7 @@ class GenericIPAddressField(Field):
     def get_db_prep_value(self, value, connection, prepared=False):
         if not prepared:
             value = self.get_prep_value(value)
-        return connection.ops.value_to_db_ipaddress(value)
+        return connection.ops.adapt_ipaddressfield_value(value)
 
     def get_prep_value(self, value):
         value = super(GenericIPAddressField, self).get_prep_value(value)
@@ -2266,7 +2266,7 @@ class TimeField(DateTimeCheckMixin, Field):
         # Casts times into the format expected by the backend
         if not prepared:
             value = self.get_prep_value(value)
-        return connection.ops.value_to_db_time(value)
+        return connection.ops.adapt_timefield_value(value)
 
     def value_to_string(self, obj):
         val = self._get_val_from_obj(obj)

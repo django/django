@@ -374,7 +374,7 @@ WHEN (new.%(col_name)s IS NULL)
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
-    def value_to_db_date(self, value):
+    def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected
         by the backend driver for date columns.
@@ -383,7 +383,7 @@ WHEN (new.%(col_name)s IS NULL)
         """
         return value
 
-    def value_to_db_datetime(self, value):
+    def adapt_datetimefield_value(self, value):
         """
         Transform a datetime value to an object compatible with what is expected
         by the backend driver for datetime columns.
@@ -405,7 +405,7 @@ WHEN (new.%(col_name)s IS NULL)
 
         return Oracle_datetime.from_datetime(value)
 
-    def value_to_db_time(self, value):
+    def adapt_timefield_value(self, value):
         if value is None:
             return None
 
