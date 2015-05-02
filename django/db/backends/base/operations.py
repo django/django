@@ -433,6 +433,25 @@ class BaseDatabaseOperations(object):
         """
         return value
 
+    def value_to_db_unknown(self, value):
+        """
+        Transforms a value to something compatible with the backend driver.
+
+        This method only depends on the type of the value. It's designed for
+        cases where the target type isn't known, such as .raw() SQL queries.
+        As a consequence it may not work perfectly in all circumstances.
+        """
+        if isinstance(value, datetime.datetime):   # must be before date
+            return self.value_to_db_datetime(value)
+        elif isinstance(value, datetime.date):
+            return self.value_to_db_date(value)
+        elif isinstance(value, datetime.time):
+            return self.value_to_db_time(value)
+        elif isinstance(value, decimal.Decimal):
+            return self.value_to_db_decimal(value)
+        else:
+            return value
+
     def value_to_db_date(self, value):
         """
         Transforms a date value to an object compatible with what is expected
@@ -486,6 +505,8 @@ class BaseDatabaseOperations(object):
         """
         first = datetime.date(value, 1, 1)
         second = datetime.date(value, 12, 31)
+        first = self.value_to_db_date(first)
+        second = self.value_to_db_date(second)
         return [first, second]
 
     def year_lookup_bounds_for_datetime_field(self, value):
@@ -502,6 +523,8 @@ class BaseDatabaseOperations(object):
             tz = timezone.get_current_timezone()
             first = timezone.make_aware(first, tz)
             second = timezone.make_aware(second, tz)
+        first = self.value_to_db_datetime(first)
+        second = self.value_to_db_datetime(second)
         return [first, second]
 
     def get_db_converters(self, expression):

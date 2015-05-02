@@ -32,6 +32,11 @@ details on these changes.
 
 * ``django.db.models.fields.add_lazy_relation()`` will be removed.
 
+* When time zone support is enabled, database backends that don't support time
+  zones won't convert aware datetimes to naive values in UTC anymore when such
+  values are passed as parameters to SQL queries executed outside of the ORM,
+  e.g. with ``cursor.execute()``.
+
 * The ``django.contrib.auth.tests.utils.skipIfCustomUser()`` decorator will be
   removed.
 

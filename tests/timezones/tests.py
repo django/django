@@ -266,6 +266,13 @@ class LegacyDatabaseTests(TestCase):
             [event],
             transform=lambda d: d)
 
+    def test_cursor_execute_accepts_naive_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
+        with connection.cursor() as cursor:
+            cursor.execute('INSERT INTO timezones_event (dt) VALUES (%s)', [dt])
+        event = Event.objects.get()
+        self.assertEqual(event.dt, dt)
+
     def test_cursor_execute_returns_naive_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
         Event.objects.create(dt=dt)
@@ -565,6 +572,23 @@ class NewDatabaseTests(TestCase):
             transform=lambda d: d)
 
     @skipUnlessDBFeature('supports_timezones')
+    def test_cursor_execute_accepts_aware_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        with connection.cursor() as cursor:
+            cursor.execute('INSERT INTO timezones_event (dt) VALUES (%s)', [dt])
+        event = Event.objects.get()
+        self.assertEqual(event.dt, dt)
+
+    @skipIfDBFeature('supports_timezones')
+    def test_cursor_execute_accepts_naive_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
+        utc_naive_dt = timezone.make_naive(dt, timezone.utc)
+        with connection.cursor() as cursor:
+            cursor.execute('INSERT INTO timezones_event (dt) VALUES (%s)', [utc_naive_dt])
+        event = Event.objects.get()
+        self.assertEqual(event.dt, dt)
+
+    @skipUnlessDBFeature('supports_timezones')
     def test_cursor_execute_returns_aware_datetime(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         Event.objects.create(dt=dt)
@@ -578,7 +602,7 @@ class NewDatabaseTests(TestCase):
         utc_naive_dt = timezone.make_naive(dt, timezone.utc)
         Event.objects.create(dt=dt)
         with connection.cursor() as cursor:
-            cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [dt])
+            cursor.execute('SELECT dt FROM timezones_event WHERE dt = %s', [utc_naive_dt])
             self.assertEqual(cursor.fetchall()[0][0], utc_naive_dt)
 
     @requires_tz_support

@@ -86,13 +86,29 @@ class RawQuery(object):
     def __repr__(self):
         return "<RawQuery: %s>" % self
 
+    @property
+    def params_type(self):
+        return dict if isinstance(self.params, Mapping) else tuple
+
     def __str__(self):
-        _type = dict if isinstance(self.params, Mapping) else tuple
-        return self.sql % _type(self.params)
+        return self.sql % self.params_type(self.params)
 
     def _execute_query(self):
-        self.cursor = connections[self.using].cursor()
-        self.cursor.execute(self.sql, self.params)
+        connection = connections[self.using]
+
+        # Adapt parameters to the database, as much as possible considering
+        # that the target type isn't known. See #17755.
+        params_type = self.params_type
+        adapter = connection.ops.value_to_db_unknown
+        if params_type is tuple:
+            params = tuple(adapter(val) for val in self.params)
+        elif params_type is dict:
+            params = dict((key, adapter(val)) for key, val in six.iteritems(self.params))
+        else:
+            raise RuntimeError("Unexpected params type: %s" % params_type)
+
+        self.cursor = connection.cursor()
+        self.cursor.execute(self.sql, params)
 
 
 class Query(object):
