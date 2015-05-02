@@ -1762,7 +1762,7 @@ To help write more concise code, there is also a context manager
 ``django.utils.translation.override()`` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
-    from django.utils import tranlations
+    from django.utils import translation
 
     def welcome_translated(language):
         with translation.override(language):
