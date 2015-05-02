@@ -313,11 +313,15 @@ Database backend API
   doesn't implement this. You may want to review the implementation on the
   backends that Django includes for reference (:ticket:`24245`).
 
-* The recommended way to add time zone information to datetimes fetched from
-  databases that don't support time zones is to register a converter for
-  ``DateTimeField``. Do this in ``DatabaseOperations.get_db_converters()``.
-  Registering a global converter at the level of the DB-API module is
-  discouraged because it can conflict with other libraries.
+* Registering a global adapter or converter at the level of the DB-API module
+  to handle time zone information of :class:`~datetime.datetime` values passed
+  as query parameters or returned as query results on databases that don't
+  support time zones is discouraged. It can conflict with other libraries.
+
+  The recommended way to add a time zone to :class:`~datetime.datetime` values
+  fetched from the database is to register a converter for ``DateTimeField``
+  in ``DatabaseOperations.get_db_converters()``.
+
 
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -418,20 +422,40 @@ console, for example.
 If you are overriding Django's default logging, you should check to see how
 your configuration merges with the new defaults.
 
-Removal of time zone aware global converters for datetimes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Removal of time zone aware global adapters and converters for datetimes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Django no longer registers global converters for returning time zone aware
-datetimes in database query results when :setting:`USE_TZ` is ``True``.
-Instead the ORM adds suitable time zone information.
+Django no longer registers global adapters and converters for managing time
+zone information on :class:`~datetime.datetime` values sent to the database as
+query parameters or read from the database in query results. This change
+affects projects that meet all the following conditions:
 
-As a consequence, SQL queries executed outside of the ORM, for instance with
-``cursor.execute(query, params)``, now return naive datetimes instead of aware
-datetimes on databases that do not support time zones: SQLite, MySQL, and
-Oracle. Since these datetimes are in UTC, you can make them aware as follows::
+* The :setting:`USE_TZ` setting is ``True``.
+* The database is SQLite, MySQL, Oracle, or a third-party database that
+  doesn't support time zones. In doubt, you can check the value of
+  ``connection.features.supports_timezones``.
+* The code queries the database outside of the ORM, typically with
+  ``cursor.execute(sql, params)``.
+
+If you're passing aware :class:`~datetime.datetime` parameters to such
+queries, you should turn them into naive datetimes in UTC::
 
     from django.utils import timezone
-    value = value.replace(tzinfo=timezone.utc)
+    param = timezone.make_naive(param, timezone.utc)
+
+If you fail to do so, Django 1.9 and 2.0 will perform the conversion like
+earlier versions but emit a deprecation warning. Django 2.1 won't perform any
+conversion, which may result in data corruption.
+
+If you're reading :class:`~datetime.datetime` values from the results, they
+will be naive instead of aware. You can compensate as follows::
+
+    from django.utils import timezone
+    value = timezone.make_aware(value, timezone.utc)
+
+You don't need any of this if you're querying the database through the ORM,
+even if you're using :meth:`raw() <django.db.models.query.QuerySet.raw>`
+queries. The ORM takes care of managing time zone information.
 
 Miscellaneous
 ~~~~~~~~~~~~~

@@ -20,6 +20,7 @@ from django.utils import six, timezone
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
 
@@ -49,15 +50,14 @@ DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
 
-def adapt_datetime_with_timezone_support(value):
-    # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
-    if settings.USE_TZ:
-        if timezone.is_naive(value):
-            warnings.warn("SQLite received a naive datetime (%s)"
-                          " while time zone support is active." % value,
-                          RuntimeWarning)
-            default_timezone = timezone.get_default_timezone()
-            value = timezone.make_aware(value, default_timezone)
+def adapt_datetime_warn_on_aware_datetime(value):
+    # Remove this function and rely on the default adapter in Django 2.1.
+    if settings.USE_TZ and timezone.is_aware(value):
+        warnings.warn(
+            "The SQLite database adapter received an aware datetime (%s), "
+            "probably from cursor.execute(). Update your code to pass a "
+            "naive datetime in the database connection's time zone (UTC by "
+            "default).", RemovedInDjango21Warning)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
     return value.isoformat(str(" "))
 
@@ -77,7 +77,7 @@ Database.register_converter(str("timestamp"), decoder(parse_datetime))
 Database.register_converter(str("TIMESTAMP"), decoder(parse_datetime))
 Database.register_converter(str("decimal"), decoder(backend_utils.typecast_decimal))
 
-Database.register_adapter(datetime.datetime, adapt_datetime_with_timezone_support)
+Database.register_adapter(datetime.datetime, adapt_datetime_warn_on_aware_datetime)
 Database.register_adapter(decimal.Decimal, backend_utils.rev_typecast_decimal)
 if six.PY2:
     Database.register_adapter(str, lambda s: s.decode('utf-8'))

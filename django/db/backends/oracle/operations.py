@@ -419,19 +419,6 @@ WHEN (new.%(col_name)s IS NULL)
         return Oracle_datetime(1900, 1, 1, value.hour, value.minute,
                                value.second, value.microsecond)
 
-    def year_lookup_bounds_for_date_field(self, value):
-        # Create bounds as real date values
-        first = datetime.date(value, 1, 1)
-        last = datetime.date(value, 12, 31)
-        return [first, last]
-
-    def year_lookup_bounds_for_datetime_field(self, value):
-        # cx_Oracle doesn't support tz-aware datetimes
-        bounds = super(DatabaseOperations, self).year_lookup_bounds_for_datetime_field(value)
-        if settings.USE_TZ:
-            bounds = [b.astimezone(timezone.utc) for b in bounds]
-        return [Oracle_datetime.from_datetime(b) for b in bounds]
-
     def combine_expression(self, connector, sub_expressions):
         "Oracle requires special cases for %% and & operators in query expressions"
         if connector == '%%':

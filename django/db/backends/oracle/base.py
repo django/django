@@ -17,6 +17,7 @@ from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
@@ -336,13 +337,14 @@ class OracleParam(object):
         # without being converted by DateTimeField.get_db_prep_value.
         if settings.USE_TZ and (isinstance(param, datetime.datetime) and
                                 not isinstance(param, Oracle_datetime)):
-            if timezone.is_naive(param):
-                warnings.warn("Oracle received a naive datetime (%s)"
-                              " while time zone support is active." % param,
-                              RuntimeWarning)
-                default_timezone = timezone.get_default_timezone()
-                param = timezone.make_aware(param, default_timezone)
-            param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
+            if timezone.is_aware(param):
+                warnings.warn(
+                    "The Oracle database adapter received an aware datetime (%s), "
+                    "probably from cursor.execute(). Update your code to pass a "
+                    "naive datetime in the database connection's time zone (UTC by "
+                    "default).", RemovedInDjango21Warning)
+                param = param.astimezone(timezone.utc).replace(tzinfo=None)
+            param = Oracle_datetime.from_datetime(param)
 
         if isinstance(param, datetime.timedelta):
             param = duration_string(param)
