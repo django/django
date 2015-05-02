@@ -201,6 +201,10 @@ Management Commands
 Models
 ^^^^^^
 
+* Database configuration gained a :setting:`TIME_ZONE <DATABASE-TIME_ZONE>`
+  option for interacting with databases that store datetimes in local time and
+  don't support time zones when :setting:`USE_TZ` is ``True``.
+
 * Added the :meth:`RelatedManager.set()
   <django.db.models.fields.related.RelatedManager.set()>` method to the related
   managers created by ``ForeignKey``, ``GenericForeignKey``, and

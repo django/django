@@ -196,7 +196,7 @@ WHEN (new.%(col_name)s IS NULL)
     def convert_datetimefield_value(self, value, expression, connection, context):
         if value is not None:
             if settings.USE_TZ:
-                value = value.replace(tzinfo=timezone.utc)
+                value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_datefield_value(self, value, expression, connection, context):
@@ -399,7 +399,7 @@ WHEN (new.%(col_name)s IS NULL)
         # cx_Oracle doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(timezone.utc).replace(tzinfo=None)
+                value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError("Oracle backend does not support timezone-aware datetimes when USE_TZ is False.")
 
