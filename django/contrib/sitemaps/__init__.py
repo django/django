@@ -47,7 +47,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
     # http://sitemaps.org/protocol.php#index.
-    limit = 50000
+    limit = settings.SITEMAP_MAX_ITEMS
 
     # If protocol is None, the URLs in the sitemap will use the protocol
     # with which the sitemap was requested.
