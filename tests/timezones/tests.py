@@ -106,7 +106,6 @@ class LegacyDatabaseTests(TestCase):
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt.replace(microsecond=0))
 
     @skipUnlessDBFeature('supports_timezones')
-    @skipIfDBFeature('needs_datetime_string_cast')
     def test_aware_datetime_in_utc(self):
         dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
         Event.objects.create(dt=dt)
@@ -115,24 +114,7 @@ class LegacyDatabaseTests(TestCase):
         # interpret the naive datetime in local time to get the correct value
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt)
 
-    # This combination is no longer possible since timezone support
-    # was removed from the SQLite backend -- it didn't work.
     @skipUnlessDBFeature('supports_timezones')
-    @skipUnlessDBFeature('needs_datetime_string_cast')
-    def test_aware_datetime_in_utc_unsupported(self):
-        dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
-        Event.objects.create(dt=dt)
-        event = Event.objects.get()
-        self.assertIsNone(event.dt.tzinfo)
-        # django.db.backends.utils.typecast_dt will just drop the
-        # timezone, so a round-trip in the database alters the data (!)
-        # interpret the naive datetime in local time and you get a wrong value
-        self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
-        # interpret the naive datetime in original time to get the correct value
-        self.assertEqual(event.dt.replace(tzinfo=UTC), dt)
-
-    @skipUnlessDBFeature('supports_timezones')
-    @skipIfDBFeature('needs_datetime_string_cast')
     def test_aware_datetime_in_other_timezone(self):
         dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT)
         Event.objects.create(dt=dt)
@@ -140,22 +122,6 @@ class LegacyDatabaseTests(TestCase):
         self.assertIsNone(event.dt.tzinfo)
         # interpret the naive datetime in local time to get the correct value
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt)
-
-    # This combination is no longer possible since timezone support
-    # was removed from the SQLite backend -- it didn't work.
-    @skipUnlessDBFeature('supports_timezones')
-    @skipUnlessDBFeature('needs_datetime_string_cast')
-    def test_aware_datetime_in_other_timezone_unsupported(self):
-        dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=ICT)
-        Event.objects.create(dt=dt)
-        event = Event.objects.get()
-        self.assertIsNone(event.dt.tzinfo)
-        # django.db.backends.utils.typecast_dt will just drop the
-        # timezone, so a round-trip in the database alters the data (!)
-        # interpret the naive datetime in local time and you get a wrong value
-        self.assertNotEqual(event.dt.replace(tzinfo=EAT), dt)
-        # interpret the naive datetime in original time to get the correct value
-        self.assertEqual(event.dt.replace(tzinfo=ICT), dt)
 
     @skipIfDBFeature('supports_timezones')
     def test_aware_datetime_unspported(self):

@@ -326,6 +326,8 @@ Database backend API
   fetched from the database is to register a converter for ``DateTimeField``
   in ``DatabaseOperations.get_db_converters()``.
 
+  The ``needs_datetime_string_cast`` database feature was removed. Database
+  backends that set it must register a converter instead, as explained above.
 
 * The ``DatabaseOperations.value_to_db_<type>()`` methods were renamed to
   ``adapt_<type>field_value()`` to mirror the ``convert_<type>field_value()``

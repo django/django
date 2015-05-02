@@ -9,7 +9,6 @@ except ImportError:
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     has_select_for_update = True
