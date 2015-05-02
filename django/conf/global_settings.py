@@ -540,6 +540,12 @@ PASSWORD_HASHERS = [
 
 SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
 
+############
+# SITEMAPS #
+############
+
+SITEMAP_MAX_ITEMS = 50000
+
 ########
 # CSRF #
 ########
