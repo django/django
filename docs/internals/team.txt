@@ -514,6 +514,14 @@ Daniele Procida
 
     .. _Josh Smeaton: https://github.com/jarshwah
 
+`Preston Timmons`_
+    Preston is a software developer with a background in mathematics. He enjoys
+    Django because it enables consistent, simple, and tested systems to be
+    built that even new programmers can quickly dive into. Preston lives in
+    Dallas, TX.
+
+    .. _Preston Timmons: https://github.com/prestontimmons
+
 Past team members
 =================
 
