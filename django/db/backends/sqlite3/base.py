@@ -58,6 +58,8 @@ def adapt_datetime_warn_on_aware_datetime(value):
             "probably from cursor.execute(). Update your code to pass a "
             "naive datetime in the database connection's time zone (UTC by "
             "default).", RemovedInDjango21Warning)
+        # This doesn't account for the database connection's timezone,
+        # which isn't known. (That's why this adapter is deprecated.)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
     return value.isoformat(str(" "))
 

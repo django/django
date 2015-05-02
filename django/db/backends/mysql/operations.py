@@ -145,7 +145,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # MySQL doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
-                value = value.astimezone(timezone.utc).replace(tzinfo=None)
+                value = timezone.make_naive(value, self.connection.timezone)
             else:
                 raise ValueError("MySQL backend does not support timezone-aware datetimes when USE_TZ is False.")
 
@@ -205,7 +205,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_datetimefield_value(self, value, expression, connection, context):
         if value is not None:
             if settings.USE_TZ:
-                value = value.replace(tzinfo=timezone.utc)
+                value = timezone.make_aware(value, self.connection.timezone)
         return value
 
     def convert_uuidfield_value(self, value, expression, connection, context):

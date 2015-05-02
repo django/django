@@ -4,13 +4,20 @@ from collections import deque
 from contextlib import contextmanager
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.six.moves import _thread as thread
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -71,6 +78,39 @@ class BaseDatabaseWrapper(object):
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
+    @cached_property
+    def timezone(self):
+        """
+        Time zone for datetimes stored as naive values in the database.
+
+        Returns a tzinfo object or None.
+
+        This is only needed when time zone support is enabled and the database
+        doesn't support time zones. (When the database supports time zones,
+        the adapter handles aware datetimes so Django doesn't need to.)
+        """
+        if not settings.USE_TZ:
+            return None
+        elif self.features.supports_timezones:
+            return None
+        elif self.settings_dict['TIME_ZONE'] is None:
+            return timezone.utc
+        else:
+            # Only this branch requires pytz.
+            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+
+    @cached_property
+    def timezone_name(self):
+        """
+        Name of the time zone of the database connection.
+        """
+        if not settings.USE_TZ:
+            return settings.TIME_ZONE
+        elif self.settings_dict['TIME_ZONE'] is None:
+            return 'UTC'
+        else:
+            return self.settings_dict['TIME_ZONE']
+
     @property
     def queries_logged(self):
         return self.force_debug_cursor or settings.DEBUG
@@ -105,6 +145,8 @@ class BaseDatabaseWrapper(object):
 
     def connect(self):
         """Connects to the database. Assumes that the connection is closed."""
+        # Check for invalid configurations.
+        self.check_settings()
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
@@ -120,6 +162,21 @@ class BaseDatabaseWrapper(object):
         self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
+
+    def check_settings(self):
+        if self.settings_dict['TIME_ZONE'] is not None:
+            if not settings.USE_TZ:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
+                    "False." % self.alias)
+            elif self.features.supports_timezones:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because its engine "
+                    "handles time zones conversions natively." % self.alias)
+            elif pytz is None:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
+                    "installed." % self.alias)
 
     def ensure_connection(self):
         """

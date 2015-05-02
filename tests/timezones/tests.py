@@ -9,15 +9,17 @@ from xml.dom.minidom import parseString
 
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.db import connection
+from django.db import connection, connections
 from django.db.models import Max, Min
 from django.http import HttpRequest
 from django.template import (
     Context, RequestContext, Template, TemplateSyntaxError, context_processors,
 )
 from django.test import (
-    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, override_settings, skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.utils import six, timezone
@@ -618,6 +620,67 @@ class NewDatabaseTests(TestCase):
         # Regression test for #17294
         e = MaybeEvent.objects.create()
         self.assertEqual(e.dt, None)
+
+
+# TODO: chaining @skipIfDBFeature and @skipUnlessDBFeature doesn't work!
+@skipIfDBFeature('supports_timezones')
+@skipUnlessDBFeature('test_db_allows_multiple_connections')
+@override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
+class ForcedTimeZoneDatabaseTests(TransactionTestCase):
+    """
+    Test the TIME_ZONE database configuration parameter.
+
+    Since this involves reading and writing to the same database through two
+    connections, this is a TransactionTestCase.
+    """
+
+    available_apps = ['timezones']
+
+    @classmethod
+    def setUpClass(cls):
+        super(ForcedTimeZoneDatabaseTests, cls).setUpClass()
+        connections.databases['tz'] = connections.databases['default'].copy()
+        connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
+
+    @classmethod
+    def tearDownClass(cls):
+        connections['tz'].close()
+        del connections['tz']
+        del connections.databases['tz']
+        super(ForcedTimeZoneDatabaseTests, cls).tearDownClass()
+
+    def test_read_datetime(self):
+        fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
+        Event.objects.create(dt=fake_dt)
+
+        event = Event.objects.using('tz').get()
+        dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
+        self.assertEqual(event.dt, dt)
+
+    def test_write_datetime(self):
+        dt = datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC)
+        Event.objects.using('tz').create(dt=dt)
+
+        event = Event.objects.get()
+        fake_dt = datetime.datetime(2011, 9, 1, 17, 20, 30, tzinfo=UTC)
+        self.assertEqual(event.dt, fake_dt)
+
+
+@skipUnlessDBFeature('supports_timezones')
+@override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
+class UnsupportedTimeZoneDatabaseTests(TestCase):
+
+    def test_time_zone_parameter_not_supported_if_database_supports_timezone(self):
+        connections.databases['tz'] = connections.databases['default'].copy()
+        connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
+        tz_conn = connections['tz']
+        try:
+            with self.assertRaises(ImproperlyConfigured):
+                tz_conn.cursor()
+        finally:
+            connections['tz'].close()       # in case the test fails
+            del connections['tz']
+            del connections.databases['tz']
 
 
 @override_settings(TIME_ZONE='Africa/Nairobi')

@@ -589,6 +589,41 @@ Default: ``''`` (Empty string)
 The port to use when connecting to the database. An empty string means the
 default port. Not used with SQLite.
 
+.. setting:: DATABASE-TIME_ZONE
+
+TIME_ZONE
+~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Default: ``None``
+
+A string representing the time zone for datetimes stored in this database
+(assuming that it doesn't support time zones) or ``None``. The same values are
+accepted as in the general :setting:`TIME_ZONE` setting.
+
+This allows interacting with third-party databases that store datetimes in
+local time rather than UTC. To avoid issues around DST changes, you shouldn't
+set this option for databases managed by Django.
+
+Setting this option requires installing pytz_.
+
+When :setting:`USE_TZ` is ``True`` and the database doesn't support time zones
+(e.g. SQLite, MySQL, Oracle), Django reads and writes datetimes in local time
+according to this option if it is set and in UTC if it isn't.
+
+When :setting:`USE_TZ` is ``True`` and the database supports time zones (e.g.
+PostgreSQL), it is an error to set this option.
+
+.. versionchanged:: 1.9
+
+    Before Django 1.9, the PostgreSQL database backend accepted an
+    undocumented ``TIME_ZONE`` option, which caused data corruption.
+
+When :setting:`USE_TZ` is ``False``, it is an error to set this option.
+
+.. _pytz: http://pytz.sourceforge.net/
+
 .. setting:: USER
 
 USER
@@ -2471,8 +2506,6 @@ to ensure your processes are running in the correct environment.
     match the system time zone.
 
 .. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-
-.. _pytz: http://pytz.sourceforge.net/
 
 .. setting:: USE_ETAGS
 
