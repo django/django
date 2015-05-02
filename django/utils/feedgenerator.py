@@ -29,7 +29,6 @@ from django.utils import datetime_safe, six
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
-from django.utils.timezone import is_aware
 from django.utils.xmlutils import SimplerXMLGenerator
 
 
@@ -46,13 +45,14 @@ def rfc2822_date(date):
     time_str = date.strftime('%s, %%d %s %%Y %%H:%%M:%%S ' % (dow, month))
     if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
-    if is_aware(date):
-        offset = date.tzinfo.utcoffset(date)
+    offset = date.utcoffset()
+    # Historically, this function assumes that naive datetimes are in UTC.
+    if offset is None:
+        return time_str + '-0000'
+    else:
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + '%+03d%02d' % (hour, minute)
-    else:
-        return time_str + '-0000'
 
 
 def rfc3339_date(date):
@@ -61,13 +61,14 @@ def rfc3339_date(date):
     time_str = date.strftime('%Y-%m-%dT%H:%M:%S')
     if six.PY2:             # strftime returns a byte string in Python 2
         time_str = time_str.decode('utf-8')
-    if is_aware(date):
-        offset = date.tzinfo.utcoffset(date)
+    offset = date.utcoffset()
+    # Historically, this function assumes that naive datetimes are in UTC.
+    if offset is None:
+        return time_str + 'Z'
+    else:
         timezone = (offset.days * 24 * 60) + (offset.seconds // 60)
         hour, minute = divmod(timezone, 60)
         return time_str + '%+03d:%02d' % (hour, minute)
-    else:
-        return time_str + 'Z'
 
 
 def get_tag_uri(url, date):
