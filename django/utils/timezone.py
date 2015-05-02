@@ -331,20 +331,26 @@ def is_aware(value):
     """
     Determines if a given datetime.datetime is aware.
 
-    The logic is described in Python's docs:
+    The concept is defined in Python's docs:
     http://docs.python.org/library/datetime.html#datetime.tzinfo
+
+    Assuming value.tzinfo is either None or a proper datetime.tzinfo,
+    value.utcoffset() implements the appropriate logic.
     """
-    return value.tzinfo is not None and value.tzinfo.utcoffset(value) is not None
+    return value.utcoffset() is not None
 
 
 def is_naive(value):
     """
     Determines if a given datetime.datetime is naive.
 
-    The logic is described in Python's docs:
+    The concept is defined in Python's docs:
     http://docs.python.org/library/datetime.html#datetime.tzinfo
+
+    Assuming value.tzinfo is either None or a proper datetime.tzinfo,
+    value.utcoffset() implements the appropriate logic.
     """
-    return value.tzinfo is None or value.tzinfo.utcoffset(value) is None
+    return value.utcoffset() is None
 
 
 def make_aware(value, timezone=None, is_dst=None):
