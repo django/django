@@ -66,7 +66,7 @@ def nested_view(request):
     """
     setup_test_environment()
     c = Client()
-    c.get("/no_template_view")
+    c.get("/no_template_view/")
     return render_to_response('base.html', {'nested': 'yes'})
 
 
