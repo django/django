@@ -2992,6 +2992,25 @@ table. This is used so that application data can hook into specific sites
 and a single database can manage content for multiple sites.
 
 
+.. _settings-sitemaps:
+
+Sitemaps
+=====
+
+Settings for :mod:`django.contrib.sitemaps`.
+
+.. setting:: SITEMAP_MAX_ITEMS
+
+SITEMAP_MAX_ITEMS
+-------
+
+Default: ``50000``
+
+The maximum number of items, as an integer, per page of indexed sitemap pages.
+``50000`` is the maximum number of items recommended by the sitemap protocol, but you
+may want to lower this number for performance purposes.
+
+
 .. _settings-staticfiles:
 
 Static files

@@ -362,7 +362,8 @@ dict don't change at all.
 
 You should create an index file if one of your sitemaps has more than 50,000
 URLs. In this case, Django will automatically paginate the sitemap, and the
-index will reflect that.
+index will reflect that. You can lower the number of items per page by defining
+ :setting:`SITEMAP_MAX_ITEMS` in your settings.
 
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
