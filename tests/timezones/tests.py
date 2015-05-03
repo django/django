@@ -4,7 +4,7 @@ import datetime
 import re
 import sys
 import warnings
-from unittest import skipIf
+from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
 
 from django.contrib.auth.models import User
@@ -622,9 +622,6 @@ class NewDatabaseTests(TestCase):
         self.assertEqual(e.dt, None)
 
 
-# TODO: chaining @skipIfDBFeature and @skipUnlessDBFeature doesn't work!
-@skipIfDBFeature('supports_timezones')
-@skipUnlessDBFeature('test_db_allows_multiple_connections')
 @override_settings(TIME_ZONE='Africa/Nairobi', USE_TZ=True)
 class ForcedTimeZoneDatabaseTests(TransactionTestCase):
     """
@@ -638,6 +635,13 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
 
     @classmethod
     def setUpClass(cls):
+        # @skipIfDBFeature and @skipUnlessDBFeature cannot be chained. The
+        # outermost takes precedence. Handle skipping manually instead.
+        if connection.features.supports_timezones:
+            raise SkipTest("Database has feature(s) supports_timezones")
+        if not connection.features.test_db_allows_multiple_connections:
+            raise SkipTest("Database doesn't support feature(s): test_db_allows_multiple_connections")
+
         super(ForcedTimeZoneDatabaseTests, cls).setUpClass()
         connections.databases['tz'] = connections.databases['default'].copy()
         connections.databases['tz']['TIME_ZONE'] = 'Asia/Bangkok'
