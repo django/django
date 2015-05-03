@@ -208,7 +208,11 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :func:`~django.contrib.sites.shortcuts.get_current_site` now handles the case
+  where ``request.get_host()`` returns ``domain:port``, e.g.
+  ``example.com:80``. If the lookup fails because the host does not match a
+  record in the database and the host has a port, the port is stripped and the
+  lookup is retried with the domain part only.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

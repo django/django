@@ -495,10 +495,23 @@ Finally, to avoid repetitive fallback code, the framework provides a
     A function that checks if ``django.contrib.sites`` is installed and
     returns either the current :class:`~django.contrib.sites.models.Site`
     object or a :class:`~django.contrib.sites.requests.RequestSite` object
-    based on the request.
+    based on the request. It looks up the current site based on
+    :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+    :setting:`SITE_ID` setting is not defined.
+
+    Both a domain and a port may be returned by :meth:`request.get_host()
+    <django.http.HttpRequest.get_host>` when the Host header has a port
+    explicitly specified, e.g. ``example.com:80``. In such cases, if the
+    lookup fails because the host does not match a record in the database,
+    the port is stripped and the lookup is retried with the domain part
+    only. This does not apply to
+    :class:`~django.contrib.sites.requests.RequestSite` which will always
+    use the unmodified host.
 
     .. versionchanged:: 1.8
 
-        This function will now lookup the current site based on
-        :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
-        :setting:`SITE_ID` setting is not defined.
+        Looking up the current site based on ``request.get_host()`` was added.
+
+    .. versionchanged:: 1.9
+
+        Retrying the lookup with the port stripped was added.
