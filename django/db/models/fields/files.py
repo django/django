@@ -243,6 +243,8 @@ class FileField(Field):
         self._unique_set_explicitly = 'unique' in kwargs
 
         self.storage = storage or default_storage
+        if callable(self.storage):
+            self.storage = self.storage()
         self.upload_to = upload_to
         if callable(upload_to):
             self.generate_filename = upload_to
