@@ -1,4 +1,3 @@
-import _sqlite3  # isort:skip
 import codecs
 import contextlib
 import copy
@@ -34,6 +33,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             c.execute('PRAGMA foreign_keys = %s' % int(self._initial_pragma_fk))
 
     def quote_value(self, value):
+        # The backend "mostly works" without this function and there are use
+        # cases for compiling Python without the sqlite3 libraries (e.g.
+        # security hardening).
+        import _sqlite3
         try:
             value = _sqlite3.adapt(value)
         except _sqlite3.ProgrammingError:
