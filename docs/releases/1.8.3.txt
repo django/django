@@ -9,4 +9,5 @@ Django 1.8.3 fixes several bugs in 1.8.2.
 Bugfixes
 ========
 
-* ...
+* Fixed ``get_current_site()`` failure in the case where a port is
+  present in the value returned by ``HttpRequest.get_host()``.

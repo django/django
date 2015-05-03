@@ -75,6 +75,26 @@ class SitesFrameworkTests(TestCase):
             self.assertIsInstance(site, RequestSite)
             self.assertEqual(site.name, "example.com")
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_get_current_site_host_header_with_port(self):
+        # Test that the correct Site object is returned
+        request = HttpRequest()
+        request.META = {"HTTP_HOST": "example.com:80"}
+        site = get_current_site(request)
+        self.assertIsInstance(site, Site)
+        self.assertEqual(site.id, settings.SITE_ID)
+
+        # Test that an exception is raised if the sites framework is installed
+        # but there is no matching Site
+        site.delete()
+        self.assertRaises(ObjectDoesNotExist, get_current_site, request)
+
+        # A RequestSite is returned if the sites framework is not installed
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
+            site = get_current_site(request)
+            self.assertIsInstance(site, RequestSite)
+            self.assertEqual(site.name, "example.com")
+
     @override_settings(SITE_ID='', ALLOWED_HOSTS=['example.com'])
     def test_get_current_site_no_site_id(self):
         request = HttpRequest()
