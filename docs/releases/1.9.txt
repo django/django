@@ -141,7 +141,9 @@ Email
 File Storage
 ^^^^^^^^^^^^
 
-* ...
+* :meth:`Storage.get_valid_name()
+  <django.core.files.storage.Storage.get_valid_name>` is now called when
+  the :attr:`~django.db.models.FileField.upload_to` is a callable.
 
 File Uploads
 ^^^^^^^^^^^^
