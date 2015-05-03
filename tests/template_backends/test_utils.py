@@ -35,3 +35,12 @@ class TemplateStringsTests(SimpleTestCase):
             engines.all()
         with self.assertRaises(ImproperlyConfigured):
             engines.all()
+
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }, {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    }])
+    def test_backend_names_must_be_unique(self):
+        with self.assertRaises(ImproperlyConfigured):
+            engines.all()
