@@ -244,8 +244,6 @@ class FileField(Field):
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
-        if callable(upload_to):
-            self.generate_filename = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
@@ -326,6 +324,13 @@ class FileField(Field):
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
 
     def generate_filename(self, instance, filename):
+        # If upload_to is a callable, make sure that the path returned by it is
+        # passed through the get_valid_name of underlying storage.
+        if callable(self.upload_to):
+            directory_name, filename = os.path.split(self.upload_to(instance, filename))
+            filename = self.storage.get_valid_name(filename)
+            return os.path.normpath(os.path.join(directory_name, filename))
+
         return os.path.join(self.get_directory_name(), self.get_filename(filename))
 
     def save_form_data(self, instance, data):
