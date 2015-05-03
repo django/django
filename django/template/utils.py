@@ -50,6 +50,7 @@ class EngineHandler(object):
             ]
 
         templates = OrderedDict()
+        backend_names = []
         for tpl in self._templates:
             tpl = tpl.copy()
             try:
@@ -68,8 +69,9 @@ class EngineHandler(object):
             tpl.setdefault('OPTIONS', {})
 
             templates[tpl['NAME']] = tpl
+            backend_names.append(tpl['NAME'])
 
-        counts = Counter(list(templates))
+        counts = Counter(backend_names)
         duplicates = [alias for alias, count in counts.most_common() if count > 1]
         if duplicates:
             raise ImproperlyConfigured(
