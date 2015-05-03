@@ -37,6 +37,8 @@ try:
 except ImportError:
     pytz = None
 
+requires_pytz = skipIf(pytz is None, "this test requires pytz")
+
 # These tests use the EAT (Eastern Africa Time) and ICT (Indochina Time)
 # who don't have Daylight Saving Time, so we can represent them easily
 # with FixedOffset, and use them directly as tzinfo in the constructors.
@@ -372,7 +374,7 @@ class NewDatabaseTests(TestCase):
         self.assertEqual(Event.objects.filter(dt__gte=dt2).count(), 1)
         self.assertEqual(Event.objects.filter(dt__gt=dt2).count(), 0)
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_query_filter_with_pytz_timezones(self):
         tz = pytz.timezone('Europe/Paris')
         dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=tz)
@@ -898,7 +900,7 @@ class TemplateTests(TestCase):
                     expected = results[k1][k2]
                     self.assertEqual(actual, expected, '%s / %s: %r != %r' % (k1, k2, actual, expected))
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_localtime_filters_with_pytz(self):
         """
         Test the |localtime, |utc, and |timezone filters with pytz.
@@ -963,7 +965,7 @@ class TemplateTests(TestCase):
                        'tz1': ICT, 'tz2': None})
         self.assertEqual(tpl.render(ctx), "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00")
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_timezone_templatetag_with_pytz(self):
         """
         Test the {% timezone %} templatetag with pytz.
@@ -1003,7 +1005,7 @@ class TemplateTests(TestCase):
         with timezone.override(UTC):
             self.assertEqual(tpl.render(Context({'tz': ICT})), "+0700")
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_get_current_timezone_templatetag_with_pytz(self):
         """
         Test the {% get_current_timezone %} templatetag with pytz.
@@ -1071,7 +1073,7 @@ class LegacyFormsTests(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 9, 1, 13, 20, 30))
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_form_with_non_existent_time(self):
         form = EventForm({'dt': '2011-03-27 02:30:00'})
         with timezone.override(pytz.timezone('Europe/Paris')):
@@ -1079,7 +1081,7 @@ class LegacyFormsTests(TestCase):
             self.assertTrue(form.is_valid())
             self.assertEqual(form.cleaned_data['dt'], datetime.datetime(2011, 3, 27, 2, 30, 0))
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_form_with_ambiguous_time(self):
         form = EventForm({'dt': '2011-10-30 02:30:00'})
         with timezone.override(pytz.timezone('Europe/Paris')):
@@ -1118,7 +1120,7 @@ class NewFormsTests(TestCase):
         # Datetime inputs formats don't allow providing a time zone.
         self.assertFalse(form.is_valid())
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_form_with_non_existent_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-03-27 02:30:00'})
@@ -1127,7 +1129,7 @@ class NewFormsTests(TestCase):
                 ["2011-03-27 02:30:00 couldn't be interpreted in time zone "
                  "Europe/Paris; it may be ambiguous or it may not exist."])
 
-    @skipIf(pytz is None, "this test requires pytz")
+    @requires_pytz
     def test_form_with_ambiguous_time(self):
         with timezone.override(pytz.timezone('Europe/Paris')):
             form = EventForm({'dt': '2011-10-30 02:30:00'})
