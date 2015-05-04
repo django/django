@@ -232,6 +232,17 @@ Sitemap class reference
         sitemap was requested is used. If the sitemap is built outside the
         context of a request, the default is ``'http'``.
 
+    .. attribute:: Sitemap.limit
+
+        **Optional.**
+
+        This attribute defines the maximum number of urls included per page. Its
+        value should not exceed ``50000`` which is the upper limit defined by 
+        Google. Default value is ``50000``. See the `index documentation on
+        sitemaps.org`_ for more.
+
+        .. _index documentation on sitemaps.org: http://www.sitemaps.org/protocol.html#index
+
     .. attribute:: Sitemap.i18n
 
         .. versionadded:: 1.8
