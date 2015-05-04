@@ -16,8 +16,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
+    sql_rename_sequence = "RENAME %(old_sq_name)s TO %(new_sq_name)s"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_delete_table = "DROP TABLE %(table)s CASCADE CONSTRAINTS"
+    sql_delete_trigger = "DROP TRIGGER %(tr_name)s"
 
     def quote_value(self, value):
         if isinstance(value, (datetime.date, datetime.time, datetime.datetime)):
@@ -46,6 +48,32 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 END IF;
             END;
         /""" % {'sq_name': self.connection.ops._get_sequence_name(model._meta.db_table)})
+
+    def alter_db_table(self, model, old_db_table, new_db_table):
+        # Run superclass action
+        super(DatabaseSchemaEditor, self).alter_db_table(model, old_db_table, new_db_table)
+        # Don't do anything if table name hasn't changed.
+        if old_db_table == new_db_table:
+            return
+        # If auto_field rename sequences and triggers
+        opts = model._meta
+        if opts.auto_field:
+            # Get auto column
+            auto_column = opts.auto_field.db_column or opts.auto_field.name
+            # Rename autoincrement sequence
+            sql = self.sql_rename_sequence % {
+                "old_sq_name": self.connection.ops._get_sequence_name(old_db_table),
+                "new_sq_name": self.connection.ops._get_sequence_name(new_db_table)
+            }
+            self.execute(sql)
+            # Drop old trigger
+            sql = self.sql_delete_trigger % {
+                'tr_name': self.connection.ops._get_trigger_name(old_db_table),
+            }
+            self.execute(sql)
+            # Create new trigger
+            (sequence_sql, trigger_sql) = self.connection.ops.autoinc_sql(new_db_table, auto_column)
+            self.execute(trigger_sql)
 
     def alter_field(self, model, old_field, new_field, strict=False):
         try:

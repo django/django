@@ -1,15 +1,11 @@
 ==========================
-Django 1.8.2 release notes
+Django 1.7.9 release notes
 ==========================
 
 *Under development*
-
-Django 1.8.2 fixes several bugs in 1.8.1.
 
 Bugfixes
 ========
 
 * Added renaming of Oracle triggers and sequences when using
   ``RenameModel`` (:ticket:`24715`).
-
-* Fixed check for template engine alias unicity (:ticket:`24685`).

@@ -3,6 +3,7 @@ import itertools
 import unittest
 from copy import copy
 
+from django.core.management.color import no_style
 from django.db import (
     DatabaseError, IntegrityError, OperationalError, connection,
 )
@@ -1161,6 +1162,11 @@ class SchemaTests(TransactionTestCase):
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
         self.assertEqual(columns['name'][0], "CharField")
+        # Ensure we can still reset sequence and sequence was renamed properly
+        sql_list = connection.ops.sequence_reset_sql(no_style(), [Author, ])
+        with connection.schema_editor() as editor:
+            for sql in sql_list:
+                editor.execute(sql)
         # Alter the table again
         with connection.schema_editor() as editor:
             editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
