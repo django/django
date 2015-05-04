@@ -237,9 +237,9 @@ Sitemap class reference
         **Optional.**
 
         This attribute defines the maximum number of urls included per page. Its
-        value should not exceed ``50000`` which is the upper limit defined by 
-        Google. Default value is ``50000``. See the `index documentation on
-        sitemaps.org`_ for more.
+        value should not exceed ``50000`` which is the upper limit allowed/accepted 
+        by Google. Default value is ``50000``. See the `index documentation on
+        sitemaps.org`_ for more information.
 
         .. _index documentation on sitemaps.org: http://www.sitemaps.org/protocol.html#index
 
