@@ -143,8 +143,14 @@ class SQLCompiler(object):
             # then also add having expressions to group by.
             pk = None
             for expr in expressions:
-                if (expr.output_field.primary_key and
-                        getattr(expr.output_field, 'model') == self.query.model):
+                # Is this a reference to query's base table primary key? If the expression
+                # isn't a Col-like, then skip the expression.
+                try:
+                    target = expr.target
+                    alias = expr.alias
+                except AttributeError:
+                    continue
+                if target == self.query.model._meta.pk and alias == self.query.tables[0]:
                     pk = expr
             if pk:
                 # MySQLism: Columns in HAVING clause must be added to the GROUP BY.
