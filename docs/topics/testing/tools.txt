@@ -475,14 +475,22 @@ can access these properties as part of a test condition.
     A dictionary-like object containing session information. See the
     :doc:`session documentation</topics/http/sessions>` for full details.
 
-    To modify the session and then save it, it must be stored in a variable
-    first (because a new ``SessionStore`` is created every time this property
-    is accessed)::
+    In Django 1.7, ``client.session`` returns a plain dictionary if the session
+    is empty. The following code creates a test client with a fully working
+    session engine::
 
-        def test_something(self):
-            session = self.client.session
-            session['somekey'] = 'test'
-            session.save()
+        from importlib import import_module
+
+        from django.conf import settings
+        from django.test import Client
+
+        def get_client_with_session(self):
+            client = Client()
+            engine = import_module(settings.SESSION_ENGINE)
+            s = engine.SessionStore()
+            s.save()
+            client.cookies[settings.SESSION_COOKIE_NAME] = s.session_key
+            return client
 
 Example
 ~~~~~~~
