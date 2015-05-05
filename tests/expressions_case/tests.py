@@ -9,6 +9,7 @@ from uuid import UUID
 from django.core.exceptions import FieldError
 from django.db import connection, models
 from django.db.models import F, Q, Max, Min, Value
+from django.db.models.aggregates import Count
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
@@ -128,6 +129,21 @@ class CaseExpressionTests(TestCase):
                 output_field=models.CharField(),
             )).order_by('pk'),
             [(1, 'equal'), (2, '+1'), (3, '+1'), (2, 'equal'), (3, '+1'), (3, 'equal'), (4, 'other')],
+            transform=attrgetter('integer', 'join_test')
+        )
+
+    def test_annotate_with_reverse_join_in_condition(self):
+        # Create model instance with no reverse FKs
+        CaseTestModel.objects.create(integer=-1, integer2=-1, string='other')
+
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.annotate(join_test=Count(Case(
+                When(Q(fk_rel__integer=5), 'fk_rel'),
+                output_field=models.IntegerField(),
+            ))).order_by('pk'),
+            [(1, 0), (2, 0), (3, 0), (2, 0), (3, 0), (3, 0), (4, 1),
+             (-1, 0)],
+
             transform=attrgetter('integer', 'join_test')
         )
 
