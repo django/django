@@ -711,6 +711,13 @@ utility methods:
         * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
           and zero)
 
+.. versionchanged:: 1.9
+
+    ``AbstractBaseUser`` and ``BaseUserManager`` were moved to a new
+    ``django.contrib.auth.base_user`` module so they can be imported without
+    including ``django.contrib.auth`` in :setting:`INSTALLED_APPS`.
+
+
 Extending Django's default User
 -------------------------------
 

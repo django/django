@@ -428,6 +428,10 @@ Miscellaneous
 
 * Support for PostGIS 1.5 has been dropped.
 
+* ``AbstractBaseUser`` and ``BaseUserManager`` were moved to a new
+  ``django.contrib.auth.base_user`` module so they can be imported without
+  including ``django.contrib.auth`` in :setting:`INSTALLED_APPS`.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
