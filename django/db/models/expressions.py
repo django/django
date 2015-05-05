@@ -780,6 +780,11 @@ class Case(Expression):
         c.default = c.default.resolve_expression(query, allow_joins, reuse, summarize, for_save)
         return c
 
+    def copy(self):
+        c = super(Case, self).copy()
+        c.cases = c.cases[:]
+        return c
+
     def as_sql(self, compiler, connection, template=None, extra=None):
         connection.ops.check_expression_support(self)
         if not self.cases:
