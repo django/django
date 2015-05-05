@@ -8,6 +8,7 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.core.management import call_command
 from django.db import connection, connections
 from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import modify_settings
 from django.utils.six import StringIO
 
 from ..test_data import TEST_DATA
@@ -20,8 +21,8 @@ if HAS_GDAL:
 
 
 @skipUnless(HAS_GDAL, "InspectDbTests needs GDAL support")
-@skipUnlessDBFeature("gis_enabled")
 class InspectDbTests(TestCase):
+    @skipUnlessDBFeature("gis_enabled")
     def test_geom_columns(self):
         """
         Test the geo-enabled inspectdb command.
@@ -62,7 +63,9 @@ class InspectDbTests(TestCase):
 
 
 @skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
-@skipUnlessDBFeature("gis_enabled")
+@modify_settings(
+    INSTALLED_APPS={'append': 'django.contrib.gis'},
+)
 class OGRInspectTest(TestCase):
     maxDiff = 1024
 
@@ -83,6 +86,11 @@ class OGRInspectTest(TestCase):
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
+
+    def test_poly_multi(self):
+        shp_file = os.path.join(TEST_DATA, 'test_poly', 'test_poly.shp')
+        model_def = ogrinspect(shp_file, 'MyModel', multi_geom=True)
+        self.assertIn('geom = models.MultiPolygonField(srid=-1)', model_def)
 
     def test_date_field(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
