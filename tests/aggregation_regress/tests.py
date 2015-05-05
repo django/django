@@ -17,7 +17,7 @@ from django.utils import six
 
 from .models import (
     Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
-    Publisher, Store, WithManualPK,
+    Publisher, Store, Thing, WithManualPK,
 )
 
 
@@ -1277,3 +1277,15 @@ class JoinPromotionTests(TestCase):
     def test_non_nullable_fk_not_promoted(self):
         qs = Book.objects.annotate(Count('contact__name'))
         self.assertIn(' INNER JOIN ', str(qs.query))
+
+
+class Ticket24748Tests(TestCase):
+    def test_ticket_24748(self):
+        t1 = Thing.objects.create(name='t1')
+        Thing.objects.create(name='t2', parent=t1)
+        Thing.objects.create(name='t3', parent=t1)
+        self.assertQuerysetEqual(
+            Thing.objects.annotate(num_children=Count('children')).order_by('name'),
+            [('t1', 2), ('t2', 0), ('t3', 0)],
+            lambda x: (x.name, x.num_children)
+        )
