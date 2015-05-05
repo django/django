@@ -195,12 +195,15 @@ class Atomic(ContextDecorator):
 
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
+        commit_successful = False
+        toplevel_of_transaction = False
 
         if connection.savepoint_ids:
             sid = connection.savepoint_ids.pop()
         else:
             # Prematurely unset this flag to allow using commit or rollback.
             connection.in_atomic_block = False
+            toplevel_of_transaction = True
 
         try:
             if connection.closed_in_transaction:
@@ -238,6 +241,8 @@ class Atomic(ContextDecorator):
                             # went wrong with the connection. Drop it.
                             connection.close()
                         raise
+                    else:
+                        commit_successful = True
             else:
                 # This flag will be set to True again if there isn't a savepoint
                 # allowing to perform the rollback at this level.
@@ -283,6 +288,12 @@ class Atomic(ContextDecorator):
                 else:
                     connection.in_atomic_block = False
 
+        if toplevel_of_transaction:
+            if commit_successful:
+                connection.invoke_callbacks_after_commit()
+            else:
+                connection.remove_all_callbacks()
+
 
 def atomic(using=None, savepoint=True):
     # Bare decorator: @atomic -- although the first argument is called
@@ -309,3 +320,8 @@ def non_atomic_requests(using=None):
         if using is None:
             using = DEFAULT_DB_ALIAS
         return lambda view: _non_atomic_requests(view, using)
+
+
+def add_callback_after_commit(callback, args, kwargs, using=None):
+    return get_connection(using).add_callback_after_commit(
+        callback, args, kwargs)

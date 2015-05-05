@@ -58,6 +58,8 @@ class BaseDatabaseWrapper(object):
         # Tracks if the outermost 'atomic' block should commit on exit,
         # ie. if autocommit was active on entry.
         self.commit_on_exit = True
+        # Callbacks to be invoked after commit.
+        self.callbacks_after_commit = []
         # Tracks if the transaction should be rolled back to the next
         # available savepoint because of an exception in an inner block.
         self.needs_rollback = False
@@ -326,6 +328,17 @@ class BaseDatabaseWrapper(object):
             raise TransactionManagementError(
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block.")
+
+    def add_callback_after_commit(self, callback, args, kwargs):
+        self.callbacks_after_commit.append((callback, args, kwargs))
+
+    def invoke_callbacks_after_commit(self):
+        for (callback, args, kwargs) in self.callbacks_after_commit:
+            callback(*args, **kwargs)
+        self.callbacks_after_commit = []
+
+    def remove_all_callbacks(self):
+        self.callbacks_after_commit = []
 
     # ##### Foreign key constraints checks handling #####
 

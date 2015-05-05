@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import signals
 from django.dispatch import receiver
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.utils import six
 
 from .models import Author, Book, Car, Person
@@ -255,6 +255,107 @@ class SignalTests(BaseSignalTest):
         self.assertTrue(a._run)
         self.assertTrue(b._run)
         self.assertEqual(signals.post_save.receivers, [])
+
+
+class ModelSignalAfterCommitTest(TransactionTestCase):
+    available_apps = ['signals']
+
+    def setUp(self):
+        # Save up the number of connected signals so that we can check at the
+        # end that all the signals we register get properly unregistered (#9989)
+        self.pre_signals = (
+            len(signals.post_save.receivers),
+            len(signals.post_delete.receivers),
+            len(signals.m2m_changed.receivers),
+        )
+        self.received = []
+
+    def tearDown(self):
+        # Check that all our signals got disconnected properly.
+        post_signals = (
+            len(signals.post_save.receivers),
+            len(signals.post_delete.receivers),
+            len(signals.m2m_changed.receivers),
+        )
+        self.assertEqual(self.pre_signals, post_signals)
+
+    def receiver(self, **kwargs):
+        another = {'signal': kwargs['signal'],
+                   'instance': kwargs['instance'],
+                   }
+        if 'action' in kwargs:
+            another.update({'action': kwargs['action']})
+        self.received.append(another)
+
+    def test_post_save_defer_until_commit(self):
+        signals.post_save.connect(self.receiver, weak=False, after_commit=True)
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1 = Person.objects.create(first_name="John", last_name="Smith")
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [
+                {'signal': signals.post_save, 'instance': p1}
+            ])
+        finally:
+            signals.post_save.disconnect(self.receiver)
+
+    def test_post_delete_defer_until_commit(self):
+        signals.post_delete.connect(self.receiver, weak=False, after_commit=True)
+        p1 = Person.objects.create(first_name="Delete", last_name="Me")
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1.delete()
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [
+                {'signal': signals.post_delete, 'instance': p1}
+            ])
+        finally:
+            signals.post_delete.disconnect(self.receiver)
+
+    def test_m2m_changed_defer_until_commit(self):
+        signals.m2m_changed.connect(self.receiver, weak=False, after_commit=True)
+        a1 = Author.objects.create(name='Neal Stephenson')
+        b1 = Book.objects.create(name='Snow Crash')
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                b1.authors.add(a1)
+                self.assertFalse(self.received)
+            self.assertEqual(self.received, [
+                {'signal': signals.m2m_changed, 'instance': b1, 'action': "pre_add"},
+                {'signal': signals.m2m_changed, 'instance': b1, 'action': "post_add"},
+            ])
+        finally:
+            signals.m2m_changed.disconnect(self.receiver)
+
+    def test_decorator_form(self):
+        data = []
+
+        @receiver(signals.post_save, weak=False, after_commit=True)
+        def decorated_handler(signal, instance, **kwargs):
+            data.append(instance)
+
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            with transaction.atomic():
+                p1 = Person.objects.create(first_name="John", last_name="Smith")
+                self.assertFalse(data)
+            self.assertEqual(data, [p1])
+        finally:
+            signals.post_save.disconnect(decorated_handler)
+
+    def test_autocommit_not_deferred(self):
+        signals.post_save.connect(self.receiver, weak=False, after_commit=True)
+        try:
+            self.assertTrue(transaction.get_autocommit())
+            p1 = Person.objects.create(first_name="John", last_name="Smith")
+            self.assertEqual(self.received, [
+                {'signal': signals.post_save, 'instance': p1}
+            ])
+        finally:
+            signals.post_save.disconnect(self.receiver)
 
 
 class LazyModelRefTest(BaseSignalTest):
