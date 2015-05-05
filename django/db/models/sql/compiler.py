@@ -145,9 +145,12 @@ class SQLCompiler(object):
             # then also add having expressions to group by.
             pk = None
             for expr in expressions:
-                if (expr.output_field.primary_key and
-                        getattr(expr.output_field, 'model') == self.query.model):
+                # Is this a reference to query's base table primary key? If the
+                # expression isn't a Col-like, then skip the expression.
+                if (getattr(expr, 'target', None) == self.query.model._meta.pk and
+                        getattr(expr, 'alias', None) == self.query.tables[0]):
                     pk = expr
+                    break
             if pk:
                 expressions = [pk] + [expr for expr in expressions if expr in having]
         return expressions

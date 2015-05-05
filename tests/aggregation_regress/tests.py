@@ -16,7 +16,7 @@ from django.utils import six
 
 from .models import (
     Alfa, Author, Book, Bravo, Charlie, Clues, Entries, HardbackBook, ItemTag,
-    Publisher, WithManualPK,
+    Publisher, SelfRefFK, WithManualPK,
 )
 
 
@@ -1174,28 +1174,13 @@ class JoinPromotionTests(TestCase):
         self.assertIn(' INNER JOIN ', str(qs.query))
 
 
-class AggregationOnRelationTest(TestCase):
-    def setUp(self):
-        self.a = Author.objects.create(name='Anssi', age=33)
-        self.p = Publisher.objects.create(name='Manning', num_awards=3)
-        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
-                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
-
-    def test_annotate_on_relation(self):
-        qs = Book.objects.annotate(avg_price=Avg('price'), publisher_name=F('publisher__name'))
-        self.assertEqual(qs[0].avg_price, 0.0)
-        self.assertEqual(qs[0].publisher_name, "Manning")
-
-    def test_aggregate_on_relation(self):
-        # A query with an existing annotation aggregation on a relation should
-        # succeed.
-        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
-            publisher_awards=Sum('publisher__num_awards')
+class SelfReferentialFKTests(TestCase):
+    def test_ticket_24748(self):
+        t1 = SelfRefFK.objects.create(name='t1')
+        SelfRefFK.objects.create(name='t2', parent=t1)
+        SelfRefFK.objects.create(name='t3', parent=t1)
+        self.assertQuerysetEqual(
+            SelfRefFK.objects.annotate(num_children=Count('children')).order_by('name'),
+            [('t1', 2), ('t2', 0), ('t3', 0)],
+            lambda x: (x.name, x.num_children)
         )
-        self.assertEqual(qs['publisher_awards'], 3)
-        Book.objects.create(isbn='asdf', name='Foo', pages=10, rating=0.1, price="0.0",
-                            contact=self.a, publisher=self.p, pubdate=datetime.date.today())
-        qs = Book.objects.annotate(avg_price=Avg('price')).aggregate(
-            publisher_awards=Sum('publisher__num_awards')
-        )
-        self.assertEqual(qs['publisher_awards'], 6)

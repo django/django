@@ -104,3 +104,8 @@ class Bravo(models.Model):
 class Charlie(models.Model):
     alfa = models.ForeignKey(Alfa, null=True)
     bravo = models.ForeignKey(Bravo, null=True)
+
+
+class SelfRefFK(models.Model):
+    name = models.CharField(max_length=50)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
