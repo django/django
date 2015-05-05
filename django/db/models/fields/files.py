@@ -1,7 +1,7 @@
 import datetime
 import os
 import warnings
-from inspect import getargspec
+from inspect import getargspec, isfunction
 
 from django import forms
 from django.core import checks
@@ -243,6 +243,8 @@ class FileField(Field):
         self._unique_set_explicitly = 'unique' in kwargs
 
         self.storage = storage or default_storage
+        if isfunction(self.storage):
+            self.storage = self.storage()
         self.upload_to = upload_to
         if callable(upload_to):
             self.generate_filename = upload_to
