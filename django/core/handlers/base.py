@@ -162,14 +162,14 @@ class BaseHandler(object):
                             % (middleware_method.__self__.__class__.__name__))
                 response = response.render()
 
-        except http.Http404 as e:
+        except http.Http404 as exc:
             logger.warning('Not Found: %s', request.path,
                         extra={
                             'status_code': 404,
                             'request': request
                         })
             if settings.DEBUG:
-                response = debug.technical_404_response(request, e)
+                response = debug.technical_404_response(request, exc)
             else:
                 response = self.get_exception_response(request, resolver, 404)
 
@@ -191,13 +191,13 @@ class BaseHandler(object):
                 })
             response = self.get_exception_response(request, resolver, 400)
 
-        except SuspiciousOperation as e:
+        except SuspiciousOperation as exc:
             # The request logger receives events for any problematic request
             # The security logger receives events for all SuspiciousOperations
             security_logger = logging.getLogger('django.security.%s' %
-                            e.__class__.__name__)
+                            exc.__class__.__name__)
             security_logger.error(
-                force_text(e),
+                force_text(exc),
                 extra={
                     'status_code': 400,
                     'request': request
