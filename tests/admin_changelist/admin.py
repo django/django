@@ -60,6 +60,11 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
 
+class ConcertAdmin(admin.ModelAdmin):
+    list_filter = ['group__members']
+    search_fields = ['group__members__name']
+
+
 class QuartetAdmin(admin.ModelAdmin):
     list_filter = ['members']
 
