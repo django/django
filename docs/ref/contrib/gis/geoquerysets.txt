@@ -286,7 +286,7 @@ Example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
 
 PostGIS SQL equivalent::
 
@@ -308,7 +308,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
 
 Oracle SQL equivalent::
 
