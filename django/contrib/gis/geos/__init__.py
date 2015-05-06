@@ -1,7 +1,6 @@
 """
 The GeoDjango GEOS module.  Please consult the GeoDjango documentation
-for more details:
-  http://geodjango.org/docs/geos.html
+for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 """
 from .collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon  # NOQA
 from .error import GEOSException, GEOSIndexError  # NOQA
