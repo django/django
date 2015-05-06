@@ -217,6 +217,11 @@ foundation for custom widgets.
                 >>> name.render('name', 'A name')
                 '<input name="name" type="text" value="A name" />'
 
+    .. attribute:: Widget.supports_microseconds
+
+       If set to ``False`` the microseconds part of a
+       :class:`~datetime.datetime` value will be set to 0.
+
     .. method:: render(name, value, attrs=None)
 
         Returns HTML for the widget, as a Unicode string. This method must be
@@ -491,6 +496,10 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
     :ref:`format-localization`.
 
+    The microseconds part of the time value is always set to 0. If microseconds
+    are required, derive your own widget class with the
+    ``supports_microseconds`` attribute set to ``True``.
+
 ``TimeInput``
 ~~~~~~~~~~~~~
 
@@ -507,6 +516,9 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`TIME_INPUT_FORMATS` and respects
     :ref:`format-localization`.
+
+    For the treatment of microseconds see :class:`DateTimeInput`.
+
 
 ``Textarea``
 ~~~~~~~~~~~~
