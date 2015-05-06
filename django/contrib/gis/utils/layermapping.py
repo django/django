@@ -4,7 +4,7 @@
  vector files (e.g. SHP files) to Geographic-enabled Django models.
 
  For more information, please consult the GeoDjango documentation:
-   http://geodjango.org/docs/layermapping.html
+   https://docs.djangoproject.com/en/dev/ref/contrib/gis/layermapping/
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
