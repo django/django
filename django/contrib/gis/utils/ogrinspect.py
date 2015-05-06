@@ -43,11 +43,9 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
             mfield += 'field'
         _mapping[mfield] = field
     gtype = data_source[layer_key].geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
-        prefix = 'MULTI'
-    else:
-        prefix = ''
-    _mapping[geom_name] = prefix + str(gtype).upper()
+    if multi_geom:
+        gtype.to_multi()
+    _mapping[geom_name] = str(gtype).upper()
     return _mapping
 
 
@@ -210,10 +208,9 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     # TODO: Autodetection of multigeometry types (see #7218).
     gtype = layer.geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
-        geom_field = 'Multi%s' % gtype.django
-    else:
-        geom_field = gtype.django
+    if multi_geom:
+        gtype.to_multi()
+    geom_field = gtype.django
 
     # Setting up the SRID keyword string.
     if srid is None:
