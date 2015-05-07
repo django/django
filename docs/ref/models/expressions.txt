@@ -593,7 +593,7 @@ to play nice with other query expressions::
     def get_source_expressions(self):
         return self.expressions
 
-    def set_source_expressions(expressions):
+    def set_source_expressions(self, expressions):
         self.expressions = expressions
 
 Let's see how it works::
