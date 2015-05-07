@@ -1738,7 +1738,7 @@ removed in Django 1.8 (please see the :ref:`deprecation timeline
 
 * Usage of the hard-coded *Hold down "Control", or "Command" on a Mac, to select
   more than one.* string to override or append to user-provided ``help_text`` in
-  forms for ``ManyToMany`` model fields is not be performed by Django anymore
+  forms for ``ManyToMany`` model fields is not performed by Django anymore
   either at the model or forms layer.
 
 * The ``Model._meta.get_(add|change|delete)_permission`` methods are removed.
