@@ -46,14 +46,14 @@ class LogEntry(models.Model):
         return smart_text(self.action_time)
 
     def __str__(self):
-        if self.action_flag == ADDITION:
+        if self.is_addition():
             return ugettext('Added "%(object)s".') % {'object': self.object_repr}
-        elif self.action_flag == CHANGE:
+        elif self.is_change():
             return ugettext('Changed "%(object)s" - %(changes)s') % {
                 'object': self.object_repr,
                 'changes': self.change_message,
             }
-        elif self.action_flag == DELETION:
+        elif self.is_deletion():
             return ugettext('Deleted "%(object)s."') % {'object': self.object_repr}
 
         return ugettext('LogEntry Object')
