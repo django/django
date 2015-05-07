@@ -13,7 +13,7 @@ Settings
     and :setting:`STATICFILES_FINDERS`. Make sure you keep the components
     required by the features of Django you wish to use.
 
-Core settings
+Core Settings
 =============
 
 Here's a list of settings available in Django core and their default values.
@@ -71,8 +71,8 @@ Default: ``[]`` (Empty list)
 
 A list of strings representing the host/domain names that this Django site can
 serve. This is a security measure to prevent an attacker from poisoning caches
-and password reset emails with links to malicious hosts by submitting requests
-with a fake HTTP ``Host`` header, which is possible even under many
+and triggering password reset emails with links to malicious hosts by submitting
+requests with a fake HTTP ``Host`` header, which is possible even under many
 seemingly-safe web server configurations.
 
 Values in this list can be fully qualified names (e.g. ``'www.example.com'``),
@@ -331,7 +331,7 @@ CSRF_COOKIE_AGE
 
 .. versionadded:: 1.7
 
-Default: ``31449600`` (1 year, in seconds)
+Default: ``31449600`` (approximately 1 year, in seconds)
 
 The age of CSRF cookies, in seconds.
 
@@ -342,7 +342,7 @@ would fail in this case.
 
 Some browsers (specifically Internet Explorer) can disallow the use of
 persistent cookies or can have the indexes to the cookie jar corrupted on disk,
-thereby causing CSRF protection checks to fail (and sometimes intermittently).
+thereby causing CSRF protection checks to (sometimes intermittently) fail.
 Change this setting to ``None`` to use session-based CSRF cookies, which
 keep the cookies in-memory instead of on persistent storage.
 
@@ -387,8 +387,8 @@ CSRF_COOKIE_NAME
 
 Default: ``'csrftoken'``
 
-The name of the cookie to use for the CSRF authentication token. This can be whatever you
-want.  See :doc:`/ref/csrf`.
+The name of the cookie to use for the CSRF authentication token. This can be
+whatever you want. See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -413,7 +413,7 @@ Default: ``False``
 
 Whether to use a secure cookie for the CSRF cookie. If this is set to ``True``,
 the cookie will be marked as "secure," which means browsers may ensure that the
-cookie is only sent under an HTTPS connection.
+cookie is only sent with an HTTPS connection.
 
 .. setting:: CSRF_FAILURE_VIEW
 
@@ -425,7 +425,8 @@ Default: ``'django.views.csrf.csrf_failure'``
 A dotted path to the view function to be used when an incoming request
 is rejected by the CSRF protection.  The function should have this signature::
 
-  def csrf_failure(request, reason="")
+    def csrf_failure(request, reason=""):
+        ...
 
 where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
@@ -439,7 +440,7 @@ DATABASES
 Default: ``{}`` (Empty dictionary)
 
 A dictionary containing the settings for all databases to be used with
-Django. It is a nested dictionary whose contents maps database aliases
+Django. It is a nested dictionary whose contents map a database alias
 to a dictionary containing the options for an individual database.
 
 The :setting:`DATABASES` setting must configure a ``default`` database;
@@ -721,7 +722,7 @@ Default: ``True``
 This is an Oracle-specific setting.
 
 If it is set to ``False``, the test tablespaces won't be automatically created
-at the beginning of the tests and dropped at the end.
+at the beginning of the tests or dropped at the end.
 
 .. setting:: TEST_USER_CREATE
 
@@ -971,7 +972,7 @@ DATABASE_ROUTERS
 Default: ``[]`` (Empty list)
 
 The list of routers that will be used to determine which database
-to use when performing a database queries.
+to use when performing a database query.
 
 See the documentation on :ref:`automatic database routing in multi
 database configurations <topics-db-multi-db-routing>`.
@@ -1110,6 +1111,11 @@ when you're debugging, but it'll rapidly consume memory on a production server.
 Finally, if :setting:`DEBUG` is ``False``, you also need to properly set
 the :setting:`ALLOWED_HOSTS` setting. Failing to do so will result in all
 requests being returned as "Bad Request (400)".
+
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` sets ``DEBUG = True`` for convenience.
 
 .. _django/views/debug.py: https://github.com/django/django/blob/master/django/views/debug.py
 
@@ -1469,7 +1475,7 @@ FILE_UPLOAD_TEMP_DIR
 
 Default: ``None``
 
-The directory to store data (typically files larger than
+The directory to store data to (typically files larger than
 :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`) temporarily while uploading files.
 If ``None``, Django will use the standard temporary directory for the operating
 system. For example, this will default to ``/tmp`` on \*nix-style operating
@@ -1484,7 +1490,7 @@ FIRST_DAY_OF_WEEK
 
 Default: ``0`` (Sunday)
 
-Number representing the first day of the week. This is especially useful
+A number representing the first day of the week. This is especially useful
 when displaying a calendar. This value is only used when not using
 format internationalization, or when a format cannot be found for the
 current locale.
@@ -1528,7 +1534,7 @@ Default: ``None``
 A full Python path to a Python package that contains format definitions for
 project locales. If not ``None``, Django will check for a ``formats.py``
 file, under the directory named as the current locale, and will use the
-formats defined on this file.
+formats defined in this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
@@ -1592,7 +1598,7 @@ A tuple of strings designating all applications that are enabled in this
 Django installation. Each string should be a dotted Python path to:
 
 * an application configuration class, or
-* a package containing a application.
+* a package containing an application.
 
 :doc:`Learn more about application configurations </ref/applications>`.
 
@@ -1620,7 +1626,7 @@ Django installation. Each string should be a dotted Python path to:
     different :attr:`~django.apps.AppConfig.label`.
 
     These rules apply regardless of whether :setting:`INSTALLED_APPS`
-    references application configuration classes on application packages.
+    references application configuration classes or application packages.
 
 When several applications provide different versions of the same resource
 (template, static file, management command, translation), the application
@@ -1877,7 +1883,8 @@ Default: ``''`` (Empty string)
 URL that handles the media served from :setting:`MEDIA_ROOT`, used
 for :doc:`managing stored files </topics/files>`. It must end in a slash if set
 to a non-empty value. You will need to :ref:`configure these files to be served
-<serving-uploaded-files-in-development>` in both development and production.
+<serving-uploaded-files-in-development>` in both development and production
+environments.
 
 If you want to use ``{{ MEDIA_URL }}`` in your templates, add
 ``'django.template.context_processors.media'`` in the ``'context_processors'``
@@ -2049,6 +2056,12 @@ If you rotate your secret key, all of the above will be invalidated.
 Secret keys are not used for passwords of users and key rotation will not
 affect them.
 
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` creates a unique ``SECRET_KEY`` for
+    convenience.
+
 .. setting:: SECURE_BROWSER_XSS_FILTER
 
 SECURE_BROWSER_XSS_FILTER
@@ -2089,8 +2102,9 @@ header. It has no effect unless :setting:`SECURE_HSTS_SECONDS` is set to a
 non-zero value.
 
 .. warning::
-    Setting this incorrectly can irreversibly (for some time) break your site.
-    Read the :ref:`http-strict-transport-security` documentation first.
+    Setting this incorrectly can irreversibly (for the value of
+    :setting:`SECURE_HSTS_SECONDS`) break your site. Read the
+    :ref:`http-strict-transport-security` documentation first.
 
 .. setting:: SECURE_HSTS_SECONDS
 
@@ -2178,7 +2192,7 @@ SECURE_REDIRECT_EXEMPT
 
 .. versionadded:: 1.8
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
 redirected to HTTPS. If :setting:`SECURE_SSL_REDIRECT` is ``False``, this
@@ -2295,7 +2309,7 @@ SILENCED_SYSTEM_CHECKS
 
 .. versionadded:: 1.7
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 A list of identifiers of messages generated by the system check framework
 (i.e. ``["models.W001"]``) that you wish to permanently acknowledge and ignore.
@@ -2311,14 +2325,14 @@ TEMPLATES
 
 .. versionadded:: 1.8
 
-Default:: ``[]`` (Empty list)
+Default: ``[]`` (Empty list)
 
 A list containing the settings for all template engines to be used with
 Django. Each item of the list is a dictionary containing the options for an
 individual engine.
 
 Here's a simple setup that tells the Django template engine to load templates
-from the ``templates`` subdirectories inside installed applications::
+from the ``templates`` subdirectory inside each installed application::
 
     TEMPLATES = [
         {
@@ -2365,7 +2379,7 @@ its default name is ``'whatever'``.
 DIRS
 ~~~~
 
-Default:: ``[]`` (Empty list)
+Default: ``[]`` (Empty list)
 
 Directories where the engine should look for template source files, in search
 order.
@@ -2375,7 +2389,7 @@ order.
 APP_DIRS
 ~~~~~~~~
 
-Default:: ``False``
+Default: ``False``
 
 Whether the engine should look for template source files inside installed
 applications.
@@ -2385,7 +2399,7 @@ applications.
 OPTIONS
 ~~~~~~~
 
-Default:: ``{}`` (Empty dict)
+Default: ``{}`` (Empty dict)
 
 Extra parameters to pass to the template backend. Available parameters vary
 depending on the template backend.
@@ -2514,13 +2528,13 @@ TEST_NON_SERIALIZED_APPS
 
 .. versionadded:: 1.7
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
 In order to restore the database state between tests for
 ``TransactionTestCase``\s and database backends without transactions, Django
-will :ref:`serialize the contents of all apps with migrations
-<test-case-serialized-rollback>` when it starts the test run so it can then
-reload from that copy before tests that need it.
+will :ref:`serialize the contents of all apps <test-case-serialized-rollback>`
+when it starts the test run so it can then reload from that copy before running
+tests that need it.
 
 This slows down the startup time of the test runner; if you have apps that
 you know don't need this feature, you can add their full names in here (e.g.
@@ -2659,6 +2673,11 @@ This provides an easy way to turn it off, for performance. If this is set to
 translation machinery.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
+
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` includes ``USE_I18N = True`` for convenience.
 
 .. setting:: USE_L10N
 
@@ -3162,7 +3181,7 @@ and a single database can manage content for multiple sites.
 
 .. _settings-staticfiles:
 
-Static files
+Static Files
 ============
 
 Settings for :mod:`django.contrib.staticfiles`.
@@ -3186,7 +3205,7 @@ files</howto/static-files/index>` for more details about usage.
 
 .. warning::
 
-    This should be an (initially empty) destination directory for collecting
+    This should be an initially empty destination directory for collecting
     your static files from their permanent locations into one directory for
     ease of deployment; it is **not** a place to store your static files
     permanently. You should do that in directories that will be found by
@@ -3441,7 +3460,7 @@ Models
 
 Security
 --------
-* Cross Site Request Forgery protection
+* Cross Site Request Forgery Protection
 
   * :setting:`CSRF_COOKIE_DOMAIN`
   * :setting:`CSRF_COOKIE_NAME`
