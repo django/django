@@ -303,7 +303,7 @@ one model.
 .. versionadded:: 1.8
 
 By default ``dumpdata`` will output all the serialized data to standard output.
-This options allows to specify the file to which the data is to be written.
+This option allows you to specify the file to which the data is to be written.
 
 flush
 -----
@@ -530,7 +530,7 @@ Database-specific fixtures
 
 If you're in a multi-database setup, you might have fixture data that
 you want to load onto one database, but not onto another. In this
-situation, you can add database identifier into the names of your fixtures.
+situation, you can add a database identifier into the names of your fixtures.
 
 For example, if your :setting:`DATABASES` setting has a 'master' database
 defined, name the fixture ``mydata.master.json`` or
@@ -631,7 +631,7 @@ several lines in language files.
 
 .. django-admin-option:: --no-location
 
-Use the ``--no-location`` option to not write '``#: filename:line``’
+Use the ``--no-location`` option to suppress writing '``#: filename:line``’
 comment lines in language files. Note that using this option makes it harder
 for technically skilled translators to understand each message's context.
 
@@ -695,7 +695,7 @@ of a generated one.
 .. versionadded:: 1.8
 
 The ``--exit`` option will cause ``makemigrations`` to exit with error code 1
-when no migration are created (or would have been created, if combined with
+when no migrations are created (or would have been created, if combined with
 ``--dry-run``).
 
 migrate [<app_label> [<migrationname>]]
@@ -792,8 +792,8 @@ server is running, the system check framework will check your entire Django
 project for some common errors (see the :djadmin:`check` command). If any
 errors are found, they will be printed to standard output.
 
-You can run as many servers as you want, as long as they're on separate ports.
-Just execute ``django-admin runserver`` more than once.
+You can run as many concurrent servers as you want, as long as they're on
+separate ports. Just execute ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
@@ -949,7 +949,7 @@ Shows all migrations in a project.
 .. django-admin-option:: --list, -l
 
 The ``--list`` option lists all of the apps Django knows about, the
-migrations available for each app, and whether or not each migrations is
+migrations available for each app, and whether or not each migration is
 applied (marked by an ``[X]`` next to the migration name).
 
 Apps without migrations are also listed, but have ``(no migrations)`` printed
@@ -1198,7 +1198,7 @@ expected to run from. The default value is ``localhost:8081``.
 
 The ``--keepdb`` option can be used to preserve the test database between test
 runs. This has the advantage of skipping both the create and destroy actions
-which greatly decreases the time to run tests, especially those in a large
+which can greatly decrease the time to run tests, especially those in a large
 test suite. If the test database does not exist, it will be created on the first
 run and then preserved for each subsequent run. Any unapplied migrations will also
 be applied to the test database before running the test suite.
@@ -1208,8 +1208,8 @@ be applied to the test database before running the test suite.
 .. versionadded:: 1.8
 
 The ``--reverse`` option can be used to sort test cases in the opposite order.
-This may help in debugging tests that aren't properly isolated and have side
-effects. :ref:`Grouping by test class <order-of-tests>` is preserved when using
+This may help in debugging the side effects of tests that aren't properly
+isolated. :ref:`Grouping by test class <order-of-tests>` is preserved when using
 this option.
 
 .. django-admin-option:: --debug-sql
@@ -1302,10 +1302,10 @@ changepassword
 This command is only available if Django's :doc:`authentication system
 </topics/auth/index>` (``django.contrib.auth``) is installed.
 
-Allows changing a user's password. It prompts you to enter twice the password of
-the user given as parameter. If they both match, the new password will be
-changed immediately. If you do not supply a user, the command will attempt to
-change the password whose username matches the current user.
+Allows changing a user's password. It prompts you to enter a new password twice
+for the given user. If the entries are identical, this immediately becomes the
+new password. If you do not supply a user, the command will attempt to change
+the password whose username matches the current user.
 
 Use the ``--database`` option to specify the database to query for the user. If
 it's not supplied, Django will use the ``default`` database.
@@ -1448,7 +1448,7 @@ Example usage::
 
     django-admin migrate --traceback
 
-By default, ``django-admin`` will show a simple error message whenever an
+By default, ``django-admin`` will show a simple error message whenever a
 :class:`~django.core.management.CommandError` occurs, but a full stack trace
 for any other exception. If you specify ``--traceback``, ``django-admin``
 will also output a full stack trace when a ``CommandError`` is raised.
@@ -1601,7 +1601,7 @@ A color specification follows one of the following patterns:
 where ``role`` is the name of a valid color role, ``fg`` is the
 foreground color, ``bg`` is the background color and each ``option``
 is one of the color modifying options. Multiple color specifications
-are then separated by semicolon. For example::
+are then separated by a semicolon. For example::
 
     export DJANGO_COLORS="error=yellow/blue,blink;notice=magenta"
 
