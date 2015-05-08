@@ -14,7 +14,6 @@ of a `Digital Elevation Model`__ as our examples::
     class Zipcode(models.Model):
         code = models.CharField(max_length=5)
         poly = models.PolygonField()
-        objects = models.GeoManager()
 
     class Elevation(models.Model):
         name = models.CharField(max_length=100)
@@ -246,36 +245,40 @@ determining `when to use geography data type over geometry data type
 .. currentmodule:: django.contrib.gis.db.models
 .. class:: GeoManager
 
-In order to conduct geographic queries, each geographic model requires
-a ``GeoManager`` model manager.  This manager allows for the proper SQL
-construction for geographic queries; thus, without it, all geographic filters
-will fail.
+The ``GeoManager`` is required in order to use the legacy
+:ref:`geoqueryset-methods`.
 
-.. note::
+.. deprecated:: 1.9
 
-    Geographic filtering support is limited to geometry fields. ``RasterField``
-    does not currently allow spatial querying.
+    All ``GeoQuerySet`` methods have been deprecated and replaced by
+    :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
+    as the legacy methods have been replaced in your code, you should be able
+    to remove the special ``GeoManager`` from your GIS-enabled classes.
 
-It should also be noted that ``GeoManager`` is required even if the
-model does not have a geographic field itself, e.g., in the case of a
-``ForeignKey`` relation to a model with a geographic field.  For example,
-if we had an ``Address`` model with a ``ForeignKey`` to our ``Zipcode``
-model::
+.. versionchanged:: 1.9
 
-    from django.contrib.gis.db import models
+    In older versions, the manager was required to conduct geographic queries.
+    Without it, all geographic filters failed.
 
-    class Address(models.Model):
-        num = models.IntegerField()
-        street = models.CharField(max_length=100)
-        city = models.CharField(max_length=100)
-        state = models.CharField(max_length=2)
-        zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
-        objects = models.GeoManager()
+    ``GeoManager`` was required even if the model did not have a geographic
+    field itself, e.g., in the case of a ``ForeignKey`` relation to a model
+    with a geographic field.  For example, if we had an ``Address`` model with
+    a ``ForeignKey`` to our ``Zipcode`` model::
 
-The geographic manager is needed to do spatial queries on related ``Zipcode`` objects,
-for example::
+        from django.contrib.gis.db import models
 
-    qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
+        class Address(models.Model):
+            num = models.IntegerField()
+            street = models.CharField(max_length=100)
+            city = models.CharField(max_length=100)
+            state = models.CharField(max_length=2)
+            zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
+            objects = models.GeoManager()
+
+    The geographic manager was needed to do spatial queries on related
+    ``Zipcode`` objects, for example::
+
+        qs = Address.objects.filter(zipcode__poly__contains='POINT(-104.590948 38.319914)')
 
 .. rubric:: Footnotes
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.

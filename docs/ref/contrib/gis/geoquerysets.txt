@@ -629,6 +629,8 @@ Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 
     This lookup is not available on SpatiaLite.
 
+.. _geoqueryset-methods:
+
 ``GeoQuerySet`` Methods
 =======================
 
