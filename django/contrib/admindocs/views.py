@@ -12,12 +12,7 @@ from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
-from django.template.base import (
-    InvalidTemplateLibrary, builtins, get_library, get_templatetags_modules,
-    libraries,
-)
 from django.template.engine import Engine
-from django.utils._os import upath
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
@@ -60,31 +55,32 @@ class TemplateTagIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/template_tag_index.html'
 
     def get_context_data(self, **kwargs):
-        load_all_installed_template_libraries()
-
         tags = []
-        app_libs = list(libraries.items())
-        builtin_libs = [(None, lib) for lib in builtins]
-        for module_name, library in builtin_libs + app_libs:
-            for tag_name, tag_func in library.tags.items():
-                title, body, metadata = utils.parse_docstring(tag_func.__doc__)
-                if title:
-                    title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
-                if body:
-                    body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
-                for key in metadata:
-                    metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
-                if library in builtins:
-                    tag_library = ''
-                else:
+        try:
+            engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            app_libs = sorted(engine.template_libraries.items())
+            builtin_libs = [('', lib) for lib in engine.template_builtins]
+            for module_name, library in builtin_libs + app_libs:
+                for tag_name, tag_func in library.tags.items():
+                    title, body, metadata = utils.parse_docstring(tag_func.__doc__)
+                    if title:
+                        title = utils.parse_rst(title, 'tag', _('tag:') + tag_name)
+                    if body:
+                        body = utils.parse_rst(body, 'tag', _('tag:') + tag_name)
+                    for key in metadata:
+                        metadata[key] = utils.parse_rst(metadata[key], 'tag', _('tag:') + tag_name)
                     tag_library = module_name.split('.')[-1]
-                tags.append({
-                    'name': tag_name,
-                    'title': title,
-                    'body': body,
-                    'meta': metadata,
-                    'library': tag_library,
-                })
+                    tags.append({
+                        'name': tag_name,
+                        'title': title,
+                        'body': body,
+                        'meta': metadata,
+                        'library': tag_library,
+                    })
         kwargs.update({'tags': tags})
         return super(TemplateTagIndexView, self).get_context_data(**kwargs)
 
@@ -93,31 +89,32 @@ class TemplateFilterIndexView(BaseAdminDocsView):
     template_name = 'admin_doc/template_filter_index.html'
 
     def get_context_data(self, **kwargs):
-        load_all_installed_template_libraries()
-
         filters = []
-        app_libs = list(libraries.items())
-        builtin_libs = [(None, lib) for lib in builtins]
-        for module_name, library in builtin_libs + app_libs:
-            for filter_name, filter_func in library.filters.items():
-                title, body, metadata = utils.parse_docstring(filter_func.__doc__)
-                if title:
-                    title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
-                if body:
-                    body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
-                for key in metadata:
-                    metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
-                if library in builtins:
-                    tag_library = ''
-                else:
+        try:
+            engine = Engine.get_default()
+        except ImproperlyConfigured:
+            # Non-trivial TEMPLATES settings aren't supported (#24125).
+            pass
+        else:
+            app_libs = sorted(engine.template_libraries.items())
+            builtin_libs = [('', lib) for lib in engine.template_builtins]
+            for module_name, library in builtin_libs + app_libs:
+                for filter_name, filter_func in library.filters.items():
+                    title, body, metadata = utils.parse_docstring(filter_func.__doc__)
+                    if title:
+                        title = utils.parse_rst(title, 'filter', _('filter:') + filter_name)
+                    if body:
+                        body = utils.parse_rst(body, 'filter', _('filter:') + filter_name)
+                    for key in metadata:
+                        metadata[key] = utils.parse_rst(metadata[key], 'filter', _('filter:') + filter_name)
                     tag_library = module_name.split('.')[-1]
-                filters.append({
-                    'name': filter_name,
-                    'title': title,
-                    'body': body,
-                    'meta': metadata,
-                    'library': tag_library,
-                })
+                    filters.append({
+                        'name': filter_name,
+                        'title': title,
+                        'body': body,
+                        'meta': metadata,
+                        'library': tag_library,
+                    })
         kwargs.update({'filters': filters})
         return super(TemplateFilterIndexView, self).get_context_data(**kwargs)
 
@@ -319,29 +316,6 @@ class TemplateDetailView(BaseAdminDocsView):
 ####################
 # Helper functions #
 ####################
-
-def load_all_installed_template_libraries():
-    # Load/register all template tag libraries from installed apps.
-    for module_name in get_templatetags_modules():
-        mod = import_module(module_name)
-        if not hasattr(mod, '__file__'):
-            # e.g. packages installed as eggs
-            continue
-
-        try:
-            libraries = [
-                os.path.splitext(p)[0]
-                for p in os.listdir(os.path.dirname(upath(mod.__file__)))
-                if p.endswith('.py') and p[0].isalpha()
-            ]
-        except OSError:
-            continue
-        else:
-            for library_name in libraries:
-                try:
-                    get_library(library_name)
-                except InvalidTemplateLibrary:
-                    pass
 
 
 def get_return_data_type(func_name):

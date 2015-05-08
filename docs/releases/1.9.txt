@@ -263,6 +263,10 @@ Templates
 * :ref:`Debug page integration <template-debug-integration>` for custom
   template engines was added.
 
+* The :class:`~django.template.backends.django.DjangoTemplates` backend gained
+  the ability to register libraries and builtins explicitly through the
+  template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -466,6 +470,28 @@ will be naive instead of aware. You can compensate as follows::
 You don't need any of this if you're querying the database through the ORM,
 even if you're using :meth:`raw() <django.db.models.query.QuerySet.raw>`
 queries. The ORM takes care of managing time zone information.
+
+Template tag modules are imported when templates are configured
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :class:`~django.template.backends.django.DjangoTemplates` backend now
+performs discovery on installed template tag modules when instantiated. This
+update enables libraries to be provided explicitly via the ``'libraries'``
+key of :setting:`OPTIONS <TEMPLATES-OPTIONS>` when defining a
+:class:`~django.template.backends.django.DjangoTemplates` backend. Import
+or syntax errors in template tag modules now fail early at instantiation time
+rather than when a template with a :ttag:`{% load %}<load>` tag is first
+compiled.
+
+``django.template.base.add_to_builtins()`` is removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Although it was a private API, projects commonly used ``add_to_builtins()`` to
+make template tags and filters available without using the
+:ttag:`{% load %}<load>` tag. This API has been formalized. Projects should now
+define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
+<TEMPLATES-OPTIONS>` when defining a
+:class:`~django.template.backends.django.DjangoTemplates` backend.
 
 Miscellaneous
 ~~~~~~~~~~~~~

@@ -7,6 +7,7 @@ from ..utils import setup
 
 @override_settings(MEDIA_URL="/media/", STATIC_URL="/static/")
 class StaticTagTests(SimpleTestCase):
+    libraries = {'static': 'django.templatetags.static'}
 
     @setup({'static-prefixtag01': '{% load static %}{% get_static_prefix %}'})
     def test_static_prefixtag01(self):

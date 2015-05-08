@@ -5,9 +5,6 @@ from __future__ import unicode_literals
 import functools
 import os
 
-from django import template
-from django.template import Library
-from django.template.base import libraries
 from django.template.engine import Engine
 from django.test.utils import override_settings
 from django.utils._os import upath
@@ -49,14 +46,17 @@ def setup(templates, *args, **kwargs):
     ]
 
     def decorator(func):
-        @register_test_tags
         # Make Engine.get_default() raise an exception to ensure that tests
         # are properly isolated from Django's global settings.
         @override_settings(TEMPLATES=None)
         @functools.wraps(func)
         def inner(self):
+            # Set up custom template tag libraries if specified
+            libraries = getattr(self, 'libraries', {})
+
             self.engine = Engine(
                 allowed_include_roots=[ROOT],
+                libraries=libraries,
                 loaders=loaders,
             )
             func(self)
@@ -66,6 +66,7 @@ def setup(templates, *args, **kwargs):
 
             self.engine = Engine(
                 allowed_include_roots=[ROOT],
+                libraries=libraries,
                 loaders=loaders,
                 string_if_invalid='INVALID',
             )
@@ -75,6 +76,7 @@ def setup(templates, *args, **kwargs):
             self.engine = Engine(
                 allowed_include_roots=[ROOT],
                 debug=True,
+                libraries=libraries,
                 loaders=loaders,
             )
             func(self)
@@ -85,42 +87,8 @@ def setup(templates, *args, **kwargs):
     return decorator
 
 
-# Custom template tag for tests
-
-register = Library()
-
-
-class EchoNode(template.Node):
-    def __init__(self, contents):
-        self.contents = contents
-
-    def render(self, context):
-        return ' '.join(self.contents)
-
-
-@register.tag
-def echo(parser, token):
-    return EchoNode(token.contents.split()[1:])
-register.tag('other_echo', echo)
-
-
-@register.filter
-def upper(value):
-    return value.upper()
-
-
-def register_test_tags(func):
-    @functools.wraps(func)
-    def inner(self):
-        libraries['testtags'] = register
-        try:
-            func(self)
-        finally:
-            del libraries['testtags']
-    return inner
-
-
 # Helper objects
+
 
 class SomeException(Exception):
     silent_variable_failure = True

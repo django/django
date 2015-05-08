@@ -6,6 +6,7 @@ from ..utils import setup
 
 
 class FirstOfTagTests(SimpleTestCase):
+    libraries = {'future': 'django.templatetags.future'}
 
     @setup({'firstof01': '{% firstof a b c %}'})
     def test_firstof01(self):

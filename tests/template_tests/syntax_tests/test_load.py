@@ -5,6 +5,10 @@ from ..utils import setup
 
 
 class LoadTagTests(SimpleTestCase):
+    libraries = {
+        'subpackage.echo': 'template_tests.templatetags.subpackage.echo',
+        'testtags': 'template_tests.templatetags.testtags',
+    }
 
     @setup({'load01': '{% load testtags subpackage.echo %}{% echo test %} {% echo2 "test" %}'})
     def test_load01(self):
@@ -42,30 +46,30 @@ class LoadTagTests(SimpleTestCase):
     # {% load %} tag errors
     @setup({'load07': '{% load echo other_echo bad_tag from testtags %}'})
     def test_load07(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'bad_tag' is not a valid tag or filter in tag library 'testtags'"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('load07')
 
     @setup({'load08': '{% load echo other_echo bad_tag from %}'})
     def test_load08(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'echo' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('load08')
 
     @setup({'load09': '{% load from testtags %}'})
     def test_load09(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'from' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('load09')
 
     @setup({'load10': '{% load echo from bad_library %}'})
     def test_load10(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'bad_library' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('load10')
-
-    @setup({'load11': '{% load subpackage.echo_invalid %}'})
-    def test_load11(self):
-        with self.assertRaises(TemplateSyntaxError):
-            self.engine.get_template('load11')
 
     @setup({'load12': '{% load subpackage.missing %}'})
     def test_load12(self):
-        with self.assertRaises(TemplateSyntaxError):
+        msg = "'subpackage.missing' is not a registered tag library. Must be one of:\nsubpackage.echo\ntesttags"
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.get_template('load12')

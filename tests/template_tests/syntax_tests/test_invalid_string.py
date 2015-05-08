@@ -4,6 +4,7 @@ from ..utils import setup
 
 
 class InvalidStringTests(SimpleTestCase):
+    libraries = {'i18n': 'django.templatetags.i18n'}
 
     @setup({'invalidstr01': '{{ var|default:"Foo" }}'})
     def test_invalidstr01(self):
