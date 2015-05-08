@@ -226,7 +226,6 @@ in southern Texas::
         # A projected coordinate system (only valid for South Texas!)
         # is used, units are in meters.
         point = models.PointField(srid=32140)
-        objects = models.GeoManager()
 
 Then distance queries may be performed as follows::
 
