@@ -712,7 +712,7 @@ Miscellaneous
 
 * Accessing reverse one-to-one relations fetched via
   :meth:`~django.db.models.query.QuerySet.select_related` now raises
-  :exc:`~django.core.exceptions.DoesNotExist` instead of returning ``None``.
+  :exc:`~django.db.models.Model.DoesNotExist` instead of returning ``None``.
 
 .. _deprecated-features-1.5:
 

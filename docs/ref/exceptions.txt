@@ -12,25 +12,17 @@ Django Core Exceptions
 
 Django core exception classes are defined in ``django.core.exceptions``.
 
-``ObjectDoesNotExist`` and ``DoesNotExist``
--------------------------------------------
-
-.. exception:: DoesNotExist
-
-    The ``DoesNotExist`` exception is raised when an object is not found for
-    the given parameters of a query. Django provides a ``DoesNotExist``
-    exception as an attribute of each model class to identify the class of
-    object that could not be found and to allow you to catch a particular model
-    class with ``try/except``.
+``ObjectDoesNotExist``
+----------------------
 
 .. exception:: ObjectDoesNotExist
 
-    The base class for ``DoesNotExist`` exceptions; a ``try/except`` for
-    ``ObjectDoesNotExist`` will catch ``DoesNotExist`` exceptions for all
-    models.
+    The base class for :exc:`~django.db.models.Model.DoesNotExist` exceptions;
+    a ``try/except`` for ``ObjectDoesNotExist`` will catch
+    :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
+    on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
 
 ``FieldDoesNotExist``
 ---------------------

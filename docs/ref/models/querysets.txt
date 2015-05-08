@@ -1578,15 +1578,15 @@ than one object was found. The
 :exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
 attribute of the model class.
 
-``get()`` raises a :exc:`~django.core.exceptions.DoesNotExist` exception if an
-object wasn't found for the given parameters. This exception is also an
-attribute of the model class. Example::
+``get()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
+object wasn't found for the given parameters. This exception is an attribute
+of the model class. Example::
 
     Entry.objects.get(id='foo') # raises Entry.DoesNotExist
 
-The :exc:`~django.core.exceptions.DoesNotExist` exception inherits from
+The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
 :exc:`django.core.exceptions.ObjectDoesNotExist`, so you can target multiple
-:exc:`~django.core.exceptions.DoesNotExist` exceptions. Example::
+:exc:`~django.db.models.Model.DoesNotExist` exceptions. Example::
 
     from django.core.exceptions import ObjectDoesNotExist
     try:
@@ -1905,7 +1905,7 @@ If your model's :ref:`Meta <meta-options>` specifies
 field specified in :attr:`~django.db.models.Options.get_latest_by` by default.
 
 Like :meth:`get()`, ``earliest()`` and ``latest()`` raise
-:exc:`~django.core.exceptions.DoesNotExist` if there is no object with the
+:exc:`~django.db.models.Model.DoesNotExist` if there is no object with the
 given parameters.
 
 Note that ``earliest()`` and ``latest()`` exist purely for convenience and

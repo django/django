@@ -291,7 +291,7 @@ will be returned::
 
    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
    but it raises :class:`~django.http.Http404` instead of the model's
-   :class:`~django.core.exceptions.DoesNotExist` exception.
+   :class:`~django.db.models.Model.DoesNotExist` exception.
 
 Required arguments
 ------------------
