@@ -115,6 +115,15 @@ though:
 
 .. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
 
+New styling for ``contrib.admin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The admin sports a modern, flat design. It still provides a fully-functional
+experience to `YUI's A-grade`_ browsers. Older browser may experience varying
+levels of graceful degradation.
+
+.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
+
 Minor features
 ~~~~~~~~~~~~~~
 
