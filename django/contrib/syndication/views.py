@@ -19,9 +19,7 @@ def add_domain(domain, url, secure=False):
     if url.startswith('//'):
         # Support network-path reference (see #16753) - RSS requires a protocol
         url = '%s:%s' % (protocol, url)
-    elif not (url.startswith('http://')
-            or url.startswith('https://')
-            or url.startswith('mailto:')):
+    elif not url.startswith(('http://', 'https://', 'mailto:')):
         url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
