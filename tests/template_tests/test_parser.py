@@ -9,6 +9,7 @@ from django.template import Library, TemplateSyntaxError
 from django.template.base import (
     TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
+from django.template.defaultfilters import register as filter_library
 from django.utils import six
 
 
@@ -24,7 +25,7 @@ class ParserTests(TestCase):
 
     def test_filter_parsing(self):
         c = {"article": {"section": "News"}}
-        p = Parser("")
+        p = Parser("", builtins=[filter_library])
 
         def fe_test(s, val):
             self.assertEqual(FilterExpression(s, p).resolve(c), val)

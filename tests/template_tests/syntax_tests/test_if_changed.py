@@ -5,6 +5,7 @@ from ..utils import setup
 
 
 class IfChangedTagTests(SimpleTestCase):
+    libraries = {'custom': 'template_tests.templatetags.custom'}
 
     @setup({'ifchanged01': '{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}'})
     def test_ifchanged01(self):

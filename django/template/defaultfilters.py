@@ -25,7 +25,8 @@ from django.utils.text import (
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
 
-from .base import Library, Variable, VariableDoesNotExist
+from .base import Variable, VariableDoesNotExist
+from .library import Library
 
 register = Library()
 

@@ -56,6 +56,7 @@ inheritance_templates = {
 
 
 class InheritanceTests(SimpleTestCase):
+    libraries = {'testtags': 'template_tests.templatetags.testtags'}
 
     @setup(inheritance_templates)
     def test_inheritance01(self):

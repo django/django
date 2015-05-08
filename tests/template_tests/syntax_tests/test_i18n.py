@@ -10,6 +10,10 @@ from ..utils import setup
 
 
 class I18nTagTests(SimpleTestCase):
+    libraries = {
+        'custom': 'template_tests.templatetags.custom',
+        'i18n': 'django.templatetags.i18n',
+    }
 
     @setup({'i18n01': '{% load i18n %}{% trans \'xxxyyyxxx\' %}'})
     def test_i18n01(self):

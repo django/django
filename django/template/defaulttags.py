@@ -19,12 +19,12 @@ from django.utils.safestring import mark_safe
 from .base import (
     BLOCK_TAG_END, BLOCK_TAG_START, COMMENT_TAG_END, COMMENT_TAG_START,
     SINGLE_BRACE_END, SINGLE_BRACE_START, VARIABLE_ATTRIBUTE_SEPARATOR,
-    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, InvalidTemplateLibrary,
-    Library, Node, NodeList, Template, TemplateSyntaxError,
-    VariableDoesNotExist, get_library, kwarg_re, render_value_in_context,
-    token_kwargs,
+    VARIABLE_TAG_END, VARIABLE_TAG_START, Context, Node, NodeList, Template,
+    TemplateSyntaxError, VariableDoesNotExist, kwarg_re,
+    render_value_in_context, token_kwargs,
 )
 from .defaultfilters import date
+from .library import Library
 from .smartif import IfParser, Literal
 
 register = Library()
@@ -1121,10 +1121,43 @@ def ssi(parser, token):
     return SsiNode(filepath, parsed)
 
 
+def find_library(parser, name):
+    try:
+        return parser.libraries[name]
+    except KeyError:
+        raise TemplateSyntaxError(
+            "'%s' is not a registered tag library. Must be one of:\n%s" % (
+                name, "\n".join(sorted(parser.libraries.keys())),
+            ),
+        )
+
+
+def load_from_library(library, label, names):
+    """
+    Return a subset of tags and filters from a library.
+    """
+    subset = Library()
+    for name in names:
+        found = False
+        if name in library.tags:
+            found = True
+            subset.tags[name] = library.tags[name]
+        if name in library.filters:
+            found = True
+            subset.filters[name] = library.filters[name]
+        if found is False:
+            raise TemplateSyntaxError(
+                "'%s' is not a valid tag or filter in tag library '%s'" % (
+                    name, label,
+                ),
+            )
+    return subset
+
+
 @register.tag
 def load(parser, token):
     """
-    Loads a custom template tag set.
+    Loads a custom template tag library into the parser.
 
     For example, to load the template tags in
     ``django/templatetags/news/photos.py``::
@@ -1140,35 +1173,16 @@ def load(parser, token):
     # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
     if len(bits) >= 4 and bits[-2] == "from":
-        try:
-            taglib = bits[-1]
-            lib = get_library(taglib)
-        except InvalidTemplateLibrary as e:
-            raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
-                                      (taglib, e))
-        else:
-            temp_lib = Library()
-            for name in bits[1:-2]:
-                if name in lib.tags:
-                    temp_lib.tags[name] = lib.tags[name]
-                    # a name could be a tag *and* a filter, so check for both
-                    if name in lib.filters:
-                        temp_lib.filters[name] = lib.filters[name]
-                elif name in lib.filters:
-                    temp_lib.filters[name] = lib.filters[name]
-                else:
-                    raise TemplateSyntaxError("'%s' is not a valid tag or filter in tag library '%s'" %
-                                              (name, taglib))
-            parser.add_library(temp_lib)
+        # from syntax is used; load individual tags from the library
+        name = bits[-1]
+        lib = find_library(parser, name)
+        subset = load_from_library(lib, name, bits[1:-2])
+        parser.add_library(subset)
     else:
-        for taglib in bits[1:]:
-            # add the library to the parser
-            try:
-                lib = get_library(taglib)
-                parser.add_library(lib)
-            except InvalidTemplateLibrary as e:
-                raise TemplateSyntaxError("'%s' is not a valid tag library: %s" %
-                                          (taglib, e))
+        # one or more libraries are specified; load and add them to the parser
+        for name in bits[1:]:
+            lib = find_library(parser, name)
+            parser.add_library(lib)
     return LoadNode()
 
 

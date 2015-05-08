@@ -66,7 +66,7 @@ from .base import (Context, Node, NodeList, Origin, RequestContext,     # NOQA
 from .base import resolve_variable                                      # NOQA
 
 # Library management
-from .base import Library                                               # NOQA
+from .library import Library                                            # NOQA
 
 
 __all__ += ('Template', 'Context', 'RequestContext')

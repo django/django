@@ -54,25 +54,18 @@ from __future__ import unicode_literals
 import logging
 import re
 import warnings
-from functools import partial
-from importlib import import_module
 from inspect import getargspec, getcallargs
 
-from django.apps import apps
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
-from django.utils import lru_cache, six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
-)
+from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
-from django.utils.itercompat import is_iterable
-from django.utils.module_loading import module_has_submodule
 from django.utils.safestring import (
     EscapeData, SafeData, mark_for_escaping, mark_safe,
 )
@@ -123,11 +116,6 @@ tag_re = (re.compile('(%s.*?%s|%s.*?%s|%s.*?%s)' %
            re.escape(VARIABLE_TAG_START), re.escape(VARIABLE_TAG_END),
            re.escape(COMMENT_TAG_START), re.escape(COMMENT_TAG_END))))
 
-# global dictionary of libraries that have been loaded using get_library
-libraries = {}
-# global list of libraries to load by default for a new parser
-builtins = []
-
 logger = logging.getLogger('django.template')
 
 
@@ -144,10 +132,6 @@ class VariableDoesNotExist(Exception):
 
     def __str__(self):
         return self.msg % tuple(force_text(p, errors='replace') for p in self.params)
-
-
-class InvalidTemplateLibrary(Exception):
-    pass
 
 
 class Origin(object):
@@ -232,7 +216,9 @@ class Template(object):
             lexer = Lexer(self.source)
 
         tokens = lexer.tokenize()
-        parser = Parser(tokens)
+        parser = Parser(
+            tokens, self.engine.template_libraries, self.engine.template_builtins,
+        )
 
         try:
             return parser.parse()
@@ -452,13 +438,20 @@ class DebugLexer(Lexer):
 
 
 class Parser(object):
-    def __init__(self, tokens):
+    def __init__(self, tokens, libraries=None, builtins=None):
         self.tokens = tokens
         self.tags = {}
         self.filters = {}
         self.command_stack = []
-        for lib in builtins:
-            self.add_library(lib)
+
+        if libraries is None:
+            libraries = {}
+        if builtins is None:
+            builtins = []
+
+        self.libraries = libraries
+        for builtin in builtins:
+            self.add_library(builtin)
 
     def parse(self, parse_until=None):
         """
@@ -1073,377 +1066,3 @@ def token_kwargs(bits, parser, support_legacy=False):
                 return kwargs
             del bits[:1]
     return kwargs
-
-
-def parse_bits(parser, bits, params, varargs, varkw, defaults,
-               takes_context, name):
-    """
-    Parses bits for template tag helpers simple_tag and inclusion_tag, in
-    particular by detecting syntax errors and by extracting positional and
-    keyword arguments.
-    """
-    if takes_context:
-        if params[0] == 'context':
-            params = params[1:]
-        else:
-            raise TemplateSyntaxError(
-                "'%s' is decorated with takes_context=True so it must "
-                "have a first argument of 'context'" % name)
-    args = []
-    kwargs = {}
-    unhandled_params = list(params)
-    for bit in bits:
-        # First we try to extract a potential kwarg from the bit
-        kwarg = token_kwargs([bit], parser)
-        if kwarg:
-            # The kwarg was successfully extracted
-            param, value = kwarg.popitem()
-            if param not in params and varkw is None:
-                # An unexpected keyword argument was supplied
-                raise TemplateSyntaxError(
-                    "'%s' received unexpected keyword argument '%s'" %
-                    (name, param))
-            elif param in kwargs:
-                # The keyword argument has already been supplied once
-                raise TemplateSyntaxError(
-                    "'%s' received multiple values for keyword argument '%s'" %
-                    (name, param))
-            else:
-                # All good, record the keyword argument
-                kwargs[str(param)] = value
-                if param in unhandled_params:
-                    # If using the keyword syntax for a positional arg, then
-                    # consume it.
-                    unhandled_params.remove(param)
-        else:
-            if kwargs:
-                raise TemplateSyntaxError(
-                    "'%s' received some positional argument(s) after some "
-                    "keyword argument(s)" % name)
-            else:
-                # Record the positional argument
-                args.append(parser.compile_filter(bit))
-                try:
-                    # Consume from the list of expected positional arguments
-                    unhandled_params.pop(0)
-                except IndexError:
-                    if varargs is None:
-                        raise TemplateSyntaxError(
-                            "'%s' received too many positional arguments" %
-                            name)
-    if defaults is not None:
-        # Consider the last n params handled, where n is the
-        # number of defaults.
-        unhandled_params = unhandled_params[:-len(defaults)]
-    if unhandled_params:
-        # Some positional arguments were not supplied
-        raise TemplateSyntaxError(
-            "'%s' did not receive value(s) for the argument(s): %s" %
-            (name, ", ".join("'%s'" % p for p in unhandled_params)))
-    return args, kwargs
-
-
-def generic_tag_compiler(parser, token, params, varargs, varkw, defaults,
-                         name, takes_context, node_class):
-    """
-    Returns a template.Node subclass.
-    """
-    bits = token.split_contents()[1:]
-    args, kwargs = parse_bits(parser, bits, params, varargs, varkw,
-                              defaults, takes_context, name)
-    return node_class(takes_context, args, kwargs)
-
-
-class TagHelperNode(Node):
-    """
-    Base class for tag helper nodes such as SimpleNode and InclusionNode.
-    Manages the positional and keyword arguments to be passed to the decorated
-    function.
-    """
-
-    def __init__(self, takes_context, args, kwargs):
-        self.takes_context = takes_context
-        self.args = args
-        self.kwargs = kwargs
-
-    def get_resolved_arguments(self, context):
-        resolved_args = [var.resolve(context) for var in self.args]
-        if self.takes_context:
-            resolved_args = [context] + resolved_args
-        resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
-        return resolved_args, resolved_kwargs
-
-
-class Library(object):
-    def __init__(self):
-        self.filters = {}
-        self.tags = {}
-
-    def tag(self, name=None, compile_function=None):
-        if name is None and compile_function is None:
-            # @register.tag()
-            return self.tag_function
-        elif name is not None and compile_function is None:
-            if callable(name):
-                # @register.tag
-                return self.tag_function(name)
-            else:
-                # @register.tag('somename') or @register.tag(name='somename')
-                def dec(func):
-                    return self.tag(name, func)
-                return dec
-        elif name is not None and compile_function is not None:
-            # register.tag('somename', somefunc)
-            self.tags[name] = compile_function
-            return compile_function
-        else:
-            raise InvalidTemplateLibrary("Unsupported arguments to "
-                "Library.tag: (%r, %r)", (name, compile_function))
-
-    def tag_function(self, func):
-        self.tags[getattr(func, "_decorated_function", func).__name__] = func
-        return func
-
-    def filter(self, name=None, filter_func=None, **flags):
-        if name is None and filter_func is None:
-            # @register.filter()
-            def dec(func):
-                return self.filter_function(func, **flags)
-            return dec
-
-        elif name is not None and filter_func is None:
-            if callable(name):
-                # @register.filter
-                return self.filter_function(name, **flags)
-            else:
-                # @register.filter('somename') or @register.filter(name='somename')
-                def dec(func):
-                    return self.filter(name, func, **flags)
-                return dec
-
-        elif name is not None and filter_func is not None:
-            # register.filter('somename', somefunc)
-            self.filters[name] = filter_func
-            for attr in ('expects_localtime', 'is_safe', 'needs_autoescape'):
-                if attr in flags:
-                    value = flags[attr]
-                    # set the flag on the filter for FilterExpression.resolve
-                    setattr(filter_func, attr, value)
-                    # set the flag on the innermost decorated function
-                    # for decorators that need it e.g. stringfilter
-                    if hasattr(filter_func, "_decorated_function"):
-                        setattr(filter_func._decorated_function, attr, value)
-            filter_func._filter_name = name
-            return filter_func
-        else:
-            raise InvalidTemplateLibrary("Unsupported arguments to "
-                "Library.filter: (%r, %r)", (name, filter_func))
-
-    def filter_function(self, func, **flags):
-        name = getattr(func, "_decorated_function", func).__name__
-        return self.filter(name, func, **flags)
-
-    def simple_tag(self, func=None, takes_context=None, name=None):
-        def dec(func):
-            params, varargs, varkw, defaults = getargspec(func)
-
-            class SimpleNode(TagHelperNode):
-                def __init__(self, takes_context, args, kwargs, target_var):
-                    super(SimpleNode, self).__init__(takes_context, args, kwargs)
-                    self.target_var = target_var
-
-                def render(self, context):
-                    resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    output = func(*resolved_args, **resolved_kwargs)
-                    if self.target_var is not None:
-                        context[self.target_var] = output
-                        return ''
-                    return output
-
-            function_name = (name or
-                getattr(func, '_decorated_function', func).__name__)
-
-            def compile_func(parser, token):
-                bits = token.split_contents()[1:]
-                target_var = None
-                if len(bits) >= 2 and bits[-2] == 'as':
-                    target_var = bits[-1]
-                    bits = bits[:-2]
-                args, kwargs = parse_bits(parser, bits, params,
-                    varargs, varkw, defaults, takes_context, function_name)
-                return SimpleNode(takes_context, args, kwargs, target_var)
-
-            compile_func.__doc__ = func.__doc__
-            self.tag(function_name, compile_func)
-            return func
-
-        if func is None:
-            # @register.simple_tag(...)
-            return dec
-        elif callable(func):
-            # @register.simple_tag
-            return dec(func)
-        else:
-            raise TemplateSyntaxError("Invalid arguments provided to simple_tag")
-
-    def assignment_tag(self, func=None, takes_context=None, name=None):
-        warnings.warn(
-            "assignment_tag() is deprecated. Use simple_tag() instead",
-            RemovedInDjango21Warning,
-            stacklevel=2,
-        )
-        return self.simple_tag(func, takes_context, name)
-
-    def inclusion_tag(self, file_name, takes_context=False, name=None):
-        def dec(func):
-            params, varargs, varkw, defaults = getargspec(func)
-
-            class InclusionNode(TagHelperNode):
-
-                def render(self, context):
-                    """
-                    Renders the specified template and context. Caches the
-                    template object in render_context to avoid reparsing and
-                    loading when used in a for loop.
-                    """
-                    resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
-                    _dict = func(*resolved_args, **resolved_kwargs)
-
-                    t = context.render_context.get(self)
-                    if t is None:
-                        if isinstance(file_name, Template):
-                            t = file_name
-                        elif isinstance(getattr(file_name, 'template', None), Template):
-                            t = file_name.template
-                        elif not isinstance(file_name, six.string_types) and is_iterable(file_name):
-                            t = context.template.engine.select_template(file_name)
-                        else:
-                            t = context.template.engine.get_template(file_name)
-                        context.render_context[self] = t
-                    new_context = context.new(_dict)
-                    # Copy across the CSRF token, if present, because
-                    # inclusion tags are often used for forms, and we need
-                    # instructions for using CSRF protection to be as simple
-                    # as possible.
-                    csrf_token = context.get('csrf_token')
-                    if csrf_token is not None:
-                        new_context['csrf_token'] = csrf_token
-                    return t.render(new_context)
-
-            function_name = (name or
-                getattr(func, '_decorated_function', func).__name__)
-            compile_func = partial(generic_tag_compiler,
-                params=params, varargs=varargs, varkw=varkw,
-                defaults=defaults, name=function_name,
-                takes_context=takes_context, node_class=InclusionNode)
-            compile_func.__doc__ = func.__doc__
-            self.tag(function_name, compile_func)
-            return func
-        return dec
-
-
-def is_library_missing(name):
-    """Check if library that failed to load cannot be found under any
-    templatetags directory or does exist but fails to import.
-
-    Non-existing condition is checked recursively for each subpackage in cases
-    like <appdir>/templatetags/subpackage/package/module.py.
-    """
-    # Don't bother to check if '.' is in name since any name will be prefixed
-    # with some template root.
-    path, module = name.rsplit('.', 1)
-    try:
-        package = import_module(path)
-        return not module_has_submodule(package, module)
-    except ImportError:
-        return is_library_missing(path)
-
-
-def import_library(taglib_module):
-    """
-    Load a template tag library module.
-
-    Verifies that the library contains a 'register' attribute, and
-    returns that attribute as the representation of the library
-    """
-    try:
-        mod = import_module(taglib_module)
-    except ImportError as e:
-        # If the ImportError is because the taglib submodule does not exist,
-        # that's not an error that should be raised. If the submodule exists
-        # and raised an ImportError on the attempt to load it, that we want
-        # to raise.
-        if is_library_missing(taglib_module):
-            return None
-        else:
-            raise InvalidTemplateLibrary("ImportError raised loading %s: %s" %
-                                         (taglib_module, e))
-    try:
-        return mod.register
-    except AttributeError:
-        raise InvalidTemplateLibrary("Template library %s does not have "
-                                     "a variable named 'register'" %
-                                     taglib_module)
-
-
-@lru_cache.lru_cache()
-def get_templatetags_modules():
-    """
-    Return the list of all available template tag modules.
-
-    Caches the result for faster access.
-    """
-    templatetags_modules_candidates = ['django.templatetags']
-    templatetags_modules_candidates.extend(
-        '%s.templatetags' % app_config.name
-        for app_config in apps.get_app_configs())
-
-    templatetags_modules = []
-    for templatetag_module in templatetags_modules_candidates:
-        try:
-            import_module(templatetag_module)
-        except ImportError:
-            continue
-        else:
-            templatetags_modules.append(templatetag_module)
-    return templatetags_modules
-
-
-def get_library(library_name):
-    """
-    Load the template library module with the given name.
-
-    If library is not already loaded loop over all templatetags modules
-    to locate it.
-
-    {% load somelib %} and {% load someotherlib %} loops twice.
-
-    Subsequent loads eg. {% load somelib %} in the same process will grab
-    the cached module from libraries.
-    """
-    lib = libraries.get(library_name)
-    if not lib:
-        templatetags_modules = get_templatetags_modules()
-        tried_modules = []
-        for module in templatetags_modules:
-            taglib_module = '%s.%s' % (module, library_name)
-            tried_modules.append(taglib_module)
-            lib = import_library(taglib_module)
-            if lib:
-                libraries[library_name] = lib
-                break
-        if not lib:
-            raise InvalidTemplateLibrary("Template library %s not found, "
-                                         "tried %s" %
-                                         (library_name,
-                                          ','.join(tried_modules)))
-    return lib
-
-
-def add_to_builtins(module):
-    builtins.append(import_library(module))
-
-
-add_to_builtins('django.template.defaulttags')
-add_to_builtins('django.template.defaultfilters')
-add_to_builtins('django.template.loader_tags')

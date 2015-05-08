@@ -49,7 +49,7 @@ class ErrorIndexTest(TestCase):
             'range': range(5),
             'five': 5,
         })
-        engine = Engine(debug=True)
+        engine = Engine(debug=True, libraries={'bad_tag': 'template_tests.templatetags.bad_tag'})
         for source, expected_error_source_index in tests:
             template = engine.from_string(source)
             try:

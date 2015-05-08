@@ -97,7 +97,10 @@ class TemplateTests(SimpleTestCase):
         Errors raised while compiling nodes should include the token
         information.
         """
-        engine = Engine(debug=True)
+        engine = Engine(
+            debug=True,
+            libraries={'bad_tag': 'template_tests.templatetags.bad_tag'},
+        )
         with self.assertRaises(RuntimeError) as e:
             engine.from_string("{% load bad_tag %}{% badtag %}")
         self.assertEqual(e.exception.template_debug['during'], '{% badtag %}')

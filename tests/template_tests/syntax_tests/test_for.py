@@ -6,6 +6,7 @@ from ..utils import setup
 
 
 class ForTagTests(SimpleTestCase):
+    libraries = {'custom': 'template_tests.templatetags.custom'}
 
     @setup({'for-tag01': '{% for val in values %}{{ val }}{% endfor %}'})
     def test_for_tag01(self):

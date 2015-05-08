@@ -4,9 +4,9 @@ from django.utils import six
 from django.utils.safestring import mark_safe
 
 from .base import (
-    Library, Node, Template, TemplateSyntaxError, TextNode, Variable,
-    token_kwargs,
+    Node, Template, TemplateSyntaxError, TextNode, Variable, token_kwargs,
 )
+from .library import Library
 
 register = Library()
 

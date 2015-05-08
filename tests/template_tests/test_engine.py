@@ -14,7 +14,10 @@ OTHER_DIR = os.path.join(ROOT, 'other_templates')
 class DeprecatedRenderToStringTest(SimpleTestCase):
 
     def setUp(self):
-        self.engine = Engine(dirs=[TEMPLATE_DIR])
+        self.engine = Engine(
+            dirs=[TEMPLATE_DIR],
+            libraries={'custom': 'template_tests.templatetags.custom'},
+        )
 
     def test_basic_context(self):
         self.assertEqual(

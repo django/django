@@ -6,6 +6,7 @@ from ..utils import setup
 
 
 class CycleTagTests(SimpleTestCase):
+    libraries = {'future': 'django.templatetags.future'}
 
     @setup({'cycle01': '{% cycle a %}'})
     def test_cycle01(self):

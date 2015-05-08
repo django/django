@@ -6,6 +6,10 @@ from ..utils import setup
 
 
 class CacheTagTests(SimpleTestCase):
+    libraries = {
+        'cache': 'django.templatetags.cache',
+        'custom': 'template_tests.templatetags.custom',
+    }
 
     def tearDown(self):
         cache.clear()
@@ -121,7 +125,7 @@ class CacheTests(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine()
+        cls.engine = Engine(libraries={'cache': 'django.templatetags.cache'})
         super(CacheTests, cls).setUpClass()
 
     def test_cache_regression_20130(self):

@@ -13,9 +13,11 @@ available to your templates using the :ttag:`{% load %}<load>` tag.
 Code layout
 -----------
 
-Custom template tags and filters must live inside a Django app. If they relate
-to an existing app it makes sense to bundle them there; otherwise, you should
-create a new app to hold them.
+The most common place to specify custom template tags and filters is inside
+a Django app. If they relate to an existing app, it makes sense to bundle them
+there; otherwise, they can be added to a new app. When a Django app is added
+to :setting:`INSTALLED_APPS`, any tags it defines in the conventional location
+described below are automatically made available to load within templates.
 
 The app should contain a ``templatetags`` directory, at the same level as
 ``models.py``, ``views.py``, etc. If this doesn't already exist, create it -
@@ -62,6 +64,15 @@ following::
     from django import template
 
     register = template.Library()
+
+.. versionadded:: 1.9
+
+Alternatively, template tag modules can be registered through the
+``'libraries'`` argument to
+:class:`~django.template.backends.django.DjangoTemplates`. This is useful if
+you want to use a different label from the template tag module name when
+loading template tags. It also enables you to register tags without installing
+an application.
 
 .. admonition:: Behind the scenes
 

@@ -4,18 +4,26 @@ import os
 
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
+from django.template.library import InvalidTemplateLibrary
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import extend_sys_path
+from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from .templatetags import custom, inclusion
 from .utils import ROOT
 
+LIBRARIES = {
+    'custom': 'template_tests.templatetags.custom',
+    'inclusion': 'template_tests.templatetags.inclusion',
+}
+
 
 class CustomFilterTests(SimpleTestCase):
 
     def test_filter(self):
-        t = Engine().from_string("{% load custom %}{{ string|trim:5 }}")
+        engine = Engine(libraries=LIBRARIES)
+        t = engine.from_string("{% load custom %}{{ string|trim:5 }}")
         self.assertEqual(
             t.render(Context({"string": "abcdefghijklmnopqrstuvwxyz"})),
             "abcde"
@@ -26,7 +34,7 @@ class TagTestCase(SimpleTestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.engine = Engine(app_dirs=True)
+        cls.engine = Engine(app_dirs=True, libraries=LIBRARIES)
         super(TagTestCase, cls).setUpClass()
 
     def verify_tag(self, tag, name):
@@ -269,7 +277,7 @@ class InclusionTagTests(TagTestCase):
         """
         #23441 -- InclusionNode shouldn't modify its nodelist at render time.
         """
-        engine = Engine(app_dirs=True)
+        engine = Engine(app_dirs=True, libraries=LIBRARIES)
         template = engine.from_string('{% load inclusion %}{% inclusion_no_params %}')
         count = template.nodelist.get_nodes_by_type(Node)
         template.render(Context({}))
@@ -281,7 +289,7 @@ class InclusionTagTests(TagTestCase):
         when rendering. Otherwise, leftover values such as blocks from
         extending can interfere with subsequent rendering.
         """
-        engine = Engine(app_dirs=True)
+        engine = Engine(app_dirs=True, libraries=LIBRARIES)
         template = engine.from_string('{% load inclusion %}{% inclusion_extends1 %}{% inclusion_extends2 %}')
         self.assertEqual(template.render(Context({})).strip(), 'one\ntwo')
 
@@ -313,34 +321,37 @@ class TemplateTagLoadingTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.egg_dir = os.path.join(ROOT, 'eggs')
-        cls.engine = Engine()
         super(TemplateTagLoadingTests, cls).setUpClass()
 
     def test_load_error(self):
-        ttext = "{% load broken_tag %}"
-        with self.assertRaises(TemplateSyntaxError) as e:
-            self.engine.from_string(ttext)
-
-        self.assertIn('ImportError', e.exception.args[0])
-        self.assertIn('Xtemplate', e.exception.args[0])
+        msg = (
+            "Invalid template library specified. ImportError raised when "
+            "trying to load 'template_tests.broken_tag': cannot import name "
+            "'?Xtemplate'?"
+        )
+        with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+            Engine(libraries={
+                'broken_tag': 'template_tests.broken_tag',
+            })
 
     def test_load_error_egg(self):
-        ttext = "{% load broken_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
+        msg = (
+            "Invalid template library specified. ImportError raised when "
+            "trying to load 'tagsegg.templatetags.broken_egg': cannot "
+            "import name '?Xtemplate'?"
+        )
         with extend_sys_path(egg_name):
-            with self.assertRaises(TemplateSyntaxError):
-                with self.settings(INSTALLED_APPS=['tagsegg']):
-                    self.engine.from_string(ttext)
-            try:
-                with self.settings(INSTALLED_APPS=['tagsegg']):
-                    self.engine.from_string(ttext)
-            except TemplateSyntaxError as e:
-                self.assertIn('ImportError', e.args[0])
-                self.assertIn('Xtemplate', e.args[0])
+            with six.assertRaisesRegex(self, InvalidTemplateLibrary, msg):
+                Engine(libraries={
+                    'broken_egg': 'tagsegg.templatetags.broken_egg',
+                })
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
         egg_name = '%s/tagsegg.egg' % self.egg_dir
         with extend_sys_path(egg_name):
-            with self.settings(INSTALLED_APPS=['tagsegg']):
-                self.engine.from_string(ttext)
+            engine = Engine(libraries={
+                'working_egg': 'tagsegg.templatetags.working_egg',
+            })
+            engine.from_string(ttext)

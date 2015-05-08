@@ -13,6 +13,7 @@ include_fail_templates = {
 
 
 class IncludeTagTests(SimpleTestCase):
+    libraries = {'bad_tag': 'template_tests.templatetags.bad_tag'}
 
     @setup({'include01': '{% include "basic-syntax01" %}'}, basic_templates)
     def test_include01(self):
