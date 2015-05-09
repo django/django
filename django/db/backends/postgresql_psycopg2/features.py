@@ -27,3 +27,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     closed_cursor_error_class = InterfaceError
     has_case_insensitive_like = False
     requires_sqlparse_for_splitting = False
+    greatest_least_ignores_nulls = True
