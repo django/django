@@ -578,8 +578,7 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
-    def assertRaisesMessage(self, expected_exception, expected_message,
-                           callable_obj=None, *args, **kwargs):
+    def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
         Asserts that the message in a raised exception matches the passed
         value.
@@ -587,12 +586,11 @@ class SimpleTestCase(unittest.TestCase):
         Args:
             expected_exception: Exception class expected to be raised.
             expected_message: expected error message string value.
-            callable_obj: Function to be called.
-            args: Extra args.
+            args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
         return six.assertRaisesRegex(self, expected_exception,
-                re.escape(expected_message), callable_obj, *args, **kwargs)
+                re.escape(expected_message), *args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
             field_kwargs=None, empty_value=''):
