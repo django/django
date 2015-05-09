@@ -619,13 +619,13 @@ then you should use :class:`~django.test.TransactionTestCase` or
 
             @classmethod
             def setUpClass(cls):
-                super(cls, MyTestCase).setUpClass()     # Call parent first
+                super(MyTestCase, cls).setUpClass()     # Call parent first
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(cls, MyTestCase).tearDownClass()  # Call parent last
+                super(MyTestCase, cls).tearDownClass()  # Call parent last
 
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
