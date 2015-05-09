@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db.utils import DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -53,3 +54,7 @@ class NodeNotFoundError(LookupError):
 
     def __repr__(self):
         return "NodeNotFoundError(%r)" % self.node
+
+
+class MigrationSchemaMissing(DatabaseError):
+    pass

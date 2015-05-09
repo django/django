@@ -12,6 +12,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.servers.basehttp import get_internal_wsgi_application, run
 from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload, six
 from django.utils.encoding import force_text, get_system_encoding
@@ -109,10 +110,7 @@ class Command(BaseCommand):
 
         self.stdout.write("Performing system checks...\n\n")
         self.check(display_num_errors=True)
-        try:
-            self.check_migrations()
-        except ImproperlyConfigured:
-            pass
+        self.check_migrations()
         now = datetime.now().strftime('%B %d, %Y - %X')
         if six.PY2:
             now = now.decode(get_system_encoding())
@@ -157,7 +155,17 @@ class Command(BaseCommand):
         Checks to see if the set of migrations on disk matches the
         migrations in the database. Prints a warning if they don't match.
         """
-        executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+        try:
+            executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
+        except ImproperlyConfigured:
+            # No databases are configured (or the dummy one)
+            return
+        except MigrationSchemaMissing:
+            self.stdout.write(self.style.NOTICE(
+                "\nNot checking migrations as it is not possible to access/create the django_migrations table."
+            ))
+            return
+
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
             self.stdout.write(self.style.NOTICE(
