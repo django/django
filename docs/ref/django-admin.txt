@@ -840,6 +840,8 @@ Example usage::
 
 .. django-admin-option:: --certfile
 
+.. versionadded:: 1.9
+
 With the  ``--certfile`` option you can specify an SSL certificate file that
 will be used to serve your application over HTTPS. The certificate file can
 contain the certificate chain alone or the certificate chain concatenated
@@ -853,6 +855,8 @@ Example Usage::
     django-admin runserver --certfile server.crt --keyfile server.key
 
 .. django-admin-option:: --keyfile
+
+.. versionadded:: 1.9
 
 With the ``--keyfile`` option you can specify an SSL key file that will be
 used to serve your application over HTTPS in conjunction with the specified

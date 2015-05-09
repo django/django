@@ -1306,7 +1306,9 @@ class ManageRunserver(AdminScriptTestCase):
         self.assertServerSettings('127.0.0.1', '8000', certfile="server.crt", use_ssl=True)
 
     def test_runner_keyfile(self):
-        self.assertRaises(CommandError, self.cmd.handle, keyfile="server.key")
+        with self.assertRaises(CommandError) as context_manager:
+            self.cmd.handle(keyfile="server.key")
+        self.assertEqual(str(context_manager.exception), 'The `certfile` argument must be specified with a key file.')
 
     def test_runner_certfile_keyfile(self):
         self.cmd.handle(certfile="server.crt", keyfile="server.key")
