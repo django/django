@@ -12,6 +12,7 @@ class Author(models.Model):
     name = models.CharField(max_length=50)
     alias = models.CharField(max_length=50, null=True, blank=True)
     goes_by = models.CharField(max_length=50, null=True, blank=True)
+    age = models.PositiveSmallIntegerField(default=30)
 
     def __str__(self):
         return self.name
@@ -25,7 +26,18 @@ class Article(models.Model):
     text = models.TextField()
     written = models.DateTimeField()
     published = models.DateTimeField(null=True, blank=True)
+    updated = models.DateTimeField(null=True, blank=True)
     views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
+
+
+@python_2_unicode_compatible
+class Fan(models.Model):
+    name = models.CharField(max_length=50)
+    age = models.PositiveSmallIntegerField(default=30)
+    author = models.ForeignKey(Author, related_name='fans')
+
+    def __str__(self):
+        return self.name
