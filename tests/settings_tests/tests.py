@@ -112,7 +112,7 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
 
     @classmethod
     def setUpClass(cls):
-        super(cls, ClassDecoratedTestCase).setUpClass()
+        super(ClassDecoratedTestCase, cls).setUpClass()
         cls.foo = getattr(settings, 'TEST', 'BUG')
 
     def test_override(self):
