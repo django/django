@@ -1268,6 +1268,17 @@ class RequestMethodStringDataTests(TestCase):
         response = self.client.head('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
 
+    def test_json(self):
+        # Regression test for #24773
+        response = self.client.get('/json/')
+        self.assertEqual(response.json(), {'ford': 'prefect'})
+
+    def test_json_wrong_header(self):
+        # Regression test for #24773
+        response = self.client.get('/body/')
+        with self.assertRaises(ValueError):
+            self.assertEqual(response.json(), {'ford': 'prefect'})
+
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class QueryStringTests(TestCase):
