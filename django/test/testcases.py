@@ -565,8 +565,7 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
-    def assertRaisesMessage(self, expected_exception, expected_message,
-                           callable_obj=None, *args, **kwargs):
+    def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
         Asserts that the message in a raised exception matches the passed
         value.
@@ -574,12 +573,17 @@ class SimpleTestCase(unittest.TestCase):
         Args:
             expected_exception: Exception class expected to be raised.
             expected_message: expected error message string value.
-            callable_obj: Function to be called.
-            args: Extra args.
+            args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
+        # callable_obj was a documented kwarg in older version of Django, but
+        # had to be removed due to a bad fix for http://bugs.python.org/issue24134
+        # inadvertently making its way into Python 2.7.10.
+        callable_obj = kwargs.pop('callable_obj', None)
+        if callable_obj:
+            args = (callable_obj,) + args
         return six.assertRaisesRegex(self, expected_exception,
-                re.escape(expected_message), callable_obj, *args, **kwargs)
+                re.escape(expected_message), *args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
             field_kwargs=None, empty_value=''):

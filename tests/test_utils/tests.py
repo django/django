@@ -752,6 +752,12 @@ class AssertRaisesMsgTest(SimpleTestCase):
             raise ValueError("[.*x+]y?")
         self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
 
+    def test_callable_obj_param(self):
+        # callable_obj was a documented kwarg in older version of Django.
+        def func1():
+            raise ValueError("[.*x+]y?")
+        self.assertRaisesMessage(ValueError, "[.*x+]y?", callable_obj=func1)
+
 
 class AssertFieldOutputTests(SimpleTestCase):
 
