@@ -4,7 +4,7 @@ from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 
-from .models import Article, Publication
+from .models import Article, InheritedArticleA, InheritedArticleB, Publication
 
 
 class ManyToManyTests(TestCase):
@@ -454,3 +454,28 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(),
                                  ['<Article: NASA finds intelligent life on Earth>'])
+
+    def test_inherited_models_selects(self):
+        """
+        #24156 - Objects from child models where the parent's m2m field uses
+        related_name='+' should be retrieved correctly.
+        """
+        a = InheritedArticleA.objects.create()
+        b = InheritedArticleB.objects.create()
+        a.publications.add(self.p1, self.p2)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(), [])
+        b.publications.add(self.p3)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(),
+            [
+                '<Publication: Science Weekly>',
+            ])
