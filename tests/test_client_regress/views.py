@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -106,6 +106,10 @@ def return_undecodable_binary(request):
     return HttpResponse(
         b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e ReportLab Generated PDF document http://www.reportlab.com'
     )
+
+
+def return_json_response(request):
+    return JsonResponse({'key': 'value'})
 
 
 def return_json_file(request):
