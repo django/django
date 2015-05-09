@@ -22,6 +22,9 @@ from django.conf import settings
 from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
+from django.db import ConnectionHandler
+from django.db.migrations.exceptions import MigrationSchemaMissing
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, TestCase, mock, override_settings
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
@@ -1247,7 +1250,8 @@ class ManageRunserver(AdminScriptTestCase):
         def monkey_run(*args, **options):
             return
 
-        self.cmd = Command()
+        self.output = StringIO()
+        self.cmd = Command(stdout=self.output)
         self.cmd.run = monkey_run
 
     def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):
@@ -1297,6 +1301,26 @@ class ManageRunserver(AdminScriptTestCase):
         # Uses only characters that could be in an ipv6 address
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
+
+    def test_no_database(self):
+        """
+        Ensure runserver.check_migrations doesn't choke on empty DATABASES.
+        """
+        tested_connections = ConnectionHandler({})
+        with mock.patch('django.core.management.commands.runserver.connections', new=tested_connections):
+            self.cmd.check_migrations()
+
+    def test_readonly_database(self):
+        """
+        Ensure runserver.check_migrations doesn't choke when a database is read-only
+        (with possibly no django_migrations table).
+        """
+        with mock.patch.object(
+                MigrationRecorder, 'ensure_schema',
+                side_effect=MigrationSchemaMissing()):
+            self.cmd.check_migrations()
+        # Check a warning is emitted
+        self.assertIn("Not checking migrations", self.output.getvalue())
 
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
