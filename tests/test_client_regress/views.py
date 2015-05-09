@@ -108,7 +108,7 @@ def return_undecodable_binary(request):
     )
 
 
-def return_json(request):
+def return_json_response(request):
     return JsonResponse({'ford': 'prefect'})
 
 

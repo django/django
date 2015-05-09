@@ -1270,7 +1270,7 @@ class RequestMethodStringDataTests(TestCase):
 
     def test_json(self):
         # Regression test for #24773
-        response = self.client.get('/json/')
+        response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'ford': 'prefect'})
 
     def test_json_wrong_header(self):

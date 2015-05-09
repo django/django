@@ -647,7 +647,7 @@ class Client(RequestFactory):
     def _parse_json(self, response, **extra):
         if 'application/json' not in response.get('Content-Type'):
             raise ValueError('Content-Type not set to application/json.')
-        return json.loads(response.content, **extra)
+        return json.loads(response.content.decode(), **extra)
 
     def _handle_redirects(self, response, **extra):
         "Follows any redirects by requesting responses from the server using GET."
