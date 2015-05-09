@@ -84,6 +84,21 @@ class WSGIServer(simple_server.WSGIServer, object):
             super(WSGIServer, self).handle_error(request, client_address)
 
 
+class SecureWSGIServer(WSGIServer):
+    """BASEHTTPServer that implements the Python WSGI protocol with an SSL-wrapped socket."""
+
+    def __init__(self, *args, certfile=None, keyfile=None, **kwargs):
+        super(SecureWSGIServer, self).__init__(*args, **kwargs)
+        import ssl
+        self.socket = ssl.wrap_socket(
+            self.socket,
+            certfile=certfile,
+            keyfile=keyfile,
+            server_side=True,
+            ssl_version=ssl.PROTOCOL_SSLv23
+        )
+
+
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
     def handle_error(self):
@@ -179,13 +194,21 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         handler.run(self.server.get_app())
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False):
+class SecureWSGIRequestHandler(WSGIRequestHandler):
+    def get_environ(self):
+        env = super(SecureWSGIRequestHandler, self).get_environ()
+        env['HTTPS'] = 'on'
+        env['wsgi.url_scheme'] = 'https'
+        return env
+
+
+def run(addr, port, wsgi_handler, threading=False, server_class=WSGIServer, handler_class=WSGIRequestHandler, **kwargs):
     server_address = (addr, port)
     if threading:
-        httpd_cls = type(str('WSGIServer'), (socketserver.ThreadingMixIn, WSGIServer), {})
+        httpd_cls = type(str(server_class.__name__), (socketserver.ThreadingMixIn, server_class), {})
     else:
-        httpd_cls = WSGIServer
-    httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
+        httpd_cls = server_class
+    httpd = httpd_cls(server_address, handler_class, **kwargs)
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an
         # abrupt shutdown; like quitting the server by the user or restarting

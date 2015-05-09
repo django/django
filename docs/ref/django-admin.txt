@@ -838,6 +838,32 @@ Example usage::
 
     django-admin runserver --ipv6
 
+.. django-admin-option:: --certfile
+
+With the  ``--certfile`` option you can specify an SSL certificate file that
+will be used to serve your application over HTTPS. The certificate file can
+contain the certificate chain alone or the certificate chain concatenated
+with the private key. If the ``--certfile`` option is specified without
+specifying the ``--keyfile`` option, it is assumed that the certificate and
+private key are concatenated in a single file.
+
+Example Usage::
+
+    django-admin runserver --certfile server.pem
+    django-admin runserver --certfile server.crt --keyfile server.key
+
+.. django-admin-option:: --keyfile
+
+With the ``--keyfile`` option you can specify an SSL key file that will be
+used to serve your application over HTTPS in conjunction with the specified
+certificate file. If the ``--keyfile`` is specified then a certificate must
+also be provided with the ``--certfile`` option.
+
+Example Usage::
+
+    django-admin runserver --keyfile server.key --certfile server.crt
+
+
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

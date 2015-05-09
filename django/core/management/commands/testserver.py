@@ -17,6 +17,11 @@ class Command(BaseCommand):
             help='Port number or ipaddr:port to run the server on.')
         parser.add_argument('--ipv6', '-6', action='store_true', dest='use_ipv6', default=False,
             help='Tells Django to use an IPv6 address.')
+        parser.add_argument('--certfile', dest='certfile',
+            help='Tells Django to serve over HTTPS with the specified SSL certificate. Must be specified if `keyfile` \
+            is set.')
+        parser.add_argument('--keyfile', dest='keyfile',
+            help='Tells Django to server over HTTPS with the specified SSL key.')
 
     def handle(self, *fixture_labels, **options):
         verbosity = options.get('verbosity')
@@ -42,5 +47,7 @@ class Command(BaseCommand):
             shutdown_message=shutdown_message,
             use_reloader=False,
             use_ipv6=options['use_ipv6'],
-            use_threading=use_threading
+            use_threading=use_threading,
+            certfile=options.get('certfile'),
+            keyfile=options.get('keyfile')
         )
