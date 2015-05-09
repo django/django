@@ -106,7 +106,8 @@ Example requests:
 * ``/articles/2003/`` would match the first pattern in the list, not the
   second one, because the patterns are tested in order, and the first one
   is the first test to pass. Feel free to exploit the ordering to insert
-  special cases like this.
+  special cases like this. Here, Django would call the function
+  ``views.special_case_2003(request)``
 
 * ``/articles/2003`` would not match any of these patterns, because each
   pattern requires that the URL end with a slash.
@@ -197,8 +198,8 @@ URLconf line::
 
     url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
 
-...the ``year`` argument to ``views.year_archive()`` will be a string, not
-an integer, even though the ``[0-9]{4}`` will only match integer strings.
+...the ``year`` argument passed to ``views.year_archive()`` will be a string,
+ not an integer, even though the ``[0-9]{4}`` will only match integer strings.
 
 Specifying defaults for view arguments
 ======================================
@@ -247,7 +248,7 @@ exception is raised, Django will invoke an error-handling view.
 
 The views to use for these cases are specified by four variables. Their
 default values should suffice for most projects, but further customization is
-possible by assigning values to them.
+possible by overriding their default values.
 
 See the documentation on :ref:`customizing error views
 <customizing-error-views>` for the full details.
@@ -260,10 +261,10 @@ to the view that should be called to handle the error condition at hand.
 
 The variables are:
 
+* ``handler400`` -- See :data:`django.conf.urls.handler400`.
+* ``handler403`` -- See :data:`django.conf.urls.handler403`.
 * ``handler404`` -- See :data:`django.conf.urls.handler404`.
 * ``handler500`` -- See :data:`django.conf.urls.handler500`.
-* ``handler403`` -- See :data:`django.conf.urls.handler403`.
-* ``handler400`` -- See :data:`django.conf.urls.handler400`.
 
 .. _including-other-urlconfs:
 
@@ -300,6 +301,7 @@ Another possibility is to include additional URL patterns by using a list of
     from credit import views as credit_views
 
     extra_patterns = [
+        url(r'^reports/$', credit_views.report),
         url(r'^reports/(?P<id>[0-9]+)/$', credit_views.report),
         url(r'^charge/$', credit_views.charge),
     ]
@@ -311,7 +313,7 @@ Another possibility is to include additional URL patterns by using a list of
     ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
-``credit.views.report()`` Django view.
+``credit_views.report()`` Django view.
 
 This can be used to remove redundancy from URLconfs where a single pattern
 prefix is used repeatedly. For example, consider this URLconf::
@@ -497,17 +499,17 @@ in their final forms either for embedding in generated content (views and assets
 URLs, URLs shown to the user, etc.) or for handling of the navigation flow on
 the server side (redirections, etc.)
 
-It is strongly desirable not having to hard-code these URLs (a laborious,
-non-scalable and error-prone strategy) or having to devise ad-hoc mechanisms for
-generating URLs that are parallel to the design described by the URLconf and as
-such in danger of producing stale URLs at some point.
+It is strongly desirable to avoid hard-coding these URLs (a laborious,
+non-scalable and error-prone strategy). Equally dangerous is devising ad-hoc
+mechanisms to generate URLs that are parallel to the design described by the
+URLconf, which can result in the production of URLs that become stale over time.
 
 In other words, what's needed is a DRY mechanism. Among other advantages it
-would allow evolution of the URL design without having to go all over the
+would allow evolution of the URL design without having to go over all the
 project source code to search and replace outdated URLs.
 
-The piece of information we have available as a starting point to get a URL is
-an identification (e.g. the name) of the view in charge of handling it, other
+The primary piece of information we have available to get a URL is an
+identification (e.g. the name) of the view in charge of handling it. Other
 pieces of information that necessarily must participate in the lookup of the
 right URL are the types (positional, keyword) and values of the view arguments.
 
