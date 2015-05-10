@@ -23,7 +23,7 @@ from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
 from django.db.models.sql.constants import CURSOR
-from django.db.utils import ConnectionHandler
+from django.db.utils import OperationalError, ConnectionHandler
 from django.test import (
     TestCase, TransactionTestCase, mock, override_settings, skipIfDBFeature,
     skipUnlessDBFeature,
@@ -297,6 +297,19 @@ class PostgreSQLTests(TestCase):
 
         with mock.patch(version_path, '2.5.dev0'):
             self.assertEqual(psycopg2_version(), (2, 5))
+
+    def test_statement_timeout(self):
+        databases = copy.deepcopy(settings.DATABASES)
+        # Set timeout to 1ms and execute a 1s query.
+        databases[DEFAULT_DB_ALIAS]['STATEMENT_TIMEOUT'] = 1
+        new_connections = ConnectionHandler(databases)
+        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        try:
+            with new_connection.cursor() as cursor:
+                with self.assertRaises(OperationalError):
+                    cursor.execute("SELECT pg_sleep(1)")
+        finally:
+            new_connection.close()
 
 
 class DateQuotingTest(TestCase):

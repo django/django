@@ -354,6 +354,9 @@ class BaseDatabaseOperations(object):
         """
         return ''
 
+    def set_statement_timeout_sql(self):
+        raise NotImplementedError('subclasses of BaseDatabaseOperations may require a set_statement_timeout_sql() method')
+
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         """
         Returns a list of SQL statements required to remove all data from

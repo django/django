@@ -134,7 +134,11 @@ class BaseDatabaseWrapper(object):
     def _cursor(self):
         self.ensure_connection()
         with self.wrap_database_errors:
-            return self.create_cursor()
+            cursor = self.create_cursor()
+            timeout = self.settings_dict['STATEMENT_TIMEOUT']
+            if timeout is not None:
+                cursor.execute(self.ops.set_statement_timeout_sql(), [timeout])
+            return cursor
 
     def _commit(self):
         if self.connection is not None:

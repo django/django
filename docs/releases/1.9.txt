@@ -128,6 +128,13 @@ Cache
   headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
   to better prevent caching.
 
+Database backend API
+^^^^^^^^^^^^^^^^^^^^
+
+* Added database setting :setting:`STATEMENT_TIMEOUT`. The setting sets the max
+  time, in milliseconds, before an SQL statement is aborted. Supported for the
+  PostgreSQL (``postgresql_psycopg2``) backend.
+
 Email
 ^^^^^
 
