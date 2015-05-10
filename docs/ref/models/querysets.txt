@@ -1996,7 +1996,7 @@ update
 
 .. method:: update(**kwargs)
 
-Performs an SQL update query for the specified fields, and returns
+Performs a SQL update query for the specified fields, and returns
 the number of rows matched (which may not be equal to the number of rows
 updated if some rows already have the new value).
 
