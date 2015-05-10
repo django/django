@@ -2366,7 +2366,7 @@ class UUIDField(Field):
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if isinstance(value, six.string_types):
-            value = uuid.UUID(value.replace('-', ''))
+            value = uuid.UUID(value)
         if isinstance(value, uuid.UUID):
             if connection.features.has_native_uuid_field:
                 return value
