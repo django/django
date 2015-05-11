@@ -23,7 +23,7 @@ from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, total_ordering, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango21Warning, warn_about_renamed_method
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import (smart_text, force_text, force_bytes,
     python_2_unicode_compatible)
@@ -828,18 +828,17 @@ class Field(RegisterLookupMixin):
         first_choice = blank_choice if include_blank else []
         return first_choice + list(self.flatchoices)
 
+    @warn_about_renamed_method('Field', '_get_val_from_obj', 'value_from_object',
+                               RemovedInDjango21Warning)
     def _get_val_from_obj(self, obj):
-        if obj is not None:
-            return getattr(obj, self.attname)
-        else:
-            return self.get_default()
+        return self.value_from_object(obj)
 
     def value_to_string(self, obj):
         """
         Returns a string value of this field from the passed obj.
         This is used by the serialization framework.
         """
-        return smart_text(self._get_val_from_obj(obj))
+        return smart_text(getattr(obj, self.attname))
 
     def _get_flatchoices(self):
         """Flattened version of choices tuple."""
@@ -1298,7 +1297,7 @@ class DateField(DateTimeCheckMixin, Field):
         return connection.ops.value_to_db_date(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -1458,7 +1457,7 @@ class DateTimeField(DateField):
         return connection.ops.value_to_db_datetime(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -1664,7 +1663,7 @@ class DurationField(Field):
         return converters + super(DurationField, self).get_db_converters(connection)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else duration_string(val)
 
     def formfield(self, **kwargs):
@@ -2269,7 +2268,7 @@ class TimeField(DateTimeCheckMixin, Field):
         return connection.ops.value_to_db_time(value)
 
     def value_to_string(self, obj):
-        val = self._get_val_from_obj(obj)
+        val = getattr(obj, self.attname)
         return '' if val is None else val.isoformat()
 
     def formfield(self, **kwargs):
@@ -2336,7 +2335,7 @@ class BinaryField(Field):
 
     def value_to_string(self, obj):
         """Binary data is serialized as base64"""
-        return b64encode(force_bytes(self._get_val_from_obj(obj))).decode('ascii')
+        return b64encode(force_bytes(getattr(obj, self.attname))).decode('ascii')
 
     def to_python(self, value):
         # If it's a string, it should be base64-encoded data

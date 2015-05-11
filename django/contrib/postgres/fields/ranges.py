@@ -32,7 +32,7 @@ class RangeField(models.Field):
         return value
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
+        value = getattr(obj, self.attname)
         if value is None:
             return None
         if value.isempty:

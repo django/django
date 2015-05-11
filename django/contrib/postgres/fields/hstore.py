@@ -42,8 +42,7 @@ class HStoreField(Field):
         return value
 
     def value_to_string(self, obj):
-        value = self._get_val_from_obj(obj)
-        return json.dumps(value)
+        return json.dumps(getattr(obj, self.attname))
 
     def formfield(self, **kwargs):
         defaults = {

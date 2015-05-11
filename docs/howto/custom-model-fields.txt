@@ -705,15 +705,16 @@ Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To customize how the values are serialized by a serializer, you can override
-:meth:`~Field.value_to_string`. Calling ``Field._get_val_from_obj(obj)`` is the
-best way to get the value serialized. For example, since our ``HandField`` uses
-strings for its data storage anyway, we can reuse some existing conversion code::
+:meth:`~Field.value_to_string`. Using ``value_from_object`` is the
+best way to get the field's value prior to serialization. For example, since
+our ``HandField`` uses strings for its data storage anyway, we can reuse some
+existing conversion code::
 
     class HandField(models.Field):
         # ...
 
         def value_to_string(self, obj):
-            value = self._get_val_from_obj(obj)
+            value = self.value_from_object(obj)
             return self.get_prep_value(value)
 
 Some general advice

@@ -520,6 +520,8 @@ Miscellaneous
   Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
   decorate tests in ``django.contrib.auth``.
 
+* ``Field._get_val_from_obj`` was renamed to ``Field.value_from_object``.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
