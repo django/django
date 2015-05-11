@@ -162,6 +162,7 @@ class SessionTestsMixin(object):
         self.session.flush()
         self.assertFalse(self.session.exists(prev_key))
         self.assertNotEqual(self.session.session_key, prev_key)
+        self.assertIsNone(self.session.session_key)
         self.assertTrue(self.session.modified)
         self.assertTrue(self.session.accessed)
 
