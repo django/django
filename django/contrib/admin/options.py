@@ -1312,9 +1312,6 @@ class ModelAdmin(BaseModelAdmin):
             # We have to special-case M2Ms as a list of comma-separated PKs.
             if isinstance(f, models.ManyToManyField):
                 initial[k] = initial[k].split(",")
-            # Populate DateTimeFields with a comma-separated date and time.
-            if isinstance(f, models.DateTimeField):
-                initial[k] = initial[k].split(",")
         return initial
 
     @csrf_protect_m
