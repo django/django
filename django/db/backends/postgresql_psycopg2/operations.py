@@ -97,6 +97,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 
+    def set_statement_timeout_sql(self):
+        return "SET statement_timeout = %s"
+
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         if tables:
             # Perform a single SQL 'TRUNCATE x, y, z...;' statement.  It allows

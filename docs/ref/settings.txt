@@ -556,6 +556,21 @@ The lifetime of a database connection, in seconds. Use ``0`` to close database
 connections at the end of each request — Django's historical behavior — and
 ``None`` for unlimited persistent connections.
 
+.. setting:: STATEMENT_TIMEOUT
+
+STATEMENT_TIMEOUT
+~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Default: ``None``
+
+The max time, in milliseconds, before an SQL statement is aborted.
+
+Supported for the PostgreSQL__ (``postgresql_psycopg2``) backend.
+
+.. __: http://www.postgresql.org/docs/current/static/runtime-config-client.html#GUC-STATEMENT-TIMEOUT
+
 .. setting:: OPTIONS
 
 OPTIONS
