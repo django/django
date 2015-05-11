@@ -895,15 +895,6 @@ If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
 
-Custom users and signals
-------------------------
-
-Another limitation of custom User models is that you can't use
-:func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
-handler. Instead, you must register the handler with the resulting User model.
-See :doc:`/topics/signals` for more information on registering and sending
-signals.
-
 Custom users and testing/fixtures
 ---------------------------------
 
