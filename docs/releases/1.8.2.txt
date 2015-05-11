@@ -13,3 +13,7 @@ Bugfixes
 
 * Fixed crash when reusing the same ``Case`` instance in a query
   (:ticket:`24752`).
+
+* Corrected join promotion for ``Case`` expressions. For example, annotating a
+  query with a  ``Case`` expression could unexpectedly filter out results
+  (:ticket:`24766`).
