@@ -18,7 +18,7 @@ Testing operates at different levels. Some tests might apply to a tiny detail
 (*does a particular model method return values as expected?*) while others
 examine the overall operation of the software (*does a sequence of user inputs
 on the site produce the desired result?*). That's no different from the kind of
-testing you did earlier in :doc:`Tutorial 1 </intro/tutorial01>`, using the
+testing you did earlier in :doc:`Tutorial 2 </intro/tutorial02>`, using the
 :djadmin:`shell` to examine the behavior of a method, or running the
 application and entering data to check how it behaves.
 
@@ -134,10 +134,8 @@ right away: the ``Question.was_published_recently()`` method returns ``True`` if
 the ``Question`` was published within the last day (which is correct) but also if
 the ``Question``’s ``pub_date`` field is in the future (which certainly isn't).
 
-You can see this in the Admin; create a question whose date lies in the future;
-you'll see that the ``Question`` change list claims it was published recently.
-
-You can also see this using the :djadmin:`shell`::
+To check if the bug really exists, using the Admin create a question whose date
+lies in the future and check the method using the :djadmin:`shell`::
 
     >>> import datetime
     >>> from django.utils import timezone
@@ -393,7 +391,7 @@ Improving our view
 The list of polls shows polls that aren't published yet (i.e. those that have a
 ``pub_date`` in the future). Let's fix that.
 
-In :ref:`Tutorial 4 <tutorial04-amend-views>` we introduced a class-based view,
+In :doc:`Tutorial 4 </intro/tutorial04>` we introduced a class-based view,
 based on :class:`~django.views.generic.list.ListView`:
 
 .. snippet::
