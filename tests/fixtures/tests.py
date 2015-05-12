@@ -216,7 +216,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Excluding a bogus app should throw an error
         with six.assertRaisesRegex(self, management.CommandError,
-                "Unknown app in excludes: foo_app"):
+                "No installed app with label 'foo_app'."):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
