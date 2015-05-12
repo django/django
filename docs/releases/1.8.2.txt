@@ -20,3 +20,7 @@ Bugfixes
 
 * Fixed incorrect GROUP BY clause generation on MySQL when the query's model
   has a self-referential foreign key (:ticket:`24748`).
+
+* Implemented ``get_db_prep_value`` on :class:`~django.db.models.ForeignKey` 
+  so that ForeignKeys pointing to :class:`~django.db.models.UUIDField` work
+  correctly (:ticket:`24698` :ticket:`24712`).

@@ -375,3 +375,12 @@ class PrimaryKeyUUIDModel(models.Model):
 
 class RelatedToUUIDModel(models.Model):
     uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
+
+
+# Following two models are for #24712 & #24698
+class FirstLevelInheritFromUUIDModel(PrimaryKeyUUIDModel):
+    pass
+
+
+class SecondLevelInheritFromUUIDModel(FirstLevelInheritFromUUIDModel):
+    pass
