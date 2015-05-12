@@ -373,3 +373,11 @@ class PrimaryKeyUUIDModel(models.Model):
 
 class RelatedToUUIDModel(models.Model):
     uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
+
+
+class UUIDChild(PrimaryKeyUUIDModel):
+    pass
+
+
+class UUIDGrandchild(UUIDChild):
+    pass
