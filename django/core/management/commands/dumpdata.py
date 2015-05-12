@@ -68,8 +68,8 @@ class Command(BaseCommand):
             else:
                 try:
                     app_config = apps.get_app_config(exclude)
-                except LookupError:
-                    raise CommandError('Unknown app in excludes: %s' % exclude)
+                except LookupError as e:
+                    raise CommandError(str(e))
                 excluded_apps.add(app_config)
 
         if len(app_labels) == 0:
@@ -87,8 +87,8 @@ class Command(BaseCommand):
                     app_label, model_label = label.split('.')
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     try:
@@ -111,8 +111,8 @@ class Command(BaseCommand):
                     app_label = label
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     app_list[app_config] = None

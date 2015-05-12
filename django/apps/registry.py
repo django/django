@@ -147,7 +147,12 @@ class Apps(object):
         try:
             return self.app_configs[app_label]
         except KeyError:
-            raise LookupError("No installed app with label '%s'." % app_label)
+            message = "No installed app with label '%s'." % app_label
+            for app_config in self.get_app_configs():
+                if app_config.name == app_label:
+                    message += " Did you mean '%s'?" % app_config.label
+                    break
+            raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
     @lru_cache.lru_cache(maxsize=None)

@@ -121,6 +121,10 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(LookupError):
             apps.get_app_config('webdesign')
 
+        msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
+        with self.assertRaisesMessage(LookupError, msg):
+            apps.get_app_config('django.contrib.auth')
+
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         """
