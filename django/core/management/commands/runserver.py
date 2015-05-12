@@ -22,7 +22,6 @@ naiveip_re = re.compile(r"""^(?:
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
     (?P<fqdn>[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*) # FQDN
 ):)?(?P<port>\d+)$""", re.X)
-DEFAULT_PORT = "8000"
 
 
 class Command(BaseCommand):
@@ -31,6 +30,8 @@ class Command(BaseCommand):
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = False
     leave_locale_alone = True
+    
+    default_port = '8000'
 
     def add_arguments(self, parser):
         parser.add_argument('addrport', nargs='?',
@@ -68,7 +69,7 @@ class Command(BaseCommand):
         self._raw_ipv6 = False
         if not options.get('addrport'):
             self.addr = ''
-            self.port = DEFAULT_PORT
+            self.port = self.default_port
         else:
             m = re.match(naiveip_re, options['addrport'])
             if m is None:
