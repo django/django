@@ -1,8 +1,8 @@
 =====================================
-Writing your first Django app, part 3
+Writing your first Django app, part 2
 =====================================
 
-This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
+This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off. We're
 continuing the Web-poll application and will focus on creating the public
 interface -- "views."
 
@@ -57,130 +57,6 @@ URLconf maps URL patterns (described as regular expressions) to views.
 
 This tutorial provides basic instruction in the use of URLconfs, and you can
 refer to :mod:`django.core.urlresolvers` for more information.
-
-Write your first view
-=====================
-
-Let's write the first view. Open the file ``polls/views.py``
-and put the following Python code in it:
-
-.. snippet::
-    :filename: polls/views.py
-
-    from django.http import HttpResponse
-
-
-    def index(request):
-        return HttpResponse("Hello, world. You're at the polls index.")
-
-This is the simplest view possible in Django. To call the view, we need to map
-it to a URL - and for this we need a URLconf.
-
-To create a URLconf in the polls directory, create a file called ``urls.py``.
-Your app directory should now look like::
-
-    polls/
-        __init__.py
-        admin.py
-        models.py
-        tests.py
-        urls.py
-        views.py
-
-In the ``polls/urls.py`` file include the following code:
-
-.. snippet::
-    :filename: polls/urls.py
-
-    from django.conf.urls import url
-
-    from . import views
-
-    urlpatterns = [
-        url(r'^$', views.index, name='index'),
-    ]
-
-The next step is to point the root URLconf at the ``polls.urls`` module. In
-``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
-with:
-
-.. snippet::
-    :filename: mysite/urls.py
-
-    from django.conf.urls import include, url
-    from django.contrib import admin
-
-    urlpatterns = [
-        url(r'^polls/', include('polls.urls')),
-        url(r'^admin/', include(admin.site.urls)),
-    ]
-
-.. admonition:: Doesn't match what you see?
-
-    If you're seeing ``admin.autodiscover()`` before the definition of
-    ``urlpatterns``, you're probably using a version of Django that doesn't
-    match this tutorial version.  You'll want to either switch to the older
-    tutorial or the newer Django version.
-
-You have now wired an ``index`` view into the URLconf. Go to
-http://localhost:8000/polls/ in your browser, and you should see the text
-"*Hello, world. You're at the polls index.*", which you defined in the
-``index`` view.
-
-The :func:`~django.conf.urls.url` function is passed four arguments, two
-required: ``regex`` and ``view``, and two optional: ``kwargs``, and ``name``.
-At this point, it's worth reviewing what these arguments are for.
-
-:func:`~django.conf.urls.url` argument: regex
----------------------------------------------
-
-The term "regex" is a commonly used short form meaning "regular expression",
-which is a syntax for matching patterns in strings, or in this case, url
-patterns. Django starts at the first regular expression and makes its way down
-the list,  comparing the requested URL against each regular expression until it
-finds one that matches.
-
-Note that these regular expressions do not search GET and POST parameters, or
-the domain name. For example, in a request to
-``http://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
-request to ``http://www.example.com/myapp/?page=3``, the URLconf will also
-look for ``myapp/``.
-
-If you need help with regular expressions, see `Wikipedia's entry`_ and the
-documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
-Regular Expressions" by Jeffrey Friedl is fantastic. In practice, however,
-you don't need to be an expert on regular expressions, as you really only need
-to know how to capture simple patterns. In fact, complex regexes can have poor
-lookup performance, so you probably shouldn't rely on the full power of regexes.
-
-Finally, a performance note: these regular expressions are compiled the first
-time the URLconf module is loaded. They're super fast (as long as the lookups
-aren't too complex as noted above).
-
-.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
-
-:func:`~django.conf.urls.url` argument: view
---------------------------------------------
-
-When Django finds a regular expression match, Django calls the specified view
-function, with an :class:`~django.http.HttpRequest` object as the first
-argument and any “captured” values from the regular expression as other
-arguments. If the regex uses simple captures, values are passed as positional
-arguments; if it uses named captures, values are passed as keyword arguments.
-We'll give an example of this in a bit.
-
-:func:`~django.conf.urls.url` argument: kwargs
-----------------------------------------------
-
-Arbitrary keyword arguments can be passed in a dictionary to the target view. We
-aren't going to use this feature of Django in the tutorial.
-
-:func:`~django.conf.urls.url` argument: name
----------------------------------------------
-
-Naming your URL lets you refer to it unambiguously from elsewhere in Django
-especially templates. This powerful feature allows you to make  global changes
-to the url patterns of your project while only touching a single file.
 
 Writing more views
 ==================
@@ -327,10 +203,9 @@ knows to find the polls templates even though we didn't modify the
 
     We *could* have all our templates together, in one big templates directory,
     and it would work perfectly well. However, this template belongs to the
-    polls application, so unlike the admin template we created in the previous
-    tutorial, we'll put this one in the application's template directory
-    (``polls/templates``) rather than the project's (``templates``). We'll
-    discuss in more detail in the :doc:`reusable apps tutorial
+    polls application, so we'll put this one in the application's template 
+    directory (``polls/templates``) rather than the project's (``templates``). 
+    We'll discuss in more detail in the :doc:`reusable apps tutorial
     </intro/reusable-apps>` *why* we do this.
 
 Within the ``templates`` directory you have just created, create another
@@ -607,5 +482,5 @@ to point at the namespaced detail view:
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 
-When you're comfortable with writing views, read :doc:`part 4 of this tutorial
-</intro/tutorial04>` to learn about simple form processing and generic views.
+When you're comfortable with writing views, read :doc:`part 3 of this tutorial
+</intro/tutorial03>` to learn about simple form processing and generic views.

@@ -118,6 +118,182 @@ These files are:
 
 .. _more about packages: https://docs.python.org/tutorial/modules.html#packages
 
+Creating the Polls app
+----------------------
+
+Now that your environment -- a "project" -- is set up, you're set to start
+doing work.
+
+Each application you write in Django consists of a Python package that follows
+a certain convention. Django comes with a utility that automatically generates
+the basic directory structure of an app, so you can focus on writing code
+rather than creating directories.
+
+.. admonition:: Projects vs. apps
+
+    What's the difference between a project and an app? An app is a Web
+    application that does something -- e.g., a Weblog system, a database of
+    public records or a simple poll app. A project is a collection of
+    configuration and apps for a particular Web site. A project can contain
+    multiple apps. An app can be in multiple projects.
+
+Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
+create our poll app right next to your :file:`manage.py` file so that it can be
+imported as its own top-level module, rather than a submodule of ``mysite``.
+
+To create your app, make sure you're in the same directory as :file:`manage.py`
+and type this command:
+
+.. code-block:: console
+
+    $ python manage.py startapp polls
+
+That'll create a directory :file:`polls`, which is laid out like this::
+
+    polls/
+        __init__.py
+        admin.py
+        migrations/
+            __init__.py
+        models.py
+        tests.py
+        views.py
+
+This directory structure will house the poll application.
+
+Write your first view
+---------------------
+
+Let's write the first view. Open the file ``polls/views.py``
+and put the following Python code in it:
+
+.. snippet::
+    :filename: polls/views.py
+
+    from django.http import HttpResponse
+
+
+    def index(request):
+        return HttpResponse("Hello, world. You're at the polls index.")
+
+This is the simplest view possible in Django. To call the view, we need to map
+it to a URL - and for this we need a URLconf.
+
+To create a URLconf in the polls directory, create a file called ``urls.py``.
+Your app directory should now look like::
+
+    polls/
+        __init__.py
+        admin.py
+        models.py
+        tests.py
+        urls.py
+        views.py
+
+In the ``polls/urls.py`` file include the following code:
+
+.. snippet::
+    :filename: polls/urls.py
+
+    from django.conf.urls import url
+
+    from . import views
+
+    urlpatterns = [
+        url(r'^$', views.index, name='index'),
+    ]
+
+The next step is to point the root URLconf at the ``polls.urls`` module. In
+``mysite/urls.py`` insert an :func:`~django.conf.urls.include`, leaving you
+with:
+
+.. snippet::
+    :filename: mysite/urls.py
+
+    from django.conf.urls import include, url
+    from django.contrib import admin
+
+    urlpatterns = [
+        url(r'^polls/', include('polls.urls')),
+        url(r'^admin/', include(admin.site.urls)),
+    ]
+
+.. admonition:: Doesn't match what you see?
+
+    If you're seeing ``admin.autodiscover()`` before the definition of
+    ``urlpatterns``, you're probably using a version of Django that doesn't
+    match this tutorial version.  You'll want to either switch to the older
+    tutorial or the newer Django version.
+
+You have now wired an ``index`` view into the URLconf. Lets verify it's
+working, run the following command:
+
+.. code-block:: console
+
+   $ python manage.py runserver
+
+Ignore the warning about unapplied database migrations for now, we'll deal
+with the database shortly.
+
+Go to http://localhost:8000/polls/ in your browser, and you should see the
+text "*Hello, world. You're at the polls index.*", which you defined in the
+``index`` view.
+
+The :func:`~django.conf.urls.url` function is passed four arguments, two
+required: ``regex`` and ``view``, and two optional: ``kwargs``, and ``name``.
+At this point, it's worth reviewing what these arguments are for.
+
+:func:`~django.conf.urls.url` argument: regex
+---------------------------------------------
+
+The term "regex" is a commonly used short form meaning "regular expression",
+which is a syntax for matching patterns in strings, or in this case, url
+patterns. Django starts at the first regular expression and makes its way down
+the list,  comparing the requested URL against each regular expression until it
+finds one that matches.
+
+Note that these regular expressions do not search GET and POST parameters, or
+the domain name. For example, in a request to
+``http://www.example.com/myapp/``, the URLconf will look for ``myapp/``. In a
+request to ``http://www.example.com/myapp/?page=3``, the URLconf will also
+look for ``myapp/``.
+
+If you need help with regular expressions, see `Wikipedia's entry`_ and the
+documentation of the :mod:`re` module. Also, the O'Reilly book "Mastering
+Regular Expressions" by Jeffrey Friedl is fantastic. In practice, however,
+you don't need to be an expert on regular expressions, as you really only need
+to know how to capture simple patterns. In fact, complex regexes can have poor
+lookup performance, so you probably shouldn't rely on the full power of regexes.
+
+Finally, a performance note: these regular expressions are compiled the first
+time the URLconf module is loaded. They're super fast (as long as the lookups
+aren't too complex as noted above).
+
+.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
+
+:func:`~django.conf.urls.url` argument: view
+--------------------------------------------
+
+When Django finds a regular expression match, Django calls the specified view
+function, with an :class:`~django.http.HttpRequest` object as the first
+argument and any “captured” values from the regular expression as other
+arguments. If the regex uses simple captures, values are passed as positional
+arguments; if it uses named captures, values are passed as keyword arguments.
+We'll give an example of this in a bit.
+
+:func:`~django.conf.urls.url` argument: kwargs
+----------------------------------------------
+
+Arbitrary keyword arguments can be passed in a dictionary to the target view. We
+aren't going to use this feature of Django in the tutorial.
+
+:func:`~django.conf.urls.url` argument: name
+---------------------------------------------
+
+Naming your URL lets you refer to it unambiguously from elsewhere in Django
+especially templates. This powerful feature allows you to make  global changes
+to the url patterns of your project while only touching a single file.
+
 Database setup
 --------------
 
@@ -172,8 +348,8 @@ distribute them for use by others in their projects.
 By default, :setting:`INSTALLED_APPS` contains the following apps, all of which
 come with Django:
 
-* :mod:`django.contrib.admin` -- The admin site. You'll use it in :doc:`part 2
-  of this tutorial </intro/tutorial02>`.
+* :mod:`django.contrib.admin` -- The admin site. You'll use it in :doc:`part 6
+  of this tutorial </intro/tutorial06>`.
 
 * :mod:`django.contrib.auth` -- An authentication system.
 
@@ -216,7 +392,7 @@ database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
 The development server
 ----------------------
 
-Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
+Let's explore the development server. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
 .. code-block:: console
@@ -243,10 +419,6 @@ Apache -- until you're ready for production.
 Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making Web frameworks, not Web servers.)
-
-Now that the server's running, visit http://127.0.0.1:8000/ with your Web
-browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
-It worked!
 
 .. admonition:: Changing the port
 
@@ -284,48 +456,8 @@ It worked!
 Creating models
 ===============
 
-Now that your environment -- a "project" -- is set up, you're set to start
-doing work.
-
-Each application you write in Django consists of a Python package that follows
-a certain convention. Django comes with a utility that automatically generates
-the basic directory structure of an app, so you can focus on writing code
-rather than creating directories.
-
-.. admonition:: Projects vs. apps
-
-    What's the difference between a project and an app? An app is a Web
-    application that does something -- e.g., a Weblog system, a database of
-    public records or a simple poll app. A project is a collection of
-    configuration and apps for a particular Web site. A project can contain
-    multiple apps. An app can be in multiple projects.
-
-Your apps can live anywhere on your `Python path`_. In this tutorial, we'll
-create our poll app right next to your :file:`manage.py` file so that it can be
-imported as its own top-level module, rather than a submodule of ``mysite``.
-
-To create your app, make sure you're in the same directory as :file:`manage.py`
-and type this command:
-
-.. code-block:: console
-
-    $ python manage.py startapp polls
-
-That'll create a directory :file:`polls`, which is laid out like this::
-
-    polls/
-        __init__.py
-        admin.py
-        migrations/
-            __init__.py
-        models.py
-        tests.py
-        views.py
-
-This directory structure will house the poll application.
-
-The first step in writing a database Web app in Django is to define your models
--- essentially, your database layout, with additional metadata.
+Now we'll define your models -- essentially, your database layout, with 
+additional metadata.
 
 .. admonition:: Philosophy
 
@@ -807,4 +939,4 @@ full details on the database API, see our :doc:`Database API reference
 </topics/db/queries>`.
 
 When you're comfortable with the API, read :doc:`part 2 of this tutorial
-</intro/tutorial02>` to get Django's automatic admin working.
+</intro/tutorial02>` to start working on public poll views.

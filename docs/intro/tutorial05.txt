@@ -1,8 +1,8 @@
 =====================================
-Writing your first Django app, part 6
+Writing your first Django app, part 5
 =====================================
 
-This tutorial begins where :doc:`Tutorial 5 </intro/tutorial05>` left off.
+This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
 We've built a tested Web-poll application, and we'll now add a stylesheet and
 an image.
 
@@ -116,13 +116,5 @@ with the framework see
 static files </howto/static-files/deployment>` discusses how to use static
 files on a real server.
 
-What's next?
-============
-
-The beginner tutorial ends here for the time being. In the meantime, you might
-want to check out some pointers on :doc:`where to go from here
-</intro/whatsnext>`.
-
-If you are familiar with Python packaging and interested in learning how to
-turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
-write reusable apps</intro/reusable-apps>`.
+When you're comfortable with the static files, read :doc:`part 6 of this tutorial
+</intro/tutorial06>` to get Django's automatic admin working.

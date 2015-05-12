@@ -1,8 +1,8 @@
 =====================================
-Writing your first Django app, part 2
+Writing your first Django app, part 6
 =====================================
 
-This tutorial begins where :doc:`Tutorial 1 </intro/tutorial01>` left off. We're
+This tutorial begins where :doc:`Tutorial 5 </intro/tutorial05>` left off. We're
 continuing the Web-poll application and will focus on Django's
 automatically-generated admin site.
 
@@ -600,5 +600,13 @@ object-specific admin pages in whatever way you think is best. Again,
 don't worry if you can't understand the template language -- we'll cover that
 in more detail in Tutorial 3.
 
-When you're comfortable with the admin site, read :doc:`part 3 of this tutorial
-</intro/tutorial03>` to start working on public poll views.
+What's next?
+============
+
+The beginner tutorial ends here for the time being. In the meantime, you might
+want to check out some pointers on :doc:`where to go from here
+</intro/whatsnext>`.
+
+If you are familiar with Python packaging and interested in learning how to
+turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
+write reusable apps</intro/reusable-apps>`.

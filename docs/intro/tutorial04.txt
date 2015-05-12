@@ -1,8 +1,8 @@
 =====================================
-Writing your first Django app, part 5
+Writing your first Django app, part 4
 =====================================
 
-This tutorial begins where :doc:`Tutorial 4 </intro/tutorial04>` left off.
+This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off.
 We've built a Web-poll application, and we'll now create some automated tests
 for it.
 
@@ -693,5 +693,5 @@ For full details on testing, see :doc:`Testing in Django
 </topics/testing/index>`.
 
 When you're comfortable with testing Django views, read
-:doc:`part 6 of this tutorial</intro/tutorial06>` to learn about
+:doc:`part 5 of this tutorial</intro/tutorial05>` to learn about
 static files management.
