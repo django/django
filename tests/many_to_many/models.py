@@ -35,3 +35,20 @@ class Article(models.Model):
 
     class Meta:
         ordering = ('headline',)
+
+
+# Models to test correct related_name inheritance
+class AbstractArticle(models.Model):
+    class Meta:
+        abstract = True
+        ordering = ('title',)
+
+    publications = models.ManyToManyField(Publication, name='publications', related_name='+')
+
+
+class InheritedArticleA(AbstractArticle):
+    pass
+
+
+class InheritedArticleB(AbstractArticle):
+    pass
