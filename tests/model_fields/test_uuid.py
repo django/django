@@ -6,7 +6,8 @@ from django.db import models
 from django.test import TestCase
 
 from .models import (
-    NullableUUIDModel, PrimaryKeyUUIDModel, RelatedToUUIDModel, UUIDModel,
+    NullableUUIDModel, PrimaryKeyUUIDModel, RelatedToUUIDModel, UUIDGrandchild,
+    UUIDModel,
 )
 
 
@@ -146,3 +147,7 @@ class TestAsPrimaryKey(TestCase):
         RelatedToUUIDModel.objects.update(uuid_fk=u2.pk)
         r.refresh_from_db()
         self.assertEqual(r.uuid_fk, u2)
+
+    def test_two_level_foreign_keys(self):
+        # exercises ForeignKey.get_db_prep_value()
+        UUIDGrandchild().save()

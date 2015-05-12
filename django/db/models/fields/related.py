@@ -1939,6 +1939,9 @@ class ForeignKey(ForeignObject):
         else:
             return self.related_field.get_db_prep_save(value, connection=connection)
 
+    def get_db_prep_value(self, value, connection, prepared=False):
+        return self.related_field.get_db_prep_value(value, connection, prepared)
+
     def value_to_string(self, obj):
         if not obj:
             # In required many-to-one fields with only one available choice,
