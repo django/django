@@ -25,3 +25,6 @@ Bugfixes
   pointing to :class:`~django.db.models.UUIDField` and inheritance on models
   with ``UUIDField`` primary keys work correctly (:ticket:`24698`,
   :ticket:`24712`).
+
+* Added back MySQL index creation for foreign keys when using the InnoDB
+  storage engine due to problems when dropping other indexes (:ticket:`24757`).

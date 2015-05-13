@@ -50,18 +50,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 'column': self.quote_name(field.column),
             }, [effective_default])
 
-    def _model_indexes_sql(self, model):
-        storage = self.connection.introspection.get_storage_engine(
-            self.connection.cursor(), model._meta.db_table
-        )
-        if storage == "InnoDB":
-            for field in model._meta.local_fields:
-                if field.db_index and not field.unique and field.get_internal_type() == "ForeignKey":
-                    # Temporary setting db_index to False (in memory) to disable
-                    # index creation for FKs (index automatically created by MySQL)
-                    field.db_index = False
-        return super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
-
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         # Keep null property of old field, if it has changed, it will be handled separately
         if old_field.null:
