@@ -1084,6 +1084,24 @@ class SchemaTests(TransactionTestCase):
         self.assertRaises(IntegrityError, UniqueTest.objects.create, year=2012, slug="foo")
         UniqueTest.objects.all().delete()
 
+    def test_unique_together_with_fk(self):
+        """
+        Tests adding and removing unique_together constraints that include
+        a foreign key.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        # Ensure the fields aren't unique to begin with
+        self.assertEqual(Book._meta.unique_together, ())
+        # Add the unique_together constraint
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Book, [], [['author', 'title']])
+        # Alter it back
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Book, [['author', 'title']], [])
+
     def test_index_together(self):
         """
         Tests removing and adding index_together constraints on a model.

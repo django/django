@@ -3,7 +3,7 @@ from unittest import skipUnless
 from django.db import connection
 from django.test import TestCase
 
-from .models import Article, ArticleTranslation, IndexTogetherSingleList
+from .models import Article, IndexTogetherSingleList
 
 
 class SchemaIndexesTests(TestCase):
@@ -59,17 +59,3 @@ class SchemaIndexesTests(TestCase):
         """Test indexes are not created for related objects"""
         index_sql = connection.schema_editor()._model_indexes_sql(Article)
         self.assertEqual(len(index_sql), 1)
-
-    @skipUnless(connection.vendor == 'mysql', "This is a mysql-specific issue")
-    def test_no_index_for_foreignkey(self):
-        """
-        MySQL on InnoDB already creates indexes automatically for foreign keys.
-        (#14180).
-        """
-        storage = connection.introspection.get_storage_engine(
-            connection.cursor(), ArticleTranslation._meta.db_table
-        )
-        if storage != "InnoDB":
-            self.skip("This test only applies to the InnoDB storage engine")
-        index_sql = connection.schema_editor()._model_indexes_sql(ArticleTranslation)
-        self.assertEqual(index_sql, [])
