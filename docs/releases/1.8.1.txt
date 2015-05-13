@@ -93,4 +93,5 @@ Optimizations
 * Changed ``ModelState`` to deepcopy fields instead of deconstructing and
   reconstructing (:ticket:`24591`). This speeds up the rendering of model
   states and reduces memory usage when running :djadmin:`manage.py migrate
-  <migrate>`.
+  <migrate>` (although other changes in this release may negate any performance
+  benefits).
