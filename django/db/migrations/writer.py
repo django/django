@@ -504,12 +504,11 @@ class MigrationWriter(object):
 
 MIGRATION_TEMPLATE = """\
 # -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals
 
 %(imports)s
-
-class Migration(migrations.Migration):
-%(replaces_str)s
+class Migration(migrations.Migration):%(replaces_str)s
     dependencies = [
 %(dependencies)s\
     ]
