@@ -110,6 +110,17 @@ class TestQuerying(TestCase):
             self.objs[:3]
         )
 
+    def test_key_isnull(self):
+        obj = HStoreModel.objects.create(field={'a': None})
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__a__isnull=True),
+            self.objs[2:5] + [obj]
+        )
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__a__isnull=False),
+            self.objs[:2]
+        )
+
 
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
