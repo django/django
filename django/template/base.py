@@ -1325,7 +1325,7 @@ class Library(object):
                     # inclusion tags are often used for forms, and we need
                     # instructions for using CSRF protection to be as simple
                     # as possible.
-                    csrf_token = context.get('csrf_token', None)
+                    csrf_token = context.get('csrf_token')
                     if csrf_token is not None:
                         new_context['csrf_token'] = csrf_token
                     return t.render(new_context)
@@ -1421,7 +1421,7 @@ def get_library(library_name):
     Subsequent loads eg. {% load somelib %} in the same process will grab
     the cached module from libraries.
     """
-    lib = libraries.get(library_name, None)
+    lib = libraries.get(library_name)
     if not lib:
         templatetags_modules = get_templatetags_modules()
         tried_modules = []

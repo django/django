@@ -36,7 +36,7 @@ def set_language(request):
             next = '/'
     response = http.HttpResponseRedirect(next)
     if request.method == 'POST':
-        lang_code = request.POST.get('language', None)
+        lang_code = request.POST.get('language')
         if lang_code and check_for_language(lang_code):
             next_trans = translate_url(next, lang_code)
             if next_trans != next:

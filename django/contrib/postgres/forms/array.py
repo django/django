@@ -112,7 +112,7 @@ class SplitArrayWidget(forms.Widget):
         value = value or []
         output = []
         final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         for i in range(max(len(value), self.size)):
             try:
                 widget_value = value[i]

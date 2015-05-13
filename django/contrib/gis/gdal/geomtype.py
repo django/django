@@ -37,7 +37,7 @@ class OGRGeomType(object):
             type_input = type_input.lower()
             if type_input == 'geometry':
                 type_input = 'unknown'
-            num = self._str_types.get(type_input, None)
+            num = self._str_types.get(type_input)
             if num is None:
                 raise GDALException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):

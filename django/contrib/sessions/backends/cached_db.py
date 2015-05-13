@@ -29,7 +29,7 @@ class SessionStore(DBStore):
 
     def load(self):
         try:
-            data = self._cache.get(self.cache_key, None)
+            data = self._cache.get(self.cache_key)
         except Exception:
             # Some backends (e.g. memcache) raise an exception on invalid
             # cache keys. If this happens, reset the session. See #17810.

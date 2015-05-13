@@ -89,7 +89,7 @@ class GeoIP(object):
 
         # Getting the GeoIP data path.
         if not path:
-            path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
+            path = GEOIP_SETTINGS.get('GEOIP_PATH')
             if not path:
                 raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, six.string_types):

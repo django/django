@@ -378,7 +378,7 @@ class BaseModelForm(BaseForm):
             # from validation.
             else:
                 form_field = self.fields[field]
-                field_value = self.cleaned_data.get(field, None)
+                field_value = self.cleaned_data.get(field)
                 if not f.blank and not form_field.required and field_value in form_field.empty_values:
                     exclude.append(f.name)
         return exclude

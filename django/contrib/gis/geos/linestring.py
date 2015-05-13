@@ -72,7 +72,7 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
                 cs[i] = coords[i]
 
         # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid', None)
+        srid = kwargs.get('srid')
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.

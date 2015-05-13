@@ -23,8 +23,8 @@ class Serializer(base.Serializer):
     """
 
     def indent(self, level):
-        if self.options.get('indent', None) is not None:
-            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent', None) * level)
+        if self.options.get('indent') is not None:
+            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent') * level)
 
     def start_serialization(self):
         """

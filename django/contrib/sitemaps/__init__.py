@@ -112,8 +112,8 @@ class Sitemap(object):
         all_items_lastmod = True  # track if all items have a lastmod
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
-            priority = self.__get('priority', item, None)
-            lastmod = self.__get('lastmod', item, None)
+            priority = self.__get('priority', item)
+            lastmod = self.__get('lastmod', item)
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
                 if (all_items_lastmod and
@@ -123,7 +123,7 @@ class Sitemap(object):
                 'item': item,
                 'location': loc,
                 'lastmod': lastmod,
-                'changefreq': self.__get('changefreq', item, None),
+                'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
@@ -138,7 +138,7 @@ class GenericSitemap(Sitemap):
 
     def __init__(self, info_dict, priority=None, changefreq=None):
         self.queryset = info_dict['queryset']
-        self.date_field = info_dict.get('date_field', None)
+        self.date_field = info_dict.get('date_field')
         self.priority = priority
         self.changefreq = changefreq
 

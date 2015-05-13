@@ -50,7 +50,7 @@ class Media(object):
         self._js = []
 
         for name in MEDIA_TYPES:
-            getattr(self, 'add_' + name)(media_attrs.get(name, None))
+            getattr(self, 'add_' + name)(media_attrs.get(name))
 
     def __str__(self):
         return self.render()
@@ -228,7 +228,7 @@ class Widget(six.with_metaclass(MediaDefiningClass)):
         Given a dictionary of data and this widget's name, returns the value
         of this widget. Returns None if it's not provided.
         """
-        return data.get(name, None)
+        return data.get(name)
 
     def id_for_label(self, id_):
         """
@@ -317,7 +317,7 @@ class MultipleHiddenInput(HiddenInput):
         if value is None:
             value = []
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         inputs = []
         for i, v in enumerate(value):
             input_attrs = dict(value=force_text(v), **final_attrs)
@@ -331,7 +331,7 @@ class MultipleHiddenInput(HiddenInput):
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
-        return data.get(name, None)
+        return data.get(name)
 
 
 class FileInput(Input):
@@ -343,7 +343,7 @@ class FileInput(Input):
 
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
-        return files.get(name, None)
+        return files.get(name)
 
 
 FILE_INPUT_CONTRADICTION = object()
@@ -581,13 +581,13 @@ class NullBooleanSelect(Select):
         return super(NullBooleanSelect, self).render(name, value, attrs, choices)
 
     def value_from_datadict(self, data, files, name):
-        value = data.get(name, None)
+        value = data.get(name)
         return {'2': True,
                 True: True,
                 'True': True,
                 '3': False,
                 'False': False,
-                False: False}.get(value, None)
+                False: False}.get(value)
 
 
 class SelectMultiple(Select):
@@ -607,7 +607,7 @@ class SelectMultiple(Select):
     def value_from_datadict(self, data, files, name):
         if isinstance(data, MultiValueDict):
             return data.getlist(name)
-        return data.get(name, None)
+        return data.get(name)
 
 
 @html_safe
@@ -706,7 +706,7 @@ class ChoiceFieldRenderer(object):
         If an id was given to the field, it is applied to the <ul> (each
         item in the list will get an id of `$id_$i`).
         """
-        id_ = self.attrs.get('id', None)
+        id_ = self.attrs.get('id')
         output = []
         for i, choice in enumerate(self.choices):
             choice_value, choice_label = choice
@@ -831,7 +831,7 @@ class MultiWidget(Widget):
             value = self.decompress(value)
         output = []
         final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         for i, widget in enumerate(self.widgets):
             try:
                 widget_value = value[i]
@@ -1031,7 +1031,7 @@ class SelectDateWidget(Widget):
                     return date_value.strftime(input_format)
             else:
                 return '%s-%s-%s' % (y, m, d)
-        return data.get(name, None)
+        return data.get(name)
 
     def create_select(self, name, field, value, val, choices, none_value):
         if 'id' in self.attrs:
