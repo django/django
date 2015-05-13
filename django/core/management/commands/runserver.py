@@ -10,7 +10,7 @@ from datetime import datetime
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import get_internal_wsgi_application, run
+from django.core.servers.basehttp import SecureWSGIRequestHandler, SecureWSGIServer, get_internal_wsgi_application, run
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.migrations.executor import MigrationExecutor
 from django.utils import autoreload, six
@@ -43,6 +43,11 @@ class Command(BaseCommand):
             help='Tells Django to NOT use threading.')
         parser.add_argument('--noreload', action='store_false', dest='use_reloader', default=True,
             help='Tells Django to NOT use the auto-reloader.')
+        parser.add_argument('--certfile', dest='certfile',
+            help='Tells Django to serve over HTTPS with the specified SSL certificate. Must be specified if `keyfile` \
+            is set.')
+        parser.add_argument('--keyfile', dest='keyfile',
+            help='Tells Django to server over HTTPS with the specified SSL key.')
 
     def execute(self, *args, **options):
         if options.get('no_color'):
@@ -89,6 +94,13 @@ class Command(BaseCommand):
         if not self.addr:
             self.addr = '::1' if self.use_ipv6 else '127.0.0.1'
             self._raw_ipv6 = bool(self.use_ipv6)
+
+        self.keyfile = options.get('keyfile')
+        self.certfile = options.get('certfile')
+        self.use_ssl = True if self.keyfile or self.certfile else False
+        if self.keyfile and not self.certfile:
+                raise CommandError('The `certfile` argument must be specified with a key file.')
+
         self.run(**options)
 
     def run(self, **options):
@@ -119,11 +131,12 @@ class Command(BaseCommand):
         self.stdout.write(now)
         self.stdout.write((
             "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at http://%(addr)s:%(port)s/\n"
+            "Starting development server at %(scheme)s://%(addr)s:%(port)s/\n"
             "Quit the server with %(quit_command)s.\n"
         ) % {
             "version": self.get_version(),
             "settings": settings.SETTINGS_MODULE,
+            "scheme": 'https' if self.use_ssl else 'http',
             "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
             "port": self.port,
             "quit_command": quit_command,
@@ -131,8 +144,18 @@ class Command(BaseCommand):
 
         try:
             handler = self.get_handler(*args, **options)
+            if self.use_ssl:
+                extra_kwargs = {
+                    'server_class': SecureWSGIServer,
+                    'handler_class': SecureWSGIRequestHandler,
+                    'certfile': self.certfile,
+                    'keyfile': self.keyfile
+                }
+            else:
+                extra_kwargs = {}
+
             run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading)
+                ipv6=self.use_ipv6, threading=threading, **extra_kwargs)
         except socket.error as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {

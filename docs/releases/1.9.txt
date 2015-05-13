@@ -198,6 +198,10 @@ Management Commands
 * The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
   print out the SQL rather than execute it.
 
+* The :djadmin:`runserver` command now supports serving over SSL. This does
+  not change the development server's intended scope. Use in a production
+  environment remains highly discouraged.
+
 Models
 ^^^^^^
 

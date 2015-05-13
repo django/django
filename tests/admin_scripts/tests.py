@@ -1250,11 +1250,14 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd = Command()
         self.cmd.run = monkey_run
 
-    def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):
+    def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False, certfile=None, keyfile=None, use_ssl=False):
         self.assertEqual(self.cmd.addr, addr)
         self.assertEqual(self.cmd.port, port)
         self.assertEqual(self.cmd.use_ipv6, ipv6)
         self.assertEqual(self.cmd._raw_ipv6, raw_ipv6)
+        self.assertEqual(self.cmd.certfile, certfile)
+        self.assertEqual(self.cmd.keyfile, keyfile)
+        self.assertEqual(self.cmd.use_ssl, use_ssl)
 
     def test_runserver_addrport(self):
         self.cmd.handle()
@@ -1298,6 +1301,19 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
 
+    def test_runner_certfile(self):
+        self.cmd.handle(certfile="server.crt")
+        self.assertServerSettings('127.0.0.1', '8000', certfile="server.crt", use_ssl=True)
+
+    def test_runner_keyfile(self):
+        with self.assertRaises(CommandError) as context_manager:
+            self.cmd.handle(keyfile="server.key")
+        self.assertEqual(str(context_manager.exception), 'The `certfile` argument must be specified with a key file.')
+
+    def test_runner_certfile_keyfile(self):
+        self.cmd.handle(certfile="server.crt", keyfile="server.key")
+        self.assertServerSettings('127.0.0.1', '8000', certfile="server.crt", keyfile="server.key", use_ssl=True)
+
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
     def setUp(self):
@@ -1326,7 +1342,7 @@ class ManageTestserver(AdminScriptTestCase):
             'blah.json',
             stdout=out, settings=None, pythonpath=None, verbosity=1,
             traceback=False, addrport='', no_color=False, use_ipv6=False,
-            skip_checks=True, interactive=True,
+            skip_checks=True, interactive=True, certfile=None, keyfile=None,
         )
 
 
