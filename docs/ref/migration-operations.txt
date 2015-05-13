@@ -421,6 +421,24 @@ It accepts two list of operations, and when asked to apply state will use the
 state list, and when asked to apply changes to the database will use the database
 list. Do not use this operation unless you're very sure you know what you're doing.
 
+.. module:: django.db.backends.postgresql.migrations.operations
+
+CreateExtension
+---------------
+
+.. class:: CreateExtension(name)
+
+    An ``Operation`` subclass which installs PostgreSQL extensions.
+
+    .. attribute:: name
+
+        This is a required argument. The name of the extension to be installed.
+
+    .. versionchanged:: 1.11
+
+        This class was previously defined in
+        ``django.contrib.postgres.operations``.
+
 Writing your own
 ================
 

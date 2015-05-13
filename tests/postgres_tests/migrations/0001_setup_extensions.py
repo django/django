@@ -4,9 +4,11 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 try:
+    from django.db.backends.postgresql.migrations.operations import (
+        CreateExtension,
+    )
     from django.contrib.postgres.operations import (
-        BtreeGinExtension, CreateExtension, HStoreExtension, TrigramExtension,
-        UnaccentExtension,
+        BtreeGinExtension, HStoreExtension, TrigramExtension, UnaccentExtension,
     )
 except ImportError:
     from django.test import mock

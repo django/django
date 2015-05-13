@@ -164,6 +164,14 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
+Migration operation for adding extensions
+-----------------------------------------
+
+If you need to add a PostgreSQL extension (like hstore, postgis, etc.) through
+a migration, you can use the
+:class:`~django.db.backends.postgresql.migrations.operations.CreateExtension`
+operation.
+
 Test database templates
 -----------------------
 
