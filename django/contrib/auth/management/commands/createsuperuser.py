@@ -50,7 +50,7 @@ class Command(BaseCommand):
         return super(Command, self).execute(*args, **options)
 
     def handle(self, *args, **options):
-        username = options.get(self.UserModel.USERNAME_FIELD, None)
+        username = options.get(self.UserModel.USERNAME_FIELD)
         database = options.get('database')
 
         # If not provided, create the user with an unusable password

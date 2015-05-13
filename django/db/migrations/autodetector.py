@@ -591,7 +591,7 @@ class MigrationAutodetector(object):
         added = set(self.new_proxy_keys) - set(self.old_proxy_keys)
         for app_label, model_name in sorted(added):
             model_state = self.to_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy")
             # Depend on the deletion of any possible non-proxy version of us
             dependencies = [
                 (app_label, model_name, None, False),
@@ -695,7 +695,7 @@ class MigrationAutodetector(object):
             for name, field in sorted(related_fields.items()):
                 dependencies.append((app_label, model_name, name, False))
             # We're referenced in another field's through=
-            through_user = self.through_users.get((app_label, model_state.name_lower), None)
+            through_user = self.through_users.get((app_label, model_state.name_lower))
             if through_user:
                 dependencies.append((through_user[0], through_user[1], through_user[2], False))
             # Finally, make the operation, deduping any dependencies
@@ -714,7 +714,7 @@ class MigrationAutodetector(object):
         deleted = set(self.old_proxy_keys) - set(self.new_proxy_keys)
         for app_label, model_name in sorted(deleted):
             model_state = self.from_state.models[app_label, model_name]
-            assert model_state.options.get("proxy", False)
+            assert model_state.options.get("proxy")
             self.add_operation(
                 app_label,
                 operations.DeleteModel(
@@ -980,12 +980,12 @@ class MigrationAutodetector(object):
             old_model_name = self.renamed_models.get((app_label, model_name), model_name)
             old_model_state = self.from_state.models[app_label, old_model_name]
             new_model_state = self.to_state.models[app_label, model_name]
-            if (old_model_state.options.get("order_with_respect_to", None) !=
-                    new_model_state.options.get("order_with_respect_to", None)):
+            if (old_model_state.options.get("order_with_respect_to") !=
+                    new_model_state.options.get("order_with_respect_to")):
                 # Make sure it comes second if we're adding
                 # (removal dependency is part of RemoveField)
                 dependencies = []
-                if new_model_state.options.get("order_with_respect_to", None):
+                if new_model_state.options.get("order_with_respect_to"):
                     dependencies.append((
                         app_label,
                         model_name,
@@ -997,7 +997,7 @@ class MigrationAutodetector(object):
                     app_label,
                     operations.AlterOrderWithRespectTo(
                         name=model_name,
-                        order_with_respect_to=new_model_state.options.get('order_with_respect_to', None),
+                        order_with_respect_to=new_model_state.options.get('order_with_respect_to'),
                     ),
                     dependencies=dependencies,
                 )

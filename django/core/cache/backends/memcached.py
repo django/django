@@ -24,7 +24,7 @@ class BaseMemcachedCache(BaseCache):
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
-        self._options = params.get('OPTIONS', None)
+        self._options = params.get('OPTIONS')
 
     @property
     def _cache(self):

@@ -172,7 +172,7 @@ class HttpRequest(object):
                 raise ImproperlyConfigured(
                     'The SECURE_PROXY_SSL_HEADER setting must be a tuple containing two values.'
                 )
-            if self.META.get(header, None) == value:
+            if self.META.get(header) == value:
                 return 'https'
         return self._get_scheme()
 

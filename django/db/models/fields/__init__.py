@@ -1739,7 +1739,7 @@ class FilePathField(Field):
             kwargs['allow_files'] = self.allow_files
         if self.allow_folders is not False:
             kwargs['allow_folders'] = self.allow_folders
-        if kwargs.get("max_length", None) == 100:
+        if kwargs.get("max_length") == 100:
             del kwargs["max_length"]
         return name, path, args, kwargs
 
@@ -1955,7 +1955,7 @@ class GenericIPAddressField(Field):
             kwargs['unpack_ipv4'] = self.unpack_ipv4
         if self.protocol != "both":
             kwargs['protocol'] = self.protocol
-        if kwargs.get("max_length", None) == 39:
+        if kwargs.get("max_length") == 39:
             del kwargs['max_length']
         return name, path, args, kwargs
 
@@ -2099,7 +2099,7 @@ class SlugField(CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super(SlugField, self).deconstruct()
-        if kwargs.get("max_length", None) == 50:
+        if kwargs.get("max_length") == 50:
             del kwargs['max_length']
         if self.db_index is False:
             kwargs['db_index'] = False
@@ -2288,7 +2288,7 @@ class URLField(CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super(URLField, self).deconstruct()
-        if kwargs.get("max_length", None) == 200:
+        if kwargs.get("max_length") == 200:
             del kwargs['max_length']
         return name, path, args, kwargs
 

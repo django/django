@@ -200,7 +200,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         ordering.  Otherwise don't specify the queryset, let the field decide
         (returns None in that case).
         """
-        related_admin = self.admin_site._registry.get(db_field.remote_field.model, None)
+        related_admin = self.admin_site._registry.get(db_field.remote_field.model)
         if related_admin is not None:
             ordering = related_admin.get_ordering(request)
             if ordering is not None and ordering != ():

@@ -43,7 +43,7 @@ class Command(BaseCommand):
         self.dry_run = options.get('dry_run', False)
         self.merge = options.get('merge', False)
         self.empty = options.get('empty', False)
-        self.migration_name = options.get('name', None)
+        self.migration_name = options.get('name')
         self.exit_code = options.get('exit_code', False)
 
         # Make sure the app they asked for exists
@@ -165,7 +165,7 @@ class Command(BaseCommand):
                 if not self.dry_run:
                     # Write the migrations file to the disk.
                     migrations_directory = os.path.dirname(writer.path)
-                    if not directory_created.get(app_label, False):
+                    if not directory_created.get(app_label):
                         if not os.path.isdir(migrations_directory):
                             os.mkdir(migrations_directory)
                         init_path = os.path.join(migrations_directory, "__init__.py")

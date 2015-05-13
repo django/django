@@ -53,7 +53,7 @@ class CommentNode(Node):
 
 class CsrfTokenNode(Node):
     def render(self, context):
-        csrf_token = context.get('csrf_token', None)
+        csrf_token = context.get('csrf_token')
         if csrf_token:
             if csrf_token == 'NOTPROVIDED':
                 return format_html("")

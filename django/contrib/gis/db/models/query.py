@@ -32,7 +32,7 @@ class GeoQuerySet(QuerySet):
         # Performing setup here rather than in `_spatial_attribute` so that
         # we can get the units for `AreaField`.
         procedure_args, geo_field = self._spatial_setup(
-            'area', field_name=kwargs.get('field_name', None))
+            'area', field_name=kwargs.get('field_name'))
         s = {'procedure_args': procedure_args,
              'geo_field': geo_field,
              'setup': False,
@@ -403,7 +403,7 @@ class GeoQuerySet(QuerySet):
         """
         if not isinstance(srid, six.integer_types):
             raise TypeError('An integer SRID must be provided.')
-        field_name = kwargs.get('field_name', None)
+        field_name = kwargs.get('field_name')
         self._spatial_setup('transform', field_name=field_name)
         self.query.add_context('transformed_srid', srid)
         return self._clone()
@@ -534,7 +534,7 @@ class GeoQuerySet(QuerySet):
         if settings.get('setup', True):
             default_args, geo_field = self._spatial_setup(
                 att, desc=settings['desc'], field_name=field_name,
-                geo_field_type=settings.get('geo_field_type', None))
+                geo_field_type=settings.get('geo_field_type'))
             for k, v in six.iteritems(default_args):
                 settings['procedure_args'].setdefault(k, v)
         else:
@@ -563,7 +563,7 @@ class GeoQuerySet(QuerySet):
         fmt = '%%(function)s(%s)' % settings['procedure_fmt']
 
         # If the result of this function needs to be converted.
-        if settings.get('select_field', False):
+        if settings.get('select_field'):
             select_field = settings['select_field']
             if connection.ops.oracle:
                 select_field.empty_strings_allowed = False
@@ -583,7 +583,7 @@ class GeoQuerySet(QuerySet):
         DRY routine for GeoQuerySet distance attribute routines.
         """
         # Setting up the distance procedure arguments.
-        procedure_args, geo_field = self._spatial_setup(func, field_name=kwargs.get('field_name', None))
+        procedure_args, geo_field = self._spatial_setup(func, field_name=kwargs.get('field_name'))
 
         # If geodetic defaulting distance attribute to meters (Oracle and
         # PostGIS spherical distances return meters).  Otherwise, use the

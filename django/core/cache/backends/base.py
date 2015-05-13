@@ -74,7 +74,7 @@ class BaseCache(object):
 
         self.key_prefix = params.get('KEY_PREFIX', '')
         self.version = params.get('VERSION', 1)
-        self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
+        self.key_func = get_key_func(params.get('KEY_FUNCTION'))
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """

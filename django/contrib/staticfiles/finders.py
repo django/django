@@ -168,7 +168,7 @@ class AppDirectoriesFinder(BaseFinder):
         """
         Find a requested static file in an app's static locations.
         """
-        storage = self.storages.get(app, None)
+        storage = self.storages.get(app)
         if storage:
             # only try to find a file if the source dir actually exists
             if storage.exists(path):
