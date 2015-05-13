@@ -62,6 +62,24 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     field.db_index = False
         return super(DatabaseSchemaEditor, self)._model_indexes_sql(model)
 
+    def _delete_composed_index(self, model, fields, *args):
+        """
+        MySQL can remove an implicit FK index on a field when that field is
+        covered by another index like a unique_together. "covered" here means
+        that the more complex index starts like the simpler one.
+        http://bugs.mysql.com/bug.php?id=37910 / Django ticket #24757
+        We check here before removing the [unique|index]_together if we have to
+        recreate a FK index.
+        """
+        first_field = model._meta.get_field(fields[0])
+        if first_field.get_internal_type() == 'ForeignKey':
+            constraint_names = self._constraint_names(model, fields[0], index=True)
+            if not constraint_names:
+                self.execute(
+                    self._create_index_sql(model, [model._meta.get_field(fields[0])], suffix="")
+                )
+        return super(DatabaseSchemaEditor, self)._delete_composed_index(model, fields, *args)
+
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         # Keep null property of old field, if it has changed, it will be handled separately
         if old_field.null:
