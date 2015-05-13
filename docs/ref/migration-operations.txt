@@ -331,11 +331,23 @@ or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
 
-By default, ``RunPython`` will run its contents inside a transaction even
-on databases that do not support DDL transactions (for example, MySQL and
+By default, ``RunPython`` will run its contents inside a transaction on
+databases that do not support DDL transactions (for example, MySQL and
 Oracle). This should be safe, but may cause a crash if you attempt to use
-the ``schema_editor`` provided on these backends; in this case, please
-set ``atomic=False``.
+the ``schema_editor`` provided on these backends; in this case, pass
+``atomic=False`` to the ``RunPython`` operation.
+
+On databases that do support DDL transactions (SQLite and PostgreSQL),
+``RunPython`` operations do not have any transactions automatically added
+besides the transactions created for each migration (the ``atomic`` parameter
+has no effect on these databases). Thus, on PostgreSQL, for example, you should
+avoid combining schema changes and ``RunPython`` operations in the same
+migration or you may hit errors like ``OperationalError: cannot ALTER TABLE
+"mytable" because it has pending trigger events``.
+
+If you have a different database and aren't sure if it supports DDL
+transactions, check the ``django.db.connection.features.can_rollback_ddl``
+attribute.
 
 .. warning::
 
