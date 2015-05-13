@@ -3350,7 +3350,7 @@ Email
 * :setting:`EMAIL_SSL_CERTFILE`
 * :setting:`EMAIL_SSL_KEYFILE`
 * :setting:`EMAIL_SUBJECT_PREFIX`
-* :setting*`EMAIL_TIMEOUT`
+* :setting:`EMAIL_TIMEOUT`
 * :setting:`EMAIL_USE_TLS`
 * :setting:`MANAGERS`
 * :setting:`SERVER_EMAIL`
