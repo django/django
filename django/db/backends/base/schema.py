@@ -317,15 +317,7 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_unique_together)
         # Deleted uniques
         for fields in olds.difference(news):
-            columns = [model._meta.get_field(field).column for field in fields]
-            constraint_names = self._constraint_names(model, columns, unique=True)
-            if len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
-                    len(constraint_names),
-                    model._meta.db_table,
-                    ", ".join(columns),
-                ))
-            self.execute(self._delete_constraint_sql(self.sql_delete_unique, model, constraint_names[0]))
+            self._delete_composed_index(model, fields, {'unique': True}, self.sql_delete_unique)
         # Created uniques
         for fields in news.difference(olds):
             columns = [model._meta.get_field(field).column for field in fields]
@@ -341,19 +333,22 @@ class BaseDatabaseSchemaEditor(object):
         news = set(tuple(fields) for fields in new_index_together)
         # Deleted indexes
         for fields in olds.difference(news):
-            columns = [model._meta.get_field(field).column for field in fields]
-            constraint_names = self._constraint_names(model, list(columns), index=True)
-            if len(constraint_names) != 1:
-                raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
-                    len(constraint_names),
-                    model._meta.db_table,
-                    ", ".join(columns),
-                ))
-            self.execute(self._delete_constraint_sql(self.sql_delete_index, model, constraint_names[0]))
+            self._delete_composed_index(model, fields, {'index': True}, self.sql_delete_index)
         # Created indexes
         for field_names in news.difference(olds):
             fields = [model._meta.get_field(field) for field in field_names]
             self.execute(self._create_index_sql(model, fields, suffix="_idx"))
+
+    def _delete_composed_index(self, model, fields, constraint_kwargs, sql):
+        columns = [model._meta.get_field(field).column for field in fields]
+        constraint_names = self._constraint_names(model, columns, **constraint_kwargs)
+        if len(constraint_names) != 1:
+            raise ValueError("Found wrong number (%s) of constraints for %s(%s)" % (
+                len(constraint_names),
+                model._meta.db_table,
+                ", ".join(columns),
+            ))
+        self.execute(self._delete_constraint_sql(sql, model, constraint_names[0]))
 
     def alter_db_table(self, model, old_db_table, new_db_table):
         """

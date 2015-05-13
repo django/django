@@ -27,3 +27,6 @@ Bugfixes
   :ticket:`24712`).
 
 * Fixed ``isnull`` lookup for ``HStoreField`` (:ticket:`24751`).
+
+* Fixed a MySQL crash when a migration removes a combined index (unique_together
+  or index_together) containing a foreign key (:ticket:`24757`).
