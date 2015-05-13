@@ -25,3 +25,5 @@ Bugfixes
   pointing to :class:`~django.db.models.UUIDField` and inheritance on models
   with ``UUIDField`` primary keys work correctly (:ticket:`24698`,
   :ticket:`24712`).
+
+* Fixed ``isnull`` lookup for ``HStoreField`` (:ticket:`24751`).
