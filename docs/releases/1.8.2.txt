@@ -33,3 +33,7 @@ Bugfixes
 
 * Fixed session cookie deletion when using :setting:`SESSION_COOKIE_DOMAIN`
   (:ticket:`24799`).
+
+* On PostgreSQL, when no access is granted for the ``postgres`` database,
+  Django now falls back to the default database when it normally requires a
+  "no database" connection (:ticket:`24791`).
