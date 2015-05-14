@@ -610,6 +610,35 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    @override_settings(SESSION_COOKIE_DOMAIN='.example.local')
+    def test_session_delete_on_end_with_custom_domain(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Before deleting, there has to be an existing cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the cookie was deleted, not recreated.
+        # A deleted cookie header with a custom domain looks like:
+        #  Set-Cookie: sessionid=; Domain=.example.local;
+        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        self.assertEqual(
+            'Set-Cookie: {}={}; Domain=.example.local; expires=Thu, '
+            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'.format(
+                settings.SESSION_COOKIE_NAME,
+                '""' if sys.version_info >= (3, 5) else '',
+            ),
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
+
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class
 class CookieSessionTests(SessionTestsMixin, unittest.TestCase):
