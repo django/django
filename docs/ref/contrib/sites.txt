@@ -23,6 +23,10 @@ The sites framework is mainly based on a simple model:
 
         The domain name associated with the Web site.
 
+    .. versionchanged:: 1.9
+
+        The ``domain`` attribute was set to be unique.
+
     .. attribute:: name
 
         A human-readable "verbose" name for the Web site.
