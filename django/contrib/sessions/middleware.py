@@ -31,7 +31,8 @@ class SessionMiddleware(object):
             # First check if we need to delete this cookie.
             # The session should be deleted only if the session is entirely empty
             if settings.SESSION_COOKIE_NAME in request.COOKIES and empty:
-                response.delete_cookie(settings.SESSION_COOKIE_NAME)
+                response.delete_cookie(settings.SESSION_COOKIE_NAME,
+                    domain=settings.SESSION_COOKIE_DOMAIN)
             else:
                 if accessed:
                     patch_vary_headers(response, ('Cookie',))
