@@ -447,6 +447,9 @@ Miscellaneous
 
 * Support for PostGIS 1.5 has been dropped.
 
+* The ``django.contrib.sites.models.Site.domain`` field was changed to be
+  :attr:`~django.db.models.Field.unique`.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

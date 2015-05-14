@@ -135,6 +135,12 @@ class SitesFrameworkTests(TestCase):
         clear_site_cache(Site, instance=site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
 
+    def test_unique_domain(self):
+        site = Site(domain=self.site.domain)
+        msg = 'Site with this Domain name already exists.'
+        with self.assertRaisesMessage(ValidationError, msg):
+            site.validate_unique()
+
 
 class JustOtherRouter(object):
     def allow_migrate(self, db, app_label, **hints):
