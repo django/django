@@ -162,6 +162,32 @@ class PostgreSQLTests(TestCase):
         self.assert_parses("PostgreSQL 9.4beta1", 90400)
         self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
 
+    def test_nodb_connection(self):
+        """
+        Test that the _nodb_connection property fallbacks to the default connection
+        database when access to the 'postgres' database is not granted.
+        """
+        def mocked_connect(self):
+            if self.settings_dict['NAME'] is None:
+                raise DatabaseError()
+            return ''
+
+        nodb_conn = connection._nodb_connection
+        self.assertIsNone(nodb_conn.settings_dict['NAME'])
+
+        # Now assume the 'postgres' db isn't available
+        del connection._nodb_connection
+        with warnings.catch_warnings(record=True) as w:
+            with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
+                            side_effect=mocked_connect, autospec=True):
+                nodb_conn = connection._nodb_connection
+        del connection._nodb_connection
+        self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
+        self.assertEqual(nodb_conn.settings_dict['NAME'], settings.DATABASES[DEFAULT_DB_ALIAS]['NAME'])
+        # Check a RuntimeWarning nas been emitted
+        self.assertEqual(len(w), 1)
+        self.assertEqual(w[0].message.__class__, RuntimeWarning)
+
     def test_version_detection(self):
         """Test PostgreSQL version detection"""
 

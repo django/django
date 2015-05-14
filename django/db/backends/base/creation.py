@@ -514,7 +514,7 @@ class BaseDatabaseCreation(object):
         # ourselves. Connect to the previous database (not the test database)
         # to do so, because it's not allowed to delete a database while being
         # connected to it.
-        with self._nodb_connection.cursor() as cursor:
+        with self.connection._nodb_connection.cursor() as cursor:
             # Wait to avoid "database is being accessed by other users" errors.
             time.sleep(1)
             cursor.execute("DROP DATABASE %s"
