@@ -50,7 +50,7 @@ class ChangeListTests(TestCase):
         Regression test for #10348: ChangeList.get_queryset() shouldn't
         overwrite a custom select_related provided by ModelAdmin.get_queryset().
         """
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         request = self.factory.get('/child/')
         list_select_related = m.get_list_select_related(request)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
@@ -62,7 +62,7 @@ class ChangeListTests(TestCase):
         })
 
     def test_select_related_as_tuple(self):
-        ia = InvitationAdmin(Invitation, admin.site)
+        ia = InvitationAdmin(Invitation, custom_site)
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
@@ -72,7 +72,7 @@ class ChangeListTests(TestCase):
         self.assertEqual(cl.queryset.query.select_related, {'player': {}})
 
     def test_select_related_as_empty_tuple(self):
-        ia = InvitationAdmin(Invitation, admin.site)
+        ia = InvitationAdmin(Invitation, custom_site)
         ia.list_select_related = ()
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
@@ -89,7 +89,7 @@ class ChangeListTests(TestCase):
             def get_list_select_related(self, request):
                 return ('band', 'player')
 
-        ia = GetListSelectRelatedAdmin(Invitation, admin.site)
+        ia = GetListSelectRelatedAdmin(Invitation, custom_site)
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
@@ -105,7 +105,7 @@ class ChangeListTests(TestCase):
         """
         new_child = Child.objects.create(name='name', parent=None)
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
@@ -128,7 +128,7 @@ class ChangeListTests(TestCase):
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
@@ -155,7 +155,7 @@ class ChangeListTests(TestCase):
         new_parent = Parent.objects.create(name='parent')
         new_child = Child.objects.create(name='name', parent=new_parent)
         request = self.factory.get('/child/')
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
 
         # Test with list_editable fields
         m.list_display = ['id', 'name', 'parent']
@@ -186,7 +186,7 @@ class ChangeListTests(TestCase):
         for i in range(200):
             Child.objects.create(name='name %s' % i, parent=new_parent)
         request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
 
         # Test with list_editable fields
         m.list_display = ['id', 'name', 'parent']
@@ -203,7 +203,7 @@ class ChangeListTests(TestCase):
             Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
-        m = CustomPaginationAdmin(Child, admin.site)
+        m = CustomPaginationAdmin(Child, custom_site)
 
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
@@ -223,7 +223,7 @@ class ChangeListTests(TestCase):
         band.genres.add(blues)
         band.genres.add(blues)
 
-        m = BandAdmin(Band, admin.site)
+        m = BandAdmin(Band, custom_site)
         request = self.factory.get('/band/', data={'genres': blues.pk})
 
         cl = ChangeList(request, Band, m.list_display,
@@ -246,7 +246,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(group=band, music=lead, role='lead voice')
         Membership.objects.create(group=band, music=lead, role='bass player')
 
-        m = GroupAdmin(Group, admin.site)
+        m = GroupAdmin(Group, custom_site)
         request = self.factory.get('/group/', data={'members': lead.pk})
 
         cl = ChangeList(request, Group, m.list_display,
@@ -271,7 +271,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(group=band, music=lead, role='lead voice')
         Membership.objects.create(group=band, music=lead, role='bass player')
 
-        m = ConcertAdmin(Concert, admin.site)
+        m = ConcertAdmin(Concert, custom_site)
         request = self.factory.get('/concert/', data={'group__members': lead.pk})
 
         cl = ChangeList(request, Concert, m.list_display,
@@ -295,7 +295,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(group=four, music=lead, role='lead voice')
         Membership.objects.create(group=four, music=lead, role='guitar player')
 
-        m = QuartetAdmin(Quartet, admin.site)
+        m = QuartetAdmin(Quartet, custom_site)
         request = self.factory.get('/quartet/', data={'members': lead.pk})
 
         cl = ChangeList(request, Quartet, m.list_display,
@@ -319,7 +319,7 @@ class ChangeListTests(TestCase):
         Invitation.objects.create(band=three, player=lead, instrument='guitar')
         Invitation.objects.create(band=three, player=lead, instrument='bass')
 
-        m = ChordsBandAdmin(ChordsBand, admin.site)
+        m = ChordsBandAdmin(ChordsBand, custom_site)
         request = self.factory.get('/chordsband/', data={'members': lead.pk})
 
         cl = ChangeList(request, ChordsBand, m.list_display,
@@ -342,7 +342,7 @@ class ChangeListTests(TestCase):
         Child.objects.create(parent=parent, name='Daniel')
         Child.objects.create(parent=parent, name='Daniel')
 
-        m = ParentAdmin(Parent, admin.site)
+        m = ParentAdmin(Parent, custom_site)
         request = self.factory.get('/parent/', data={'child__name': 'Daniel'})
 
         cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
@@ -362,7 +362,7 @@ class ChangeListTests(TestCase):
         Child.objects.create(parent=parent, name='Danielle')
         Child.objects.create(parent=parent, name='Daniel')
 
-        m = ParentAdmin(Parent, admin.site)
+        m = ParentAdmin(Parent, custom_site)
         request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel'})
 
         cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
@@ -385,7 +385,7 @@ class ChangeListTests(TestCase):
         Membership.objects.create(group=band, music=lead, role='lead voice')
         Membership.objects.create(group=band, music=lead, role='bass player')
 
-        m = ConcertAdmin(Concert, admin.site)
+        m = ConcertAdmin(Concert, custom_site)
         request = self.factory.get('/concert/', data={SEARCH_VAR: 'vox'})
 
         cl = ChangeList(request, Concert, m.list_display,
@@ -409,7 +409,7 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/child/')
 
         # Test default queryset
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all,
@@ -419,7 +419,7 @@ class ChangeListTests(TestCase):
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
 
         # Test custom queryset
-        m = FilteredChildAdmin(Child, admin.site)
+        m = FilteredChildAdmin(Child, custom_site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all,
@@ -464,7 +464,7 @@ class ChangeListTests(TestCase):
         self.assertEqual(list_display_links, ['name'])
 
         # Test with user 'parents'
-        m = DynamicListDisplayChildAdmin(Child, admin.site)
+        m = DynamicListDisplayChildAdmin(Child, custom_site)
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertContains(response, 'Parent object')
@@ -493,7 +493,7 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/child/', data={ALL_VAR: ''})
 
         # Test valid "show all" request (number of total objects is under max)
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         # 200 is the max we'll pass to ChangeList
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
@@ -503,7 +503,7 @@ class ChangeListTests(TestCase):
 
         # Test invalid "show all" request (number of total objects over max)
         # falls back to paginated pages
-        m = ChildAdmin(Child, admin.site)
+        m = ChildAdmin(Child, custom_site)
         # 30 is the max we'll pass to ChangeList for this test
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
                 m.list_filter, m.date_hierarchy, m.search_fields,
@@ -519,7 +519,7 @@ class ChangeListTests(TestCase):
         for i in range(1, 10):
             Child.objects.create(id=i, name='child %s' % i, parent=parent, age=i)
 
-        m = DynamicListDisplayLinksChildAdmin(Child, admin.site)
+        m = DynamicListDisplayLinksChildAdmin(Child, custom_site)
         superuser = self._create_superuser('superuser')
         request = self._mocked_authenticated_request('/child/', superuser)
         response = m.changelist_view(request)
@@ -535,7 +535,7 @@ class ChangeListTests(TestCase):
     def test_no_list_display_links(self):
         """#15185 -- Allow no links from the 'change list' view grid."""
         p = Parent.objects.create(name='parent')
-        m = NoListDisplayLinksParentAdmin(Parent, admin.site)
+        m = NoListDisplayLinksParentAdmin(Parent, custom_site)
         superuser = self._create_superuser('superuser')
         request = self._mocked_authenticated_request('/parent/', superuser)
         response = m.changelist_view(request)
@@ -549,7 +549,7 @@ class ChangeListTests(TestCase):
         """
         swallow = Swallow.objects.create(
             origin='Africa', load='12.34', speed='22.2')
-        model_admin = SwallowAdmin(Swallow, admin.site)
+        model_admin = SwallowAdmin(Swallow, custom_site)
         superuser = self._create_superuser('superuser')
         request = self._mocked_authenticated_request('/swallow/', superuser)
         response = model_admin.changelist_view(request)
@@ -574,8 +574,8 @@ class ChangeListTests(TestCase):
             list_per_page = 10
 
         def check_results_order(ascending=False):
-            admin.site.register(UnorderedObject, UnorderedObjectAdmin)
-            model_admin = UnorderedObjectAdmin(UnorderedObject, admin.site)
+            custom_site.register(UnorderedObject, UnorderedObjectAdmin)
+            model_admin = UnorderedObjectAdmin(UnorderedObject, custom_site)
             counter = 0 if ascending else 51
             for page in range(0, 5):
                 request = self._mocked_authenticated_request('/unorderedobject/?p=%s' % page, superuser)
@@ -583,7 +583,7 @@ class ChangeListTests(TestCase):
                 for result in response.context_data['cl'].result_list:
                     counter += 1 if ascending else -1
                     self.assertEqual(result.id, counter)
-            admin.site.unregister(UnorderedObject)
+            custom_site.unregister(UnorderedObject)
 
         # When no order is defined at all, everything is ordered by '-pk'.
         check_results_order()
@@ -619,8 +619,8 @@ class ChangeListTests(TestCase):
             list_per_page = 10
 
         def check_results_order(ascending=False):
-            admin.site.register(OrderedObject, OrderedObjectAdmin)
-            model_admin = OrderedObjectAdmin(OrderedObject, admin.site)
+            custom_site.register(OrderedObject, OrderedObjectAdmin)
+            model_admin = OrderedObjectAdmin(OrderedObject, custom_site)
             counter = 0 if ascending else 51
             for page in range(0, 5):
                 request = self._mocked_authenticated_request('/orderedobject/?p=%s' % page, superuser)
@@ -628,7 +628,7 @@ class ChangeListTests(TestCase):
                 for result in response.context_data['cl'].result_list:
                     counter += 1 if ascending else -1
                     self.assertEqual(result.id, counter)
-            admin.site.unregister(OrderedObject)
+            custom_site.unregister(OrderedObject)
 
         # When no order is defined at all, use the model's default ordering (i.e. 'number')
         check_results_order(ascending=True)
@@ -660,20 +660,20 @@ class ChangeListTests(TestCase):
         user_parents = self._create_superuser('parents')
 
         # Test with user 'noparents'
-        m = DynamicListFilterChildAdmin(Child, admin.site)
+        m = DynamicListFilterChildAdmin(Child, custom_site)
         request = self._mocked_authenticated_request('/child/', user_noparents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ['name', 'age'])
 
         # Test with user 'parents'
-        m = DynamicListFilterChildAdmin(Child, admin.site)
+        m = DynamicListFilterChildAdmin(Child, custom_site)
         request = self._mocked_authenticated_request('/child/', user_parents)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].list_filter, ('parent', 'name', 'age'))
 
     def test_dynamic_search_fields(self):
         child = self._create_superuser('child')
-        m = DynamicSearchFieldsChildAdmin(Child, admin.site)
+        m = DynamicSearchFieldsChildAdmin(Child, custom_site)
         request = self._mocked_authenticated_request('/child/', child)
         response = m.changelist_view(request)
         self.assertEqual(response.context_data['cl'].search_fields, ('name', 'age'))
@@ -684,7 +684,7 @@ class ChangeListTests(TestCase):
         generated for changelist views are correct.
         """
         # instantiating and setting up ChangeList object
-        m = GroupAdmin(Group, admin.site)
+        m = GroupAdmin(Group, custom_site)
         request = self.factory.get('/group/')
         cl = ChangeList(request, Group, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,

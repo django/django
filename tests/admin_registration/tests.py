@@ -104,6 +104,7 @@ class TestRegistrationDecorator(TestCase):
             isinstance(self.default_site._registry[Person],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Person)
 
     def test_custom_site_registration(self):
         register(Person, site=self.custom_site)(NameAdmin)
@@ -118,10 +119,12 @@ class TestRegistrationDecorator(TestCase):
             isinstance(self.default_site._registry[Traveler],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Traveler)
         self.assertTrue(
             isinstance(self.default_site._registry[Place],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
         self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.',
