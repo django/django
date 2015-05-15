@@ -27,3 +27,5 @@ Bugfixes
   :ticket:`24712`).
 
 * Fixed ``isnull`` lookup for ``HStoreField`` (:ticket:`24751`).
+
+* Fixed deleting empty session cookie when using ``SESSION_COOKIE_DOMAIN`` (:ticket:`24799`).
