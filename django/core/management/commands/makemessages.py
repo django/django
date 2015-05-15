@@ -23,6 +23,7 @@ from django.utils.text import get_text_list
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
+NO_LOCALE_DIR = object()
 
 
 def check_programs(*programs):
@@ -150,6 +151,10 @@ class TranslatableFile(object):
                 command.stdout.write(errors)
         if msgs:
             # Write/append messages to pot file
+            if self.locale_dir is NO_LOCALE_DIR:
+                file_path = os.path.normpath(os.path.join(self.dirpath, self.file))
+                raise CommandError(
+                    "Unable to find a locale path to store translations for file %s" % file_path)
             potfile = os.path.join(self.locale_dir, '%s.pot' % str(domain))
             if is_templatized:
                 # Remove '.py' suffix
@@ -436,8 +441,7 @@ class Command(BaseCommand):
                     if not locale_dir:
                         locale_dir = self.default_locale_path
                     if not locale_dir:
-                        raise CommandError(
-                            "Unable to find a locale path to store translations for file %s" % file_path)
+                        locale_dir = NO_LOCALE_DIR
                     all_files.append(TranslatableFile(dirpath, filename, locale_dir))
         return sorted(all_files)
 
