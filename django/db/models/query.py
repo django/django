@@ -968,6 +968,13 @@ class QuerySet(object):
     # empty" result.
     value_annotation = True
 
+    def __get__(self, instance, owner, type=None):
+        """
+        If the queryset has been added as a class attribute,
+        clone the queryset to avoid confusing bugs where instances
+        share the same queryset and it gets evaluated, sliced, etc.
+        """
+        return self._clone()
 
 class ValuesQuerySet(QuerySet):
     def __init__(self, *args, **kwargs):
