@@ -28,8 +28,8 @@ your operating system's package manager.
 You can verify that Python is installed by typing ``python`` from your shell;
 you should see something like::
 
-    Python 3.3.3 (default, Nov 26 2013, 13:33:18)
-    [GCC 4.8.2] on linux
+    Python 3.4.3 (default, Feb 24 2015, 22:43:06)
+    [GCC 4.8.4] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
 
