@@ -229,7 +229,7 @@ def deferred_class_factory(model, attrs):
     # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
+    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(attrs)))
     name = utils.truncate_name(name, 80, 32)
 
     try:

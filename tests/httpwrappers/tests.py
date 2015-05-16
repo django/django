@@ -140,13 +140,13 @@ class QueryDictTests(unittest.TestCase):
             self.assertTrue(q.has_key('foo'))
         self.assertIn('foo', q)
 
-        self.assertListEqual(sorted(list(six.iteritems(q))),
+        self.assertListEqual(sorted(six.iteritems(q)),
                              [('foo', 'another'), ('name', 'john')])
-        self.assertListEqual(sorted(list(six.iterlists(q))),
+        self.assertListEqual(sorted(six.iterlists(q)),
                              [('foo', ['bar', 'baz', 'another']), ('name', ['john'])])
-        self.assertListEqual(sorted(list(six.iterkeys(q))),
+        self.assertListEqual(sorted(six.iterkeys(q)),
                              ['foo', 'name'])
-        self.assertListEqual(sorted(list(six.itervalues(q))),
+        self.assertListEqual(sorted(six.itervalues(q)),
                              ['another', 'john'])
 
         q.update({'foo': 'hello'})

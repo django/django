@@ -32,12 +32,12 @@ class MultiValueDictTests(SimpleTestCase):
         self.assertEqual(d.get('name'), 'Simon')
         self.assertEqual(d.getlist('name'), ['Adrian', 'Simon'])
         self.assertEqual(
-            sorted(list(six.iteritems(d))),
+            sorted(six.iteritems(d)),
             [('name', 'Simon'), ('position', 'Developer')]
         )
 
         self.assertEqual(
-            sorted(list(six.iterlists(d))),
+            sorted(six.iterlists(d)),
             [('name', ['Adrian', 'Simon']), ('position', ['Developer'])]
         )
 
@@ -52,7 +52,7 @@ class MultiValueDictTests(SimpleTestCase):
 
         d.setlist('lastname', ['Holovaty', 'Willison'])
         self.assertEqual(d.getlist('lastname'), ['Holovaty', 'Willison'])
-        self.assertEqual(sorted(list(six.itervalues(d))),
+        self.assertEqual(sorted(six.itervalues(d)),
                          ['Developer', 'Simon', 'Willison'])
 
     def test_appendlist(self):
