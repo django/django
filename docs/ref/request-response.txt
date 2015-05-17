@@ -51,7 +51,7 @@ All attributes should be considered read-only, unless stated otherwise below.
 .. attribute:: HttpRequest.path
 
     A string representing the full path to the requested page, not including
-    the domain.
+    the scheme or domain.
 
     Example: ``"/music/bands/the_beatles/"``
 
@@ -331,7 +331,7 @@ Methods
     Methods implementing a file-like interface for reading from an
     HttpRequest instance. This makes it possible to consume an incoming
     request in a streaming fashion. A common use-case would be to process a
-    big XML payload with iterative parser without constructing a whole
+    big XML payload with an iterative parser without constructing a whole
     XML tree in memory.
 
     Given this standard interface, an HttpRequest instance can be
@@ -473,7 +473,7 @@ In addition, ``QueryDict`` has the following methods:
     Returns the data with the requested key, as a Python list. Returns an
     empty list if the key doesn't exist and no default value was provided.
     It's guaranteed to return a list of some sort unless the default value
-    was no list.
+    provided is not a list.
 
 .. method:: QueryDict.setlist(key, list_)
 
@@ -739,7 +739,7 @@ Methods
       header. It is not part of the :rfc:`2109` standard for cookies,
       and it isn't honored consistently by all browsers. However,
       when it is honored, it can be a useful way to mitigate the
-      risk of client side script accessing the protected cookie
+      risk of a client-side script from accessing the protected cookie
       data.
 
     .. _HTTPOnly: https://www.owasp.org/index.php/HTTPOnly
