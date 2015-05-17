@@ -589,6 +589,10 @@ class SimpleTestCase(unittest.TestCase):
             args: Function to be called and extra positional args.
             kwargs: Extra kwargs.
         """
+        # callable_obj was a documented kwarg in Django 1.8 and older.
+        callable_obj = kwargs.pop('callable_obj', None)
+        if callable_obj:
+            args = (callable_obj,) + args
         return six.assertRaisesRegex(self, expected_exception,
                 re.escape(expected_message), *args, **kwargs)
 
