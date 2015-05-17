@@ -199,11 +199,18 @@ You can edit it multiple times.
 
     .. method:: __contains__(key)
 
-      Example: ``'fav_color' in request.session``
+      Example: ``'fav_color' in request.session``    Returns either True 
+      or False in response to whether or not the key is contained in 
+      request.session.
+        >>> request.session['fav_color'] = 'blue'
+        >>> request.session.contains('favorite_animal')
+        >>> False
 
     .. method:: get(key, default=None)
 
       Example: ``fav_color = request.session.get('fav_color', 'red')``
+      Returns 'red' as the color of fav_color only if fav_color has not 
+      previously set to another value.
 
     .. method:: pop(key, default=None)
 
@@ -211,17 +218,45 @@ You can edit it multiple times.
 
     .. method:: keys()
 
+      Example: Returns a list of existing dict keys, or an empty list
+      if no key:value pairs exist. 
+      
+        >>> request.session['fav_color'] = 'blue'
+        >>> request.session.keys()
+        >>> (['fav_color'])
+
     .. method:: items()
+    
+      Example: Returns a list of values for each key in the session 
+      variable, or an empty list if no key:value pairs exist. 
+
+        >>> request.session['fav_color'] = 'blue'
+        >>> request.session.items()
+        >>> (['blue'])
 
     .. method:: setdefault()
 
+      Establishes an empty default session for a request.
+      
+        >>> request.session.setdefault()
+        >>> request.session.items()
+        >>> ([])
+        
     .. method:: clear()
+    
+      Example: Clears the values from a session without actually 
+      destroying the session itself. 
+
+        >>> request.session['fav_color'] = 'blue'
+        >>> request.session.clear()
+        >>> request.session.items()
+        >>> ([])
 
     It also has these methods:
 
     .. method:: flush()
 
-      Delete the current session data from the session and delete the session
+      Delete the current session data from the session and deletes the session
       cookie. This is used if you want to ensure that the previous session data
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
@@ -411,7 +446,7 @@ This simplistic view sets a ``has_commented`` variable to ``True`` after a user
 posts a comment. It doesn't let a user post a comment more than once::
 
     def post_comment(request, new_comment):
-        if request.session.get('has_commented', False):
+        if request.session.get('has_commented', True):
             return HttpResponse("You've already commented.")
         c = comments.Comment(comment=new_comment)
         c.save()
