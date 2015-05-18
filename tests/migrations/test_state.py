@@ -378,17 +378,22 @@ class StateTests(TestCase):
         #24573 - Adding relations to existing models should reload the
         referenced models too.
         """
+        new_apps = Apps()
+
         class A(models.Model):
             class Meta:
                 app_label = 'something'
+                apps = new_apps
 
         class B(A):
             class Meta:
                 app_label = 'something'
+                apps = new_apps
 
         class C(models.Model):
             class Meta:
                 app_label = 'something'
+                apps = new_apps
 
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(A))
@@ -429,15 +434,19 @@ class StateTests(TestCase):
         #24225 - Tests that relations between models are updated while
         remaining the relations and references for models of an old state.
         """
+        new_apps = Apps()
+
         class A(models.Model):
             class Meta:
                 app_label = "something"
+                apps = new_apps
 
         class B(models.Model):
             to_a = models.ForeignKey(A)
 
             class Meta:
                 app_label = "something"
+                apps = new_apps
 
         def get_model_a(state):
             return [mod for mod in state.apps.get_models() if mod._meta.model_name == 'a'][0]
