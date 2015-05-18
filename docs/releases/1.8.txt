@@ -1159,6 +1159,10 @@ Miscellaneous
 * :func:`django.utils.translation.get_language()` now returns ``None`` instead
   of :setting:`LANGUAGE_CODE` when translations are temporarily deactivated.
 
+* When a translation doesn't exist for a specific literal, the fallback is now
+  taken from the :setting:`LANGUAGE_CODE` language (instead of from the
+  untranslated ``msgid`` message).
+
 * The ``name`` field of :class:`django.contrib.contenttypes.models.ContentType`
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
