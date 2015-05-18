@@ -31,7 +31,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     """
     @property
     def media(self):
-        js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
+        js = ["SelectBox.js", "selectfilter.js"]
         return forms.Media(js=[static("admin/js/%s" % path) for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
@@ -42,15 +42,27 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     def render(self, name, value, attrs=None, choices=()):
         if attrs is None:
             attrs = {}
-        attrs['class'] = 'selectfilter'
         if self.is_stacked:
-            attrs['class'] += 'stacked'
+            attrs['class'] = 'stacked'
+        id_ = attrs.get('id', 'id_%s' % name)
         output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
-        output.append('<script type="text/javascript">addEvent(window, "load", function(e) {')
-        # TODO: "id_" is hard-coded here. This should instead use the correct
-        # API to determine the ID dynamically.
-        output.append('SelectFilter.init("id_%s", "%s", %s); });</script>\n'
-            % (name, escapejs(self.verbose_name), int(self.is_stacked)))
+        output.append('''
+<script type="text/javascript">
+(function($) {
+    $(document).ready(function() {
+        $("#%(id)s").selectFilter({
+            "name": "%(name)s",
+            "verboseName": "%(verbose_name)s",
+            "stacked": %(is_stacked)s
+        });
+    });
+})(django.jQuery);
+</script>''' % {
+            'id': id_,
+            'name': name,
+            'verbose_name': escapejs(self.verbose_name),
+            'is_stacked': int(self.is_stacked),
+        })
         return mark_safe(''.join(output))
 
 
@@ -172,10 +184,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                 url = ''
             if "class" not in attrs:
                 attrs['class'] = 'vForeignKeyRawIdAdminField'  # The JavaScript code looks for this hook.
-            # TODO: "lookup_id_" is hard-coded here. This should instead use
-            # the correct API to determine the ID dynamically.
-            extra.append('<a href="%s%s" class="related-lookup" id="lookup_id_%s" title="%s"></a>' %
-                (related_url, url, name, _('Lookup')))
+            id_ = attrs.get('id', 'id_%s' % name)
+            extra.append('<a href="%s%s" class="related-lookup" id="lookup_%s" title="%s"></a>' %
+                (related_url, url, id_, _('Lookup')))
         output = [super(ForeignKeyRawIdWidget, self).render(name, value, attrs)] + extra
         if value:
             output.append(self.label_for_value(value))

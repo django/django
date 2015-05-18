@@ -268,9 +268,10 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', False)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 0); });</script>\n'
+            '<select multiple="multiple" name="test">\n</select>'
+            '<script type="text/javascript">(function($) { $(document).ready(function() '
+            '{ $("#id_test").selectFilter({ "name": "test", "verboseName": "test\\u005C", "stacked": 0 }); '
+            '}); })(django.jQuery);</script>\n'
         )
 
     def test_stacked_render(self):
@@ -278,9 +279,10 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', True)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 1); });</script>\n'
+            '<select multiple="multiple" name="test" class="stacked">\n</select>'
+            '<script type="text/javascript">(function($) { $(document).ready(function() '
+            '{ $("#id_test").selectFilter({ "name": "test", "verboseName": "test\\u005C", "stacked": 1 }); '
+            '}); })(django.jQuery);</script>\n'
         )
 
 
@@ -863,13 +865,17 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.cliff = models.Student.objects.create(name='Cliff')
         self.arthur = models.Student.objects.create(name='Arthur')
         self.school = models.School.objects.create(name='School of Awesome')
+        self.school.students = [self.lisa, self.peter]
+        self.school.alumni = [self.lisa, self.peter]
+        self.school.save()
 
     def assertActiveButtons(self, mode, field_name, choose, remove,
             choose_all=None, remove_all=None):
-        choose_link = '#id_%s_add_link' % field_name
-        choose_all_link = '#id_%s_add_all_link' % field_name
-        remove_link = '#id_%s_remove_link' % field_name
-        remove_all_link = '#id_%s_remove_all_link' % field_name
+        choose_link = '#id_%s_selector .selector-add' % field_name
+        choose_all_link = '#id_%s_selector .selector-chooseall' % field_name
+        remove_link = '#id_%s_selector .selector-remove' % field_name
+        remove_all_link = '#id_%s_selector .selector-clearall' % field_name
+
         self.assertEqual(self.has_css_class(choose_link, 'active'), choose)
         self.assertEqual(self.has_css_class(remove_link, 'active'), remove)
         if mode == 'horizontal':
@@ -879,10 +885,10 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
     def execute_basic_operations(self, mode, field_name):
         from_box = '#id_%s_from' % field_name
         to_box = '#id_%s_to' % field_name
-        choose_link = 'id_%s_add_link' % field_name
-        choose_all_link = 'id_%s_add_all_link' % field_name
-        remove_link = 'id_%s_remove_link' % field_name
-        remove_all_link = 'id_%s_remove_all_link' % field_name
+        choose_link = '#id_%s_selector .selector-add' % field_name
+        choose_all_link = '#id_%s_selector .selector-chooseall' % field_name
+        remove_link = '#id_%s_selector .selector-remove' % field_name
+        remove_all_link = '#id_%s_selector .selector-clearall' % field_name
 
         # Initial positions ---------------------------------------------------
         self.assertSelectOptions(from_box,
@@ -895,13 +901,13 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
 
         # Click 'Choose all' --------------------------------------------------
         if mode == 'horizontal':
-            self.selenium.find_element_by_id(choose_all_link).click()
+            self.selenium.find_element_by_css_selector(choose_all_link).click()
         elif mode == 'vertical':
             # There 's no 'Choose all' button in vertical mode, so individually
             # select all options and click 'Choose'.
             for option in self.selenium.find_elements_by_css_selector(from_box + ' > option'):
                 option.click()
-            self.selenium.find_element_by_id(choose_link).click()
+            self.selenium.find_element_by_css_selector(choose_link).click()
         self.assertSelectOptions(from_box, [])
         self.assertSelectOptions(to_box,
                         [str(self.lisa.id), str(self.peter.id),
@@ -912,13 +918,13 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
 
         # Click 'Remove all' --------------------------------------------------
         if mode == 'horizontal':
-            self.selenium.find_element_by_id(remove_all_link).click()
+            self.selenium.find_element_by_css_selector(remove_all_link).click()
         elif mode == 'vertical':
             # There 's no 'Remove all' button in vertical mode, so individually
             # select all options and click 'Remove'.
             for option in self.selenium.find_elements_by_css_selector(to_box + ' > option'):
                 option.click()
-            self.selenium.find_element_by_id(remove_link).click()
+            self.selenium.find_element_by_css_selector(remove_link).click()
         self.assertSelectOptions(from_box,
                         [str(self.lisa.id), str(self.peter.id),
                          str(self.arthur.id), str(self.bob.id),
@@ -938,7 +944,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.get_select_option(from_box, str(self.bob.id)).click()
         self.get_select_option(from_box, str(self.john.id)).click()
         self.assertActiveButtons(mode, field_name, True, False, True, False)
-        self.selenium.find_element_by_id(choose_link).click()
+        self.selenium.find_element_by_css_selector(choose_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box,
@@ -956,7 +962,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.get_select_option(to_box, str(self.lisa.id)).click()
         self.get_select_option(to_box, str(self.bob.id)).click()
         self.assertActiveButtons(mode, field_name, False, True, True, True)
-        self.selenium.find_element_by_id(remove_link).click()
+        self.selenium.find_element_by_css_selector(remove_link).click()
         self.assertActiveButtons(mode, field_name, False, False, True, True)
 
         self.assertSelectOptions(from_box,
@@ -969,7 +975,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         # Choose some more options --------------------------------------------
         self.get_select_option(from_box, str(self.arthur.id)).click()
         self.get_select_option(from_box, str(self.cliff.id)).click()
-        self.selenium.find_element_by_id(choose_link).click()
+        self.selenium.find_element_by_css_selector(choose_link).click()
 
         self.assertSelectOptions(from_box,
                         [str(self.peter.id), str(self.jenny.id),
@@ -979,10 +985,6 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
                          str(self.arthur.id), str(self.cliff.id)])
 
     def test_basic(self):
-        self.school.students = [self.lisa, self.peter]
-        self.school.alumni = [self.lisa, self.peter]
-        self.school.save()
-
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get('%s%s' % (
             self.live_server_url, reverse('admin:admin_widgets_school_change', args=(self.school.id,))))
@@ -995,6 +997,47 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
         self.wait_page_loaded()
         self.school = models.School.objects.get(id=self.school.id)  # Reload from database
+        self.assertEqual(list(self.school.students.all()),
+                         [self.arthur, self.cliff, self.jason, self.john])
+        self.assertEqual(list(self.school.alumni.all()),
+                         [self.arthur, self.cliff, self.jason, self.john])
+
+    def test_back_button_bug_13614(self):
+        self.admin_login(username='super', password='secret', login_url='/')
+        self.selenium.get(
+             '%s%s' % (self.live_server_url, '/admin_widgets/school/%s/' % self.school.id))
+
+        self.execute_basic_operations('vertical', 'students')
+        self.execute_basic_operations('horizontal', 'alumni')
+
+        # Navigate away and go back to the change form page -------------------
+        self.selenium.find_element_by_link_text('Home').click()
+        self.selenium.back()
+
+        # Check that everything is still in place -----------------------------
+        # Don't take in account the order of options in the select controls
+        # to accommodate behavior divergence by some browsers (i.e. Firefox)
+        from_box = '#id_students_from'
+        to_box = '#id_students_to'
+        self.assertSelectOptions(from_box,
+                        [str(self.bob.id), str(self.jenny.id),
+                         str(self.lisa.id), str(self.peter.id)], order_matters=False)
+        self.assertSelectOptions(to_box,
+                        [str(self.arthur.id), str(self.cliff.id),
+                         str(self.jason.id), str(self.john.id)], order_matters=False)
+
+        from_box = '#id_alumni_from'
+        to_box = '#id_alumni_to'
+        self.assertSelectOptions(from_box,
+                        [str(self.bob.id), str(self.jenny.id),
+                         str(self.lisa.id), str(self.peter.id)], order_matters=False)
+        self.assertSelectOptions(to_box,
+                        [str(self.arthur.id), str(self.cliff.id),
+                         str(self.jason.id), str(self.john.id)], order_matters=False)
+
+        # Save and check that everything is properly stored in the database ---
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.school = models.School.objects.get(id=self.school.id) # Reload from database
         self.assertEqual(list(self.school.students.all()),
                          [self.arthur, self.cliff, self.jason, self.john])
         self.assertEqual(list(self.school.alumni.all()),
@@ -1018,8 +1061,8 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name
-            choose_link = '#id_%s_add_link' % field_name
-            remove_link = '#id_%s_remove_link' % field_name
+            choose_link = '#id_%s_selector .selector-add' % field_name
+            remove_link = '#id_%s_selector .selector-remove' % field_name
             input = self.selenium.find_element_by_css_selector('#id_%s_input' % field_name)
 
             # Initial values
