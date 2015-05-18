@@ -37,3 +37,6 @@ Bugfixes
 * On PostgreSQL, when no access is granted for the ``postgres`` database,
   Django now falls back to the default database when it normally requires a
   "no database" connection (:ticket:`24791`).
+
+* Fixed display of ``contrib.admin``’s ``ForeignKey`` widget when it's used
+  in a row with other fields (:ticket:`24784`).
