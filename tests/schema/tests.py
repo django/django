@@ -765,8 +765,10 @@ class SchemaTests(TransactionTestCase):
                 app_label = 'schema'
                 apps = new_apps
 
-        self.local_models = [LocalBookWithM2M]
-
+        self.local_models = [
+            LocalBookWithM2M,
+            LocalBookWithM2M._meta.get_field('tags').remote_field.through,
+        ]
         # Create the tables
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -845,6 +847,7 @@ class SchemaTests(TransactionTestCase):
         # Create an M2M field
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors")
         new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
+        self.local_models += [new_field.remote_field.through]
         # Ensure there's no m2m table there
         self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
         # Add the field
@@ -934,7 +937,10 @@ class SchemaTests(TransactionTestCase):
                 app_label = 'schema'
                 apps = new_apps
 
-        self.local_models = [LocalBookWithM2M]
+        self.local_models = [
+            LocalBookWithM2M,
+            LocalBookWithM2M._meta.get_field('tags').remote_field.through,
+        ]
 
         # Create the tables
         with connection.schema_editor() as editor:
@@ -955,6 +961,7 @@ class SchemaTests(TransactionTestCase):
         old_field = LocalBookWithM2M._meta.get_field("tags")
         new_field = M2MFieldClass(UniqueTest)
         new_field.contribute_to_class(LocalBookWithM2M, "uniques")
+        self.local_models += [new_field.remote_field.through]
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field)
         # Ensure old M2M is gone
