@@ -699,6 +699,15 @@ available to the included template::
 
     {% include "name_snippet.html" with greeting="Hi" only %}
 
+If the included template causes an exception while it's rendered (including
+if it's missing or has syntax errors), the behavior varies depending on the
+:class:`template engine's <django.template.Engine>` ``debug`` option (if not
+set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
+turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
+:exc:`~django.template.TemplateSyntaxError` will be raised; otherwise
+``{% include %}`` silences any exception that happens while rendering the
+included template and returns an empty string.
+
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
     "render this subtemplate and include the HTML", not as "parse this
