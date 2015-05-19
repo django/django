@@ -194,19 +194,7 @@ Your project's :setting:`TEMPLATES` setting describes how Django will load and
 render templates. The default settings file configures a ``DjangoTemplates``
 backend whose :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` option is set to
 ``True``. By convention ``DjangoTemplates`` looks for a "templates"
-subdirectory in each of the :setting:`INSTALLED_APPS`. This is how Django
-knows to find the polls templates even though we didn't modify the
-:setting:`DIRS <TEMPLATES-DIRS>` option, as we did in :ref:`Tutorial 2
-<ref-customizing-your-projects-templates>`.
-
-.. admonition:: Organizing templates
-
-    We *could* have all our templates together, in one big templates directory,
-    and it would work perfectly well. However, this template belongs to the
-    polls application, so we'll put this one in the application's template 
-    directory (``polls/templates``) rather than the project's (``templates``). 
-    We'll discuss in more detail in the :doc:`reusable apps tutorial
-    </intro/reusable-apps>` *why* we do this.
+subdirectory in each of the :setting:`INSTALLED_APPS`.
 
 Within the ``templates`` directory you have just created, create another
 directory called ``polls``, and within that create a file called
@@ -265,8 +253,8 @@ context. The context is a dictionary mapping template variable names to Python
 objects.
 
 Load the page by pointing your browser at "/polls/", and you should see a
-bulleted-list containing the "What's up" question from Tutorial 1. The link points
-to the question's detail page.
+bulleted-list containing the "What's up" question from :doc:`Tutorial 1
+</intro/tutorial01>`. The link points to the question's detail page.
 
 A shortcut: :func:`~django.shortcuts.render`
 --------------------------------------------

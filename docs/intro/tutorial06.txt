@@ -518,6 +518,16 @@ Open your settings file (:file:`mysite/settings.py`, remember) and add a
 :setting:`DIRS <TEMPLATES-DIRS>` is a list of filesystem directories to check
 when loading Django templates; it's a search path.
 
+.. admonition:: Organizing templates
+
+    We *could* have all our templates together, in one big templates directory,
+    and it would work perfectly well. However, templates that  belongs to a
+    particular application, we should put in the application’s template
+    directory (ex: ``polls/templates``) rather than the project’s
+    (``templates``). We'll discuss in more detail in the :doc:`reusable apps
+    tutorial </intro/reusable-apps>` *why* we do this.
+
+
 Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
