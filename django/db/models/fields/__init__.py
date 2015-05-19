@@ -455,7 +455,7 @@ class Field(RegisterLookupMixin):
     def validators(self):
         # Some validators can't be created at field initialization time.
         # This method provides a way to delay their creation until required.
-        return self.default_validators + self._validators
+        return self.default_validators + list(self._validators)
 
     def run_validators(self, value):
         if value in self.empty_values:
