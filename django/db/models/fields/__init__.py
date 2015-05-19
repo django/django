@@ -1069,11 +1069,7 @@ class CharField(Field):
         return errors
 
     def _check_max_length_attribute(self, **kwargs):
-        try:
-            max_length = int(self.max_length)
-            if max_length <= 0:
-                raise ValueError()
-        except TypeError:
+        if self.max_length is None:
             return [
                 checks.Error(
                     "CharFields must define a 'max_length' attribute.",
@@ -1082,7 +1078,7 @@ class CharField(Field):
                     id='fields.E120',
                 )
             ]
-        except ValueError:
+        elif not isinstance(self.max_length, six.integer_types) or self.max_length <= 0:
             return [
                 checks.Error(
                     "'max_length' must be a positive integer.",
