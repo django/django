@@ -121,7 +121,7 @@ These files are:
 Database setup
 --------------
 
-Now, edit :file:`mysite/settings.py`. It's a normal Python module with
+Now, open up :file:`mysite/settings.py`. It's a normal Python module with
 module-level variables representing Django settings.
 
 By default, the configuration uses SQLite. If you're new to databases, or
@@ -188,7 +188,7 @@ come with Django:
 
 These applications are included by default as a convenience for the common case.
 
-Some of these applications makes use of at least one database table, though,
+Some of these applications make use of at least one database table, though,
 so we need to create the tables in the database before we can use them. To do
 that, run the following command:
 
@@ -263,7 +263,7 @@ It worked!
 
     If you want to change the server's IP, pass it along with the port. So to
     listen on all public IPs (useful if you want to show off your work on other
-    computers), use:
+    computers on your network), use:
 
     .. code-block:: console
 
@@ -518,8 +518,8 @@ Note the following:
 * It's tailored to the database you're using, so database-specific field types
   such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
   primary key autoincrement`` (SQLite) are handled for you automatically. Same
-  goes for quoting of field names -- e.g., using double quotes or single
-  quotes.
+  goes for the quoting of field names -- e.g., using double quotes or 
+  single quotes.
 
 * The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
   database - it just prints it to the screen so that you can see what SQL
@@ -565,10 +565,10 @@ but for now, remember the three-step guide to making model changes:
 * Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
   the database.
 
-The reason there's separate commands to make and apply migrations is because
-you'll commit migrations to your version control system and ship them with
-your app; they not only make your development easier, they're also useable by
-other developers and in production.
+The reason that there are separate commands to make and apply migrations is 
+because you'll commit migrations to your version control system and ship them 
+with your app; they not only make your development easier, they're also 
+useable by other developers and in production.
 
 Read the :doc:`django-admin documentation </ref/django-admin>` for full
 information on what the ``manage.py`` utility can do.
