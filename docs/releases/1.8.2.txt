@@ -18,6 +18,11 @@ Bugfixes
   query with a  ``Case`` expression could unexpectedly filter out results
   (:ticket:`24766`).
 
+* Fixed negated Q-objects as expressions. Negated Q-objects tried to generate
+  a subquery when the Q-object was used as an expression (for example
+  `Case(When(~Q(friends__age__lte=30)))`). This resulted in crash
+  (:ticket:`24705`).
+
 * Fixed incorrect GROUP BY clause generation on MySQL when the query's model
   has a self-referential foreign key (:ticket:`24748`).
 

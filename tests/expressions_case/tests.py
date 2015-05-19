@@ -1048,6 +1048,45 @@ class CaseExpressionTests(TestCase):
             lambda x: (x, x.foo)
         )
 
+    def test_m2m_exclude(self):
+        CaseTestModel.objects.create(integer=10, integer2=1, string='1')
+        qs = CaseTestModel.objects.annotate(
+            cnt=models.Sum(
+                Case(When(~Q(fk_rel__integer=1), then=1),
+                     default=2),
+                output_field=models.IntegerField())).order_by('integer')
+        # The first o has 2 as result as its fk_rel__integer=1, thus it hits
+        # the default=2 case. Other ones have 2 as result as they have 2
+        # fk_rel objects, except for integer=4 and integer=10 (created above).
+        # The integer=4 case has one integer, thus result is 1, and integer=10
+        # doesn't have any, and this too generates 1 (instead of 0) as ~Q()
+        # matches also nulls.
+        self.assertQuerysetEqual(
+            qs,
+            [(1, 2), (2, 2), (2, 2), (3, 2), (3, 2), (3, 2), (4, 1), (10, 1)],
+            lambda x: (x.integer, x.cnt)
+        )
+
+    def test_m2m_reuse(self):
+        CaseTestModel.objects.create(integer=10, integer2=1, string='1')
+        qs = CaseTestModel.objects.annotate(
+            cnt=models.Sum(
+                Case(When(~Q(fk_rel__integer=1), then=1),
+                     default=2),
+                output_field=models.IntegerField())
+        ).annotate(
+            cnt2=models.Sum(
+                Case(When(~Q(fk_rel__integer=1), then=1),
+                     default=2),
+                output_field=models.IntegerField())
+        ).order_by('integer')
+        self.assertEqual(str(qs.query).count(' JOIN '), 1)
+        self.assertQuerysetEqual(
+            qs,
+            [(1, 2, 2), (2, 2, 2), (2, 2, 2), (3, 2, 2), (3, 2, 2), (3, 2, 2), (4, 1, 1), (10, 1, 1)],
+            lambda x: (x.integer, x.cnt, x.cnt2)
+        )
+
 
 class CaseDocumentationExamples(TestCase):
     @classmethod
