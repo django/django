@@ -88,7 +88,7 @@ class Q(tree.Node):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
         joins_before = query.tables[:]
-        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins)
+        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
         joins_to_promote = [j for j in joins if j not in joins_before]
         query.promote_joins(joins_to_promote)
         return clause
