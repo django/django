@@ -534,7 +534,7 @@ class FileFieldStorageTests(SimpleTestCase):
     def test_extended_length_storage(self):
         # Testing FileField with max_length > 255. Most systems have filename
         # length limitation of 255. Path takes extra chars.
-        filename = 251 * 'a'  # 4 chars for extension.
+        filename = (temp_storage.MAX_FILENAME_LENGTH - 4) * 'a'  # 4 chars for extension.
         obj = Storage()
         obj.extended_length.save('%s.txt' % filename, ContentFile('Same Content'))
         self.assertEqual(obj.extended_length.name, 'tests/%s.txt' % filename)

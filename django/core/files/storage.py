@@ -13,7 +13,7 @@ from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import filepath_to_uri, force_text
-from django.utils.functional import LazyObject
+from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
@@ -26,6 +26,8 @@ class Storage(object):
     A base storage class, providing some default behaviors that all other
     storage systems can inherit or override, as necessary.
     """
+
+    MAX_FILENAME_LENGTH = 255  # Should be safe on most backends
 
     # The following methods represent a public interface to private methods.
     # These shouldn't be overridden by subclasses unless absolutely necessary.
@@ -197,6 +199,16 @@ class FileSystemStorage(Storage):
             directory_permissions_mode if directory_permissions_mode is not None
             else settings.FILE_UPLOAD_DIRECTORY_PERMISSIONS
         )
+
+    @cached_property
+    def MAX_FILENAME_LENGTH(self):
+        dir_to_test = self.location
+        while not os.path.exists(dir_to_test):
+            dir_to_test = os.path.dirname(dir_to_test)
+        try:
+            return os.pathconf(dir_to_test, 'PC_NAME_MAX')
+        except Exception:
+            return Storage.MAX_FILENAME_LENGTH
 
     def _open(self, name, mode='rb'):
         return File(open(self.path(name), mode))
