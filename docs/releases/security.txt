@@ -611,3 +611,15 @@ Versions affected
 * Django 1.6 `(patch) <https://github.com/django/django/commit/5510f070711540aaa8d3707776cd77494e688ef9>`__
 * Django 1.7 `(patch) <https://github.com/django/django/commit/2a4113dbd532ce952308992633d802dc169a75f1>`__
 * Django 1.8 `(patch) <https://github.com/django/django/commit/770427c2896a078925abfca2317486b284d22f04>`__
+
+May 20, 2015 - CVE-2015-3982
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-3982 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-3982&cid=2>`_:
+Fixed session flushing in the cached_db backend.
+`Full description <https://www.djangoproject.com/weblog/2015/may/20/security-release/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/31cb25adecba930bdeee4556709f5a1c42d88fd6>`__
