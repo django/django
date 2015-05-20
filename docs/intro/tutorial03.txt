@@ -55,7 +55,7 @@ A quick rundown:
   :ttag:`{% csrf_token %}<csrf_token>` template tag.
 
 Now, let's create a Django view that handles the submitted data and does
-something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
+something with it. Remember, in :doc:`Tutorial 2 </intro/tutorial02>`, we
 created a URLconf for the polls application that includes this line:
 
 .. snippet::
@@ -129,18 +129,19 @@ This code includes a few things we haven't covered yet in this tutorial:
   This function helps avoid having to hardcode a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
-  case, using the URLconf we set up in Tutorial 3, this
-  :func:`~django.core.urlresolvers.reverse` call will return a string like
+  case, using the URLconf we set up in :doc:`Tutorial 2 </intro/tutorial02>`,
+  this :func:`~django.core.urlresolvers.reverse` call will return a string like
   ::
 
     '/polls/3/results/'
 
-  ... where the ``3`` is the value of ``p.id``. This redirected URL will
+  where the ``3`` is the value of ``p.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
 
-As mentioned in Tutorial 3, ``request`` is a :class:`~django.http.HttpRequest`
-object. For more on :class:`~django.http.HttpRequest` objects, see the
-:doc:`request and response documentation </ref/request-response>`.
+As mentioned in :doc:`Tutorial 2 </intro/tutorial02>`, ``request`` is a
+:class:`~django.http.HttpRequest` object. For more on
+:class:`~django.http.HttpRequest` objects, see the :doc:`request and
+response documentation </ref/request-response>`.
 
 After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
@@ -155,8 +156,8 @@ page for the question. Let's write that view:
         question = get_object_or_404(Question, pk=question_id)
         return render(request, 'polls/results.html', {'question': question})
 
-This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 3
-</intro/tutorial03>`. The only difference is the template name. We'll fix this
+This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 2
+</intro/tutorial02>`. The only difference is the template name. We'll fix this
 redundancy later.
 
 Now, create a ``polls/results.html`` template:
@@ -181,9 +182,9 @@ without having chosen a choice, you should see the error message.
 Use generic views: Less code is better
 ======================================
 
-The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
+The ``detail()`` (from :doc:`Tutorial 2 </intro/tutorial02>`) and ``results()``
 views are very simple -- and, as mentioned above, redundant. The ``index()``
-view (also from Tutorial 3), which displays a list of polls, is similar.
+view, which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
@@ -326,5 +327,181 @@ Run the server, and use your new polling app based on generic views.
 For full details on generic views, see the :doc:`generic views documentation
 </topics/class-based-views/index>`.
 
-When you're comfortable with forms and generic views, read :doc:`part 4 of this
+Introducing the Django Admin
+============================
+
+.. admonition:: Philosophy
+
+    Generating admin sites for your staff or clients to add, change and delete
+    content is tedious work that doesn't require much creativity. For that
+    reason, Django entirely automates creation of admin interfaces for models.
+
+    Django was written in a newsroom environment, with a very clear separation
+    between "content publishers" and the "public" site. Site managers use the
+    system to add news stories, events, sports scores, etc., and that content is
+    displayed on the public site. Django solves the problem of creating a
+    unified interface for site administrators to edit content.
+
+    The admin isn't intended to be used by site visitors. It's for site
+    managers.
+
+Creating an admin user
+----------------------
+
+First we'll need to create a user who can login to the admin site. Run the
+following command:
+
+.. code-block:: console
+
+    $ python manage.py createsuperuser
+
+Enter your desired username and press enter.
+
+.. code-block:: text
+
+    Username: admin
+
+You will then be prompted for your desired email address:
+
+.. code-block:: text
+
+    Email address: admin@example.com
+
+The final step is to enter your password. You will be asked to enter your
+password twice, the second time as a confirmation of the first.
+
+.. code-block:: text
+
+    Password: **********
+    Password (again): *********
+    Superuser created successfully.
+
+Start the development server
+----------------------------
+
+The Django admin site is activated by default. Let's start the development
+server and explore it.
+
+If the server is not running start it like so:
+
+.. code-block:: console
+
+    $ python manage.py runserver
+
+Now, open a Web browser and go to "/admin/" on your local domain -- e.g.,
+http://127.0.0.1:8000/admin/. You should see the admin's login screen:
+
+.. image:: _images/admin01.png
+   :alt: Django admin login screen
+
+Since :doc:`translation </topics/i18n/translation>` is turned on by default,
+the login screen may be displayed in your own language, depending on your
+browser's settings and on whether Django has a translation for this language.
+
+.. admonition:: Doesn't match what you see?
+
+    If at this point, instead of the above login page, you get an error
+    page reporting something like::
+
+        ImportError at /admin/
+        cannot import name patterns
+        ...
+
+    then you're probably using a version of Django that doesn't match this
+    tutorial version. You'll want to either switch to the older tutorial or the
+    newer Django version.
+
+Enter the admin site
+--------------------
+
+Now, try logging in with the superuser account you created in the previous step.
+You should see the Django admin index page:
+
+.. image:: _images/admin02.png
+   :alt: Django admin index page
+
+You should see a few types of editable content: groups and users. They are
+provided by :mod:`django.contrib.auth`, the authentication framework shipped
+by Django.
+
+Make the poll app modifiable in the admin
+-----------------------------------------
+
+But where's our poll app? It's not displayed on the admin index page.
+
+Just one thing to do: we need to tell the admin that ``Question``
+objects have an admin interface. To do this, open the :file:`polls/admin.py`
+file, and edit it to look like this:
+
+.. snippet::
+    :filename: polls/admin.py
+
+    from django.contrib import admin
+
+    from .models import Question
+
+    admin.site.register(Question)
+
+Explore the free admin functionality
+------------------------------------
+
+Now that we've registered ``Question``, Django knows that it should be displayed on
+the admin index page:
+
+.. image:: _images/admin03t.png
+   :alt: Django admin index page, now with polls displayed
+
+Click "Questions". Now you're at the "change list" page for questions. This page
+displays all the questions in the database and lets you choose one to change it.
+There's the "What's up?" question we created in the first tutorial:
+
+.. image:: _images/admin04t.png
+   :alt: Polls change list page
+
+Click the "What's up?" question to edit it:
+
+.. image:: _images/admin05t.png
+   :alt: Editing form for question object
+
+Things to note here:
+
+* The form is automatically generated from the ``Question`` model.
+
+* The different model field types (:class:`~django.db.models.DateTimeField`,
+  :class:`~django.db.models.CharField`) correspond to the appropriate HTML
+  input widget. Each type of field knows how to display itself in the Django
+  admin.
+
+* Each :class:`~django.db.models.DateTimeField` gets free JavaScript
+  shortcuts. Dates get a "Today" shortcut and calendar popup, and times get
+  a "Now" shortcut and a convenient popup that lists commonly entered times.
+
+The bottom part of the page gives you a couple of options:
+
+* Save -- Saves changes and returns to the change-list page for this type of
+  object.
+
+* Save and continue editing -- Saves changes and reloads the admin page for
+  this object.
+
+* Save and add another -- Saves changes and loads a new, blank form for this
+  type of object.
+
+* Delete -- Displays a delete confirmation page.
+
+If the value of "Date published" doesn't match the time when you created the
+question in :doc:`Tutorial 1</intro/tutorial01>`, it probably 
+means you forgot to set the correct value for the :setting:`TIME_ZONE` setting. 
+Change it, reload the page and check that the correct value appears.
+
+Change the "Date published" by clicking the "Today" and "Now" shortcuts. Then
+click "Save and continue editing." Then click "History" in the upper right.
+You'll see a page listing all changes made to this object via the Django admin,
+with the timestamp and username of the person who made the change:
+
+.. image:: _images/admin06t.png
+   :alt: History page for question object
+
+When you're comfortable with forms and generic views, and have familiarized 
+yourself with the Admin functionality, read :doc:`part 4 of this 
 tutorial</intro/tutorial04>` to learn about testing our polls app.
