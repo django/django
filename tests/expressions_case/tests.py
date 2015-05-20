@@ -1050,7 +1050,7 @@ class CaseExpressionTests(TestCase):
 
     def test_m2m_exclude(self):
         CaseTestModel.objects.create(integer=10, integer2=1, string='1')
-        qs = CaseTestModel.objects.annotate(
+        qs = CaseTestModel.objects.values_list('id', 'integer').annotate(
             cnt=models.Sum(
                 Case(When(~Q(fk_rel__integer=1), then=1),
                      default=2),
@@ -1064,12 +1064,14 @@ class CaseExpressionTests(TestCase):
         self.assertQuerysetEqual(
             qs,
             [(1, 2), (2, 2), (2, 2), (3, 2), (3, 2), (3, 2), (4, 1), (10, 1)],
-            lambda x: (x.integer, x.cnt)
+            lambda x: x[1:]
         )
 
     def test_m2m_reuse(self):
         CaseTestModel.objects.create(integer=10, integer2=1, string='1')
-        qs = CaseTestModel.objects.annotate(
+        # Need to use values before annotate so that Oracle will not group
+        # by fields it isn't capable of grouping by.
+        qs = CaseTestModel.objects.values_list('id', 'integer').annotate(
             cnt=models.Sum(
                 Case(When(~Q(fk_rel__integer=1), then=1),
                      default=2),
@@ -1084,7 +1086,7 @@ class CaseExpressionTests(TestCase):
         self.assertQuerysetEqual(
             qs,
             [(1, 2, 2), (2, 2, 2), (2, 2, 2), (3, 2, 2), (3, 2, 2), (3, 2, 2), (4, 1, 1), (10, 1, 1)],
-            lambda x: (x.integer, x.cnt, x.cnt2)
+            lambda x: x[1:]
         )
 
 
