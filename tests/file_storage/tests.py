@@ -249,7 +249,7 @@ class FileStorageTests(unittest.TestCase):
         self.assertEqual(self.storage.url(r"""~!*()'@#$%^&*abc`+ =.file"""),
             """/test_media_url/~!*()'%40%23%24%25%5E%26*abc%60%2B%20%3D.file""")
 
-        # should stanslate os path separator(s) to the url path separator
+        # should translate os path separator(s) to the url path separator
         self.assertEqual(self.storage.url("""a/b\\c.file"""),
             """/test_media_url/a/b/c.file""")
 
