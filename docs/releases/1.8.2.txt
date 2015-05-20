@@ -2,7 +2,7 @@
 Django 1.8.2 release notes
 ==========================
 
-*Under development*
+*May 20, 2015*
 
 Django 1.8.2 fixes a security issue and several bugs in 1.8.1.
 
