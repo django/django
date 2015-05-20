@@ -505,6 +505,19 @@ Miscellaneous
 * The ``django.contrib.sites.models.Site.domain`` field was changed to be
   :attr:`~django.db.models.Field.unique`.
 
+* Changes were made to a few methods in generic Class Based Views to reduce
+  interdependencies between methods.
+  :meth:`SingleObjectMixin.get_context_data <django.views.generic.detail.SingleObjectMixin.get_context_data>`
+  and
+  :meth:`MultipleObjectMixin.get_context_data <django.views.generic.list.MultipleObjectMixin.get_context_data>`
+  will now get the object or object list from respective methods if they are
+  not set in ``get()`` or ``post()`` methods.
+  :meth:`SingleObjectTemplateResponseMixin.get_template_names <django.views.generic.detail.SingleObjectTemplateResponseMixin.get_template_names>`
+  and
+  :meth:`MultipleObjectTemplateResponseMixin.get_template_names <django.views.generic.list.MultipleObjectTemplateResponseMixin.get_template_names>`
+  will also no longer raise an ``AttributeError`` if the object or object list
+  are not set.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

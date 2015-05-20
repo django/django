@@ -104,11 +104,18 @@ SingleObjectMixin
 
     .. method:: get_context_data(**kwargs)
 
-        Returns context data for displaying the list of objects.
+        Returns context data for displaying a single object.
 
-        The base implementation of this method requires that the ``object``
-        attribute be set by the view (even if ``None``). Be sure to do this if
-        you are using this mixin without one of the built-in views that does so.
+        If the ``object`` attribute is not set, ``get_object()`` will be used to
+        get the object. If the ``object`` attribute is set to ``None`` value, it
+        will not be inserted in context (this behavior is used by
+        :class:`~django.views.generic.edit.CreateView`).
+
+        .. versionchanged:: 1.9
+
+            In order to reduce interdependencies of different methods, this
+            method no longer requires ``object`` attribute to be set in
+            ``get()`` and ``post()`` methods.
 
     .. method:: get_slug_field()
 
@@ -160,3 +167,10 @@ SingleObjectTemplateResponseMixin
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
         * ``<app_label>/<model_name><template_name_suffix>.html``
+
+        .. versionchanged:: 1.9
+
+            In order to reduce interdependencies of different methods, this
+            method no longer requires ``object`` attribute to be set in
+            ``get()`` and ``post()`` methods.
+
