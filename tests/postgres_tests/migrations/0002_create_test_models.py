@@ -144,6 +144,21 @@ class Migration(migrations.Migration):
                 ('dates', DateRangeField(null=True, blank=True)),
             ],
             options={
+                'required_db_vendor': 'postgresql'
+            },
+            bases=(models.Model,)
+        ),
+        migrations.CreateModel(
+            name='RangeLookupsModel',
+            fields=[
+                ('parent', models.ForeignKey('postgres_tests.RangesModel', blank=True, null=True)),
+                ('integer', models.IntegerField(blank=True, null=True)),
+                ('big_integer', models.BigIntegerField(blank=True, null=True)),
+                ('float', models.FloatField(blank=True, null=True)),
+                ('timestamp', models.DateTimeField(blank=True, null=True)),
+                ('date', models.DateField(blank=True, null=True)),
+            ],
+            options={
                 'required_db_vendor': 'postgresql',
             },
             bases=(models.Model,),

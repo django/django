@@ -631,14 +631,18 @@ model::
     class Event(models.Model):
         name = models.CharField(max_length=200)
         ages = IntegerRangeField()
+        start = models.DateTimeField()
 
         def __str__(self):  # __unicode__ on Python 2
             return self.name
 
 We will also use the following example objects::
 
-    >>> Event.objects.create(name='Soft play', ages=(0, 10))
-    >>> Event.objects.create(name='Pub trip', ages=(21, None))
+    >>> import datetime
+    >>> from django.utils import timezone
+    >>> now = timezone.now()
+    >>> Event.objects.create(name='Soft play', ages=(0, 10), start=now)
+    >>> Event.objects.create(name='Pub trip', ages=(21, None), start=now - datetime.timedelta(days=1))
 
 and ``NumericRange``:
 
@@ -665,6 +669,22 @@ contained_by
 ''''''''''''
 
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
+    [<Event: Soft play>]
+
+.. versionadded 1.9
+
+    The `contained_by` lookup is also available on the non-range field types:
+    :class:`~django.db.models.fields.IntegerField`,
+    :class:`~django.db.models.fields.BigIntegerField`,
+    :class:`~django.db.models.fields.FloatField`,
+    :class:`~django.db.models.fields.DateField`, and
+    :class:`~django.db.models.fields.DateTimeField`. For example::
+
+    >>> from psycopg2.extras import DateTimeTZRange
+    >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
+    ...     timezone.now() - datetime.timedelta(hours=1),
+    ...     timezone.now() + datetime.timedelta(hours=1),
+    ... )
     [<Event: Soft play>]
 
 .. fieldlookup:: rangefield.overlap

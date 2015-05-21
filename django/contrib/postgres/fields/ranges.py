@@ -98,6 +98,38 @@ RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
 
 
+class RangeContainedBy(models.Lookup):
+    lookup_name = 'contained_by'
+    type_mapping = {
+        'integer': 'int4range',
+        'bigint': 'int8range',
+        'double precision': 'numrange',
+        'date': 'daterange',
+        'timestamp with time zone': 'tstzrange',
+    }
+
+    def as_sql(self, qn, connection):
+        field = self.lhs.output_field
+        if isinstance(field, models.FloatField):
+            sql = '%s::numeric <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
+        else:
+            sql = '%s <@ %s::{}'.format(self.type_mapping[field.db_type(connection)])
+        lhs, lhs_params = self.process_lhs(qn, connection)
+        rhs, rhs_params = self.process_rhs(qn, connection)
+        params = lhs_params + rhs_params
+        return sql % (lhs, rhs), params
+
+    def get_prep_lookup(self):
+        return RangeField().get_prep_lookup(self.lookup_name, self.rhs)
+
+
+models.DateField.register_lookup(RangeContainedBy)
+models.DateTimeField.register_lookup(RangeContainedBy)
+models.IntegerField.register_lookup(RangeContainedBy)
+models.BigIntegerField.register_lookup(RangeContainedBy)
+models.FloatField.register_lookup(RangeContainedBy)
+
+
 @RangeField.register_lookup
 class FullyLessThan(lookups.PostgresSimpleLookup):
     lookup_name = 'fully_lt'
