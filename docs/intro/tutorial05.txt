@@ -44,11 +44,11 @@ reference the path for templates.
 
 .. admonition:: Static file namespacing
 
-    Just like templates, we *might* be able to get away with putting our static
-    files directly in ``polls/static`` (rather than creating another ``polls``
-    subdirectory), but it would actually be a bad idea. Django will choose the
-    first static file it finds whose name matches, and if you had a static file
-    with the same name in a *different* application, Django would be unable to
+    We *might* be able to get away with putting our static files directly in
+    ``polls/static`` (rather than creating another ``polls`` subdirectory),
+    but it would actually be a bad idea. Django will choose the first static
+    file it finds whose name matches, and if you had a static file with the
+    same name in a *different* application, Django would be unable to
     distinguish between them. We need to be able to point Django at the right
     one, and the easiest way to ensure this is by *namespacing* them. That is,
     by putting those static files inside *another* directory named for the
@@ -117,4 +117,4 @@ static files </howto/static-files/deployment>` discusses how to use static
 files on a real server.
 
 When you're comfortable with the static files, read :doc:`part 6 of this tutorial
-</intro/tutorial06>` to get Django's automatic admin working.
+</intro/tutorial06>` to learn how to customize Django's admin.
