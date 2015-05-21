@@ -172,11 +172,6 @@ groups:
    demonstrated ability to responsibly receive, keep confidential and
    act on these notifications.
 
-Additionally, a maximum of six days prior to disclosure, notification
-will be sent to the ``distros@vs.openwall.org`` mailing list, whose
-membership includes representatives of most major open-source
-operating system vendors.
-
 Requesting notifications
 ========================
 
