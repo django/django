@@ -1097,8 +1097,8 @@ subclass::
     ``['first_name', 'last_name']`` and a user searches for ``john lennon``,
     Django will do the equivalent of this SQL ``WHERE`` clause::
 
-        WHERE (first_name LIKE '%john%' OR last_name LIKE '%john%')
-        AND (first_name LIKE '%lennon%' OR last_name LIKE '%lennon%')
+        WHERE (first_name ILIKE '%john%' OR last_name ILIKE '%john%')
+        AND (first_name ILIKE '%lennon%' OR last_name ILIKE '%lennon%')
 
     For faster and/or more restrictive searches, prefix the field name
     with an operator:
@@ -1110,8 +1110,8 @@ subclass::
         ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
         clause::
 
-            WHERE (first_name LIKE 'john%' OR last_name LIKE 'john%')
-            AND (first_name LIKE 'lennon%' OR last_name LIKE 'lennon%')
+            WHERE (first_name ILIKE 'john%' OR last_name ILIKE 'john%')
+            AND (first_name ILIKE 'lennon%' OR last_name ILIKE 'lennon%')
 
         This query is more efficient than the normal ``'%john%'`` query,
         because the database only needs to check the beginning of a column's
@@ -1126,8 +1126,8 @@ subclass::
         ``john lennon``, Django will do the equivalent of this SQL 
         ``WHERE`` clause::
 
-            WHERE (first_name LIKE 'john' OR last_name LIKE 'john')
-            AND (first_name LIKE 'lennon' OR last_name LIKE 'lennon')
+            WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
+            AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
 
         Note that the query input is split by spaces, so, following this
         example, it's currently not possible to search for all records in which
