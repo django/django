@@ -237,13 +237,13 @@ subclass::
 
 .. attribute:: ModelAdmin.fields
 
-    If you need to achieve simple changes in the layout of fields in the forms
-    of the "add" and "change" pages like only showing a subset of the available
-    fields, modifying their order or grouping them in rows you can use the
-    ``fields`` option (for more complex layout needs see the
-    :attr:`~ModelAdmin.fieldsets` option described in the next section). For
-    example, you could define a simpler version of the admin form for the
-    :class:`django.contrib.flatpages.models.FlatPage` model as follows::
+    Use the ``fields`` option to make simple layout changes in the forms on
+    the “add” and “change” pages (i.e., show only a subset of available
+    fields, modify their order, or group into rows). For more complex layout
+    needs see the :attr:`~ModelAdmin.fieldsets` option described in the 
+    next section. For example, you could define a simpler version of the
+    admin form for the :class:`django.contrib.flatpages.models.FlatPage` 
+    model as follows::
 
         class FlatPageAdmin(admin.ModelAdmin):
             fields = ('url', 'title', 'content')
@@ -260,7 +260,7 @@ subclass::
 
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
-    same line and the ``content`` field will be displayed below them in its
+    same line and the ``content`` field will be displayed below them on its
     own line::
 
         class FlatPageAdmin(admin.ModelAdmin):
@@ -344,7 +344,7 @@ subclass::
         listed in :attr:`~ModelAdmin.readonly_fields`.
 
     * ``classes``
-        A list containing extra CSS classes to apply to the fieldset.
+        A tuple containing extra CSS classes to apply to the fieldset.
 
         Example::
 
@@ -1085,8 +1085,8 @@ subclass::
         search_fields = ['foreign_key__related_fieldname']
 
     For example, if you have a blog entry with an author, the following
-    definition would enable search blog entries by the email address of the
-    author::
+    definition would enable searching blog entries by the email address
+    of the author::
 
         search_fields = ['user__email']
 
@@ -1104,8 +1104,9 @@ subclass::
     with an operator:
 
     ``^``
-        Matches the beginning of the field. For example, if ``search_fields``
-        is set to ``['^first_name', '^last_name']`` and a user searches for
+        Use the '^' operator to match starting at the beginning of the
+        field. For example, if ``search_fields`` is set to 
+        ``['^first_name', '^last_name']`` and a user searches for
         ``john lennon``, Django will do the equivalent of this SQL ``WHERE``
         clause::
 
@@ -1119,10 +1120,11 @@ subclass::
         index for this query, even though it's a ``LIKE`` query.
 
     ``=``
-        Matches exactly, case-insensitive. For example, if
-        ``search_fields`` is set to ``['=first_name', '=last_name']`` and
-        a user searches for ``john lennon``, Django will do the equivalent
-        of this SQL ``WHERE`` clause::
+        Use the '=' operator for case-insensitive exact matching. For 
+        example, if ``search_fields`` is set to 
+        ``['=first_name', '=last_name']`` and a user searches for 
+        ``john lennon``, Django will do the equivalent of this SQL 
+        ``WHERE`` clause::
 
             WHERE (first_name ILIKE 'john' OR last_name ILIKE 'john')
             AND (first_name ILIKE 'lennon' OR last_name ILIKE 'lennon')
@@ -1132,8 +1134,9 @@ subclass::
         ``first_name`` is exactly ``'john winston'`` (containing a space).
 
     ``@``
-        Performs a full-text match. This is like the default search method but
-        uses an index. Currently this is only available for MySQL.
+        Using the '@' operator performs a full text match. This is like 
+        the default search method but uses an index. Currently this is 
+        only available for MySQL.
 
     If you need to customize search you can use
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
@@ -1284,8 +1287,8 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.get_search_results(request, queryset, search_term)
 
-    The ``get_search_results`` method modifies the list of objects displayed in
-    to those that match the provided search term. It accepts the request, a
+    The ``get_search_results`` method modifies the list of objects displayed 
+    into those that match the provided search term. It accepts the request, a
     queryset that applies the current filters, and the user-provided search term.
     It returns a tuple containing a queryset modified to implement the search, and
     a boolean indicating if the results may contain duplicates.
@@ -1354,7 +1357,7 @@ templates used by the :class:`ModelAdmin` views:
 .. method:: ModelAdmin.get_fields(request, obj=None)
 
     The ``get_fields`` method is given the ``HttpRequest`` and the ``obj``
-    being edited (or ``None`` on an add form) and is expected to return a list
+    being edited (or ``None`` on an add form) and is expected to return a tuple
     of fields, as described above in the :attr:`ModelAdmin.fields` section.
 
 .. method:: ModelAdmin.get_fieldsets(request, obj=None)
@@ -1576,9 +1579,9 @@ templates used by the :class:`ModelAdmin` views:
 
     .. admonition:: Note
 
-        Any ``choices`` attribute set on the formfield will limited to the form
-        field only. If the corresponding field on the model has choices set,
-        the choices provided to the form must be a valid subset of those
+        Any ``choices`` attributes set on the formfield will be limited to the 
+        form field only. If the corresponding field on the model has choices 
+        set, the choices provided to the form must be a valid subset of those
         choices, otherwise the form submission will fail with
         a :exc:`~django.core.exceptions.ValidationError` when the model itself
         is validated before saving.
@@ -2023,7 +2026,7 @@ The ``InlineModelAdmin`` class adds:
     overhead of having to select all the related instances to display in the
     drop-down.
 
-    ``raw_id_fields`` is a list of fields you would like to change into a
+    ``raw_id_fields`` is a list of fields you would like to change into an
     ``Input`` widget for either a ``ForeignKey`` or ``ManyToManyField``::
 
         class BookInline(admin.TabularInline):
@@ -2276,11 +2279,11 @@ you have the following models::
     class Product(models.Model):
         name = models.CharField(max_length=100)
 
-If you want to allow editing and creating ``Image`` instance on the ``Product``
+If you want to allow editing and creating an ``Image`` instance on the ``Product``
 add/change views you can use :class:`~django.contrib.contenttypes.admin.GenericTabularInline`
 or :class:`~django.contrib.contenttypes.admin.GenericStackedInline` (both
 subclasses of :class:`~django.contrib.contenttypes.admin.GenericInlineModelAdmin`)
-provided by :mod:`~django.contrib.contenttypes.admin`, they implement tabular and
+provided by :mod:`~django.contrib.contenttypes.admin`. They implement tabular and
 stacked visual layouts for the forms representing the inline objects
 respectively just like their non-generic counterparts and behave just like any
 other inline. In your ``admin.py`` for this example app::
