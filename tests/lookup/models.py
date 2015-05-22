@@ -11,6 +11,14 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class Alarm(models.Model):
+    desc = models.CharField(max_length=100)
+    time = models.TimeField()
+
+    def __str__(self):
+        return '%s (%s)' % (self.time, self.desc)
+
+
 class Author(models.Model):
     name = models.CharField(max_length=100)
 

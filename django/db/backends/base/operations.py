@@ -122,6 +122,13 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetime_trunk_sql() method')
 
+    def time_extract_sql(self, lookup_type, field_name):
+        """
+        Given a lookup_type of 'hour', 'minute' or 'second', returns the SQL
+        that extracts a value from the given time field field_name.
+        """
+        return self.date_extract_sql(lookup_type, field_name)
+
     def deferrable_sql(self):
         """
         Returns the SQL necessary to make a constraint "initially deferred"

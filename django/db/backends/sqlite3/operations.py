@@ -88,6 +88,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_datetime_trunc('%s', %s, %%s)" % (
             lookup_type.lower(), field_name), [tzname]
 
+    def time_extract_sql(self, lookup_type, field_name):
+        # sqlite doesn't support extract, so we fake it with the user-defined
+        # function django_time_extract that's registered in connect(). Note that
+        # single quotes are used because this is a string (and could otherwise
+        # cause a collision with a field name).
+        return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
+
     def drop_foreignkey_sql(self):
         return ""
 
