@@ -2535,13 +2535,6 @@ django.contrib.humanize
 A set of Django template filters useful for adding a "human touch" to data. See
 :doc:`/ref/contrib/humanize`.
 
-
-django.contrib.webdesign
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-A collection of template tags that can be useful while designing a Web site,
-such as a generator of Lorem Ipsum text. See :doc:`/ref/contrib/webdesign`.
-
 static
 ^^^^^^
 
