@@ -11,7 +11,7 @@ from django.contrib.postgres.validators import (
 )
 from django.core import exceptions, serializers
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from .models import RangesModel
@@ -466,6 +466,14 @@ class TestFormField(TestCase):
         self.assertEqual(cm.exception.messages[0], 'This field is required.')
         value = field.clean(['2013-04-09 11:45', ''])
         self.assertEqual(value, DateTimeTZRange(datetime.datetime(2013, 4, 9, 11, 45), None))
+
+    @override_settings(USE_TZ=True, TIME_ZONE='Africa/Johannesburg')
+    def test_datetime_prepare_value(self):
+        field = pg_forms.DateTimeRangeField()
+        value = field.prepare_value(
+            DateTimeTZRange(datetime.datetime(2015, 5, 22, 16, 6, 33, tzinfo=timezone.utc), None)
+        )
+        self.assertEqual(value, [datetime.datetime(2015, 5, 22, 18, 6, 33), None])
 
     def test_model_field_formfield_integer(self):
         model_field = pg_fields.IntegerRangeField()
