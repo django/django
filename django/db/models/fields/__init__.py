@@ -2413,9 +2413,12 @@ class DateTransform(Transform):
             tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
             sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
             params.extend(tz_params)
-        else:
-            # DateField and TimeField.
+        elif isinstance(lhs_output_field, DateField):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
+        elif isinstance(lhs_output_field, TimeField):
+            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+        else:
+            raise ValueError('DateTransform only valid on Date/Time/DateTimeFields')
         return sql, params
 
     @cached_property

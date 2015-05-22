@@ -2606,23 +2606,29 @@ in the database <database-time-zone-definitions>`.
 hour
 ~~~~
 
-For datetime fields, an exact hour match. Allows chaining additional field
-lookups. Takes an integer between 0 and 23.
+For datetime and time fields, an exact hour match. Allows chaining additional
+field lookups. Takes an integer between 0 and 23.
 
 Example::
 
     Event.objects.filter(timestamp__hour=23)
+    Event.objects.filter(time__hour=5)
     Event.objects.filter(timestamp__hour__gte=12)
 
 SQL equivalent::
 
     SELECT ... WHERE EXTRACT('hour' FROM timestamp) = '23';
+    SELECT ... WHERE EXTRACT('hour' FROM time) = '5';
     SELECT ... WHERE EXTRACT('hour' FROM timestamp) >= '12';
 
 (The exact SQL syntax varies for each database engine.)
 
-When :setting:`USE_TZ` is ``True``, values are converted to the current time
-zone before filtering.
+For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
+to the current time zone before filtering.
+
+.. versionchanged:: 1.9
+
+    Add support for TimeFields.
 
 .. versionchanged:: 1.9
 
@@ -2633,23 +2639,29 @@ zone before filtering.
 minute
 ~~~~~~
 
-For datetime fields, an exact minute match. Allows chaining additional field
-lookups. Takes an integer between 0 and 59.
+For datetime and time fields, an exact minute match. Allows chaining additional
+field lookups. Takes an integer between 0 and 59.
 
 Example::
 
     Event.objects.filter(timestamp__minute=29)
+    Event.objects.filter(time__minute=46)
     Event.objects.filter(timestamp__minute__gte=29)
 
 SQL equivalent::
 
     SELECT ... WHERE EXTRACT('minute' FROM timestamp) = '29';
+    SELECT ... WHERE EXTRACT('minute' FROM time) = '46';
     SELECT ... WHERE EXTRACT('minute' FROM timestamp) >= '29';
 
 (The exact SQL syntax varies for each database engine.)
 
-When :setting:`USE_TZ` is ``True``, values are converted to the current time
-zone before filtering.
+For datetime fields, When :setting:`USE_TZ` is ``True``, values are converted
+to the current time zone before filtering.
+
+.. versionchanged:: 1.9
+
+    Add support for TimeFields.
 
 .. versionchanged:: 1.9
 
@@ -2660,23 +2672,29 @@ zone before filtering.
 second
 ~~~~~~
 
-For datetime fields, an exact second match. Allows chaining additional field
-lookups. Takes an integer between 0 and 59.
+For datetime and time fields, an exact second match. Allows chaining additional
+field lookups. Takes an integer between 0 and 59.
 
 Example::
 
     Event.objects.filter(timestamp__second=31)
+    Event.objects.filter(time__second=2)
     Event.objects.filter(timestamp__second__gte=31)
 
 SQL equivalent::
 
     SELECT ... WHERE EXTRACT('second' FROM timestamp) = '31';
+    SELECT ... WHERE EXTRACT('second' FROM time) = '2';
     SELECT ... WHERE EXTRACT('second' FROM timestamp) >= '31';
 
 (The exact SQL syntax varies for each database engine.)
 
-When :setting:`USE_TZ` is ``True``, values are converted to the current time
-zone before filtering.
+For datetime fields, when :setting:`USE_TZ` is ``True``, values are converted
+to the current time zone before filtering.
+
+.. versionchanged:: 1.9
+
+    Add support for TimeFields.
 
 .. versionchanged:: 1.9
 
