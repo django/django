@@ -14,10 +14,10 @@ automatically-generated admin site.
 
     Django was written in a newsroom environment, with a very clear separation
     between "content publishers" and the "public" site. Site managers use the
-    system to add news stories, events, sports scores, etc., and that content is
-    displayed on the public site. Django solves the problem of creating a
-    unified interface for site administrators to edit content.
-
+    admin system to add content (i.e., news stories, events, sports scores)
+    which is displayed on the public site. The admin interface streamlines the
+    process of creating and managing content.
+    
     The admin isn't intended to be used by site visitors. It's for site
     managers.
 
@@ -37,7 +37,7 @@ Enter your desired username and press enter.
 
     Username: admin
 
-You will then be prompted for your desired email address:
+You will then be prompted for this user's email address:
 
 .. code-block:: text
 
@@ -96,7 +96,7 @@ You should see the Django admin index page:
 .. image:: _images/admin02.png
    :alt: Django admin index page
 
-You should see a few types of editable content: groups and users. They are
+You should see a few types of editable content: Groups and Users. They are
 provided by :mod:`django.contrib.auth`, the authentication framework shipped
 by Django.
 
@@ -107,7 +107,7 @@ But where's our poll app? It's not displayed on the admin index page.
 
 Just one thing to do: we need to tell the admin that ``Question``
 objects have an admin interface. To do this, open the :file:`polls/admin.py`
-file, and edit it to look like this:
+file, edit it to look like this and refresh your browser window:
 
 .. snippet::
     :filename: polls/admin.py
@@ -187,8 +187,9 @@ Django was able to construct a default form representation. Often, you'll want
 to customize how the admin form looks and works. You'll do this by telling
 Django the options you want when you register the object.
 
-Let's see how this works by re-ordering the fields on the edit form. Replace
-the ``admin.site.register(Question)`` line with:
+Let's see how this works by re-ordering the fields on the edit form. To do this,
+first add a new class to admin.py called QuestionAdmin, and then replace the
+``admin.site.register(Question)`` line with:
 
 .. snippet::
     :filename: polls/admin.py
@@ -207,7 +208,7 @@ You'll follow this pattern -- create a model admin object, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
 admin options for an object.
 
-This particular change above makes the "Publication date" come before the
+These particular changes make the "Publication date" come before the
 "Question" field:
 
 .. image:: _images/admin07.png
@@ -217,7 +218,7 @@ This isn't impressive with only two fields, but for admin forms with dozens
 of fields, choosing an intuitive order is an important usability detail.
 
 And speaking of forms with dozens of fields, you might want to split the form
-up into fieldsets:
+up into fieldsets as shown below:
 
 .. snippet::
     :filename: polls/admin.py
@@ -308,7 +309,8 @@ But, really, this is an inefficient way of adding ``Choice`` objects to the syst
 It'd be better if you could add a bunch of Choices directly when you create the
 ``Question`` object. Let's make that happen.
 
-Remove the ``register()`` call for the ``Choice`` model. Then, edit the ``Question``
+First remove the ``register()`` call for the ``Choice`` model. Next, add a new
+class to display the choices, named ChoiceInline. Finally, edit the ``Question``
 registration code to read:
 
 .. snippet::
@@ -436,9 +438,9 @@ attributes, as follows:
 For more information on these method properties, see
 :attr:`~django.contrib.admin.ModelAdmin.list_display`.
 
-Edit your :file:`polls/admin.py` file again and add an improvement to the
-``Question`` change list page: filters using the
-:attr:`~django.contrib.admin.ModelAdmin.list_filter`. Add the following line to
+Edit your :file:`polls/admin.py` file again to add the
+:attr:`~django.contrib.admin.ModelAdmin.list_filter` feature to the 
+``Question`` change list page. Do this by adding the following line to
 ``QuestionAdmin``::
 
     list_filter = ['pub_date']
