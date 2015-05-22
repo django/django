@@ -435,6 +435,18 @@ class FileFieldStorageTests(TestCase):
     def tearDown(self):
         shutil.rmtree(temp_storage_location)
 
+    def _storage_max_filename_length(self, storage):
+        """
+        Query filesystem for maximum filename length (e.g. AUFS has 242).
+        """
+        dir_to_test = storage.location
+        while not os.path.exists(dir_to_test):
+            dir_to_test = os.path.dirname(dir_to_test)
+        try:
+            return os.pathconf(dir_to_test, 'PC_NAME_MAX')
+        except Exception:
+            return 255  # Should be safe on most backends
+
     def test_files(self):
         # Attempting to access a FileField from the class raises a descriptive
         # error
@@ -536,7 +548,7 @@ class FileFieldStorageTests(TestCase):
     def test_extended_length_storage(self):
         # Testing FileField with max_length > 255. Most systems have filename
         # length limitation of 255. Path takes extra chars.
-        filename = 251 * 'a'  # 4 chars for extension.
+        filename = (self._storage_max_filename_length(temp_storage) - 4) * 'a'  # 4 chars for extension.
         obj = Storage()
         obj.extended_length.save('%s.txt' % filename, ContentFile('Same Content'))
         self.assertEqual(obj.extended_length.name, 'tests/%s.txt' % filename)
