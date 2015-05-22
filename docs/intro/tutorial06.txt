@@ -31,9 +31,9 @@ the ``admin.site.register(Question)`` line with:
 
     admin.site.register(Question, QuestionAdmin)
 
-You'll follow this pattern -- create a model admin object, then pass it as the
+You'll follow this pattern -- create a model admin class, then pass it as the
 second argument to ``admin.site.register()`` -- any time you need to change the
-admin options for an object.
+admin options for an model.
 
 This particular change above makes the "Publication date" come before the
 "Question" field:
@@ -127,8 +127,8 @@ exists at this point.
 
 Also note the "Add Another" link next to "Question." Every object with a
 ``ForeignKey`` relationship to another gets this for free. When you click "Add
-Another," you'll get a popup window with the "Add question" form. If you add a question
-in that window and click "Save," Django will save the question to the database and
+Another", you'll get a popup window with the "Add question" form. If you add a question
+in that window and click "Save", Django will save the question to the database and
 dynamically add it as the selected choice on the "Add choice" form you're
 looking at.
 
@@ -226,7 +226,7 @@ object:
         list_display = ('question_text', 'pub_date')
 
 Just for good measure, let's also include the ``was_published_recently`` custom
-method from Tutorial 1:
+method from :doc:`Tutorial 1 </intro/tutorial01>`:
 
 .. snippet::
     :filename: polls/admin.py
@@ -279,8 +279,8 @@ That adds a "Filter" sidebar that lets people filter the change list by the
 
 The type of filter displayed depends on the type of field you're filtering on.
 Because ``pub_date`` is a :class:`~django.db.models.DateTimeField`, Django
-knows to give appropriate filter options: "Any date," "Today," "Past 7 days,"
-"This month," "This year."
+knows to give appropriate filter options: "Any date", "Today", "Past 7 days",
+"This month", "This year".
 
 This is shaping up well. Let's add some search capability::
 
@@ -348,12 +348,12 @@ when loading Django templates; it's a search path.
 
 .. admonition:: Organizing templates
 
-    We *could* have all our templates together, in one big templates directory,
-    and it would work perfectly well. However, templates that  belongs to a
-    particular application, we should put in the application’s template
-    directory (ex: ``polls/templates``) rather than the project’s
-    (``templates``). We'll discuss in more detail in the :doc:`reusable apps
-    tutorial </intro/reusable-apps>` *why* we do this.
+    Just like the static files, we *could* have all our templates together, in
+    one big templates directory, and it would work perfectly well. However,
+    templates that  belongs to a particular application, we should put in the
+    application’s template directory (ex: ``polls/templates``) rather than the
+    project’s (``templates``). We'll discuss in more detail in the
+    :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
 
 Now create a directory called ``admin`` inside ``templates``, and copy the
@@ -389,9 +389,8 @@ make this particular customization.
 This template file contains lots of text like ``{% block branding %}``
 and ``{{ title }}``. The ``{%`` and ``{{`` tags are part of Django's
 template language. When Django renders ``admin/base_site.html``, this
-template language will be evaluated to produce the final HTML page.
-Don't worry if you can't make any sense of the template right now --
-we'll delve into Django's templating language in Tutorial 3.
+template language will be evaluated to produce the final HTML page, just like
+we saw in :doc:`Tutorial 2 </intro/tutorial02>`.
 
 Note that any of Django's default admin templates can be overridden. To
 override a template, just do the same thing you did with ``base_site.html`` --
@@ -431,12 +430,10 @@ most important page of the admin, and it should be easy to use.
 
 The template to customize is ``admin/index.html``. (Do the same as with
 ``admin/base_site.html`` in the previous section -- copy it from the default
-directory to your custom template directory.) Edit the file, and you'll see it
+directory to your custom template directory). Edit the file, and you'll see it
 uses a template variable called ``app_list``. That variable contains every
 installed Django app. Instead of using that, you can hard-code links to
-object-specific admin pages in whatever way you think is best. Again,
-don't worry if you can't understand the template language -- we'll cover that
-in more detail in Tutorial 3.
+object-specific admin pages in whatever way you think is best.
 
 What's next?
 ============
