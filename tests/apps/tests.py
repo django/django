@@ -121,6 +121,9 @@ class AppsTests(SimpleTestCase):
         with self.assertRaises(LookupError):
             apps.get_app_config('webdesign')
 
+        with six.assertRaisesRegex(self, LookupError, "Did you mean 'myauth'?"):
+            apps.get_app_config('django.contrib.auth')
+
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_is_installed(self):
         """
