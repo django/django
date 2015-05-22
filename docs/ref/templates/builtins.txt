@@ -2542,6 +2542,11 @@ django.contrib.webdesign
 A collection of template tags that can be useful while designing a Web site,
 such as a generator of Lorem Ipsum text. See :doc:`/ref/contrib/webdesign`.
 
+.. deprecated:: 1.8
+
+    This package has been deprecated and the contained :ttag:`lorem` has been
+    made a built-in tag.
+
 static
 ^^^^^^
 
