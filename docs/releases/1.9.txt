@@ -214,6 +214,14 @@ Models
   <django.db.models.Model.delete>` to allow deleting only a child's data in a
   model that uses multi-table inheritance.
 
+* :meth:`Model.delete() <django.db.models.Model.delete>`
+  and :meth:`QuerySet.delete() <django.db.models.query.QuerySet.delete>` return the number
+  of objects deleted. For example::
+
+      >>> b = Blog.objects.get(id=1)
+      >>> b.delete()
+      (5, {'weblog.Blog': 1, 'weblog.Entry': 2, 'weblog.Entry_authors': 2})
+
 * Added a system check to prevent defining both ``Meta.ordering`` and
   ``order_with_respect_to`` on the same model.
 
