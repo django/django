@@ -157,9 +157,6 @@ class BaseDatabaseFeatures(object):
     # Support for the DISTINCT ON clause
     can_distinct_on_fields = False
 
-    # Can the backend use an Avg aggregate on DurationField?
-    can_avg_on_durationfield = True
-
     # Does the backend decide to commit before SAVEPOINT statements
     # when autocommit is disabled? http://bugs.python.org/issue8145#msg109965
     autocommits_when_autocommit_is_off = False
