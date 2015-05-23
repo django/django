@@ -78,6 +78,15 @@ class Avg(Aggregate):
         output_field = extra.pop('output_field', FloatField())
         super(Avg, self).__init__(expression, output_field=output_field, **extra)
 
+    def as_oracle(self, compiler, connection):
+        if self.output_field.get_internal_type() == 'DurationField':
+            expression = self.get_source_expressions()[0]
+            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
+            return compiler.compile(
+                SecondsToInterval(Avg(IntervalToSeconds(expression)))
+            )
+        return super(Avg, self).as_sql(compiler, connection)
+
 
 class Count(Aggregate):
     function = 'COUNT'
@@ -136,6 +145,15 @@ class StdDev(Aggregate):
 class Sum(Aggregate):
     function = 'SUM'
     name = 'Sum'
+
+    def as_oracle(self, compiler, connection):
+        if self.output_field.get_internal_type() == 'DurationField':
+            expression = self.get_source_expressions()[0]
+            from django.db.backends.oracle.functions import IntervalToSeconds, SecondsToInterval
+            return compiler.compile(
+                SecondsToInterval(Sum(IntervalToSeconds(expression)))
+            )
+        return super(Sum, self).as_sql(compiler, connection)
 
 
 class Variance(Aggregate):

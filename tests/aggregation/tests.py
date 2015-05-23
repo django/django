@@ -10,7 +10,7 @@ from django.db.models import (
     F, Aggregate, Avg, Count, DecimalField, DurationField, FloatField, Func,
     IntegerField, Max, Min, Sum, Value,
 )
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -441,11 +441,16 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.annotate(num_authors=Count("authors__id")).aggregate(Avg("num_authors"))
         self.assertEqual(vals, {"num_authors__avg": Approximate(1.66, places=1)})
 
-    @skipUnlessDBFeature('can_avg_on_durationfield')
     def test_avg_duration_field(self):
         self.assertEqual(
             Publisher.objects.aggregate(Avg('duration', output_field=DurationField())),
-            {'duration__avg': datetime.timedelta(1, 43200)}  # 1.5 days
+            {'duration__avg': datetime.timedelta(days=1, hours=12)}
+        )
+
+    def test_sum_duration_field(self):
+        self.assertEqual(
+            Publisher.objects.aggregate(Sum('duration', output_field=DurationField())),
+            {'duration__sum': datetime.timedelta(days=3)}
         )
 
     def test_sum_distinct_aggregate(self):
@@ -984,47 +989,50 @@ class AggregateTestCase(TestCase):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
 
     def test_add_implementation(self):
-        try:
-            # test completely changing how the output is rendered
-            def lower_case_function_override(self, compiler, connection):
-                sql, params = compiler.compile(self.source_expressions[0])
-                substitutions = dict(function=self.function.lower(), expressions=sql)
-                substitutions.update(self.extra)
-                return self.template % substitutions, params
-            setattr(Sum, 'as_' + connection.vendor, lower_case_function_override)
+        class MySum(Sum):
+            pass
 
-            qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                       output_field=IntegerField()))
-            self.assertEqual(str(qs.query).count('sum('), 1)
-            b1 = qs.get(pk=self.b4.pk)
-            self.assertEqual(b1.sums, 383)
+        # test completely changing how the output is rendered
+        def lower_case_function_override(self, compiler, connection):
+            sql, params = compiler.compile(self.source_expressions[0])
+            substitutions = dict(function=self.function.lower(), expressions=sql)
+            substitutions.update(self.extra)
+            return self.template % substitutions, params
+        setattr(MySum, 'as_' + connection.vendor, lower_case_function_override)
 
-            # test changing the dict and delegating
-            def lower_case_function_super(self, compiler, connection):
-                self.extra['function'] = self.function.lower()
-                return super(Sum, self).as_sql(compiler, connection)
-            setattr(Sum, 'as_' + connection.vendor, lower_case_function_super)
+        qs = Book.objects.annotate(
+            sums=MySum(F('rating') + F('pages') + F('price'), output_field=IntegerField())
+        )
+        self.assertEqual(str(qs.query).count('sum('), 1)
+        b1 = qs.get(pk=self.b4.pk)
+        self.assertEqual(b1.sums, 383)
 
-            qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                       output_field=IntegerField()))
-            self.assertEqual(str(qs.query).count('sum('), 1)
-            b1 = qs.get(pk=self.b4.pk)
-            self.assertEqual(b1.sums, 383)
+        # test changing the dict and delegating
+        def lower_case_function_super(self, compiler, connection):
+            self.extra['function'] = self.function.lower()
+            return super(MySum, self).as_sql(compiler, connection)
+        setattr(MySum, 'as_' + connection.vendor, lower_case_function_super)
 
-            # test overriding all parts of the template
-            def be_evil(self, compiler, connection):
-                substitutions = dict(function='MAX', expressions='2')
-                substitutions.update(self.extra)
-                return self.template % substitutions, ()
-            setattr(Sum, 'as_' + connection.vendor, be_evil)
+        qs = Book.objects.annotate(
+            sums=MySum(F('rating') + F('pages') + F('price'), output_field=IntegerField())
+        )
+        self.assertEqual(str(qs.query).count('sum('), 1)
+        b1 = qs.get(pk=self.b4.pk)
+        self.assertEqual(b1.sums, 383)
 
-            qs = Book.objects.annotate(sums=Sum(F('rating') + F('pages') + F('price'),
-                                       output_field=IntegerField()))
-            self.assertEqual(str(qs.query).count('MAX('), 1)
-            b1 = qs.get(pk=self.b4.pk)
-            self.assertEqual(b1.sums, 2)
-        finally:
-            delattr(Sum, 'as_' + connection.vendor)
+        # test overriding all parts of the template
+        def be_evil(self, compiler, connection):
+            substitutions = dict(function='MAX', expressions='2')
+            substitutions.update(self.extra)
+            return self.template % substitutions, ()
+        setattr(MySum, 'as_' + connection.vendor, be_evil)
+
+        qs = Book.objects.annotate(
+            sums=MySum(F('rating') + F('pages') + F('price'), output_field=IntegerField())
+        )
+        self.assertEqual(str(qs.query).count('MAX('), 1)
+        b1 = qs.get(pk=self.b4.pk)
+        self.assertEqual(b1.sums, 2)
 
     def test_complex_values_aggregation(self):
         max_rating = Book.objects.values('rating').aggregate(
