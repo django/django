@@ -331,7 +331,7 @@ Consider the following structure::
 
 The ``models.py`` file in the test module contains your test-only model definitions. It is important to leave the original ``models.py`` file in the app module even if it is empty.
 
-Create a migration for your test-models in the migrations module. You will need to adapt the migration to only execute during unit tests. You can do this by checking if the database name::
+Create a migration for your test-models in the migrations module. You will need to adapt the migration to only execute during unit tests. You can do this by checking the database name::
 
     from django.db import migrations
     from django.conf import settings
