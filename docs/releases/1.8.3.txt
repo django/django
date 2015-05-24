@@ -9,4 +9,5 @@ Django 1.8.3 fixes several bugs in 1.8.2.
 Bugfixes
 ========
 
-* ...
+* Fixed crash during :djadmin:`makemigrations` if a migrations module
+  either was missing ``__init__.py`` or was a file (:ticket:`24848`).
