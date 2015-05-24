@@ -4,6 +4,7 @@ from django.contrib.postgres import forms
 from django.contrib.postgres.fields import HStoreField
 from django.contrib.postgres.validators import KeysValidator
 from django.core import exceptions, serializers
+from django.forms import Form
 from django.test import TestCase
 
 from .models import HStoreModel
@@ -173,6 +174,12 @@ class TestFormField(TestCase):
         model_field = HStoreField()
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, forms.HStoreField)
+
+    def test_empty_field_has_not_changed(self):
+        class HStoreFormTest(Form):
+            f1 = HStoreField()
+        form_w_hstore = HStoreFormTest()
+        self.assertFalse(form_w_hstore.has_changed())
 
 
 class TestValidator(TestCase):
