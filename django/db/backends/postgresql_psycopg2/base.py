@@ -199,7 +199,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         if conn_timezone_name != self.timezone_name:
             cursor = self.connection.cursor()
             try:
-                print "UPS"
                 cursor.execute(self.ops.set_time_zone_sql(), [self.timezone_name])
             finally:
                 cursor.close()
