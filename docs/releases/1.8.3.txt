@@ -14,3 +14,6 @@ Bugfixes
 
 * Fixed crash during :djadmin:`makemigrations` if a migrations module either
   is missing ``__init__.py`` or is a file (:ticket:`24848`).
+
+* Fixed ``exists()`` returning incorrect results after annotation with
+  ``Count()`` (:ticket:`24835`).
