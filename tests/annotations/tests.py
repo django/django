@@ -325,6 +325,10 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda a: (a['age'], a['age_count'])
         )
 
+    def test_annotate_exists(self):
+        authors = Author.objects.annotate(c=Count('id')).filter(c__gt=1)
+        self.assertFalse(authors.exists())
+
     def test_column_field_ordering(self):
         """
         Test that columns are aligned in the correct order for
