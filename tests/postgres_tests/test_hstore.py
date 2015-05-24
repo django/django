@@ -178,6 +178,12 @@ class TestFormField(PostgresSQLTestCase):
         form_field = model_field.formfield()
         self.assertIsInstance(form_field, forms.HStoreField)
 
+    def test_empty_field_has_not_changed(self):
+        class HStoreFormTest(forms.Form):
+            f1 = HStoreField()
+        form_w_hstore = HStoreFormTest()
+        self.assertFalse(form_w_hstore.has_changed())
+
 
 class TestValidator(PostgresSQLTestCase):
 
