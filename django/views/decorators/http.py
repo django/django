@@ -47,13 +47,13 @@ def require_http_methods(request_method_list):
     return decorator
 
 require_GET = require_http_methods(["GET"])
-require_GET.__doc__ = "Decorator to require that a view only accept the GET method."
+require_GET.__doc__ = "Decorator to require that a view only accepts the GET method."
 
 require_POST = require_http_methods(["POST"])
-require_POST.__doc__ = "Decorator to require that a view only accept the POST method."
+require_POST.__doc__ = "Decorator to require that a view only accepts the POST method."
 
 require_safe = require_http_methods(["GET", "HEAD"])
-require_safe.__doc__ = "Decorator to require that a view only accept safe methods: GET and HEAD."
+require_safe.__doc__ = "Decorator to require that a view only accepts safe methods: GET and HEAD."
 
 
 def _precondition_failed(request):
