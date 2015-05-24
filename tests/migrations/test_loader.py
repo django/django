@@ -164,12 +164,20 @@ class LoaderTests(TestCase):
 
     def test_load_module_file(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.file"}):
-            MigrationLoader(connection)
+            loader = MigrationLoader(connection)
+            self.assertIn(
+                "migrations", loader.unmigrated_apps,
+                "App with migrations module file not in unmigrated apps."
+            )
 
     @skipIf(six.PY2, "PY2 doesn't load empty dirs.")
     def test_load_empty_dir(self):
         with override_settings(MIGRATION_MODULES={"migrations": "migrations.faulty_migrations.namespace"}):
-            MigrationLoader(connection)
+            loader = MigrationLoader(connection)
+            self.assertIn(
+                "migrations", loader.unmigrated_apps,
+                "App missing __init__.py in migrations module not in unmigrated apps."
+            )
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
