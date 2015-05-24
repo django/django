@@ -77,9 +77,11 @@ class MigrationLoader(object):
             else:
                 # PY3 will happily import empty dirs as namespaces.
                 if not hasattr(module, '__file__'):
+                    self.unmigrated_apps.add(app_config.label)
                     continue
                 # Module is not a package (e.g. migrations.py).
                 if not hasattr(module, '__path__'):
+                    self.unmigrated_apps.add(app_config.label)
                     continue
                 # Force a reload if it's already loaded (tests need this)
                 if was_loaded:
