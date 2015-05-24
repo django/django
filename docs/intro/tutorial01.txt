@@ -121,7 +121,7 @@ These files are:
 The development server
 ======================
 
-Let's explore the development server. Change into the outer :file:`mysite` directory, if
+Let's verify your Django project works. Change into the outer :file:`mysite` directory, if
 you haven't already, and run the following commands:
 
 .. code-block:: console
@@ -156,6 +156,10 @@ Apache -- until you're ready for production.
 Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
 the business of making Web frameworks, not Web servers.)
+
+Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+browser. You'll see a "Welcome to Django" page, in pleasant, light-blue pastel.
+It worked!
 
 .. admonition:: Changing the port
 
