@@ -17,7 +17,9 @@ from django.db.models.fields.related import (
 from django.db.transaction import atomic
 from django.test import TransactionTestCase, skipIfDBFeature
 
-from .fields import CustomManyToManyField, InheritedManyToManyField
+from .fields import (
+    CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
+)
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
     BookWithLongName, BookWithO2O, BookWithSlug, Note, NoteRename, Tag,
@@ -382,6 +384,23 @@ class SchemaTests(TransactionTestCase):
         # MySQL annoyingly uses the same backend, so it'll come back as one of
         # these two types.
         self.assertIn(columns['bits'][0], ("BinaryField", "TextField"))
+
+    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL specific")
+    def test_add_binaryfield_mediumblob(self):
+        """
+        Test adding a custom-sized binary field on MySQL (#24846).
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add the new field with default
+        new_field = MediumBlobField(blank=True, default=b'123')
+        new_field.set_attributes_from_name('bits')
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, new_field)
+        columns = self.column_classes(Author)
+        # Introspection treats BLOBs as TextFields
+        self.assertEqual(columns['bits'][0], "TextField")
 
     def test_alter(self):
         """

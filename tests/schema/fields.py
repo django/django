@@ -1,3 +1,4 @@
+from django.db import models
 from django.db.models.fields.related import (
     RECURSIVE_RELATIONSHIP_CONSTANT, ManyRelatedObjectsDescriptor,
     ManyToManyField, ManyToManyRel, RelatedField,
@@ -56,3 +57,11 @@ class CustomManyToManyField(RelatedField):
 
 class InheritedManyToManyField(ManyToManyField):
     pass
+
+
+class MediumBlobField(models.BinaryField):
+    """
+    A MySQL BinaryField that uses a different blob size.
+    """
+    def db_type(self, connection):
+        return 'MEDIUMBLOB'
