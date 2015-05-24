@@ -1,6 +1,7 @@
 import json
 
 from django.core import exceptions, serializers
+from django.forms import Form
 
 from . import PostgresSQLTestCase
 from .models import HStoreModel
@@ -179,7 +180,7 @@ class TestFormField(PostgresSQLTestCase):
         self.assertIsInstance(form_field, forms.HStoreField)
 
     def test_empty_field_has_not_changed(self):
-        class HStoreFormTest(forms.Form):
+        class HStoreFormTest(Form):
             f1 = HStoreField()
         form_w_hstore = HStoreFormTest()
         self.assertFalse(form_w_hstore.has_changed())
