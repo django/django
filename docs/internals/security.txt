@@ -112,8 +112,8 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-4. Post a notice to the |django-announce| mailing list that links to the blog
-   post.
+4. Post a notice to the |django-announce| and oss-security@lists.openwall.com
+   mailing lists that links to the blog post.
 
 .. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
