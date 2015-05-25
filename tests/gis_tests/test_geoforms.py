@@ -204,7 +204,7 @@ class SpecializedFieldTest(SimpleTestCase):
 
         self.assertIn('<textarea ', rendered)
         self.assertIn('required', rendered)
-        self.assertIn(geom.wkt, rendered)
+        self.assertIn(escape(geom.json), rendered)
 
     # map_srid in operlayers.html template must not be localized.
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
@@ -318,7 +318,7 @@ class OSMWidgetTest(SimpleTestCase):
         form = PointForm(data={'p': geom})
         rendered = form.as_p()
 
-        self.assertIn("OpenStreetMap (Mapnik)", rendered)
+        self.assertIn("ol.source.OSM()", rendered)
         self.assertIn("id: 'id_p',", rendered)
 
     def test_default_lat_lon(self):

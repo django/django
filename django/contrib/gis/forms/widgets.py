@@ -80,13 +80,22 @@ class OpenLayersWidget(BaseGeometryWidget):
     template_name = 'gis/openlayers.html'
 
     class Media:
+        css = {
+            'all': (
+                'https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.css',
+                'gis/css/ol3.css',
+            )
+        }
         js = (
-            'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/ol3/3.20.1/ol.js',
             'gis/js/OLMapWidget.js',
         )
 
+    def serialize(self, value):
+        return value.json if value else ''
 
-class OSMWidget(BaseGeometryWidget):
+
+class OSMWidget(OpenLayersWidget):
     """
     An OpenLayers/OpenStreetMap-based widget.
     """
@@ -94,12 +103,6 @@ class OSMWidget(BaseGeometryWidget):
     default_lon = 5
     default_lat = 47
     map_srid = 3857
-
-    class Media:
-        js = (
-            'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js',
-            'gis/js/OLMapWidget.js',
-        )
 
     def __init__(self, attrs=None):
         super(OSMWidget, self).__init__()

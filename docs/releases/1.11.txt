@@ -165,7 +165,8 @@ Minor features
 
 * The OpenLayers-based form widgets now use ``OpenLayers.js`` from
   ``https://cdnjs.cloudflare.com`` which is more suitable for production use
-  than the the old ``http://openlayers.org`` source.
+  than the the old ``http://openlayers.org`` source. They are also updated to
+  use OpenLayers 3.
 
 * PostGIS migrations can now change field dimensions.
 
@@ -468,6 +469,11 @@ Backwards incompatible changes in 1.11
   us know <https://code.djangoproject.com/ticket/14284>`_.
 
 * The ``GEOSGeometry`` equality operator now also compares SRID.
+
+* The OpenLayers-based form widgets now use OpenLayers 3, and the
+  ``gis/openlayers.html`` and ``gis/openlayers-osm.html`` templates have been
+  updated. Check your project if you subclass these widgets or extend the
+  templates.
 
 Database backend API
 --------------------

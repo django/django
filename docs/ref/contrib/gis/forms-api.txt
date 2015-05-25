@@ -164,18 +164,25 @@ Widget classes
         isn't suitable for production use since it offers no guaranteed uptime
         and runs on a slow server.
 
-    .. _tailored to your needs: http://docs.openlayers.org/library/deploying.html
+        Also, the widget nows uses OpenLayers 3 instead of OpenLayers 2.
+
+    .. _tailored to your needs: http://openlayers.org/en/latest/doc/tutorials/custom-builds.html
 
 ``OSMWidget``
 
 .. class:: OSMWidget
 
-    This widget uses an OpenStreetMap base layer (Mapnik) to display geographic
-    objects on.
-    ``template_name`` is ``gis/openlayers-osm.html``.
+    This widget uses an OpenStreetMap base layer to display geographic objects
+    on. ``template_name`` is ``gis/openlayers-osm.html``.
 
     The :class:`OpenLayersWidget` note about JavaScript file hosting above also
     applies here. See also this `FAQ answer`_ about ``https`` access to map
     tiles.
+
+    .. versionchanged:: 1.11
+
+        OpenLayers 2.x has been dropped in favor of OpenLayers 3. If you extend
+        the ``gis/openlayers-osm.html`` template, please review your custom
+        template.
 
     .. _FAQ answer: https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site
