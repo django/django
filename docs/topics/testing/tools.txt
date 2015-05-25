@@ -425,15 +425,13 @@ Specifically, a ``Response`` object has the following attributes:
             >>> response.context['name']
             'Arthur'
 
-    .. method:: json()
+    .. method:: json(**kwargs)
 
         .. versionadded:: 1.9
 
         The body of the response, parsed as JSON. Extra keyword arguments are
-        passed to ``json.loads``, see the `Python documentation
-        <https://docs.python.org/3/library/json.html#json.loads>`_ for more
-        information. If the Content-Type is not `"application/json"`
-        then a ValueError will be raised on trying to parse the response.
+        passed to :func:`json.loads`. If the `Content-Type` is not ``"application/json"``
+        then a `ValueError` will be raised when trying to parse the response.
 
         >>> response = client.get('/foo/')
         >>> response.json()['name']

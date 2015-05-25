@@ -1269,14 +1269,13 @@ class RequestMethodStringDataTests(TestCase):
         self.assertEqual(response.content, b'')
 
     def test_json(self):
-        # Regression test for #24773
         response = self.client.get('/json_response/')
         self.assertEqual(response.json(), {'ford': 'prefect'})
 
     def test_json_wrong_header(self):
-        # Regression test for #24773
         response = self.client.get('/body/')
-        with self.assertRaises(ValueError):
+        with self.assertRaisesMessage(ValueError,
+                                      'Content-Type header is "text/html; charset=utf-8", not "application/json"'):
             self.assertEqual(response.json(), {'ford': 'prefect'})
 
 

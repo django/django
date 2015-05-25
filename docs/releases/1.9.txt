@@ -267,7 +267,8 @@ Requests and Responses
 Tests
 ^^^^^
 
-* ...
+* Added :meth:`json(**kwargs) <django.test.Response.json>` to test client
+  responses to give access to the response body as JSON.
 
 URLs
 ^^^^
