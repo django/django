@@ -533,7 +533,7 @@ class DirectoryCreationTests(SimpleTestCase):
         os.chmod(MEDIA_ROOT, 0o500)
         self.addCleanup(os.chmod, MEDIA_ROOT, 0o700)
         try:
-            self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'))
+            self.obj.testfile.save('foo.txt', SimpleUploadedFile('foo.txt', b'x'), save=False)
         except OSError as err:
             self.assertEqual(err.errno, errno.EACCES)
         except Exception:
@@ -546,7 +546,7 @@ class DirectoryCreationTests(SimpleTestCase):
         self.addCleanup(os.remove, UPLOAD_TO)
         with self.assertRaises(IOError) as exc_info:
             with SimpleUploadedFile('foo.txt', b'x') as file:
-                self.obj.testfile.save('foo.txt', file)
+                self.obj.testfile.save('foo.txt', file, save=False)
         # The test needs to be done on a specific string as IOError
         # is raised even without the patch (just not early enough)
         self.assertEqual(exc_info.exception.args[0],
