@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.http.request import split_domain_port
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -13,7 +14,9 @@ class RequestSite(object):
     The save() and delete() methods raise NotImplementedError.
     """
     def __init__(self, request):
-        self.domain = self.name = request.get_host()
+        host = request.get_host()
+        domain, port = split_domain_port(host)
+        self.domain = self.name = domain
 
     def __str__(self):
         return self.domain
