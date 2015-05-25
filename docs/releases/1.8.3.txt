@@ -9,4 +9,6 @@ Django 1.8.3 fixes several bugs in 1.8.2.
 Bugfixes
 ========
 
+* Fixed ``BaseRangeField.prepare_value`` to use ``base_field``'s prepare value method. (:ticket `24841`).
+
 * ...
