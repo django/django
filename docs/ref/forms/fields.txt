@@ -293,7 +293,7 @@ See the :doc:`validators documentation </ref/validators>` for more information.
 
 .. attribute:: Field.localize
 
-The ``localize`` argument enables the localization of form data, input as well
+The ``localize`` argument enables the localization of form data input, as well
 as the rendered output.
 
 See the :ref:`format localization <format-localization>` documentation for
@@ -653,7 +653,7 @@ For each field, we describe the default widget used if you don't specify
       ``False``, else :class:`TextInput`.
     * Empty value: ``None``
     * Normalizes to: A Python float.
-    * Validates that the given value is an float. Leading and trailing
+    * Validates that the given value is a float. Leading and trailing
       whitespace is allowed, as in Python's ``float()`` function.
     * Error message keys: ``required``, ``invalid``, ``max_value``,
       ``min_value``
@@ -915,7 +915,7 @@ Slightly complex built-in ``Field`` classes
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: A Unicode object.
-    * Validates that the given value against each of the fields specified
+    * Validates the given value against each of the fields specified
       as an argument to the ``ComboField``.
     * Error message keys: ``required``, ``invalid``
 
@@ -943,7 +943,7 @@ Slightly complex built-in ``Field`` classes
     * Default widget: :class:`TextInput`
     * Empty value: ``''`` (an empty string)
     * Normalizes to: the type returned by the ``compress`` method of the subclass.
-    * Validates that the given value against each of the fields specified
+    * Validates the given value against each of the fields specified
       as an argument to the ``MultiValueField``.
     * Error message keys: ``required``, ``invalid``, ``incomplete``
 
