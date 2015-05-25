@@ -6,10 +6,10 @@ Form and field validation
 =========================
 
 Form validation happens when the data is cleaned. If you want to customize
-this process, there are various places you can change, each one serving a
+this process, there are various places to make changes, each one serving a
 different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
-method on a form. There are other things that can trigger cleaning and
+method on a form. There are other things that can also trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
@@ -29,7 +29,7 @@ Validation of a Form is split into several steps, which can be customized or
 overridden:
 
 * The ``to_python()`` method on a Field is the first step in every
-  validation. It coerces the value to correct datatype and raises
+  validation. It coerces the value to a correct datatype and raises
   ``ValidationError`` if that is not possible. This method accepts the raw
   value from the widget and returns the converted value. For example, a
   FloatField will turn the data into a Python ``float`` or raise a
@@ -37,7 +37,7 @@ overridden:
 
 * The ``validate()`` method on a Field handles field-specific validation
   that is not suitable for a validator. It takes a value that has been
-  coerced to correct datatype and raises ``ValidationError`` on any error.
+  coerced to a correct datatype and raises ``ValidationError`` on any error.
   This method does not return anything and shouldn't alter the value. You
   should override it to handle validation logic that you can't or don't
   want to put in a validator.
@@ -46,14 +46,14 @@ overridden:
   validators and aggregates all the errors into a single
   ``ValidationError``. You shouldn't need to override this method.
 
-* The ``clean()`` method on a Field subclass. This is responsible for
+* The ``clean()`` method on a Field subclass is responsible for
   running ``to_python``, ``validate`` and ``run_validators`` in the correct
   order and propagating their errors. If, at any time, any of the methods
   raise ``ValidationError``, the validation stops and that error is raised.
   This method returns the clean data, which is then inserted into the
   ``cleaned_data`` dictionary of the form.
 
-* The ``clean_<fieldname>()`` method in a form subclass -- where
+* The ``clean_<fieldname>()`` method is called on a form subclass -- where
   ``<fieldname>`` is replaced with the name of the form field attribute.
   This method does any cleaning that is specific to that particular
   attribute, unrelated to the type of field that it is. This method is not
@@ -73,16 +73,15 @@ overridden:
   This method should return the cleaned value obtained from cleaned_data,
   regardless of whether it changed anything or not.
 
-* The Form subclass's ``clean()`` method. This method can perform
-  any validation that requires access to multiple fields from the form at
-  once. This is where you might put in things to check that if field ``A``
-  is supplied, field ``B`` must contain a valid email address and the
-  like. This method can return a completely different dictionary if it wishes,
-  which will be used as the ``cleaned_data``.
+* The Form subclass's ``clean()`` method can perform validation that requires
+  simultaneous access to multiple form fields. This is where you might put
+  in things to check that if field ``A``is supplied, field ``B`` must contain
+  a valid email address and the like. This method can return a completely
+  different dictionary if it wishes, which will be used as the ``cleaned_data``.
 
   Since the field validation methods have been run by the time ``clean()`` is
   called, you also have access to the form's ``errors`` attribute which
-  contains all the errors raised by cleaning of individual fields.
+  contains all the errors raised by cleaning the individual fields.
 
   Note that any errors raised by your :meth:`Form.clean()` override will not
   be associated with any field in particular. They go into a special
