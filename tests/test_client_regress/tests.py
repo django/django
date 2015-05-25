@@ -1270,6 +1270,16 @@ class RequestMethodStringDataTests(SimpleTestCase):
         response = self.client.head('/body/', data='', content_type='application/json')
         self.assertEqual(response.content, b'')
 
+    def test_json(self):
+        response = self.client.get('/json_response/')
+        self.assertEqual(response.json(), {'ford': 'prefect'})
+
+    def test_json_wrong_header(self):
+        response = self.client.get('/body/')
+        with self.assertRaisesMessage(ValueError,
+                                      'Content-Type header is "text/html; charset=utf-8", not "application/json"'):
+            self.assertEqual(response.json(), {'ford': 'prefect'})
+
 
 @override_settings(ROOT_URLCONF='test_client_regress.urls',)
 class QueryStringTests(SimpleTestCase):
