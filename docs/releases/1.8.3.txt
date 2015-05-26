@@ -19,3 +19,6 @@ Bugfixes
   ``Count()`` (:ticket:`24835`).
 
 * Corrected ``HStoreField.has_changed()`` (:ticket:`24844`).
+
+* Prevented the loss of ``null``/``not null`` column properties during field
+  rename of MySQL databases (:ticket:`24817`).
