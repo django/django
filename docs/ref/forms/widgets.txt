@@ -7,7 +7,7 @@ Widgets
 
 .. currentmodule:: django.forms
 
-A widget is Django's representation of a HTML input element. The widget
+A widget is Django's representation of an HTML input element. The widget
 handles the rendering of the HTML, and the extraction of data from a GET/POST
 dictionary that corresponds to the widget.
 
@@ -428,7 +428,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     Beware that not all browsers support entering localized numbers in
     ``number`` input types. Django itself avoids using them for fields having
-    their :attr:`~django.forms.Field.localize` property to ``True``.
+    their :attr:`~django.forms.Field.localize` property set to ``True``.
 
 ``EmailInput``
 ~~~~~~~~~~~~~~
