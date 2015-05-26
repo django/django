@@ -243,7 +243,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
         from django.db import connection 
         import sys
 
-        cu = connection.cursor()
+        cu = connection.cursor.wrapped()
 
         try:
             cu.execute('INSERT INTAO "pippo" VALUES (1,2)')
@@ -255,7 +255,7 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
 
             #--- Saved exc_info to be used in the debug view
             pass
-
+        
         #-- call the debug view with the DB exception
         rf = RequestFactory()
         response = technical_500_response(rf.get('/'), *exc_info_rv)
