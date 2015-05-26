@@ -2,7 +2,7 @@
 
 from django.http import HttpRequest
 from django.template import (
-    Context, Engine, RequestContext, Variable, VariableDoesNotExist,
+    Context, Engine, RequestContext, Template, Variable, VariableDoesNotExist,
 )
 from django.template.context import RenderContext
 from django.test import RequestFactory, SimpleTestCase
@@ -153,8 +153,8 @@ class RequestContextTests(SimpleTestCase):
         request = RequestFactory().get('/')
         ctx = RequestContext(request, {})
         # The stack should now contain 3 items:
-        # [builtins, supplied context, context processor]
-        self.assertEqual(len(ctx.dicts), 3)
+        # [builtins, supplied context, context processor, empty dict]
+        self.assertEqual(len(ctx.dicts), 4)
 
     def test_context_comparable(self):
         # Create an engine without any context processors.
@@ -168,3 +168,10 @@ class RequestContextTests(SimpleTestCase):
             RequestContext(request, dict_=test_data),
             RequestContext(request, dict_=test_data),
         )
+
+    def test_modify_context_and_render(self):
+        template = Template('{{ foo }}')
+        request = RequestFactory().get('/')
+        context = RequestContext(request, {})
+        context['foo'] = 'foo'
+        self.assertEqual(template.render(context), 'foo')
