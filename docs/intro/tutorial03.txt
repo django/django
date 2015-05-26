@@ -346,7 +346,7 @@ passes to the :meth:`~django.db.models.query.QuerySet.get` function of the
 model's manager. It raises :exc:`~django.http.Http404` if the object doesn't
 exist.
 
-.. admonition:: Overview
+.. admonition:: Philosophy
 
     Why do we use a helper function :func:`~django.shortcuts.get_object_or_404`
     instead of automatically catching the

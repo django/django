@@ -4,7 +4,8 @@ Writing your first Django app, part 7
 
 This tutorial begins where :doc:`Tutorial 6 </intro/tutorial06>` left off. We're
 continuing the Web-poll application and will focus on customizing the Django's
-automatically-generated admin site.
+automatically-generated admin site that we first explored in :doc:`Tutorial 2
+</intro/tutorial02>`.
 
 Customize the admin form
 ========================
@@ -72,8 +73,8 @@ Here's what our form looks like now:
 Adding related objects
 ======================
 
-OK, we have our Question admin page. But a ``Question`` has multiple ``Choices``, and
-the admin page doesn't display choices.
+OK, we have our Question admin page, but a ``Question`` has multiple
+``Choice``\s, and the admin page doesn't display choices.
 
 Yet.
 
@@ -200,7 +201,7 @@ object:
         # ...
         list_display = ('question_text', 'pub_date')
 
-Just for good measure, let's also include the ``was_published_recently`` custom
+Just for good measure, let's also include the ``was_published_recently()``
 method from :doc:`Tutorial 2 </intro/tutorial02>`:
 
 .. snippet::
@@ -330,7 +331,6 @@ when loading Django templates; it's a search path.
     project’s (``templates``). We'll discuss in more detail in the
     :doc:`reusable apps tutorial </intro/reusable-apps>` *why* we do this.
 
-
 Now create a directory called ``admin`` inside ``templates``, and copy the
 template ``admin/base_site.html`` from within the default Django admin
 template directory in the source code of Django itself
@@ -413,9 +413,8 @@ object-specific admin pages in whatever way you think is best.
 What's next?
 ============
 
-The beginner tutorial ends here for the time being. In the meantime, you might
-want to check out some pointers on :doc:`where to go from here
-</intro/whatsnext>`.
+The beginner tutorial ends here. In the meantime, you might want to check out
+some pointers on :doc:`where to go from here </intro/whatsnext>`.
 
 If you are familiar with Python packaging and interested in learning how to
 turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to

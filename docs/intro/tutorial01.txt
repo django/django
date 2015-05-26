@@ -10,7 +10,7 @@ poll application.
 It'll consist of two parts:
 
 * A public site that lets people view polls and vote in them.
-* An admin site that lets you add, change and delete polls.
+* An admin site that lets you add, change, and delete polls.
 
 We'll assume you have :doc:`Django installed </intro/install>` already. You can
 tell Django is installed and which version by running the following command:
@@ -145,7 +145,7 @@ You'll see the following output on the command line:
     Quit the server with CONTROL-C.
 
 .. note::
-    Ignore the warning about unapplied database migrations for now, we'll deal
+    Ignore the warning about unapplied database migrations for now; we'll deal
     with the database shortly.
 
 You've started the Django development server, a lightweight Web server written
@@ -367,6 +367,6 @@ Naming your URL lets you refer to it unambiguously from elsewhere in Django
 especially templates. This powerful feature allows you to make  global changes
 to the url patterns of your project while only touching a single file.
 
-When you're comfortable with the basic request and response flow, read 
+When you're comfortable with the basic request and response flow, read
 :doc:`part 2 of this tutorial </intro/tutorial02>` to start working with the
 database.

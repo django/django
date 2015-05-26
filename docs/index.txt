@@ -41,8 +41,8 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1: Request and response overview <intro/tutorial01>` |
-  :doc:`Part 2: Models and admin <intro/tutorial02>` |
+  :doc:`Part 1: Requests and responses <intro/tutorial01>` |
+  :doc:`Part 2: Models and the admin site <intro/tutorial02>` |
   :doc:`Part 3: Views and templates <intro/tutorial03>` |
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
