@@ -1,0 +1,10 @@
+==========================
+Django 1.7.9 release notes
+==========================
+
+*Under development*
+
+Django 1.7.9 fixes several bugs in 1.7.8.
+
+* Prevented the loss of ``null``/``not null`` column properties during field
+  renaming of MySQL databases (:ticket:`24817`).

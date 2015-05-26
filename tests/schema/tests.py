@@ -20,8 +20,8 @@ from django.test import TransactionTestCase, skipIfDBFeature
 from .fields import CustomManyToManyField, InheritedManyToManyField
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
-    BookWithLongName, BookWithO2O, BookWithSlug, Note, Tag, TagIndexed,
-    TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
+    BookWithLongName, BookWithO2O, BookWithSlug, Note, NoteRename, Tag,
+    TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 
@@ -750,6 +750,26 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['display_name'][0], "CharField")
         self.assertNotIn("name", columns)
+
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
+    def test_rename_keep_null_status(self):
+        """
+        Renaming a field shouldn't affect the not null status.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        with self.assertRaises(IntegrityError):
+            Note.objects.create(info=None)
+        old_field = Note._meta.get_field("info")
+        new_field = TextField()
+        new_field.set_attributes_from_name("detail_info")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+        columns = self.column_classes(Note)
+        self.assertEqual(columns['detail_info'][0], "TextField")
+        self.assertNotIn("info", columns)
+        with self.assertRaises(IntegrityError):
+            NoteRename.objects.create(detail_info=None)
 
     def _test_m2m_create(self, M2MFieldClass):
         """
