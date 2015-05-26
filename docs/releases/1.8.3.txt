@@ -25,3 +25,6 @@ Bugfixes
 
 * Fixed a regression which caused template context processors to overwrite
   variables set on a ``RequestContext`` after it's created (:ticket:`24847`).
+
+* Prevented the loss of ``null``/``not null`` column properties during field
+  renaming of MySQL databases (:ticket:`24817`).
