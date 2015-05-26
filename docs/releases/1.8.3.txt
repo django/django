@@ -19,3 +19,6 @@ Bugfixes
   ``Count()`` (:ticket:`24835`).
 
 * Corrected ``HStoreField.has_changed()`` (:ticket:`24844`).
+
+* Fixed template context processors overwriting variables set after
+  ``RequestContext`` creation (:ticket:`24847`).
