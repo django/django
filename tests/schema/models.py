@@ -122,6 +122,14 @@ class BookWithSlug(models.Model):
         db_table = "schema_book"
 
 
+class NoteRename(models.Model):
+    detail_info = models.TextField()
+
+    class Meta:
+        apps = new_apps
+        db_table = "schema_note"
+
+
 class Tag(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)

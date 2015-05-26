@@ -1,17 +1,27 @@
 import datetime
 import unittest
 
-from django.test import TransactionTestCase, skipIfDBFeature
-from django.db import connection, DatabaseError, IntegrityError, OperationalError
-from django.db.models.fields import (BigIntegerField, BinaryField, BooleanField, CharField,
-    IntegerField, PositiveIntegerField, SlugField, TextField)
-from django.db.models.fields.related import ForeignKey, ManyToManyField, OneToOneField
+from django.db import (
+    DatabaseError, IntegrityError, OperationalError, connection,
+)
+from django.db.models.fields import (
+    BigIntegerField, BinaryField, BooleanField, CharField, IntegerField,
+    PositiveIntegerField, SlugField, TextField,
+)
+from django.db.models.fields.related import (
+    ForeignKey, ManyToManyField, OneToOneField,
+)
 from django.db.transaction import atomic
+from django.test import TransactionTestCase, skipIfDBFeature
+
 from .fields import CustomManyToManyField, InheritedManyToManyField
-from .models import (Author, AuthorWithDefaultHeight, AuthorWithM2M, Book, BookWithLongName,
-    BookWithSlug, BookWithM2M, Tag, TagIndexed, TagM2MTest, TagUniqueRename,
-    UniqueTest, Thing, TagThrough, BookWithM2MThrough, AuthorTag, AuthorWithM2MThrough,
-    AuthorWithEvenLongerName, BookWeak, Note, BookWithO2O, BookWithoutFK)
+from .models import (
+    Author, AuthorTag, AuthorWithDefaultHeight, AuthorWithEvenLongerName,
+    AuthorWithM2M, AuthorWithM2MThrough, Book, BookWeak, BookWithLongName,
+    BookWithM2M, BookWithM2MThrough, BookWithO2O, BookWithoutFK, BookWithSlug,
+    Note, NoteRename, Tag, TagIndexed, TagM2MTest, TagThrough, TagUniqueRename,
+    Thing, UniqueTest,
+)
 
 
 class SchemaTests(TransactionTestCase):
@@ -753,6 +763,26 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         self.assertEqual(columns['display_name'][0], "CharField")
         self.assertNotIn("name", columns)
+
+    @skipIfDBFeature('interprets_empty_strings_as_nulls')
+    def test_rename_keep_null_status(self):
+        """
+        Renaming a field shouldn't affect the not null status.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        with self.assertRaises(IntegrityError):
+            Note.objects.create(info=None)
+        old_field = Note._meta.get_field("info")
+        new_field = TextField()
+        new_field.set_attributes_from_name("detail_info")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+        columns = self.column_classes(Note)
+        self.assertEqual(columns['detail_info'][0], "TextField")
+        self.assertNotIn("info", columns)
+        with self.assertRaises(IntegrityError):
+            NoteRename.objects.create(detail_info=None)
 
     def test_m2m_create(self):
         """
