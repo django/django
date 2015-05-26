@@ -22,3 +22,6 @@ Bugfixes
 
 * Reverted an optimization to the CSRF template context processor which caused
   a regression (:ticket:`24836`).
+
+* Fixed a regression which caused template context processors to overwrite
+  variables set on a ``RequestContext`` after it's created (:ticket:`24847`).

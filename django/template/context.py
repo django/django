@@ -219,7 +219,13 @@ class RequestContext(Context):
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
-        self.update({})         # placeholder for context processors output
+
+        # placeholder for context processors output
+        self.update({})
+
+        # empty dict for any new modifications
+        # (so that context processors don't overwrite them)
+        self.update({})
 
     @contextmanager
     def bind_template(self, template):
