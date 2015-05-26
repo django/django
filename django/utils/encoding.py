@@ -77,12 +77,12 @@ def force_text(s, encoding='utf-8', strings_only=False, errors='strict'):
     If strings_only is True, don't convert (some) non-string-like objects.
     """
     # Handle the common case first for performance reasons.
-    if isinstance(s, six.text_type):
+    if issubclass(type(s), six.text_type):
         return s
     if strings_only and is_protected_type(s):
         return s
     try:
-        if not isinstance(s, six.string_types):
+        if not issubclass(type(s), six.string_types):
             if six.PY3:
                 if isinstance(s, bytes):
                     s = six.text_type(s, encoding, errors)

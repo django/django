@@ -9,6 +9,7 @@ from django.utils.encoding import (
     escape_uri_path, filepath_to_uri, force_bytes, force_text, iri_to_uri,
     smart_text, uri_to_iri,
 )
+from django.utils.functional import SimpleLazyObject
 from django.utils.http import urlquote_plus
 
 
@@ -27,6 +28,10 @@ class TestEncodingUtils(unittest.TestCase):
         # python 2 fails when it tries converting from str to unicode (via ASCII).
         exception = TypeError if six.PY3 else UnicodeError
         self.assertRaises(exception, force_text, MyString())
+
+    def test_force_text_lazy(self):
+        s = SimpleLazyObject(lambda: 'x')
+        self.assertTrue(issubclass(type(force_text(s)), six.text_type))
 
     def test_force_bytes_exception(self):
         """
