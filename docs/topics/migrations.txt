@@ -236,6 +236,9 @@ give them migrations yourself (using :setting:`MIGRATION_MODULES` to
 store those modules outside of the app's own module if you wish), or
 keep the app with your user model unmigrated.
 
+In addition, any models that are used in ``RunPython`` operations must have
+migrations so that their relations to other models are properly created.
+
 .. _migration-files:
 
 Migration files
