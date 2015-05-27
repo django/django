@@ -83,6 +83,10 @@ class Swallow(models.Model):
         ordering = ('speed', 'load')
 
 
+class SwallowOneToOne(models.Model):
+    swallow = models.OneToOneField(Swallow)
+
+
 class UnorderedObject(models.Model):
     """
     Model without any defined `Meta.ordering`.

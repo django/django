@@ -200,7 +200,7 @@ def items_for_result(cl, result, form):
         except ObjectDoesNotExist:
             result_repr = EMPTY_CHANGELIST_VALUE
         else:
-            if f is None:
+            if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
