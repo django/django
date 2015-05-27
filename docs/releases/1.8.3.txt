@@ -28,3 +28,6 @@ Bugfixes
 
 * Prevented the loss of ``null``/``not null`` column properties during field
   renaming of MySQL databases (:ticket:`24817`).
+
+* Fixed a crash when using a reverse one-to-one relation in
+  ``ModelAdmin.list_display`` (:ticket:`24851`).
