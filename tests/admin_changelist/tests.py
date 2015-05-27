@@ -27,7 +27,7 @@ from .admin import (
 from .models import (
     Band, Child, ChordsBand, ChordsMusician, Concert, CustomIdUser, Event,
     Genre, Group, Invitation, Membership, Musician, OrderedObject, Parent,
-    Quartet, Swallow, UnorderedObject,
+    Quartet, Swallow, SwallowOneToOne, UnorderedObject,
 )
 
 
@@ -547,8 +547,10 @@ class ChangeListTests(TestCase):
         Regression test for #17128
         (ChangeList failing under Python 2.5 after r16319)
         """
-        swallow = Swallow.objects.create(
-            origin='Africa', load='12.34', speed='22.2')
+        swallow = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
+        swallow2 = Swallow.objects.create(origin='Africa', load='12.34', speed='22.2')
+        swallow_o2o = SwallowOneToOne.objects.create(swallow=swallow2)
+
         model_admin = SwallowAdmin(Swallow, custom_site)
         superuser = self._create_superuser('superuser')
         request = self._mocked_authenticated_request('/swallow/', superuser)
@@ -557,6 +559,9 @@ class ChangeListTests(TestCase):
         self.assertContains(response, six.text_type(swallow.origin))
         self.assertContains(response, six.text_type(swallow.load))
         self.assertContains(response, six.text_type(swallow.speed))
+        # Reverse one-to-one relations should work.
+        self.assertContains(response, '<td class="field-swallowonetoone">-</td>')
+        self.assertContains(response, '<td class="field-swallowonetoone">%s</td>' % swallow_o2o)
 
     def test_deterministic_order_for_unordered_model(self):
         """
