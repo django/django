@@ -2613,18 +2613,24 @@ Hooking ``AdminSite`` instances into your URLconf
 
 The last step in setting up the Django admin is to hook your ``AdminSite``
 instance into your URLconf. Do this by pointing a given URL at the
-``AdminSite.urls`` method.
+``AdminSite.urls`` method. It is not necessary to use
+:func:`~django.conf.urls.include()`.
 
 In this example, we register the default ``AdminSite`` instance
 ``django.contrib.admin.site`` at the URL ``/admin/`` ::
 
     # urls.py
-    from django.conf.urls import include, url
+    from django.conf.urls import url
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
     ]
+
+.. versionchanged:: 1.9
+
+    In previous versions, you would pass ``admin.site.urls`` to
+    :func:`~django.conf.urls.include()`.
 
 .. _customizing-adminsite:
 
@@ -2655,12 +2661,12 @@ update :file:`myproject/urls.py` to reference your :class:`AdminSite` subclass.
 .. snippet::
     :filename: myproject/urls.py
 
-    from django.conf.urls import include, url
+    from django.conf.urls import url
 
     from myapp.admin import admin_site
 
     urlpatterns = [
-        url(r'^myadmin/', include(admin_site.urls)),
+        url(r'^myadmin/', admin_site.urls),
     ]
 
 Note that you may not want autodiscovery of ``admin`` modules when using your
@@ -2684,12 +2690,12 @@ separate versions of the admin site -- using the ``AdminSite`` instances
 respectively::
 
     # urls.py
-    from django.conf.urls import include, url
+    from django.conf.urls import url
     from myproject.admin import basic_site, advanced_site
 
     urlpatterns = [
-        url(r'^basic-admin/', include(basic_site.urls)),
-        url(r'^advanced-admin/', include(advanced_site.urls)),
+        url(r'^basic-admin/', basic_site.urls),
+        url(r'^advanced-admin/', advanced_site.urls),
     ]
 
 ``AdminSite`` instances take a single argument to their constructor, their

@@ -1285,11 +1285,11 @@ prepend the current active language code to all url patterns defined within
         url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
     ]
 
-    news_patterns = [
+    news_patterns = ([
         url(r'^$', news_views.index, name='index'),
         url(r'^category/(?P<slug>[\w-]+)/$', news_views.category, name='category'),
         url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
-    ]
+    ], 'news')
 
     urlpatterns += i18n_patterns(
         url(r'^about/$', about_views.main, name='about'),
@@ -1343,11 +1343,11 @@ URL patterns can also be marked translatable using the
         url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
     ]
 
-    news_patterns = [
+    news_patterns = ([
         url(r'^$', news_views.index, name='index'),
         url(_(r'^category/(?P<slug>[\w-]+)/$'), news_views.category, name='category'),
         url(r'^(?P<slug>[\w-]+)/$', news_views.details, name='detail'),
-    ]
+    ], 'news')
 
     urlpatterns += i18n_patterns(
         url(_(r'^about/$'), about_views.main, name='about'),

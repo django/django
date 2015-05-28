@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views
 from django.contrib.auth.decorators import login_required
@@ -97,5 +97,5 @@ urlpatterns = auth_urlpatterns + [
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
 
     # This line is only required to render the password reset with is_admin=True
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]

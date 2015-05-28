@@ -70,6 +70,15 @@ details on these changes.
   ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
   ``content_type``.
 
+* The ``app_name`` argument to :func:`~django.conf.urls.include()` will be
+  removed.
+
+* Support for passing a 3-tuple as the first argument to ``include()`` will
+  be removed.
+
+* Support for setting a URL instance namespace without an application
+  namespace will be removed.
+
 .. _deprecation-removed-in-2.0:
 
 2.0

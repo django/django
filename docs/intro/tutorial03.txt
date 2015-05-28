@@ -442,18 +442,20 @@ view, and so might an app on the same project that is for a blog. How does one
 make it so that Django knows which app view to create for a url when using the
 ``{% url %}`` template tag?
 
-The answer is to add namespaces to your root URLconf. In the ``mysite/urls.py``
-file, go ahead and change it to include namespacing:
+The answer is to add namespaces to your  URLconf. In the ``polls/urls.py``
+file, go ahead and add an ``app_name`` to set the application namespace:
 
 .. snippet::
-    :filename: mysite/urls.py
+    :filename: polls/urls.py
 
-    from django.conf.urls import include, url
-    from django.contrib import admin
+    from django.conf.urls import url
 
+    app_name = 'polls'
     urlpatterns = [
-        url(r'^polls/', include('polls.urls', namespace="polls")),
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^$', views.index, name='index'),
+        url(r'^(?P<question_id>[0-9]+)/$', views.detail, name='detail'),
+        url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
+        url(r'^(?P<question_id>[0-9]+)/vote/$', views.vote, name='vote'),
     ]
 
 Now change your ``polls/index.html`` template from:

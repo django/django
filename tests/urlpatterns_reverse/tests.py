@@ -10,7 +10,7 @@ import unittest
 from admin_scripts.tests import AdminScriptTestCase
 
 from django.conf import settings
-from django.conf.urls import include
+from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urlresolvers import (
@@ -26,7 +26,9 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango21Warning,
+)
 
 from . import middleware, urlconf_outer, views
 from .views import empty_view
@@ -184,6 +186,26 @@ test_data = (
 )
 
 
+class URLObject(object):
+    urlpatterns = [
+        url(r'^inner/$', views.empty_view, name='urlobject-view'),
+        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
+    ]
+
+    def __init__(self, app_name, namespace=None):
+        self.app_name = app_name
+        self.namespace = namespace
+
+    @property
+    def urls(self):
+        return self.urlpatterns, self.app_name, self.namespace
+
+    @property
+    def app_urls(self):
+        return self.urlpatterns, self.app_name
+
+
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.no_urls')
 class NoURLPatternsTests(SimpleTestCase):
 
@@ -281,6 +303,7 @@ class URLPatternReverse(SimpleTestCase):
 
 
 class ResolverTests(unittest.TestCase):
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_resolver_repr(self):
         """
         Test repr of RegexURLResolver, especially when urlconf_name is a list
@@ -460,6 +483,7 @@ class ReverseShortcutTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
+@ignore_warnings(category=RemovedInDjango21Warning)
 class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
@@ -500,6 +524,20 @@ class NamespaceTests(SimpleTestCase):
         self.assertEqual('/test1/inner/42/37/', reverse('test-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/test1/inner/+%5C$*/', reverse('test-ns1:urlobject-special-view'))
 
+    def test_app_object(self):
+        "Dynamic URL objects can return a (pattern, app_name) 2-tuple, and include() can set the namespace"
+        self.assertEqual('/newapp1/inner/', reverse('new-ns1:urlobject-view'))
+        self.assertEqual('/newapp1/inner/37/42/', reverse('new-ns1:urlobject-view', args=[37, 42]))
+        self.assertEqual('/newapp1/inner/42/37/', reverse('new-ns1:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
+        self.assertEqual('/newapp1/inner/+%5C$*/', reverse('new-ns1:urlobject-special-view'))
+
+    def test_app_object_default_namespace(self):
+        "Namespace defaults to app_name when including a (pattern, app_name) 2-tuple"
+        self.assertEqual('/new-default/inner/', reverse('newapp:urlobject-view'))
+        self.assertEqual('/new-default/inner/37/42/', reverse('newapp:urlobject-view', args=[37, 42]))
+        self.assertEqual('/new-default/inner/42/37/', reverse('newapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}))
+        self.assertEqual('/new-default/inner/+%5C$*/', reverse('newapp:urlobject-special-view'))
+
     def test_embedded_namespace_object(self):
         "Namespaces can be installed anywhere in the URL pattern tree"
         self.assertEqual('/included/test3/inner/', reverse('test-ns3:urlobject-view'))
@@ -513,6 +551,13 @@ class NamespaceTests(SimpleTestCase):
         self.assertEqual('/ns-included1/normal/37/42/', reverse('inc-ns1:inc-normal-view', args=[37, 42]))
         self.assertEqual('/ns-included1/normal/42/37/', reverse('inc-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
         self.assertEqual('/ns-included1/+%5C$*/', reverse('inc-ns1:inc-special-view'))
+
+    def test_app_name_pattern(self):
+        "Namespaces can be applied to include()'d urlpatterns that set an app_name attribute"
+        self.assertEqual('/app-included1/normal/', reverse('app-ns1:inc-normal-view'))
+        self.assertEqual('/app-included1/normal/37/42/', reverse('app-ns1:inc-normal-view', args=[37, 42]))
+        self.assertEqual('/app-included1/normal/42/37/', reverse('app-ns1:inc-normal-view', kwargs={'arg1': 42, 'arg2': 37}))
+        self.assertEqual('/app-included1/+%5C$*/', reverse('app-ns1:inc-special-view'))
 
     def test_namespace_pattern_with_variable_prefix(self):
         "When using an include with namespaces when there is a regex variable in front of it"
@@ -769,6 +814,7 @@ class NoRootUrlConfTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
 class ResolverMatchTests(SimpleTestCase):
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_urlpattern_resolve(self):
         for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
             # Test legacy support for extracting "function, args, kwargs"
@@ -793,6 +839,7 @@ class ResolverMatchTests(SimpleTestCase):
             self.assertEqual(match[1], args)
             self.assertEqual(match[2], kwargs)
 
+    @ignore_warnings(category=RemovedInDjango21Warning)
     def test_resolver_match_on_request(self):
         response = self.client.get('/resolver_match/')
         resolver_match = response.resolver_match
@@ -845,10 +892,65 @@ class ViewLoadingTests(SimpleTestCase):
 
 
 class IncludeTests(SimpleTestCase):
+    url_patterns = [
+        url(r'^inner/$', views.empty_view, name='urlobject-view'),
+        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
+        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
+    ]
+    app_urls = URLObject('inc-app')
+
     def test_include_app_name_but_no_namespace(self):
         msg = "Must specify a namespace if specifying app_name."
         with self.assertRaisesMessage(ValueError, msg):
-            include('urls', app_name='bar')
+            include(self.url_patterns, app_name='bar')
+
+    def test_include_urls(self):
+        self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_include_namespace(self):
+        # no app_name -> deprecated
+        self.assertEqual(include(self.url_patterns, 'namespace'), (self.url_patterns, None, 'namespace'))
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_include_namespace_app_name(self):
+        # app_name argument to include -> deprecated
+        self.assertEqual(
+            include(self.url_patterns, 'namespace', 'app_name'),
+            (self.url_patterns, 'app_name', 'namespace')
+        )
+
+    @ignore_warnings(category=RemovedInDjango21Warning)
+    def test_include_3_tuple(self):
+        # 3-tuple -> deprecated
+        self.assertEqual(
+            include((self.url_patterns, 'app_name', 'namespace')),
+            (self.url_patterns, 'app_name', 'namespace')
+        )
+
+    def test_include_2_tuple(self):
+        self.assertEqual(
+            include((self.url_patterns, 'app_name')),
+            (self.url_patterns, 'app_name', 'app_name')
+        )
+
+    def test_include_2_tuple_namespace(self):
+        self.assertEqual(
+            include((self.url_patterns, 'app_name'), namespace='namespace'),
+            (self.url_patterns, 'app_name', 'namespace')
+        )
+
+    def test_include_app_name(self):
+        self.assertEqual(
+            include(self.app_urls),
+            (self.app_urls, 'inc-app', 'inc-app')
+        )
+
+    def test_include_app_name_namespace(self):
+        self.assertEqual(
+            include(self.app_urls, 'namespace'),
+            (self.app_urls, 'inc-app', 'namespace')
+        )
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
