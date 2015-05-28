@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.conf.urls import include, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -16,7 +16,7 @@ site.register(User)
 site.register(Article)
 
 urlpatterns = [
-    url(r'^test_admin/admin/', include(site.urls)),
+    url(r'^test_admin/admin/', site.urls),
 ]
 
 
