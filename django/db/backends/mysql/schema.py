@@ -41,7 +41,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return (
             db_type is not None and
             db_type.lower() in {
-                'tinytext', 'tinyblob', 'text', 'blob', 'mediumtext', 'mediumblob', 'longtext', 'longblob'
+                'tinyblob', 'blob', 'mediumblob', 'longblob',
+                'tinytext', 'text', 'mediumtext', 'longtext',
             }
         )
 
