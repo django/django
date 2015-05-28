@@ -293,15 +293,15 @@ with:
 
     urlpatterns = [
         url(r'^polls/', include('polls.urls')),
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
     ]
 
 .. admonition:: Doesn't match what you see?
 
-    If you're seeing ``admin.autodiscover()`` before the definition of
-    ``urlpatterns``, you're probably using a version of Django that doesn't
-    match this tutorial version.  You'll want to either switch to the older
-    tutorial or the newer Django version.
+    If you're seeing ``include(admin.site.urls)`` instead of just
+    ``admin.site.urls``, you're probably using a version of Django that
+    doesn't match this tutorial version.  You'll want to either switch to the
+    older tutorial or the newer Django version.
 
 You have now wired an ``index`` view into the URLconf. Lets verify it's
 working, run the following command:

@@ -716,8 +716,8 @@ displaying polls.
     from django.conf.urls import include, url
 
     urlpatterns = [
-        url(r'^author-polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
-        url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls', app_name='polls')),
+        url(r'^author-polls/', include('polls.urls', namespace='author-polls')),
+        url(r'^publisher-polls/', include('polls.urls', namespace='publisher-polls')),
     ]
 
 .. snippet::
@@ -727,6 +727,7 @@ displaying polls.
 
     from . import views
 
+    app_name = 'polls'
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
@@ -778,25 +779,44 @@ declared last in ``urlpatterns``.
 URL namespaces and included URLconfs
 ------------------------------------
 
-URL namespaces of included URLconfs can be specified in two ways.
+Application namespaces of included URLconfs can be specified in two ways.
 
-Firstly, you can provide the :term:`application <application namespace>` and
-:term:`instance <instance namespace>` namespaces as arguments to
-:func:`~django.conf.urls.include()` when you construct your URL patterns. For
-example,::
+Firstly, you can set an ``app_name`` attribute in the included URLconf module,
+at the same level as the ``urlpatterns`` attribute. You have to pass the actual
+module, or a string reference to the module, to
+:func:`~django.conf.urls.include`, not the list of ``urlpatterns`` itself.
 
-    url(r'^polls/', include('polls.urls', namespace='author-polls', app_name='polls')),
+.. snippet::
+    :filename: polls/urls.py
 
-This will include the URLs defined in ``polls.urls`` into the
-:term:`application namespace` ``'polls'``, with the :term:`instance namespace`
-``'author-polls'``.
+    from django.conf.urls import url
+
+    from . import views
+
+    app_name = 'polls'
+    urlpatterns = [
+        url(r'^$', views.IndexView.as_view(), name='index'),
+        url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+        ...
+    ]
+
+.. snippet::
+    :filename: urls.py
+
+    from django.conf.urls import include, url
+
+    urlpatterns = [
+        url(r'^polls/', include('polls.urls')),
+    ]
+
+The URLs defined in ``polls.urls`` will have an application namespace ``polls``.
 
 Secondly, you can include an object that contains embedded namespace data. If
 you ``include()`` a list of :func:`~django.conf.urls.url` instances,
 the URLs contained in that object will be added to the global namespace.
-However, you can also ``include()`` a 3-tuple containing::
+However, you can also ``include()`` a 2-tuple containing::
 
-    (<list of url() instances>, <application namespace>, <instance namespace>)
+    (<list of url() instances>, <application namespace>)
 
 For example::
 
@@ -804,25 +824,25 @@ For example::
 
     from . import views
 
-    polls_patterns = [
+    polls_patterns = ([
         url(r'^$', views.IndexView.as_view(), name='index'),
         url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
-    ]
+    ], 'polls')
 
-    url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
+    url(r'^polls/', include(polls_patterns)),
 
-This will include the nominated URL patterns into the given application and
-instance namespace.
+This will include the nominated URL patterns into the given application
+namespace.
 
-For example, the Django admin is deployed as instances of
-:class:`~django.contrib.admin.AdminSite`.  ``AdminSite`` objects have a ``urls``
-attribute: A 3-tuple that contains all the patterns in the corresponding admin
-site, plus the application namespace ``'admin'``, and the name of the admin
-instance. It is this ``urls`` attribute that you ``include()`` into your
-projects ``urlpatterns`` when you deploy an admin instance.
+The instance namespace can be specified using the ``namespace`` argument to
+:func:`~django.conf.urls.include`. If the instance namespace is not specified,
+it will default to the included URLconf's application namespace. This means
+it will also be the default instance for that namespace.
 
-Be sure to pass a tuple to ``include()``. If you simply pass three arguments:
-``include(polls_patterns, 'polls', 'author-polls')``, Django won't throw an
-error but due to the signature of ``include()``, ``'polls'`` will be the
-instance namespace and ``'author-polls'`` will be the application namespace
-instead of vice versa.
+.. versionchanged:: 1.9
+
+    In previous versions, you had to specify both the application namespace
+    and the instance namespace in a single place, either by passing them as
+    parameters to :func:`~django.conf.urls.include` or by including a 3-tuple
+    containing
+    ``(<list of url() instances>, <application namespace>, <instance namespace>)``.

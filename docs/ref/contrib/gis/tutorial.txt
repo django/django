@@ -749,7 +749,7 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
     from django.contrib.gis import admin
 
     urlpatterns = [
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
     ]
 
 Create an admin user:

@@ -343,6 +343,11 @@ URLs
 
 * Regular expression lookaround assertions are now allowed in URL patterns.
 
+* The application namespace can now be set using an ``app_name`` attribute
+  on the included module or object. It can also be set by passing a 2-tuple
+  of (<list of patterns>, <application namespace>) as the first argument to
+  :func:`~django.conf.urls.include`.
+
 Validators
 ^^^^^^^^^^
 
@@ -660,6 +665,40 @@ extending. This change necessitated a new template loader API. The old
 ``load_template()`` and ``load_template_sources()`` methods are now deprecated.
 Details about the new API can be found :ref:`in the template loader
 documentation <custom-template-loaders>`.
+
+Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The instance namespace part of passing a tuple as the first argument has been
+replaced by passing the ``namespace`` argument to ``include()``. The
+``app_name`` argument to ``include()`` has been replaced by passing a 2-tuple,
+or passing an object or module with an ``app_name`` attribute.
+
+If the ``app_name`` is set in this new way, the ``namespace`` argument is no
+longer required. It will default to the value of ``app_name``.
+
+This change also means that the old way of including an ``AdminSite`` instance
+is deprecated. Instead, pass ``admin.site.urls`` directly to
+:func:`~django.conf.urls.url()`:
+
+.. snippet::
+    :filename: urls.py
+
+    from django.conf.urls import url
+    from django.contrib import admin
+
+    urlpatterns = [
+        url(r'^admin/', admin.site.urls),
+    ]
+
+URL application namespace required if setting an instance namespace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the past, an instance namespace without an application namespace
+would serve the same purpose as the application namespace, but it was
+impossible to reverse the patterns if there was an application namespace
+with the same name. Includes that specify an instance namespace require that
+the included URLconf sets an application namespace.
 
 Miscellaneous
 ~~~~~~~~~~~~~
