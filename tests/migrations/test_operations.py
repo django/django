@@ -11,7 +11,7 @@ from django.db.utils import IntegrityError
 from django.test import override_settings
 from django.utils import six
 
-from .models import FoodManager, FoodQuerySet, MediumBlobField
+from .models import FoodManager, FoodQuerySet
 from .test_base import MigrationTestBase
 
 try:
@@ -796,46 +796,6 @@ class OperationTests(OperationTestBase):
         self.assertEqual(bytes(pony.empty), b"")
         self.assertEqual(bytes(pony.digits), b"42")
         self.assertEqual(bytes(pony.quotes), b'"\'"')
-
-    @unittest.skipUnless(connection.vendor == 'mysql', "MySQL only")
-    def test_add_binaryfield_mediumblob(self):
-        """
-        Test adding a custom-sized binary field on MySQL. Refs #24846.
-        """
-        project_state = self.set_up_test_model("test_admblobfl")
-
-        Pony = project_state.apps.get_model("test_admblobfl", "Pony")
-        pony = Pony.objects.create(weight=42)
-
-        new_state = self.apply_operations("test_admblobfl", project_state, [
-            migrations.AddField(
-                "Pony",
-                "blob",
-                MediumBlobField(default=b"some text"),
-            ),
-            migrations.AddField(
-                "Pony",
-                "empty",
-                MediumBlobField(default=b""),
-            ),
-            migrations.AddField(
-                "Pony",
-                "digits",
-                MediumBlobField(default=b"42"),
-            ),
-            migrations.AddField(
-                "Pony",
-                "quotes",
-                MediumBlobField(default=b'"\'"'),
-            ),
-        ])
-
-        Pony = new_state.apps.get_model("test_admblobfl", "Pony")
-        pony = Pony.objects.get(pk=pony.pk)
-        self.assertEqual(pony.blob, b"some text")
-        self.assertEqual(pony.empty, b"")
-        self.assertEqual(pony.digits, b"42")
-        self.assertEqual(pony.quotes, b'"\'"')
 
     def test_column_name_quoting(self):
         """
