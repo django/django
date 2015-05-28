@@ -72,3 +72,11 @@ class FoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
 
 class NoMigrationFoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
     pass
+
+
+class MediumBlobField(models.BinaryField):
+    """
+    A MySQL-only BinaryField that uses a different blob size.
+    """
+    def db_type(self, connection):
+        return 'MEDIUMBLOB'
