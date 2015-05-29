@@ -178,7 +178,9 @@ def inotify_code_changed():
             pyinotify.IN_ATTRIB |
             pyinotify.IN_MOVED_FROM |
             pyinotify.IN_MOVED_TO |
-            pyinotify.IN_CREATE
+            pyinotify.IN_CREATE |
+            pyinotify.IN_DELETE_SELF |
+            pyinotify.IN_MOVE_SELF
         )
         for path in gen_filenames(only_new=True):
             wm.add_watch(path, mask)
