@@ -1471,6 +1471,11 @@ class ManyToOneRel(ForeignObjectRel):
 
         self.field_name = field_name
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop('related_model', None)
+        return state
+
     def get_related_field(self):
         """
         Return the Field in the 'to' object to which this relationship is tied.
