@@ -1538,7 +1538,12 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
     # to merge in the prefetch_related lookups.
-    additional_lookups = getattr(rel_qs, '_prefetch_related_lookups', [])
+    # Copy the lookups in case it is a Prefetch object which could be reused
+    # later (happens in nested prefetch_related).
+    additional_lookups = [
+        copy.copy(additional_lookup) for additional_lookup
+        in getattr(rel_qs, '_prefetch_related_lookups', [])
+    ]
     if additional_lookups:
         # Don't need to clone because the manager should have given us a fresh
         # instance, so we access an internal instead of using public interface
