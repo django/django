@@ -1,8 +1,10 @@
 from __future__ import unicode_literals
 
+from datetime import datetime, timedelta
+
 from django.db.models import CharField, TextField, Value as V
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Coalesce, Concat, Length, Lower, Now, Substr, Upper,
 )
 from django.test import TestCase
 from django.utils import six, timezone
@@ -310,4 +312,41 @@ class FunctionTests(TestCase):
                 'Rhonda Simpson',
             ],
             lambda a: a.name
+        )
+
+    def test_now(self):
+        ar1 = Article.objects.create(
+            title='How to Django',
+            text=lorem_ipsum,
+            written=timezone.now(),
+        )
+        ar2 = Article.objects.create(
+            title='How to Time Travel',
+            text=lorem_ipsum,
+            written=timezone.now(),
+        )
+
+        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
+        self.assertEqual(num_updated, 1)
+
+        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
+        self.assertEqual(num_updated, 0)
+
+        ar1.refresh_from_db()
+        self.assertIsInstance(ar1.published, datetime)
+
+        ar2.published = Now() + timedelta(days=2)
+        ar2.save()
+        ar2.refresh_from_db()
+        self.assertIsInstance(ar2.published, datetime)
+
+        self.assertQuerysetEqual(
+            Article.objects.filter(published__lte=Now()),
+            ['How to Django'],
+            lambda a: a.title
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(published__gt=Now()),
+            ['How to Time Travel'],
+            lambda a: a.title
         )
