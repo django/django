@@ -37,3 +37,6 @@ Bugfixes
 
 * Fixed lack of unique constraint when changing a field from
   ``primary_key=True`` to ``unique=True`` (:ticket:`24893`).
+
+* Fixed queryset pickling when using ``prefetch_related()`` after deleting
+  objects (:ticket:`24831`).

@@ -1407,6 +1407,11 @@ class ManyToOneRel(ForeignObjectRel):
             parent_link=parent_link, on_delete=on_delete, related_query_name=related_query_name)
         self.field_name = field_name
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state.pop('related_model', None)
+        return state
+
     def get_related_field(self):
         """
         Returns the Field in the 'to' object to which this relationship is
