@@ -117,6 +117,21 @@ Usage example::
     >>> print(author.name_lower)
     margaret smith
 
+Now
+---
+
+.. class:: Now()
+
+.. versionadded:: 1.9
+
+Returns the database server's current date and time when the query is executed.
+
+Usage example::
+
+    >>> from django.db.models.functions import Now
+    >>> Article.objects.filter(published__lte=Now())
+    [<Article: How to Django>]
+
 Substr
 ------
 

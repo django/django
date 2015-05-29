@@ -240,6 +240,9 @@ Models
 * Added the :lookup:`date` lookup to :class:`~django.db.models.DateTimeField`
   to allow querying the field by only the date portion.
 
+* Added the :class:`~django.db.models.functions.Now` database function, which
+  returns the current date and time.
+
 CSRF
 ^^^^
 
