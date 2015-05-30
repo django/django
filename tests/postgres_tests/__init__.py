@@ -5,5 +5,5 @@ from django.test import TestCase
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")
-class PostgresSQLTestCase(TestCase):
+class PostgreSQLTestCase(TestCase):
     pass

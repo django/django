@@ -5,7 +5,7 @@ from django.core import exceptions, serializers
 from django.db import connection
 from django.test import TestCase
 
-from . import PostgresSQLTestCase
+from . import PostgreSQLTestCase
 from .models import JSONModel
 
 try:
@@ -219,7 +219,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.field, {'a': 'b'})
 
 
-class TestValidation(PostgresSQLTestCase):
+class TestValidation(PostgreSQLTestCase):
 
     def test_not_serializable(self):
         field = JSONField()
@@ -229,7 +229,7 @@ class TestValidation(PostgresSQLTestCase):
         self.assertEqual(cm.exception.message % cm.exception.params, "Value must be valid JSON.")
 
 
-class TestFormField(PostgresSQLTestCase):
+class TestFormField(PostgreSQLTestCase):
 
     def test_valid(self):
         field = forms.JSONField()
