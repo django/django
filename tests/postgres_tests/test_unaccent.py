@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 
 from django.test import modify_settings
 
-from . import PostgresSQLTestCase
+from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.postgres'})
-class UnaccentTest(PostgresSQLTestCase):
+class UnaccentTest(PostgreSQLTestCase):
 
     Model = CharFieldModel
 
