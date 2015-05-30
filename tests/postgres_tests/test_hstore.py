@@ -79,6 +79,12 @@ class TestQuerying(PostgresSQLTestCase):
             self.objs[1:2]
         )
 
+    def test_has_any_keys(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__has_any_keys=['a', 'c']),
+            self.objs[:3]
+        )
+
     def test_key_transform(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__a='b'),
