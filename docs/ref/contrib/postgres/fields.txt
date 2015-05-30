@@ -385,6 +385,23 @@ Returns objects where the given key is in the data. Uses the SQL operator
     >>> Dog.objects.filter(data__has_key='owner')
     [<Dog: Meg>]
 
+.. fieldlookup:: hstorefield.has_any_keys
+
+has_any_keys
+~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Returns objects where any of the given keys are in the data. Uses the SQL
+operator ``?|``. For example::
+
+    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+    >>> Dog.objects.create(name='Meg', data={'owner': 'Bob'})
+    >>> Dog.objects.create(name='Fred', data={})
+
+    >>> Dog.objects.filter(data__has_any_keys=['owner', 'breed'])
+    [<Dog: Rufus>, <Dog: Meg>]
+
 .. fieldlookup:: hstorefield.has_keys
 
 has_keys
