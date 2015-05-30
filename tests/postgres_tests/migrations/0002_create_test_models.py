@@ -150,6 +150,19 @@ class Migration(migrations.Migration):
         ),
     ]
 
+    pg_94_operations = [
+        migrations.CreateModel(
+            name='JSONModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('field', JSONField(null=True, blank=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+    ]
+
     def apply(self, project_state, schema_editor, collect_sql=False):
         try:
             PG_VERSION = schema_editor.connection.pg_version
@@ -158,4 +171,6 @@ class Migration(migrations.Migration):
         else:
             if PG_VERSION >= 90200:
                 self.operations = self.operations + self.pg_92_operations
+            if PG_VERSION >= 90400:
+                self.operations = self.operations + self.pg_94_operations
         return super(Migration, self).apply(project_state, schema_editor, collect_sql)

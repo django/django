@@ -3,7 +3,7 @@ import json
 from django.core import exceptions, serializers
 from django.forms import Form
 
-from . import PostgresSQLTestCase
+from . import PostgreSQLTestCase
 from .models import HStoreModel
 
 try:
@@ -14,7 +14,7 @@ except ImportError:
     pass
 
 
-class SimpleTests(PostgresSQLTestCase):
+class SimpleTests(PostgreSQLTestCase):
     apps = ['django.contrib.postgres']
 
     def test_save_load_success(self):
@@ -38,7 +38,7 @@ class SimpleTests(PostgresSQLTestCase):
         self.assertEqual(reloaded.field, value)
 
 
-class TestQuerying(PostgresSQLTestCase):
+class TestQuerying(PostgreSQLTestCase):
 
     def setUp(self):
         self.objs = [
@@ -77,6 +77,12 @@ class TestQuerying(PostgresSQLTestCase):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__has_keys=['a', 'c']),
             self.objs[1:2]
+        )
+
+    def test_has_any_keys(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__has_any_keys=['a', 'c']),
+            self.objs[:3]
         )
 
     def test_key_transform(self):
@@ -127,7 +133,7 @@ class TestQuerying(PostgresSQLTestCase):
         )
 
 
-class TestSerialization(PostgresSQLTestCase):
+class TestSerialization(PostgreSQLTestCase):
     test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
 
     def test_dumping(self):
@@ -140,7 +146,7 @@ class TestSerialization(PostgresSQLTestCase):
         self.assertEqual(instance.field, {'a': 'b'})
 
 
-class TestValidation(PostgresSQLTestCase):
+class TestValidation(PostgreSQLTestCase):
 
     def test_not_a_string(self):
         field = HStoreField()
@@ -150,7 +156,7 @@ class TestValidation(PostgresSQLTestCase):
         self.assertEqual(cm.exception.message % cm.exception.params, 'The value of "a" is not a string.')
 
 
-class TestFormField(PostgresSQLTestCase):
+class TestFormField(PostgreSQLTestCase):
 
     def test_valid(self):
         field = forms.HStoreField()
@@ -186,7 +192,7 @@ class TestFormField(PostgresSQLTestCase):
         self.assertFalse(form_w_hstore.has_changed())
 
 
-class TestValidator(PostgresSQLTestCase):
+class TestValidator(PostgreSQLTestCase):
 
     def test_simple_valid(self):
         validator = KeysValidator(keys=['a', 'b'])

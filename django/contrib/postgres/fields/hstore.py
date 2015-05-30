@@ -55,18 +55,9 @@ class HStoreField(Field):
 
 HStoreField.register_lookup(lookups.DataContains)
 HStoreField.register_lookup(lookups.ContainedBy)
-
-
-@HStoreField.register_lookup
-class HasKeyLookup(lookups.PostgresSimpleLookup):
-    lookup_name = 'has_key'
-    operator = '?'
-
-
-@HStoreField.register_lookup
-class HasKeysLookup(lookups.PostgresSimpleLookup):
-    lookup_name = 'has_keys'
-    operator = '?&'
+HStoreField.register_lookup(lookups.HasKey)
+HStoreField.register_lookup(lookups.HasKeys)
+HStoreField.register_lookup(lookups.HasAnyKeys)
 
 
 class KeyTransform(Transform):

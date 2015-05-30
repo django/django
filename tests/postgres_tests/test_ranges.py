@@ -8,7 +8,7 @@ from django.db import connection
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from . import PostgresSQLTestCase
+from . import PostgreSQLTestCase
 from .models import RangesModel
 
 try:
@@ -222,7 +222,7 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.dates, None)
 
 
-class TestValidators(PostgresSQLTestCase):
+class TestValidators(PostgreSQLTestCase):
 
     def test_max(self):
         validator = RangeMaxValueValidator(5)
@@ -241,7 +241,7 @@ class TestValidators(PostgresSQLTestCase):
         self.assertEqual(cm.exception.code, 'min_value')
 
 
-class TestFormField(PostgresSQLTestCase):
+class TestFormField(PostgreSQLTestCase):
 
     def test_valid_integer(self):
         field = pg_forms.IntegerRangeField()
@@ -508,7 +508,7 @@ class TestFormField(PostgresSQLTestCase):
         self.assertIsInstance(form_field, pg_forms.DateTimeRangeField)
 
 
-class TestWidget(PostgresSQLTestCase):
+class TestWidget(PostgreSQLTestCase):
     def test_range_widget(self):
         f = pg_forms.ranges.DateTimeRangeField()
         self.assertHTMLEqual(
