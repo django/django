@@ -274,7 +274,7 @@ HStoreField
        privileges, you'll have to create the extension outside of Django
        migrations with a user that has the appropriate privileges. In that
        case, connect to your Django database and run the query
-       ``CREATE EXTENSION IF NOT EXISTS 'hstore';``
+       ``CREATE EXTENSION IF NOT EXISTS hstore;``
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
     step, or ``type "hstore" does not exist`` if you skip the second.
