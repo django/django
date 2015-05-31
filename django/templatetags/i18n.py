@@ -215,6 +215,7 @@ def do_get_language_info(parser, token):
         {% get_language_info for LANGUAGE_CODE as l %}
         {{ l.code }}
         {{ l.name }}
+        {{ l.name_translated }}
         {{ l.name_local }}
         {{ l.bidi|yesno:"bi-directional,uni-directional" }}
     """
@@ -238,6 +239,7 @@ def do_get_language_info_list(parser, token):
         {% for l in langs %}
           {{ l.code }}
           {{ l.name }}
+          {{ l.name_translated }}
           {{ l.name_local }}
           {{ l.bidi|yesno:"bi-directional,uni-directional" }}
         {% endfor %}
@@ -251,6 +253,12 @@ def do_get_language_info_list(parser, token):
 @register.filter
 def language_name(lang_code):
     return translation.get_language_info(lang_code)['name']
+
+
+@register.filter
+def language_name_translated(lang_code):
+    english_name = translation.get_language_info(lang_code)['name']
+    return translation.ugettext(english_name)
 
 
 @register.filter
