@@ -3,6 +3,7 @@ from django.db import connection, models
 from .fields import (
     ArrayField, BigIntegerRangeField, DateRangeField, DateTimeRangeField,
     FloatRangeField, HStoreField, IntegerRangeField, JSONField,
+    SearchVectorField,
 )
 
 
@@ -77,6 +78,37 @@ class CharFieldModel(models.Model):
 
 class TextFieldModel(models.Model):
     field = models.TextField()
+
+    def __str__(self):
+        return self.field
+
+
+# Scene/Character/Line models are used to test full text search. They're
+# populated with content from Monty Python and the Holy Grail.
+class Scene(models.Model):
+    scene = models.CharField(max_length=255)
+    setting = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.scene
+
+
+class Character(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
+
+
+class Line(PostgreSQLModel):
+    scene = models.ForeignKey('Scene', models.CASCADE)
+    character = models.ForeignKey('Character', models.CASCADE)
+    dialogue = models.TextField(blank=True, null=True)
+    dialogue_search_vector = SearchVectorField(blank=True, null=True)
+    dialogue_config = models.CharField(max_length=100, blank=True, null=True)
+
+    def __str__(self):
+        return self.dialogue or ''
 
 
 class RangesModel(PostgreSQLModel):
