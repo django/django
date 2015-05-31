@@ -187,6 +187,10 @@ Internationalization
   for languages which can be written in different scripts, for example Latin
   and Cyrillic (e.g. ``be@latin``).
 
+* Added the ``name_translated`` attribute to the object returned by the
+  :ttag:`get_language_info` template tag. Also added a corresponding template
+  filter: :tfilter:`language_name_translated`.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
