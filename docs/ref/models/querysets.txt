@@ -1510,14 +1510,17 @@ do not support ``nowait``, such as MySQL, will cause a
 :exc:`~django.db.DatabaseError` to be raised. This is in order to prevent code
 unexpectedly blocking.
 
-Evaluating a queryset with ``select_for_update()`` in autocommit mode is
-a :exc:`~django.db.transaction.TransactionManagementError` error because the
+Evaluating a queryset with ``select_for_update()`` in autocommit mode on
+backends which support ``SELECT ... FOR UPDATE`` is a
+:exc:`~django.db.transaction.TransactionManagementError` error because the
 rows are not locked in that case. If allowed, this would facilitate data
 corruption and could easily be caused by calling code that expects to be run in
 a transaction outside of one.
 
 Using ``select_for_update()`` on backends which do not support
 ``SELECT ... FOR UPDATE`` (such as SQLite) will have no effect.
+``SELECT ... FOR UPDATE`` will not be added to the query, and an error isn't
+raised if ``select_for_update()`` is used in autocommit mode.
 
 .. versionchanged:: 1.6.3
 
