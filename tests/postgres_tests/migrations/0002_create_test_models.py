@@ -115,6 +115,40 @@ class Migration(migrations.Migration):
             bases=None,
         ),
         migrations.CreateModel(
+            name='Scene',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('scene', models.CharField(max_length=255)),
+                ('setting', models.CharField(max_length=255)),
+            ],
+            options=None,
+            bases=None,
+        ),
+        migrations.CreateModel(
+            name='Character',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=255)),
+            ],
+            options=None,
+            bases=None,
+        ),
+        migrations.CreateModel(
+            name='Line',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('scene', models.ForeignKey('postgres_tests.Scene', on_delete=models.SET_NULL)),
+                ('character', models.ForeignKey('postgres_tests.Character', on_delete=models.SET_NULL)),
+                ('dialogue', models.TextField(blank=True, null=True)),
+                ('dialogue_search_vector', SearchVectorField(blank=True, null=True)),
+                ('dialogue_config', models.CharField(max_length=100, blank=True, null=True)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+            bases=None,
+        ),
+        migrations.CreateModel(
             name='AggregateTestModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),

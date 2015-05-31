@@ -105,6 +105,7 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Raw SQL <topics/db/sql>` |
   :doc:`Transactions <topics/db/transactions>` |
   :doc:`Aggregation <topics/db/aggregation>` |
+  :doc:`Search <topics/db/search>` |
   :doc:`Custom fields <howto/custom-model-fields>` |
   :doc:`Multiple databases <topics/db/multi-db>` |
   :doc:`Custom lookups <howto/custom-lookups>` |

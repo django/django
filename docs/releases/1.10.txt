@@ -24,7 +24,14 @@ recommend** and only officially support the latest release of each series.
 What's new in Django 1.10
 =========================
 
-...
+Full text search for PostgreSQL
+-------------------------------
+
+``django.contrib.postgres`` now includes a :doc:`collection of database
+functions </ref/contrib/postgres/search>` to allow the use of the full text
+search engine. You can search across multiple fields in your relational
+database, combine the searches with other lookups, use different language
+configurations and weightings, and rank the results by relevance.
 
 Minor features
 --------------

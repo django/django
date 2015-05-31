@@ -125,9 +125,11 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    _output_field = None
 
     def __init__(self, output_field=None):
-        self._output_field = output_field
+        if output_field is not None:
+            self._output_field = output_field
 
     def get_db_converters(self, connection):
         return [self.convert_value] + self.output_field.get_db_converters(connection)
