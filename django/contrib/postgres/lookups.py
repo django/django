@@ -1,5 +1,7 @@
 from django.db.models import Lookup, Transform
 
+from .search import SearchVector, SearchVectorExact, SearchVectorField
+
 
 class PostgresSimpleLookup(Lookup):
     def as_sql(self, qn, connection):
@@ -43,3 +45,13 @@ class Unaccent(Transform):
     bilateral = True
     lookup_name = 'unaccent'
     function = 'UNACCENT'
+
+
+class SearchLookup(SearchVectorExact):
+    lookup_name = 'search'
+
+    def process_lhs(self, qn, connection):
+        if not isinstance(self.lhs.output_field, SearchVectorField):
+            self.lhs = SearchVector(self.lhs)
+        lhs, lhs_params = super(SearchLookup, self).process_lhs(qn, connection)
+        return lhs, lhs_params
