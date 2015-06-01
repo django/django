@@ -283,3 +283,4 @@ class GraphTests(SimpleTestCase):
         graph.add_dependency("app_a.0003", ("app_a", "0003"), ("app_b", "0002"))
 
         self.assertEqual(force_text(graph), "Graph: 5 nodes, 3 edges")
+        self.assertEqual(repr(graph), "<MigrationGraph: nodes=5, edges=3>")
