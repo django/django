@@ -224,15 +224,29 @@ class MigrationLoader(object):
                 for child_key in reverse_dependencies.get(replaced, set()):
                     if child_key in migration.replaces:
                         continue
-                    # child_key may appear in a replacement
+                    # List of migrations whose dependency on `replaced` needs
+                    # to be updated to a dependency on `key`.
+                    to_update = []
+                    # Child key may itself be replaced, in which case it might
+                    # not be in `normal` anymore (depending on whether we've
+                    # processed its replacement yet). If it's present, we go
+                    # ahead and update it; it may be deleted later on if it is
+                    # replaced, but there's no harm in updating it regardless.
+                    if child_key in normal:
+                        to_update.append(normal[child_key])
+                    # If the child key is replaced, we update its replacement's
+                    # dependencies too, if necessary. (We don't know if this
+                    # replacement will actually take effect or not, but either
+                    # way it's OK to update the replacing migration).
                     if child_key in reverse_replacements:
-                        for replaced_child_key in reverse_replacements[child_key]:
-                            if replaced in replacing[replaced_child_key].dependencies:
-                                replacing[replaced_child_key].dependencies.remove(replaced)
-                                replacing[replaced_child_key].dependencies.append(key)
-                    else:
-                        normal[child_key].dependencies.remove(replaced)
-                        normal[child_key].dependencies.append(key)
+                        for replaces_child_key in reverse_replacements[child_key]:
+                            if replaced in replacing[replaces_child_key].dependencies:
+                                to_update.append(replacing[replaces_child_key])
+                    # Actually perform the dependency update on all migrations
+                    # that require it.
+                    for migration_needing_update in to_update:
+                        migration_needing_update.dependencies.remove(replaced)
+                        migration_needing_update.dependencies.append(key)
             normal[key] = migration
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):

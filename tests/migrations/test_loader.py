@@ -259,12 +259,37 @@ class LoaderTests(TestCase):
         loader.build_graph()
 
         plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
-        expected_plan = set([
+        expected_plan = {
             ('app1', '4_auto'),
             ('app1', '2_squashed_3'),
             ('app2', '1_squashed_2'),
             ('app1', '1_auto')
-        ])
+        }
+        self.assertEqual(plan, expected_plan)
+
+    @override_settings(MIGRATION_MODULES={
+        "app1": "migrations.test_migrations_squashed_complex_multi_apps.app1",
+        "app2": "migrations.test_migrations_squashed_complex_multi_apps.app2",
+    })
+    @modify_settings(INSTALLED_APPS={'append': [
+        "migrations.test_migrations_squashed_complex_multi_apps.app1",
+        "migrations.test_migrations_squashed_complex_multi_apps.app2",
+    ]})
+    def test_loading_squashed_complex_multi_apps_partially_applied(self):
+        loader = MigrationLoader(connection)
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied('app1', '1_auto')
+        recorder.record_applied('app1', '2_auto')
+        loader.build_graph()
+
+        plan = set(loader.graph.forwards_plan(('app1', '4_auto')))
+        plan = plan - loader.applied_migrations
+        expected_plan = {
+            ('app1', '4_auto'),
+            ('app1', '3_auto'),
+            ('app2', '1_squashed_2'),
+        }
+
         self.assertEqual(plan, expected_plan)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed_erroneous"})

@@ -43,3 +43,7 @@ Bugfixes
 
 * Allowed using ``choices`` longer than 1 day with ``DurationField``
   (:ticket:`24897`).
+
+* Fixed a crash when loading squashed migrations from two apps with a
+  dependency between them, where the dependent app's replaced migrations are
+  partially applied (:ticket:`24895`).
