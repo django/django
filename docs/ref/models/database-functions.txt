@@ -203,13 +203,21 @@ Now
 
 .. versionadded:: 1.9
 
-Returns the database server's current date and time when the query is executed.
+Returns the database server's current date and time when the query is executed,
+typically using the SQL ``CURRENT_TIMESTAMP``.
 
 Usage example::
 
     >>> from django.db.models.functions import Now
     >>> Article.objects.filter(published__lte=Now())
     [<Article: How to Django>]
+
+.. admonition:: PostgreSQL considerations
+
+    On PostgreSQL, the SQL ``CURRENT_TIMESTAMP`` returns the time that the
+    current transaction started. Therefore for cross-database compatibility,
+    ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
+    timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
 Substr
 ------
