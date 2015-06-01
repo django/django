@@ -6,6 +6,7 @@ from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.lookups import Transform
 from django.db.models.query_utils import Q, refs_aggregate
 from django.utils import six, timezone
 from django.utils.functional import cached_property
@@ -512,6 +513,46 @@ class Func(Expression):
         copy.source_expressions = self.source_expressions[:]
         copy.extra = self.extra.copy()
         return copy
+
+    @classmethod
+    def transformer(cls):
+        if not cls.transform:
+            raise ValueError('%s can not be used as a Transform' % cls.__name__)
+        return FuncTransform(cls)
+
+
+class FuncTransform(Transform):
+
+    def __init__(self, func_class):
+        self.func_class = func_class
+        self.lookup_name = func_class.lookup_name
+
+    def __call__(self, lhs, lookups):
+        self.func = self.func_class(lhs)
+        self.bilateral = getattr(self.func, 'bilateral', False)
+        self.init_lookups = lookups[:]
+        return self
+
+    @property
+    def lhs(self):
+        return self.func.get_source_expressions()[0]
+
+    def as_sql(self, compiler, connection):
+        return compiler.compile(self.func)
+
+    @cached_property
+    def output_field(self):
+        return self.func.output_field
+
+    def relabeled_clone(self, relabels):
+        return self.func.relabeled_clone(relabels)
+
+    def get_group_by_cols(self):
+        return self.func.get_group_by_cols()
+
+    @cached_property
+    def contains_aggregate(self):
+        return self.func.contains_aggregate
 
 
 class Value(Expression):

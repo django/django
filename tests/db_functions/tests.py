@@ -311,3 +311,45 @@ class FunctionTests(TestCase):
             ],
             lambda a: a.name
         )
+
+    def test_length_transform(self):
+        try:
+            CharField.register_lookup(Length.transformer())
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__length__gt=7)
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith'
+                ],
+                lambda a: a.name)
+        finally:
+            CharField._unregister_lookup(Length)
+
+    def test_lower_transform(self):
+        try:
+            CharField.register_lookup(Lower.transformer())
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__lower__exact='john smith')
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith'
+                ],
+                lambda a: a.name)
+        finally:
+            CharField._unregister_lookup(Lower)
+
+    def test_upper_transform(self):
+        try:
+            CharField.register_lookup(Upper.transformer())
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__upper__exact='JOHN SMITH')
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith'
+                ],
+                lambda a: a.name)
+        finally:
+            CharField._unregister_lookup(Upper)
