@@ -6,7 +6,6 @@ from importlib import import_module
 
 from django.apps import apps
 from django.conf import settings
-from django.db import migrations
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.utils import six
