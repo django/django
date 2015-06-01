@@ -8,8 +8,8 @@ from django.db import (
 )
 from django.db.models import Model
 from django.db.models.fields import (
-    BigIntegerField, BinaryField, BooleanField, CharField, DateTimeField,
-    IntegerField, PositiveIntegerField, SlugField, TextField,
+    AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
+    DateTimeField, IntegerField, PositiveIntegerField, SlugField, TextField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField,
@@ -22,8 +22,8 @@ from .fields import (
 )
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
-    BookWithLongName, BookWithO2O, BookWithSlug, Note, NoteRename, Tag,
-    TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
+    BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Note, NoteRename,
+    Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 
@@ -40,8 +40,8 @@ class SchemaTests(TransactionTestCase):
 
     models = [
         Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
-        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, Note, Tag,
-        TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
+        BookWeak, BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Note,
+        Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest,
     ]
 
     # Utility functions
@@ -747,6 +747,22 @@ class SchemaTests(TransactionTestCase):
         # This will fail if DROP DEFAULT is inadvertently executed on this
         # field which drops the id sequence, at least on PostgreSQL.
         Author.objects.create(name='Foo')
+
+    def test_alter_int_pk_to_autofield_pk(self):
+        """
+        Should be able to rename an IntegerField(primary_key=True) to
+        AutoField(primary_key=True).
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(IntegerPK)
+
+        old_field = IntegerPK._meta.get_field('i')
+        new_field = AutoField(primary_key=True)
+        new_field.model = IntegerPK
+        new_field.set_attributes_from_name('i')
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(IntegerPK, old_field, new_field, strict=True)
 
     def test_rename(self):
         """

@@ -52,31 +52,31 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 [
                     (
                         self.sql_delete_sequence % {
-                            "sequence": sequence_name,
+                            "sequence": self.quote_name(sequence_name),
                         },
                         [],
                     ),
                     (
                         self.sql_create_sequence % {
-                            "sequence": sequence_name,
+                            "sequence": self.quote_name(sequence_name),
                         },
                         [],
                     ),
                     (
                         self.sql_alter_column % {
-                            "table": table,
+                            "table": self.quote_name(table),
                             "changes": self.sql_alter_column_default % {
-                                "column": column,
-                                "default": "nextval('%s')" % sequence_name,
+                                "column": self.quote_name(column),
+                                "default": "nextval('%s')" % self.quote_name(sequence_name),
                             }
                         },
                         [],
                     ),
                     (
                         self.sql_set_sequence_max % {
-                            "table": table,
-                            "column": column,
-                            "sequence": sequence_name,
+                            "table": self.quote_name(table),
+                            "column": self.quote_name(column),
+                            "sequence": self.quote_name(sequence_name),
                         },
                         [],
                     ),
