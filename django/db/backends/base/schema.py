@@ -657,7 +657,9 @@ class BaseDatabaseSchemaEditor(object):
             for sql, params in post_actions:
                 self.execute(sql, params)
         # Added a unique?
-        if not old_field.unique and new_field.unique:
+        if (not old_field.unique and new_field.unique) or (
+            old_field.primary_key and not new_field.primary_key and new_field.unique
+        ):
             self.execute(self._create_unique_sql(model, [new_field.column]))
         # Added an index?
         if (not old_field.db_index and new_field.db_index and

@@ -82,6 +82,7 @@ class BookWithSlug(models.Model):
 
 class IntegerPK(models.Model):
     i = models.IntegerField(primary_key=True)
+    j = models.IntegerField(unique=True)
 
     class Meta:
         apps = new_apps

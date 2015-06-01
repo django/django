@@ -34,3 +34,6 @@ Bugfixes
 
 * Fixed quoting of SQL when renaming a field to ``AutoField`` in PostgreSQL
   (:ticket:`24892`).
+
+* Fixed lack of unique constraint when changing a field from
+  ``primary_key=True`` to ``unique=True`` (:ticket:`24893`).
