@@ -132,6 +132,14 @@ Usage example::
     >>> Article.objects.filter(published__lte=Now())
     [<Article: How to Django>]
 
+.. note::
+
+    On PostgreSQL, ``CURRENT_TIMESTAMP`` returns the same date and time across
+    a transaction. For compatibility, ``Now()`` uses ``STATEMENT_TIMESTAMP``,
+    which returns the same date and time across the current statement only. If
+    you need the transaction timestamp, use
+    :class:`django.contrib.postgres.functions.TransactionNow`.
+
 Substr
 ------
 
