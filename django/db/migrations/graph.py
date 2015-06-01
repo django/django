@@ -247,10 +247,14 @@ class MigrationGraph(object):
                     node = stack.pop()
 
     def __str__(self):
-        return "Graph: %s nodes, %s edges" % (
-            len(self.nodes),
-            sum(len(node.parents) for node in self.node_map.values()),
-        )
+        return "Graph: %s nodes, %s edges" % self._nodes_and_edges()
+
+    def __repr__(self):
+        nodes, edges = self._nodes_and_edges()
+        return '<%s: nodes=%s, edges=%s>' % (self.__class__.__name__, nodes, edges)
+
+    def _nodes_and_edges(self):
+        return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())
 
     def make_state(self, nodes=None, at_end=True, real_apps=None):
         """
