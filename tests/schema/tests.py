@@ -745,6 +745,45 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(IntegerPK, old_field, new_field, strict=True)
 
+    def test_alter_int_pk_to_int_unique(self):
+        """
+        Should be able to rename an IntegerField(primary_key=True) to
+        IntegerField(unique=True).
+        """
+        class IntegerUnique(Model):
+            i = IntegerField(unique=True)
+            j = IntegerField(primary_key=True)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+                db_table = 'INTEGERPK'
+
+        with connection.schema_editor() as editor:
+            editor.create_model(IntegerPK)
+
+        # model requires a new PK
+        old_field = IntegerPK._meta.get_field('j')
+        new_field = IntegerField(primary_key=True)
+        new_field.model = IntegerPK
+        new_field.set_attributes_from_name('j')
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(IntegerPK, old_field, new_field, strict=True)
+
+        old_field = IntegerPK._meta.get_field('i')
+        new_field = IntegerField(unique=True)
+        new_field.model = IntegerPK
+        new_field.set_attributes_from_name('i')
+
+        with connection.schema_editor() as editor:
+            editor.alter_field(IntegerPK, old_field, new_field, strict=True)
+
+        # Ensure unique constraint works.
+        IntegerUnique.objects.create(i=1, j=1)
+        with self.assertRaises(IntegrityError):
+            IntegerUnique.objects.create(i=1, j=2)
+
     def test_rename(self):
         """
         Tests simple altering of fields
