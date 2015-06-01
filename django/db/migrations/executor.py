@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from django.apps.registry import apps as global_apps
 from django.db import migrations
 
@@ -66,50 +68,96 @@ class MigrationExecutor(object):
         """
         Migrates the database up to the given targets.
 
-        Django first needs to create all project states before a migration is
-        (un)applied and in a second step run all the database operations.
+        This process is split in 3 phases:
+
+        1. Group consecutive migrations with respect to a full plan on an empty
+           database. The first migration of each group and all migrations that
+           will later be unapplied are kept in mind for state preservation.
+        2. We will iterate over the full plan and mutate the project state
+           along the process. If the migration that will be mutated is one kept
+           in mind from phase 1 the state right before that migration is
+           stored.
+           As soon as no migrations require preserving a state, the iteration
+           over the full plan stops.
+        3. During this step the migrations are applied
         """
         if plan is None:
             plan = self.migration_plan(targets)
-        migrations_to_run = {m[0] for m in plan}
         # Create the forwards plan Django would follow on an empty database
         full_plan = self.migration_plan(self.loader.graph.leaf_nodes(), clean_start=True)
-        # Holds all states right before a migration is applied
-        # if the migration is being run.
+
+        # Phase 1 -- Group successive migrations in plan.
+        # Mapping of "migration -> position" in the full_plan
+        node_map = {m: i for i, (m, _) in enumerate(full_plan)}
+        groups = []
+        # Mapping of "migration -> (position, backwards)" in the group
+        current_group = OrderedDict()
+        current_index = 0
+        last = None
+        compute_state_for = set()
+        for migration, backwards in plan:
+            if last is None:
+                current_group[migration] = (0, backwards)
+                compute_state_for.add(migration)
+                current_index = 1
+            else:
+                if last[1] == backwards and (
+                        backwards and node_map[last[0]] - 1 == node_map[migration] or
+                        not backwards and node_map[last[0]] + 1 == node_map[migration]):
+                    # If last and current node are both forwards or backwards
+                    # AND if they are consecutive in the full_plan
+                    current_group[migration] = (current_index, backwards)
+                    if backwards:
+                        compute_state_for.add(migration)
+                    current_index += 1
+                else:
+                    groups.append(current_group)
+                    current_group = OrderedDict()
+                    current_group[migration] = (0, backwards)
+                    compute_state_for.add(migration)
+                    current_index = 1
+            last = (migration, backwards)
+        groups.append(current_group)
+
+        # Phase 2 -- Compute and store project states. The migration that first
+        # whose "before-state" is stored also triggers the rendering of
+        # state.apps. From this time on models will be recursively reloaded as
+        # explained in .state.get_related_models_recursive().
         states = {}
         state = ProjectState(real_apps=list(self.loader.unmigrated_apps))
         if self.progress_callback:
             self.progress_callback("render_start")
-        # Phase 1 -- Store all project states of migrations right before they
-        # are applied. The first migration that will be applied in phase 2 will
-        # trigger the rendering of the initial project state. From this time on
-        # models will be recursively reloaded as explained in
-        # `django.db.migrations.state.get_related_models_recursive()`.
         for migration, _ in full_plan:
-            if not migrations_to_run:
-                # We remove every migration whose state was already computed
-                # from the set below (`migrations_to_run.remove(migration)`).
-                # If no states for migrations must be computed, we can exit
-                # this loop. Migrations that occur after the latest migration
-                # that is about to be applied would only trigger unneeded
-                # mutate_state() calls.
+            if not compute_state_for:
+                # The last migration that needs a preservation of its
+                # "before-state" has been rendered.
                 break
-            do_run = migration in migrations_to_run
+            do_run = migration in compute_state_for
             if do_run:
                 if 'apps' not in state.__dict__:
                     state.apps  # Render all real_apps -- performance critical
                 states[migration] = state.clone()
-                migrations_to_run.remove(migration)
+                compute_state_for.remove(migration)
             # Only preserve the state if the migration is being run later
             state = migration.mutate_state(state, preserve=do_run)
         if self.progress_callback:
             self.progress_callback("render_success")
-        # Phase 2 -- Run the migrations
-        for migration, backwards in plan:
+
+        # Phase 3 -- Run the migrations from each group.
+        for group in groups:
+            migration, (_, backwards) = next(iter(group.items()))
             if not backwards:
-                self.apply_migration(states[migration], migration, fake=fake, fake_initial=fake_initial)
+                # We take the state from the first migration of the group and
+                # reuse it for the other migrations in that group as
+                # apply_migration() returns the new state.
+                state = states[migration]
+                for migration, (_, backwards) in group.items():
+                    state = self.apply_migration(state, migration, fake=fake, fake_initial=fake_initial)
             else:
-                self.unapply_migration(states[migration], migration, fake=fake)
+                # We cannot pass the state as with forwards migrations but have
+                # to look it up for every migration.
+                for migration, (_, backwards) in group.items():
+                    self.unapply_migration(states[migration], migration, fake=fake)
 
     def collect_sql(self, plan):
         """
