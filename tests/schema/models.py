@@ -80,6 +80,14 @@ class BookWithSlug(models.Model):
         db_table = "schema_book"
 
 
+class IntegerPK(models.Model):
+    i = models.IntegerField(primary_key=True)
+
+    class Meta:
+        apps = new_apps
+        db_table = "INTEGERPK"  # uppercase to ensure proper quoting
+
+
 class Note(models.Model):
     info = models.TextField()
 
