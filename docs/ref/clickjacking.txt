@@ -45,6 +45,9 @@ site:
 2. A set of view decorators that can be used to override the middleware or to
    only set the header for certain views.
 
+The ``X-Frame-Options`` HTTP header will only be set by the middleware or view
+decorators if it is not already present in the response.
+
 How to use it
 =============
 
