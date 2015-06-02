@@ -31,3 +31,6 @@ Bugfixes
 
 * Fixed a crash when using a reverse one-to-one relation in
   ``ModelAdmin.list_display`` (:ticket:`24851`).
+
+* Fixed pickling queryset cache issue when using ``prefetch_related`` after
+  objects deletion (:ticket:`24831`).
