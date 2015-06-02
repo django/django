@@ -1,6 +1,7 @@
 import os
 
 from django.db import connection
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import TransactionTestCase
 from django.utils._os import upath
 
@@ -12,6 +13,11 @@ class MigrationTestBase(TransactionTestCase):
 
     available_apps = ["migrations"]
     test_dir = os.path.abspath(os.path.dirname(upath(__file__)))
+
+    def tearDown(self):
+        # Reset applied-migrations state.
+        recorder = MigrationRecorder(connection)
+        recorder.migration_qs.filter(app='migrations').delete()
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
