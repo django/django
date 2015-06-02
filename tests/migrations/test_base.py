@@ -6,6 +6,7 @@ from importlib import import_module
 
 from django.apps import apps
 from django.db import connection
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import TransactionTestCase
 from django.test.utils import extend_sys_path
 from django.utils.module_loading import module_dir
@@ -17,6 +18,11 @@ class MigrationTestBase(TransactionTestCase):
     """
 
     available_apps = ["migrations"]
+
+    def tearDown(self):
+        # Reset applied-migrations state.
+        recorder = MigrationRecorder(connection)
+        recorder.migration_qs.filter(app='migrations').delete()
 
     def get_table_description(self, table):
         with connection.cursor() as cursor:
