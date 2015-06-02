@@ -3,3 +3,4 @@
 *css text eol=lf
 tests/staticfiles_tests/apps/test/static/test/*txt text eol=lf
 tests/staticfiles_tests/project/documents/test/*txt text eol=lf
+docs/releases/*.txt merge=union
