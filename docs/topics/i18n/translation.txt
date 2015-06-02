@@ -821,18 +821,33 @@ Other tags
 
 These tags also require a ``{% load i18n %}``.
 
-* ``{% get_available_languages as LANGUAGES %}`` returns a list of tuples in
-  which the first element is the :term:`language code` and the second is the
-  language name (translated into the currently active locale).
+.. templatetag:: get_available_languages
 
-* ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
-  preferred language, as a string.  Example: ``en-us``. (See
-  :ref:`how-django-discovers-language-preference`.)
+``get_available_languages``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ``{% get_current_language_bidi as LANGUAGE_BIDI %}`` returns the current
-  locale's direction. If True, it's a right-to-left language, e.g.: Hebrew,
-  Arabic. If False it's a left-to-right language, e.g.: English, French, German
-  etc.
+``{% get_available_languages as LANGUAGES %}`` returns a list of tuples in
+which the first element is the :term:`language code` and the second is the
+language name (translated into the currently active locale).
+
+.. templatetag:: get_current_language
+
+``get_current_languages``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
+preferred language as a string. Example: ``en-us``. See
+:ref:`how-django-discovers-language-preference`.
+
+.. templatetag:: get_current_language_bidi
+
+``get_current_language_bidi``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``{% get_current_language_bidi as LANGUAGE_BIDI %}`` returns the current
+locale's direction. If ``True``, it's a right-to-left language, e.g. Hebrew,
+Arabic. If ``False`` it's a left-to-right language, e.g. English, French,
+German, etc.
 
 If you enable the ``django.template.context_processors.i18n`` context processor
 then each ``RequestContext`` will have access to ``LANGUAGES``,
@@ -841,6 +856,11 @@ then each ``RequestContext`` will have access to ``LANGUAGES``,
 .. versionchanged:: 1.8
 
     The ``i18n`` context processor is not enabled by default for new projects.
+
+.. templatetag:: get_language_info
+
+``get_language_info``
+~~~~~~~~~~~~~~~~~~~~~
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
@@ -855,6 +875,11 @@ You can then access the information::
     Name of language: {{ lang.name_local }}<br />
     Name in English: {{ lang.name }}<br />
     Bi-directional: {{ lang.bidi }}
+
+.. templatetag:: get_language_info_list
+
+``get_language_info_list``
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can also use the ``{% get_language_info_list %}`` template tag to retrieve
 information for a list of languages (e.g. active languages as specified in
@@ -875,6 +900,13 @@ you can iterate over those languages in the template::
 
   {% get_language_info_list for available_languages as langs %}
   {% for lang in langs %} ... {% endfor %}
+
+.. templatefilter:: language_name
+.. templatefilter:: language_name_local
+.. templatefilter:: language_bidi
+
+Template filters
+~~~~~~~~~~~~~~~~
 
 There are also simple filters available for convenience:
 
