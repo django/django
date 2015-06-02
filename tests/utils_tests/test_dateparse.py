@@ -51,6 +51,7 @@ class DateParseTests(unittest.TestCase):
 
 
 class DurationParseTests(unittest.TestCase):
+    
     def test_parse_python_format(self):
         timedeltas = [
             timedelta(days=4, minutes=15, seconds=30, milliseconds=100),  # fractions of seconds
@@ -63,6 +64,7 @@ class DurationParseTests(unittest.TestCase):
         ]
         for delta in timedeltas:
             self.assertEqual(parse_duration(format(delta)), delta)
+
     def test_seconds(self):
         self.assertEqual(parse_duration('30'), timedelta(seconds=30))
 
