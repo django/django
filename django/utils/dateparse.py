@@ -29,7 +29,7 @@ datetime_re = re.compile(
 
 standard_duration_re = re.compile(
     r'^'
-    r'(?:(?P<days>-?\d+) )?'
+    r'(?:(?P<days>-?\d+) (days?, )?)?'
     r'((?:(?P<hours>\d+):)(?=\d+:\d+))?'
     r'(?:(?P<minutes>\d+):)?'
     r'(?P<seconds>\d+)'

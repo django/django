@@ -40,3 +40,6 @@ Bugfixes
 
 * Fixed queryset pickling when using ``prefetch_related()`` after deleting
   objects (:ticket:`24831`).
+
+* Allowed using ``choices`` longer than 1 day with ``DurationField``
+  (:ticket:`24897`).
