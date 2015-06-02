@@ -51,7 +51,7 @@ class DateParseTests(unittest.TestCase):
 
 
 class DurationParseTests(unittest.TestCase):
-    
+
     def test_parse_python_format(self):
         timedeltas = [
             timedelta(days=4, minutes=15, seconds=30, milliseconds=100),  # fractions of seconds
