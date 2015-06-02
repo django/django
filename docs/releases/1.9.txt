@@ -278,6 +278,10 @@ Templates
   the ability to register libraries and builtins explicitly through the
   template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
 
+* Added ``name_translated`` attribute to object returned by
+  ``get_language_info`` tag. Also added corresponding filter
+  ``language_name_translated``.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 

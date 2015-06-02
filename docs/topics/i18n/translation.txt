@@ -870,6 +870,11 @@ You can then access the information::
     Name of language: {{ lang.name_local }}<br />
     Name in English: {{ lang.name }}<br />
     Bi-directional: {{ lang.bidi }}
+    Name in the active language: {{ lang.name_translated }}
+
+.. versionadded:: 1.9
+
+   The ``name_translated`` attribute was added.
 
 .. templatetag:: get_language_info_list
 
@@ -908,6 +913,12 @@ There are also simple filters available for convenience:
 * ``{{ LANGUAGE_CODE|language_name }}`` ("German")
 * ``{{ LANGUAGE_CODE|language_name_local }}`` ("Deutsch")
 * ``{{ LANGUAGE_CODE|language_bidi }}`` (False)
+* ``{{ LANGUAGE_CODE|language_name_translated }}`` ("německy", when active language is Czech)
+
+.. versionadded:: 1.9
+
+   The ``language_name_translated`` filter was added
+
 
 .. _Django templates: ../templates_python/
 
