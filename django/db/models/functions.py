@@ -1,7 +1,7 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import IntegerField
+from django.db.models import DateTimeField, IntegerField
 from django.db.models.expressions import Func, Value
 
 
@@ -137,3 +137,19 @@ class Upper(Func):
 
     def __init__(self, expression, **extra):
         super(Upper, self).__init__(expression, **extra)
+
+
+class Now(Func):
+    template = 'CURRENT_TIMESTAMP'
+
+    def __init__(self, output_field=None, **extra):
+        if output_field is None:
+            output_field = DateTimeField()
+        super(Now, self).__init__(output_field=output_field, **extra)
+
+    def as_postgresql(self, compiler, connection):
+        # Postgres' CURRENT_TIMESTAMP means "the time at the start of the
+        # transaction". We use STATEMENT_TIMESTAMP to be cross compatible with
+        # the other databases.
+        self.template = 'STATEMENT_TIMESTAMP()'
+        return self.as_sql(compiler, connection)
