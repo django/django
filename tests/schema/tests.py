@@ -63,6 +63,7 @@ class SchemaTests(TransactionTestCase):
 
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
+        converter = connection.introspection.table_name_converter
         with connection.cursor() as cursor:
             connection.disable_constraint_checking()
             table_names = connection.introspection.table_names(cursor)
@@ -70,7 +71,7 @@ class SchemaTests(TransactionTestCase):
                 # Remove any M2M tables first
                 for field in model._meta.local_many_to_many:
                     with atomic():
-                        tbl = field.remote_field.through._meta.db_table
+                        tbl = converter(field.remote_field.through._meta.db_table)
                         if tbl in table_names:
                             cursor.execute(connection.schema_editor().sql_delete_table % {
                                 "table": connection.ops.quote_name(tbl),
@@ -78,7 +79,7 @@ class SchemaTests(TransactionTestCase):
                             table_names.remove(tbl)
                 # Then remove the main tables
                 with atomic():
-                    tbl = model._meta.db_table
+                    tbl = converter(model._meta.db_table)
                     if tbl in table_names:
                         cursor.execute(connection.schema_editor().sql_delete_table % {
                             "table": connection.ops.quote_name(tbl),
