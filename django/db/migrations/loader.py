@@ -251,6 +251,8 @@ class MigrationLoader(object):
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):
                 self.applied_migrations.add(key)
+        # Store the replacement migrations for later checks
+        self.replacements = replacing
         # Finally, make a graph and load everything into it
         self.graph = MigrationGraph()
         for key, migration in normal.items():

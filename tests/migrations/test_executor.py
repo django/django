@@ -2,6 +2,7 @@ from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.recorder import MigrationRecorder
 from django.db.utils import DatabaseError
 from django.test import TestCase, modify_settings, override_settings
 
@@ -410,6 +411,31 @@ class ExecutorTests(MigrationTestBase):
                 editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
             self.assertTableNotExists("author_app_author")
             self.assertTableNotExists("book_app_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_apply_all_replaced_marks_replacement_as_applied(self):
+        """
+        Applying all replaced migrations marks the replacement as applied.
+
+        Ticket #24628.
+        """
+        recorder = MigrationRecorder(connection)
+        # Place the database in a state where the replaced migrations are
+        # partially applied: 0001 is applied, 0002 is not.
+        recorder.record_applied("migrations", "0001_initial")
+        executor = MigrationExecutor(connection)
+        # Use fake because we don't actually have the first migration
+        # applied, so the second will fail. And there's no need to actually
+        # create/modify tables here, we're just testing the
+        # MigrationRecord, which works the same with or without fake.
+        executor.migrate([("migrations", "0002_second")], fake=True)
+
+        # Because we've now applied 0001 and 0002 both, their squashed
+        # replacement should be marked as applied.
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations(),
+        )
 
 
 class FakeLoader(object):

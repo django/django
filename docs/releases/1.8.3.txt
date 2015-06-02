@@ -47,3 +47,6 @@ Bugfixes
 * Fixed a crash when loading squashed migrations from two apps with a
   dependency between them, where the dependent app's replaced migrations are
   partially applied (:ticket:`24895`).
+
+* Fixed recording of applied status for squashed (replacement) migrations
+  (:ticket:`24628`).

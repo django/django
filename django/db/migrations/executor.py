@@ -110,6 +110,7 @@ class MigrationExecutor(object):
                 self.apply_migration(states[migration], migration, fake=fake, fake_initial=fake_initial)
             else:
                 self.unapply_migration(states[migration], migration, fake=fake)
+        self.check_replacements()
 
     def collect_sql(self, plan):
         """
@@ -175,6 +176,16 @@ class MigrationExecutor(object):
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)
         return state
+
+    def check_replacements(self):
+        """
+        Mark replacement migrations applied if their replaced set all are.
+        """
+        applied = self.recorder.applied_migrations()
+        for key, migration in self.loader.replacements.items():
+            all_applied = all(m in applied for m in migration.replaces)
+            if all_applied and key not in applied:
+                self.recorder.record_applied(*key)
 
     def detect_soft_applied(self, project_state, migration):
         """
