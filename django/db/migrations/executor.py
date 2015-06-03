@@ -180,6 +180,14 @@ class MigrationExecutor(object):
     def check_replacements(self):
         """
         Mark replacement migrations applied if their replaced set all are.
+
+        We do this unconditionally on every migrate, rather than just when
+        migrations are applied or unapplied, so as to correctly handle the case
+        when a new squash migration is pushed to a deployment that already had
+        all its replaced migrations applied. In this case no new migration will
+        be applied, but we still want to correctly maintain the applied state
+        of the squash migration.
+
         """
         applied = self.recorder.applied_migrations()
         for key, migration in self.loader.replacements.items():
