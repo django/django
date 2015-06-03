@@ -574,6 +574,53 @@ class NamespaceTests(SimpleTestCase):
         self.assertEqual('/inc70/', reverse('inc-ns5:inner-nothing', args=['70']))
         self.assertEqual('/inc78/extra/foobar/', reverse('inc-ns5:inner-extra', args=['78', 'foobar']))
 
+    def test_nested_app_lookup(self):
+        "A nested current_app should be split in individual namespaces (#24904)"
+        self.assertEqual('/ns-included1/test4/inner/', reverse('inc-ns1:testapp:urlobject-view'))
+        self.assertEqual('/ns-included1/test4/inner/37/42/', reverse('inc-ns1:testapp:urlobject-view', args=[37, 42]))
+        self.assertEqual(
+            '/ns-included1/test4/inner/42/37/',
+            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37})
+        )
+        self.assertEqual('/ns-included1/test4/inner/+%5C$*/', reverse('inc-ns1:testapp:urlobject-special-view'))
+
+        self.assertEqual(
+            '/ns-included1/test3/inner/',
+            reverse('inc-ns1:testapp:urlobject-view', current_app='inc-ns1:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test3/inner/37/42/',
+            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='inc-ns1:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test3/inner/42/37/',
+            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37}, current_app='inc-ns1:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test3/inner/+%5C$*/',
+            reverse('inc-ns1:testapp:urlobject-special-view', current_app='inc-ns1:test-ns3')
+        )
+
+    def test_current_app_no_partial_match(self):
+        "current_app should either match the whole path or shouldn't be used"
+        self.assertEqual(
+            '/ns-included1/test4/inner/',
+            reverse('inc-ns1:testapp:urlobject-view', current_app='non-existant:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test4/inner/37/42/',
+            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='non-existant:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test4/inner/42/37/',
+            reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37},
+                    current_app='non-existant:test-ns3')
+        )
+        self.assertEqual(
+            '/ns-included1/test4/inner/+%5C$*/',
+            reverse('inc-ns1:testapp:urlobject-special-view', current_app='non-existant:test-ns3')
+        )
+
 
 @override_settings(ROOT_URLCONF=urlconf_outer.__name__)
 class RequestURLconfTests(SimpleTestCase):
