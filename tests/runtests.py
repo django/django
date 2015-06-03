@@ -235,7 +235,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
     state = setup(verbosity, test_labels)
     extra_tests = []
 
-    if test_labels and 'postgres_tests' in test_labels and connection.vendor != 'postgres':
+    if test_labels and 'postgres_tests' in test_labels and connection.vendor != 'postgresql':
         if verbosity >= 2:
             print("Removed postgres_tests from tests as we're not running with PostgreSQL.")
         test_labels.remove('postgres_tests')
