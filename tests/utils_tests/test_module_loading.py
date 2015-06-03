@@ -115,7 +115,7 @@ class ModuleImportTestCase(unittest.TestCase):
 
         # Test exceptions raised
         self.assertRaises(ImportError, import_string, 'no_dots_in_path')
-        self.assertRaises(ImportError, import_string, 'utils_tests.unexistent')
+        self.assertRaisesRegexp(ImportError, 'Module "utils_tests"', import_string, 'utils_tests.unexistent')
 
 
 @modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})
