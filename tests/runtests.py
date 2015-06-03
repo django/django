@@ -239,11 +239,6 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
     state = setup(verbosity, test_labels)
     extra_tests = []
 
-    if test_labels and 'postgres_tests' in test_labels and connection.vendor != 'postgres':
-        if verbosity >= 2:
-            print("Removed postgres_tests from tests as we're not running with PostgreSQL.")
-        test_labels.remove('postgres_tests')
-
     # Run the test suite, including the extra validation tests.
     if not hasattr(settings, 'TEST_RUNNER'):
         settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
