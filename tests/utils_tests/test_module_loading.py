@@ -150,8 +150,10 @@ class ModuleImportTestCase(unittest.TestCase):
 
         # Test exceptions raised
         self.assertRaises(ImportError, import_string, 'no_dots_in_path')
-        self.assertRaises(ImportError, import_string, 'utils_tests.unexistent')
         self.assertRaises(ImportError, import_string, 'unexistent.path')
+        msg = 'Module "utils_tests" does not define a "unexistent" attribute'
+        with six.assertRaisesRegex(self, ImportError, msg):
+            import_string('utils_tests.unexistent')
 
 
 @modify_settings(INSTALLED_APPS={'append': 'utils_tests.test_module'})
