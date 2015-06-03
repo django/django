@@ -416,7 +416,7 @@ Migration Initial Property
 Initial migrations are now marked with an ``initial = True`` class attribute on
 the migration class, which only has effect when :djadmin:`migrate` is run with
 the ``--fake-initial`` argument.  Details about the attribute can be found in
-the :ref:`migrations documentation <initial-property>`.
+the :ref:`migrations documentation <migration-initial-property>`.
 
 Backwards incompatible changes in 1.9
 =====================================
