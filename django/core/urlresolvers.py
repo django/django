@@ -549,19 +549,26 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         view = parts[0]
         path = parts[1:]
 
+        if current_app:
+            current_path = current_app.split(':')
+            current_path.reverse()
+        else:
+            current_path = None
+
         resolved_path = []
         ns_pattern = ''
         while path:
             ns = path.pop()
+            current_ns = current_path.pop() if current_path else None
 
             # Lookup the name to see if it could be an app identifier
             try:
                 app_list = resolver.app_dict[ns]
                 # Yes! Path part matches an app in the current Resolver
-                if current_app and current_app in app_list:
+                if current_ns and current_ns in app_list:
                     # If we are reversing for a particular app,
                     # use that namespace
-                    ns = current_app
+                    ns = current_ns
                 elif ns not in app_list:
                     # The name isn't shared by one of the instances
                     # (i.e., the default) so just pick the first instance
@@ -569,6 +576,9 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
                     ns = app_list[0]
             except KeyError:
                 pass
+
+            if ns != current_ns:
+                current_path = None
 
             try:
                 extra, resolver = resolver.namespace_dict[ns]
