@@ -105,6 +105,14 @@ class Command(BaseCommand):
                 if prefixed_path not in found_files:
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
+                else:
+                    self.log(
+                        "Found another file with the destination path '%s'. It "
+                        "will be ignored since only the first encountered file "
+                        "is collected. If this is not what you want, make sure "
+                        "every static file has a unique path." % prefixed_path,
+                        level=1,
+                    )
 
         # Here we check if the storage backend has a post_process
         # method and pass it the list of modified files.
