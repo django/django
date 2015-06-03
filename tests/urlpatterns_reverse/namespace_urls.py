@@ -48,6 +48,8 @@ urlpatterns = [
     url(r'^ns-included[135]/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     url(r'^ns-included2/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
+    url(r'^app-included/', include('urlpatterns_reverse.included_namespace_urls', 'inc-app', 'inc-app')),
+
     url(r'^included/', include('urlpatterns_reverse.included_namespace_urls')),
     url(r'^inc(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls', namespace='inc-ns5')),
     url(r'^included/([0-9]+)/', include('urlpatterns_reverse.included_namespace_urls')),
