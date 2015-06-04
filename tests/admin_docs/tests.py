@@ -149,7 +149,13 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 }])
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewWithMultipleEngines(AdminDocViewTests):
-    pass
+    def test_templatefilter_index(self):
+        response = self.client.get(reverse('django-admindocs-filters'))
+        self.assertContains(response, '<title>Template filters</title>', html=True)
+
+    def test_templatetag_index(self):
+        response = self.client.get(reverse('django-admindocs-tags'))
+        self.assertContains(response, '<title>Template tags</title>', html=True)
 
 
 class XViewMiddlewareTest(TestDataMixin, AdminDocsTestCase):
