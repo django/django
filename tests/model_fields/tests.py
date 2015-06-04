@@ -246,6 +246,13 @@ class ManyToManyFieldTests(test.SimpleTestCase):
         )
 
 
+class TextFieldTests(test.TestCase):
+    def test_to_python(self):
+        """TextField.to_python should return a string"""
+        f = models.CharField()
+        self.assertEqual(f.to_python(1), '1')
+
+
 class DateTimeFieldTests(test.TestCase):
     def test_datetimefield_to_python_usecs(self):
         """DateTimeField.to_python should support usecs"""
