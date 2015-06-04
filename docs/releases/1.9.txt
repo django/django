@@ -285,6 +285,9 @@ Templates
   the ability to register libraries and builtins explicitly through the
   template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
 
+* The ``timesince`` and ``timeuntil`` filters were improved to deal with leap
+  years when given large time spans.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
