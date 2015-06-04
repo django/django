@@ -164,6 +164,27 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
 
+    def test_value_stripping(self):
+
+        """
+        Ensure that 'strip' argument works as intended (#4960).
+        """
+
+        # Test behaviour of strip method
+
+        f = CharField()  # strip=False
+        self.assertEqual(f.clean(' Foo bar '), ' Foo bar ')
+        self.assertEqual(f.clean(' Foo \nBar '), ' Foo \nBar ')
+        self.assertEqual(f.clean('Baz'), 'Baz')
+        self.assertEqual(f.clean(' '), ' ')
+
+        f = CharField(strip=True)
+        self.assertEqual(f.clean(' Foo bar '), 'Foo bar')
+        self.assertEqual(f.clean(' Foo \nBar '), 'Foo \nBar')
+        with self.assertRaises(forms.ValidationError) as err:
+            f.clean(' ')  # Whitespace, yet empty following strip
+        self.assertEqual(err.exception.messages[0], 'This field is required.')
+
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
