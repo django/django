@@ -359,6 +359,11 @@ Database backend API
 * To use the new ``date`` lookup, third-party database backends may need to
   implement the ``DatabaseOperations.datetime_cast_date_sql()`` method.
 
+* The ``DatabaseOperations.datetime_cast_sql()`` (without "``_date_``") method
+  has been removed. This method served to format dates on Oracle long
+  before 1.0, but hasn't been overridden by any core backend in years,
+  and hasn't been called anywhere in Django's code or tests.
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
