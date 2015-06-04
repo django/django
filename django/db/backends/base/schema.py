@@ -465,11 +465,8 @@ class BaseDatabaseSchemaEditor(object):
                 old_field.remote_field.through._meta.auto_created and
                 new_field.remote_field.through._meta.auto_created):
             return self._alter_many_to_many(model, old_field, new_field, strict)
-        elif old_type is None and new_type is None and (
-                old_field.remote_field.through and new_field.remote_field.through and
-                not old_field.remote_field.through._meta.auto_created and
-                not new_field.remote_field.through._meta.auto_created):
-            # Both sides have through models; this is a no-op.
+        elif old_type is None and new_type is None and old_field.remote_field.through and new_field.remote_field.through:
+            # Both sides are many-to-many; this is a no-op.
             return
         elif old_type is None or new_type is None:
             raise ValueError(

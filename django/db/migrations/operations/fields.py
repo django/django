@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.db.migrations.state import ModelState
 from django.db.models.fields import NOT_PROVIDED
 from django.utils import six
 from django.utils.functional import cached_property
@@ -49,6 +50,12 @@ class AddField(Operation):
             field = self.field
         state.models[app_label, self.model_name_lower].fields.append((self.name, field))
         state.reload_model(app_label, self.model_name_lower)
+        if field.many_to_many and not field.remote_field.through:
+            # field.remote_field.through is auto-created, add it to the project state.
+            model = state.apps.get_model(app_label, self.model_name_lower)
+            through = model._meta.get_field(self.name).remote_field.through
+            if through and through._meta.auto_created:
+                state.add_model(ModelState.from_model(through))
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         to_model = to_state.apps.get_model(app_label, self.model_name)
@@ -109,9 +116,16 @@ class RemoveField(Operation):
 
     def state_forwards(self, app_label, state):
         new_fields = []
+        field = None
         for name, instance in state.models[app_label, self.model_name_lower].fields:
             if name != self.name:
                 new_fields.append((name, instance))
+            else:
+                field = instance
+        if field.many_to_many and not field.remote_field.through:
+            # field.rel.through is auto-created. Remove it from the state.
+            through_name = "%s_%s" % (self.model_name, self.name)
+            state.remove_model(app_label, through_name.lower())
         state.models[app_label, self.model_name_lower].fields = new_fields
         state.reload_model(app_label, self.model_name_lower)
 

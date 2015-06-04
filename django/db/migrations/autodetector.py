@@ -82,6 +82,20 @@ class MigrationAutodetector(object):
         else:
             return obj
 
+    def m2m_field_compare(self, through, rem_through):
+        """
+        Compare if two many-to-many fields describe the same through model,
+        i.e. define a relation between the same from and to models and have
+        the same field name.
+        Used to detect through model renames, regardless of how much the
+        model has changed.
+        """
+        return (
+            through["from"] == rem_through["from"]
+            and through["to"] == rem_through["to"]
+            and through["field"] == rem_through["field"]
+        )
+
     def only_relation_agnostic_fields(self, fields):
         """
         Return a definition of the fields that ignores field names and
@@ -154,6 +168,53 @@ class MigrationAutodetector(object):
 
         # Renames have to come first
         self.generate_renamed_models()
+
+        self.old_through_models = {}
+        self.new_through_models = {}
+        # Prepare a list of all m2m fields in the old and new models.
+        # This is used to detect changes to through models.
+        for app_label, model_name in sorted(set(self.old_model_keys).intersection(self.new_model_keys)):
+            old_model_name = self.renamed_models.get((app_label, model_name), model_name)
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            for field_name, field in old_model_state.fields:
+                # We need the through model, even if it is auto-created and
+                # through is None in the deconstructed field.
+                old_field = self.old_apps.get_model(app_label, old_model_name)._meta.get_field(field_name)
+                if old_field.remote_field and getattr(old_field.remote_field, "through", None):
+                    # Get the through key from the rendered field.
+                    through_key = (
+                        old_field.remote_field.through._meta.app_label,
+                        old_field.remote_field.through._meta.model_name
+                    )
+                    # Get the to key from the deconstructed field.
+                    to_key = field.related_model.split('.')
+                    self.old_through_models[through_key] = {
+                        "from": (app_label, model_name),
+                        "to": to_key,
+                        "through": through_key,
+                        "field": field_name
+                    }
+            new_model_state = self.to_state.models[app_label, model_name]
+            for field_name, field in new_model_state.fields:
+                # We need the through model, even if it is auto-created and
+                # through is None in the deconstructed field.
+                new_field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+                if new_field.remote_field and getattr(new_field.remote_field, "through", None):
+                    # Get the through key from the rendered field.
+                    through_key = (
+                        new_field.remote_field.through._meta.app_label,
+                        new_field.remote_field.through._meta.model_name
+                    )
+                    # Get the to key from the deconstructed field.
+                    to_key = field.remote_field.model.split('.')
+                    self.new_through_models[through_key] = {
+                        "from": (app_label, model_name),
+                        "to": to_key,
+                        "through": through_key,
+                        "field": field_name,
+                    }
+
+        self.generate_renamed_through_models()
 
         # Prepare field lists, and prepare a list of the fields that used
         # through models in the old state so we can make dependencies
@@ -429,12 +490,16 @@ class MigrationAutodetector(object):
         for app_label, model_name in sorted(added_models):
             model_state = self.to_state.models[app_label, model_name]
             model_fields_def = self.only_relation_agnostic_fields(model_state.fields)
+            if 'auto_created' in model_state.options:
+                continue
 
             removed_models = set(self.old_model_keys) - set(self.new_model_keys)
             for rem_app_label, rem_model_name in removed_models:
                 if rem_app_label == app_label:
                     rem_model_state = self.from_state.models[rem_app_label, rem_model_name]
                     rem_model_fields_def = self.only_relation_agnostic_fields(rem_model_state.fields)
+                    if 'auto_created' in rem_model_state.options:
+                        continue
                     if model_fields_def == rem_model_fields_def:
                         if self.questioner.ask_rename_model(rem_model_state, model_state):
                             self.add_operation(
@@ -449,6 +514,32 @@ class MigrationAutodetector(object):
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.append((app_label, model_name))
                             break
+
+    def generate_renamed_through_models(self):
+        for (app_label, model_name), through in sorted(self.new_through_models.items()):
+            through_state = self.to_state.models[app_label, model_name]
+            for (rem_app_label, rem_model_name), rem_through in sorted(self.old_through_models.items()):
+                if self.m2m_field_compare(through, rem_through):
+                    if through["through"] == rem_through["through"]:
+                        break
+                    rem_through_state = self.from_state.models[rem_app_label, rem_model_name]
+                    self.add_operation(
+                        app_label,
+                        operations.RenameModel(
+                            old_name=rem_through_state.name,
+                            new_name=through_state.name,
+                        )
+                    )
+                    self.renamed_models[app_label, model_name] = rem_model_name
+                    self.renamed_models_rel['%s.%s' % (rem_through_state.app_label, rem_through_state.name)] = '%s.%s' % (through_state.app_label, through_state.name)
+                    self.old_model_keys.remove((rem_app_label, rem_model_name))
+                    self.old_model_keys.append((app_label, model_name))
+                    break
+                elif through["field"] == rem_through["field"] and through["from"] == rem_through["from"]:
+                    self.old_model_keys.remove(rem_through["through"])
+                    del self.old_through_models[rem_through["through"]]
+                    self.new_model_keys.remove(through["through"])
+                    del self.new_through_models[through["through"]]
 
     def generate_created_models(self):
         """
@@ -470,6 +561,8 @@ class MigrationAutodetector(object):
         for app_label, model_name in all_added_models:
             model_state = self.to_state.models[app_label, model_name]
             model_opts = self.new_apps.get_model(app_label, model_name)._meta
+            if model_opts.auto_created:
+                continue
             # Gather related fields
             related_fields = {}
             primary_key_rel = None
@@ -646,8 +739,9 @@ class MigrationAutodetector(object):
         for app_label, model_name in all_deleted_models:
             model_state = self.from_state.models[app_label, model_name]
             model = self.old_apps.get_model(app_label, model_name)
-            if not model._meta.managed:
+            if model._meta.auto_created or not model._meta.managed:
                 # Skip here, no need to handle fields for unmanaged models
+                # Auto-created models are handled when the creating model is processed
                 continue
 
             # Gather related fields

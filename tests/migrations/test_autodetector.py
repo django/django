@@ -233,6 +233,13 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher")),
     ])
+    author_publisher_m2m = ModelState("testapp", "Author_publishers", [
+        ("id", models.AutoField(primary_key=True, auto_created=True, verbose_name="ID")),
+        ("author", models.ForeignKey("testapp.Author", related_name="Author_publishers+")),
+        ("publisher", models.ForeignKey("testapp.Publisher", related_name="Author_publishers+")),
+    ], {
+        "auto_created": "testapp.Author",
+    })
     author_with_m2m_blank = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.ManyToManyField("testapp.Publisher", blank=True)),
@@ -244,6 +251,15 @@ class AutodetectorTests(TestCase):
     author_with_former_m2m = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("publishers", models.CharField(max_length=100)),
+    ])
+    author_with_repointed_m2m = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("publishers", models.ManyToManyField("otherapp.Book")),
+    ])
+    author_book_m2m = ModelState("testapp", "Author_publishers", [
+        ("id", models.AutoField(primary_key=True, auto_created=True, verbose_name="ID")),
+        ("author", models.ForeignKey("testapp.Author", related_name="Author_publishers+")),
+        ("book", models.ForeignKey("otherapp.Book", related_name="Author_publishers+")),
     ])
     author_with_options = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -1497,7 +1513,7 @@ class AutodetectorTests(TestCase):
                 raise Exception("Should not have prompted for not null addition")
 
         before = self.make_project_state([self.author_empty, self.publisher])
-        after = self.make_project_state([self.author_with_m2m, self.publisher])
+        after = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m])
         autodetector = MigrationAutodetector(before, after, CustomQuestioner())
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
@@ -1506,8 +1522,8 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publishers")
 
     def test_alter_many_to_many(self):
-        before = self.make_project_state([self.author_with_m2m, self.publisher])
-        after = self.make_project_state([self.author_with_m2m_blank, self.publisher])
+        before = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m])
+        after = self.make_project_state([self.author_with_m2m_blank, self.publisher, self.author_publisher_m2m])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
@@ -1601,13 +1617,65 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 3, name="Author")
         self.assertOperationAttributes(changes, "testapp", 0, 4, name="Contract")
 
+    def test_m2m_add_through_model(self):
+        """
+        Tests that the auto-created through model is correctly renamed to the
+        new custom through model.
+        """
+        before = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m])
+        after = self.make_project_state([self.author_with_m2m_through, self.publisher, self.contract])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, [
+            "RenameModel", "AlterModelOptions", "AlterField", "AlterField", "AlterField", "AlterField",
+        ])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, old_name="Author_publishers", new_name="Contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="contract", options={})
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publishers", model_name="author")
+        self.assertOperationAttributes(changes, "testapp", 0, 3, name="author", model_name="contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 4, name="id", model_name="contract")
+        self.assertOperationAttributes(changes, "testapp", 0, 5, name="publisher", model_name="contract")
+
+    def test_m2m_remove_through_model(self):
+        """
+        Tests that the custom through model is correctly renamed to the
+        auto-created through model.
+        """
+        before = self.make_project_state([self.author_with_m2m_through, self.publisher, self.contract])
+        after = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, [
+            "RenameModel", "AlterModelOptions", "AlterField", "AlterField", "AlterField", "AlterField",
+        ])
+        self.assertOperationAttributes(changes, "testapp", 0, 0, old_name="Contract", new_name="Author_publishers")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="author_publishers", options={
+            "auto_created": "testapp.Author"
+        })
+        self.assertOperationAttributes(changes, "testapp", 0, 2, name="publishers", model_name="author")
+        self.assertOperationAttributes(changes, "testapp", 0, 3, name="author", model_name="author_publishers")
+        self.assertOperationAttributes(changes, "testapp", 0, 4, name="id", model_name="author_publishers")
+        self.assertOperationAttributes(changes, "testapp", 0, 5, name="publisher", model_name="author_publishers")
+
+    def test_repoint_m2m_field(self):
+        before = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m, self.book])
+        after = self.make_project_state([self.author_with_repointed_m2m, self.book, self.author_book_m2m, self.publisher])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, [
+            "AlterField",
+        ])
+
     def test_concrete_field_changed_to_many_to_many(self):
         """
         #23938 - Tests that changing a concrete field into a ManyToManyField
         first removes the concrete field and then adds the m2m field.
         """
         before = self.make_project_state([self.author_with_former_m2m])
-        after = self.make_project_state([self.author_with_m2m, self.publisher])
+        after = self.make_project_state([self.author_with_m2m, self.publisher, self.author_publisher_m2m])
         autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?

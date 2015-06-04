@@ -142,7 +142,8 @@ class ProjectState(object):
                 except KeyError:
                     pass
                 else:
-                    states_to_be_rendered.append(model_state)
+                    if "auto_created" not in model_state.options:
+                        states_to_be_rendered.append(model_state)
 
             # Render all models
             self.apps.render_multiple(states_to_be_rendered)
@@ -170,7 +171,7 @@ class ProjectState(object):
     def from_apps(cls, apps):
         "Takes in an Apps and returns a ProjectState matching it"
         app_models = {}
-        for model in apps.get_models(include_swapped=True):
+        for model in apps.get_models(include_swapped=True, include_auto_created=True):
             model_state = ModelState.from_model(model)
             app_models[(model_state.app_label, model_state.name_lower)] = model_state
         return cls(app_models)
