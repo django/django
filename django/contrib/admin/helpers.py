@@ -174,7 +174,9 @@ class AdminReadonlyField(object):
         self.is_first = is_first
         self.is_checkbox = False
         self.is_readonly = True
+
         self.empty_value_display = model_admin.get_empty_value_display()
+
 
     def label_tag(self):
         attrs = {}
