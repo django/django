@@ -15,13 +15,18 @@ class Aggregate(Func):
     name = None
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        assert len(self.source_expressions) == 1
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
-        if c.source_expressions[0].contains_aggregate and not summarize:
-            name = self.source_expressions[0].name
-            raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
-                c.name, name, name))
+        for index, source_expression in enumerate(c.source_expressions):
+            if source_expression.contains_aggregate and not summarize:
+                expr = self.source_expressions[index]
+                if hasattr(expr, 'name'):
+                    name = expr.name
+                else:
+                    raise TypeError("Complex expressions require an alias")
+                name = self.source_expressions[index].name
+                raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
+                    c.name, name, name))
         c._patch_aggregate(query)  # backward-compatibility support
         return c
 
