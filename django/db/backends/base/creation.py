@@ -85,6 +85,13 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
+    def set_as_test_mirror(self, primary_settings_dict):
+        """
+        Set this database up to be used in testing as a mirror of a primary database
+        whose settings are given
+        """
+        self.connection.settings_dict['NAME'] = primary_settings_dict['NAME']
+
     def serialize_db_to_string(self):
         """
         Serializes all data in the database into a JSON string.
