@@ -369,6 +369,13 @@ For each field, we describe the default widget used if you don't specify
     If provided, these arguments ensure that the string is at most or at least
     the given length.
 
+    Has one additional optional argument:
+
+    .. attribute:: strip
+
+    If set to ``True``, string values will have whitespace stripped prior to
+    any validation.
+
 ``ChoiceField``
 ~~~~~~~~~~~~~~~
 

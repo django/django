@@ -210,8 +210,8 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
+    def __init__(self, max_length=None, min_length=None, strip=False, *args, **kwargs):
+        self.max_length, self.min_length, self.strip = max_length, min_length, strip
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
@@ -230,6 +230,12 @@ class CharField(Field):
             # The HTML attribute is maxlength, not max_length.
             attrs.update({'maxlength': str(self.max_length)})
         return attrs
+
+    def clean(self, value):
+        if self.strip and isinstance(value, six.text_type):
+            value = self.to_python(value)
+            value = value.strip()
+        return super(CharField, self).clean(value)
 
 
 class IntegerField(Field):
