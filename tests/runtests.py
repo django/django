@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import atexit
 import logging
 import os
 import shutil
@@ -34,6 +35,12 @@ TMPDIR = tempfile.mkdtemp(prefix='django_')
 # Set the TMPDIR environment variable in addition to tempfile.tempdir
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
+
+# Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
+# successfully remove temp trees containing non-ASCII filenames on Windows.
+# (We're assuming the temp dir name itself only contains ASCII characters.)
+atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+
 
 SUBDIRS_TO_SKIP = [
     'data',
@@ -220,15 +227,6 @@ def setup(verbosity, test_labels, parallel):
 
 
 def teardown(state):
-    try:
-        # Removing the temporary TMPDIR. Ensure we pass in unicode
-        # so that it will successfully remove temp trees containing
-        # non-ASCII filenames on Windows. (We're assuming the temp dir
-        # name itself does not contain non-ASCII characters.)
-        shutil.rmtree(six.text_type(TMPDIR))
-    except OSError:
-        print('Failed to remove temp directory: %s' % TMPDIR)
-
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
