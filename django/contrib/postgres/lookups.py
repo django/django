@@ -1,5 +1,7 @@
 from django.db.models import Lookup, Transform
 
+from . import functions
+
 
 class PostgresSimpleLookup(Lookup):
     def as_sql(self, qn, connection):
@@ -45,7 +47,4 @@ class HasAnyKeys(PostgresSimpleLookup):
     operator = '?|'
 
 
-class Unaccent(FunctionTransform):
-    bilateral = True
-    lookup_name = 'unaccent'
-    function = 'UNACCENT'
+Unaccent = functions.Unaccent.as_transform(lookup_name='unaccent', bilateral=True)

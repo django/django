@@ -93,6 +93,7 @@ Minor features
 
 * Added :class:`~django.contrib.postgres.fields.JSONField`.
 * Added :doc:`/ref/contrib/postgres/aggregates`.
+* Added :doc:`/ref/contrib/postgres/functions`.
 
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
