@@ -39,7 +39,7 @@ class Feed(object):
         except ObjectDoesNotExist:
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
-        response = HttpResponse(content_type=feedgen.mime_type)
+        response = HttpResponse(content_type=feedgen.content_type)
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
             # if item_pubdate or item_updateddate is defined for the feed, set
             # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED

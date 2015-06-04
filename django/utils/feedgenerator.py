@@ -24,8 +24,10 @@ http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
 from django.utils import datetime_safe, six
+from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
@@ -219,7 +221,7 @@ class Enclosure(object):
 
 
 class RssFeed(SyndicationFeed):
-    mime_type = 'application/rss+xml; charset=utf-8'
+    content_type = 'application/rss+xml; charset=utf-8'
 
     def write(self, outfile, encoding):
         handler = SimplerXMLGenerator(outfile, encoding)
@@ -260,6 +262,15 @@ class RssFeed(SyndicationFeed):
 
     def endChannelElement(self, handler):
         handler.endElement("channel")
+
+    @property
+    def mime_type(self):
+        warnings.warn(
+            'The mime_type attribute of RssFeed is deprecated. '
+            'Use content_type instead.',
+            RemovedInDjango21Warning, stacklevel=2
+        )
+        return self.content_type
 
 
 class RssUserland091Feed(RssFeed):
@@ -318,7 +329,7 @@ class Rss201rev2Feed(RssFeed):
 
 class Atom1Feed(SyndicationFeed):
     # Spec: http://atompub.org/2005/07/11/draft-ietf-atompub-format-10.html
-    mime_type = 'application/atom+xml; charset=utf-8'
+    content_type = 'application/atom+xml; charset=utf-8'
     ns = "http://www.w3.org/2005/Atom"
 
     def write(self, outfile, encoding):
@@ -409,6 +420,15 @@ class Atom1Feed(SyndicationFeed):
         # Rights.
         if item['item_copyright'] is not None:
             handler.addQuickElement("rights", item['item_copyright'])
+
+    @property
+    def mime_type(self):
+        warnings.warn(
+            'The mime_type attribute of Atom1Feed is deprecated. '
+            'Use content_type instead.',
+            RemovedInDjango21Warning, stacklevel=2
+        )
+        return self.content_type
 
 # This isolates the decision of what the system default is, so calling code can
 # do "feedgenerator.DefaultFeed" instead of "feedgenerator.Rss201rev2Feed".
