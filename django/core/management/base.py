@@ -300,6 +300,9 @@ class BaseCommand(object):
 
         """
         if not self.use_argparse:
+            def store_as_int(option, opt_str, value, parser):
+                setattr(parser.values, option.dest, int(value))
+
             # Backwards compatibility: use deprecated optparse module
             warnings.warn("OptionParser usage for Django management commands "
                           "is deprecated, use ArgumentParser instead",
@@ -307,8 +310,8 @@ class BaseCommand(object):
             parser = OptionParser(prog=prog_name,
                                 usage=self.usage(subcommand),
                                 version=self.get_version())
-            parser.add_option('-v', '--verbosity', action='store', dest='verbosity', default='1',
-                type='choice', choices=['0', '1', '2', '3'],
+            parser.add_option('-v', '--verbosity', action='callback', dest='verbosity', default=1,
+                type='choice', choices=['0', '1', '2', '3'], callback=store_as_int,
                 help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
             parser.add_option('--settings',
                 help=(
