@@ -314,6 +314,9 @@ Templates
 * The ``timesince`` and ``timeuntil`` filters were improved to deal with leap
   years when given large time spans.
 
+* The ``include`` tag now caches parsed templates objects during template
+  rendering, speeding up reuse in places such as for loops.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
