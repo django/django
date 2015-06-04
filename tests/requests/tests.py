@@ -878,6 +878,68 @@ class DataUploadMaxMemorySizePostTests(SimpleTestCase):
             self.request._load_post_and_files()
 
 
+class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):
+    def setUp(self):
+        payload = FakePayload("\r\n".join([
+            '--boundary',
+            'Content-Disposition: form-data; name="name1"',
+            '',
+            'value1',
+            '--boundary',
+            'Content-Disposition: form-data; name="name2"',
+            '',
+            'value2',
+            '--boundary--'
+            ''
+        ]))
+        self.request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+
+    def test_number_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
+            with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
+                self.request._load_post_and_files()
+
+    def test_number_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
+            self.request._load_post_and_files()
+
+    def test_no_limit(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=None):
+            self.request._load_post_and_files()
+
+
+class DataUploadMaxNumberOfFieldsFPost(SimpleTestCase):
+    def setUp(self):
+        payload = FakePayload("\r\n".join([
+            'a=1&a=2',
+            ''
+        ]))
+        self.request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+
+    def test_number_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
+            with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
+                self.request._load_post_and_files()
+
+    def test_number_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
+            self.request._load_post_and_files()
+
+    def test_no_limit(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=None):
+            self.request._load_post_and_files()
+
+
 class BuildAbsoluteURITestCase(SimpleTestCase):
     """
     Regression tests for ticket #18314.

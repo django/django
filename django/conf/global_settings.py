@@ -290,6 +290,10 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 # data in form data requests, excluding file uploads.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 
+# Maxinum number of fields in a form post that will be allowed before raising
+# a SuspiciousOperation.
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 100
+
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
 # (i.e. "/tmp" on *nix systems).

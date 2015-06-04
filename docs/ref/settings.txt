@@ -888,6 +888,20 @@ or with a large number of fields, this limit may need to be increased.
 
 See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
+.. setting:: DATA_UPLOAD_MAX_NUMBER_FIELDS
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS
+-----------------------------
+
+.. versionadded:: 1.9
+
+Default: ``100``
+
+The maximum number of parameters received either via GET, or FORM POST before a
+:exc:`~django.core.exceptions.SuspiciousOperation` is raised. You can set it to
+``None`` to disable the check. When processing forms with a very large number
+of fields, this limit may need to be increased.
+
 .. setting:: DATABASE_ROUTERS
 
 ``DATABASE_ROUTERS``
@@ -3256,6 +3270,7 @@ Globalization (``i18n``/``l10n``)
 HTTP
 ----
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DEFAULT_CONTENT_TYPE`
 * :setting:`DISALLOWED_USER_AGENTS`

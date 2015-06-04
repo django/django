@@ -381,6 +381,7 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
+        self.num_inserted_items = 0
         if six.PY3:
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -456,6 +457,9 @@ class QueryDict(MultiValueDict):
         key = bytes_to_text(key, self.encoding)
         value = bytes_to_text(value, self.encoding)
         super(QueryDict, self).appendlist(key, value)
+        self.num_inserted_items += 1
+        if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < self.num_inserted_items:
+            raise SuspiciousOperation('Too many fields')
 
     def pop(self, key, *args):
         self._assert_mutable()
