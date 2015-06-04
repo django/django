@@ -363,6 +363,11 @@ Database backend API
 * To use the new ``date`` lookup, third-party database backends may need to
   implement the ``DatabaseOperations.datetime_cast_date_sql()`` method.
 
+* A new ``time_extract_sql`` method was added, defaulting to calling the
+  existing ``date_extract_sql`` method. This is used by the SQLite backend to
+  add :lookup:`time <hour>` lookups to :class:`~django.db.models.TimeField`,
+  and may be needed by third-party database backends.
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
