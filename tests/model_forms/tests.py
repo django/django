@@ -357,6 +357,22 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(list(ExcludeFields.base_fields),
                          ['name', 'slug'])
 
+    def test_exclude_overridden_fields(self):
+        class NoExcludeFields(forms.ModelForm):
+            url = forms.URLField()
+
+            class Meta:
+                model = Category
+                exclude = []
+
+        class ExcludeFields(NoExcludeFields):
+            class Meta:
+                model = Category
+                exclude = ['url']
+
+        self.assertEqual(list(ExcludeFields.base_fields),
+                         ['name', 'slug'])
+
     def test_exclude_nonexistent_field(self):
         class ExcludeFields(forms.ModelForm):
             class Meta:
