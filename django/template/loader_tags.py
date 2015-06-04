@@ -11,7 +11,6 @@ from .library import Library
 register = Library()
 
 BLOCK_CONTEXT_KEY = 'block_context'
-INCLUDE_CONTEXT_KEY = '__include_history'
 
 
 class ExtendsError(Exception):
@@ -172,6 +171,8 @@ class ExtendsNode(Node):
 
 
 class IncludeNode(Node):
+    context_key = '__include_context'
+
     def __init__(self, template, *args, **kwargs):
         self.template = template
         self.extra_context = kwargs.pop('extra_context', {})
@@ -179,20 +180,22 @@ class IncludeNode(Node):
         super(IncludeNode, self).__init__(*args, **kwargs)
 
     def render(self, context):
-        history = context[INCLUDE_CONTEXT_KEY] = context.get(
-            INCLUDE_CONTEXT_KEY, {},
-        )
-
+        """
+        Render the specified template and context. Cache the template object
+        in render_context to avoid reparsing and loading when used in a for
+        loop.
+        """
         try:
-            if self.template in history:
-                template = history[self.template]
-            else:
-                template = self.template.resolve(context)
-                # Does this quack like a Template?
-                if not callable(getattr(template, 'render', None)):
-                    # If not, we'll try get_template
-                    template = context.template.engine.get_template(template)
-                history[self.template] = template
+            template = self.template.resolve(context)
+            # Does this quack like a Template?
+            if not callable(getattr(template, 'render', None)):
+                # If not, we'll try our cache, and get_template
+                template_name = template
+                cache = context.render_context.setdefault(self.context_key, {})
+                template = cache.get(template_name)
+                if template is None:
+                    template = context.template.engine.get_template(template_name)
+                    cache[template_name] = template
 
             values = {
                 name: var.resolve(context)

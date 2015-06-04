@@ -720,6 +720,10 @@ included template and returns an empty string.
     been evaluated and rendered* - not blocks that can be overridden by, for
     example, an extending template.
 
+.. versionchanged:: 1.9
+
+    Parsed template objects are cached during rendering.
+
 .. templatetag:: load
 
 load
