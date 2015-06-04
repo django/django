@@ -540,6 +540,12 @@ Database backend API
   SQLite backend to add time lookups (hour, minute, second) to
   :class:`~django.db.models.TimeField`, and may be needed by third-party
   database backends.
+  
+* The ``DatabaseOperations.datetime_cast_sql()`` method (not to be confused
+  with ``DatabaseOperations.datetime_cast_date_sql()`` mentioned above)
+  has been removed. This method served to format dates on Oracle long
+  before 1.0, but hasn't been overridden by any core backend in years
+  and hasn't been called anywhere in Django's code or tests.
 
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
