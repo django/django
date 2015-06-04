@@ -35,7 +35,7 @@ class FunctionTests(TestCase):
         with self.assertRaisesMessage(ValueError, 'Coalesce must take at least two expressions'):
             Author.objects.annotate(display_name=Coalesce('alias'))
 
-    def test_coalesce_datetime_output_field_null(self):
+    def test_coalesce_datetime_value(self):
         now = timezone.now()
         Article.objects.create(title='Testing, testing.', written=now)
 
