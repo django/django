@@ -117,6 +117,12 @@ Minor features
 * The permission argument of
   :func:`~django.contrib.auth.decorators.permission_required()` accepts all
   kinds of iterables, not only list and tuples.
+* The module ``django.contrib.auth.mixins`` was added with
+  :class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+  :class:`~django.contrib.auth.mixins.PermissionRequiredMixin` and
+  :class:`~django.contrib.auth.mixins.UserPassesTestMixin` mixins to provide the
+  functionality of the ``django.contrib.auth.decorators`` shortcuts to class-based
+  views.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
