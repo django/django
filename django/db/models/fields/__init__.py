@@ -2141,11 +2141,14 @@ class TextField(Field):
     def get_internal_type(self):
         return "TextField"
 
-    def get_prep_value(self, value):
-        value = super(TextField, self).get_prep_value(value)
+    def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
         return smart_text(value)
+
+    def get_prep_value(self, value):
+        value = super(TextField, self).get_prep_value(value)
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         # Passing max_length to forms.CharField means that the value's length
