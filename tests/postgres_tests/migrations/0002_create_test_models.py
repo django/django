@@ -97,6 +97,17 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.CreateModel(
+            name='ChoiceIntegerArrayModel',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('field', ArrayField(models.IntegerField(), size=None)),
+            ],
+            options={
+                'required_db_vendor': 'postgresql',
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
             name='CharFieldModel',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),

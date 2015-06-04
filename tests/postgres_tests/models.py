@@ -5,6 +5,11 @@ from .fields import (
     FloatRangeField, HStoreField, IntegerRangeField, JSONField,
 )
 
+ARRAY_CHOICES = (
+    ([1, 2], 'Value 1'),
+    ([2, 3, 4], 'Value 2'),
+)
+
 
 class Tag(object):
     def __init__(self, tag_id):
@@ -44,6 +49,10 @@ class IntegerArrayModel(PostgreSQLModel):
 
 class NullableIntegerArrayModel(PostgreSQLModel):
     field = ArrayField(models.IntegerField(), blank=True, null=True)
+
+
+class ChoiceIntegerArrayModel(PostgreSQLModel):
+    field = ArrayField(base_field=models.IntegerField(), choices=ARRAY_CHOICES)
 
 
 class CharArrayModel(PostgreSQLModel):

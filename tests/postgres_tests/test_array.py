@@ -13,9 +13,9 @@ from django.utils import timezone
 
 from . import PostgreSQLTestCase
 from .models import (
-    ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel, Tag,
+    ArrayFieldSubclass, CharArrayModel, ChoiceIntegerArrayModel,
+    DateTimeArrayModel, IntegerArrayModel, NestedIntegerArrayModel,
+    NullableIntegerArrayModel, OtherTypesArrayModel, PostgreSQLModel, Tag,
 )
 
 try:
@@ -116,6 +116,11 @@ class TestSaveLoad(PostgreSQLTestCase):
         field = instance._meta.get_field('field')
         self.assertEqual(field.model, IntegerArrayModel)
         self.assertEqual(field.base_field.model, IntegerArrayModel)
+
+    def test_choices(self):
+        instance = ChoiceIntegerArrayModel(field=[1, 2])
+        instance.save()
+        self.assertEqual(instance.get_field_display(), 'Value 1')
 
 
 class TestQuerying(PostgreSQLTestCase):
