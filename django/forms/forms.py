@@ -447,12 +447,6 @@ class BaseForm(object):
     def changed_data(self):
         if self._changed_data is None:
             self._changed_data = []
-            # XXX: For now we're asking the individual fields whether or not the
-            # data has changed. It would probably be more efficient to hash the
-            # initial data, store it in a hidden field, and compare a hash of the
-            # submitted data, but we'd need a way to easily get the string value
-            # for a given field. Right now, that logic is embedded in the render
-            # method of each widget.
             for name, field in self.fields.items():
                 prefixed_name = self.add_prefix(name)
                 data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
