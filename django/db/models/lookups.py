@@ -72,8 +72,13 @@ class Transform(RegisterLookupMixin):
     def output_field(self):
         return self.lhs.output_field
 
+    def copy(self):
+        return copy(self)
+
     def relabeled_clone(self, relabels):
-        return self.__class__(self.lhs.relabeled_clone(relabels))
+        copy = self.copy()
+        copy.lhs = self.lhs.relabeled_clone(relabels)
+        return copy
 
     def get_group_by_cols(self):
         return self.lhs.get_group_by_cols()

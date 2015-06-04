@@ -557,3 +557,18 @@ class CustomisedMethodsTests(TestCase):
     def test_overridden_get_transform_chain(self):
         q = CustomModel.objects.filter(field__transformfunc_banana__transformfunc_pear=3)
         self.assertIn('pear()', str(q.query))
+
+
+class SubqueryTransformTests(TestCase):
+    def test_subquery_usage(self):
+        models.IntegerField.register_lookup(Div3Transform)
+        try:
+            Author.objects.create(name='a1', age=1)
+            a2 = Author.objects.create(name='a2', age=2)
+            Author.objects.create(name='a3', age=3)
+            Author.objects.create(name='a4', age=4)
+            self.assertQuerysetEqual(
+                Author.objects.order_by('name').filter(id__in=Author.objects.filter(age__div3=2)),
+                [a2], lambda x: x)
+        finally:
+            models.IntegerField._unregister_lookup(Div3Transform)
