@@ -243,6 +243,10 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.rollback()
         transaction.set_autocommit(True)
 
+    def test_create_with_autocommit_false(self):
+        Reporter.objects.create(first_name="Tintin")
+
+
 
 @skipUnless(connection.features.uses_savepoints,
         "'atomic' requires transactions and savepoints.")
