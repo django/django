@@ -65,7 +65,7 @@ class Command(BaseCommand):
         for dirpath, dirnames, filenames in os.walk('.', topdown=True):
             for dirname in dirnames:
                 if dirname == 'locale':
-                    basedirs.insert(0, os.path.join(dirpath, dirname))
+                    basedirs.append(os.path.join(dirpath, dirname))
 
         # Gather existing directories.
         basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
