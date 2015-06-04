@@ -98,6 +98,7 @@ class BaseCollectionTestCase(BaseStaticFilesTestCase):
     is separated because some test cases need those asserts without
     all these tests.
     """
+
     def setUp(self):
         super(BaseCollectionTestCase, self).setUp()
         temp_dir = tempfile.mkdtemp()

@@ -183,13 +183,43 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
-    def destroy_test_db(self, old_database_name, verbosity=1, keepdb=False):
+    def clone_test_db(self, suffix, verbosity=1, autoclobber=False, keepdb=False):
+        """
+        Clone a test database.
+        """
+        source_database_name = self.connection.settings_dict['NAME']
+        target_database_name = '%s_%s' % (source_database_name, suffix)
+
+        if verbosity >= 1:
+            test_db_repr = ''
+            action = 'Cloning test database'
+            if verbosity >= 2:
+                test_db_repr = " ('%s')" % source_database_name
+            if keepdb:
+                action = 'Using existing clone'
+            print("%s for alias '%s'%s..." % (
+                action, self.connection.alias, test_db_repr))
+
+        # We could skip this call if keepdb is True, but we instead
+        # give it the keepdb param. See create_test_db for details.
+        self._clone_test_db(source_database_name, target_database_name, verbosity, keepdb)
+
+    def _clone_test_db(self, source_database_name, target_database_name, verbosity, keepdb=False):
+        """
+        Internal implementation - duplicate the test db tables.
+        """
+        raise NotImplementedError
+
+    def destroy_test_db(self, old_database_name=None, verbosity=1, keepdb=False, suffix=None):
         """
         Destroy a test database, prompting the user for confirmation if the
         database already exists.
         """
         self.connection.close()
         test_database_name = self.connection.settings_dict['NAME']
+        if suffix is not None:
+            test_database_name = '%s_%s' % (test_database_name, suffix)
+
         if verbosity >= 1:
             test_db_repr = ''
             action = 'Destroying'
@@ -206,8 +236,9 @@ class BaseDatabaseCreation(object):
             self._destroy_test_db(test_database_name, verbosity)
 
         # Restore the original database name
-        settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
-        self.connection.settings_dict["NAME"] = old_database_name
+        if old_database_name is not None:
+            settings.DATABASES[self.connection.alias]["NAME"] = old_database_name
+            self.connection.settings_dict["NAME"] = old_database_name
 
     def _destroy_test_db(self, test_database_name, verbosity):
         """

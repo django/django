@@ -9,6 +9,7 @@ from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
 from django.test import ignore_warnings, mock, override_settings
+from django.test.testcases import SerializeMixin
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -17,10 +18,12 @@ from .models import UnicodeModel, UnserializableModel
 from .test_base import MigrationTestBase
 
 
-class MigrateTests(MigrationTestBase):
+class MigrateTests(SerializeMixin, MigrationTestBase):
     """
     Tests running the migrate command.
     """
+
+    lockfile = __file__
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate(self):
@@ -372,7 +375,7 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
 
 
-class MakeMigrationsTests(MigrationTestBase):
+class MakeMigrationsTests(SerializeMixin, MigrationTestBase):
     """
     Tests running the makemigrations command.
     """
@@ -867,11 +870,28 @@ class MakeMigrationsTests(MigrationTestBase):
                 call_command("makemigrations", "--exit", "migrations", verbosity=0)
 
 
+<<<<<<< HEAD
 class SquashMigrationsTests(MigrationTestBase):
+=======
+class SquashMigrationsTest(SerializeMixin, MigrationTestBase):
+>>>>>>> 9cc3d8f... Serialized some tests that interact with the filesystem.
     """
     Tests running the squashmigrations command.
     """
 
+<<<<<<< HEAD
+=======
+    lockfile = __file__
+
+    path = "test_migrations/0001_squashed_0002_second.py"
+    path = os.path.join(MigrationTestBase.test_dir, path)
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+>>>>>>> 9cc3d8f... Serialized some tests that interact with the filesystem.
     def test_squashmigrations_squashes(self):
         """
         Tests that squashmigrations squashes migrations.
