@@ -117,6 +117,21 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             html=True
         )
 
+    @override_settings(TEMPLATES=[{
+        'NAME': 'ONE',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }, {
+        'NAME': 'TWO',
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }])
+    def test_template_detail__with_multiple_engines(self):
+        response = self.client.get(reverse('django-admindocs-templates',
+            args=['admin_doc/template_detail.html']))
+        self.assertContains(response,
+            '<h1>Template: "admin_doc/template_detail.html"</h1>', html=True)
+
     def test_template_detail(self):
         response = self.client.get(reverse('django-admindocs-templates',
             args=['admin_doc/template_detail.html']))
