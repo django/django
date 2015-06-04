@@ -180,7 +180,6 @@ class UtilsTests(TestCase):
         self.assertEqual(display_value, self.empty_value)
 
     def test_number_formats_display_for_field(self):
-        empty_value = '-empty-'
         display_value = display_for_field(12345.6789, models.FloatField(), self.empty_value)
         self.assertEqual(display_value, '12345.6789')
 
@@ -192,7 +191,6 @@ class UtilsTests(TestCase):
 
     @override_settings(USE_L10N=True, USE_THOUSAND_SEPARATOR=True)
     def test_number_formats_with_thousand_seperator_display_for_field(self):
-        empty_value = '-empty-'
         display_value = display_for_field(12345.6789, models.FloatField(), self.empty_value)
         self.assertEqual(display_value, '12,345.6789')
 
