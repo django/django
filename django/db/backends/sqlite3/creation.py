@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
@@ -46,6 +47,26 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
         return test_database_name
+
+    def _clone_test_db(self, source_database_name, target_database_name, verbosity, keepdb=False):
+        # Forking automatically makes a copy of an in-memory database.
+        if not self.connection.is_in_memory_db(source_database_name):
+            # Erase the old test database
+            if verbosity >= 1:
+                print("Destroying old test database '%s'..." % self.connection.alias)
+            if os.access(target_database_name, os.F_OK):
+                if keepdb:
+                    return
+                try:
+                    os.remove(target_database_name)
+                except Exception as e:
+                    sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                    sys.exit(2)
+            try:
+                shutil.copy(source_database_name, target_database_name)
+            except Exception as e:
+                sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):
         if test_database_name and not self.connection.is_in_memory_db(test_database_name):

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+import multiprocessing
 import os
 import shutil
 import subprocess
@@ -235,7 +236,8 @@ def teardown(state):
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
+def django_tests(verbosity, interactive, failfast, keepdb, reverse,
+                 test_labels, debug_sql, parallel):
     state = setup(verbosity, test_labels)
     extra_tests = []
 
@@ -251,6 +253,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
+        parallel=parallel,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -396,6 +399,14 @@ if __name__ == "__main__":
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
         help='Turn on the SQL query logger within tests')
+    parser.add_argument(
+        '--parallel', action='store_const', dest='parallel', default=0,
+        const=multiprocessing.cpu_count(),
+        help='Run tests in parallel processes')
+    parser.add_argument(
+        '--parallel-num', dest='parallel', default=0, type=int,
+        help='Run tests in the given number of parallel processes')
+
     options = parser.parse_args()
 
     # mock is a required dependency
@@ -432,6 +443,6 @@ if __name__ == "__main__":
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
                                 options.reverse, options.modules,
-                                options.debug_sql)
+                                options.debug_sql, options.parallel)
         if failures:
             sys.exit(bool(failures))

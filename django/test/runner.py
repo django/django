@@ -1,15 +1,19 @@
+import ctypes
+import itertools
 import logging
+import multiprocessing
 import os
 import unittest
 from importlib import import_module
-from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
 from django.utils.six import StringIO
+from django.utils.six.moves.builtins import zip
 
 
 class DebugSQLTextTestResult(unittest.TextTestResult):
@@ -52,19 +56,128 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln("%s" % sql_debug)
 
 
+class RemoteTextTestRunner(unittest.TextTestRunner):
+
+    def run(self, test):
+        # Mimic RemoteTestRunner.run() -- minus code that outputs results.
+        result = self._makeResult()
+        unittest.registerResult(result)
+        result.failfast = self.failfast
+        result.buffer = self.buffer
+        result.startTestRun()
+        try:
+            test(result)
+        finally:
+            result.stopTestRun()
+
+        # Capture tracebacks in the worker process because it's impossible to
+        # pickle tracebacks in general (they can reference arbitrary objects).
+        result.stream = unittest.runner._WritelnDecorator(StringIO())
+        result.printErrors()
+        errors = result.stream.getvalue().strip()
+
+        # Save aggregate statistics because tests methods may be unpickleable.
+        stats = (
+            result.testsRun,
+            len(result.expectedFailures),
+            len(result.unexpectedSuccesses),
+            len(result.skipped),
+            len(result.failures),
+            len(result.errors),
+        )
+
+        return errors, stats
+
+
+_worker_id = 0
+
+
+def _init_worker(counter):
+    global _worker_id
+    with counter.get_lock():
+        counter.value += 1
+        _worker_id = counter.value
+
+    for alias in connections:
+        connection = connections[alias]
+        connection.settings_dict["NAME"] += '_{}'.format(_worker_id)
+        connection.close()
+
+
+def _run_subsuite(subsuite):
+    return RemoteTextTestRunner().run(subsuite)
+
+
+class ParallelTestSuite(unittest.TestSuite):
+
+    def __init__(self, suite, processes):
+        self.subsuites = partition_suite_by_case(suite)
+        self.processes = processes
+        super(ParallelTestSuite, self).__init__()
+
+    def run(self, result):
+        counter = multiprocessing.Value(ctypes.c_int, 0)
+        pool = multiprocessing.Pool(
+            processes=self.processes,
+            initializer=_init_worker,
+            initargs=[counter])
+        test_results = pool.imap_unordered(_run_subsuite, self.subsuites)
+
+        errors = []
+        stats = []
+
+        while True:
+            if result.shouldStop:
+                pool.terminate()
+                break
+
+            try:
+                test_errors, test_stats = test_results.next(timeout=0.1)
+            except multiprocessing.TimeoutError:
+                continue
+            except StopIteration:
+                pool.close()
+                break
+
+            errors.append(test_errors)
+            stats.append(test_stats)
+
+        pool.join()
+
+        # Gross hack to trick result into displaying the right data.
+
+        errors_text = '\n'.join(error for error in errors if error)
+
+        def _printErrors():
+            result.stream.writeln(errors_text)
+
+        result.printErrors = _printErrors
+
+        stats = tuple(map(sum, zip(*stats)))
+        result.testsRun = stats[0]
+        result.expectedFailures = [None] * stats[1]
+        result.unexpectedSuccesses = [None] * stats[2]
+        result.skipped = [None] * stats[3]
+        result.failures = [None] * stats[4]
+        result.errors = [None] * stats[5]
+
+        return result
+
+
 class DiscoverRunner(object):
     """
     A Django test runner that uses unittest2 test discovery.
     """
 
-    test_suite = TestSuite
+    test_suite = unittest.TestSuite
     test_runner = unittest.TextTestRunner
-    test_loader = defaultTestLoader
+    test_loader = unittest.defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
-                 reverse=False, debug_sql=False, **kwargs):
+                 reverse=False, debug_sql=False, parallel=0,
+                 **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -75,6 +188,7 @@ class DiscoverRunner(object):
         self.keepdb = keepdb
         self.reverse = reverse
         self.debug_sql = debug_sql
+        self.parallel = parallel
 
     @classmethod
     def add_arguments(cls, parser):
@@ -93,6 +207,13 @@ class DiscoverRunner(object):
         parser.add_argument('-d', '--debug-sql', action='store_true', dest='debug_sql',
             default=False,
             help='Prints logged SQL queries on failure.')
+        parser.add_argument(
+            '--parallel', action='store_const', dest='parallel', default=0,
+            const=multiprocessing.cpu_count(),
+            help='Run tests in parallel processes')
+        parser.add_argument(
+            '--parallel-num', dest='parallel', default=0, type=int,
+            help='Run tests in the given number of parallel processes')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -158,13 +279,17 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
-        return reorder_suite(suite, self.reorder_by, self.reverse)
+        suite = reorder_suite(suite, self.reorder_by, self.reverse)
+
+        if self.parallel > 1:
+            suite = ParallelTestSuite(suite, self.parallel)
+
+        return suite
 
     def setup_databases(self, **kwargs):
         return setup_databases(
             self.verbosity, self.interactive, self.keepdb, self.debug_sql,
-            **kwargs
-        )
+            self.parallel, **kwargs)
 
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
@@ -184,6 +309,13 @@ class DiscoverRunner(object):
         old_names, mirrors = old_config
         for connection, old_name, destroy in old_names:
             if destroy:
+                if self.parallel > 1:
+                    for index in range(self.parallel):
+                        connection.creation.destroy_test_db(
+                            suffix=str(index + 1),
+                            verbosity=self.verbosity,
+                            keepdb=self.keepdb,
+                        )
                 connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
     def teardown_test_environment(self, **kwargs):
@@ -287,14 +419,14 @@ def reorder_suite(suite, classes, reverse=False):
     class_count = len(classes)
     suite_class = type(suite)
     bins = [OrderedSet() for i in range(class_count + 1)]
-    partition_suite(suite, classes, bins, reverse=reverse)
+    partition_suite_by_type(suite, classes, bins, reverse=reverse)
     reordered_suite = suite_class()
     for i in range(class_count + 1):
         reordered_suite.addTests(bins[i])
     return reordered_suite
 
 
-def partition_suite(suite, classes, bins, reverse=False):
+def partition_suite_by_type(suite, classes, bins, reverse=False):
     """
     Partitions a test suite by test type. Also prevents duplicated tests.
 
@@ -310,7 +442,7 @@ def partition_suite(suite, classes, bins, reverse=False):
         suite = reversed(tuple(suite))
     for test in suite:
         if isinstance(test, suite_class):
-            partition_suite(test, classes, bins, reverse=reverse)
+            partition_suite_by_type(test, classes, bins, reverse=reverse)
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):
@@ -320,7 +452,22 @@ def partition_suite(suite, classes, bins, reverse=False):
                 bins[-1].add(test)
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
+def partition_suite_by_case(suite):
+    """
+    Partitions a test suite by test case, preserving the order of tests.
+    """
+    groups = []
+    suite_class = type(suite)
+    for test_type, test_group in itertools.groupby(suite, type):
+        if issubclass(test_type, unittest.TestCase):
+            groups.append(suite_class(test_group))
+        else:
+            for item in test_group:
+                groups.extend(partition_suite_by_case(item))
+    return groups
+
+
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
     from django.db import connections, DEFAULT_DB_ALIAS
 
     # First pass -- work out which databases actually need to be created,
@@ -364,11 +511,18 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
             connection = connections[alias]
             if test_db_name is None:
                 test_db_name = connection.creation.create_test_db(
-                    verbosity,
+                    verbosity=verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
                     serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
+                if parallel > 1:
+                    for index in range(parallel):
+                        connection.creation.clone_test_db(
+                            suffix=str(index + 1),
+                            verbosity=verbosity,
+                            keepdb=keepdb,
+                        )
                 destroy = True
             else:
                 connection.settings_dict['NAME'] = test_db_name
