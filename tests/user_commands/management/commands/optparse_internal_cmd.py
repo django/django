@@ -1,13 +1,12 @@
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
+from django.core.management.commands.test import Command as TestCommand
 
 
-class Command(BaseCommand):
-    help = "Test optparse compatibility."
-    args = ''
+class Command(TestCommand):
+    help = "Test optparse compatibility when extending an internal command."
 
-    option_list = BaseCommand.option_list + (
+    option_list = TestCommand.option_list + (
         make_option("-s", "--style", default="Rock'n'Roll"),
         make_option("-x", "--example")
     )

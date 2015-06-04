@@ -118,6 +118,11 @@ class CommandTests(SimpleTestCase):
             management.execute_from_command_line(['django-admin', 'optparse_cmd'])
         self.assertEqual(stdout.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
+        # Test overridden internal command
+        out = StringIO()
+        management.call_command('optparse_internal_cmd', stdout=out)
+        self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
+
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()
         management.call_command('hal', "--empty", stdout=out)
