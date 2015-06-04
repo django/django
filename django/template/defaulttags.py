@@ -32,14 +32,20 @@ class AutoEscapeControlNode(Node):
         self.setting, self.nodelist = setting, nodelist
 
     def render(self, context):
-        old_setting = context.autoescape
-        context.autoescape = self.setting
-        output = self.nodelist.render(context)
-        context.autoescape = old_setting
+        output = ''.join(self.stream(context, False))
         if self.setting:
             return mark_safe(output)
         else:
             return output
+
+    def stream(self, context, stream=True):
+        old_setting = context.autoescape
+        context.autoescape = self.setting
+        if self.setting and stream:
+            yield from map(mark_safe, self.nodelist.render(context, stream=True))
+        else:
+            yield from self.nodelist.render(context, stream=True)
+        context.autoescape = old_setting
 
 
 class CommentNode(Node):
@@ -106,10 +112,13 @@ class FilterNode(Node):
         self.filter_expr, self.nodelist = filter_expr, nodelist
 
     def render(self, context):
-        output = self.nodelist.render(context)
-        # Apply filters.
-        with context.push(var=output):
-            return self.filter_expr.resolve(context)
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
+        for chunk in self.nodelist.render(context, stream=True):
+            # Apply filters.
+            with context.push(var=chunk):
+                yield self.filter_expr.resolve(context)
 
 
 class FirstOfNode(Node):
@@ -153,6 +162,9 @@ class ForNode(Node):
         )
 
     def render(self, context):
+        return mark_safe(''.join(self.stream(context)))
+
+    def stream(self, context):
         if 'forloop' in context:
             parentloop = context['forloop']
         else:
@@ -165,8 +177,8 @@ class ForNode(Node):
                 values = list(values)
             len_values = len(values)
             if len_values < 1:
-                return self.nodelist_empty.render(context)
-            nodelist = []
+                yield from self.nodelist_empty.render(context, stream=True)
+                return
             if self.is_reversed:
                 values = reversed(values)
             num_loopvars = len(self.loopvars)
@@ -206,14 +218,13 @@ class ForNode(Node):
                     context[self.loopvars[0]] = item
 
                 for node in self.nodelist_loop:
-                    nodelist.append(node.render_annotated(context))
+                    yield from node.stream_annotated(context)
 
                 if pop_context:
                     # Pop the loop variables pushed on to the context to avoid
                     # the context ending up in an inconsistent state when other
                     # tags (e.g., include and with) push data to context.
                     context.pop()
-        return mark_safe(''.join(nodelist))
 
 
 class IfChangedNode(Node):
@@ -224,6 +235,9 @@ class IfChangedNode(Node):
         self._varlist = varlist
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         # Init state storage
         state_frame = self._get_context_stack_frame(context)
         state_frame.setdefault(self)
@@ -241,10 +255,12 @@ class IfChangedNode(Node):
         if compare_to != state_frame[self]:
             state_frame[self] = compare_to
             # render true block if not already rendered
-            return nodelist_true_output or self.nodelist_true.render(context)
+            if nodelist_true_output:
+                yield nodelist_true_output
+            else:
+                yield from self.nodelist_true.render(context, stream=True)
         elif self.nodelist_false:
-            return self.nodelist_false.render(context)
-        return ''
+            yield from self.nodelist_false.render(context, stream=True)
 
     def _get_context_stack_frame(self, context):
         # The Context object behaves like a stack where each template tag can create a new scope.
@@ -271,11 +287,15 @@ class IfEqualNode(Node):
         return '<%s>' % self.__class__.__name__
 
     def render(self, context):
-        val1 = self.var1.resolve(context, ignore_failures=True)
-        val2 = self.var2.resolve(context, ignore_failures=True)
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
+        val1 = self.var1.resolve(context, True)
+        val2 = self.var2.resolve(context, True)
         if (self.negate and val1 != val2) or (not self.negate and val1 == val2):
-            return self.nodelist_true.render(context)
-        return self.nodelist_false.render(context)
+            yield from self.nodelist_true.render(context, stream=True)
+        else:
+            yield from self.nodelist_false.render(context, stream=True)
 
 
 class IfNode(Node):
@@ -295,6 +315,9 @@ class IfNode(Node):
         return NodeList(self)
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         for condition, nodelist in self.conditions_nodelists:
 
             if condition is not None:           # if / elif clause
@@ -306,9 +329,8 @@ class IfNode(Node):
                 match = True
 
             if match:
-                return nodelist.render(context)
-
-        return ''
+                yield from nodelist.render(context, stream=True)
+                return
 
 
 class LoremNode(Node):
@@ -394,8 +416,12 @@ class SpacelessNode(Node):
         self.nodelist = nodelist
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         from django.utils.html import strip_spaces_between_tags
-        return strip_spaces_between_tags(self.nodelist.render(context).strip())
+        yield from (strip_spaces_between_tags(chunk.strip())
+                    for chunk in self.nodelist.render(context, stream=True))
 
 
 class TemplateTagNode(Node):
@@ -508,9 +534,12 @@ class WithNode(Node):
         return '<%s>' % self.__class__.__name__
 
     def render(self, context):
+        return ''.join(self.stream(context))
+
+    def stream(self, context):
         values = {key: val.resolve(context) for key, val in self.extra_context.items()}
         with context.push(**values):
-            return self.nodelist.render(context)
+            yield from self.nodelist.render(context, stream=True)
 
 
 @register.tag

@@ -135,3 +135,11 @@ class AutoescapeTagTests(SimpleTestCase):
         msg = "'autoescape' tag requires exactly one argument."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('autoescape-incorrect-arg', {'var': {'key': 'this & that'}})
+
+    @setup({'autoescape-tag-stream': '{% autoescape off %}{{ first }}{{ second }}{% endautoescape %}'})
+    def test_autoescape_tag_stream(self):
+        output = self.engine.render_to_string(
+            'autoescape-tag-stream', {'first': '<b>first</b>', 'second': '<b>second</b>'}, stream=True
+        )
+        self.assertEqual(next(output), '<b>first</b>')
+        self.assertEqual(next(output), '<b>second</b>')

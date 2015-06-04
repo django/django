@@ -211,6 +211,13 @@ class ForTagTests(SimpleTestCase):
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('invalid_for_loop', {'items': (1, 2)})
 
+    @setup({'for-tag-stream': '{% for val in values %}{{ val }}{% endfor %}'})
+    def test_for_tag_stream(self):
+        output = self.engine.render_to_string('for-tag-stream', {'values': [1, 2, 3]}, stream=True)
+        self.assertEqual(next(output), '1')
+        self.assertEqual(next(output), '2')
+        self.assertEqual(next(output), '3')
+
 
 class ForNodeTests(SimpleTestCase):
     def test_repr(self):

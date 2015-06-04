@@ -6,7 +6,9 @@ from django.http import (
     HttpResponse, HttpResponseGone, HttpResponseNotAllowed,
     HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
-from django.template.response import TemplateResponse
+from django.template.response import (
+    StreamingTemplateResponse, TemplateResponse,
+)
 from django.urls import reverse
 from django.utils.decorators import classonlymethod
 
@@ -157,6 +159,14 @@ class TemplateView(TemplateResponseMixin, ContextMixin, View):
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
+
+
+class StreamingTemplateView(TemplateView):
+    """
+    A view that streams a template. This view will also pass into the context
+    any keyword arguments passed by the URLConf.
+    """
+    response_class = StreamingTemplateResponse
 
 
 class RedirectView(View):

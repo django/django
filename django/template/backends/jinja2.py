@@ -58,7 +58,7 @@ class Template:
             name=template.filename, template_name=template.name,
         )
 
-    def render(self, context=None, request=None):
+    def render(self, context=None, request=None, stream=False):
         from .utils import csrf_input_lazy, csrf_token_lazy
         if context is None:
             context = {}
@@ -68,7 +68,7 @@ class Template:
             context['csrf_token'] = csrf_token_lazy(request)
             for context_processor in self.backend.template_context_processors:
                 context.update(context_processor(request))
-        return self.template.render(context)
+        return self.template.render(context, stream=stream)
 
 
 class Origin:

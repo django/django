@@ -203,6 +203,15 @@ Signals
 Templates
 ~~~~~~~~~
 
+* Added :class:`~django.template.response.StreamingTemplateResponse` and
+  :class:`~django.template.response.SimpleStreamingTemplateResponse` to
+  handle streaming of templates.
+
+* Support for iterating over templates was added. This add a
+  ``stream`` parameter to the ``Template.render()`` and
+  ``django.template.loader()`` methods, and to the
+  :func:`~django.shortcuts.render` shortcut.
+
 * ...
 
 Tests

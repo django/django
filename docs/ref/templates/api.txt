@@ -224,6 +224,17 @@ different contexts.
         >>> template.render(context)
         "My name is Dolores."
 
+    .. versionadded:: 3.0
+
+    You can pass `stream` as `True` to create a generator of the template
+    instead.
+
+        >>> template = Template("{% for value in values %}{{value}}{% endfor %}")
+        >>> context = Context(['one', 'two'])
+        >>> list(template.render(context, stream=True))
+        ['one', 'two']
+
+
 Variables and lookups
 ---------------------
 

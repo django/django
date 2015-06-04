@@ -155,6 +155,13 @@ class IfChangedTagTests(SimpleTestCase):
         output = self.engine.render_to_string('ifchanged-filter-ws', {'num': (1, 2, 3)})
         self.assertEqual(output, '..1..2..3')
 
+    @setup({'ifchanged-stream': '{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}'})
+    def test_ifchanged_stream(self):
+        output = self.engine.render_to_string('ifchanged-stream', {'num': (1, 2, 3)}, stream=True)
+        self.assertEqual(next(output), '1')
+        self.assertEqual(next(output), '2')
+        self.assertEqual(next(output), '3')
+
 
 class IfChangedTests(SimpleTestCase):
 

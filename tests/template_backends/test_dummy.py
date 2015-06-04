@@ -94,3 +94,11 @@ class TemplateStringsTests(SimpleTestCase):
         template = self.engine.get_template('template_backends/hello.html')
         content = template.render({'name': 'Jérôme'})
         self.assertEqual(content, "Hello Jérôme!\n")
+
+
+class TemplateStringsTestsSealed(TemplateStringsTests):
+
+    def test_dummy_doesnt_stream(self):
+        template = self.engine.from_string("Hello!\n")
+        with self.assertRaises(NotImplementedError):
+            template.render(stream=True)

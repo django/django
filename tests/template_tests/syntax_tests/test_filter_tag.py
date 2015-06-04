@@ -45,3 +45,8 @@ class FilterTagTests(SimpleTestCase):
     def test_filter06bis(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.get_template('filter06bis')
+
+    @setup({'filter-stream': '{% filter upper %}django{% endfilter %}'})
+    def test_filter_stream(self):
+        output = self.engine.render_to_string('filter-stream', stream=True)
+        self.assertEqual(next(output), 'DJANGO')

@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 
 from .loader import get_template, select_template
 
@@ -7,8 +7,12 @@ class ContentNotRenderedError(Exception):
     pass
 
 
-class SimpleTemplateResponse(HttpResponse):
-    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+class AbstractTemplateResponse:
+    """
+    An abstract base type allowing subclasses to implement either rendering
+    or streaming of content.
+    """
+    rendering_attrs = ['template_name', 'context_data']
 
     def __init__(self, template, context=None, content_type=None, status=None,
                  charset=None, using=None):
@@ -19,8 +23,6 @@ class SimpleTemplateResponse(HttpResponse):
         self.context_data = context
 
         self.using = using
-
-        self._post_render_callbacks = []
 
         # _request stores the current request object in subclasses that know
         # about requests, like TemplateResponse. It's defined in the base class
@@ -42,6 +44,28 @@ class SimpleTemplateResponse(HttpResponse):
         # True, so we initialize it to False after the call to super __init__.
         self._is_rendered = False
 
+    def resolve_template(self, template):
+        """Accept a template object, path-to-template, or list of paths."""
+        if isinstance(template, (list, tuple)):
+            return select_template(template, using=self.using)
+        elif isinstance(template, str):
+            return get_template(template, using=self.using)
+        else:
+            return template
+
+    def resolve_context(self, context):
+        return context
+
+
+class SimpleTemplateResponse(AbstractTemplateResponse, HttpResponse):
+    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+
+    def __init__(self, template, context=None, content_type=None, status=None,
+                 charset=None, using=None):
+        self._post_render_callbacks = []
+        super(SimpleTemplateResponse, self).__init__(
+            template, context, content_type, status, charset, using)
+
     def __getstate__(self):
         """
         Raise an exception if trying to pickle an unrendered response. Pickle
@@ -56,18 +80,6 @@ class SimpleTemplateResponse(HttpResponse):
                 del obj_dict[attr]
 
         return obj_dict
-
-    def resolve_template(self, template):
-        """Accept a template object, path-to-template, or list of paths."""
-        if isinstance(template, (list, tuple)):
-            return select_template(template, using=self.using)
-        elif isinstance(template, str):
-            return get_template(template, using=self.using)
-        else:
-            return template
-
-    def resolve_context(self, context):
-        return context
 
     @property
     def rendered_content(self):
@@ -136,10 +148,36 @@ class SimpleTemplateResponse(HttpResponse):
         self._is_rendered = True
 
 
-class TemplateResponse(SimpleTemplateResponse):
+class RequestContextMixin(object):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
 
     def __init__(self, request, template, context=None, content_type=None,
                  status=None, charset=None, using=None):
         super().__init__(template, context, content_type, status, charset, using)
         self._request = request
+
+
+class TemplateResponse(RequestContextMixin, SimpleTemplateResponse):
+    pass
+
+
+class SimpleStreamingTemplateResponse(AbstractTemplateResponse, StreamingHttpResponse):
+
+    @property
+    def streaming_content(self):
+        """
+        Return a generator for the content given the template and context
+        described by the TemplateResponse.
+        """
+        template = self.resolve_template(self.template_name)
+        context = self.resolve_context(self.context_data)
+        streaming_content = template.render(context, self._request, stream=True)
+        return map(self.make_bytes, streaming_content)
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._set_streaming_content(value)
+
+
+class StreamingTemplateResponse(RequestContextMixin, SimpleStreamingTemplateResponse):
+    pass

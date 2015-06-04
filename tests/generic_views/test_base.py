@@ -1,11 +1,13 @@
 import time
 
 from django.core.exceptions import ImproperlyConfigured
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 from django.urls import resolve
-from django.views.generic import RedirectView, TemplateView, View
+from django.views.generic import (
+    RedirectView, StreamingTemplateView, TemplateView, View,
+)
 
 from . import views
 
@@ -44,6 +46,16 @@ class DecoratedDispatchView(SimpleView):
 
 
 class AboutTemplateView(TemplateView):
+
+    def get(self, request):
+        return self.render_to_response({})
+
+    def get_template_names(self):
+        return ['generic_views/about.html']
+
+
+class AboutStreamingTemplateView(StreamingTemplateView):
+
     def get(self, request):
         return self.render_to_response({})
 
@@ -386,6 +398,21 @@ class TemplateViewTest(SimpleTestCase):
     def test_extra_context(self):
         response = self.client.get('/template/extra_context/')
         self.assertEqual(response.context['title'], 'Title')
+
+
+@override_settings(ROOT_URLCONF='generic_views.urls')
+class StreamingTemplateViewTest(SimpleTestCase):
+
+    rf = RequestFactory()
+
+    def test_get(self):
+        """
+        Test a view that simply streams a template on GET
+        """
+        response = AboutStreamingTemplateView.as_view()(self.rf.get('/about/'))
+        self.assertIsInstance(response, StreamingHttpResponse)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<h1>About</h1>')
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
