@@ -65,6 +65,18 @@ the included auth forms for your project, you could set, for example::
 
 See :ref:`password-validation` for more details.
 
+Permission mixins for class-based views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now ships with the mixins
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.PermissionRequiredMixin`, and
+:class:`~django.contrib.auth.mixins.UserPassesTestMixin` to provide the
+functionality of the ``django.contrib.auth.decorators`` for class-based views.
+The mixins have been inspired by the `django-braces`_ project.
+
+.. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
+
 Minor features
 ~~~~~~~~~~~~~~
 
