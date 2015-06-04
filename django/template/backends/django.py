@@ -60,10 +60,10 @@ class Template(object):
     def origin(self):
         return self.template.origin
 
-    def render(self, context=None, request=None):
+    def render(self, context=None, request=None, stream=False):
         context = make_context(context, request, autoescape=self.backend.engine.autoescape)
         try:
-            return self.template.render(context)
+            return self.template.render(context, stream=stream)
         except TemplateDoesNotExist as exc:
             reraise(exc, self.backend)
 

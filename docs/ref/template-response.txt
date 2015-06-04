@@ -292,3 +292,43 @@ with a simple template and a context containing a queryset::
 
     def blog_index(request):
         return TemplateResponse(request, 'entry_list.html', {'entries': Entry.objects.all()})
+
+``StreamingTemplateResponse`` and ``SimpleStreamingTemplateResponse``
+=====================================================================
+
+.. versionadded:: 1.10
+
+:class:`~django.template.response.StreamingTemplateResponse` and
+:class:`~django.template.response.SimpleStreamingTemplateResponse` allow the
+same features as :class:`~django.template.response.TemplateResponse` and
+:class:`~django.template.response.SimpleTemplateResponse` but stream the
+template instead of rendering it.
+
+``SimpleStreamingTemplateResponse`` objects
+-------------------------------------------
+
+.. class:: SimpleStreamingTemplateResponse()
+
+    ``SimpleStreamingTemplateResponse`` shares most of
+    :class:`~django.template.response.SimpleTemplateResponse` attributes and
+    methods, however, ``SimpleStreamingTemplateResponse`` does not handle any
+    rendering attributes/methods (including callbacks).
+
+Attributes
+~~~~~~~~~~
+
+.. attribute:: SimpleStreamingTemplateResponse.streaming_content
+
+    The generator streaming the response content, using the current
+    template and context data.
+
+``StreamingTemplateResponse`` objects
+-------------------------------------
+
+.. class:: StreamingTemplateResponse()
+
+    ``StreamingTemplateResponse`` is a subclass of
+    :class:`~django.template.response.SimpleStreamingTemplateResponse` that
+    knows about the current :class:`~django.http.HttpRequest`. It is
+    initialized the same way as
+    :class:`~django.template.response.TemplateResponse`.

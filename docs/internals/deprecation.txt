@@ -248,6 +248,7 @@ details on these changes.
   * ``django.template.Context()``
   * ``django.template.RequestContext()``
   * ``django.template.response.TemplateResponse()``
+  * ``django.template.response.StreamingTemplateResponse()``
 
 * The ``dictionary`` and ``context_instance`` parameters for the following
   functions will be removed:

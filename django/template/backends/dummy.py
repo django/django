@@ -52,7 +52,10 @@ class TemplateStrings(BaseEngine):
 
 class Template(string.Template):
 
-    def render(self, context=None, request=None):
+    def render(self, context=None, request=None, stream=False):
+        if stream:
+            raise NotImplementedError()
+
         if context is None:
             context = {}
         else:

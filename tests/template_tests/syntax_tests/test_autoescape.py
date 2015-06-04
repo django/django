@@ -119,3 +119,11 @@ class AutoescapeTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('autoescape-lookup01', {'var': {'key': 'this & that'}})
         self.assertEqual(output, 'this &amp; that')
+
+    @setup({'autoescape-tag-stream': '{% autoescape off %}{{ first }}{{ second }}{% endautoescape %}'})
+    def test_autoescape_tag_stream(self):
+        output = self.engine.render_to_string(
+            'autoescape-tag-stream', {'first': '<b>first</b>', 'second': '<b>second</b>'}, stream=True
+        )
+        self.assertEqual(next(output), '<b>first</b>')
+        self.assertEqual(next(output), '<b>second</b>')

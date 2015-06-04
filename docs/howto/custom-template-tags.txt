@@ -804,6 +804,24 @@ Notes:
   ``django.template.TemplateSyntaxError`` if they receive the wrong number or
   type of arguments.
 
+* You can implement a ``stream()`` method if your renderer can iterate.
+  This method allows to display the node as it is rendered if the template
+  is streamed.
+
+  The ``stream()`` method must be a generator::
+
+    class OneToNineNode(template.Node):
+        def render(self, context):
+            return ''.join(self.stream(context))
+
+        def stream(self, context):
+            for i in range(1, 10):
+                yield str(i)
+
+  .. versionadded:: 1.10
+
+      The ``stream()`` method was added.
+
 Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.

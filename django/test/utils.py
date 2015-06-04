@@ -89,7 +89,16 @@ def instrumented_test_render(self, context):
     that can be intercepted by the test system Client
     """
     template_rendered.send(sender=self, template=self, context=context)
-    return self.nodelist.render(context)
+    return self.nodelist.render(context, stream=False)
+
+
+def instrumented_test_stream(self, context):
+    """
+    An instrumented Template stream method, providing a signal
+    that can be intercepted by the test system Client.
+    """
+    template_rendered.send(sender=self, template=self, context=context)
+    return self.nodelist.render(context, stream=True)
 
 
 def setup_test_environment():
@@ -101,6 +110,8 @@ def setup_test_environment():
     """
     Template._original_render = Template._render
     Template._render = instrumented_test_render
+    Template._original_stream = Template._stream
+    Template._stream = instrumented_test_stream
 
     # Storing previous values in the settings module itself is problematic.
     # Store them in arbitrary (but related) modules instead. See #20636.

@@ -154,3 +154,10 @@ class ForTagTests(SimpleTestCase):
     def test_for_tag_unpack14(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 1.'):
             self.engine.render_to_string('for-tag-unpack14', {'items': (1, 2)})
+
+    @setup({'for-tag-stream': '{% for val in values %}{{ val }}{% endfor %}'})
+    def test_for_tag_stream(self):
+        output = self.engine.render_to_string('for-tag-stream', {'values': [1, 2, 3]}, stream=True)
+        self.assertEqual(next(output), '1')
+        self.assertEqual(next(output), '2')
+        self.assertEqual(next(output), '3')

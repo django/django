@@ -36,3 +36,10 @@ class SpacelessTagTests(SimpleTestCase):
     def test_spaceless06(self):
         output = self.engine.render_to_string('spaceless06', {'text': 'This & that'})
         self.assertEqual(output, "<b><i>This & that</i></b>")
+
+    @setup({'spaceless-stream': "{% spaceless %}<b>   <i>{{ text }}</i>  </b>{% endspaceless %}"})
+    def test_spaceless_stream(self):
+        output = self.engine.render_to_string('spaceless-stream', {'text': 'This & that'}, stream=True)
+        self.assertEqual(next(output), "<b><i>")
+        self.assertEqual(next(output), "This &amp; that")
+        self.assertEqual(next(output), "</i></b>")

@@ -527,3 +527,9 @@ class IfTagTests(SimpleTestCase):
         # A single equals sign is a syntax error.
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('if-tag-single-eq', {'foo': 1})
+
+    @setup({'if-tag-stream': '{% if foo %}{{ a }}42{% else %}no{% endif %}'})
+    def test_if_tag_stream(self):
+        output = self.engine.render_to_string('if-tag-stream', {'foo': True, 'a': 21}, stream=True)
+        self.assertEqual(next(output), '21')
+        self.assertEqual(next(output), '42')

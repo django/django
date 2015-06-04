@@ -257,6 +257,9 @@ Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
 * Added ``request.user`` to the debug view.
+* Added :class:`~django.template.response.StreamingTemplateResponse` and
+  :class:`~django.template.response.SimpleStreamingTemplateResponse` to
+  handle streaming of templates.
 
 * Added :class:`~django.http.HttpResponse` methods
   :meth:`~django.http.HttpResponse.readable()` and
@@ -280,6 +283,11 @@ Templates
 * Added the ``autoescape`` option to the
   :class:`~django.template.backends.django.DjangoTemplates` backend and the
   :class:`~django.template.Engine` class.
+* Support for iterating over templates was added. This add a
+  ``stream`` parameter to the ``Template.render()`` and
+  ``django.template.loader()`` methods, and to the
+  :func:`~django.shortcuts.render_to_response` and
+  :func:`~django.shortcuts.render` shortcuts.
 
 Tests
 ^^^^^

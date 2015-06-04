@@ -6,7 +6,9 @@ from functools import update_wrapper
 from django import http
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.template.response import TemplateResponse
+from django.template.response import (
+    StreamingTemplateResponse, TemplateResponse,
+)
 from django.utils import six
 from django.utils.decorators import classonlymethod
 
@@ -151,11 +153,19 @@ class TemplateResponseMixin(object):
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
     A view that renders a template.  This view will also pass into the context
-    any keyword arguments passed by the URLconf.
+    any keyword arguments passed by the URLConf.
     """
     def get(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         return self.render_to_response(context)
+
+
+class StreamingTemplateView(TemplateView):
+    """
+    A view that streams a template. This view will also pass into the context
+    any keyword arguments passed by the URLConf.
+    """
+    response_class = StreamingTemplateResponse
 
 
 class RedirectView(View):

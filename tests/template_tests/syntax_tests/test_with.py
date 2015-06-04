@@ -50,3 +50,9 @@ class WithTagTests(SimpleTestCase):
     def test_with_error02(self):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('with-error02', {'dict': {'key': 50}})
+
+    @setup({'with-stream': '{% with key=dict.key %}{{ key }}42{% endwith %}'})
+    def test_with_stream(self):
+        output = self.engine.render_to_string('with-stream', {'dict': {'key': 50}}, stream=True)
+        self.assertEqual(next(output), '50')
+        self.assertEqual(next(output), '42')

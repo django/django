@@ -60,13 +60,15 @@ class Template(object):
             name=template.filename, template_name=template.name,
         )
 
-    def render(self, context=None, request=None):
+    def render(self, context=None, request=None, stream=False):
         if context is None:
             context = {}
         if request is not None:
             context['request'] = request
             context['csrf_input'] = csrf_input_lazy(request)
             context['csrf_token'] = csrf_token_lazy(request)
+        if stream:
+            return self.template.stream(context)
         return self.template.render(context)
 
 

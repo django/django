@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from django.utils import six
 
 from .loader import get_template, select_template
@@ -8,8 +8,12 @@ class ContentNotRenderedError(Exception):
     pass
 
 
-class SimpleTemplateResponse(HttpResponse):
-    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+class AbstractTemplateResponse(object):
+    """
+    An abstract base type allowing subclasses to implement either rendering
+    or streaming of content.
+    """
+    rendering_attrs = ['template_name', 'context_data']
 
     def __init__(self, template, context=None, content_type=None, status=None,
                  charset=None, using=None):
@@ -20,8 +24,6 @@ class SimpleTemplateResponse(HttpResponse):
         self.context_data = context
 
         self.using = using
-
-        self._post_render_callbacks = []
 
         # _request stores the current request object in subclasses that know
         # about requests, like TemplateResponse. It's defined in the base class
@@ -34,7 +36,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super(SimpleTemplateResponse, self).__init__('', content_type, status, charset)
+        super(AbstractTemplateResponse, self).__init__('', content_type, status, charset)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -42,23 +44,6 @@ class SimpleTemplateResponse(HttpResponse):
         # the empty string we just gave it, which wrongly sets _is_rendered
         # True, so we initialize it to False after the call to super __init__.
         self._is_rendered = False
-
-    def __getstate__(self):
-        """Pickling support function.
-
-        Ensures that the object can't be pickled before it has been
-        rendered, and that the pickled state only includes rendered
-        data, not the data used to construct the response.
-        """
-        obj_dict = self.__dict__.copy()
-        if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be '
-                                          'rendered before it can be pickled.')
-        for attr in self.rendering_attrs:
-            if attr in obj_dict:
-                del obj_dict[attr]
-
-        return obj_dict
 
     def resolve_template(self, template):
         "Accepts a template object, path-to-template or list of paths"
@@ -71,6 +56,34 @@ class SimpleTemplateResponse(HttpResponse):
 
     def resolve_context(self, context):
         return context
+
+
+class SimpleTemplateResponse(AbstractTemplateResponse, HttpResponse):
+    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+
+    def __init__(self, template, context=None, content_type=None, status=None,
+                 charset=None, using=None):
+        self._post_render_callbacks = []
+        super(SimpleTemplateResponse, self).__init__(
+            template, context, content_type, status, charset, using)
+
+    def __getstate__(self):
+        """Pickling support function.
+
+        Ensures that the object can't be pickled before it has been
+        rendered, and that the pickled state only includes rendered
+        data, not the data used to construct the response.
+        """
+        obj_dict = self.__dict__.copy()
+        if not self._is_rendered:
+            raise ContentNotRenderedError(
+                'The response content must be rendered before it can be pickled.'
+            )
+        for attr in self.rendering_attrs:
+            if attr in obj_dict:
+                del obj_dict[attr]
+
+        return obj_dict
 
     @property
     def rendered_content(self):
@@ -132,17 +145,44 @@ class SimpleTemplateResponse(HttpResponse):
 
     @content.setter
     def content(self, value):
-        """Sets the content for the response
+        """Sets the content for the response.
         """
         HttpResponse.content.fset(self, value)
         self._is_rendered = True
 
 
-class TemplateResponse(SimpleTemplateResponse):
+class RequestContextMixin(object):
     rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
 
     def __init__(self, request, template, context=None, content_type=None,
             status=None, charset=None, using=None):
-        super(TemplateResponse, self).__init__(
-            template, context, content_type, status, charset, using)
+        super(RequestContextMixin, self).__init__(
+            template, context=context, content_type=content_type,
+            status=status, charset=charset, using=using
+        )
         self._request = request
+
+
+class TemplateResponse(RequestContextMixin, SimpleTemplateResponse):
+    pass
+
+
+class SimpleStreamingTemplateResponse(AbstractTemplateResponse, StreamingHttpResponse):
+    @property
+    def streaming_content(self):
+        """
+        Return a generator for the content given the template and context
+        described by the TemplateResponse.
+        """
+        template = self.resolve_template(self.template_name)
+        context = self.resolve_context(self.context_data)
+        streaming_content = template.render(context, self._request, stream=True)
+        return six.moves.map(self.make_bytes, streaming_content)
+
+    @streaming_content.setter
+    def streaming_content(self, value):
+        self._set_streaming_content(value)
+
+
+class StreamingTemplateResponse(RequestContextMixin, SimpleStreamingTemplateResponse):
+    pass

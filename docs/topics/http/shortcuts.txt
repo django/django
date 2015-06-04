@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name, context=None, content_type=None, status=None, using=None)
+.. function:: render(request, template_name, context=None, content_type=None, status=None, using=None, stream=False)
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -56,6 +56,14 @@ Optional arguments
     The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
     loading the template.
 
+``stream``
+   If set to True, a :class:`~django.http.StreamingHttpResponse` will be
+   return instead.
+
+   .. versionchanged:: 1.10
+
+       The ``stream`` parameter was added.
+
 Example
 -------
 
@@ -84,7 +92,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
+.. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None, stream=False)
 
    This function preceded the introduction of :func:`render` and works
    similarly except that it doesn't make the ``request`` available in the

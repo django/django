@@ -14,4 +14,6 @@ urlpatterns = [
     url(r'^render/content_type/$', views.render_view_with_content_type),
     url(r'^render/status/$', views.render_view_with_status),
     url(r'^render/using/$', views.render_view_with_using),
+    url(r'^stream_to_response/$', views.stream_to_response_view),
+    url(r'^stream/$', views.stream_view),
 ]

@@ -193,6 +193,12 @@ class IfEqualTagTests(SimpleTestCase):
         output = self.engine.render_to_string('ifequal-filter05', {'x': 'aaa'})
         self.assertEqual(output, 'x')
 
+    @setup({'ifequal-stream': '{% ifequal a b %}{{ a }}{{ b }}{% endifequal %}'})
+    def test_ifequal_stream(self):
+        output = self.engine.render_to_string('ifequal-stream', {'a': 1, 'b': 1}, stream=True)
+        self.assertEqual(next(output), '1')
+        self.assertEqual(next(output), '1')
+
 
 class IfNotEqualTagTests(SimpleTestCase):
 

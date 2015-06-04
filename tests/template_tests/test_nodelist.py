@@ -85,3 +85,8 @@ class ErrorIndexTest(TestCase):
             except (RuntimeError, TypeError) as e:
                 debug = e.template_debug
                 self.assertEqual((debug['start'], debug['end']), expected_error_source_index)
+            try:
+                ''.join(template.render(context, stream=True))
+            except (RuntimeError, TypeError) as e:
+                debug = e.template_debug
+                self.assertEqual((debug['start'], debug['end']), expected_error_source_index)

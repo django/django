@@ -9,6 +9,7 @@ from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
+    StreamingHttpResponse,
 )
 from django.template import loader
 from django.utils import six
@@ -16,27 +17,31 @@ from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
 
-def render_to_response(template_name, context=None, content_type=None, status=None, using=None):
+def render_to_response(template_name, context=None, content_type=None, status=None, using=None, stream=False):
     """
-    Returns a HttpResponse whose content is filled with the result of calling
+    Return a response whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
+    Can use HttpResponse or StreamingHttpResponse depending on stream parameter.
     """
-    content = loader.render_to_string(template_name, context, using=using)
-    return HttpResponse(content, content_type, status)
+    response_class = StreamingHttpResponse if stream else HttpResponse
+    content = loader.render_to_string(template_name, context, using=using, stream=stream)
+    return response_class(content, content_type, status)
 
 
-def render(request, template_name, context=None, content_type=None, status=None, using=None):
+def render(request, template_name, context=None, content_type=None, status=None, using=None, stream=False):
     """
-    Returns a HttpResponse whose content is filled with the result of calling
+    Returns a response whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
+    Can use HttpResponse or StreamingHttpResponse depending on stream parameter.
     """
-    content = loader.render_to_string(template_name, context, request, using=using)
-    return HttpResponse(content, content_type, status)
+    response_class = StreamingHttpResponse if stream else HttpResponse
+    content = loader.render_to_string(template_name, context, request, using=using, stream=stream)
+    return response_class(content, content_type, status)
 
 
 def redirect(to, *args, **kwargs):
     """
-    Returns an HttpResponseRedirect to the appropriate URL for the arguments
+    Return an HttpResponseRedirect to the appropriate URL for the arguments
     passed.
 
     The arguments could be:
@@ -61,7 +66,7 @@ def redirect(to, *args, **kwargs):
 
 def _get_queryset(klass):
     """
-    Returns a QuerySet from a Model, Manager, or QuerySet. Created to make
+    Return a QuerySet from a Model, Manager, or QuerySet. Created to make
     get_object_or_404 and get_list_or_404 more DRY.
 
     Raises a ValueError if klass is not a Model, Manager, or QuerySet.
@@ -102,7 +107,7 @@ def get_object_or_404(klass, *args, **kwargs):
 
 def get_list_or_404(klass, *args, **kwargs):
     """
-    Uses filter() to return a list of objects, or raise a Http404 exception if
+    Use filter() to return a list of objects, or raise a Http404 exception if
     the list is empty.
 
     klass may be a Model, Manager, or QuerySet object. All other passed

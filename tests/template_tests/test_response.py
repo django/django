@@ -7,7 +7,8 @@ from datetime import datetime
 from django.conf import settings
 from django.template import engines
 from django.template.response import (
-    ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
+    ContentNotRenderedError, SimpleStreamingTemplateResponse,
+    SimpleTemplateResponse, StreamingTemplateResponse, TemplateResponse,
 )
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
@@ -314,6 +315,39 @@ class TemplateResponseTest(SimpleTestCase):
         pickled_response = pickle.dumps(response)
         unpickled_response = pickle.loads(pickled_response)
         pickle.dumps(unpickled_response)
+
+
+class SimpleStreamingTemplateResponseTest(SimpleTestCase):
+
+    def _response(self, template='foo', *args, **kwargs):
+        template = engines['django'].from_string(template)
+        return SimpleStreamingTemplateResponse(template, *args, **kwargs)
+
+    def test_stream(self):
+        response = self._response()
+        self.assertEqual(b''.join(response.streaming_content), b'foo')
+
+
+@override_settings(TEMPLATES=[{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': [TEMPLATE_DIR],
+    'OPTIONS': {
+        'context_processors': [test_processor_name],
+    },
+}])
+class StreamingTemplateResponseTest(SimpleTestCase):
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _response(self, template='foo', *args, **kwargs):
+        self._request = self.factory.get('/')
+        template = engines['django'].from_string(template)
+        return StreamingTemplateResponse(self._request, template, *args, **kwargs)
+
+    def test_stream(self):
+        response = self._response('{{ foo }}{{ processors }}')
+        self.assertEqual(b''.join(response.streaming_content), b'yes')
 
 
 @override_settings(

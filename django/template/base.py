@@ -54,6 +54,7 @@ from __future__ import unicode_literals
 import inspect
 import logging
 import re
+from contextlib import contextmanager
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -194,21 +195,36 @@ class Template(object):
             for subnode in node:
                 yield subnode
 
-    def _render(self, context):
-        return self.nodelist.render(context)
-
-    def render(self, context):
-        "Display stage -- can be called many times"
+    @contextmanager
+    def push_context(self, context):
         context.render_context.push()
         try:
             if context.template is None:
                 with context.bind_template(self):
                     context.template_name = self.name
-                    return self._render(context)
+                    yield
             else:
-                return self._render(context)
+                yield
         finally:
             context.render_context.pop()
+
+    def _render(self, context):
+        return self.nodelist.render(context, stream=False)
+
+    def _stream(self, context):
+        return self.nodelist.render(context, stream=True)
+
+    def stream(self, context):
+        with self.push_context(context):
+            for chunk in self._stream(context):
+                yield chunk
+
+    def render(self, context, stream=False):
+        "Display stage -- can be called many times"
+        if stream:
+            return self.stream(context)
+        with self.push_context(context):
+            return self._render(context)
 
     def compile_nodelist(self):
         """
@@ -919,6 +935,20 @@ class Variable(object):
         return current
 
 
+@contextmanager
+def annotate_exception(context, token):
+    """
+    Check for errors during template rendering. If debug is True, contextual
+    line information is added to the exception before it is reraised.
+    """
+    try:
+        yield
+    except Exception as e:
+        if context.template.engine.debug and not hasattr(e, 'template_debug'):
+            e.template_debug = context.template.get_exception_info(e, token)
+        raise
+
+
 class Node(object):
     # Set this to True for nodes that must be first in the template (although
     # they can be preceded by text nodes.
@@ -934,17 +964,28 @@ class Node(object):
 
     def render_annotated(self, context):
         """
-        Render the node. If debug is True and an exception occurs during
-        rendering, the exception is annotated with contextual line information
-        where it occurred in the template. For internal usage this method is
-        preferred over using the render method directly.
+        Render the node with debug information if an error occurs. For
+        internal usage this method is preferred over using the render method
+        directly.
         """
-        try:
+        with annotate_exception(context, self.token):
             return self.render(context)
-        except Exception as e:
-            if context.template.engine.debug and not hasattr(e, 'template_debug'):
-                e.template_debug = context.template.get_exception_info(e, self.token)
-            raise
+
+    def stream(self, context):
+        """
+        Return a string generator rendering the node.
+        """
+        yield self.render(context)
+
+    def stream_annotated(self, context):
+        """
+        Stream the node with debug information if an error occurs. For
+        internal usage this method is preferred over using the render method
+        directly.
+        """
+        with annotate_exception(context, self.token):
+            for chunk in self.stream(context):
+                yield chunk
 
     def __iter__(self):
         yield self
@@ -969,15 +1010,18 @@ class NodeList(list):
     # extend_nodelist().
     contains_nontext = False
 
-    def render(self, context):
-        bits = []
+    def render(self, context, stream=False):
+        if not stream:
+            return mark_safe(''.join(self._stream(context)))
+        return self._stream(context)
+
+    def _stream(self, context):
         for node in self:
             if isinstance(node, Node):
-                bit = node.render_annotated(context)
+                for bit in node.stream_annotated(context):
+                    yield mark_safe(force_text(bit))
             else:
-                bit = node
-            bits.append(force_text(bit))
-        return mark_safe(''.join(bits))
+                yield mark_safe(force_text(node))
 
     def get_nodes_by_type(self, nodetype):
         "Return a list of all nodes of the given type"
@@ -1031,6 +1075,7 @@ class VariableNode(Node):
             # quietly.
             return ''
         return render_value_in_context(output, context)
+
 
 # Regex for token keyword arguments
 kwarg_re = re.compile(r"(?:(\w+)=)?(.+)")

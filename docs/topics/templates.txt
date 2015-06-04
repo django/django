@@ -155,7 +155,7 @@ must provide a ``render()`` method with the following signature:
 
 .. currentmodule:: django.template.backends.base
 
-.. method:: Template.render(context=None, request=None)
+.. method:: Template.render(context=None, request=None, stream=False)
 
     Renders this template with a given context.
 
@@ -165,6 +165,13 @@ must provide a ``render()`` method with the following signature:
     If ``request`` is provided, it must be an :class:`~django.http.HttpRequest`.
     Then the engine must make it, as well as the CSRF token, available in the
     template. How this is achieved is up to each backend.
+
+    If ``stream`` is set to True, it will return a generator for rendering
+    the template instead
+
+    .. versionadded:: 1.10
+
+        The stream argument was added.
 
 Here's an example of the search algorithm. For this example the
 :setting:`TEMPLATES` setting is::
@@ -238,7 +245,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name, context=None, request=None, using=None)
+.. function:: render_to_string(template_name, context=None, request=None, using=None, stream=False)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -255,6 +262,13 @@ templates, Django provides a shortcut function which automates the process.
     ``request``
         An optional :class:`~django.http.HttpRequest` that will be available
         during the template's rendering process.
+
+    ``stream``
+        If set to ``True``, it will return a generator of the template instead.
+
+        .. versionadded:: 1.10
+
+            The ``stream()`` argument was added.
 
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
