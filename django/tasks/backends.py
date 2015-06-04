@@ -1,13 +1,7 @@
-UNKNOWN = 0
-PENDING = 1
-FAILED = 2
-SUCCESS = 3
+from . import constants
+from .base import get_backend
+from .exceptions import ResultUnavailable
 
-class ResultUnavailable(Exception):
-    pass
-
-class InvalidCacheBackendError(Exception):
-    pass
 
 class TaskResult(object):
     """
@@ -15,6 +9,8 @@ class TaskResult(object):
     the task's status and result value/error.
     """
     def __init__(self, backend, task_id):
+        if not isinstance(backend, BaseBackend):
+            backend = get_backend(backend)
         self._backend = backend
         self.task_id = task_id
 
@@ -36,7 +32,9 @@ class TaskResult(object):
         Retrieve the result of the task from the backend if the task has
         successfully finished or the causing error if the task has failed.
 
-        raises ResultUnavailable exception when there is no result available.
+        raises a ResultUnavailable exception when there is no result available:
+            ResultUnknown if status is UNKNOWN
+            ResultPending if status is PENDING
         """
         return self._backend.get_result(self.task_id, **kwargs)
 
@@ -60,7 +58,9 @@ class BaseBackend(object):
         """
         If the task has ran and returned a result, return that result.
 
-        If not, raise a ResultUnavailable exception
+        If not, raise a ResultUnavailable exception:
+            ResultUnknown if status is UNKNOWN
+            ResultPending if status is PENDING
         """
         raise NotImplementedError
 
@@ -69,6 +69,7 @@ class BaseBackend(object):
         Enqueue provided task and return TaskResult instance.
         """
         raise NotImplementedError
+
 
 class DummyTaskResult(TaskResult):
     """
@@ -86,6 +87,7 @@ class DummyTaskResult(TaskResult):
     def get_result(self, **kwargs):
         return self._result
 
+
 class DummyTaskBackend(BaseBackend):
     """
     Dummy backend that executes tasks in-place and returns an instance of
@@ -97,7 +99,7 @@ class DummyTaskBackend(BaseBackend):
         self._next_task_id = 1
 
     def get_status(self, task_id):
-        return UNKNOWN
+        return constants.UNKNOWN
 
     def get_result(self, task_id):
         raise ResultUnavailable(
@@ -107,11 +109,11 @@ class DummyTaskBackend(BaseBackend):
         task_id = self._next_task_id
         self._next_task_id += 1
         result = None
-        status = SUCCESS
+        status = constants.SUCCESS
         try:
             result = task(*args, **kwargs)
         except Exception as e:
             result = e
-            status = FAILED
+            status = constants.FAILED
 
         return DummyTaskResult(self, task_id, status, result)

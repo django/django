@@ -2,7 +2,8 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
+from .exceptions import InvalidTaskBackendError
 
 
 DEFAULT_TASK_ALIAS = 'default'
@@ -11,25 +12,26 @@ DEFAULT_TASK_ALIAS = 'default'
 # all the backends should be thread-safe
 backends = {}
 
-class InvalidTaskBackendError(Exception):
-    pass
 
 def _create_task_backend(alias):
     try:
         conf = settings.QUEUES[alias]
     except KeyError:
+        if alias != DEFAULT_TASK_ALIAS:
+            return _create_task_backend(DEFAULT_TASK_ALIAS)
         raise ImproperlyConfigured("%s is not defined in QUEUES" % alias)
 
     args = conf.copy()
     backend = args.pop('BACKEND')
     try:
         # import the given backend
-        backend_cls = import_by_path(backend)
-    except ImproperlyConfigured as e:
+        backend_cls = import_string(backend)
+    except ImportError as e:
         raise InvalidTaskBackendError("Could not find backend '%s': %s" % (
             backend, e))
 
     return backend_cls(alias, **args)
+
 
 def get_backend(alias=DEFAULT_TASK_ALIAS):
     try:
@@ -39,6 +41,7 @@ def get_backend(alias=DEFAULT_TASK_ALIAS):
 
     backends[alias] = _create_task_backend(alias)
     return backends[alias]
+
 
 class Task(object):
     def __init__(self, func=None, name=None, using=DEFAULT_TASK_ALIAS, options=None):
@@ -78,4 +81,3 @@ class Task(object):
     def __call__(self, *args, **kwargs):
         # call it right away
         return self.run(*args, **kwargs)
-

@@ -1,7 +1,7 @@
 import unittest
 
 from django.test import override_settings, SimpleTestCase
-from django.tasks import registry, task, Task, backends, get_backend, base
+from django.tasks import registry, task, Task, backends, get_backend, base, constants
 
 def dummy_task(*args, **kwargs):
     return args, kwargs
@@ -29,13 +29,18 @@ class TestDummyBackend(SimpleTestCase):
 
         self.assertIs(backend, backend2)
 
+    def test_unknown_backend_will_fallback_to_default(self):
+        backend = get_backend('non-default')
+
+        self.assertIsInstance(backend, backends.DummyTaskBackend)
+
     def test_delay_runs_and_returns_result_with_status_and_result(self):
         t = Task(dummy_task)
         o = object()
         r = t.delay(1, o, 'xyz', a=42)
 
         self.assertIsInstance(r, backends.DummyTaskResult)
-        self.assertEquals(backends.SUCCESS, r.get_status())
+        self.assertEquals(constants.SUCCESS, r.get_status())
         self.assertEquals(((1, o, 'xyz'), {'a': 42}), r.get_result())
 
     def test_failing_task_reports_failure_and_returns_exception(self):
@@ -46,7 +51,7 @@ class TestDummyBackend(SimpleTestCase):
         r = t.delay()
 
         self.assertIsInstance(r, backends.DummyTaskResult)
-        self.assertEquals(backends.FAILED, r.get_status())
+        self.assertEquals(constants.FAILED, r.get_status())
         self.assertIs(e, r.get_result())
 
 
@@ -54,6 +59,12 @@ class TestTaskDecorator(unittest.TestCase):
     def tearDown(self):
         super(TestTaskDecorator, self).tearDown()
         registry._registry.clear()
+
+    def test_decorating_a_task_will_extract_the_func(self):
+        t = task(dummy_task)
+        t2 = task(t, name='dummy_task_2')
+
+        self.assertIs(t2.run, dummy_task)
 
     def test_decorator_works_without_arguments(self):
         t = task()(dummy_task)
@@ -94,7 +105,7 @@ class TestTaskDecorator(unittest.TestCase):
 
         tr = registry.delay_by_name('some_name', 1, 2, 3, answer=42)
         self.assertIsInstance(tr, backends.DummyTaskResult)
-        self.assertEquals(backends.SUCCESS, tr.get_status())
+        self.assertEquals(constants.SUCCESS, tr.get_status())
         self.assertEquals(((1, 2, 3), {'answer': 42}), tr.get_result())
 
 class TestTask(unittest.TestCase):

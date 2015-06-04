@@ -1,8 +1,10 @@
 class AlreadyRegistered(Exception):
     pass
 
+
 class TaskDoesNotExist(Exception):
     pass
+
 
 class TaskRegistry(object):
     def __init__(self):
