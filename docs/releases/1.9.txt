@@ -287,6 +287,9 @@ Templates
   the ability to register libraries and builtins explicitly through the
   template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
 
+* The include tag now caches parsed templates objects during template
+  rendering, speeding up reuse in e.g. for loops.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
