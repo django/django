@@ -243,6 +243,9 @@ Models
 * Added the :class:`~django.db.models.functions.Now` database function, which
   returns the current date and time.
 
+* Added :func:`~django.db.models.Func.as_transform` to convert ``Func`` objects
+  into ``Transform`` objects.
+
 CSRF
 ^^^^
 

@@ -4,8 +4,6 @@ from copy import copy
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
-from .query_utils import QueryWrapper
-
 
 class RegisterLookupMixin(object):
     def _get_lookup(self, lookup_name):
@@ -115,13 +113,14 @@ class Lookup(RegisterLookupMixin):
         return value
 
     def batch_process_rhs(self, compiler, connection, rhs=None):
+        from django.db.models.expressions import Value
+
         if rhs is None:
             rhs = self.rhs
         if self.bilateral_transforms:
             sqls, sqls_params = [], []
             for p in rhs:
-                value = QueryWrapper('%s',
-                    [self.lhs.output_field.get_db_prep_value(p, connection)])
+                value = Value(self.lhs.output_field.get_db_prep_value(p, connection))
                 value = self.apply_bilateral_transforms(value)
                 sql, sql_params = compiler.compile(value)
                 sqls.append(sql)
@@ -145,13 +144,14 @@ class Lookup(RegisterLookupMixin):
         return compiler.compile(lhs)
 
     def process_rhs(self, compiler, connection):
+        from django.db.models.expressions import Value
+
         value = self.rhs
         if self.bilateral_transforms:
             if self.rhs_is_direct_value():
                 # Do not call get_db_prep_lookup here as the value will be
                 # transformed before being used for lookup
-                value = QueryWrapper("%s",
-                    [self.lhs.output_field.get_db_prep_value(value, connection)])
+                value = Value(self.lhs.output_field.get_db_prep_value(value, connection))
             value = self.apply_bilateral_transforms(value)
         # Due to historical reasons there are a couple of different
         # ways to produce sql here. get_compiler is likely a Query

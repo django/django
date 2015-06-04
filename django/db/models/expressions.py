@@ -4,6 +4,7 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
+from django.db.models.lookups import Transform
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q, refs_aggregate
@@ -512,6 +513,32 @@ class Func(Expression):
         copy.source_expressions = self.source_expressions[:]
         copy.extra = self.extra.copy()
         return copy
+
+    @classmethod
+    def as_transform(cls, lookup_name, bilateral=False, output_field=None, expressions=None):
+        def as_sql(self, compiler, connection):
+            expressions = self.mapped_expressions
+            if expressions is None:
+                expressions = []
+            else:
+                expressions = list(expressions)
+            if 'self' in expressions:
+                expressions = [self.lhs if e == 'self' else e for e in expressions]
+            else:
+                expressions.insert(0, self.lhs)
+            return compiler.compile(cls(*expressions))
+
+        name = '%sTransform' % cls.__name__
+        attrs = {
+            'lookup_name': lookup_name,
+            'bilateral': bilateral,
+            'mapped_expressions': expressions,
+            'as_sql': as_sql,
+        }
+        if output_field is not None:
+            attrs['output_field'] = output_field
+
+        return type(name, (Transform,), attrs)
 
 
 class Value(Expression):

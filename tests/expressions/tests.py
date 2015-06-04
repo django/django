@@ -6,7 +6,7 @@ from copy import deepcopy
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, connection, models, transaction
-from django.db.models import TimeField, UUIDField
+from django.db.models import CharField, TimeField, UUIDField
 from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
@@ -882,3 +882,65 @@ class ReprTests(TestCase):
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")
         self.assertEqual(repr(Sum('a')), "Sum(F(a))")
         self.assertEqual(repr(Variance('a', sample=True)), "Variance(F(a), sample=True)")
+
+
+class FuncAsTransformTests(TestCase):
+    def test_as_transform(self):
+        LowerTransform = Lower.as_transform(lookup_name='custom_lower')
+        CharField.register_lookup(LowerTransform)
+
+        try:
+            Employee.objects.create(firstname='Bob', lastname='Testerton')
+            self.assertQuerysetEqual(Employee.objects.filter(firstname__custom_lower='bob'), [
+                '<Employee: Bob Testerton>',
+            ])
+        finally:
+            CharField._unregister_lookup(LowerTransform)
+
+    def test_bilateral_as_transform(self):
+        LowerTransform = Lower.as_transform(lookup_name='custom_lower', bilateral=True)
+        CharField.register_lookup(LowerTransform)
+
+        try:
+            Employee.objects.create(firstname='Bob', lastname='Testerton')
+            self.assertQuerysetEqual(Employee.objects.filter(firstname__custom_lower='bOB'), [
+                '<Employee: Bob Testerton>',
+            ])
+        finally:
+            CharField._unregister_lookup(LowerTransform)
+
+    def test_other_expressions(self):
+        Question = Concat.as_transform(lookup_name='question', expressions=[Value('?')])
+        CharField.register_lookup(Question)
+
+        try:
+            Employee.objects.create(firstname='Bob', lastname='Testerton')
+            self.assertQuerysetEqual(Employee.objects.filter(lastname__question='Testerton?'), [
+                '<Employee: Bob Testerton>',
+            ])
+        finally:
+            CharField._unregister_lookup(Question)
+
+    def test_other_expressions_with_self(self):
+        Quoted = Concat.as_transform(lookup_name='quoted', expressions=[Value('"'), 'self', Value('"')])
+        CharField.register_lookup(Quoted)
+
+        try:
+            Employee.objects.create(firstname='Bob', lastname='Testerton')
+            self.assertQuerysetEqual(Employee.objects.filter(lastname__quoted='"Testerton"'), [
+                '<Employee: Bob Testerton>',
+            ])
+        finally:
+            CharField._unregister_lookup(Quoted)
+
+    def test_substr_expressions_not_value(self):
+        FirstTwo = Substr.as_transform(lookup_name='first_two', expressions=[1, 2])
+        CharField.register_lookup(FirstTwo)
+
+        try:
+            Employee.objects.create(firstname='Bob', lastname='Testerton')
+            self.assertQuerysetEqual(Employee.objects.filter(lastname__first_two='Te'), [
+                '<Employee: Bob Testerton>',
+            ])
+        finally:
+            CharField._unregister_lookup(FirstTwo)
