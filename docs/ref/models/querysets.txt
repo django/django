@@ -2628,7 +2628,7 @@ to the current time zone before filtering.
 
 .. versionchanged:: 1.9
 
-    Add support for TimeFields.
+    Add support for :class:~`django.db.models.TimeField`.
 
 .. versionchanged:: 1.9
 
@@ -2661,7 +2661,7 @@ to the current time zone before filtering.
 
 .. versionchanged:: 1.9
 
-    Add support for TimeFields.
+    Add support for :class:~`django.db.models.TimeField`.
 
 .. versionchanged:: 1.9
 
@@ -2694,7 +2694,7 @@ to the current time zone before filtering.
 
 .. versionchanged:: 1.9
 
-    Add support for TimeFields.
+    Add support for :class:~`django.db.models.TimeField`.
 
 .. versionchanged:: 1.9
 

@@ -233,9 +233,9 @@ Models
   (such as :lookup:`exact`, :lookup:`gt`, :lookup:`lt`, etc.). For example:
   ``Entry.objects.filter(pub_date__month__gt=6)``.
 
-* :lookup:`Time <hour>` lookups are now supported by TimeField for all
-  backends. Support for backends other than SQLite was added but undocumented
-  in Django 1.7.
+* :lookup:`Time <hour>` lookups are now supported by
+  :class:`~django.db.models.TimeField` for all backends. Support for backends
+  other than SQLite was added but undocumented in Django 1.7.
 
 * You can specify the ``output_field`` parameter of the
   :class:`~django.db.models.Avg` aggregate in order to aggregate over
