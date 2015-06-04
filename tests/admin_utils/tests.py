@@ -96,11 +96,7 @@ class NestedObjectsTests(TestCase):
 
 class UtilsTests(TestCase):
 
-    def setUp(self):
-        """
-        Set empty value to use with display_for_field() and display_for_value()
-        """
-        self.empty_value = '-empty-'
+    empty_value = '-empty-'
 
     def test_values_from_lookup_field(self):
         """
