@@ -119,7 +119,6 @@ class TestSaveLoad(PostgreSQLTestCase):
 
     def test_choices(self):
         instance = ChoiceIntegerArrayModel(field=[1, 2])
-        instance.save()
         self.assertEqual(instance.get_field_display(), 'Value 1')
 
 

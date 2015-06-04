@@ -1,3 +1,4 @@
+import collections
 import json
 
 from django.contrib.postgres import lookups
@@ -7,6 +8,8 @@ from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
 from django.db.models.lookups import Exact, In
 from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
 
 from ..utils import prefix_validation_error
@@ -45,6 +48,42 @@ class ArrayField(Field):
     def model(self, model):
         self.__dict__['model'] = model
         self.base_field.model = model
+
+    def _get_flatchoices(self):
+        flat = []
+        for choice, value in self.choices:
+            if isinstance(value, (list, tuple)):
+                flat.extend(value)
+            elif isinstance(choice, collections.Hashable):
+                flat.append((choice, value))
+            elif isinstance(choice, list):
+                flat.append((tuple(choice), value))
+
+        return flat
+
+    flatchoices = property(_get_flatchoices)
+
+    def contribute_to_class(self, cls, name, virtual_only=False):
+        super(ArrayField, self).contribute_to_class(cls, name, virtual_only=virtual_only)
+        self.base_field.model = cls
+
+        if self.choices:
+            # Model._get_FIELD_display only knows how to handle hashable values
+            # from its field; overwrite it with a custom version to cope with
+            # lists.
+            def model_get_FIELD_display(model, field):
+                value = getattr(model, field.attname)
+                flatchoices = field.flatchoices
+
+                if isinstance(value, list):
+                    value = tuple(value)
+                elif not isinstance(value, collections.Hashable):
+                    raise ValueError('Unexpected unhashable type')
+
+                return force_text(dict(flatchoices).get(value, value), strings_only=True)
+
+            setattr(cls, 'get_%s_display' % self.name,
+                    curry(model_get_FIELD_display, field=self))
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
