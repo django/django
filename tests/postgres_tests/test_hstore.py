@@ -122,6 +122,12 @@ class TestQuerying(TestCase):
             self.objs[:2]
         )
 
+    def test_usage_in_subquery(self):
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(id__in=HStoreModel.objects.filter(field__a='b')),
+            self.objs[:2]
+        )
+
 
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"field": "{\\"a\\": \\"b\\"}"}, "model": "postgres_tests.hstoremodel", "pk": null}]'
