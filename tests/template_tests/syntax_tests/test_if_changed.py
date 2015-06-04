@@ -196,3 +196,17 @@ class IfChangedTests(SimpleTestCase):
         template = self.engine.from_string('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
         output = template.render(Context({}))
         self.assertEqual(output, '1st time')
+
+    def test_include(self):
+        """
+        #23516 -- This test fails only if the cached loader isn't used. Hence
+        we don't use the @setup decorator.
+        """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
+                'include': '{% ifchanged %}{{ x }}{% endifchanged %}',
+            }),
+        ])
+        output = engine.render_to_string('template', dict(vars=[1, 1, 2, 2, 3, 3]))
+        self.assertEqual(output, "123")
