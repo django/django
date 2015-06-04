@@ -511,6 +511,10 @@ class QuerySet(object):
             if f.attname in lookup:
                 lookup[f.name] = lookup.pop(f.attname)
         params = {k: v for k, v in kwargs.items() if LOOKUP_SEP not in k}
+        lookup_parameters = set(kwargs.keys()) - set(params.keys())
+        if lookup_parameters:
+            raise TypeError("Lookups are not allowed for get_or_create() and update_or_create(). "
+                            "Wrong parameters: %s" % sorted(lookup_parameters))
         params.update(defaults)
         return lookup, params
 

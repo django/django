@@ -126,6 +126,16 @@ class GetOrCreateTests(TestCase):
         # The publisher should have three books.
         self.assertEqual(p.books.count(), 3)
 
+    def test_get_or_create_with_lookups_raises_exception(self):
+        Person.objects.create(first_name="Morihei", last_name="Ueshiba", birthday=date(1883, 12, 14))
+        self.assertRaisesMessage(
+            TypeError,
+            "Lookups are not allowed for get_or_create() and update_or_create(). "
+            "Wrong parameters: ['birthday__gte', 'first_name__iexact']",
+            Person.objects.get_or_create,
+            first_name__iexact='morihei', last_name="Ueshiba", birthday__gte=date(1800, 12, 12)
+        )
+
 
 class GetOrCreateTestsWithManualPKs(TestCase):
 
@@ -348,3 +358,13 @@ class UpdateOrCreateTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(book.name, name)
         self.assertEqual(author.books.count(), 1)
+
+    def test_update_or_create_with_lookups_raises_exception(self):
+        Person.objects.create(first_name="Morihei", last_name="Ueshiba", birthday=date(1883, 12, 14))
+        self.assertRaisesMessage(
+            TypeError,
+            "Lookups are not allowed for get_or_create() and update_or_create(). "
+            "Wrong parameters: ['birthday__gte', 'first_name__iexact']",
+            Person.objects.update_or_create,
+            first_name__iexact='morihei', last_name="Ueshiba", birthday__gte=date(1800, 12, 12)
+        )

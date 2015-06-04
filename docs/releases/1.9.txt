@@ -559,6 +559,9 @@ Miscellaneous
   :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
   to ``True`` on your test class.
 
+* Lookups usage in ``get_or_create()`` and ``update_or_create()`` was
+  prohibited.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

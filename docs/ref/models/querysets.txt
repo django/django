@@ -1702,6 +1702,14 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
+  .. versionchanged:: 1.9
+
+  Lookups usage is not allowed for ``get_or_create()``.
+  If you will try to use it, ``TypeError`` will be raised.
+
+      >>> Person.objects.get_or_create(name='Bob', birthday__gte=date(1800, 12, 12))
+      # Raises TypeError
+
 update_or_create
 ~~~~~~~~~~~~~~~~
 
@@ -1743,6 +1751,14 @@ For detailed description how names passed in ``kwargs`` are resolved see
 As described above in :meth:`get_or_create`, this method is prone to a
 race-condition which can result in multiple rows being inserted simultaneously
 if uniqueness is not enforced at the database level.
+
+  .. versionchanged:: 1.9
+
+  Lookups usage is not allowed for ``update_or_create()``.
+  If you will try to use it, ``TypeError`` will be raised.
+
+      >>> Person.objects.update_or_create(name='Bob', birthday__gte=date(1800, 12, 12))
+      # Raises TypeError
 
 bulk_create
 ~~~~~~~~~~~
