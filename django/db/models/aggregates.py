@@ -15,13 +15,15 @@ class Aggregate(Func):
     name = None
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        assert len(self.source_expressions) == 1
         # Aggregates are not allowed in UPDATE queries, so ignore for_save
         c = super(Aggregate, self).resolve_expression(query, allow_joins, reuse, summarize)
-        if c.source_expressions[0].contains_aggregate and not summarize:
-            name = self.source_expressions[0].name
-            raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
-                c.name, name, name))
+        if not summarize:
+            expressions = c.get_source_expressions()
+            for index, expr in enumerate(expressions):
+                if expr.contains_aggregate:
+                    before_resolved = self.get_source_expressions()[index]
+                    name = before_resolved.name if hasattr(before_resolved, 'name') else repr(before_resolved)
+                    raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (c.name, name, name))
         c._patch_aggregate(query)  # backward-compatibility support
         return c
 
@@ -31,8 +33,9 @@ class Aggregate(Func):
 
     @property
     def default_alias(self):
-        if hasattr(self.source_expressions[0], 'name'):
-            return '%s__%s' % (self.source_expressions[0].name, self.name.lower())
+        expressions = self.get_source_expressions()
+        if len(expressions) == 1 and hasattr(expressions[0], 'name'):
+            return '%s__%s' % (expressions[0].name, self.name.lower())
         raise TypeError("Complex expressions require an alias")
 
     def get_group_by_cols(self):

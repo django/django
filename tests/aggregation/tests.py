@@ -985,8 +985,30 @@ class AggregateTestCase(TestCase):
         self.assertEqual(author.sum_age, other_author.sum_age)
 
     def test_annotated_aggregate_over_annotated_aggregate(self):
-        with six.assertRaisesRegex(self, FieldError, "Cannot compute Sum\('id__max'\): 'id__max' is an aggregate"):
+        with self.assertRaisesMessage(FieldError, "Cannot compute Sum('id__max'): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
+
+        class MyMax(Max):
+            def as_sql(self, compiler, connection):
+                self.set_source_expressions(self.get_source_expressions()[0:1])
+                return super(MyMax, self).as_sql(compiler, connection)
+
+        with self.assertRaisesMessage(FieldError, "Cannot compute Max('id__max'): 'id__max' is an aggregate"):
+            Book.objects.annotate(Max('id')).annotate(my_max=MyMax('id__max', 'price'))
+
+    def test_multi_arg_aggregate(self):
+        class MyMax(Max):
+            def as_sql(self, compiler, connection):
+                self.set_source_expressions(self.get_source_expressions()[0:1])
+                return super(MyMax, self).as_sql(compiler, connection)
+
+        with self.assertRaisesMessage(TypeError, 'Complex aggregates require an alias'):
+            Book.objects.aggregate(MyMax('pages', 'price'))
+
+        with self.assertRaisesMessage(TypeError, 'Complex annotations require an alias'):
+            Book.objects.annotate(MyMax('pages', 'price'))
+
+        Book.objects.aggregate(max_field=MyMax('pages', 'price'))
 
     def test_add_implementation(self):
         class MySum(Sum):
