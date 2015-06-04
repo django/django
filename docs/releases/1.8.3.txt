@@ -50,3 +50,6 @@ Bugfixes
 
 * Fixed recording of applied status for squashed (replacement) migrations
   (:ticket:`24628`).
+
+* Fixed prefetch_related for models using UUID primary keys on non-PostgreSQL
+  databases (:ticket:`24912`).

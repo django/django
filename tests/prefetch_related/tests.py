@@ -12,7 +12,7 @@ from django.utils.encoding import force_text
 from .models import (
     Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
     BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
-    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
+    House, LessonEntry, Person, Pet, Qualification, Reader, Room, TaggedItem,
     Teacher, WordEntry,
 )
 
@@ -1161,3 +1161,20 @@ class Ticket21760Tests(TestCase):
         prefetcher = get_prefetcher(self.rooms[0], 'house')[0]
         queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
         self.assertNotIn(' JOIN ', force_text(queryset.query))
+
+
+class UUIDPrefetchRelated(TestCase):
+    def setUp(self):
+        self.pet = Pet.objects.create(name='Fifi')
+        self.pet.people.add(
+            *[
+                Person.objects.create(name='Ellen'),
+                Person.objects.create(name='George'),
+            ]
+        )
+
+    def test_prefetch_related(self):
+        with self.assertNumQueries(2):
+            pet = Pet.objects.filter(pk=self.pet.pk).prefetch_related('people').first()
+        with self.assertNumQueries(0):
+            self.assertEqual(2, len(pet.people.all()))

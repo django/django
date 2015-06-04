@@ -1,3 +1,4 @@
+import uuid
 from django.contrib.contenttypes.fields import (
     GenericForeignKey, GenericRelation,
 )
@@ -257,3 +258,11 @@ class Author2(models.Model):
 
     class Meta:
         ordering = ['id']
+
+
+# Model for many-to-many with UUID pk test:
+
+class Pet(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=20)
+    people = models.ManyToManyField(Person, related_name='pets')
