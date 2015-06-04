@@ -204,6 +204,12 @@ class TestQuerying(TestCase):
             [self.objs[7], self.objs[8]]
         )
 
+    def test_usage_in_subquery(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(id__in=JSONModel.objects.filter(field__c=1)),
+            self.objs[7:9]
+        )
+
 
 @skipUnlessPG94
 class TestSerialization(TestCase):
