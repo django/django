@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
-from .exceptions import InvalidTaskBackendError
 
+from .exceptions import InvalidTaskBackendError
 
 DEFAULT_TASK_ALIAS = 'default'
 

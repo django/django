@@ -1,19 +1,25 @@
 import unittest
 
-from django.test import override_settings, SimpleTestCase
-from django.tasks import registry, task, Task, backends, get_backend, base, constants
+from django.tasks import (
+    Task, backends, base, constants, get_backend, registry, task,
+)
+from django.test import SimpleTestCase, override_settings
+
 
 def dummy_task(*args, **kwargs):
     return args, kwargs
+
 
 class DummierTask(object):
     def __call__(self, *args, **kwargs):
         return args, kwargs
 
+
 dummier_task = DummierTask()
 
+
 @override_settings(
-    QUEUES = {
+    QUEUES={
         'default': {'BACKEND': 'django.tasks.backends.DummyTaskBackend'},
     }
 )
@@ -45,8 +51,10 @@ class TestDummyBackend(SimpleTestCase):
 
     def test_failing_task_reports_failure_and_returns_exception(self):
         e = KeyError('Nope!')
+
         def t():
             raise e
+
         t = Task(t)
         r = t.delay()
 
@@ -108,6 +116,7 @@ class TestTaskDecorator(unittest.TestCase):
         self.assertEquals(constants.SUCCESS, tr.get_status())
         self.assertEquals(((1, 2, 3), {'answer': 42}), tr.get_result())
 
+
 class TestTask(unittest.TestCase):
     def test_configure_clones_and_updates_alias_and_options(self):
         t = Task(lambda: 'XYZ', using='default', options={'priority': 1})
@@ -118,9 +127,10 @@ class TestTask(unittest.TestCase):
 
         self.assertEqual('special', t2.alias)
         self.assertEqual({'priority': 3}, t2.options)
-        
+
     def test_task_works_as_original_callable(self):
         o = object()
+
         def f():
             return o
 
