@@ -415,9 +415,7 @@ class ExecutorTests(MigrationTestBase):
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_apply_all_replaced_marks_replacement_as_applied(self):
         """
-        Applying all replaced migrations marks the replacement as applied.
-
-        Ticket #24628.
+        Applying all replaced migrations marks replacement as applied (#24628).
         """
         recorder = MigrationRecorder(connection)
         # Place the database in a state where the replaced migrations are
@@ -441,10 +439,7 @@ class ExecutorTests(MigrationTestBase):
     def test_migrate_marks_replacement_applied_even_if_it_did_nothing(self):
         """
         A new squash migration will be marked as applied even if all its
-        replaced migrations were previously already applied.
-
-        Ticket #24628.
-
+        replaced migrations were previously already applied (#24628).
         """
         recorder = MigrationRecorder(connection)
         # Record all replaced migrations as applied
