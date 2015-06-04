@@ -261,6 +261,7 @@ Your app directory should now look like::
     polls/
         __init__.py
         admin.py
+        migrations/
         models.py
         tests.py
         urls.py
