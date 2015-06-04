@@ -187,7 +187,6 @@ class MigrationExecutor(object):
         all its replaced migrations applied. In this case no new migration will
         be applied, but we still want to correctly maintain the applied state
         of the squash migration.
-
         """
         applied = self.recorder.applied_migrations()
         for key, migration in self.loader.replacements.items():
