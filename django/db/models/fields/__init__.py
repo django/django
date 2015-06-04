@@ -2380,13 +2380,17 @@ class UUIDField(Field):
         return "UUIDField"
 
     def get_db_prep_value(self, value, connection, prepared=False):
-        if isinstance(value, six.string_types):
-            value = uuid.UUID(value)
-        if isinstance(value, uuid.UUID):
-            if connection.features.has_native_uuid_field:
-                return value
-            return value.hex
-        return value
+        if value is None:
+            return None
+        if not isinstance(value, uuid.UUID):
+            try:
+                value = uuid.UUID(value)
+            except AttributeError:
+                raise TypeError(self.error_messages['invalid'] % {'value': value})
+
+        if connection.features.has_native_uuid_field:
+            return value
+        return value.hex
 
     def to_python(self, value):
         if value and not isinstance(value, uuid.UUID):
