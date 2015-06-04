@@ -66,6 +66,10 @@ details on these changes.
 * Support for custom error views with a single positional parameter will be
   dropped.
 
+* The ``mime_type`` attributes of ``django.utils.feedgenerator.Atom1Feed`` and
+  ``django.utils.feedgenerator.RssFeed`` will be removed in favor of
+  ``content_type``.
+
 .. _deprecation-removed-in-2.0:
 
 2.0
