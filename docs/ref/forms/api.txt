@@ -256,8 +256,8 @@ precedence::
     <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-Checking if form data has changed
----------------------------------
+Checking which form data has changed
+------------------------------------
 
 .. method:: Form.has_changed()
 
@@ -282,6 +282,16 @@ so that the comparison can be done:
 from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
 result is computed by calling :meth:`Field.has_changed` for each field in the
 form.
+
+.. attribute:: Form.changed_data
+
+The ``changed_data`` attribute returns a list of the names of the fields whose
+values in the form's bound data (usually ``request.POST``) differ from what was
+provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> if f.has_changed():
+    ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
 
 Accessing the fields from the form
 ----------------------------------
