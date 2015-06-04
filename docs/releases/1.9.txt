@@ -641,6 +641,10 @@ Miscellaneous
   signatures with only one request parameter are deprecated. The views should
   now also accept a second ``exception`` positional parameter.
 
+* ``django.utils.feedgenerator.Atom1Feed.mime_type`` and
+  ``django.utils.feedgenerator.RssFeed.mime_type`` are renamed to ``content_type``.
+  The old attributes are deprecated and will be removed in Django 2.1.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
