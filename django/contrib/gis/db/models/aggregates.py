@@ -25,8 +25,9 @@ class GeoAggregate(Aggregate):
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = super(GeoAggregate, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
-        if not hasattr(c.input_field.field, 'geom_type'):
-            raise ValueError('Geospatial aggregates only allowed on geometry fields.')
+        for expr in c.get_source_expressions():
+            if not hasattr(expr.field, 'geom_type'):
+                raise ValueError('Geospatial aggregates only allowed on geometry fields.')
         return c
 
     def convert_value(self, value, expression, connection, context):

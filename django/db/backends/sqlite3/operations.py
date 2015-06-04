@@ -35,17 +35,19 @@ class DatabaseOperations(BaseDatabaseOperations):
         bad_fields = (fields.DateField, fields.DateTimeField, fields.TimeField)
         bad_aggregates = (aggregates.Sum, aggregates.Avg, aggregates.Variance, aggregates.StdDev)
         if isinstance(expression, bad_aggregates):
-            try:
-                output_field = expression.input_field.output_field
-                if isinstance(output_field, bad_fields):
-                    raise NotImplementedError(
-                        'You cannot use Sum, Avg, StdDev and Variance aggregations '
-                        'on date/time fields in sqlite3 '
-                        'since date/time is saved as text.')
-            except FieldError:
-                # not every sub-expression has an output_field which is fine to
-                # ignore
-                pass
+            for expr in expression.get_source_expressions():
+                try:
+                    output_field = expr.output_field
+                    if isinstance(output_field, bad_fields):
+                        raise NotImplementedError(
+                            'You cannot use Sum, Avg, StdDev, and Variance '
+                            'aggregations on date/time fields in sqlite3 '
+                            'since date/time is saved as text.'
+                        )
+                except FieldError:
+                    # Not every subexpression has an output_field which is fine
+                    # to ignore.
+                    pass
 
     def date_extract_sql(self, lookup_type, field_name):
         # sqlite doesn't support extract, so we fake it with the user-defined
