@@ -105,6 +105,10 @@ class AggregateTestCase(TestCase):
     def test_empty_aggregate(self):
         self.assertEqual(Author.objects.all().aggregate(), {})
 
+    def test_aggregate_in_order_by(self):
+        with self.assertRaises(FieldError):
+            Author.objects.values('age').order_by(Avg('book__rating'))
+
     def test_single_aggregate(self):
         vals = Author.objects.aggregate(Avg("age"))
         self.assertEqual(vals, {"age__avg": Approximate(37.4, places=1)})
