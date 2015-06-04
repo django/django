@@ -247,7 +247,6 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         Reporter.objects.create(first_name="Tintin")
 
 
-
 @skipUnless(connection.features.uses_savepoints,
         "'atomic' requires transactions and savepoints.")
 class AtomicMergeTests(TransactionTestCase):
