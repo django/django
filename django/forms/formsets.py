@@ -54,13 +54,14 @@ class BaseFormSet(object):
     A collection of instances of the same Form class.
     """
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList, form_kwargs=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
         self.data = data or {}
         self.files = files or {}
         self.initial = initial
+        self.form_kwargs = form_kwargs or {}
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
@@ -139,8 +140,15 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in range(self.total_form_count())]
+        forms = [self._construct_form(i, **self.get_form_kwargs(i))
+                 for i in range(self.total_form_count())]
         return forms
+
+    def get_form_kwargs(self, index):
+        """
+        Return additional keyword arguments for each individual formset form.
+        """
+        return self.form_kwargs.copy()
 
     def _construct_form(self, i, **kwargs):
         """
@@ -184,6 +192,7 @@ class BaseFormSet(object):
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
+            **self.get_form_kwargs(None)
         )
         self.add_fields(form, None)
         return form

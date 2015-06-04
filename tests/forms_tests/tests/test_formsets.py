@@ -57,6 +57,12 @@ class SplitDateTimeForm(Form):
 SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
+class CustomKwargForm(Form):
+    def __init__(self, *args, **kwargs):
+        self.custom_kwarg = kwargs.pop('custom_kwarg')
+        super(CustomKwargForm, self).__init__(*args, **kwargs)
+
+
 class FormsFormsetTestCase(SimpleTestCase):
 
     def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
@@ -113,6 +119,37 @@ class FormsFormsetTestCase(SimpleTestCase):
         formset = self.make_choiceformset()
         self.assertFalse(formset.is_valid())
         self.assertFalse(formset.has_changed())
+
+    def test_form_kwargs_formset(self):
+        """
+        Test that custom kwargs set on the formset instance are passed to the
+        underlying forms.
+        """
+        FormSet = formset_factory(CustomKwargForm, extra=2)
+        formset = FormSet(form_kwargs={'custom_kwarg': 1})
+        for form in formset:
+            self.assertTrue(hasattr(form, 'custom_kwarg'))
+            self.assertEqual(form.custom_kwarg, 1)
+
+    def test_form_kwargs_formset_dynamic(self):
+        """
+        Test that form kwargs can be passed dynamically in a formset.
+        """
+        class DynamicBaseFormSet(BaseFormSet):
+            def get_form_kwargs(self, index):
+                return {'custom_kwarg': index}
+
+        DynamicFormSet = formset_factory(CustomKwargForm, formset=DynamicBaseFormSet, extra=2)
+        formset = DynamicFormSet(form_kwargs={'custom_kwarg': 'ignored'})
+        for i, form in enumerate(formset):
+            self.assertTrue(hasattr(form, 'custom_kwarg'))
+            self.assertEqual(form.custom_kwarg, i)
+
+    def test_form_kwargs_empty_form(self):
+        FormSet = formset_factory(CustomKwargForm)
+        formset = FormSet(form_kwargs={'custom_kwarg': 1})
+        self.assertTrue(hasattr(formset.empty_form, 'custom_kwarg'))
+        self.assertEqual(formset.empty_form.custom_kwarg, 1)
 
     def test_formset_validation(self):
         # FormSet instances can also have an error attribute if validation failed for
