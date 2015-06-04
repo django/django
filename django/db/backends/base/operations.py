@@ -90,15 +90,6 @@ class BaseDatabaseOperations(object):
         """
         raise NotImplementedError('subclasses of BaseDatabaseOperations may require a datetrunc_sql() method')
 
-    def datetime_cast_sql(self):
-        """
-        Returns the SQL necessary to cast a datetime value so that it will be
-        retrieved as a Python datetime object instead of a string.
-
-        This SQL should include a '%s' in place of the field's name.
-        """
-        return "%s"
-
     def datetime_cast_date_sql(self, field_name, tzname):
         """
         Returns the SQL necessary to cast a datetime value to date value.
