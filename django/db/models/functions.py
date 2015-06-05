@@ -1,9 +1,40 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import (
-    DateTimeField, Func, IntegerField, Transform, Value,
-)
+from django.db.models import Func, Transform, Value, fields
+
+
+class Cast(Func):
+    """
+    Coerce an expression to a new field type.
+    """
+    function = 'CAST'
+    template = '%(function)s(%(expressions)s AS %(db_type)s)'
+
+    mysql_types = {
+        fields.CharField: 'char',
+        fields.IntegerField: 'signed integer',
+        fields.FloatField: 'signed',
+    }
+
+    def __init__(self, expression, output_field):
+        super(Cast, self).__init__(expression, output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        self.extra['db_type'] = self._output_field.db_type(connection)
+        return super(Cast, self).as_sql(compiler, connection)
+
+    def as_mysql(self, compiler, connection):
+        if type(self._output_field) in self.mysql_types:
+            self.extra['db_type'] = self.mysql_types[type(self._output_field)]
+        else:
+            self.extra['db_type'] = self._output_field.db_type(connection)
+        return super(Cast, self).as_sql(compiler, connection)
+
+    def as_postgresql(self, compiler, connection):
+        # CAST would be valid too, but the :: shortcut syntax is more readable.
+        self.template = '%(expressions)s::%(db_type)s'
+        return self.as_sql(compiler, connection)
 
 
 class Coalesce(Func):
@@ -133,7 +164,7 @@ class Length(Transform):
     lookup_name = 'length'
 
     def __init__(self, expression, **extra):
-        output_field = extra.pop('output_field', IntegerField())
+        output_field = extra.pop('output_field', fields.IntegerField())
         super(Length, self).__init__(expression, output_field=output_field, **extra)
 
     def as_mysql(self, compiler, connection):
@@ -151,7 +182,7 @@ class Now(Func):
 
     def __init__(self, output_field=None, **extra):
         if output_field is None:
-            output_field = DateTimeField()
+            output_field = fields.DateTimeField()
         super(Now, self).__init__(output_field=output_field, **extra)
 
     def as_postgresql(self, compiler, connection):
