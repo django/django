@@ -3,6 +3,7 @@ import json
 from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
 
 from django.contrib.postgres import forms, lookups
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils import six
 
@@ -41,7 +42,7 @@ class RangeField(models.Field):
             "lower": value.lower,
             "upper": value.upper,
             "bounds": value._bounds,
-        })
+        }, cls=DjangoJSONEncoder)
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', self.form_field)
