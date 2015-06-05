@@ -434,6 +434,8 @@ Requests and Responses
 * View error handlers now support
   :class:`~django.template.response.TemplateResponse`, commonly used with
   class-based views.
+* Exceptions raised by the ``render()`` method are now passed to the
+  ``process_exception`` method of each middleware.
 
 Tests
 ^^^^^
