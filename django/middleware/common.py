@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import re
 
@@ -6,6 +5,7 @@ from django import http
 from django.conf import settings
 from django.core import urlresolvers
 from django.core.mail import mail_managers
+from django.utils.cache import handle_conditional_get, set_response_etag
 from django.utils.encoding import force_text
 
 logger = logging.getLogger('django.request')
@@ -97,20 +97,17 @@ class CommonMiddleware(object):
         Calculate the ETag, if needed.
         """
         if settings.USE_ETAGS:
+            if not response.has_header('ETag'):
+                set_response_etag(response)
+
             if response.has_header('ETag'):
                 etag = response['ETag']
-            elif response.streaming:
-                etag = None
-            else:
-                etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if etag is not None:
-                if (200 <= response.status_code < 300
-                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
-                    cookies = response.cookies
-                    response = http.HttpResponseNotModified()
-                    response.cookies = cookies
-                else:
-                    response['ETag'] = etag
+
+                return handle_conditional_get(
+                    request,
+                    etag=etag,
+                    response=response,
+                )
 
         return response
 
