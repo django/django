@@ -173,11 +173,11 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.order_with_respect_to
 
-    Marks this object as "orderable" with respect to the given field. This is almost
-    always used with related objects to allow them to be ordered with respect to a
-    parent object. For example, if an ``Answer`` relates to a ``Question`` object,
-    and a question has more than one answer, and the order of answers matters, you'd
-    do this::
+    Makes this object orderable with respect to the given field, usually a
+    ``ForeignKey``. This can be used to make related objects orderable with
+    respect to a parent object. For example, if an ``Answer`` relates to a
+    ``Question`` object, and a question has more than one answer, and the order
+    of answers matters, you'd do this::
 
         from django.db import models
 
@@ -218,12 +218,20 @@ Django quotes column and table names behind the scenes.
         >>> answer.get_previous_in_order()
         <Answer: 1>
 
-.. admonition:: Changing order_with_respect_to
+.. admonition:: ``order_with_respect_to`` implicitly sets the ``ordering`` option
 
-        ``order_with_respect_to`` adds an additional field/database column
-        named ``_order``, so be sure to make and apply the appropriate
-        migrations if you add or change ``order_with_respect_to``
-        after your initial :djadmin:`migrate`.
+    Internally, ``order_with_respect_to`` adds an additional field/database
+    column named ``_order`` and sets the model's :attr:`~Options.ordering`
+    option to this field. Consequently, ``order_with_respect_to`` and
+    ``ordering`` cannot be used together, and the ordering added by
+    ``order_with_respect_to`` will apply whenever you obtain a list of objects
+    of this model.
+
+.. admonition:: Changing ``order_with_respect_to``
+
+    Because ``order_with_respect_to`` adds a new database column, be sure to
+    make and apply the appropriate migrations if you add or change
+    ``order_with_respect_to`` after your initial :djadmin:`migrate`.
 
 ``ordering``
 ------------
