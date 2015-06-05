@@ -85,3 +85,7 @@ Bugfixes
 
 * Reallowed non-ASCII values for ``ForeignKey.related_name`` on Python 3 by
   fixing the false positive system check (:ticket:`25016`).
+
+* Fixed inline forms that use a parent object that has a ``UUIDField`` primary
+  key and a child object that has an ``AutoField`` primary key
+  (:ticket:`24958`).
