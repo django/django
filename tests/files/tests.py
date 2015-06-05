@@ -6,7 +6,6 @@ import os
 import struct
 import tempfile
 import unittest
-import zlib
 from io import BytesIO, StringIO
 
 from django.core.files import File
@@ -233,10 +232,7 @@ class InconsistentGetImageDimensionsBug(unittest.TestCase):
         get_image_dimensions fails on some pngs, while Image.size is working good on them
         """
         img_path = os.path.join(os.path.dirname(upath(__file__)), "magic.png")
-        try:
-            size = images.get_image_dimensions(img_path)
-        except zlib.error:
-            self.fail("Exception raised from get_image_dimensions().")
+        size = images.get_image_dimensions(img_path)
         with open(img_path, 'rb') as fh:
             self.assertEqual(size, Image.open(fh).size)
 

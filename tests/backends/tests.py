@@ -370,10 +370,7 @@ class LastExecutedQueryTest(TestCase):
         query has been run.
         """
         cursor = connection.cursor()
-        try:
-            connection.ops.last_executed_query(cursor, '', ())
-        except Exception:
-            self.fail("'last_executed_query' should not raise an exception.")
+        connection.ops.last_executed_query(cursor, '', ())
 
     def test_debug_sql(self):
         list(models.Reporter.objects.filter(first_name="test"))
