@@ -322,13 +322,13 @@ class AdminSite(object):
         from django.contrib.auth.views import password_change
         url = reverse('admin:password_change_done', current_app=self.name)
         defaults = {
-            'current_app': self.name,
             'password_change_form': AdminPasswordChangeForm,
             'post_change_redirect': url,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_template is not None:
             defaults['template_name'] = self.password_change_template
+        request.current_app = self.name
         return password_change(request, **defaults)
 
     def password_change_done(self, request, extra_context=None):
@@ -337,11 +337,11 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import password_change_done
         defaults = {
-            'current_app': self.name,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.password_change_done_template is not None:
             defaults['template_name'] = self.password_change_done_template
+        request.current_app = self.name
         return password_change_done(request, **defaults)
 
     def i18n_javascript(self, request):
@@ -366,11 +366,11 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import logout
         defaults = {
-            'current_app': self.name,
             'extra_context': dict(self.each_context(request), **(extra_context or {})),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template
+        request.current_app = self.name
         return logout(request, **defaults)
 
     @never_cache
@@ -399,10 +399,10 @@ class AdminSite(object):
 
         defaults = {
             'extra_context': context,
-            'current_app': self.name,
             'authentication_form': self.login_form or AdminAuthenticationForm,
             'template_name': self.login_template or 'admin/login.html',
         }
+        request.current_app = self.name
         return login(request, **defaults)
 
     def _build_app_dict(self, request, label=None):
