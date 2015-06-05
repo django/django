@@ -25,6 +25,8 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
                 type(self.obj))
 
 
+# Since version 1.9.0 six ships with this compatibility function. To maintain
+# backwards compatibility we keep the import / function accessible here.
 python_2_unicode_compatible = six.python_2_unicode_compatible
 
 
