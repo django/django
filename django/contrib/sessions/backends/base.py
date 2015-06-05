@@ -161,10 +161,25 @@ class SessionBase(object):
             self._session_key = self._get_new_session_key()
         return self._session_key
 
+    def _validate_session_key(self, key):
+        """Key must be truthy and at least 8 characters long"""
+        return key and len(key) >= 8
+
     def _get_session_key(self):
-        return self._session_key
+        return self.__session_key
+
+    def _set_session_key(self, value):
+        """
+        Validate session key on assignment
+        Invalid values will set None instead
+        """
+        if self._validate_session_key(value):
+            self.__session_key = value
+        else:
+            self.__session_key = None
 
     session_key = property(_get_session_key)
+    _session_key = property(_get_session_key, _set_session_key)
 
     def _get_session(self, no_load=False):
         """

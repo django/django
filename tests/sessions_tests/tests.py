@@ -198,6 +198,22 @@ class SessionTestsMixin(object):
             # session key; make sure that entry is manually deleted
             session.delete('1')
 
+    def test_session_key_empty_string_invalid(self):
+        """Falsey values (Such as an empty string) are rejected"""
+        self.session._session_key = ''
+        self.assertNotEqual(self.session.session_key, '')
+        self.assertEqual(self.session.session_key, None)
+
+    def test_session_key_too_short_invalid(self):
+        """Strings shorter than 8 characters are rejected"""
+        self.session._session_key = '1234567'
+        self.assertEqual(self.session.session_key, None)
+
+    def test_session_key_valid_string_saved(self):
+        """Strings of length 8 and up are accepted and stored"""
+        self.session._session_key = '12345678'
+        self.assertEqual(self.session.session_key, '12345678')
+
     def test_session_key_is_read_only(self):
         def set_session_key(session):
             session.session_key = session._get_new_session_key()
