@@ -210,6 +210,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         conn.create_function("django_datetime_cast_date", 2, _sqlite_datetime_cast_date)
         conn.create_function("django_datetime_extract", 3, _sqlite_datetime_extract)
         conn.create_function("django_datetime_trunc", 3, _sqlite_datetime_trunc)
+        conn.create_function("django_time_extract", 2, _sqlite_time_extract)
         conn.create_function("regexp", 2, _sqlite_regexp)
         conn.create_function("django_format_dtdelta", 3, _sqlite_format_dtdelta)
         conn.create_function("django_power", 2, _sqlite_power)
@@ -400,6 +401,16 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname):
         return "%i-%02i-%02i %02i:%02i:00" % (dt.year, dt.month, dt.day, dt.hour, dt.minute)
     elif lookup_type == 'second':
         return "%i-%02i-%02i %02i:%02i:%02i" % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
+
+def _sqlite_time_extract(lookup_type, dt):
+    if dt is None:
+        return None
+    try:
+        dt = backend_utils.typecast_time(dt)
+    except (ValueError, TypeError):
+        return None
+    return getattr(dt, lookup_type)
 
 
 def _sqlite_format_dtdelta(conn, lhs, rhs):
