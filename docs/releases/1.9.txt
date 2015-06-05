@@ -173,6 +173,9 @@ Forms
 * A form prefix can be specified inside a form class, not only when
   instantiating a form. See :ref:`form-prefix` for details.
 
+* You can now :ref:`specify keyword arguments <custom-formset-form-kwargs>`
+  that you want to pass to the constructor of forms in a formset.
+
 Generic Views
 ^^^^^^^^^^^^^
 
