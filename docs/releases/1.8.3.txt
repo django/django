@@ -59,3 +59,5 @@ Bugfixes
   results (:ticket:`24924`).
 
 * Fixed usage of transforms in subqueries (:ticket:`24744`).
+* Fixed prefetch_related for models using UUID primary keys on non-PostgreSQL
+  databases (:ticket:`24912`).

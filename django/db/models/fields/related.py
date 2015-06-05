@@ -1002,7 +1002,10 @@ def create_many_related_manager(superclass, rel, reverse):
                     getattr(result, '_prefetch_related_val_%s' % f.attname)
                     for f in fk.local_related_fields
                 ),
-                lambda inst: tuple(getattr(inst, f.attname) for f in fk.foreign_related_fields),
+                lambda inst: tuple(
+                    f.get_db_prep_value(getattr(inst, f.attname), connection)
+                    for f in fk.foreign_related_fields
+                ),
                 False,
                 self.prefetch_cache_name,
             )
