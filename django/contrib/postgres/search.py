@@ -185,3 +185,19 @@ class SearchRank(Func):
 
 
 SearchVectorField.register_lookup(SearchVectorExact)
+
+
+class TrigramBase(Func):
+    def __init__(self, expression, string, **extra):
+        if not hasattr(string, 'resolve_expression'):
+            string = Value(string)
+        super(TrigramBase, self).__init__(expression, string, output_field=FloatField(), **extra)
+
+
+class TrigramSimilarity(TrigramBase):
+    function = 'SIMILARITY'
+
+
+class TrigramDistance(TrigramBase):
+    function = ''
+    arg_joiner = ' <-> '
