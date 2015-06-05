@@ -273,6 +273,15 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 'object_id': obj.pk
             })
 
+    def get_empty_value_display(self):
+        """
+        Return the empty_value_display set on ModelAdmin or AdminSite.
+        """
+        try:
+            return mark_safe(self.empty_value_display)
+        except AttributeError:
+            return mark_safe(self.admin_site.empty_value_display)
+
     def get_fields(self, request, obj=None):
         """
         Hook for specifying fields.

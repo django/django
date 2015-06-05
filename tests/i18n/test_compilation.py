@@ -192,14 +192,21 @@ class CompilationErrorHandling(MessageCompilationTests):
             call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
 
 
-class FuzzyTranslationTest(MessageCompilationTests):
-
+class ProjectAndAppTests(MessageCompilationTests):
     LOCALE = 'ru'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    PROJECT_MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
+    APP_MO_FILE = 'app_with_locale/locale/%s/LC_MESSAGES/django.mo' % LOCALE
+
+    def setUp(self):
+        super(ProjectAndAppTests, self).setUp()
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.PROJECT_MO_FILE))
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.APP_MO_FILE))
+
+
+class FuzzyTranslationTest(ProjectAndAppTests):
 
     def setUp(self):
         super(FuzzyTranslationTest, self).setUp()
-        self.addCleanup(self.rmfile, os.path.join(self.test_dir, self.MO_FILE))
         gettext_module._translations = {}  # flush cache or test will be useless
 
     def test_nofuzzy_compiling(self):
@@ -215,3 +222,11 @@ class FuzzyTranslationTest(MessageCompilationTests):
             with translation.override(self.LOCALE):
                 self.assertEqual(ugettext('Lenin'), force_text('Ленин'))
                 self.assertEqual(ugettext('Vodka'), force_text('Водка'))
+
+
+class AppCompilationTest(ProjectAndAppTests):
+
+    def test_app_locale_compiled(self):
+        call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
+        self.assertTrue(os.path.exists(self.PROJECT_MO_FILE))
+        self.assertTrue(os.path.exists(self.APP_MO_FILE))

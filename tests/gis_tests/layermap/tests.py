@@ -140,19 +140,19 @@ class LayerMapTest(TestCase):
     def test_layermap_unique_multigeometry_fk(self):
         "Testing the `unique`, and `transform`, geometry collection conversion, and ForeignKey mappings."
         # All the following should work.
-        try:
-            # Telling LayerMapping that we want no transformations performed on the data.
-            lm = LayerMapping(County, co_shp, co_mapping, transform=False)
 
-            # Specifying the source spatial reference system via the `source_srs` keyword.
-            lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
-            lm = LayerMapping(County, co_shp, co_mapping, source_srs='NAD83')
+        # Telling LayerMapping that we want no transformations performed on the data.
+        lm = LayerMapping(County, co_shp, co_mapping, transform=False)
 
-            # Unique may take tuple or string parameters.
-            for arg in ('name', ('name', 'mpoly')):
-                lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
-        except Exception:
-            self.fail('No exception should be raised for proper use of keywords.')
+        # Specifying the source spatial reference system via the `source_srs` keyword.
+        lm = LayerMapping(County, co_shp, co_mapping, source_srs=4269)
+        lm = LayerMapping(County, co_shp, co_mapping, source_srs='NAD83')
+
+        # Unique may take tuple or string parameters.
+        for arg in ('name', ('name', 'mpoly')):
+            lm = LayerMapping(County, co_shp, co_mapping, transform=False, unique=arg)
+
+        # Now test for failures
 
         # Testing invalid params for the `unique` keyword.
         for e, arg in ((TypeError, 5.0), (ValueError, 'foobar'), (ValueError, ('name', 'mpolygon'))):

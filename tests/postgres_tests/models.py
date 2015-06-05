@@ -60,9 +60,21 @@ if connection.vendor == 'postgresql' and connection.pg_version >= 90200:
         floats = FloatRangeField(blank=True, null=True)
         timestamps = DateTimeRangeField(blank=True, null=True)
         dates = DateRangeField(blank=True, null=True)
+
+    class RangeLookupsModel(PostgreSQLModel):
+        parent = models.ForeignKey(RangesModel, blank=True, null=True)
+        integer = models.IntegerField(blank=True, null=True)
+        big_integer = models.BigIntegerField(blank=True, null=True)
+        float = models.FloatField(blank=True, null=True)
+        timestamp = models.DateTimeField(blank=True, null=True)
+        date = models.DateField(blank=True, null=True)
+
 else:
     # create an object with this name so we don't have failing imports
     class RangesModel(object):
+        pass
+
+    class RangeLookupsModel(object):
         pass
 
 

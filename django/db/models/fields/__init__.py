@@ -2141,11 +2141,14 @@ class TextField(Field):
     def get_internal_type(self):
         return "TextField"
 
-    def get_prep_value(self, value):
-        value = super(TextField, self).get_prep_value(value)
+    def to_python(self, value):
         if isinstance(value, six.string_types) or value is None:
             return value
         return smart_text(value)
+
+    def get_prep_value(self, value):
+        value = super(TextField, self).get_prep_value(value)
+        return self.to_python(value)
 
     def formfield(self, **kwargs):
         # Passing max_length to forms.CharField means that the value's length
@@ -2413,9 +2416,12 @@ class DateTransform(Transform):
             tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
             sql, tz_params = connection.ops.datetime_extract_sql(self.lookup_name, sql, tzname)
             params.extend(tz_params)
-        else:
-            # DateField and TimeField.
+        elif isinstance(lhs_output_field, DateField):
             sql = connection.ops.date_extract_sql(self.lookup_name, sql)
+        elif isinstance(lhs_output_field, TimeField):
+            sql = connection.ops.time_extract_sql(self.lookup_name, sql)
+        else:
+            raise ValueError('DateTransform only valid on Date/Time/DateTimeFields')
         return sql, params
 
     @cached_property

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import calendar
 import datetime
 
 from django.utils.html import avoid_wrapping
@@ -40,6 +41,10 @@ def timesince(d, now=None, reversed=False):
         now = datetime.datetime.now(utc if is_aware(d) else None)
 
     delta = (d - now) if reversed else (now - d)
+
+    # Deal with leapyears by subtracing the number of leapdays
+    delta -= datetime.timedelta(calendar.leapdays(d.year, now.year))
+
     # ignore microseconds
     since = delta.days * 24 * 60 * 60 + delta.seconds
     if since <= 0:

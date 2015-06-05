@@ -52,6 +52,12 @@ Minor features
   applications for the current user, has been added to the
   :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
   method.
+* :attr:`AdminSite.empty_value_display
+  <django.contrib.admin.AdminSite.empty_value_display>` and
+  :attr:`ModelAdmin.empty_value_display
+  <django.contrib.admin.ModelAdmin.empty_value_display>` were added to override
+  the display of empty values in admin change list. You can also customize the
+  value for each field.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -91,6 +97,8 @@ Minor features
 :mod:`django.contrib.postgres`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+* Added support for the :lookup:`rangefield.contained_by` lookup for some built
+  in fields which correspond to the range fields.
 * Added :class:`~django.contrib.postgres.fields.JSONField`.
 * Added :doc:`/ref/contrib/postgres/aggregates`.
 
@@ -191,6 +199,10 @@ Internationalization
   :ttag:`get_language_info` template tag. Also added a corresponding template
   filter: :tfilter:`language_name_translated`.
 
+* You can now run :djadmin:`compilemessages` from the root directory of your
+  project and it will find all the app message files that were created by
+  :djadmin:`makemessages`.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
@@ -232,6 +244,10 @@ Models
 * :lookup:`Date and time <year>` lookups can be chained with other lookups
   (such as :lookup:`exact`, :lookup:`gt`, :lookup:`lt`, etc.). For example:
   ``Entry.objects.filter(pub_date__month__gt=6)``.
+
+* Time lookups (hour, minute, second) are now supported by
+  :class:`~django.db.models.TimeField` for all database backends. Support for
+  backends other than SQLite was added but undocumented in Django 1.7.
 
 * You can specify the ``output_field`` parameter of the
   :class:`~django.db.models.Avg` aggregate in order to aggregate over
@@ -284,6 +300,9 @@ Templates
 * The :class:`~django.template.backends.django.DjangoTemplates` backend gained
   the ability to register libraries and builtins explicitly through the
   template :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+* The ``timesince`` and ``timeuntil`` filters were improved to deal with leap
+  years when given large time spans.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -358,6 +377,12 @@ Database backend API
 
 * To use the new ``date`` lookup, third-party database backends may need to
   implement the ``DatabaseOperations.datetime_cast_date_sql()`` method.
+
+* The ``DatabaseOperations.time_extract_sql()`` method was added. It calls the
+  existing ``date_extract_sql()`` method. This method is overridden by the
+  SQLite backend to add time lookups (hour, minute, second) to
+  :class:`~django.db.models.TimeField`, and may be needed by third-party
+  database backends.
 
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -640,6 +665,10 @@ Miscellaneous
 * If you customized some :ref:`error handlers <error-views>`, the view
   signatures with only one request parameter are deprecated. The views should
   now also accept a second ``exception`` positional parameter.
+
+* The ``django.utils.feedgenerator.Atom1Feed.mime_type`` and
+  ``django.utils.feedgenerator.RssFeed.mime_type`` attributes are deprecated in
+  favor of ``content_type``.
 
 .. removed-features-1.9:
 
