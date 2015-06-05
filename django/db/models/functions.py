@@ -89,8 +89,7 @@ class Greatest(Func):
 
     If any expression is null the return value is database-specific:
     On Postgres, the maximum not-null expression is returned.
-    On MySQL, Oracle and SQLite, if any expression is null, null is
-    returned.
+    On MySQL, Oracle, and SQLite, if any expression is null, null is returned.
     """
     function = 'GREATEST'
 
@@ -110,8 +109,7 @@ class Least(Func):
 
     If any expression is null the return value is database-specific:
     On Postgres, the minimum not-null expression is returned.
-    On MySQL, Oracle and SQLite, if any expression is null, null is
-    returned.
+    On MySQL, Oracle, and SQLite, if any expression is null, null is returned.
     """
     function = 'LEAST'
 

@@ -96,13 +96,13 @@ Usage example::
 Greatest
 --------
 
-.. versionadded:: 1.9
-
 .. class:: Greatest(*expressions, **extra)
 
+.. versionadded:: 1.9
+
 Accepts a list of at least two field names or expressions and returns the
-greatest value. Each argument must be of a similar type, so mixing text and numbers
-will result in a database error.
+greatest value. Each argument must be of a similar type, so mixing text and
+numbers will result in a database error.
 
 Usage example::
 
@@ -121,8 +121,8 @@ Usage example::
     >>> comments = Comment.objects.annotate(last_updated=Greatest('modified', 'blog__modified'))
     >>> annotated_comment = comments.get()
 
-``annotated_comment.last_updated`` will be the most recent of
-``blog.modified`` and ``comment.modified``.
+``annotated_comment.last_updated`` will be the most recent of ``blog.modified``
+and ``comment.modified``.
 
 .. warning::
 
@@ -131,18 +131,18 @@ Usage example::
 
     - PostgreSQL: ``Greatest`` will return the largest non-null expression,
       or ``null`` if all expressions are ``null``.
-    - SQLite, Oracle and MySQL: If any expression is ``null``, ``Greatest``
+    - SQLite, Oracle, and MySQL: If any expression is ``null``, ``Greatest``
       will return ``null``.
 
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
     a sensible minimum value to provide as a default.
 
 Least
---------
-
-.. versionadded:: 1.9
+-----
 
 .. class:: Least(*expressions, **extra)
+
+.. versionadded:: 1.9
 
 Accepts a list of at least two field names or expressions and returns the
 least value. Each argument must be of a similar type, so mixing text and numbers
@@ -155,7 +155,7 @@ will result in a database error.
 
     - PostgreSQL: ``Least`` will return the smallest non-null expression,
       or ``null`` if all expressions are ``null``.
-    - SQLite, Oracle and MySQL: If any expression is ``null``, ``Least``
+    - SQLite, Oracle, and MySQL: If any expression is ``null``, ``Least``
       will return ``null``.
 
     The PostgreSQL behavior can be emulated using ``Coalesce`` if you know
