@@ -349,6 +349,8 @@ Models
 * :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
   sets the primary key on objects when using PostgreSQL.
 
+* Added the :class:`~django.db.models.functions.Cast` database function.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
