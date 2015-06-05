@@ -604,6 +604,8 @@ Miscellaneous
   <django.core.urlresolvers.ResolverMatch.namespace>`, the empty value is now
   an empty string instead of ``None``.
 
+* For security hardening, session keys must be at least 8 characters.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
