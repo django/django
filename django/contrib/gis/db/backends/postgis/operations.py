@@ -150,11 +150,17 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         if hasattr(settings, 'POSTGIS_VERSION'):
             version = settings.POSTGIS_VERSION
         else:
+            # Run a basic query to check the status of the connection so we're
+            # sure we only raise the error below if the problem comes from
+            # PostGIS and not from PostgreSQL itself (see #24862).
+            self._get_postgis_func('version')
+
             try:
                 vtup = self.postgis_version_tuple()
             except ProgrammingError:
                 raise ImproperlyConfigured(
-                    'Cannot determine PostGIS version for database "%s". '
+                    'Cannot determine PostGIS version for database "%s" '
+                    'using command "SELECT postgis_lib_version()". '
                     'GeoDjango requires at least PostGIS version 2.0. '
                     'Was the database created from a spatial database '
                     'template?' % self.connection.settings_dict['NAME']
