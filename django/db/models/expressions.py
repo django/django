@@ -125,6 +125,15 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    # An expression is coalescing if it produces results
+    # when some of its inputs are null. This affects join
+    # promotion. If coalescing is False, then we can
+    # generate inner joins.
+    # The example is Coalesce(best_friend__name, mother__name).
+    # Even when best_friend isn't set, the expression can produce
+    # results.
+
+    coalescing = True
 
     def __init__(self, output_field=None):
         self._output_field = output_field
@@ -202,6 +211,22 @@ class BaseExpression(object):
             for expr in c.get_source_expressions()
         ])
         return c
+
+    def get_wanted_inner_joins(self):
+        if hasattr(self, '_used_joins'):
+            return set(self._used_joins)
+        if self.coalescing:
+            source_expressions = self.get_source_expressions()
+            if not source_expressions:
+                return set()
+            joins = source_expressions[0].get_wanted_inner_joins()
+            for source in source_expressions[1:]:
+                joins &= source.get_wanted_inner_joins()
+            return joins
+        used_joins = set()
+        for se in self.get_source_expressions():
+            used_joins.update(se.get_wanted_inner_joins())
+        return used_joins
 
     def _prepare(self):
         """
