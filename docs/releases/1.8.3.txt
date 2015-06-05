@@ -66,3 +66,6 @@ Bugfixes
 * Provided better backwards compatibility for the ``verbosity`` argument in
   ``optparse`` management commands by casting it to an integer
   (:ticket:`24769`).
+
+* Fixed ``prefetch_related()`` on databases other than PostgreSQL for models
+  using UUID primary keys (:ticket:`24912`).
