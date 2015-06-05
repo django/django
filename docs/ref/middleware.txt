@@ -411,6 +411,12 @@ Middleware ordering
 
 Here are some hints about the ordering of various Django middleware classes:
 
+#. :class:`~django.middleware.security.SecurityMiddleware`
+
+   It should go near the top of the list if you're going to turn on the SSL
+   redirect as that avoids running through a bunch of other unnecessary
+   middleware.
+
 #. :class:`~django.middleware.cache.UpdateCacheMiddleware`
 
    Before those that modify the ``Vary`` header (``SessionMiddleware``,
