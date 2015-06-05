@@ -332,6 +332,22 @@ class ModelFormBaseTest(TestCase):
         wf = WriterForm({'name': 'Richard Lockridge'})
         self.assertTrue(wf.is_valid())
 
+    def tests_not_including_overridden_field(self):
+        class AllFields(forms.ModelForm):
+            url = forms.URLField()
+
+            class Meta:
+                model = Category
+                fields = '__all__'
+
+        class NameAndSlugOnly(AllFields):
+            class Meta:
+                model = Category
+                fields = ['name', 'slug']
+
+        self.assertEqual(list(NameAndSlugOnly.base_fields),
+                         ['name', 'slug'])
+
     def test_limit_nonexistent_field(self):
         expected_msg = 'Unknown field(s) (nonexistent) specified for Category'
         with self.assertRaisesMessage(FieldError, expected_msg):
