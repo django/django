@@ -696,11 +696,12 @@ class FTimeDeltaTests(TestCase):
         self.assertEqual(q1, q2)
 
     def test_query_clone(self):
-        # Ticket #21643
+        # Ticket #21643 - Crash when compiling query more than once
         qs = Experiment.objects.filter(end__lt=F('start') + datetime.timedelta(hours=1))
         qs2 = qs.all()
         list(qs)
         list(qs2)
+        # Intentionally no assert
 
     def test_delta_add(self):
         for i in range(len(self.deltas)):
