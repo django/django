@@ -260,7 +260,7 @@ Compressing JavaScript
 ~~~~~~~~~~~~~~~~~~~~~~
 
 To simplify the process of providing optimized JavaScript code, Django
-includes a handy python script which should be used to create a "minified"
+includes a handy Python script which should be used to create a "minified"
 version. To run it::
 
     python django/contrib/admin/bin/compress.py

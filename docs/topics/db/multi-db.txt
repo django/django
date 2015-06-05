@@ -359,7 +359,7 @@ from::
             return True
 
 Finally, in the settings file, we add the following (substituting
-``path.to.`` with the actual python path to the module(s) where the
+``path.to.`` with the actual Python path to the module(s) where the
 routers are defined)::
 
     DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
