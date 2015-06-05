@@ -23,6 +23,24 @@ We don't usually recommend allowing ``null=True`` for ``CharField`` since this
 allows the field to have two "empty values", but it's important for the
 ``Coalesce`` example below.
 
+``Cast``
+========
+
+.. class:: Cast(expression, output_field)
+
+.. versionadded:: 1.10
+
+Forces the result type of ``expression`` to be the one from ``output_field``.
+
+Usage example::
+
+    >>> from django.db.models import FloatField
+    >>> from django.db.models.functions import Cast
+    >>> Value.objects.create(integer=4)
+    >>> value = Value.objects.annotate(as_float=Cast('integer', FloatField)).get()
+    >>> print(value.as_float)
+    4.0
+
 ``Coalesce``
 ============
 
