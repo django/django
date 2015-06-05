@@ -17,6 +17,11 @@ ArrayField
     <ArrayField.size>`. ``ArrayField`` can be nested to store multi-dimensional
     arrays.
 
+.. warning::
+
+    Be careful when using different instances of the same ArrayField data of a
+    model as the defaults are mutable.
+
     .. attribute:: base_field
 
         This is a required argument.
