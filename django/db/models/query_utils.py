@@ -12,7 +12,7 @@ from collections import namedtuple
 from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db.backends import utils
-from django.db.models.constants import LOOKUP_SEP
+from django.db.models.constants import AND, LOOKUP_SEP, OR
 from django.utils import tree
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
@@ -48,8 +48,8 @@ class Q(tree.Node):
     & and |).
     """
     # Connection types
-    AND = 'AND'
-    OR = 'OR'
+    AND = AND
+    OR = OR
     default = AND
 
     def __init__(self, *args, **kwargs):
@@ -86,12 +86,39 @@ class Q(tree.Node):
                 clone.children.append(child)
         return clone
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        # We must promote any new joins to left outer joins so that when Q is
-        # used as an expression, rows aren't filtered due to joins.
-        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
-        query.promote_joins(joins)
-        return clause
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False,
+                           for_filter=False):
+        cond, wanted_inner = self._resolve_node(query, allow_joins, reuse, summarize, for_save, for_filter=for_filter)
+        return cond
+
+    def _resolve_node(self, query, allow_joins, reuse, summarize, for_save, current_negated=False, in_negated=False,
+                      for_filter=False):
+        self.child_clauses = []
+        current_negated = current_negated ^ self.negated
+        in_negated = self.negated or current_negated
+        joinpromoter = JoinPromoter(self.connector, len(self.children), current_negated)
+        wanted_inner = []
+        for child in self.children:
+            if hasattr(child, '_resolve_node'):
+                child_expr, needed_inner = child._resolve_node(query, allow_joins, reuse, summarize, for_save,
+                                                               current_negated, in_negated, for_filter=for_filter)
+            elif hasattr(child, 'resolve_expression'):
+                child_expr = child.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+                needed_inner = child_expr.get_wanted_inner_joins()
+            else:
+                child_expr, needed_inner = query.build_filter(
+                    child, branch_negated=in_negated, current_negated=current_negated,
+                    can_reuse=reuse, allow_joins=allow_joins, split_subq=for_filter,
+                    connector=self.connector)
+            if child_expr:
+                self.child_clauses.append(child_expr)
+                joinpromoter.add_votes(needed_inner)
+        if for_filter:
+            wanted_inner = joinpromoter.update_join_types(query)
+        clause = query.where_class(connector=self.connector, negated=self.negated)
+        for child in self.child_clauses:
+            clause.add(child, self.connector)
+        return clause, wanted_inner
 
     @classmethod
     def _refs_aggregate(cls, obj, existing_aggregates):
@@ -305,3 +332,90 @@ def check_rel_lookup_compatibility(model, target_opts, field):
         check(target_opts) or
         (getattr(field, 'primary_key', False) and check(field.model._meta))
     )
+
+
+class JoinPromoter(object):
+    """
+    A class to abstract away join promotion problems for complex filter
+    conditions.
+    """
+
+    def __init__(self, connector, num_children, negated):
+        self.connector = connector
+        self.negated = negated
+        if self.negated:
+            if connector == AND:
+                self.effective_connector = OR
+            else:
+                self.effective_connector = AND
+        else:
+            self.effective_connector = self.connector
+        self.num_children = num_children
+        # Maps of table alias to how many times it is seen as required for
+        # inner and/or outer joins.
+        self.outer_votes = {}
+        self.inner_votes = {}
+
+    def add_votes(self, inner_votes):
+        """
+        Add single vote per item to self.inner_votes. Parameter can be any
+        iterable.
+        """
+        for voted in inner_votes:
+            self.inner_votes[voted] = self.inner_votes.get(voted, 0) + 1
+
+    def update_join_types(self, query):
+        """
+        Change join types so that the generated query is as efficient as
+        possible, but still correct. So, change as many joins as possible
+        to INNER, but don't make OUTER joins INNER if that could remove
+        results from the query.
+        """
+        to_promote = set()
+        to_demote = set()
+        # The effective_connector is used so that NOT (a AND b) is treated
+        # similarly to (a OR b) for join promotion.
+        for table, votes in self.inner_votes.items():
+            # We must use outer joins in OR case when the join isn't contained
+            # in all of the joins. Otherwise the INNER JOIN itself could remove
+            # valid results. Consider the case where a model with rel_a and
+            # rel_b relations is queried with rel_a__col=1 | rel_b__col=2. Now,
+            # if rel_a join doesn't produce any results is null (for example
+            # reverse foreign key or null value in direct foreign key), and
+            # there is a matching row in rel_b with col=2, then an INNER join
+            # to rel_a would remove a valid match from the query. So, we need
+            # to promote any existing INNER to LOUTER (it is possible this
+            # promotion in turn will be demoted later on).
+            if self.effective_connector == OR and votes < self.num_children:
+                to_promote.add(table)
+            # If connector is AND and there is a filter that can match only
+            # when there is a joinable row, then use INNER. For example, in
+            # rel_a__col=1 & rel_b__col=2, if either of the rels produce NULL
+            # as join output, then the col=1 or col=2 can't match (as
+            # NULL=anything is always false).
+            # For the OR case, if all children voted for a join to be inner,
+            # then we can use INNER for the join. For example:
+            #     (rel_a__col__icontains=Alex | rel_a__col__icontains=Russell)
+            # then if rel_a doesn't produce any rows, the whole condition
+            # can't match. Hence we can safely use INNER join.
+            if self.effective_connector == AND or (
+                    self.effective_connector == OR and votes == self.num_children):
+                to_demote.add(table)
+            # Finally, what happens in cases where we have:
+            #    (rel_a__col=1|rel_b__col=2) & rel_a__col__gte=0
+            # Now, we first generate the OR clause, and promote joins for it
+            # in the first if branch above. Both rel_a and rel_b are promoted
+            # to LOUTER joins. After that we do the AND case. The OR case
+            # voted no inner joins but the rel_a__col__gte=0 votes inner join
+            # for rel_a. We demote it back to INNER join (in AND case a single
+            # vote is enough). The demotion is OK, if rel_a doesn't produce
+            # rows, then the rel_a__col__gte=0 clause can't be true, and thus
+            # the whole clause must be false. So, it is safe to use INNER
+            # join.
+            # Note that in this example we could just as well have the __gte
+            # clause and the OR clause swapped. Or we could replace the __gte
+            # clause with an OR clause containing rel_a__col=1|rel_a__col=2,
+            # and again we could safely demote to INNER.
+        query.promote_joins(to_promote)
+        query.demote_joins(to_demote)
+        return to_demote

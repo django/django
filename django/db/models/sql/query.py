@@ -19,7 +19,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.fields.related_lookups import MultiColSource
 from django.db.models.query_utils import (
-    Q, PathInfo, check_rel_lookup_compatibility, refs_expression,
+    Q, JoinPromoter, PathInfo, check_rel_lookup_compatibility, refs_expression,
 )
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
@@ -33,7 +33,6 @@ from django.db.models.sql.where import (
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
-from django.utils.tree import Node
 
 __all__ = ['Query', 'RawQuery']
 
@@ -479,6 +478,7 @@ class Query(object):
         Performs a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
+        # Avoid circular import
         obj.add_annotation(Count('*'), alias='__count', is_summary=True)
         number = obj.get_aggregation(using, ['__count'])['__count']
         if number is None:
@@ -1158,7 +1158,6 @@ class Query(object):
             condition = self.build_lookup(lookups, reffed_expression, value)
             clause.add(condition, AND)
             return clause, []
-
         opts = self.get_meta()
         alias = self.get_initial_alias()
         allow_many = not branch_negated or not split_subq
@@ -1236,39 +1235,10 @@ class Query(object):
         # So, demotion is OK.
         existing_inner = set(
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        clause = q_object.resolve_expression(self, reuse=self.used_aliases, for_filter=True)
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
-
-    def _add_q(self, q_object, used_aliases, branch_negated=False,
-               current_negated=False, allow_joins=True, split_subq=True):
-        """
-        Adds a Q-object to the current filter.
-        """
-        connector = q_object.connector
-        current_negated = current_negated ^ q_object.negated
-        branch_negated = branch_negated or q_object.negated
-        target_clause = self.where_class(connector=connector,
-                                         negated=q_object.negated)
-        joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
-        for child in q_object.children:
-            if isinstance(child, Node):
-                child_clause, needed_inner = self._add_q(
-                    child, used_aliases, branch_negated,
-                    current_negated, allow_joins, split_subq)
-                joinpromoter.add_votes(needed_inner)
-            else:
-                child_clause, needed_inner = self.build_filter(
-                    child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, connector=connector,
-                    allow_joins=allow_joins, split_subq=split_subq,
-                )
-                joinpromoter.add_votes(needed_inner)
-            if child_clause:
-                target_clause.add(child_clause, connector)
-        needed_inner = joinpromoter.update_join_types(self)
-        return target_clause, needed_inner
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
@@ -1456,6 +1426,7 @@ class Query(object):
             if reuse is not None:
                 reuse.update(join_list)
             col = targets[0].get_col(join_list[-1], sources[0])
+            col._used_joins = join_list
             return col
 
     def split_exclude(self, filter_expr, prefix, can_reuse, names_with_path):
@@ -1999,90 +1970,3 @@ def is_reverse_o2o(field):
     expected to be some sort of relation field or related object.
     """
     return field.is_relation and field.one_to_one and not field.concrete
-
-
-class JoinPromoter(object):
-    """
-    A class to abstract away join promotion problems for complex filter
-    conditions.
-    """
-
-    def __init__(self, connector, num_children, negated):
-        self.connector = connector
-        self.negated = negated
-        if self.negated:
-            if connector == AND:
-                self.effective_connector = OR
-            else:
-                self.effective_connector = AND
-        else:
-            self.effective_connector = self.connector
-        self.num_children = num_children
-        # Maps of table alias to how many times it is seen as required for
-        # inner and/or outer joins.
-        self.outer_votes = {}
-        self.inner_votes = {}
-
-    def add_votes(self, inner_votes):
-        """
-        Add single vote per item to self.inner_votes. Parameter can be any
-        iterable.
-        """
-        for voted in inner_votes:
-            self.inner_votes[voted] = self.inner_votes.get(voted, 0) + 1
-
-    def update_join_types(self, query):
-        """
-        Change join types so that the generated query is as efficient as
-        possible, but still correct. So, change as many joins as possible
-        to INNER, but don't make OUTER joins INNER if that could remove
-        results from the query.
-        """
-        to_promote = set()
-        to_demote = set()
-        # The effective_connector is used so that NOT (a AND b) is treated
-        # similarly to (a OR b) for join promotion.
-        for table, votes in self.inner_votes.items():
-            # We must use outer joins in OR case when the join isn't contained
-            # in all of the joins. Otherwise the INNER JOIN itself could remove
-            # valid results. Consider the case where a model with rel_a and
-            # rel_b relations is queried with rel_a__col=1 | rel_b__col=2. Now,
-            # if rel_a join doesn't produce any results is null (for example
-            # reverse foreign key or null value in direct foreign key), and
-            # there is a matching row in rel_b with col=2, then an INNER join
-            # to rel_a would remove a valid match from the query. So, we need
-            # to promote any existing INNER to LOUTER (it is possible this
-            # promotion in turn will be demoted later on).
-            if self.effective_connector == 'OR' and votes < self.num_children:
-                to_promote.add(table)
-            # If connector is AND and there is a filter that can match only
-            # when there is a joinable row, then use INNER. For example, in
-            # rel_a__col=1 & rel_b__col=2, if either of the rels produce NULL
-            # as join output, then the col=1 or col=2 can't match (as
-            # NULL=anything is always false).
-            # For the OR case, if all children voted for a join to be inner,
-            # then we can use INNER for the join. For example:
-            #     (rel_a__col__icontains=Alex | rel_a__col__icontains=Russell)
-            # then if rel_a doesn't produce any rows, the whole condition
-            # can't match. Hence we can safely use INNER join.
-            if self.effective_connector == 'AND' or (
-                    self.effective_connector == 'OR' and votes == self.num_children):
-                to_demote.add(table)
-            # Finally, what happens in cases where we have:
-            #    (rel_a__col=1|rel_b__col=2) & rel_a__col__gte=0
-            # Now, we first generate the OR clause, and promote joins for it
-            # in the first if branch above. Both rel_a and rel_b are promoted
-            # to LOUTER joins. After that we do the AND case. The OR case
-            # voted no inner joins but the rel_a__col__gte=0 votes inner join
-            # for rel_a. We demote it back to INNER join (in AND case a single
-            # vote is enough). The demotion is OK, if rel_a doesn't produce
-            # rows, then the rel_a__col__gte=0 clause can't be true, and thus
-            # the whole clause must be false. So, it is safe to use INNER
-            # join.
-            # Note that in this example we could just as well have the __gte
-            # clause and the OR clause swapped. Or we could replace the __gte
-            # clause with an OR clause containing rel_a__col=1|rel_a__col=2,
-            # and again we could safely demote to INNER.
-        query.promote_joins(to_promote)
-        query.demote_joins(to_demote)
-        return to_demote
