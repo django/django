@@ -240,6 +240,18 @@ class CaseExpressionTests(TestCase):
             transform=itemgetter('integer', 'max', 'test')
         )
 
+    def test_annotate_exclude(self):
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.annotate(test=Case(
+                When(integer=1, then=Value('one')),
+                When(integer=2, then=Value('two')),
+                default=Value('other'),
+                output_field=models.CharField(),
+            )).exclude(test='other').order_by('pk'),
+            [(1, 'one'), (2, 'two'), (2, 'two')],
+            transform=attrgetter('integer', 'test')
+        )
+
     def test_combined_expression(self):
         self.assertQuerysetEqual(
             CaseTestModel.objects.annotate(
