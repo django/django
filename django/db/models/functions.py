@@ -83,6 +83,48 @@ class Concat(Func):
         return ConcatPair(expressions[0], self._paired(expressions[1:]))
 
 
+class Greatest(Func):
+    """
+    Chooses the maximum expression and returns it.
+
+    If any expression is null the return value is database-specific:
+    On Postgres, the maximum not-null expression is returned.
+    On MySQL, Oracle and SQLite, if any expression is null, null is
+    returned.
+    """
+    function = 'GREATEST'
+
+    def __init__(self, *expressions, **extra):
+        if len(expressions) < 2:
+            raise ValueError('Greatest must take at least two expressions')
+        super(Greatest, self).__init__(*expressions, **extra)
+
+    def as_sqlite(self, compiler, connection):
+        """Use the MAX function on SQLite."""
+        return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+
+
+class Least(Func):
+    """
+    Chooses the minimum expression and returns it.
+
+    If any expression is null the return value is database-specific:
+    On Postgres, the minimum not-null expression is returned.
+    On MySQL, Oracle and SQLite, if any expression is null, null is
+    returned.
+    """
+    function = 'LEAST'
+
+    def __init__(self, *expressions, **extra):
+        if len(expressions) < 2:
+            raise ValueError('Least must take at least two expressions')
+        super(Least, self).__init__(*expressions, **extra)
+
+    def as_sqlite(self, compiler, connection):
+        """Use the MIN function on SQLite."""
+        return super(Least, self).as_sql(compiler, connection, function='MIN')
+
+
 class Length(Func):
     """Returns the number of characters in the expression"""
     function = 'LENGTH'
