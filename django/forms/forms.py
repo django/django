@@ -227,6 +227,7 @@ class BaseForm(object):
                     'field': six.text_type(bf),
                     'help_text': help_text,
                     'html_class_attr': html_class_attr,
+                    'css_classes': css_classes,
                     'field_name': bf.html_name,
                 })
 
@@ -250,6 +251,7 @@ class BaseForm(object):
                         'field': '',
                         'help_text': '',
                         'html_class_attr': html_class_attr,
+                        'css_classes': '',
                         'field_name': '',
                     })
                     output.append(last_row)
