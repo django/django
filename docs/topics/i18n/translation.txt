@@ -1213,6 +1213,55 @@ Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
 
+.. _json_catalog-view:
+
+The ``json_catalog`` view
+-------------------------
+
+.. versionadded:: 1.9
+
+In order to use other client-side library to handle translations, one may
+take advantage of the :meth:`~django.views.i18n.json_catalog` view, which
+replicates :meth:`~django.views.i18n.javascript_catalog` behavior, while
+the response format is JSON.
+
+.. function:: json_catalog(request, domain='djangojs', packages=None)
+
+The view sends out a JSON object which contains i18n formatting settings (those
+available for `get_format`_), a plural rule (as a ``plural`` part of a GNU
+gettext ``Plural-Forms`` expression), and translation strings. Those translation
+strings are taken from applications or Django core, according to what is
+specified either via urlpatterns arguments or as a request parameters. Paths
+listed in :setting:`LOCALE_PATHS` are also included.
+
+Basically, the view is hooked up to your application and configured in the same
+fashion as :meth:`~django.views.i18n.javascript_catalog` (namely, ``domain``
+and ``packages`` arguments behave identically)::
+
+    from django.views.i18n import json_catalog
+
+    js_info_dict = {
+        'packages': ('your.app.package',),
+    }
+
+    urlpatterns = [
+        url(r'^jsoni18n/$', json_catalog, js_info_dict),
+    ]
+
+The response format is as follows:
+
+.. code-block:: javascript
+
+    {
+        "catalog": {
+            # Translations catalog
+        },
+        "formats": {
+            # Language formats for date, time, etc.
+        },
+        "plural": "..."  # Expression for plural forms, or null.
+    }
+
 Note on performance
 -------------------
 
