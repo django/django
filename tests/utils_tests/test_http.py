@@ -129,6 +129,39 @@ class TestUtilsHttp(unittest.TestCase):
                      '/url%20with%20spaces/'):
             self.assertTrue(http.is_safe_url(good_url, host='testserver'), "%s should be allowed" % good_url)
 
+    def test_is_safe_url_whitelist(self):
+        whitelist_urls = ['https://www.daa.com/',
+                    'https://foo.com/bye/',
+                    'https://secure.bar.com/logout.html']
+        for bad_url in ('https://daa.com',
+                    'https://www.daa.com',
+                    'https://www.daa.com:443/',
+                    'http://www.daa.com/',
+                    'https://www.daa.co/',
+                    'http://www.example.com/',
+                    '//www.daa.com/',
+                    'https://foo.com/',
+                    'https://foo.com/bye',
+                    'https://foo.com/bye.html',
+                    'http://foo.com/bye/',
+                    'https://www.foo.com/bye/',
+                    'https://secure.bar.com/',
+                    'https://secure.bar.com/logout',
+                    'https://secure.bar.com/logout/',
+                    'https://secure.bar.com/logout.htm'):
+            self.assertFalse(http.is_safe_url(bad_url, host='testserver',
+                whitelist=whitelist_urls), "%s should be blocked" % bad_url)
+        for good_url in ('https://www.daa.com/',
+                    'https://www.daa.com/index.html',
+                    'https://www.daa.com/welcome/',
+                    'https://foo.com/bye/',
+                    'https://foo.com/bye/?param=bye',
+                    'https://foo.com/bye/index.html?param=bye',
+                    'https://secure.bar.com/logout.html',
+                    'HTTPS://secure.bar.com/logout.html'):
+            self.assertTrue(http.is_safe_url(good_url, host='testserver',
+                whitelist=whitelist_urls), "%s should be allowed" % good_url)
+
     def test_urlsafe_base64_roundtrip(self):
         bytestring = b'foo'
         encoded = http.urlsafe_base64_encode(bytestring)

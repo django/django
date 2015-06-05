@@ -9,6 +9,7 @@ import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
+from django.conf import settings
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
@@ -266,10 +267,10 @@ def same_origin(url1, url2):
         return False
 
 
-def is_safe_url(url, host=None):
+def is_safe_url(url, host=None, whitelist=None):
     """
     Return ``True`` if the url is a safe redirection (i.e. it doesn't point to
-    a different host and uses a safe scheme).
+    a different host and uses a safe scheme) or is in the whitelist.
 
     Always returns ``False`` on an empty url.
     """
@@ -277,6 +278,8 @@ def is_safe_url(url, host=None):
         url = url.strip()
     if not url:
         return False
+    if not whitelist:
+        whitelist = settings.REDIRECT_WHITELIST_URLS
     # Chrome treats \ completely as /
     url = url.replace('\\', '/')
     # Chrome considers any URL with more than two slashes to be absolute, but
@@ -295,5 +298,11 @@ def is_safe_url(url, host=None):
     # URL and might consider the URL as scheme relative.
     if unicodedata.category(url[0])[0] == 'C':
         return False
+    # If the redirection is outside our host, check it agains the whitelist.
+    if url_info.netloc and not url_info.netloc == host:
+        for whitelist_url in whitelist:
+            whitelist_url_info = urlparse(whitelist_url)
+            if url_info.geturl().startswith(whitelist_url_info.geturl()):
+                return True
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))
