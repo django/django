@@ -84,6 +84,8 @@ details on these changes.
 
 * ``django.template.loaders.eggs.Loader`` will be removed.
 
+* The ``current_app`` parameter to the ``contrib.auth`` views will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

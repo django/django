@@ -933,6 +933,11 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
     Here's what ``django.contrib.auth.views.login`` does:
 
     * If called via ``GET``, it displays a login form that POSTs to the
@@ -1059,6 +1064,11 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
     **Template context:**
 
     * ``title``: The string "Logged out", localized.
@@ -1100,6 +1110,11 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
 .. function:: password_change(request[, template_name, post_change_redirect, password_change_form, current_app, extra_context])
 
     Allows a user to change their password.
@@ -1127,6 +1142,11 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
     **Template context:**
 
     * ``form``: The password change form (see ``password_change_form`` above).
@@ -1149,6 +1169,11 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
 
 .. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email, current_app, extra_context, html_email_template_name])
 
@@ -1216,6 +1241,11 @@ implementation details see :ref:`using-the-views`.
         The ``is_admin_site`` argument is deprecated and will be removed in
         Django 1.10.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
     **Template context:**
 
     * ``form``: The form (see ``password_reset_form`` above) for resetting
@@ -1281,6 +1311,11 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
 .. function:: password_reset_confirm(request[, uidb64, token, template_name, token_generator, set_password_form, post_reset_redirect, current_app, extra_context])
 
     Presents a form for entering a new password.
@@ -1322,6 +1357,11 @@ implementation details see :ref:`using-the-views`.
     * ``validlink``: Boolean, True if the link (combination of ``uidb64`` and
       ``token``) is valid or unused yet.
 
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
+
 .. function:: password_reset_complete(request[,template_name, current_app, extra_context])
 
     Presents a view which informs the user that the password has been
@@ -1340,6 +1380,11 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
+
+    .. deprecated:: 1.9
+
+        The ``current_app`` parameter is deprecated and will be removed in
+        Django 2.0. Callers should set ``request.current_app`` instead.
 
 Helper functions
 ----------------

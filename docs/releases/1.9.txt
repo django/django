@@ -981,6 +981,24 @@ impossible to reverse the patterns if there was an application namespace
 with the same name. Includes that specify an instance namespace require that
 the included URLconf sets an application namespace.
 
+``current_app`` parameter to ``contrib.auth`` views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All views in ``django.contrib.auth.views`` have the following structure::
+
+    def view(request, ..., current_app=None, ...):
+
+        ...
+
+        if current_app is not None:
+            request.current_app = current_app
+
+        return TemplateResponse(request, template_name, context)
+
+As of Django 1.8, ``current_app`` is set on the ``request`` object. For
+consistency, these views will require the caller to set ``current_app`` on the
+``request`` instead of passing it in a separate argument.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
