@@ -23,10 +23,6 @@ insert_final_newline = ignore
 indent_style = ignore
 indent_size = ignore
 
-# These JS files use 2 spaces instead of 4
-[**/admin/js/{inlines,openlayers}.js]
-indent_size = 2
-
 # Minified JavaScript files shouldn't be changed
 [**.min.js]
 indent_style = ignore
