@@ -50,3 +50,7 @@ Bugfixes
 
 * Fixed recording of applied status for squashed (replacement) migrations
   (:ticket:`24628`).
+
+* Changed references check to look on expressions instead of aggregates
+  while solving lookup type to make ``Case`` expressions work with
+  ``.exclude()`` (:ticket:`22728`).
