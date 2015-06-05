@@ -1,3 +1,4 @@
+import functools
 import inspect
 import warnings
 
@@ -71,3 +72,25 @@ class RenameMethodsBase(type):
                     setattr(base, old_method_name, wrapper(new_method))
 
         return new_class
+
+
+def deprecate_current_app(func):
+    """
+    Handles deprecation of the current_app argument of auth views
+    See #24126
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        if "current_app" in kwargs:
+            warnings.warn(
+                "Passing `current_app` as a keyword argument is deprecated "
+                "since Django 1.8, as the caller of `{0}` is required to set "
+                "it on the `request`".format(func.func_name),
+                RemovedInDjango20Warning
+            )
+            current_app = kwargs.pop("current_app")
+            request = kwargs.get("request", None)
+            if request and current_app is not None:
+                request.current_app = current_app
+        return func(*args, **kwargs)
+    return inner
