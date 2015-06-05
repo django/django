@@ -50,3 +50,6 @@ Bugfixes
 
 * Fixed recording of applied status for squashed (replacement) migrations
   (:ticket:`24628`).
+
+* Fixed queryset annotations when using ``Case`` expressions with ``exclude()``
+  (:ticket:`24833`).
