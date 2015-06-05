@@ -1847,15 +1847,8 @@ Field API reference
     .. method:: get_prep_lookup(lookup_type, value)
 
         Prepares ``value`` to the database prior to be used in a lookup.
-        The ``lookup_type`` will be one of the valid Django filter lookups:
-        ``"exact"``, ``"iexact"``, ``"contains"``, ``"icontains"``,
-        ``"gt"``, ``"gte"``, ``"lt"``, ``"lte"``, ``"in"``, ``"startswith"``,
-        ``"istartswith"``, ``"endswith"``, ``"iendswith"``, ``"range"``,
-        ``"year"``, ``"month"``, ``"day"``, ``"isnull"``, ``"search"``,
-        ``"regex"``, and ``"iregex"``.
-
-        If you are using :doc:`Custom lookups </ref/models/lookups>` the
-        ``lookup_type`` can be any ``lookup_name`` registered in the field.
+        The ``lookup_type`` will be the registered name of the lookup. For
+        example: ``"exact"``, ``"iexact"``, or ``"contains"``.
 
         See :ref:`preparing-values-for-use-in-database-lookups` for usage.
 

@@ -141,6 +141,9 @@ details on these changes.
 * Support for query lookups using the model name when
   ``Meta.default_related_name`` is set will be removed.
 
+* The ``__search`` query lookup and the
+  ``DatabaseOperations.fulltext_search_sql()`` method will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

@@ -191,6 +191,7 @@ class BaseDatabaseOperations(object):
         search of the given field_name. Note that the resulting string should
         contain a '%s' placeholder for the value being searched against.
         """
+        # RemovedInDjango20Warning
         raise NotImplementedError('Full-text search is not implemented for this database backend')
 
     def last_executed_query(self, cursor, sql, params):

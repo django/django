@@ -2771,6 +2771,11 @@ SQL equivalent::
 ``search``
 ~~~~~~~~~~
 
+.. deprecated:: 1.10
+
+    See :ref:`the 1.10 release notes <search-lookup-replacement>` for how to
+    replace it.
+
 A boolean full-text search, taking advantage of full-text indexing. This is
 like :lookup:`contains` but is significantly faster due to full-text indexing.
 

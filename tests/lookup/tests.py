@@ -7,7 +7,10 @@ from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
@@ -792,6 +795,7 @@ class LookupTests(TestCase):
 class LookupTransactionTests(TransactionTestCase):
     available_apps = ['lookup']
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @skipUnless(connection.vendor == 'mysql', 'requires MySQL')
     def test_mysql_lookup_search(self):
         # To use fulltext indexes on MySQL either version 5.6 is needed, or one must use

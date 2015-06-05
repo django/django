@@ -1,3 +1,4 @@
+import warnings
 from copy import copy
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db.models.fields import (
 )
 from django.db.models.query_utils import RegisterLookupMixin
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
@@ -373,6 +375,10 @@ class Search(BuiltinLookup):
     lookup_name = 'search'
 
     def as_sql(self, compiler, connection):
+        warnings.warn(
+            'The `__search` lookup is deprecated. See the 1.10 release notes '
+            'for how to replace it.', RemovedInDjango20Warning, stacklevel=2
+        )
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         sql_template = connection.ops.fulltext_search_sql(field_name=lhs)
