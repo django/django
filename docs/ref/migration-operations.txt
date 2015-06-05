@@ -314,7 +314,7 @@ model::
 This is generally the operation you would use to create
 :ref:`data migrations <data-migrations>`, run
 custom data updates and alterations, and anything else you need access to an
-ORM and/or python code for.
+ORM and/or Python code for.
 
 If you're upgrading from South, this is basically the South pattern as an
 operation - one or two methods for forwards and backwards, with an ORM and

@@ -57,7 +57,7 @@ Usage examples::
 
 .. warning::
 
-    A python value passed to ``Coalesce`` on MySQL may be converted to an
+    A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
     >>> from django.db.models.expressions import RawSQL
