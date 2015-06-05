@@ -55,6 +55,17 @@ Usage examples::
     >>> print(aggregated['combined_age_default'])
     None
 
+.. warning::
+
+    A python value passed to ``Coalesce`` on MySQL may be converted to an
+    incorrect type unless explicitly cast to the correct database type:
+
+    >>> from django.db.models.expressions import RawSQL
+    >>> from django.utils import timezone
+    >>> now = timezone.now()
+    >>> now_sql = RawSQL("cast(%s as datetime)", (now,))
+    >>> Coalesce('updated', now_sql)
+
 Concat
 ------
 
