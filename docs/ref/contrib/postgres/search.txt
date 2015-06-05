@@ -189,3 +189,58 @@ if it were an annotated ``SearchVector``::
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 .. _PostgreSQL documentation: http://www.postgresql.org/docs/current/static/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
+
+Trigram similarity
+==================
+
+Another approach to searching is trigram similarity. A trigram is a group of
+three consecutive characters. In addition to the :lookup:`trigram_similar`
+lookup, you can use a couple of other expressions.
+
+To use them, you need to activate the `pg_trgm extension
+<http://www.postgresql.org/docs/current/interactive/pgtrgm.html>`_ on
+PostgreSQL. You can install it using the
+:class:`~django.contrib.postgres.operations.TrigramExtension` migration
+operation.
+
+``TrigramSimilarity``
+---------------------
+
+.. class:: TrigramSimilarity(expression, string, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+trigram similarity between the two arguments.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramSimilarity
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Katie Stephens'
+    >>> Author.objects.annotate(
+    ...     similarity=TrigramSimilarity('name', test),
+    ... ).filter(similarity__gt=0.3).order_by('-similarity')
+    [<Author: Katy Stephens>, <Author: Stephen Keats>]
+
+``TrigramDistance``
+-------------------
+
+.. class:: TrigramDistance(expression, string, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+trigram distance between the two arguments.
+
+Usage example::
+
+    >>> from django.contrib.postgres.search import TrigramDistance
+    >>> Author.objects.create(name='Katy Stevens')
+    >>> Author.objects.create(name='Stephen Keats')
+    >>> test = 'Katie Stephens'
+    >>> Author.objects.annotate(
+    ...     distance=TrigramDistance('name', test),
+    ... ).filter(distance__lte=0.7).order_by('distance')
+    [<Author: Katy Stephens>, <Author: Stephen Keats>]

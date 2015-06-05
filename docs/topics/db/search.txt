@@ -55,11 +55,12 @@ use :lookup:`unaccented comparison <unaccent>`::
 This shows another issue, where we are matching against a different spelling of
 the name. In this case we have an asymmetry though - a search for ``Helen``
 will pick up ``Helena`` or ``Hélène``, but not the reverse. Another option
-would be to use a trigram comparison, which compares sequences of letters.
+would be to use a :lookup:`trigram_similar` comparison, which compares
+sequences of letters.
 
 For example::
 
-    >>> Author.objects.filter(name__unaccent__lower__trigram='Hélène')
+    >>> Author.objects.filter(name__unaccent__lower__trigram_similar='Hélène')
     [<Author: Helen Mirren>, <Actor: Hélène Joy>]
 
 Now we have a different problem - the longer name of "Helena Bonham Carter"

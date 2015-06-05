@@ -27,6 +27,16 @@ the ``django.contrib.postgres.operations`` module.
     which will install the ``hstore`` extension and also immediately set up the
     connection to interpret hstore data.
 
+``TrigramExtension``
+====================
+
+.. class:: TrigramExtension()
+
+    .. versionadded:: 1.10
+
+    A subclass of :class:`~django.contrib.postgres.operations.CreateExtension`
+    that installs the ``pg_trgm`` extension.
+
 ``UnaccentExtension``
 =====================
 

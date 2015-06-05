@@ -33,6 +33,10 @@ search engine. You can search across multiple fields in your relational
 database, combine the searches with other lookups, use different language
 configurations and weightings, and rank the results by relevance.
 
+It also now includes trigram support, using the :lookup:`trigram_similar`
+lookup, and the :class:`~django.contrib.postgres.search.TrigramSimilarity` and
+:class:`~django.contrib.postgres.search.TrigramDistance` expressions.
+
 Minor features
 --------------
 

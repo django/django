@@ -60,3 +60,8 @@ class SearchLookup(SearchVectorExact):
             self.lhs = SearchVector(self.lhs)
         lhs, lhs_params = super(SearchLookup, self).process_lhs(qn, connection)
         return lhs, lhs_params
+
+
+class TrigramSimilar(PostgresSimpleLookup):
+    lookup_name = 'trigram_similar'
+    operator = '%%'
