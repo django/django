@@ -279,13 +279,6 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 # fields from the model"
                 opts.fields = None
 
-            if opts.exclude:
-                # A user-defined parent ModelForm might have declared fields
-                # which are excluded in this Modelform.
-                for excluded_field in opts.exclude:
-                    if excluded_field in new_class.base_fields:
-                        new_class.base_fields.pop(excluded_field)
-
             fields = fields_for_model(opts.model, opts.fields, opts.exclude,
                                       opts.widgets, formfield_callback,
                                       opts.localized_fields, opts.labels,
@@ -301,8 +294,14 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                                      opts.model.__name__)
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
-            # (plus, include all the other declared fields).
-            fields.update(new_class.declared_fields)
+            # (plus, include all the other declared fields), skipping excluded
+            # and non-included fields.
+            for field_name, field in new_class.declared_fields.iteritems():
+                if opts.exclude and field_name in opts.exclude:
+                    continue
+                if opts.fields and field_name not in opts.fields:
+                    continue
+                fields[field_name] = field
         else:
             fields = new_class.declared_fields
 
