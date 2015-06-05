@@ -57,7 +57,7 @@ Usage examples::
 
 .. warning::
 
-    A python value passed to ``Coalesce`` on MySQL may be converted to an
+    A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
     >>> from django.db.models.expressions import RawSQL
@@ -121,7 +121,7 @@ Usage example::
     >>> comments = Comment.objects.annotate(last_updated=Greatest('modified', 'blog__modified'))
     >>> annotated_comment = comments.get()
 
-``annotated_comment.last_updated`` will be the most recent of 
+``annotated_comment.last_updated`` will be the most recent of
 ``blog.modified`` and ``comment.modified``.
 
 .. warning::
