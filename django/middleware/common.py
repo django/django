@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import re
 
@@ -7,6 +6,7 @@ from django.conf import settings
 from django.core import urlresolvers
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
+from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
 
 logger = logging.getLogger('django.request')
@@ -113,20 +113,15 @@ class CommonMiddleware(object):
                 return self.response_redirect_class(self.get_full_path_with_slash(request))
 
         if settings.USE_ETAGS:
+            if not response.has_header('ETag'):
+                set_response_etag(response)
+
             if response.has_header('ETag'):
-                etag = response['ETag']
-            elif response.streaming:
-                etag = None
-            else:
-                etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if etag is not None:
-                if (200 <= response.status_code < 300
-                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
-                    cookies = response.cookies
-                    response = http.HttpResponseNotModified()
-                    response.cookies = cookies
-                else:
-                    response['ETag'] = etag
+                return get_conditional_response(
+                    request,
+                    etag=response['ETag'],
+                    response=response,
+                )
 
         return response
 
