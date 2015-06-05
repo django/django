@@ -53,3 +53,7 @@ Bugfixes
 
 * Fixed queryset annotations when using ``Case`` expressions with ``exclude()``
   (:ticket:`24833`).
+
+* Corrected join promotion for multiple ``Case`` expressions. Annotating a
+  query with multiple  ``Case`` expressions could unexpectedly filter out
+  results (:ticket:`24924`).
