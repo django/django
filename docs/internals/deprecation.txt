@@ -528,7 +528,7 @@ details on these changes.
 
 * The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
   Define a ``__str__`` method and apply the
-  :func:`~django.utils.encoding.python_2_unicode_compatible` decorator instead.
+  :func:`~django.utils.six.python_2_unicode_compatible` decorator instead.
 
 .. _deprecation-removed-in-1.6:
 

@@ -189,6 +189,11 @@ The functions defined in this module share the following properties:
     To support Python 2 and 3 with a single code base, define a ``__str__``
     method returning text and apply this decorator to the class.
 
+    .. versionchanged:: 1.9
+
+        This function is now a shim to the equivalent function,
+        :func:`~django.utils.six.python_2_unicode_compatible`.
+
 .. function:: smart_text(s, encoding='utf-8', strings_only=False, errors='strict')
 
     Returns a text object representing ``s`` -- ``unicode`` on Python 2 and
