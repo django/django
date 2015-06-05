@@ -953,3 +953,14 @@ class OrderBy(BaseExpression):
 
     def desc(self):
         self.descending = True
+
+
+class Cast(Func):
+    """Coerce a lookup to a new field type."""
+    def __init__(self, lookup, output_field):
+        super(Cast, self).__init__(lookup, output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        sql, params = compiler.compile(self.get_source_expressions()[0])
+        database_type = self._output_field.db_type(connection)
+        return 'Cast({} as {})'.format(sql, database_type), params
