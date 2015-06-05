@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import resolve_url
+from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.six.moves.urllib.parse import urlparse
 
@@ -59,7 +60,7 @@ def permission_required(perm, login_url=None, raise_exception=False):
     is raised.
     """
     def check_perms(user):
-        if not isinstance(perm, (list, tuple)):
+        if isinstance(perm, six.string_types):
             perms = (perm, )
         else:
             perms = perm

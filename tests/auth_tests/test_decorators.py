@@ -76,6 +76,16 @@ class PermissionsRequiredDecoratorTest(TestCase):
         resp = a_view(request)
         self.assertEqual(resp.status_code, 200)
 
+    def test_many_permissions_in_set_pass(self):
+
+        @permission_required({'auth.add_customuser', 'auth.change_customuser'})
+        def a_view(request):
+            return HttpResponse()
+        request = self.factory.get('/rand')
+        request.user = self.user
+        resp = a_view(request)
+        self.assertEqual(resp.status_code, 200)
+
     def test_single_permission_pass(self):
 
         @permission_required('auth.add_customuser')
