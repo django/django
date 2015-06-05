@@ -202,7 +202,7 @@ Model style
 
 * If you define a ``__str__`` method (previously ``__unicode__`` before Python 3
   was supported), decorate the model class with
-  :func:`~django.utils.encoding.python_2_unicode_compatible`.
+  :func:`~django.utils.six.python_2_unicode_compatible`.
 
 * The order of model inner classes and standard methods should be as
   follows (noting that these are not all required):
