@@ -17,6 +17,9 @@ from django.utils.translation import (
     LANGUAGE_SESSION_KEY, check_for_language, get_language, to_locale,
 )
 
+DEFAULT_PACKAGES = ['django.conf']
+LANGUAGE_QUERY_PARAMETER = 'language'
+
 
 def set_language(request):
     """
@@ -36,7 +39,7 @@ def set_language(request):
             next = '/'
     response = http.HttpResponseRedirect(next)
     if request.method == 'POST':
-        lang_code = request.POST.get('language')
+        lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
             next_trans = translate_url(next, lang_code)
             if next_trans != next:
@@ -199,7 +202,7 @@ def get_javascript_catalog(locale, domain, packages):
     default_locale = to_locale(settings.LANGUAGE_CODE)
     app_configs = apps.get_app_configs()
     allowable_packages = set(app_config.name for app_config in app_configs)
-    allowable_packages.add('django.conf')
+    allowable_packages.update(DEFAULT_PACKAGES)
     packages = [p for p in packages if p in allowable_packages]
     t = {}
     paths = []
@@ -284,6 +287,21 @@ def get_javascript_catalog(locale, domain, packages):
     return catalog, plural
 
 
+def _get_locale(request):
+    language = request.GET.get(LANGUAGE_QUERY_PARAMETER)
+    if not (language and check_for_language(language)):
+        language = get_language()
+    return to_locale(language)
+
+
+def _parse_packages(packages):
+    if packages is None:
+        packages = list(DEFAULT_PACKAGES)
+    elif isinstance(packages, six.string_types):
+        packages = packages.split('+')
+    return packages
+
+
 def null_javascript_catalog(request, domain=None, packages=None):
     """
     Returns "identity" versions of the JavaScript i18n functions -- i.e.,
@@ -305,16 +323,35 @@ def javascript_catalog(request, domain='djangojs', packages=None):
     go to the djangojs domain. But this might be needed if you
     deliver your JavaScript source from Django templates.
     """
-    locale = to_locale(get_language())
-
-    if request.GET and 'language' in request.GET:
-        if check_for_language(request.GET['language']):
-            locale = to_locale(request.GET['language'])
-
-    if packages is None:
-        packages = ['django.conf']
-    if isinstance(packages, six.string_types):
-        packages = packages.split('+')
-
+    locale = _get_locale(request)
+    packages = _parse_packages(packages)
     catalog, plural = get_javascript_catalog(locale, domain, packages)
     return render_javascript_catalog(catalog, plural)
+
+
+def json_catalog(request, domain='djangojs', packages=None):
+    """
+    Return the selected language catalog as a JSON object.
+
+    Receives the same parameters as javascript_catalog(), but returns
+    a response with a JSON object of the following format:
+
+        {
+            "catalog": {
+                # Translations catalog
+            },
+            "formats": {
+                # Language formats for date, time, etc.
+            },
+            "plural": '...'  # Expression for plural forms, or null.
+        }
+    """
+    locale = _get_locale(request)
+    packages = _parse_packages(packages)
+    catalog, plural = get_javascript_catalog(locale, domain, packages)
+    data = {
+        'catalog': catalog,
+        'formats': get_formats(),
+        'plural': plural,
+    }
+    return http.JsonResponse(data)
