@@ -477,9 +477,11 @@ Specifying a custom User model
 
 Django expects your custom User model to meet some minimum requirements.
 
-#. Your model must have a single unique field that can be used for
-   identification purposes. This can be a username, an email address,
-   or any other unique attribute.
+#. If you use the default authentication backend, then your model must have a
+   single unique field that can be used for identification purposes. This can
+   be a username, an email address, or any other unique attribute. A non-unique
+   username field is allowed if you use a custom authentication backend that
+   can support it.
 
 #. Your model must provide a way to address the user in a "short" and
    "long" form. The most common interpretation of this would be to use
@@ -506,10 +508,11 @@ password resets. You must then provide some key implementation details:
     .. attribute:: USERNAME_FIELD
 
         A string describing the name of the field on the User model that is
-        used as the unique identifier. This will usually be a username of
-        some kind, but it can also be an email address, or any other unique
-        identifier. The field *must* be unique (i.e., have ``unique=True``
-        set in its definition).
+        used as the unique identifier. This will usually be a username of some
+        kind, but it can also be an email address, or any other unique
+        identifier. The field *must* be unique (i.e., have ``unique=True`` set
+        in its definition), unless you use a custom authentication backend that
+        can support non-unique usernames.
 
         In the following example, the field ``identifier`` is used
         as the identifying field::
