@@ -147,6 +147,9 @@ class MultiPartParser(object):
         old_field_name = None
         counters = [0] * len(handlers)
 
+        # To count the number of fields
+        num_inserted_fields = 0
+
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
                 if old_field_name:
@@ -168,6 +171,11 @@ class MultiPartParser(object):
                 field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
+                    # avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS
+                    num_inserted_fields += 1
+                    if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_inserted_fields:
+                        raise SuspiciousOperation('Too many fields')
+
                     # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
                         read_kwargs = {'size': settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size}
