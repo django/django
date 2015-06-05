@@ -28,6 +28,7 @@ here's the default value created by :djadmin:`django-admin startproject
 <startproject>`::
 
     MIDDLEWARE_CLASSES = (
+        'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -35,7 +36,6 @@ here's the default value created by :djadmin:`django-admin startproject
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'django.middleware.security.SecurityMiddleware',
     )
 
 A Django installation doesn't require any middleware —
