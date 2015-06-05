@@ -114,6 +114,10 @@ Minor features
   a deprecation warning in older versions and is no longer supported in
   Django 1.9).
 
+* The permission argument of
+  :func:`~django.contrib.auth.decorators.permission_required()` accepts all
+  kinds of iterables, not only list and tuples.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
