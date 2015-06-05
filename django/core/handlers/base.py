@@ -146,15 +146,7 @@ class BaseHandler(object):
                 try:
                     response = wrapped_callback(request, *callback_args, **callback_kwargs)
                 except Exception as e:
-                    # If the view raised an exception, run it through exception
-                    # middleware, and if the exception middleware returns a
-                    # response, use that. Otherwise, reraise the exception.
-                    for middleware_method in self._exception_middleware:
-                        response = middleware_method(request, e)
-                        if response:
-                            break
-                    if response is None:
-                        raise
+                    response = self.process_exception_by_middleware(e, request)
 
             # Complain if the view returned None (a common error).
             if response is None:
@@ -176,7 +168,11 @@ class BaseHandler(object):
                             "%s.process_template_response didn't return an "
                             "HttpResponse object. It returned None instead."
                             % (middleware_method.__self__.__class__.__name__))
-                response = response.render()
+                try:
+                    response = response.render()
+                except Exception as e:
+                    response = self.process_exception_by_middleware(e, request)
+
                 response_is_rendered = True
 
         except http.Http404 as exc:
@@ -256,6 +252,17 @@ class BaseHandler(object):
             response = response.render()
 
         return response
+
+    def process_exception_by_middleware(self, exception, request):
+        """
+        Pass the exception to the exception middleware. If no middleware
+        return a response for this exception, raise it.
+        """
+        for middleware_method in self._exception_middleware:
+            response = middleware_method(request, exception)
+            if response:
+                return response
+        raise
 
     def handle_uncaught_exception(self, request, resolver, exc_info):
         """

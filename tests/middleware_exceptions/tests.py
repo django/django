@@ -486,6 +486,16 @@ class MiddlewareTests(BaseMiddlewareExceptionTest):
         # Check that the right middleware methods have been invoked
         self.assert_middleware_usage(middleware, True, True, True, True, False)
 
+    @override_settings(
+        MIDDLEWARE_CLASSES=['middleware_exceptions.middleware.ProcessExceptionMiddleware'],
+    )
+    def test_exception_in_render_passed_to_process_exception(self):
+        # Repopulate the list of middlewares since it's already been populated
+        # by setUp() before the MIDDLEWARE_CLASSES setting got overridden
+        self.client.handler.load_middleware()
+        response = self.client.get('/middleware_exceptions/exception_in_render/')
+        self.assertEqual(response.content, b'Exception caught')
+
 
 class BadMiddlewareTests(BaseMiddlewareExceptionTest):
 
