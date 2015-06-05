@@ -5,6 +5,7 @@ Testing of admin inline formsets.
 from __future__ import unicode_literals
 
 import random
+import uuid
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -134,6 +135,29 @@ class Fashionista(models.Model):
 class ShoppingWeakness(models.Model):
     fashionista = models.ForeignKey(Fashionista)
     item = models.ForeignKey(OutfitItem)
+
+# Models for #12749 vs #24377
+
+
+class UUIDPerson(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    firstname = models.CharField(max_length=15)
+
+
+class UUIDOutfitItem(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    name = models.CharField(max_length=15)
+
+
+class UUIDFashionista(models.Model):
+    person = models.OneToOneField(UUIDPerson, primary_key=True)
+    weaknesses = models.ManyToManyField(UUIDOutfitItem, through='UUIDShoppingWeakness', blank=True)
+
+
+class UUIDShoppingWeakness(models.Model):
+    uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
+    fashionista = models.ForeignKey(UUIDFashionista)
+    item = models.ForeignKey(UUIDOutfitItem)
 
 # Models for #13510
 
