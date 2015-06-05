@@ -2274,10 +2274,56 @@ class FormsTestCase(SimpleTestCase):
             some_field = CharField()
 
             def as_p(self):
-                return self._html_output('<p id="p_%(field_name)s"></p>', '%s', '</p>', ' %s', True)
+                return self._html_output(
+                    normal_row='<p id="p_%(field_name)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
 
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
+
+    def test_field_without_css_classes(self):
+        """
+        `css_classes` may be used as a key in _html_output() (empty classes).
+        """
+        class SomeForm(Form):
+            some_field = CharField()
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p class="%(css_classes)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p class=""></p>')
+
+    def test_field_with_css_class(self):
+        """
+        `css_classes` may be used as a key in _html_output() (class comes
+        from required_css_class in this case).
+        """
+        class SomeForm(Form):
+            some_field = CharField()
+            required_css_class = 'foo'
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p class="%(css_classes)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p class="foo"></p>')
 
     def test_field_name_with_hidden_input(self):
         """
