@@ -2,38 +2,38 @@ from django.core.checks.templates import E001
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                ]),
-            ],
+
+class CheckTemplateSettingsAppDirsTest(SimpleTestCase):
+    TEMPLATES_APPDIRS_AND_LOADERS = [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {
+                'loaders': ['django.template.loaders.filesystem.Loader'],
+            },
         },
-    },
-]
+    ]
 
-
-class CheckTemplateSettingsTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.templates import check_setting_app_dirs_loaders
         return check_setting_app_dirs_loaders
 
-    @override_settings(TEMPLATES=TEMPLATES)
+    @override_settings(TEMPLATES=TEMPLATES_APPDIRS_AND_LOADERS)
     def test_app_dirs_and_loaders(self):
         """
         Error if template loaders are specified and APP_DIRS is `True`
         """
         self.assertEqual(self.func(None), [E001])
+
+    def test_app_dirs_removed(self):
+        TEMPLATES = self.TEMPLATES_APPDIRS_AND_LOADERS[:]
+        del TEMPLATES[0]['APP_DIRS']
+        with self.settings(TEMPLATES=TEMPLATES):
+            self.assertEqual(self.func(None), [])
+
+    def test_loaders_removed(self):
+        TEMPLATES = self.TEMPLATES_APPDIRS_AND_LOADERS[:]
+        del TEMPLATES[0]['OPTIONS']['loaders']
+        with self.settings(TEMPLATES=TEMPLATES):
+            self.assertEqual(self.func(None), [])
