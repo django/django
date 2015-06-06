@@ -37,12 +37,16 @@ _urlconfs = local()
 
 
 class ResolverMatch(object):
-    def __init__(self, func, args, kwargs, url_name=None, app_name=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
         self.url_name = url_name
-        self.app_name = app_name
+
+        # If an URLRegexResolver has no namespace or app_name, it passes in
+        # an empty value
+        self.app_names = [x for x in app_names if x] if app_names else []
+        self.app_name = ':'.join(self.app_names)
 
         if namespaces:
             self.namespaces = [x for x in namespaces if x]
@@ -64,8 +68,8 @@ class ResolverMatch(object):
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_name=%s, namespaces=%s)" % (
-            self._func_path, self.args, self.kwargs, self.url_name, self.app_name, self.namespaces)
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+            self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces)
 
 
 class Resolver404(Http404):
@@ -395,7 +399,7 @@ class RegexURLResolver(LocaleRegexProvider):
                             sub_match_args,
                             sub_match_dict,
                             sub_match.url_name,
-                            self.app_name or sub_match.app_name,
+                            [self.app_name] + sub_match.app_names,
                             [self.namespace] + sub_match.namespaces
                         )
                     tried.append([pattern])
