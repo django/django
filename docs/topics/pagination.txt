@@ -24,8 +24,10 @@ page::
     4
     >>> p.num_pages
     2
+    >>> type(p.page_range)  # `<type 'rangeiterator'>` in Python 2.
+    <class 'range_iterator'>
     >>> p.page_range
-    [1, 2]
+    range(1, 3)
 
     >>> page1 = p.page(1)
     >>> page1
@@ -191,8 +193,12 @@ Attributes
 
 .. attribute:: Paginator.page_range
 
-    A 1-based range of page numbers, e.g., ``[1, 2, 3, 4]``.
+    A 1-based range iterator of page numbers, e.g. yielding ``[1, 2, 3, 4]``.
 
+    .. versionchanged:: 1.9
+
+        In older versions, ``page_range`` returned a list instead of an
+        iterator.
 
 ``InvalidPage`` exceptions
 ==========================

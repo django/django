@@ -770,6 +770,19 @@ To fix your ``simple_tag``\s, it is best to apply the following practices:
 Tags that follow these rules will be correct and safe whether they are run on
 Django 1.9+ or earlier.
 
+``Paginator.page_range``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+:attr:`Paginator.page_range <django.core.paginator.Paginator.page_range>` is
+now an iterator instead of a list.
+
+In versions of Django previous to 1.8, ``Paginator.page_range`` returned a
+``list`` in Python 2 and a ``range`` in Python 3. Django 1.8 consistently
+returned a list, but an iterator is more efficient.
+
+Existing code that depends on ``list`` specific features, such as indexing,
+can be ported by converting the iterator into a ``list`` using ``list()``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
