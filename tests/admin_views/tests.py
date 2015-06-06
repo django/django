@@ -1104,8 +1104,8 @@ class AdminJavaScriptTest(TestCase):
         """
         with override_settings(DEBUG=False):
             response = self.client.get(reverse('admin:admin_views_section_add'))
-            self.assertNotContains(response, 'jquery.js')
-            self.assertContains(response, 'jquery.min.js')
+            self.assertNotContains(response, 'vendor/jquery/jquery.js')
+            self.assertContains(response, 'vendor/jquery/jquery.min.js')
             self.assertNotContains(response, 'prepopulate.js')
             self.assertContains(response, 'prepopulate.min.js')
             self.assertNotContains(response, 'actions.js')
@@ -1116,8 +1116,8 @@ class AdminJavaScriptTest(TestCase):
             self.assertContains(response, 'inlines.min.js')
         with override_settings(DEBUG=True):
             response = self.client.get(reverse('admin:admin_views_section_add'))
-            self.assertContains(response, 'jquery.js')
-            self.assertNotContains(response, 'jquery.min.js')
+            self.assertContains(response, 'vendor/jquery/jquery.js')
+            self.assertNotContains(response, 'vendor/jquery/jquery.min.js')
             self.assertContains(response, 'prepopulate.js')
             self.assertNotContains(response, 'prepopulate.min.js')
             self.assertContains(response, 'actions.js')
