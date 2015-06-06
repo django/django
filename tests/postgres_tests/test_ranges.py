@@ -193,7 +193,7 @@ class TestQuerying(TestCase):
 @skipUnlessPG92
 class TestSerialization(TestCase):
     test_data = (
-        '[{"fields": {"ints": "{\\"upper\\": 10, \\"lower\\": 0, '
+        '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
         '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12\\", '
         '\\"lower\\": \\"2014-01-01T00:00:00\\", \\"bounds\\": \\"[)\\"}", '
