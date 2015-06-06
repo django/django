@@ -8,12 +8,9 @@ from django.db.models import Field, IntegerField, Transform
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
 
+from .utils import AttributeSetter
+
 __all__ = ['ArrayField']
-
-
-class AttributeSetter(object):
-    def __init__(self, name, value):
-        setattr(self, name, value)
 
 
 class ArrayField(Field):
