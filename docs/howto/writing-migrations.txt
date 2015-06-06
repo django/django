@@ -183,3 +183,52 @@ the respective field according to your needs.
   Note there is a race condition if you allow objects to be created while this
   migration is running. Objects created after the ``AddField`` and before
   ``RunPython`` will have their original ``uuid``’s overwritten.
+
+Controlling the order of migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django controls the order of migrations not by reference to the filename
+of each migration, but by building a graph using two properties on the
+``Migration`` class. These properties are ``dependencies`` and
+``run_before``.
+
+If you've used the :djadmin:`makemigrations` command you've probably
+already seen ``dependencies`` in action because auto-created
+migrations have this defined as part of their creation process.
+
+The ``dependecies`` property is declared like this::
+
+    # -*- coding: utf-8 -*-
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+        ]
+
+Usually this will be enough, but from time to time you may need to
+ensure that your migration runs *before* other migrations. This is
+useful, for example, to make third-party apps' migrations run *after*
+your :setting:`AUTH_USER_MODEL` replacement.
+
+To achieve this, place all migrations that should depend on yours in
+the ``run_before`` attribute on your ``Migration`` class::
+
+    # -*- coding: utf-8 -*-
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+        ]
+
+        run_before = [
+            ('third_party_app', '0001_do_awesome'),
+        ]
+
+In general though, ``dependencies`` is favored over ``run_before``.
+You should only use ``run_before`` if for some reason it is undesirable
+or impractical to specify ``dependencies`` in the migration which you
+want to run after the one you are writing.
