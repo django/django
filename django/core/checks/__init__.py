@@ -11,6 +11,7 @@ import django.core.checks.model_checks  # NOQA
 import django.core.checks.security.base  # NOQA
 import django.core.checks.security.csrf  # NOQA
 import django.core.checks.security.sessions  # NOQA
+import django.core.checks.templates  # NOQA
 
 __all__ = [
     'CheckMessage',

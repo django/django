@@ -491,3 +491,14 @@ If you're using MySQL, the following checks will be performed:
 
 * **mysql.E001**: MySQL does not allow unique ``CharField``\s to have a
   ``max_length`` > 255.
+
+Templates
+---------
+
+The following checks verify that your :setting:`TEMPLATES` are correctly
+configured:
+
+* **templates.E001**: You have ``'APP_DIRS': True`` in your
+  :setting:`TEMPLATES` while explicitly specifying the template loaders.
+  Either set ``'APP_DIRS'`` to ``False`` or remove the ``'loaders'``
+  configuration.
