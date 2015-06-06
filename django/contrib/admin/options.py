@@ -566,7 +566,7 @@ class ModelAdmin(BaseModelAdmin):
         js = [
             'core.js',
             'admin/RelatedObjectLookups.js',
-            'jquery%s.js' % extra,
+            'vendor/jquery/jquery%s.js' % extra,
             'jquery.init.js',
             'actions%s.js' % extra,
             'urlify.js',
@@ -1759,7 +1759,8 @@ class InlineModelAdmin(BaseModelAdmin):
     @property
     def media(self):
         extra = '' if settings.DEBUG else '.min'
-        js = ['jquery%s.js' % extra, 'jquery.init.js', 'inlines%s.js' % extra]
+        js = ['vendor/jquery/jquery%s.js' % extra, 'jquery.init.js',
+              'inlines%s.js' % extra]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
         return forms.Media(js=[static('admin/js/%s' % url) for url in js])
