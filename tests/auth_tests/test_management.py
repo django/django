@@ -305,6 +305,33 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         self.assertEqual(CustomUser._default_manager.count(), 0)
 
+    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+                       AUTHENTICATION_BACKENDS=[
+                           'my.custom.backend',
+                       ])
+    def test_swappable_user_username_non_unique(self):
+        @mock_inputs({
+            'username': 'joe',
+            'password': 'nopasswd',
+        })
+        def createsuperuser():
+            new_io = six.StringIO()
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                email="joe@somewhere.org",
+                stdout=new_io,
+                stdin=MockTTY(),
+            )
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, 'Superuser created successfully.')
+
+        for i in range(2):
+            createsuperuser()
+
+        users = CustomUserNonUniqueUsername.objects.filter(username="joe")
+        self.assertEqual(users.count(), 2)
+
     def test_skip_if_not_in_TTY(self):
         """
         If the command is not called from a TTY, it should be skipped and a
