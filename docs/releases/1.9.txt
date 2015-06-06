@@ -356,6 +356,18 @@ Backwards incompatible changes in 1.9
     deprecation timeline for a given feature, its removal may appear as a
     backwards incompatible change.
 
+Paginator.page_range
+~~~~~~~~~~~~~~~~~~~~
+
+``Paginator.page_range`` is now an iterator, instead of a list.
+
+In versions of Django previous to 1.8, ``Paginator.page_range`` would return
+a ``list`` in Python 2.x, and a ``range`` object in 3.x. Django 1.8 consistently
+returned a list, but an iterator is preferable, as it is more efficient.
+
+Existing code that depends on ``list`` specific features, such as indexing,
+can be ported by converting the iterator into a ``list`` using ``list()``.
+
 Database backend API
 ~~~~~~~~~~~~~~~~~~~~
 
