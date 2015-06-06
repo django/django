@@ -30,3 +30,27 @@ Usage example::
     >>> from django.contrib.postgres.functions import TransactionNow
     >>> Article.objects.filter(published__lte=TransactionNow())
     <QuerySet [<Article: How to Django>]>
+
+``Levenshtein``
+===============
+
+.. class:: Levenshtein(expression, expression, **extra)
+
+.. versionadded:: 1.10
+
+Accepts a field name or expression, and a string or expression. Returns the
+Levenshtein distance between the two arguments.
+
+To use it, you need to activate the `fuzzystrmatch extension on PostgreSQL`_.
+The :class:`~django.contrib.postgres.operations.FuzzyStrMatchExtension`
+migration operation is available if you want to perform this activation using
+migrations).
+
+.. _fuzzystrmatch extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/fuzzystrmatch.html
+
+Usage example::
+
+    >>> from django.contrib.postgres.functions import Levenshtein
+    >>> Author.objects.create(name='William')
+    >>> print Author.objects.annotate(distance=Levenshtein('name', 'Will')).first().distance
+    3

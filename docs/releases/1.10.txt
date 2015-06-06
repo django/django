@@ -33,6 +33,10 @@ search engine. You can search across multiple fields in your relational
 database, combine the searches with other lookups, use different language
 configurations and weightings, and rank the results by relevance.
 
+It also adds :lookup:`soundex`, :lookup:`metaphone`, and
+:lookup:`double_metaphone` lookups, and a
+:class:`~django.contrib.postgres.functions.Levenshtein` function.
+
 Minor features
 --------------
 
