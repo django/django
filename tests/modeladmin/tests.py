@@ -238,19 +238,13 @@ class ModelAdminTests(TestCase):
 
         ma = BandAdmin(Band, self.site)
 
-        # Current : ['bio', 'sign_date', 'name']
-        # Is current correct or should it be like this ?
         self.assertEqual(list(ma.get_form(request).base_fields),
             ['bio', 'sign_date'])
 
-        # Current : ['bio', 'sign_date', 'name', u'name']
-        # Is current correct or should it be like this ?
         self.assertEqual(list(ma.get_fields(request)),
             ['bio', 'sign_date', 'name'])
 
-        # Current : [(None, {'fields': ['bio', 'sign_date', 'name', u'name']})]
         self.assertEqual(list(ma.get_fieldsets(request)),
-            # No doubt that's how it should be ^^
             [(None, {'fields': ['bio', 'sign_date', 'name']})])
 
     def test_custom_form_meta_exclude(self):
