@@ -40,6 +40,8 @@ if HAS_POSTGRES:
                     raise ProgrammingError
                 else:
                     return self.version
+            elif func == 'version':
+                pass
             else:
                 raise NotImplementedError('This function was not expected to be called')
 
