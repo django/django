@@ -6,6 +6,8 @@ from django.contrib.postgres import forms, lookups
 from django.db import models
 from django.utils import six
 
+from .utils import AttributeSetter
+
 __all__ = [
     'RangeField', 'IntegerRangeField', 'BigIntegerRangeField',
     'FloatRangeField', 'DateTimeRangeField', 'DateRangeField',
@@ -26,10 +28,19 @@ class RangeField(models.Field):
 
     def to_python(self, value):
         if isinstance(value, six.string_types):
-            value = self.range_type(**json.loads(value))
+            # Assume we're deserializing
+            vals = json.loads(value)
+            for end in ('lower', 'upper'):
+                if end in vals:
+                    vals[end] = self.base_field.to_python(vals[end])
+            value = self.range_type(**vals)
         elif isinstance(value, (list, tuple)):
             value = self.range_type(value[0], value[1])
         return value
+
+    def set_attributes_from_name(self, name):
+        super(RangeField, self).set_attributes_from_name(name)
+        self.base_field.set_attributes_from_name(name)
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
@@ -37,11 +48,12 @@ class RangeField(models.Field):
             return None
         if value.isempty:
             return json.dumps({"empty": True})
-        return json.dumps({
-            "lower": value.lower,
-            "upper": value.upper,
-            "bounds": value._bounds,
-        })
+        base_field = self.base_field
+        result = {"bounds": value._bounds}
+        for end in ('lower', 'upper'):
+            obj = AttributeSetter(base_field.attname, getattr(value, end))
+            result[end] = base_field.value_to_string(obj)
+        return json.dumps(result)
 
     def formfield(self, **kwargs):
         kwargs.setdefault('form_class', self.form_field)

@@ -291,26 +291,37 @@ class TestQueringWithRanges(TestCase):
 @skipUnlessPG92
 class TestSerialization(TestCase):
     test_data = (
-        '[{"fields": {"ints": "{\\"upper\\": 10, \\"lower\\": 0, '
+        '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
-        '"bigints": null, "timestamps": null, "dates": null}, '
+        '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
+        '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
+        '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
+    lower_date = datetime.date(2014, 1, 1)
+    upper_date = datetime.date(2014, 2, 2)
+    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
+
     def test_dumping(self):
-        instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True))
+        instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True),
+            timestamps=DateTimeTZRange(self.lower_dt, self.upper_dt),
+            dates=DateRange(self.lower_date, self.upper_date))
         data = serializers.serialize('json', [instance])
         dumped = json.loads(data)
-        dumped[0]['fields']['ints'] = json.loads(dumped[0]['fields']['ints'])
+        for field in ('ints', 'dates', 'timestamps'):
+            dumped[0]['fields'][field] = json.loads(dumped[0]['fields'][field])
         check = json.loads(self.test_data)
-        check[0]['fields']['ints'] = json.loads(check[0]['fields']['ints'])
+        for field in ('ints', 'dates', 'timestamps'):
+            check[0]['fields'][field] = json.loads(check[0]['fields'][field])
         self.assertEqual(dumped, check)
 
     def test_loading(self):
         instance = list(serializers.deserialize('json', self.test_data))[0].object
         self.assertEqual(instance.ints, NumericRange(0, 10))
         self.assertEqual(instance.floats, NumericRange(empty=True))
-        self.assertEqual(instance.dates, None)
+        self.assertEqual(instance.bigints, None)
 
 
 class TestValidators(PostgreSQLTestCase):
