@@ -1,0 +1,28 @@
+==========
+JavaScript
+==========
+
+While most of Django core is Python, the ``admin`` and ``gis`` contrib apps
+contain JavaScript code.
+
+Please follow these coding standards when writing JavaScript code for inclusion
+in Django.
+
+Code style
+----------
+
+* Please conform to the indentation style dictated in the ``.editorconfig``
+  file. We recommend using a text editor with `EditorConfig`_ support to avoid
+  indentation and whitespace issues. Most of the JavaScript files use 4 spaces
+  for indentation, but there are some exceptions
+
+* When naming variables, use ``camelCase`` instead of ``underscore_case``.
+  Different JavaScript files sometimes use a different code style. Please try to
+  conform to the code style of each file.
+
+* Use the `JSHint`_ code linter to check your code for bugs and style errors.
+  JSHint will be run when you run the JavaScript tests. We also recommended
+  installing a JSHint plugin in your text editor.
+
+.. _EditorConfig: http://editorconfig.org/
+.. _jshint: http://jshint.com/
