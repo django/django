@@ -293,16 +293,16 @@ class TestSerialization(TestCase):
     test_data = (
         '[{"fields": {"ints": "{\\"upper\\": \\"10\\", \\"lower\\": \\"0\\", '
         '\\"bounds\\": \\"[)\\"}", "floats": "{\\"empty\\": true}", '
-        '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12\\", '
-        '\\"lower\\": \\"2014-01-01T00:00:00\\", \\"bounds\\": \\"[)\\"}", '
+        '"bigints": null, "timestamps": "{\\"upper\\": \\"2014-02-02T12:12:12+00:00\\", '
+        '\\"lower\\": \\"2014-01-01T00:00:00+00:00\\", \\"bounds\\": \\"[)\\"}", '
         '"dates": "{\\"upper\\": \\"2014-02-02\\", \\"lower\\": \\"2014-01-01\\", \\"bounds\\": \\"[)\\"}" }, '
         '"model": "postgres_tests.rangesmodel", "pk": null}]'
     )
 
     lower_date = datetime.date(2014, 1, 1)
     upper_date = datetime.date(2014, 2, 2)
-    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0)
-    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12)
+    lower_dt = datetime.datetime(2014, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    upper_dt = datetime.datetime(2014, 2, 2, 12, 12, 12, tzinfo=timezone.utc)
 
     def test_dumping(self):
         instance = RangesModel(ints=NumericRange(0, 10), floats=NumericRange(empty=True),
