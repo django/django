@@ -597,6 +597,9 @@ Miscellaneous
 * CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
   been removed as these browsers have reached end-of-life.
 
+* The jQuery static files in ``contrib.admin`` have been moved into a
+  ``vendor/jquery`` subdirectory.
+
 * The text displayed for null columns in the admin changelist ``list_display``
   cells has changed from ``(None)`` (or its translated equivalent) to ``-``.
 
