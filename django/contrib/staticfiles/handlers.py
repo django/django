@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
+from django.core import urlresolvers
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.utils.six.moves.urllib.parse import urlparse
 from django.utils.six.moves.urllib.request import url2pathname
@@ -56,7 +57,13 @@ class StaticFilesHandler(WSGIHandler):
                 if settings.DEBUG:
                     from django.views import debug
                     return debug.technical_404_response(request, e)
-        return super(StaticFilesHandler, self).get_response(request)
+                else:
+                    urlconf = settings.ROOT_URLCONF
+                    urlresolvers.set_urlconf(urlconf)
+                    resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+                    return self.get_exception_response(request, resolver, 404)
+        else:
+            return super(StaticFilesHandler, self).get_response(request)
 
     def __call__(self, environ, start_response):
         if not self._should_handle(get_path_info(environ)):

@@ -374,7 +374,7 @@ class Field(RegisterLookupMixin):
         Note that the positional or keyword arguments must contain values of the
         following types (including inner values of collection types):
 
-         * None, bool, str, unicode, int, long, float, complex, set, frozenset, list, tuple, dict
+         * None, bool, str, allow_unicode, int, long, float, complex, set, frozenset, list, tuple, dict
          * UUID
          * datetime.datetime (naive), datetime.date
          * top-level classes, top-level functions - will be referenced by their full import path
@@ -2107,6 +2107,9 @@ class SlugField(CharField):
         # Set db_index=True unless it's been set manually.
         if 'db_index' not in kwargs:
             kwargs['db_index'] = True
+        self.allow_unicode = kwargs.pop('allow_unicode', False)
+        if self.allow_unicode:
+            self.default_validators = [validators.validate_unicode_slug]
         super(SlugField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
@@ -2117,13 +2120,15 @@ class SlugField(CharField):
             kwargs['db_index'] = False
         else:
             del kwargs['db_index']
+        if self.allow_unicode is not False:
+            kwargs['allow_unicode'] = self.allow_unicode
         return name, path, args, kwargs
 
     def get_internal_type(self):
         return "SlugField"
 
     def formfield(self, **kwargs):
-        defaults = {'form_class': forms.SlugField}
+        defaults = {'form_class': forms.SlugField, 'allow_unicode': self.allow_unicode}
         defaults.update(kwargs)
         return super(SlugField, self).formfield(**defaults)
 

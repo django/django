@@ -172,11 +172,16 @@ class TestUtilsText(SimpleTestCase):
 
     def test_slugify(self):
         items = (
-            ('Hello, World!', 'hello-world'),
-            ('spam & eggs', 'spam-eggs'),
+            # given - expected - unicode?
+            ('Hello, World!', 'hello-world', False),
+            ('spam & eggs', 'spam-eggs', False),
+            ('spam & ıçüş', 'spam-ıçüş', True),
+            ('foo ıç bar', 'foo-ıç-bar', True),
+            ('    foo ıç bar', 'foo-ıç-bar', True),
+            ('你好', '你好', True),
         )
-        for value, output in items:
-            self.assertEqual(text.slugify(value), output)
+        for value, output, is_unicode in items:
+            self.assertEqual(text.slugify(value, allow_unicode=is_unicode), output)
 
     def test_unescape_entities(self):
         items = [
