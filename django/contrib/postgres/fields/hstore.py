@@ -53,11 +53,13 @@ class HStoreField(Field):
         return super(HStoreField, self).formfield(**defaults)
 
 
-HStoreField.register_lookup(lookups.DataContains)
-HStoreField.register_lookup(lookups.ContainedBy)
-HStoreField.register_lookup(lookups.HasKey)
-HStoreField.register_lookup(lookups.HasKeys)
-HStoreField.register_lookup(lookups.HasAnyKeys)
+HStoreField.register_lookups([
+    lookups.DataContains,
+    lookups.ContainedBy,
+    lookups.HasKey,
+    lookups.HasKeys,
+    lookups.HasAnyKeys,
+])
 
 
 class KeyTransform(Transform):

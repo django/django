@@ -105,9 +105,11 @@ class DateRangeField(RangeField):
         return 'daterange'
 
 
-RangeField.register_lookup(lookups.DataContains)
-RangeField.register_lookup(lookups.ContainedBy)
-RangeField.register_lookup(lookups.Overlap)
+RangeField.register_lookups([
+    lookups.DataContains,
+    lookups.ContainedBy,
+    lookups.Overlap,
+])
 
 
 class RangeContainedBy(models.Lookup):

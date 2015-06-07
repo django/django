@@ -49,6 +49,12 @@ register lookups on itself. The two prominent examples are
         lookup on ``DateField``. It overrides a lookup that already exists with
         the same name.
 
+    .. classmethod:: register_lookups(lookups)
+
+        Does the same as ``register_lookup`` for the list of lookups.
+        If there are a need to register two or more lookups for the same
+        field, it helps to be more DRY.
+
     .. method:: get_lookup(lookup_name)
 
         Returns the :class:`Lookup` named ``lookup_name`` registered in the class.
