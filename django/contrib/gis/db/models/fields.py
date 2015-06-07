@@ -317,8 +317,7 @@ class GeometryField(GeoSelectFormatMixin, Field):
         return connection.ops.get_geom_placeholder(self, value, compiler)
 
 
-for klass in gis_lookups.values():
-    GeometryField.register_lookup(klass)
+GeometryField.register_lookups(gis_lookups.values())
 
 
 # The OpenGIS Geometry Type Fields

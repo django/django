@@ -59,11 +59,13 @@ class JSONField(Field):
         return super(JSONField, self).formfield(**defaults)
 
 
-JSONField.register_lookup(lookups.DataContains)
-JSONField.register_lookup(lookups.ContainedBy)
-JSONField.register_lookup(lookups.HasKey)
-JSONField.register_lookup(lookups.HasKeys)
-JSONField.register_lookup(lookups.HasAnyKeys)
+JSONField.register_lookups([
+    lookups.DataContains,
+    lookups.ContainedBy,
+    lookups.HasKey,
+    lookups.HasKeys,
+    lookups.HasAnyKeys,
+])
 
 
 class KeyTransform(Transform):

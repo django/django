@@ -2537,19 +2537,23 @@ class SecondTransform(DateTransform):
     lookup_name = 'second'
 
 
-DateField.register_lookup(YearTransform)
-DateField.register_lookup(MonthTransform)
-DateField.register_lookup(DayTransform)
-DateField.register_lookup(WeekDayTransform)
-
-TimeField.register_lookup(HourTransform)
-TimeField.register_lookup(MinuteTransform)
-TimeField.register_lookup(SecondTransform)
-
-DateTimeField.register_lookup(YearTransform)
-DateTimeField.register_lookup(MonthTransform)
-DateTimeField.register_lookup(DayTransform)
-DateTimeField.register_lookup(WeekDayTransform)
-DateTimeField.register_lookup(HourTransform)
-DateTimeField.register_lookup(MinuteTransform)
-DateTimeField.register_lookup(SecondTransform)
+DateField.register_lookups([
+    YearTransform,
+    MonthTransform,
+    DayTransform,
+    WeekDayTransform,
+])
+TimeField.register_lookups([
+    HourTransform,
+    MinuteTransform,
+    SecondTransform,
+])
+DateTimeField.register_lookups([
+    YearTransform,
+    MonthTransform,
+    DayTransform,
+    WeekDayTransform,
+    HourTransform,
+    MinuteTransform,
+    SecondTransform,
+])

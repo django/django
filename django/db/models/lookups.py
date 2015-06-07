@@ -47,6 +47,11 @@ class RegisterLookupMixin(object):
         return lookup
 
     @classmethod
+    def register_lookups(cls, lookups):
+        for lookup in lookups:
+            cls.register_lookup(lookup)
+
+    @classmethod
     def _unregister_lookup(cls, lookup):
         """
         Removes given lookup from cls lookups. Meant to be used in

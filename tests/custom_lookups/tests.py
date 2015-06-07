@@ -188,6 +188,17 @@ class DateTimeTransform(models.Transform):
 
 
 class LookupTests(TestCase):
+    def test_register_lookup(self):
+        models.IntegerField.register_lookup(Div3Lookup)
+        self.assertTrue(len(models.IntegerField.class_lookups), 1)
+        self.assertEqual(models.IntegerField.class_lookups['div3'], Div3Lookup)
+
+    def test_register_lookups(self):
+        models.IntegerField.register_lookups([Div3Transform, Mult3BilateralTransform])
+        self.assertTrue(len(models.IntegerField.class_lookups), 2)
+        self.assertEqual(models.IntegerField.class_lookups['div3'], Div3Transform)
+        self.assertEqual(models.IntegerField.class_lookups['mult3'], Mult3BilateralTransform)
+
     def test_basic_lookup(self):
         a1 = Author.objects.create(name='a1', age=1)
         a2 = Author.objects.create(name='a2', age=2)
