@@ -805,5 +805,8 @@ Composite widgets
             field1 = forms.DateField(widget=SelectDateWidget(empty_label="Nothing"))
 
             # A custom empty label with tuple
-            field1 = forms.DateField(widget=SelectDateWidget(
-                empty_label=("Choose Year", "Choose Month", "Choose Day"))
+            field1 = forms.DateField(
+                widget=SelectDateWidget(
+                    empty_label=("Choose Year", "Choose Month", "Choose Day"),
+                ),
+            )
