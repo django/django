@@ -843,6 +843,14 @@ class ValueTests(TestCase):
         UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
         self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
 
+    def test_datetime(self):
+        now = datetime.datetime.now()
+        Time.objects.create()
+        times = Time.objects.annotate(
+            datetime_value=Value(now, output_field=models.DateTimeField()),
+        )
+        self.assertEqual(times.get().datetime_value, now)
+
 
 class ReprTests(TestCase):
 

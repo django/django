@@ -549,6 +549,16 @@ class Value(Expression):
             return 'NULL', []
         return '%s', [val]
 
+    def as_mysql(self, compiler, connection):
+        sql, params = self.as_sql(compiler, connection)
+        if params and isinstance(params[0], datetime.datetime):
+            return 'cast(%s as datetime)', params
+        elif params and isinstance(params[0], datetime.date):
+            return 'cast(%s as date)', params
+        elif params and isinstance(params[0], datetime.time):
+            return 'cast(%s as time)', params
+        return sql, params
+
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         c = super(Value, self).resolve_expression(query, allow_joins, reuse, summarize, for_save)
         c.for_save = for_save

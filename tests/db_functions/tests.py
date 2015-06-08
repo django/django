@@ -1,11 +1,8 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-from unittest import skipIf, skipUnless
 
-from django.db import connection
 from django.db.models import CharField, TextField, Value as V
-from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
     Coalesce, Concat, Greatest, Least, Length, Lower, Now, Substr, Upper,
 )
@@ -37,6 +34,16 @@ class FunctionTests(TestCase):
 
         with self.assertRaisesMessage(ValueError, 'Coalesce must take at least two expressions'):
             Author.objects.annotate(display_name=Coalesce('alias'))
+
+    def test_coalesce_datetime_value(self):
+        now = timezone.now().replace(microsecond=0)
+        Article.objects.create(title='Testing, testing.', written=now)
+
+        articles = Article.objects.annotate(
+            publised_default=Coalesce('published', now),
+        )
+        article = articles.get()
+        self.assertEqual(article.publised_default, now)
 
     def test_coalesce_mixed_values(self):
         a1 = Author.objects.create(name='John Smith', alias='smithj')
@@ -141,7 +148,6 @@ class FunctionTests(TestCase):
         )
         self.assertIsNone(articles.first().last_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
     def test_greatest_coalesce_workaround(self):
         past = datetime(1900, 1, 1)
         now = timezone.now()
@@ -152,22 +158,6 @@ class FunctionTests(TestCase):
             last_updated=Greatest(
                 Coalesce('written', past),
                 Coalesce('published', past),
-            ),
-        )
-        self.assertEqual(articles.first().last_updated, now)
-
-    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
-    def test_greatest_coalesce_workaround_mysql(self):
-        past = datetime(1900, 1, 1)
-        now = timezone.now()
-
-        Article.objects.create(title="Testing with Django", written=now)
-
-        past_sql = RawSQL("cast(%s as datetime)", (past,))
-        articles = Article.objects.annotate(
-            last_updated=Greatest(
-                Coalesce('written', past_sql),
-                Coalesce('published', past_sql),
             ),
         )
         self.assertEqual(articles.first().last_updated, now)
@@ -236,7 +226,6 @@ class FunctionTests(TestCase):
         )
         self.assertIsNone(articles.first().first_updated)
 
-    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
     def test_least_coalesce_workaround(self):
         future = datetime(2100, 1, 1)
         now = timezone.now()
@@ -247,22 +236,6 @@ class FunctionTests(TestCase):
             last_updated=Least(
                 Coalesce('written', future),
                 Coalesce('published', future),
-            ),
-        )
-        self.assertEqual(articles.first().last_updated, now)
-
-    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
-    def test_least_coalesce_workaround_mysql(self):
-        future = datetime(2100, 1, 1)
-        now = timezone.now()
-
-        Article.objects.create(title="Testing with Django", written=now)
-
-        future_sql = RawSQL("cast(%s as datetime)", (future,))
-        articles = Article.objects.annotate(
-            last_updated=Least(
-                Coalesce('written', future_sql),
-                Coalesce('published', future_sql),
             ),
         )
         self.assertEqual(articles.first().last_updated, now)
