@@ -8,6 +8,7 @@ from difflib import SequenceMatcher
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils import lru_cache
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.module_loading import import_string
@@ -47,7 +48,7 @@ def validate_password(password, user=None, password_validators=None):
         try:
             validator.validate(password, user)
         except ValidationError as error:
-            errors += error.messages
+            errors.append(error)
     if errors:
         raise ValidationError(errors)
 
@@ -95,8 +96,11 @@ class MinimumLengthValidator(object):
 
     def validate(self, password, user=None):
         if len(password) < self.min_length:
-            msg = _("This password is too short. It must contain at least %(min_length)d characters.")
-            raise ValidationError(msg % {'min_length': self.min_length})
+            raise ValidationError(
+                _("This password is too short. It must contain at least %(min_length)d characters."),
+                code='password_too_short',
+                params={'min_length': self.min_length},
+            )
 
     def get_help_text(self):
         return _("Your password must contain at least %(min_length)d characters.") % {'min_length': self.min_length}
@@ -131,7 +135,11 @@ class UserAttributeSimilarityValidator(object):
             for value_part in value_parts:
                 if SequenceMatcher(a=password.lower(), b=value_part.lower()).quick_ratio() > self.max_similarity:
                     verbose_name = force_text(user._meta.get_field(attribute_name).verbose_name)
-                    raise ValidationError(_("The password is too similar to the %s." % verbose_name))
+                    raise ValidationError(
+                        _("The password is too similar to the %(verbose_name)s."),
+                        code='password_too_similar',
+                        params={'verbose_name': verbose_name},
+                    )
 
     def get_help_text(self):
         return _("Your password can't be too similar to your other personal information.")
@@ -145,7 +153,9 @@ class CommonPasswordValidator(object):
     The list Django ships with contains 1000 common passwords, created by Mark Burnett:
     https://xato.net/passwords/more-top-worst-passwords/
     """
-    DEFAULT_PASSWORD_LIST_PATH = os.path.dirname(os.path.realpath(__file__)) + '/common-passwords.txt.gz'
+    DEFAULT_PASSWORD_LIST_PATH = os.path.join(
+        os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords.txt.gz'
+    )
 
     def __init__(self, password_list_path=DEFAULT_PASSWORD_LIST_PATH):
         try:
@@ -156,7 +166,10 @@ class CommonPasswordValidator(object):
 
     def validate(self, password, user=None):
         if password.lower().strip() in self.passwords:
-            raise ValidationError(_("This password is too common."))
+            raise ValidationError(
+                _("This password is too common."),
+                code='password_too_common',
+            )
 
     def get_help_text(self):
         return _("Your password can't be a commonly used password.")
@@ -168,7 +181,10 @@ class NumericPasswordValidator(object):
     """
     def validate(self, password, user=None):
         if password.isdigit():
-            raise ValidationError(_("This password is entirely numeric."))
+            raise ValidationError(
+                _("This password is entirely numeric."),
+                code='password_entirely_numeric',
+            )
 
     def get_help_text(self):
         return _("Your password can't be entirely numeric.")

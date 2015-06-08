@@ -278,8 +278,11 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         form = SetPasswordForm(user, data)
         self.assertFalse(form.is_valid())
         self.assertEqual(len(form["new_password2"].errors), 2)
-        self.assertTrue('The password is too similar to the username.' in form["new_password2"].errors)
-        self.assertTrue('This password is too short. It must contain at least 12 characters.' in form["new_password2"].errors)
+        self.assertIn('The password is too similar to the username.', form["new_password2"].errors)
+        self.assertIn(
+            'This password is too short. It must contain at least 12 characters.',
+            form["new_password2"].errors
+        )
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])

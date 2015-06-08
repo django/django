@@ -28,7 +28,7 @@ What's new in Django 1.9
 Password validation
 ~~~~~~~~~~~~~~~~~~~
 
-Django now offers password validation, to help prevent the usage of weak
+Django now offers password validation to help prevent the usage of weak
 passwords by users. The validation is integrated in the included password
 change and reset forms and is simple to integrate in any other code.
 Validation is performed by one or more validators, configured in the new
@@ -36,10 +36,10 @@ Validation is performed by one or more validators, configured in the new
 
 Four validators are included in Django, which can enforce a minimum length,
 compare the password to the user's attributes like their name, ensure
-passwords aren't entirely numeric or check against an included list of common
+passwords aren't entirely numeric, or check against an included list of common
 passwords. You can combine multiple validators, and some validators have
 custom configuration options. For example, you can choose to provide a custom
-list of common passwords. Each validator provides a help text to explain their
+list of common passwords. Each validator provides a help text to explain its
 requirements to the user.
 
 By default, no validation is performed and all passwords are accepted, so if

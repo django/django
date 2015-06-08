@@ -12,6 +12,7 @@ from django.contrib.auth.password_validation import (
 )
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
+from django.utils._os import upath
 
 
 @override_settings(AUTH_PASSWORD_VALIDATORS=[
@@ -43,10 +44,12 @@ class PasswordValidationTest(TestCase):
         with self.assertRaises(ValidationError, args=['This password is too short.']) as cm:
             validate_password('django4242')
         self.assertEqual(cm.exception.messages, [msg_too_short])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_too_short')
 
         with self.assertRaises(ValidationError) as cm:
             validate_password('password')
         self.assertEqual(cm.exception.messages, ['This password is too common.', msg_too_short])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_too_common')
 
         self.assertIsNone(validate_password('password', password_validators=[]))
 
@@ -56,14 +59,14 @@ class PasswordValidationTest(TestCase):
     def test_password_validators_help_texts(self):
         help_texts = password_validators_help_texts()
         self.assertEqual(len(help_texts), 2)
-        self.assertTrue('12 characters' in help_texts[1])
+        self.assertIn('12 characters', help_texts[1])
 
         self.assertEqual(password_validators_help_texts(password_validators=[]), [])
 
     def test_password_validators_help_text_html(self):
         help_text = password_validators_help_text_html()
         self.assertEqual(help_text.count('<li>'), 2)
-        self.assertTrue('12 characters' in help_text)
+        self.assertIn('12 characters', help_text)
 
 
 class MinimumLengthValidatorTest(TestCase):
@@ -75,6 +78,7 @@ class MinimumLengthValidatorTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator().validate('1234567')
         self.assertEqual(cm.exception.messages, [expected_error % 8])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_too_short')
 
         with self.assertRaises(ValidationError) as cm:
             MinimumLengthValidator(min_length=3).validate('12')
@@ -100,13 +104,17 @@ class UserAttributeSimilarityValidatorTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             UserAttributeSimilarityValidator().validate('testclient', user=user),
         self.assertEqual(cm.exception.messages, [expected_error % "username"])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_too_similar')
 
         with self.assertRaises(ValidationError) as cm:
             UserAttributeSimilarityValidator().validate('example.com', user=user),
         self.assertEqual(cm.exception.messages, [expected_error % "email address"])
 
         with self.assertRaises(ValidationError) as cm:
-            UserAttributeSimilarityValidator(user_attributes=['first_name'], max_similarity=0.3).validate('testclient', user=user),
+            UserAttributeSimilarityValidator(
+                user_attributes=['first_name'],
+                max_similarity=0.3,
+            ).validate('testclient', user=user)
         self.assertEqual(cm.exception.messages, [expected_error % "first name"])
 
         self.assertIsNone(
@@ -130,7 +138,7 @@ class CommonPasswordValidatorTest(TestCase):
         self.assertEqual(cm.exception.messages, [expected_error])
 
     def test_validate_custom_list(self):
-        path = os.path.dirname(os.path.realpath(__file__)) + '/common-passwords-custom.txt'
+        path = os.path.join(os.path.dirname(os.path.realpath(upath(__file__))), 'common-passwords-custom.txt')
         validator = CommonPasswordValidator(password_list_path=path)
         expected_error = "This password is too common."
         self.assertIsNone(validator.validate('a-safe-password'))
@@ -138,6 +146,7 @@ class CommonPasswordValidatorTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             validator.validate('from-my-custom-list')
         self.assertEqual(cm.exception.messages, [expected_error])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_too_common')
 
     def test_help_text(self):
         self.assertEqual(
@@ -154,6 +163,7 @@ class NumericPasswordValidatorTest(TestCase):
         with self.assertRaises(ValidationError) as cm:
             NumericPasswordValidator().validate('42424242')
         self.assertEqual(cm.exception.messages, [expected_error])
+        self.assertEqual(cm.exception.error_list[0].code, 'password_entirely_numeric')
 
     def test_help_text(self):
         self.assertEqual(
