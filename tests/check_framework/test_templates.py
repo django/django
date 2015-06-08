@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from django.core.checks.templates import E001
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
@@ -27,13 +29,13 @@ class CheckTemplateSettingsAppDirsTest(SimpleTestCase):
         self.assertEqual(self.func(None), [E001])
 
     def test_app_dirs_removed(self):
-        TEMPLATES = self.TEMPLATES_APP_DIRS_AND_LOADERS[:]
+        TEMPLATES = deepcopy(self.TEMPLATES_APP_DIRS_AND_LOADERS)
         del TEMPLATES[0]['APP_DIRS']
         with self.settings(TEMPLATES=TEMPLATES):
             self.assertEqual(self.func(None), [])
 
     def test_loaders_removed(self):
-        TEMPLATES = self.TEMPLATES_APP_DIRS_AND_LOADERS[:]
+        TEMPLATES = deepcopy(self.TEMPLATES_APP_DIRS_AND_LOADERS)
         del TEMPLATES[0]['OPTIONS']['loaders']
         with self.settings(TEMPLATES=TEMPLATES):
             self.assertEqual(self.func(None), [])
