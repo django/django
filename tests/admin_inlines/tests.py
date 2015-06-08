@@ -18,7 +18,7 @@ from .models import (
     Inner3, Inner4Stacked, Inner4Tabular, Novel, OutfitItem, Parent,
     ParentModelWithCustomPk, Person, Poll, Profile, ProfileCollection,
     Question, Sighting, SomeChildModel, SomeParentModel, Teacher,
-    UUIDFashionista, UUIDPerson, UUIDOutfitItem,
+    UUIDFashionista, UUIDOutfitItem, UUIDPerson,
 )
 
 INLINE_CHANGELINK_HTML = 'class="inlinechangelink">Change</a>'

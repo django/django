@@ -2,9 +2,9 @@ from django.forms.models import inlineformset_factory
 from django.test import TestCase
 
 from .models import (
-    UUIDPKChild, UUIDPKParent, AutoPKChildOfUUIDPKParent, AutoPKParent,
-    UUIDPKChildOfAutoPKParent, ChildWithEditablePK, ParentWithUUIDAlternateKey,
-    ChildRelatedViaAK
+    AutoPKChildOfUUIDPKParent, AutoPKParent, ChildRelatedViaAK,
+    ChildWithEditablePK, ParentWithUUIDAlternateKey, UUIDPKChild,
+    UUIDPKChildOfAutoPKParent, UUIDPKParent,
 )
 
 
