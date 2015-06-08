@@ -1,3 +1,4 @@
+import functools
 from django.core.handlers.base import BaseHandler
 from django.http import HttpRequest, HttpResponse
 from channels import Channel, coreg
@@ -38,6 +39,7 @@ def view_consumer(channel_name):
     Does not run any middleware.
     """
     def inner(func): 
+        @functools.wraps(func)
         def consumer(**kwargs):
             request = HttpRequest.channel_decode(kwargs)
             response = func(request)

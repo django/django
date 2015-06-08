@@ -4,16 +4,18 @@ class Worker(object):
     and runs their consumers.
     """
 
-    def __init__(self, consumer_registry, channel_class):
+    def __init__(self, consumer_registry, channel_layer):
+        from channels import channel_layers, DEFAULT_CHANNEL_LAYER
         self.consumer_registry = consumer_registry
-        self.channel_class = channel_class
+        self.channel_layer = channel_layer
 
     def run(self):
         """
         Tries to continually dispatch messages to consumers.
         """
+
         channels = self.consumer_registry.all_channel_names()
         while True:
-            channel, message = self.channel_class.receive_many(channels)
+            channel, message = self.channel_layer.receive_many(channels)
             consumer = self.consumer_registry.consumer_for_channel(channel)
             consumer(**message)

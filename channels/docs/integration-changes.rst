@@ -1,23 +1,24 @@
-Message Standards
+Integration Notes
 =================
 
-Some standardised message formats are used for common message types - they
-are detailed below.
+Django Channels is intended to be merged into Django itself; these are the
+planned changes the codebase will need to undertake in that transition.
 
-HTTP Request
-------------
+* The ``channels`` package will become ``django.channels``. The expected way
+  of interacting with the system will be via the ``Channel`` object, 
 
-Represents a full-fledged, single HTTP request coming in from a client.
-Contains the following keys:
+* Obviously, the monkeypatches in ``channels.hacks`` will be replaced by
+  placing methods onto the objects themselves. The ``request`` and ``response``
+  modules will thus no longer exist separately.
 
-* request: An encoded Django HTTP request
-* response_channel: The channel name to write responses to
+Things to ponder
+----------------
 
+* The mismatch between signals (broadcast) and channels (single-worker) means
+  we should probably leave patching signals into channels for the end developer.
+  This would also ensure the speedup improvements for empty signals keep working.
 
-HTTP Response
--------------
-
-Sends a whole response to a client.
-Contains the following keys:
-
-* response: An encoded Django HTTP response
+* It's likely that the decorator-based approach of consumer registration will
+  mean extending Django's auto-module-loading beyond ``models`` and
+  ``admin`` app modules to include ``views`` and ``consumers``. There may be
+  a better unified approach to this.

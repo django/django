@@ -1,4 +1,6 @@
 import functools
+from django.utils import six
+from .utils import name_that_thing
 
 class ConsumerRegistry(object):
     """
@@ -14,10 +16,10 @@ class ConsumerRegistry(object):
     def add_consumer(self, consumer, channels):
         for channel in channels:
             if channel in self.consumers:
-                raise ValueError("Cannot register consumer %s - channel %s already consumed by %s" % (
-                    consumer,
+                raise ValueError("Cannot register consumer %s - channel %r already consumed by %s" % (
+                    name_that_thing(consumer),
                     channel,
-                    self.consumers[channel],
+                    name_that_thing(self.consumers[channel]),
                 ))
             self.consumers[channel] = consumer
 
@@ -25,6 +27,8 @@ class ConsumerRegistry(object):
         """
         Decorator that registers a function as a consumer.
         """
+        if isinstance(channels, six.string_types):
+            channels = [channels]
         def inner(func):
             self.add_consumer(func, channels)
             return func

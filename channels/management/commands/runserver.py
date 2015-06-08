@@ -3,7 +3,7 @@ import threading
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpResponse
-from channels import Channel, coreg
+from channels import Channel, coreg, channel_layers, DEFAULT_CHANNEL_LAYER
 from channels.worker import Worker
 from channels.utils import auto_import_consumers
 from channels.adapters import UrlConsumer
@@ -42,7 +42,7 @@ class WSGIInterfaceHandler(WSGIHandler):
     def get_response(self, request):
         request.response_channel = Channel.new_name("django.wsgi.response")
         Channel("django.wsgi.request").send(**request.channel_encode())
-        channel, message = Channel.receive_many([request.response_channel])
+        channel, message = channel_layers[DEFAULT_CHANNEL_LAYER].receive_many([request.response_channel])
         return HttpResponse.channel_decode(message)
 
 
@@ -54,5 +54,5 @@ class WorkerThread(threading.Thread):
     def run(self):
         Worker(
             consumer_registry = coreg,
-            channel_class = Channel,
+            channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER],
         ).run()
