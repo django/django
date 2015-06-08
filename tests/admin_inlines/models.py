@@ -136,7 +136,7 @@ class ShoppingWeakness(models.Model):
     fashionista = models.ForeignKey(Fashionista)
     item = models.ForeignKey(OutfitItem)
 
-# Models for #12749 vs #24377
+# Models for #24958
 
 
 class UUIDPerson(models.Model):

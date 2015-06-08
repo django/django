@@ -25,6 +25,8 @@ class InlineFormsetTests(TestCase):
         """
         #24377 - Inlines with a model field default should ignore that default
         value to avoid triggering validation on empty forms.
+
+        Tests the case where both the parent and child have a UUID pk.
         """
         FormSet = inlineformset_factory(UUIDPKParent, UUIDPKChild, fields='__all__')
         formset = FormSet({
@@ -39,7 +41,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_nulls_default_pks_uuid_parent_auto_child(self):
         """
-        #24377 - If we're adding a new object, a parent's auto-generated pk
+        #24958 - If we're adding a new object, a parent's auto-generated pk
         from the model field default should be ignored as it's regenerated on
         the save request.
 
@@ -53,7 +55,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_ignores_default_pks_on_submit_uuid_parent_auto_child(self):
         """
-        #24377 - Inlines with a model field default should ignore that default
+        #24958 - Inlines with a model field default should ignore that default
         value to avoid triggering validation on empty forms.
 
         Tests the case of a parent object with a UUID primary key and a child
@@ -73,7 +75,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_nulls_default_pks_auto_parent_uuid_child(self):
         """
-        #24377 - If we're adding a new object, a parent's auto-generated pk
+        #24958 - If we're adding a new object, a parent's auto-generated pk
         from the model field default should be ignored as it's regenerated on
         the save request.
 
@@ -87,7 +89,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_ignores_default_pks_on_submit_auto_parent_uuid_child(self):
         """
-        #24377 - Inlines with a model field default should ignore that default
+        #24958 - Inlines with a model field default should ignore that default
         value to avoid triggering validation on empty forms.
 
         Tests the case of a parent object with an AutoField primary key and a
@@ -107,7 +109,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_nulls_default_pks_child_editable_pk(self):
         """
-        #24377 - If we're adding a new object, a parent's auto-generated pk
+        #24958 - If we're adding a new object, a parent's auto-generated pk
         from the model field default should be ignored as it's regenerated on
         the save request.
 
@@ -120,7 +122,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_ignores_default_pks_on_submit_child_editable_pk(self):
         """
-        #24377 - Inlines with a model field default should ignore that default
+        #24958 - Inlines with a model field default should ignore that default
         value to avoid triggering validation on empty forms.
 
         Tests the case of a parent object with a UUID primary key and a
@@ -139,7 +141,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_nulls_default_pks_alternate_key_relation(self):
         """
-        #24377 - If we're adding a new object, a parent's auto-generated pk
+        #24958 - If we're adding a new object, a parent's auto-generated pk
         from the model field default should be ignored as it's regenerated on
         the save request.
 
@@ -152,7 +154,7 @@ class InlineFormsetTests(TestCase):
 
     def test_inlineformset_factory_ignores_default_pks_on_submit_alternate_key_relation(self):
         """
-        #24377 - Inlines with a model field default should ignore that default
+        #24958 - Inlines with a model field default should ignore that default
         value to avoid triggering validation on empty forms.
 
         Tests the case of a parent object with a UUID alternate key and a
