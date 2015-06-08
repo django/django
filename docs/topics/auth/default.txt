@@ -580,7 +580,7 @@ The permission_required decorator
     (i.e. ``polls.can_vote`` for a permission on a model in the ``polls``
     application).
 
-    The decorator may also take a list of permissions.
+    The decorator may also take an iterable of permissions.
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
     also takes an optional ``login_url`` parameter. Example::
@@ -598,6 +598,11 @@ The permission_required decorator
     :exc:`~django.core.exceptions.PermissionDenied`, prompting :ref:`the 403
     (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
     login page.
+
+    .. versionchanged:: 1.9
+
+        Before Django 1.9, the permission parameter only took strings, lists and
+        tuples instead of strings and any iterable.
 
 .. _applying-permissions-to-generic-views:
 
