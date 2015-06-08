@@ -2774,11 +2774,11 @@ AUTH_PASSWORD_VALIDATORS
 
 .. versionadded:: 1.9
 
-Default: ``[]``
+Default: ``[]`` (Empty list)
 
-Sets the validators that are used to check the strength of user's passwords.
-See :ref:`password-validation` for more details.
-By default, no validation is performed and all passwords are accepted.
+The list of validators that are used to check the strength of user's passwords.
+See :ref:`password-validation` for more details. By default, no validation is
+performed and all passwords are accepted.
 
 .. _settings-messages:
 
