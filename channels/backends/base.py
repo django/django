@@ -15,8 +15,9 @@ class BaseChannelBackend(object):
     registry of consumers.
     """
 
-    def __init__(self):
+    def __init__(self, expiry=60):
         self.registry = ConsumerRegistry()
+        self.expiry = expiry
 
     def send(self, channel, message):
         """

@@ -15,7 +15,7 @@ class UrlConsumer(object):
         self.handler = BaseHandler()
         self.handler.load_middleware()
 
-    def __call__(self, **kwargs):
+    def __call__(self, channel, **kwargs):
         request = HttpRequest.channel_decode(kwargs)
         try:
             response = self.handler.get_response(request)
@@ -42,7 +42,7 @@ def view_consumer(channel_name, alias=None):
     """
     def inner(func): 
         @functools.wraps(func)
-        def consumer(**kwargs):
+        def consumer(channel, **kwargs):
             request = HttpRequest.channel_decode(kwargs)
             response = func(request)
             Channel(request.response_channel).send(**response.channel_encode())

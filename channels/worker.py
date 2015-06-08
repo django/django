@@ -16,4 +16,4 @@ class Worker(object):
         while True:
             channel, message = self.channel_layer.receive_many(channels)
             consumer = self.channel_layer.registry.consumer_for_channel(channel)
-            consumer(**message)
+            consumer(channel=channel, **message)
