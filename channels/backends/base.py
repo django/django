@@ -1,3 +1,6 @@
+from channels.consumer_registry import ConsumerRegistry
+
+
 class ChannelClosed(Exception):
     """
     Raised when you try to send to a closed channel.
@@ -7,8 +10,13 @@ class ChannelClosed(Exception):
 
 class BaseChannelBackend(object):
     """
-    Base class for all channel layer implementations.
+    Base class for all channel layer implementations. Manages both sending
+    and receving messages from the backend, and each comes with its own
+    registry of consumers.
     """
+
+    def __init__(self):
+        self.registry = ConsumerRegistry()
 
     def send(self, channel, message):
         """

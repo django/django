@@ -1,7 +1,9 @@
 import functools
+
 from django.core.handlers.base import BaseHandler
 from django.http import HttpRequest, HttpResponse
-from channels import Channel, coreg
+
+from channels import Channel, channel_layers, DEFAULT_CHANNEL_LAYER
 
 
 class UrlConsumer(object):
@@ -33,10 +35,10 @@ def view_producer(channel_name):
     return producing_view
 
 
-def view_consumer(channel_name):
+def view_consumer(channel_name, alias=None):
     """
     Decorates a normal Django view to be a channel consumer.
-    Does not run any middleware.
+    Does not run any middleware
     """
     def inner(func): 
         @functools.wraps(func)
@@ -44,6 +46,8 @@ def view_consumer(channel_name):
             request = HttpRequest.channel_decode(kwargs)
             response = func(request)
             Channel(request.response_channel).send(**response.channel_encode())
-        coreg.add_consumer(consumer, [channel_name])
+        # Get the channel layer and register
+        channel_layer = channel_layers[alias or DEFAULT_CHANNEL_LAYER]
+        channel_layer.registry.add_consumer(consumer, [channel_name])
         return func
     return inner

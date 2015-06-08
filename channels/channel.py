@@ -1,6 +1,8 @@
 import random
 import string
 
+from django.utils import six
+
 
 class Channel(object):
     """
@@ -46,3 +48,20 @@ class Channel(object):
         """
         from channels.adapters import view_producer
         return view_producer(self.name)
+
+    @classmethod
+    def consumer(self, channels, alias=None):
+        """
+        Decorator that registers a function as a consumer.
+        """
+        from channels import channel_layers, DEFAULT_CHANNEL_LAYER
+        # Upconvert if you just pass in a string
+        if isinstance(channels, six.string_types):
+            channels = [channels]
+        # Get the channel 
+        channel_layer = channel_layers[alias or DEFAULT_CHANNEL_LAYER]
+        # Return a function that'll register whatever it wraps
+        def inner(func):
+            channel_layer.registry.add_consumer(func, channels)
+            return func
+        return inner

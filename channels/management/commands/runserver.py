@@ -3,7 +3,7 @@ import threading
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpResponse
-from channels import Channel, coreg, channel_layers, DEFAULT_CHANNEL_LAYER
+from channels import Channel, channel_layers, DEFAULT_CHANNEL_LAYER
 from channels.worker import Worker
 from channels.utils import auto_import_consumers
 from channels.adapters import UrlConsumer
@@ -22,12 +22,13 @@ class Command(RunserverCommand):
         # Force disable reloader for now
         options['use_reloader'] = False
         # Check a handler is registered for http reqs
+        channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         auto_import_consumers()
-        if not coreg.consumer_for_channel("django.wsgi.request"):
+        if not channel_layer.registry.consumer_for_channel("django.wsgi.request"):
             # Register the default one
-            coreg.add_consumer(UrlConsumer(), ["django.wsgi.request"])
+            channel_layer.registry.add_consumer(UrlConsumer(), ["django.wsgi.request"])
         # Launch a worker thread
-        worker = WorkerThread()
+        worker = WorkerThread(channel_layer)
         worker.daemon = True
         worker.start()
         # Run the rest
@@ -51,8 +52,9 @@ class WorkerThread(threading.Thread):
     Class that runs a worker
     """
 
+    def __init__(self, channel_layer):
+        super(WorkerThread, self).__init__()
+        self.channel_layer = channel_layer
+
     def run(self):
-        Worker(
-            consumer_registry = coreg,
-            channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER],
-        ).run()
+        Worker(channel_layer=self.channel_layer).run()
