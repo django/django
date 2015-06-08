@@ -20,6 +20,10 @@ lorem_ipsum = """
     tempor incididunt ut labore et dolore magna aliqua."""
 
 
+def truncate_microseconds(value):
+    return value if connection.features.supports_microsecond_precision else value.replace(microsecond=0)
+
+
 class FunctionTests(TestCase):
 
     def test_coalesce(self):
@@ -117,7 +121,7 @@ class FunctionTests(TestCase):
         articles = Article.objects.annotate(
             last_updated=Greatest('written', 'published'),
         )
-        self.assertEqual(articles.first().last_updated, now)
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
 
     @skipUnlessDBFeature('greatest_least_ignores_nulls')
     def test_greatest_ignores_null(self):
@@ -170,7 +174,7 @@ class FunctionTests(TestCase):
                 Coalesce('published', past_sql),
             ),
         )
-        self.assertEqual(articles.first().last_updated, now)
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
 
     def test_greatest_all_null(self):
         Article.objects.create(title="Testing with Django", written=timezone.now())
@@ -212,7 +216,7 @@ class FunctionTests(TestCase):
         articles = Article.objects.annotate(
             first_updated=Least('written', 'published'),
         )
-        self.assertEqual(articles.first().first_updated, before)
+        self.assertEqual(articles.first().first_updated, truncate_microseconds(before))
 
     @skipUnlessDBFeature('greatest_least_ignores_nulls')
     def test_least_ignores_null(self):
@@ -265,7 +269,7 @@ class FunctionTests(TestCase):
                 Coalesce('published', future_sql),
             ),
         )
-        self.assertEqual(articles.first().last_updated, now)
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
 
     def test_least_all_null(self):
         Article.objects.create(title="Testing with Django", written=timezone.now())
