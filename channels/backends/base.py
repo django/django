@@ -1,4 +1,4 @@
-class Channel(object):
+class BaseChannel(object):
     """
     Base class for all channel layer implementations.
     """
@@ -51,3 +51,12 @@ class Channel(object):
         response channels.
         """
         raise NotImplementedError()
+
+    def as_view(self):
+        """
+        Returns a view version of this channel - one that takes
+        the request passed in and dispatches it to our channel,
+        serialized.
+        """
+        from channels.adapters import view_producer
+        return view_producer(self.name)

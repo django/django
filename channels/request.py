@@ -15,6 +15,7 @@ def encode_request(request):
         "path": request.path,
         "path_info": request.path_info,
         "method": request.method,
+        "response_channel": request.response_channel,
     }
     return value
 
@@ -31,4 +32,5 @@ def decode_request(value):
     request.path = value['path']
     request.method = value['method']
     request.path_info = value['path_info']
+    request.response_channel = value['response_channel']
     return request

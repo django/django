@@ -4,4 +4,8 @@ from .consumer_registry import ConsumerRegistry
 coreg = ConsumerRegistry()
 
 # Load an implementation of Channel
-from .channels.memory import Channel
+from .backends import InMemoryChannel as Channel
+
+# Ensure monkeypatching
+from .hacks import monkeypatch_django
+monkeypatch_django()

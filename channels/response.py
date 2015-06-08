@@ -27,3 +27,12 @@ def decode_response(value):
     )
     response._headers = {k.lower: (k, v) for k, v in value['headers']}
     return response
+
+
+class ResponseLater(Exception):
+    """
+    Class that represents a response which will be sent doown the response
+    channel later. Used to move a django view-based segment onto the next
+    task, as otherwise we'd need to write some kind of fake response.
+    """
+    pass

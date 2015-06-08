@@ -2,12 +2,12 @@ import time
 import string
 import random
 from collections import deque
-from .base import Channel as BaseChannel
+from .base import BaseChannel
 
 queues = {}
 closed = set()
 
-class Channel(BaseChannel):
+class InMemoryChannel(BaseChannel):
     """
     In-memory channel implementation. Intended only for use with threading,
     in low-throughput development environments.

@@ -10,5 +10,5 @@ def auto_import_consumers():
         try:
             __import__(consumer_module_name)
         except ImportError as e:
-            if "no module named" not in str(e).lower():
+            if "no module named consumers" not in str(e).lower():
                 raise

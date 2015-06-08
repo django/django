@@ -2,11 +2,11 @@ import django
 import threading
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.handlers.wsgi import WSGIHandler
-from channel import Channel, coreg
-from channel.request import encode_request
-from channel.response import decode_response
-from channel.worker import Worker
-from channel.utils import auto_import_consumers
+from django.http import HttpResponse
+from channels import Channel, coreg
+from channels.worker import Worker
+from channels.utils import auto_import_consumers
+from channels.adapters import UrlConsumer
 
 
 class Command(RunserverCommand):
@@ -24,7 +24,8 @@ class Command(RunserverCommand):
         # Check a handler is registered for http reqs
         auto_import_consumers()
         if not coreg.consumer_for_channel("django.wsgi.request"):
-            raise RuntimeError("No consumer registered for WSGI requests")
+            # Register the default one
+            coreg.add_consumer(UrlConsumer(), ["django.wsgi.request"])
         # Launch a worker thread
         worker = WorkerThread()
         worker.daemon = True
@@ -39,13 +40,10 @@ class WSGIInterfaceHandler(WSGIHandler):
     """
 
     def get_response(self, request):
-        response_channel = Channel.new_name("django.wsgi.response")
-        Channel("django.wsgi.request").send(
-            request = encode_request(request),
-            response_channel = response_channel,
-        )
-        channel, message = Channel.receive_many([response_channel])
-        return decode_response(message)
+        request.response_channel = Channel.new_name("django.wsgi.response")
+        Channel("django.wsgi.request").send(**request.channel_encode())
+        channel, message = Channel.receive_many([request.response_channel])
+        return HttpResponse.channel_decode(message)
 
 
 class WorkerThread(threading.Thread):
