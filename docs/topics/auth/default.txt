@@ -629,6 +629,11 @@ redirects to the login page::
         :class:`~django.core.exceptions.PermissionDenied` exception will be
         raised instead of the redirect if the user does not pass the test.
 
+    ``permission_denied_message``
+        When ``raise_exception`` is ``True``, this attribute can be used to
+        control the error message passed to the error handler and may be passed
+        to the user.
+
 .. currentmodule:: django.contrib.auth.decorators
 
 The permission_required decorator

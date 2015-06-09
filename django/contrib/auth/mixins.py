@@ -12,6 +12,7 @@ class UserPassesTestMixin(object):
     the class method `test_func`.
     """
     login_url = None
+    permission_denied_message = ''
     raise_exception = False
     redirect_field_name = REDIRECT_FIELD_NAME
 
@@ -44,6 +45,9 @@ class UserPassesTestMixin(object):
             )
         return force_text(login_url)
 
+    def get_permission_denied_message(self):
+        return self.permission_denied_message
+
     def get_redirect_field_name(self):
         """
         Override this method to customize the redirect_field_name.
@@ -53,7 +57,7 @@ class UserPassesTestMixin(object):
     def handle_no_permission(self, request):
         # In case the 403 handler should be called, raise the exception.
         if self.raise_exception:
-            raise PermissionDenied
+            raise PermissionDenied(self.get_permission_denied_message())
         return redirect_to_login(request.get_full_path(), self.get_login_url(), self.get_redirect_field_name())
 
 
