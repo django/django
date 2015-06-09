@@ -500,6 +500,41 @@ The login_required decorator
     :func:`django.contrib.admin.views.decorators.staff_member_required`
     decorator a useful alternative to ``login_required()``.
 
+.. currentmodule:: django.contrib.auth.mixins
+
+The LoginRequired mixin
+~~~~~~~~~~~~~~~~~~~~~~~
+
+When using :doc:`class-based views </topics/class-based-views/index>`, you can
+achieve the same behavior as with ``login_required`` by using the
+``LoginRequiredMixin``.
+
+.. class:: LoginRequiredMixin
+
+    .. versionadded:: 1.9
+
+    If a view is using this mixin, all requests by non-authenticated users
+    will be redirected to the login page.
+
+    You can set any of the parameters of
+    :class:`~django.contrib.auth.mixins.UserPassesTestMixin` to customize
+    the URL the user is redirected to::
+
+        from django.contrib.auth.mixins import LoginRequiredMixin
+
+        class MyView(LoginRequiredMixin, View):
+            login_url = '/login/'
+            redirect_field_name = 'redirect_to'
+
+            ...
+
+.. note::
+
+    Just as the ``login_required`` decorator, this mixin does NOT check the
+    ``is_active`` flag on a user.
+
+.. currentmodule:: django.contrib.auth.decorators
+
 Limiting access to logged-in users that pass a test
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -560,6 +595,47 @@ redirects to the login page::
         def my_view(request):
             ...
 
+
+.. currentmodule:: django.contrib.auth.mixins
+
+.. class:: UserPassesTestMixin
+
+    .. versionadded:: 1.9
+
+    When using :doc:`class-based views </topics/class-based-views/index>`, you
+    can use the ``UserPassesTestMixin`` to do this.
+
+    You have to override the ``test_func`` method of the class to provide
+    the actual test that is performed::
+
+        from django.contrib.auth.mixins import UserPassesTestMixin
+
+        class MyView(UserPassesTestMixin, View):
+
+            def test_func(self, user):
+                return user.email.endswith('@example.com')
+
+            ...
+
+    You can set the following optional attributes on your view to customize this mixin's
+    behavior:
+
+    ``login_url``
+        The URL that users who don't pass the test will be
+        redirected to. Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>`.
+
+    ``redirect_field_name``
+        The name of the query parameter that will contain the URL the user should
+        be redirected to after a successful login. If you set this to ``None``, no
+        query parameter will be added. Defaults to ``"next"``.
+
+    ``raise_exception``
+        If this attribute is set to ``True``, :class:`~django.core.exceptions.PermissionDenied`
+        exception will be raised instead of the redirect if the user does not pass the test.
+
+
+.. currentmodule:: django.contrib.auth.decorators
+
 The permission_required decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -583,7 +659,7 @@ The permission_required decorator
     The decorator may also take an iterable of permissions.
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
-    also takes an optional ``login_url`` parameter. Example::
+    also takes an optional ``login_url`` parameter::
 
         from django.contrib.auth.decorators import permission_required
 
@@ -604,16 +680,37 @@ The permission_required decorator
         In older versions, the ``permission`` parameter only worked with
         strings, lists, and tuples instead of strings and any iterable.
 
+
+.. currentmodule:: django.contrib.auth.mixins
+
 .. _applying-permissions-to-generic-views:
 
 Applying permissions to generic views
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To apply a permission to a :doc:`class-based generic view
-</ref/class-based-views/index>`, decorate the :meth:`View.dispatch
-<django.views.generic.base.View.dispatch>` method on the class. See
-:ref:`decorating-class-based-views` for details. Another approach is to
-:ref:`write a mixin that wraps as_view() <mixins_that_wrap_as_view>`.
+</ref/class-based-views/index>`, you can use the following mixin:
+
+.. class:: PermissionRequiredMixin
+
+    .. versionadded:: 1.9
+
+    This mixin, just like the ``permisison_required``
+    decorator, checks whether the user accessing a view has a particular
+    permission. You should specify the permission (or a list or permissions)
+    using the ``permission_required`` parameter::
+
+        from django.contrib.auth.mixins import PermissionRequiredMixin
+
+        class MyView(PermissionRequiredMixin, View):
+            permission_required = 'polls.can_vote'
+
+            ...
+
+    You can set any of the parameters of
+    :class:`~django.contrib.auth.mixins.UserPassesTestMixin` to customize
+    the URL the user is redirected to.
+
 
 .. _session-invalidation-on-password-change:
 
