@@ -224,7 +224,7 @@ method along with the request object.
 
 Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication.views import FeedDoesNotExist
+    from django.contrib.syndication.views import Feed
     from django.shortcuts import get_object_or_404
 
     class BeatFeed(Feed):
