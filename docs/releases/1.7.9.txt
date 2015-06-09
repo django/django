@@ -8,3 +8,6 @@ Django 1.7.9 fixes several bugs in 1.7.8.
 
 * Prevented the loss of ``null``/``not null`` column properties during field
   renaming of MySQL databases (:ticket:`24817`).
+
+* Fixed ``SimpleTestCase.assertRaisesMessage()`` on Python 2.7.10
+  (:ticket:`24903`).
