@@ -17,6 +17,27 @@ ArrayField
     <ArrayField.size>`. ``ArrayField`` can be nested to store multi-dimensional
     arrays.
 
+    .. warning::
+
+        When using a model's instance methods, it is not recommended to use
+        parameter defaults as those defaults are mutable.
+        For example, if ``default=[]``, this default is shared between all
+        instances and in this case, it is mutable. And it can cause
+        modification of the same ArrayField data of different instances.
+        This is similar to the following example code::
+
+            def my_function(foo, bar=[]):
+                bar.append(foo)
+                return bar
+
+        The first call to my_function(1) would return [1],
+        the second [1, 1], etc.
+
+        It is always a better habit to use
+        ``default=list`` instead of ``default=[]``, which avoids the mutable
+        defaults problem. More to refer to:
+        :attr:`Field.default <django.db.models.Field.default>`
+
     .. attribute:: base_field
 
         This is a required argument.
