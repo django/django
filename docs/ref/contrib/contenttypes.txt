@@ -543,3 +543,29 @@ information.
 
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
+
+
+.. module:: django.contrib.contenttypes.management
+
+Utilities
+=========
+.. versionadded:: 1.9
+
+The ``remove_contenttypes1`` method can be used to programmatically remove 
+stale content types. This is useful for automatic deployments where keyboard 
+input isn't available. 
+
+It accepts one argument, the application name, and is called within the 
+migration file. See the example below.
+
+.. code-block:: python
+
+    # 0002_my_migration.py
+    from django.contrib.contenttypes.management import remove_contenttypes
+
+    def remover(apps, schema_editor):
+        remove_contenttypes('my_app')
+
+    operations = [
+        migrations.RunPython(remover),
+    ]
