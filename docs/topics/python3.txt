@@ -8,7 +8,7 @@ compatibility layer.
 
 .. _six: http://pythonhosted.org/six/
 
-This document is primarily targeted at authors of pluggable application
+This document is primarily targeted at authors of pluggable applications
 who want to support both Python 2 and 3. It also describes guidelines that
 apply to Django's code.
 
@@ -149,7 +149,7 @@ result with the system encoding. Conversely, the
 In Python 3, there's simply :meth:`~object.__str__`, which must return ``str``
 (text).
 
-(It is also possible to define :meth:`~object.__bytes__`, but Django application
+(It is also possible to define :meth:`~object.__bytes__`, but Django applications
 have little use for that method, because they hardly ever deal with ``bytes``.)
 
 Django provides a simple way to define :meth:`~object.__str__` and
@@ -208,7 +208,7 @@ Coding guidelines
 =================
 
 The following guidelines are enforced in Django's source code. They're also
-recommended for third-party application who follow the same porting strategy.
+recommended for third-party applications that follow the same porting strategy.
 
 Syntax requirements
 -------------------
