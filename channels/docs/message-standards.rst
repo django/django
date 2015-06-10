@@ -8,6 +8,9 @@ Note: All consumers also receive the channel name as the keyword argument
 "channel", so there is no need for separate type information to let
 multi-channel consumers distinguish.
 
+The length limit on channel names will be 200 characters.
+
+
 HTTP Request
 ------------
 

@@ -1,6 +1,5 @@
 import time
-import string
-import random
+import json
 from collections import deque
 from .base import BaseChannelBackend
 
@@ -13,6 +12,8 @@ class InMemoryChannelBackend(BaseChannelBackend):
     """
 
     def send(self, channel, message):
+        # Try JSON encoding it to make sure it would, but store the native version
+        json.dumps(message)
         # Add to the deque, making it if needs be
         queues.setdefault(channel, deque()).append(message)
 

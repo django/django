@@ -3,7 +3,7 @@ import threading
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.handlers.wsgi import WSGIHandler
 from django.http import HttpResponse
-from channels import Channel, channel_layers, DEFAULT_CHANNEL_LAYER
+from channels import Channel, channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.worker import Worker
 from channels.utils import auto_import_consumers
 from channels.adapters import UrlConsumer
@@ -22,7 +22,7 @@ class Command(RunserverCommand):
         # Force disable reloader for now
         options['use_reloader'] = False
         # Check a handler is registered for http reqs
-        channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
+        channel_layer = channel_backends[DEFAULT_CHANNEL_BACKEND]
         auto_import_consumers()
         if not channel_layer.registry.consumer_for_channel("django.wsgi.request"):
             # Register the default one
@@ -43,7 +43,7 @@ class WSGIInterfaceHandler(WSGIHandler):
     def get_response(self, request):
         request.response_channel = Channel.new_name("django.wsgi.response")
         Channel("django.wsgi.request").send(**request.channel_encode())
-        channel, message = channel_layers[DEFAULT_CHANNEL_LAYER].receive_many([request.response_channel])
+        channel, message = channel_backends[DEFAULT_CHANNEL_BACKEND].receive_many([request.response_channel])
         return HttpResponse.channel_decode(message)
 
 

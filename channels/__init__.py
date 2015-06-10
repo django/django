@@ -1,12 +1,18 @@
-from .channel import Channel
-
-# Load a backend
-from .backends.memory import InMemoryChannelBackend
-DEFAULT_CHANNEL_LAYER = "default"
-channel_layers = {
-    DEFAULT_CHANNEL_LAYER: InMemoryChannelBackend(),
-}
+# Load backends
+DEFAULT_CHANNEL_BACKEND = "default"
+from .backends import BackendManager
+from django.conf import settings
+channel_backends = BackendManager(
+    getattr(settings, "CHANNEL_BACKENDS", {
+        DEFAULT_CHANNEL_BACKEND: {
+            "BACKEND": "channels.backends.memory.InMemoryChannelBackend",
+        }
+    })
+)
 
 # Ensure monkeypatching
 from .hacks import monkeypatch_django
 monkeypatch_django()
+
+# Promote channel to top-level (down here to avoid circular import errs)
+from .channel import Channel
