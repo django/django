@@ -89,7 +89,12 @@ The ``File`` Class
     the following attributes and methods of its ``file`` object:
     ``encoding``, ``fileno``, ``flush``, ``isatty``, ``newlines``,
     ``read``, ``readinto``, ``readlines``, ``seek``, ``softspace``, ``tell``,
-    ``truncate``, ``writelines``, ``xreadlines``.
+    ``truncate``, ``writelines``, ``xreadlines``. If you are using
+    Python 3, the ``seekable`` method is also available.
+
+    .. versionchanged:: 1.9
+
+        The ``seekable`` method was added.
 
 .. currentmodule:: django.core.files.base
 
