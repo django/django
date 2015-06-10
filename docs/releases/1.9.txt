@@ -200,6 +200,9 @@ File Storage
   <django.core.files.storage.Storage.get_valid_name>` is now called when
   the :attr:`~django.db.models.FileField.upload_to` is a callable.
 
+* :class:`~django.core.files.File` now has the ``seekable()`` method when using
+  Python 3.
+
 File Uploads
 ^^^^^^^^^^^^
 
