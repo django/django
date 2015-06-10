@@ -15,6 +15,10 @@ class BaseChannelBackend(object):
     registry of consumers.
     """
 
+    # Flags if this backend can only be used inside one process.
+    # Causes errors if you try to run workers/interfaces separately with it.
+    local_only = False
+
     def __init__(self, expiry=60):
         self.registry = ConsumerRegistry()
         self.expiry = expiry
@@ -31,3 +35,6 @@ class BaseChannelBackend(object):
         channels passed, as a (channel, message) tuple.
         """
         raise NotImplementedError()
+
+    def __str__(self):
+        return self.__class__.__name__

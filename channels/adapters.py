@@ -47,7 +47,7 @@ def view_consumer(channel_name, alias=DEFAULT_CHANNEL_BACKEND):
             response = func(request)
             Channel(request.response_channel).send(**response.channel_encode())
         # Get the channel layer and register
-        channel_layer = channel_backends[DEFAULT_CHANNEL_BACKEND]
-        channel_layer.registry.add_consumer(consumer, [channel_name])
+        channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
+        channel_backend.registry.add_consumer(consumer, [channel_name])
         return func
     return inner

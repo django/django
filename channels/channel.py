@@ -23,13 +23,13 @@ class Channel(object):
         Create an instance for the channel named "name"
         """
         self.name = name
-        self.channel_layer = channel_backends[alias]
+        self.channel_backend = channel_backends[alias]
 
     def send(self, **kwargs):
         """
         Send a message over the channel, taken from the kwargs.
         """
-        self.channel_layer.send(self.name, kwargs)
+        self.channel_backend.send(self.name, kwargs)
 
     @classmethod
     def new_name(self, prefix):
@@ -59,9 +59,9 @@ class Channel(object):
         if isinstance(channels, six.string_types):
             channels = [channels]
         # Get the channel 
-        channel_layer = channel_backends[alias]
+        channel_backend = channel_backends[alias]
         # Return a function that'll register whatever it wraps
         def inner(func):
-            channel_layer.registry.add_consumer(func, channels)
+            channel_backend.registry.add_consumer(func, channels)
             return func
         return inner

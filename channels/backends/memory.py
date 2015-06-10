@@ -11,6 +11,8 @@ class InMemoryChannelBackend(BaseChannelBackend):
     in low-throughput development environments.
     """
 
+    local_only = True
+
     def send(self, channel, message):
         # Try JSON encoding it to make sure it would, but store the native version
         json.dumps(message)
@@ -18,6 +20,8 @@ class InMemoryChannelBackend(BaseChannelBackend):
         queues.setdefault(channel, deque()).append(message)
 
     def receive_many(self, channels):
+        if not channels:
+            raise ValueError("Cannot receive on empty channel list!")
         while True:
             # Try to pop a message from each channel
             for channel in channels:
