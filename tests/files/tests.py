@@ -120,6 +120,19 @@ class FileTests(unittest.TestCase):
         f = File(StringIO('one\ntwo\nthree'))
         self.assertEqual(list(f), ['one\n', 'two\n', 'three'])
 
+    def test_seekable(self):
+        """
+        Test seekable property available if using python 3 (#24963).
+        """
+        with tempfile.TemporaryFile() as temp:
+            temp.write(b"contents\n")
+            test_file = File(temp, name="something.txt")
+            if six.PY2:
+                self.assertFalse(hasattr(test_file, 'seekable'))
+            if six.PY3:
+                self.assertTrue(hasattr(test_file, 'seekable'))
+                self.assertTrue(test_file.seekable())
+
 
 class NoNameFileTestCase(unittest.TestCase):
     """
