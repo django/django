@@ -1,10 +1,10 @@
 import functools
 import warnings
 from importlib import import_module
-from inspect import getargspec
 
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.inspect import getargspec
 from django.utils.itercompat import is_iterable
 
 from .base import Node, Template, token_kwargs

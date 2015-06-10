@@ -1,8 +1,8 @@
 import warnings
-from inspect import getargspec
 
 from django.template import Origin, Template, TemplateDoesNotExist
 from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.inspect import func_supports_parameter
 
 
 class Loader(object):
@@ -28,7 +28,7 @@ class Loader(object):
         args = [template_name]
         # RemovedInDjango21Warning: Add template_dirs for compatibility with
         # old loaders
-        if 'template_dirs' in getargspec(self.get_template_sources)[0]:
+        if func_supports_parameter(self.get_template_sources, 'template_dirs'):
             args.append(template_dirs)
 
         for origin in self.get_template_sources(*args):

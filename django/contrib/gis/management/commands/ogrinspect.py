@@ -1,8 +1,8 @@
 import argparse
-import inspect
 
 from django.contrib.gis import gdal
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.inspect import get_func_args
 
 
 class LayerOptionAction(argparse.Action):
@@ -91,7 +91,7 @@ class Command(BaseCommand):
         from django.contrib.gis.utils.ogrinspect import _ogrinspect, mapping
         # Filter options to params accepted by `_ogrinspect`
         ogr_options = {k: v for k, v in options.items()
-                       if k in inspect.getargspec(_ogrinspect).args and v is not None}
+                       if k in get_func_args(_ogrinspect) and v is not None}
         output = [s for s in _ogrinspect(ds, model_name, **ogr_options)]
 
         if options['mapping']:
