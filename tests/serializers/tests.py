@@ -11,7 +11,7 @@ from xml.dom import minidom
 from django.core import management, serializers
 from django.db import connection, transaction
 from django.test import (
-    SimpleTestCase, TestCase, TransactionTestCase, override_settings,
+    SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
     skipUnlessDBFeature,
 )
 from django.test.utils import Approximate
@@ -277,6 +277,14 @@ class SerializersTestBase(object):
             'first_category_pk': categories[0],
             'second_category_pk': categories[1],
         })
+
+    def test_deserialize_force_insert(self):
+        """Tests that deserialized content can be saved with force_insert as a parameter."""
+        serial_str = serializers.serialize(self.serializer_name, [self.a1])
+        deserial_obj = list(serializers.deserialize(self.serializer_name, serial_str))[0]
+        with mock.patch('django.db.models.Model') as mock_model:
+            deserial_obj.save(force_insert=False)
+            mock_model.save_base.assert_called_with(deserial_obj.object, raw=True, using=None, force_insert=False)
 
 
 class SerializersTransactionTestBase(object):
