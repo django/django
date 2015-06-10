@@ -789,6 +789,12 @@ via the :djadminopt:`--liveserver` option, for example:
 
     $ ./manage.py test --liveserver=localhost:8082
 
+.. versionchanged:: 1.9
+
+    In older versions ``live_server_url`` could only be accessed from an
+    instance. It now is a class property and can be accessed from class methods
+    like ``setUpClass()``.
+
 Another way of changing the default server address is by setting the
 `DJANGO_LIVE_TEST_SERVER_ADDRESS` environment variable somewhere in your
 code (for example, in a :ref:`custom test runner<topics-testing-test_runner>`)::

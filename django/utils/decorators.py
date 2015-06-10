@@ -144,3 +144,15 @@ if ContextDecorator is None:
                 with self:
                     return func(*args, **kwargs)
             return inner
+
+
+class classproperty(object):
+    def __init__(self, method=None):
+        self.fget = method
+
+    def __get__(self, instance, owner):
+        return self.fget(owner)
+
+    def getter(self, method):
+        self.fget = method
+        return self

@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import LiveServerTestCase, override_settings
 from django.utils._os import upath
 from django.utils.http import urlencode
+from django.utils.six import text_type
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -71,6 +72,9 @@ class LiveServerAddress(LiveServerBase):
         else:
             del os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS']
 
+        # put it in a list to prevent descriptor lookups in test
+        cls.live_server_url_test = [cls.live_server_url]
+
     @classmethod
     def tearDownClass(cls):
         # skip it, as setUpClass doesn't call its parent either
@@ -87,10 +91,9 @@ class LiveServerAddress(LiveServerBase):
         finally:
             super(LiveServerAddress, cls).tearDownClass()
 
-    def test_test_test(self):
-        # Intentionally empty method so that the test is picked up by the
-        # test runner and the overridden setUpClass() method is executed.
-        pass
+    def test_live_server_url_is_class_property(self):
+        self.assertIsInstance(self.live_server_url_test[0], text_type)
+        self.assertEqual(self.live_server_url_test[0], self.live_server_url)
 
 
 class LiveServerViews(LiveServerBase):
