@@ -16,6 +16,16 @@ class EmptyResponseView(View):
         return HttpResponse()
 
 
+class StackedMixinsView1(LoginRequiredMixin, PermissionRequiredMixin, EmptyResponseView):
+    permission_required = ['auth.add_customuser', 'auth.change_customuser']
+    raise_exception = True
+
+
+class StackedMixinsView2(PermissionRequiredMixin, LoginRequiredMixin, EmptyResponseView):
+    permission_required = ['auth.add_customuser', 'auth.change_customuser']
+    raise_exception = True
+
+
 class UserTestAlwaysTrueView(UserPassesTestMixin, EmptyResponseView):
     def test_func(self, user):
         return True
@@ -102,6 +112,52 @@ class UserPassesTestTests(TestCase):
         request.user = AnonymousUser()
         response = view(request)
         self.assertEqual(response.status_code, 200)
+
+    def test_combined_mixins_success(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
+        user.user_permissions.add(*perms)
+        request = self.factory.get('/rand')
+        request.user = user
+
+        view = StackedMixinsView1.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+        view = StackedMixinsView2.as_view()
+        response = view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_combined_mixins_missing_permission(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        perms = models.Permission.objects.filter(codename='add_customuser')
+        user.user_permissions.add(*perms)
+        request = self.factory.get('/rand')
+        request.user = user
+
+        view = StackedMixinsView1.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+        view = StackedMixinsView2.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+    def test_combined_mixins_not_logged_in(self):
+        user = models.User.objects.create(username='joe', password='qwerty')
+        user.is_authenticated = lambda: False
+        perms = models.Permission.objects.filter(codename__in=('add_customuser', 'change_customuser'))
+        user.user_permissions.add(*perms)
+        request = self.factory.get('/rand')
+        request.user = user
+
+        view = StackedMixinsView1.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
+
+        view = StackedMixinsView2.as_view()
+        with self.assertRaises(PermissionDenied):
+            view(request)
 
 
 class LoginRequiredMixinTests(AuthViewsTestCase):
