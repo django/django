@@ -15,6 +15,7 @@ from importlib import import_module
 from threading import local
 
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.core.urls import NoReverseMatch, Resolver404, ResolverMatch
 from django.http import Http404
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
@@ -36,48 +37,48 @@ _prefixes = local()
 _urlconfs = local()
 
 
-class ResolverMatch(object):
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
-        self.func = func
-        self.args = args
-        self.kwargs = kwargs
-        self.url_name = url_name
-
-        # If a URLRegexResolver doesn't have a namespace or app_name, it passes
-        # in an empty value.
-        self.app_names = [x for x in app_names if x] if app_names else []
-        self.app_name = ':'.join(self.app_names)
-
-        if namespaces:
-            self.namespaces = [x for x in namespaces if x]
-        else:
-            self.namespaces = []
-        self.namespace = ':'.join(self.namespaces)
-
-        if not hasattr(func, '__name__'):
-            # A class-based view
-            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
-        else:
-            # A function-based view
-            self._func_path = '.'.join([func.__module__, func.__name__])
-
-        view_path = url_name or self._func_path
-        self.view_name = ':'.join(self.namespaces + [view_path])
-
-    def __getitem__(self, index):
-        return (self.func, self.args, self.kwargs)[index]
-
-    def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
-            self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces)
-
-
-class Resolver404(Http404):
-    pass
-
-
-class NoReverseMatch(Exception):
-    pass
+# class ResolverMatch(object):
+#     def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
+#         self.func = func
+#         self.args = args
+#         self.kwargs = kwargs
+#         self.url_name = url_name
+#
+#         # If a URLRegexResolver doesn't have a namespace or app_name, it passes
+#         # in an empty value.
+#         self.app_names = [x for x in app_names if x] if app_names else []
+#         self.app_name = ':'.join(self.app_names)
+#
+#         if namespaces:
+#             self.namespaces = [x for x in namespaces if x]
+#         else:
+#             self.namespaces = []
+#         self.namespace = ':'.join(self.namespaces)
+#
+#         if not hasattr(func, '__name__'):
+#             # A class-based view
+#             self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+#         else:
+#             # A function-based view
+#             self._func_path = '.'.join([func.__module__, func.__name__])
+#
+#         view_path = url_name or self._func_path
+#         self.view_name = ':'.join(self.namespaces + [view_path])
+#
+#     def __getitem__(self, index):
+#         return (self.func, self.args, self.kwargs)[index]
+#
+#     def __repr__(self):
+#         return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+#             self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces)
+#
+#
+# class Resolver404(Http404):
+#     pass
+#
+#
+# class NoReverseMatch(Exception):
+#     pass
 
 
 @lru_cache.lru_cache(maxsize=None)
