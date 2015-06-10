@@ -14,7 +14,7 @@ import django
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
-from django.utils import archive
+from django.utils import archive, six
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils.version import get_docs_version
 
@@ -104,6 +104,7 @@ class TemplateCommand(BaseCommand):
             base_directory: top_dir,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
+            'unicode_literals': '' if six.PY3 else 'from __future__ import unicode_literals\n\n',
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
