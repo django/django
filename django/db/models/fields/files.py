@@ -1,7 +1,6 @@
 import datetime
 import os
 import warnings
-from inspect import getargspec
 
 from django import forms
 from django.core import checks
@@ -13,6 +12,7 @@ from django.db.models.fields import Field
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str, force_text
+from django.utils.inspect import func_supports_parameter
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -89,8 +89,7 @@ class FieldFile(File):
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
 
-        args, varargs, varkw, defaults = getargspec(self.storage.save)
-        if 'max_length' in args:
+        if func_supports_parameter(self.storage.save, 'max_length'):
             self.name = self.storage.save(name, content, max_length=self.field.max_length)
         else:
             warnings.warn(

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import decimal
-import inspect
 import math
 import os
 import re
@@ -19,6 +18,7 @@ from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+from django.utils.inspect import get_func_args
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
 
@@ -97,7 +97,7 @@ class OperationWriter(object):
 
         imports = set()
         name, args, kwargs = self.operation.deconstruct()
-        argspec = inspect.getargspec(self.operation.__init__)
+        operation_args = get_func_args(self.operation.__init__)
 
         # See if this operation is in django.db.migrations. If it is,
         # We can just use the fact we already have that imported,
@@ -110,16 +110,15 @@ class OperationWriter(object):
 
         self.indent()
 
-        # Start at one because argspec includes "self"
-        for i, arg in enumerate(args, 1):
+        for i, arg in enumerate(args):
             arg_value = arg
-            arg_name = argspec.args[i]
+            arg_name = operation_args[i]
             _write(arg_name, arg_value)
 
         i = len(args)
         # Only iterate over remaining arguments
-        for arg_name in argspec.args[i + 1:]:
-            if arg_name in kwargs:
+        for arg_name in operation_args[i:]:
+            if arg_name in kwargs:  # Don't sort to maintain signature order
                 arg_value = kwargs[arg_name]
                 _write(arg_name, arg_value)
 

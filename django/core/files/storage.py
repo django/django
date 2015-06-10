@@ -2,7 +2,6 @@ import errno
 import os
 import warnings
 from datetime import datetime
-from inspect import getargspec
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
@@ -14,6 +13,7 @@ from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject
+from django.utils.inspect import func_supports_parameter
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
@@ -49,8 +49,7 @@ class Storage(object):
         if not hasattr(content, 'chunks'):
             content = File(content)
 
-        args, varargs, varkw, defaults = getargspec(self.get_available_name)
-        if 'max_length' in args:
+        if func_supports_parameter(self.get_available_name, 'max_length'):
             name = self.get_available_name(name, max_length=max_length)
         else:
             warnings.warn(

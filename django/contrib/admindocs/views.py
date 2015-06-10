@@ -20,6 +20,7 @@ from django.template.engine import Engine
 from django.utils import six
 from django.utils._os import upath
 from django.utils.decorators import method_decorator
+from django.utils.inspect import func_has_no_args
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView
 
@@ -247,7 +248,7 @@ class ModelDetailView(BaseAdminDocsView):
 
         # Gather model methods.
         for func_name, func in model.__dict__.items():
-            if (inspect.isfunction(func) and len(inspect.getargspec(func)[0]) == 1):
+            if inspect.isfunction(func) and func_has_no_args(func):
                 try:
                     for exclude in MODEL_METHODS_EXCLUDE:
                         if func_name.startswith(exclude):
