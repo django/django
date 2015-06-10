@@ -51,10 +51,10 @@ u'<html></html>'
 
 from __future__ import unicode_literals
 
+import inspect
 import logging
 import re
 import warnings
-from inspect import getargspec, getcallargs
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
@@ -66,6 +66,7 @@ from django.utils.encoding import (
 )
 from django.utils.formats import localize
 from django.utils.html import conditional_escape, escape
+from django.utils.inspect import getargspec
 from django.utils.safestring import (
     EscapeData, SafeData, mark_for_escaping, mark_safe,
 )
@@ -723,7 +724,8 @@ class FilterExpression(object):
         plen = len(provided) + 1
         # Check to see if a decorator is providing the real function.
         func = getattr(func, '_decorated_function', func)
-        args, varargs, varkw, defaults = getargspec(func)
+
+        args, _, _, defaults = getargspec(func)
         alen = len(args)
         dlen = len(defaults or [])
         # Not enough OR Too many
@@ -884,7 +886,7 @@ class Variable(object):
                             current = current()
                         except TypeError:
                             try:
-                                getcallargs(current)
+                                inspect.getcallargs(current)
                             except TypeError:  # arguments *were* required
                                 current = context.template.engine.string_if_invalid  # invalid method call
                             else:

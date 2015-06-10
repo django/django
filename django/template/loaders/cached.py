@@ -5,11 +5,11 @@ to load templates from them in order, caching the result.
 
 import hashlib
 import warnings
-from inspect import getargspec
 
 from django.template import Origin, Template, TemplateDoesNotExist
 from django.utils.deprecation import RemovedInDjango21Warning
 from django.utils.encoding import force_bytes
+from django.utils.inspect import func_supports_parameter
 
 from .base import Loader as BaseLoader
 
@@ -51,7 +51,7 @@ class Loader(BaseLoader):
             args = [template_name]
             # RemovedInDjango21Warning: Add template_dirs for compatibility
             # with old loaders
-            if 'template_dirs' in getargspec(loader.get_template_sources)[0]:
+            if func_supports_parameter(loader.get_template_sources, 'template_dirs'):
                 args.append(template_dirs)
             for origin in loader.get_template_sources(*args):
                 yield origin

@@ -290,8 +290,16 @@ class ConnectionRouter(object):
                 # If the router doesn't have a method, skip to the next one.
                 continue
 
-            argspec = inspect.getargspec(router.allow_migrate)
-            if len(argspec.args) == 3 and not argspec.keywords:
+            if six.PY3:
+                sig = inspect.signature(router.allow_migrate)
+                has_deprecated_signature = not any(
+                    p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+                )
+            else:
+                argspec = inspect.getargspec(router.allow_migrate)
+                has_deprecated_signature = len(argspec.args) == 3 and not argspec.keywords
+
+            if has_deprecated_signature:
                 warnings.warn(
                     "The signature of allow_migrate has changed from "
                     "allow_migrate(self, db, model) to "
