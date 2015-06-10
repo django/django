@@ -31,7 +31,7 @@ from django.test import (
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 
 test_dir = os.path.realpath(os.path.join(tempfile.gettempdir(), 'test_project'))
 if not os.path.exists(test_dir):
@@ -592,6 +592,13 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
+        if not PY3:
+            with open(os.path.join(app_path, 'models.py'), 'r') as fp:
+                content = fp.read()
+            self.assertIn(
+                "from __future__ import unicode_literals\n",
+                content,
+            )
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
