@@ -6,6 +6,27 @@ Django 1.7.9 release notes
 
 Django 1.7.9 fixes several security issues and bugs in 1.7.8.
 
+Denial-of-service possibility by filling session store
+======================================================
+
+In previous versions of Django, the session backends created a new empty record
+in the session storage anytime ``request.session`` was accessed and there was a
+session key provided in the request cookies that didn't already have a session
+record. This could allow an attacker to easily create many new session records
+simply by sending repeated requests with unknown session keys, potentially
+filling up the session store or causing other users' session records to be
+evicted.
+
+The built-in session backends now create a session record only if the session
+is actually modified; empty session records are not created. Thus this
+potential DoS is now only possible if the site chooses to expose a
+session-modifying view to anonymous users.
+
+As each built-in session backend was fixed separately (rather than a fix in the
+core sessions framework), maintainers of third-party session backends should
+check whether the same vulnerability is present in their backend and correct
+it if so.
+
 Bugfixes
 ========
 

@@ -51,12 +51,12 @@ class SessionStore(DBStore):
                     logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
                     logger.warning(force_text(e))
-                self.create()
+                self._session_key = None
                 data = {}
         return data
 
     def exists(self, session_key):
-        if (KEY_PREFIX + session_key) in self._cache:
+        if session_key and (KEY_PREFIX + session_key) in self._cache:
             return True
         return super(SessionStore, self).exists(session_key)
 

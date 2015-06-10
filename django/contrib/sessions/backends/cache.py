@@ -27,7 +27,7 @@ class SessionStore(SessionBase):
             session_data = None
         if session_data is not None:
             return session_data
-        self.create()
+        self._session_key = None
         return {}
 
     def create(self):
@@ -49,6 +49,8 @@ class SessionStore(SessionBase):
             "It is likely that the cache is unavailable.")
 
     def save(self, must_create=False):
+        if self.session_key is None:
+            return self.create()
         if must_create:
             func = self._cache.add
         else:
@@ -60,7 +62,7 @@ class SessionStore(SessionBase):
             raise CreateError
 
     def exists(self, session_key):
-        return (KEY_PREFIX + session_key) in self._cache
+        return session_key and (KEY_PREFIX + session_key) in self._cache
 
     def delete(self, session_key=None):
         if session_key is None:
