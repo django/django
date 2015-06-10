@@ -37,6 +37,7 @@ from django.test.utils import (
     override_settings,
 )
 from django.utils import six
+from django.utils.decorators import classproperty
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango21Warning,
 )
@@ -1259,10 +1260,10 @@ class LiveServerTestCase(TransactionTestCase):
 
     static_handler = _StaticFilesHandler
 
-    @property
-    def live_server_url(self):
+    @classproperty
+    def live_server_url(cls):
         return 'http://%s:%s' % (
-            self.server_thread.host, self.server_thread.port)
+            cls.server_thread.host, cls.server_thread.port)
 
     @classmethod
     def setUpClass(cls):
