@@ -69,6 +69,10 @@
     border-left: 1px solid #ddd;
 }
 
+#changelist table tbody th:first-child:last-child {
+    border-right: 0;
+}
+
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {
     border-left: 0;
     border-right: 1px solid #ddd;
