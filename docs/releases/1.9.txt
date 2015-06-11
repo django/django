@@ -65,6 +65,43 @@ the included auth forms for your project, you could set, for example::
 
 See :ref:`password-validation` for more details.
 
+Permission mixins for class-based views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django now ships with the mixins
+:class:`~django.contrib.auth.mixins.AccessMixin`,
+:class:`~django.contrib.auth.mixins.LoginRequiredMixin`,
+:class:`~django.contrib.auth.mixins.PermissionRequiredMixin`, and
+:class:`~django.contrib.auth.mixins.UserPassesTestMixin` to provide the
+functionality of the ``django.contrib.auth.decorators`` for class-based views.
+These mixins have been taken from, or are at least inspired by, the
+`django-braces`_ project.
+
+There are a few differences between Django's and django-braces' implementation,
+though:
+
+* The :attr:`~django.contrib.auth.mixins.AccessMixin.raise_exception` attribute
+  can only be ``True`` or ``False``. Custom exceptions or callables are not
+  supported.
+
+* The :meth:`~django.contrib.auth.mixins.AccessMixin.handle_no_permission`
+  method does not take a ``request`` argument. The current request is available
+  in ``self.request``.
+
+* The custom ``test_func()`` of :class:`~django.contrib.auth.mixins.UserPassesTestMixin`
+  does not take a ``user`` argument. The current user is available in
+  ``self.request.user``.
+
+* The :attr:`permission_required <django.contrib.auth.mixins.PermissionRequiredMixin>`
+  attribute supports a string (defining one permission) or a list/tuple of
+  strings (defining multiple permissions) that need to be fulfilled to grant
+  access.
+
+* The new :attr:`~django.contrib.auth.mixins.AccessMixin.permission_denied_message`
+  attribute allows passing a message to the ``PermissionDenied`` exception.
+
+.. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
+
 Minor features
 ~~~~~~~~~~~~~~
 
