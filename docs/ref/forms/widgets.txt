@@ -55,9 +55,11 @@ widget on the field. In the following example, the
     from django import forms
 
     BIRTH_YEAR_CHOICES = ('1980', '1981', '1982')
-    FAVORITE_COLORS_CHOICES = (('blue', 'Blue'),
-                                ('green', 'Green'),
-                                ('black', 'Black'))
+    FAVORITE_COLORS_CHOICES = (
+        ('blue', 'Blue'),
+        ('green', 'Green'),
+        ('black', 'Black'),
+    )
 
     class SimpleForm(forms.Form):
         birth_year = forms.DateField(widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES))
@@ -364,8 +366,11 @@ foundation for custom widgets.
                     widget.value_from_datadict(data, files, name + '_%s' % i)
                     for i, widget in enumerate(self.widgets)]
                 try:
-                    D = date(day=int(datelist[0]), month=int(datelist[1]),
-                            year=int(datelist[2]))
+                    D = date(
+                        day=int(datelist[0]),
+                        month=int(datelist[1]),
+                        year=int(datelist[2]),
+                    )
                 except ValueError:
                     return ''
                 else:
