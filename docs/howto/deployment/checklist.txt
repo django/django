@@ -86,6 +86,20 @@ you use a wildcard, you must perform your own validation of the ``Host`` HTTP
 header, or otherwise ensure that you aren't vulnerable to this category of
 attacks.
 
+You should also configure the Web server that sits in front of Django to
+validate the host. It should respond with a static error page or ignore
+requests for incorrect hosts instead of forwarding the request to Django. This
+way you'll avoid spurious errors in your Django logs (or emails if you have
+error reporting configured that way). For example, on nginx you might setup a
+default server to return "444 No Response" on an unrecognized host:
+
+.. code-block:: nginx
+
+    server {
+        listen 80 default_server;
+        return 444;
+    }
+
 :setting:`CACHES`
 -----------------
 
@@ -116,6 +130,10 @@ If you haven't set up backups for your database, do it right now!
 ---------------------------------------------
 
 If your site sends emails, these values need to be set correctly.
+
+By default, Django will send email from root@localhost. However, some mail
+providers reject all email from this address. To use a different sender
+address, modify the :setting:`SERVER_EMAIL` setting.
 
 :setting:`STATIC_ROOT` and :setting:`STATIC_URL`
 ------------------------------------------------
