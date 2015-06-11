@@ -7,6 +7,10 @@ from channels.utils import auto_import_consumers
 
 class Command(BaseCommand):
 
+    def add_arguments(self, parser):
+        parser.add_argument('port', nargs='?',
+            help='Optional port number')
+
     def handle(self, *args, **options):
         # Get the backend to use
         channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
@@ -16,10 +20,9 @@ class Command(BaseCommand):
                 "You have a process-local channel backend configured, and so cannot run separate interface servers.\n"
                 "Configure a network-based backend in CHANNEL_BACKENDS to use this command."
             )
-        # Launch a worker
-        self.stdout.write("Running Twisted/Autobahn WebSocket interface against backend %s" % channel_backend)
         # Run the interface
-        try:
-            WebsocketTwistedInterface(channel_backend=channel_backend).run()
-        except KeyboardInterrupt:
-            pass
+        port = options.get("port", None) or 9000
+        self.stdout.write("Running Twisted/Autobahn WebSocket interface server")
+        self.stdout.write(" Channel backend: %s" % channel_backend)
+        self.stdout.write(" Listening on: ws://0.0.0.0:%i" % port)
+        WebsocketTwistedInterface(channel_backend=channel_backend, port=port).run()

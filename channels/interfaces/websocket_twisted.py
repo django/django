@@ -40,7 +40,10 @@ class InterfaceProtocol(WebSocketServerProtocol):
             )
 
     def onChannelSend(self, content, binary=False, **kwargs):
-        self.sendMessage(content, binary)
+        if binary:
+            self.sendMessage(content, binary)
+        else:
+            self.sendMessage(content.encode("utf8"), binary)
 
     def onClose(self, wasClean, code, reason):
         del self.factory.protocols[self.send_channel]
@@ -71,8 +74,8 @@ class InterfaceFactory(WebSocketServerFactory):
 class WebsocketTwistedInterface(object):
     """
     Easy API to run a WebSocket interface server using Twisted.
-    Integrates the channel backend by running it in a separate thread, as we don't
-    know if the backend is Twisted-compliant.
+    Integrates the channel backend by running it in a separate thread, using
+    the always-compatible polling style.
     """
 
     def __init__(self, channel_backend, port=9000):
@@ -80,7 +83,7 @@ class WebsocketTwistedInterface(object):
         self.port = port
 
     def run(self):
-        self.factory = InterfaceFactory("ws://localhost:%i" % self.port, debug=False)
+        self.factory = InterfaceFactory("ws://0.0.0.0:%i" % self.port, debug=False)
         self.factory.protocol = InterfaceProtocol
         reactor.listenTCP(self.port, self.factory)
         reactor.callInThread(self.backend_reader)
@@ -92,6 +95,9 @@ class WebsocketTwistedInterface(object):
         """
         while True:
             channels = self.factory.send_channels()
+            # Quit if reactor is stopping
+            if not reactor.running:
+                return
             # Don't do anything if there's no channels to listen on
             if channels:
                 channel, message = self.channel_backend.receive_many(channels)

@@ -9,7 +9,6 @@ from django.utils.timezone import now
 
 from .base import BaseChannelBackend
 
-queues = {}
 
 class DatabaseChannelBackend(BaseChannelBackend):
     """
