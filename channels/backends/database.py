@@ -60,16 +60,15 @@ class DatabaseChannelBackend(BaseChannelBackend):
     def receive_many(self, channels):
         if not channels:
             raise ValueError("Cannot receive on empty channel list!")
-        while True:
-            # Delete all expired messages (add 10 second grace period for clock sync)
-            self.model.objects.filter(expiry__lt=now() - datetime.timedelta(seconds=10)).delete()
-            # Get a message from one of our channels
-            message = self.model.objects.filter(channel__in=channels).order_by("id").first()
-            if message:
-                self.model.objects.filter(pk=message.pk).delete()
-                return message.channel, json.loads(message.content)
-            # If all empty, sleep for a little bit
-            time.sleep(0.1)
+        # Delete all expired messages (add 10 second grace period for clock sync)
+        self.model.objects.filter(expiry__lt=now() - datetime.timedelta(seconds=10)).delete()
+        # Get a message from one of our channels
+        message = self.model.objects.filter(channel__in=channels).order_by("id").first()
+        if message:
+            self.model.objects.filter(pk=message.pk).delete()
+            return message.channel, json.loads(message.content)
+        else:
+            return None, None
 
     def __str__(self):
         return "%s(alias=%s)" % (self.__class__.__name__, self.connection.alias)

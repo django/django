@@ -22,15 +22,13 @@ class InMemoryChannelBackend(BaseChannelBackend):
     def receive_many(self, channels):
         if not channels:
             raise ValueError("Cannot receive on empty channel list!")
-        while True:
-            # Try to pop a message from each channel
-            for channel in channels:
-                try:
-                    # This doesn't clean up empty channels - OK for testing.
-                    # For later versions, have cleanup w/lock.
-                    return channel, queues[channel].popleft()
-                except (IndexError, KeyError):
-                    pass
-            # If all empty, sleep for a little bit
-            time.sleep(0.01)
+        # Try to pop a message from each channel
+        for channel in channels:
+            try:
+                # This doesn't clean up empty channels - OK for testing.
+                # For later versions, have cleanup w/lock.
+                return channel, queues[channel].popleft()
+            except (IndexError, KeyError):
+                pass
+        return None, None
 

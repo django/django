@@ -1,3 +1,6 @@
+import time
+
+
 class Worker(object):
     """
     A "worker" process that continually looks for available messages to run
@@ -12,10 +15,10 @@ class Worker(object):
         """
         Tries to continually dispatch messages to consumers.
         """
-
         channels = self.channel_backend.registry.all_channel_names()
         while True:
-            channel, message = self.channel_backend.receive_many(channels)
+            channel, message = self.channel_backend.receive_many_blocking(channels)
+            # Handle the message
             consumer = self.channel_backend.registry.consumer_for_channel(channel)
             if self.callback:
                 self.callback(channel, message)

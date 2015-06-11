@@ -18,12 +18,15 @@ class Channel(object):
     "default" one by default.
     """
 
-    def __init__(self, name, alias=DEFAULT_CHANNEL_BACKEND):
+    def __init__(self, name, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
         """
         Create an instance for the channel named "name"
         """
         self.name = name
-        self.channel_backend = channel_backends[alias]
+        if channel_backend:
+            self.channel_backend = channel_backend
+        else:
+            self.channel_backend = channel_backends[alias]
 
     def send(self, **kwargs):
         """

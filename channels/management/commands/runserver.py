@@ -2,12 +2,11 @@ import django
 import threading
 from django.core.management.commands.runserver import Command as RunserverCommand
 from django.core.management import CommandError
-from django.core.handlers.wsgi import WSGIHandler
-from django.http import HttpResponse
-from channels import Channel, channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.worker import Worker
 from channels.utils import auto_import_consumers
 from channels.adapters import UrlConsumer
+from channels.interfaces.wsgi import WSGIInterface
 
 
 class Command(RunserverCommand):
@@ -16,36 +15,23 @@ class Command(RunserverCommand):
         """
         Returns the default WSGI handler for the runner.
         """
-        django.setup()
-        return WSGIInterfaceHandler()
+        return WSGIInterface(self.channel_backend)
 
     def run(self, *args, **options):
         # Force disable reloader for now
         options['use_reloader'] = False
         # Check a handler is registered for http reqs
-        channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
+        self.channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         auto_import_consumers()
-        if not channel_backend.registry.consumer_for_channel("django.wsgi.request"):
+        if not self.channel_backend.registry.consumer_for_channel("django.wsgi.request"):
             # Register the default one
-            channel_backend.registry.add_consumer(UrlConsumer(), ["django.wsgi.request"])
+            self.channel_backend.registry.add_consumer(UrlConsumer(), ["django.wsgi.request"])
         # Launch a worker thread
-        worker = WorkerThread(channel_backend)
+        worker = WorkerThread(self.channel_backend)
         worker.daemon = True
         worker.start()
         # Run the rest
         return super(Command, self).run(*args, **options)
-
-
-class WSGIInterfaceHandler(WSGIHandler):
-    """
-    New WSGI handler that pushes requests to channels.
-    """
-
-    def get_response(self, request):
-        request.response_channel = Channel.new_name("django.wsgi.response")
-        Channel("django.wsgi.request").send(**request.channel_encode())
-        channel, message = channel_backends[DEFAULT_CHANNEL_BACKEND].receive_many([request.response_channel])
-        return HttpResponse.channel_decode(message)
 
 
 class WorkerThread(threading.Thread):

@@ -1,3 +1,4 @@
+import time
 from channels.consumer_registry import ConsumerRegistry
 
 
@@ -31,10 +32,34 @@ class BaseChannelBackend(object):
 
     def receive_many(self, channels):
         """
-        Block and return the first message available on one of the
-        channels passed, as a (channel, message) tuple.
+        Return the first message available on one of the
+        channels passed, as a (channel, message) tuple, or return (None, None)
+        if no channels are available.
+
+        Should not block, but is allowed to be moderately slow/have a short
+        timeout - it needs to return so we can refresh the list of channels,
+        not because the rest of the process is waiting on it.
+
+        Better performance can be achieved for interface servers by directly
+        integrating the server and the backend code; this is merely for a
+        generic support-everything pattern.
         """
         raise NotImplementedError()
+
+    def receive_many_blocking(self, channels):
+        """
+        Blocking version of receive_many, if the calling context knows it
+        doesn't ever want to change the channels list until something happens.
+
+        This base class provides a default implementation; can be overridden
+        to be more efficient by subclasses.
+        """
+        while True:
+            channel, message = self.receive_many(channels)
+            if channel is None:
+                time.sleep(0.05)
+                continue
+            return channel, message
 
     def __str__(self):
         return self.__class__.__name__
