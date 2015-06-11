@@ -714,10 +714,10 @@ class ChoiceFieldRenderer(object):
                 attrs_plus = self.attrs.copy()
                 if id_:
                     attrs_plus['id'] += '_{}'.format(i)
-                sub_ul_renderer = ChoiceFieldRenderer(name=self.name,
-                                                      value=self.value,
-                                                      attrs=attrs_plus,
-                                                      choices=choice_label)
+                sub_ul_renderer = self.__class__(name=self.name,
+                                                 value=self.value,
+                                                 attrs=attrs_plus,
+                                                 choices=choice_label)
                 sub_ul_renderer.choice_input_class = self.choice_input_class
                 output.append(format_html(self.inner_html, choice_value=choice_value,
                                           sub_widgets=sub_ul_renderer.render()))
