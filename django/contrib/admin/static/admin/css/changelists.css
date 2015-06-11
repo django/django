@@ -74,6 +74,10 @@
     border-right: 1px solid #ddd;
 }
 
+#changelist table tbody th:first-child:last-child {
+    border-right: 0;
+}
+
 #changelist table tbody td.action-checkbox {
     text-align:center;
 }
