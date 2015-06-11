@@ -20,14 +20,12 @@ class ResolverMatchTests(SimpleTestCase):
         defaults.update(kwargs)
         return ResolverMatch(**defaults)
 
-    def test_argument_defaults(self):
-        match = self.get_resolver_match(url_name=None)
-        self.assertEqual(match.url_name, None)
+    def test_empty_namespaces(self):
+        match = self.get_resolver_match()
         self.assertEqual(match.namespaces, [])
         self.assertEqual(match.namespace, '')
         self.assertEqual(match.app_names, [])
         self.assertEqual(match.app_name, '')
-        self.assertEqual(match.decorators, [])
 
     def test_function_func_path(self):
         match = self.get_resolver_match()
@@ -44,6 +42,7 @@ class ResolverMatchTests(SimpleTestCase):
     def test_decorated_update_wrapper(self):
         match = self.get_resolver_match(decorators=[outer_decorator, inner_decorator])
         self.assertEqual(match.callback.__doc__, empty_view.__doc__)
+        self.assertEqual(match.callback.__module__, empty_view.__module__)
         self.assertEqual(match.callback.__name__, empty_view.__name__)
 
     def test_view_name_no_url_name(self):
