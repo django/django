@@ -164,6 +164,7 @@ class ModelBase(type):
             new_class._meta.virtual_fields
         )
         field_names = {f.name for f in new_fields}
+        field_names.update({obj_name for obj_name, obj in attrs.items() if obj is None})
 
         # Basic setup for proxy models.
         if is_proxy:
@@ -212,18 +213,18 @@ class ModelBase(type):
                 continue
 
             parent_fields = base._meta.local_fields + base._meta.local_many_to_many
-            # Check for clashes between locally declared fields and those
-            # on the base classes (we cannot handle shadowed fields at the
-            # moment).
-            for field in parent_fields:
-                if field.name in field_names:
-                    raise FieldError(
-                        'Local field %r in class %r clashes '
-                        'with field of similar name from '
-                        'base class %r' % (field.name, name, base.__name__)
-                    )
             if not base._meta.abstract:
                 # Concrete classes...
+                # Check for clashes between locally declared fields and those
+                # on the base classes (we cannot handle shadowed fields at the
+                # moment).
+                for field in parent_fields:
+                    if field.name in field_names:
+                        raise FieldError(
+                            'Local field %r in class %r clashes '
+                            'with field of similar name from '
+                            'base class %r' % (field.name, name, base.__name__)
+                        )
                 base = base._meta.concrete_model
                 base_key = make_model_tuple(base)
                 if base_key in parent_links:
@@ -242,8 +243,16 @@ class ModelBase(type):
             else:
                 # .. and abstract ones.
                 for field in parent_fields:
-                    new_field = copy.deepcopy(field)
-                    new_class.add_to_class(field.name, new_field)
+                    if hasattr(field, 'concrete_model') or field.locked:
+                        if field.name in field_names:
+                            raise FieldError(
+                                'Local field %r in class %r clashes '
+                                'with field of similar name from '
+                                'base class %r' % (field.name, name, base.__name__)
+                            )
+                    elif field.name not in field_names:
+                        new_class.add_to_class(field.name, copy.deepcopy(field))
+                        field_names.add(field.name)
 
                 # Pass any non-abstract parent classes onto child.
                 new_class._meta.parents.update(base._meta.parents)
@@ -259,13 +268,15 @@ class ModelBase(type):
             # Inherit virtual fields (like GenericForeignKey) from the parent
             # class
             for field in base._meta.virtual_fields:
-                if base._meta.abstract and field.name in field_names:
+                if field.locked and field.name in field_names:
                     raise FieldError(
                         'Local field %r in class %r clashes '
                         'with field of similar name from '
                         'abstract base class %r' % (field.name, name, base.__name__)
                     )
-                new_class.add_to_class(field.name, copy.deepcopy(field))
+                if field.name not in field_names:
+                    new_class.add_to_class(field.name, copy.deepcopy(field))
+                    field_names.add(field.name)
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in

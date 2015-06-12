@@ -270,6 +270,20 @@ Alternatively you can use plain text and
 that you escape any help text that may come from untrusted users to avoid a
 cross-site scripting attack.
 
+``locked``
+---------------
+
+.. attribute:: Field.locked
+
+.. versionadded:: 1.9
+
+If ``True``, this field cannot be overridden in any child models. Default is ``False``.
+
+If this option is ``False``, it doesn't automatically mean that the field can be overridden.
+Concrete fields inherited from concrete parent models can never be overridden. Only concrete
+fields that are not directly or indirectly inherited from a concrete base class, and virtual
+fields can be overridden if ``locked`` is ``False``.
+
 ``primary_key``
 ---------------
 
