@@ -580,8 +580,9 @@ use the following syntax::
     <title>{{ the_title }}</title>
     <meta name="description" content="{{ the_title }}">
 
-In practice you'll use this to get strings that are used in multiple places
-or should be used as arguments for other template tags or filters::
+In practice you'll use this to get a string you can use in multiple places in a
+template or so you can use the output as an argument for other template tags or
+filters::
 
     {% trans "starting point" as start %}
     {% trans "end point" as end %}
@@ -681,6 +682,21 @@ be retrieved (and stored) beforehand::
     {% blocktrans %}
     This is a URL: {{ the_url }}
     {% endblocktrans %}
+
+If you'd like to retrieve a translated string without displaying it, you can
+use the following syntax::
+
+    {% blocktrans asvar the_title %}The title is {{ title }}.{% endblocktrans %}
+    <title>{{ the_title }}</title>
+    <meta name="description" content="{{ the_title }}">
+
+In practice you'll use this to get a string you can use in multiple places in a
+template or so you can use the output as an argument for other template tags or
+filters.
+
+.. versionchanged:: 1.9
+
+    The ``asvar`` syntax was added.
 
 ``{% blocktrans %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
