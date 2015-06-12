@@ -93,19 +93,29 @@ class OptimizerTests(SimpleTestCase):
             ],
         )
 
-    def test_create_alter_delete_model(self):
+    def _test_create_alter_foo_delete_model(self, alter_foo):
         """
-        CreateModel, AlterModelTable, AlterUniqueTogether, and DeleteModel should collapse into nothing.
+        CreateModel, AlterModelTable, AlterUniqueTogether/AlterIndexTogether/
+        AlterOrderWithRespectTo, and DeleteModel should collapse into nothing.
         """
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.AlterModelTable("Foo", "woohoo"),
-                migrations.AlterUniqueTogether("Foo", [["a", "b"]]),
+                alter_foo,
                 migrations.DeleteModel("Foo"),
             ],
             [],
         )
+
+    def test_create_alter_unique_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterUniqueTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_index_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterIndexTogether("Foo", [["a", "b"]]))
+
+    def test_create_alter_owrt_delete_model(self):
+        self._test_create_alter_foo_delete_model(migrations.AlterOrderWithRespectTo("Foo", "a"))
 
     def test_optimize_through_create(self):
         """

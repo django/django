@@ -21,6 +21,7 @@ class MigrationOptimizer(object):
             migrations.AlterModelTable,
             migrations.AlterUniqueTogether,
             migrations.AlterIndexTogether,
+            migrations.AlterOrderWithRespectTo,
         )
         self.field_level_operations = (
             migrations.AddField,
@@ -44,6 +45,11 @@ class MigrationOptimizer(object):
             ),
             (
                 migrations.AlterIndexTogether,
+                migrations.DeleteModel,
+                self.reduce_model_alter_delete,
+            ),
+            (
+                migrations.AlterOrderWithRespectTo,
                 migrations.DeleteModel,
                 self.reduce_model_alter_delete,
             ),
