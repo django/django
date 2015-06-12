@@ -22,8 +22,9 @@ from .fields import (
 )
 from .models import (
     Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
-    BookWithLongName, BookWithO2O, BookWithSlug, IntegerPK, Note, NoteRename,
-    Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing, UniqueTest, new_apps,
+    BookWithLongName, BookWithO2O, BookWithoutAuthor, BookWithSlug, IntegerPK,
+    Note, NoteRename, Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing,
+    UniqueTest, new_apps,
 )
 
 
@@ -1200,6 +1201,30 @@ class SchemaTests(TransactionTestCase):
         # Add the unique_together constraint
         with connection.schema_editor() as editor:
             editor.alter_unique_together(Book, [], [['author', 'title']])
+        # Alter it back
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Book, [['author', 'title']], [])
+
+    def test_unique_together_with_fk_with_existing_index(self):
+        """
+        Regression test for #24972.
+        Tests removing and adding unique_together constraints that include
+        a foreign key, where the foreign key is added after the model is
+        created.
+        """
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(BookWithoutAuthor)
+            new_field = ForeignKey(Author)
+            new_field.set_attributes_from_name("author")
+            editor.add_field(BookWithoutAuthor, new_field)
+        # Ensure the fields are unique to begin with
+        self.assertEqual(Book._meta.unique_together, ())
+        # Add the unique_together constraint
+        with connection.schema_editor() as editor:
+            editor.alter_unique_together(Book, [], [['author', 'title']])
+
         # Alter it back
         with connection.schema_editor() as editor:
             editor.alter_unique_together(Book, [['author', 'title']], [])
