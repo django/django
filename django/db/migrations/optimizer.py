@@ -54,6 +54,26 @@ class MigrationOptimizer(object):
                 self.reduce_model_alter_delete,
             ),
             (
+                migrations.AlterModelTable,
+                migrations.AlterModelTable,
+                self.reduce_model_alter_alter,
+            ),
+            (
+                migrations.AlterUniqueTogether,
+                migrations.AlterUniqueTogether,
+                self.reduce_model_alter_alter,
+            ),
+            (
+                migrations.AlterIndexTogether,
+                migrations.AlterIndexTogether,
+                self.reduce_model_alter_alter,
+            ),
+            (
+                migrations.AlterOrderWithRespectTo,
+                migrations.AlterOrderWithRespectTo,
+                self.reduce_model_alter_alter,
+            ),
+            (
                 migrations.CreateModel,
                 migrations.RenameModel,
                 self.reduce_model_create_rename,
@@ -202,6 +222,14 @@ class MigrationOptimizer(object):
     def reduce_model_alter_delete(self, operation, other, in_between):
         """
         Folds an AlterModelSomething and a DeleteModel into just delete.
+        """
+        if operation.name_lower == other.name_lower:
+            return [other]
+
+    def reduce_model_alter_alter(self, operation, other, in_between):
+        """
+        Folds two AlterModelTable, AlterFooTogether, or AlterOrderWithRespectTo
+        operations into the latter.
         """
         if operation.name_lower == other.name_lower:
             return [other]

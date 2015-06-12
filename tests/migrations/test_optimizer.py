@@ -117,6 +117,45 @@ class OptimizerTests(SimpleTestCase):
     def test_create_alter_owrt_delete_model(self):
         self._test_create_alter_foo_delete_model(migrations.AlterOrderWithRespectTo("Foo", "a"))
 
+    def _test_alter_alter_model(self, alter_foo, alter_bar):
+        """
+        Two AlterUniqueTogether/AlterIndexTogether/AlterOrderWithRespectTo
+        should collapse into the second.
+        """
+        self.assertOptimizesTo(
+            [
+                alter_foo,
+                alter_bar,
+            ],
+            [
+                alter_bar,
+            ],
+        )
+
+    def test_alter_alter_table_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterModelTable("Foo", "a"),
+            migrations.AlterModelTable("Foo", "b"),
+        )
+
+    def test_alter_alter_unique_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterUniqueTogether("Foo", [["a", "b"]]),
+            migrations.AlterUniqueTogether("Foo", [["a", "c"]]),
+        )
+
+    def test_alter_alter_index_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterIndexTogether("Foo", [["a", "b"]]),
+            migrations.AlterIndexTogether("Foo", [["a", "c"]]),
+        )
+
+    def test_alter_alter_owrt_model(self):
+        self._test_alter_alter_model(
+            migrations.AlterOrderWithRespectTo("Foo", "a"),
+            migrations.AlterOrderWithRespectTo("Foo", "b"),
+        )
+
     def test_optimize_through_create(self):
         """
         We should be able to optimize away create/delete through a create or delete
