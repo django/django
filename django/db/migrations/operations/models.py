@@ -365,6 +365,15 @@ class AlterUniqueTogether(Operation):
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
 
+    def references_field(self, model_name, name, app_label=None):
+        return (
+            self.references_model(model_name, app_label) and
+            (
+                not self.unique_together or
+                any((name in together) for together in self.unique_together)
+            )
+        )
+
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.unique_together or ''))
 
@@ -416,6 +425,15 @@ class AlterIndexTogether(Operation):
 
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
+
+    def references_field(self, model_name, name, app_label=None):
+        return (
+            self.references_model(model_name, app_label) and
+            (
+                not self.index_together or
+                any((name in together) for together in self.index_together)
+            )
+        )
 
     def describe(self):
         return "Alter %s for %s (%s constraint(s))" % (self.option_name, self.name, len(self.index_together or ''))
@@ -473,6 +491,15 @@ class AlterOrderWithRespectTo(Operation):
 
     def references_model(self, name, app_label=None):
         return name.lower() == self.name_lower
+
+    def references_field(self, model_name, name, app_label=None):
+        return (
+            self.references_model(model_name, app_label) and
+            (
+                self.order_with_respect_to is None or
+                name == self.order_with_respect_to
+            )
+        )
 
     def describe(self):
         return "Set order_with_respect_to on %s to %s" % (self.name, self.order_with_respect_to)

@@ -56,6 +56,20 @@ class MigrationOptimizer(object):
             (AlterField, RenameField): self.reduce_alter_field_rename_field,
             (CreateModel, RenameField): self.reduce_create_model_rename_field,
             (RenameField, RenameField): self.reduce_rename_field_self,
+
+            (AlterIndexTogether, AddField): self.reduce_alter_model_addalterremove_field,
+            (AlterIndexTogether, AlterField): self.reduce_alter_model_addalterremove_field,
+            (AlterIndexTogether, RemoveField): self.reduce_alter_model_addalterremove_field,
+            (AlterOrderWithRespectTo, AddField): self.reduce_alter_model_addalterremove_field,
+            (AlterOrderWithRespectTo, AlterField): self.reduce_alter_model_addalterremove_field,
+            (AlterOrderWithRespectTo, RemoveField): self.reduce_alter_model_addalterremove_field,
+            (AlterUniqueTogether, AddField): self.reduce_alter_model_addalterremove_field,
+            (AlterUniqueTogether, AlterField): self.reduce_alter_model_addalterremove_field,
+            (AlterUniqueTogether, RemoveField): self.reduce_alter_model_addalterremove_field,
+
+            (AlterIndexTogether, RenameField): self.reduce_alter_model_rename_field,
+            (AlterOrderWithRespectTo, RenameField): self.reduce_alter_model_rename_field,
+            (AlterUniqueTogether, RenameField): self.reduce_alter_model_rename_field,
         }
 
     def optimize(self, operations, app_label=None):
@@ -309,6 +323,16 @@ class MigrationOptimizer(object):
                     other.new_name,
                 ),
             ]
+
+    def reduce_alter_model_addalterremove_field(self, operation, other, in_between):
+        if (operation.name_lower == other.model_name_lower and
+                not operation.references_field(other.model_name, other.name)):
+            return [other, operation]
+
+    def reduce_alter_model_rename_field(self, operation, other, in_between):
+        if (operation.name_lower == other.model_name_lower and
+                not operation.references_field(other.model_name, other.old_name)):
+            return [other, operation]
 
     # THROUGH CHECKS
 

@@ -889,7 +889,7 @@ class SquashMigrationsTests(MigrationTestBase):
         out = six.StringIO()
         with self.temporary_migration_module(module="migrations.test_migrations"):
             call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=1, stdout=out)
-        self.assertIn("Optimized from 7 operations to 5 operations.", force_text(out.getvalue()))
+        self.assertIn("Optimized from 7 operations to 3 operations.", force_text(out.getvalue()))
 
     def test_ticket_23799_squashmigrations_no_optimize(self):
         """
