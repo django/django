@@ -69,3 +69,5 @@ Bugfixes
 
 * Fixed ``prefetch_related()`` on databases other than PostgreSQL for models
   using UUID primary keys (:ticket:`24912`).
+
+* Fixed removing ``unique_together`` constraints on MySQL (:ticket:`24972`).
