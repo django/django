@@ -83,7 +83,7 @@ class URLValidator(RegexValidator):
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
         r'(?::\d{2,5})?'  # port
         r'(?:[/?#][^\s]*)?'  # resource path
-        r'$', re.IGNORECASE)
+        r'\Z', re.IGNORECASE)
     message = _('Enter a valid URL.')
     schemes = ['http', 'https', 'ftp', 'ftps']
 
@@ -125,12 +125,15 @@ class URLValidator(RegexValidator):
                     raise ValidationError(self.message, code=self.code)
             url = value
 
+integer_validator = RegexValidator(
+    re.compile('^-?\d+\Z'),
+    message=_('Enter a valid integer.'),
+    code='invalid',
+)
+
 
 def validate_integer(value):
-    try:
-        int(value)
-    except (ValueError, TypeError):
-        raise ValidationError(_('Enter a valid integer.'), code='invalid')
+    return integer_validator(value)
 
 
 @deconstructible
@@ -138,16 +141,16 @@ class EmailValidator(object):
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
         # max length for domain name labels is 63 characters per RFC 1034
-        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))$',
+        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
         re.IGNORECASE)
     literal_regex = re.compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:\.]+)\]$',
+        r'\[([A-f0-9:\.]+)\]\Z',
         re.IGNORECASE)
     domain_whitelist = ['localhost']
 
@@ -205,14 +208,14 @@ class EmailValidator(object):
 
 validate_email = EmailValidator()
 
-slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
+slug_re = re.compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
     'invalid'
 )
 
-ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
+ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\Z')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
 
 
@@ -255,7 +258,7 @@ def ip_address_validators(protocol, unpack_ipv4):
 
 
 def int_list_validator(sep=',', message=None, code='invalid'):
-    regexp = re.compile('^\d+(?:%s\d+)*$' % re.escape(sep))
+    regexp = re.compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
     return RegexValidator(regexp, message=message, code=code)
 
 
