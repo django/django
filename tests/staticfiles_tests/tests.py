@@ -399,6 +399,69 @@ class TestCollectionFilesOverride(CollectionTestCase):
         self.assertFileContains('file2.txt', 'duplicate of file2.txt')
 
 
+# The collectstatic test suite already has conflicting files since both
+# project/test/file.txt and apps/test/static/test/file.txt are collected. To
+# properly test for the warning not happening unless we tell it to explicitly,
+# we only include static files from the default finders.
+@override_settings(
+    STATICFILES_DIRS=[],
+)
+class TestCollectionOverwriteWarning(CollectionTestCase):
+    """
+    Test warning in ``collectstatic`` output when a file is skipped because a
+    previous and separate file was already written to the same path. See
+    Command.collect in contrib/staticfiles/management/commands/collectstatic.py
+    """
+    # If this string is in the collectstatic output, it means the warning we're
+    # looking for was emitted.
+    warning_string = 'Found another file'
+
+    def _collectstatic_output(self, **kwargs):
+        """
+        Run collectstatic, capturing output, and return entire output as string.
+        We want to run the command at highest verbosity, which is why we can't
+        just call e.g. BaseCollectionTestCase.run_collectstatic()
+        """
+        out = six.StringIO()
+        call_command('collectstatic', interactive=False, verbosity=3,
+                     stdout=out, **kwargs)
+        out.seek(0)
+        return out.read()
+
+    def test_no_warning(self):
+        """
+        Make sure there is no warning if there is no duplicate destination.
+        """
+        output = self._collectstatic_output(clear=True)
+        self.assertNotIn(self.warning_string, force_text(output))
+
+    def test_warning(self):
+        """
+        Make sure the warning is emitted when there are duplicate destinations.
+        """
+        # Create new file in the no_label app that also exists in the test app.
+        test_dir = os.path.join(TEST_ROOT, 'apps', 'no_label', 'static', 'test')
+        if not os.path.exists(test_dir):
+            os.mkdir(test_dir)
+
+        try:
+            duplicate_path = os.path.join(test_dir, 'file.txt')
+            with open(duplicate_path, 'w+') as f:
+                f.write('duplicate of file.txt')
+            output = self._collectstatic_output(clear=True)
+            self.assertIn(self.warning_string, force_text(output))
+        finally:
+            if os.path.exists(duplicate_path):
+                os.unlink(duplicate_path)
+
+        if os.path.exists(test_dir):
+            os.rmdir(test_dir)
+
+        # Make sure the warning went away again.
+        output = self._collectstatic_output(clear=True)
+        self.assertNotIn(self.warning_string, force_text(output))
+
+
 @override_settings(
     STATICFILES_STORAGE='staticfiles_tests.storage.DummyStorage',
 )
