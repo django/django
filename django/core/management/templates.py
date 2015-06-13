@@ -98,10 +98,13 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
+        camel_case_name = 'camel_case_%s_name' % app_or_project
+        camel_case_value = ''.join(x for x in name.title() if x != '_')
 
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
+            camel_case_name: camel_case_value,
             'docs_version': get_docs_version(),
             'django_version': django.__version__,
             'unicode_literals': '' if six.PY3 else 'from __future__ import unicode_literals\n\n',
