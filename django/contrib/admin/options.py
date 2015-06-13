@@ -616,8 +616,10 @@ class ModelAdmin(BaseModelAdmin):
         exclude = exclude or None
 
         # Cancel out overridden form fields which are in readonly_fields.
-        new_attrs = OrderedDict([(f, None) for f in readonly_fields
-            if f in self.form.declared_fields])
+        new_attrs = OrderedDict(
+            (f, None) for f in readonly_fields
+            if f in self.form.declared_fields
+        )
         form = type(self.form.__name__, (self.form,), new_attrs)
 
         defaults = {
