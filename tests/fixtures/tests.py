@@ -224,6 +224,10 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 "Unknown model in excludes: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
+    def test_load_fixture_with_special_characters(self):
+        management.call_command('loaddata', 'fixture?with[special]chars*', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), ['<Article: How To Deal With Special Characters>'])
+
     def test_dumpdata_with_filtering_manager(self):
         spy1 = Spy.objects.create(name='Paul')
         spy2 = Spy.objects.create(name='Alex', cover_blown=True)
