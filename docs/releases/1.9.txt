@@ -270,6 +270,9 @@ Management Commands
 * The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
   print out the SQL rather than execute it.
 
+* The :djadmin:`startapp` command creates an ``apps.py`` file 
+  and add ``default_app_config`` path in ``__init__.py``.
+
 Models
 ^^^^^^
 
