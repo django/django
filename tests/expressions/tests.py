@@ -886,7 +886,8 @@ class ReprTests(TestCase):
 
 
 class CastTests(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(self):
         Number.objects.create(integer=1, float=1.0)
 
     def test_cast_from_value(self):
