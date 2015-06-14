@@ -1,6 +1,10 @@
 from __future__ import unicode_literals
 
-from django.db import migrations
+from django.db.migrations import (
+    AddField, AlterField, AlterIndexTogether, AlterModelTable,
+    AlterOrderWithRespectTo, AlterUniqueTogether, CreateModel, DeleteModel,
+    RemoveField, RenameField, RenameModel,
+)
 from django.utils import six
 
 
@@ -17,120 +21,120 @@ class MigrationOptimizer(object):
 
     def __init__(self):
         self.model_level_operations = (
-            migrations.CreateModel,
-            migrations.AlterModelTable,
-            migrations.AlterUniqueTogether,
-            migrations.AlterIndexTogether,
-            migrations.AlterOrderWithRespectTo,
+            CreateModel,
+            AlterModelTable,
+            AlterUniqueTogether,
+            AlterIndexTogether,
+            AlterOrderWithRespectTo,
         )
         self.field_level_operations = (
-            migrations.AddField,
-            migrations.AlterField,
+            AddField,
+            AlterField,
         )
         self.reduce_methods = [
             (
-                migrations.CreateModel,
-                migrations.DeleteModel,
+                CreateModel,
+                DeleteModel,
                 self.reduce_model_create_delete,
             ),
             (
-                migrations.AlterModelTable,
-                migrations.DeleteModel,
+                AlterModelTable,
+                DeleteModel,
                 self.reduce_model_alter_delete,
             ),
             (
-                migrations.AlterUniqueTogether,
-                migrations.DeleteModel,
+                AlterUniqueTogether,
+                DeleteModel,
                 self.reduce_model_alter_delete,
             ),
             (
-                migrations.AlterIndexTogether,
-                migrations.DeleteModel,
+                AlterIndexTogether,
+                DeleteModel,
                 self.reduce_model_alter_delete,
             ),
             (
-                migrations.AlterOrderWithRespectTo,
-                migrations.DeleteModel,
+                AlterOrderWithRespectTo,
+                DeleteModel,
                 self.reduce_model_alter_delete,
             ),
             (
-                migrations.AlterModelTable,
-                migrations.AlterModelTable,
+                AlterModelTable,
+                AlterModelTable,
                 self.reduce_model_alter_alter,
             ),
             (
-                migrations.AlterUniqueTogether,
-                migrations.AlterUniqueTogether,
+                AlterUniqueTogether,
+                AlterUniqueTogether,
                 self.reduce_model_alter_alter,
             ),
             (
-                migrations.AlterIndexTogether,
-                migrations.AlterIndexTogether,
+                AlterIndexTogether,
+                AlterIndexTogether,
                 self.reduce_model_alter_alter,
             ),
             (
-                migrations.AlterOrderWithRespectTo,
-                migrations.AlterOrderWithRespectTo,
+                AlterOrderWithRespectTo,
+                AlterOrderWithRespectTo,
                 self.reduce_model_alter_alter,
             ),
             (
-                migrations.CreateModel,
-                migrations.RenameModel,
+                CreateModel,
+                RenameModel,
                 self.reduce_model_create_rename,
             ),
             (
-                migrations.RenameModel,
-                migrations.RenameModel,
+                RenameModel,
+                RenameModel,
                 self.reduce_model_rename_self,
             ),
             (
-                migrations.CreateModel,
-                migrations.AddField,
+                CreateModel,
+                AddField,
                 self.reduce_create_model_add_field,
             ),
             (
-                migrations.CreateModel,
-                migrations.AlterField,
+                CreateModel,
+                AlterField,
                 self.reduce_create_model_alter_field,
             ),
             (
-                migrations.CreateModel,
-                migrations.RemoveField,
+                CreateModel,
+                RemoveField,
                 self.reduce_create_model_remove_field,
             ),
             (
-                migrations.AddField,
-                migrations.AlterField,
+                AddField,
+                AlterField,
                 self.reduce_add_field_alter_field,
             ),
             (
-                migrations.AddField,
-                migrations.RemoveField,
+                AddField,
+                RemoveField,
                 self.reduce_add_field_delete_field,
             ),
             (
-                migrations.AlterField,
-                migrations.RemoveField,
+                AlterField,
+                RemoveField,
                 self.reduce_alter_field_delete_field,
             ),
             (
-                migrations.AddField,
-                migrations.RenameField,
+                AddField,
+                RenameField,
                 self.reduce_add_field_rename_field,
             ),
             (
-                migrations.AlterField,
-                migrations.RenameField,
+                AlterField,
+                RenameField,
                 self.reduce_alter_field_rename_field,
             ),
             (
-                migrations.CreateModel,
-                migrations.RenameField,
+                CreateModel,
+                RenameField,
                 self.reduce_create_model_rename_field,
             ),
             (
-                migrations.RenameField,
-                migrations.RenameField,
+                RenameField,
+                RenameField,
                 self.reduce_rename_field_self,
             ),
         ]
@@ -240,7 +244,7 @@ class MigrationOptimizer(object):
         """
         if operation.name_lower == other.old_name_lower:
             return [
-                migrations.CreateModel(
+                CreateModel(
                     other.new_name,
                     fields=operation.fields,
                     options=operation.options,
@@ -255,7 +259,7 @@ class MigrationOptimizer(object):
         """
         if operation.new_name_lower == other.old_name_lower:
             return [
-                migrations.RenameModel(
+                RenameModel(
                     operation.old_name,
                     other.new_name,
                 )
@@ -277,7 +281,7 @@ class MigrationOptimizer(object):
                             return None
             # OK, that's fine
             return [
-                migrations.CreateModel(
+                CreateModel(
                     operation.name,
                     fields=operation.fields + [(other.name, other.field)],
                     options=operation.options,
@@ -289,7 +293,7 @@ class MigrationOptimizer(object):
     def reduce_create_model_alter_field(self, operation, other, in_between):
         if operation.name_lower == other.model_name_lower:
             return [
-                migrations.CreateModel(
+                CreateModel(
                     operation.name,
                     fields=[
                         (n, other.field if n == other.name else v)
@@ -304,7 +308,7 @@ class MigrationOptimizer(object):
     def reduce_create_model_rename_field(self, operation, other, in_between):
         if operation.name_lower == other.model_name_lower:
             return [
-                migrations.CreateModel(
+                CreateModel(
                     operation.name,
                     fields=[
                         (other.new_name if n == other.old_name else n, v)
@@ -319,7 +323,7 @@ class MigrationOptimizer(object):
     def reduce_create_model_remove_field(self, operation, other, in_between):
         if operation.name_lower == other.model_name_lower:
             return [
-                migrations.CreateModel(
+                CreateModel(
                     operation.name,
                     fields=[
                         (n, v)
@@ -336,7 +340,7 @@ class MigrationOptimizer(object):
         if (operation.model_name_lower == other.model_name_lower and
                 operation.name_lower == other.name_lower):
             return [
-                migrations.AddField(
+                AddField(
                     model_name=operation.model_name,
                     name=operation.name,
                     field=other.field,
@@ -357,7 +361,7 @@ class MigrationOptimizer(object):
         if (operation.model_name_lower == other.model_name_lower and
                 operation.name_lower == other.old_name_lower):
             return [
-                migrations.AddField(
+                AddField(
                     model_name=operation.model_name,
                     name=other.new_name,
                     field=operation.field,
@@ -369,7 +373,7 @@ class MigrationOptimizer(object):
                 operation.name_lower == other.old_name_lower):
             return [
                 other,
-                migrations.AlterField(
+                AlterField(
                     model_name=operation.model_name,
                     name=other.new_name,
                     field=operation.field,
@@ -380,7 +384,7 @@ class MigrationOptimizer(object):
         if (operation.model_name_lower == other.model_name_lower and
                 operation.new_name_lower == other.old_name_lower):
             return [
-                migrations.RenameField(
+                RenameField(
                     operation.model_name,
                     operation.old_name,
                     other.new_name,
