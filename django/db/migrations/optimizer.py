@@ -31,113 +31,32 @@ class MigrationOptimizer(object):
             AddField,
             AlterField,
         )
-        self.reduce_methods = [
-            (
-                CreateModel,
-                DeleteModel,
-                self.reduce_model_create_delete,
-            ),
-            (
-                AlterModelTable,
-                DeleteModel,
-                self.reduce_model_alter_delete,
-            ),
-            (
-                AlterUniqueTogether,
-                DeleteModel,
-                self.reduce_model_alter_delete,
-            ),
-            (
-                AlterIndexTogether,
-                DeleteModel,
-                self.reduce_model_alter_delete,
-            ),
-            (
-                AlterOrderWithRespectTo,
-                DeleteModel,
-                self.reduce_model_alter_delete,
-            ),
-            (
-                AlterModelTable,
-                AlterModelTable,
-                self.reduce_model_alter_alter,
-            ),
-            (
-                AlterUniqueTogether,
-                AlterUniqueTogether,
-                self.reduce_model_alter_alter,
-            ),
-            (
-                AlterIndexTogether,
-                AlterIndexTogether,
-                self.reduce_model_alter_alter,
-            ),
-            (
-                AlterOrderWithRespectTo,
-                AlterOrderWithRespectTo,
-                self.reduce_model_alter_alter,
-            ),
-            (
-                CreateModel,
-                RenameModel,
-                self.reduce_model_create_rename,
-            ),
-            (
-                RenameModel,
-                RenameModel,
-                self.reduce_model_rename_self,
-            ),
-            (
-                CreateModel,
-                AddField,
-                self.reduce_create_model_add_field,
-            ),
-            (
-                CreateModel,
-                AlterField,
-                self.reduce_create_model_alter_field,
-            ),
-            (
-                CreateModel,
-                RemoveField,
-                self.reduce_create_model_remove_field,
-            ),
-            (
-                AddField,
-                AlterField,
-                self.reduce_add_field_alter_field,
-            ),
-            (
-                AddField,
-                RemoveField,
-                self.reduce_add_field_delete_field,
-            ),
-            (
-                AlterField,
-                RemoveField,
-                self.reduce_alter_field_delete_field,
-            ),
-            (
-                AddField,
-                RenameField,
-                self.reduce_add_field_rename_field,
-            ),
-            (
-                AlterField,
-                RenameField,
-                self.reduce_alter_field_rename_field,
-            ),
-            (
-                CreateModel,
-                RenameField,
-                self.reduce_create_model_rename_field,
-            ),
-            (
-                RenameField,
-                RenameField,
-                self.reduce_rename_field_self,
-            ),
-        ]
+        self.reduce_methods = {
+            (AddField, AlterField): self.reduce_add_field_alter_field,
+            (AddField, RemoveField): self.reduce_add_field_delete_field,
+            (AlterField, RemoveField): self.reduce_alter_field_delete_field,
+            (CreateModel, AddField): self.reduce_create_model_add_field,
+            (CreateModel, AlterField): self.reduce_create_model_alter_field,
+            (CreateModel, DeleteModel): self.reduce_model_create_delete,
+            (CreateModel, RemoveField): self.reduce_create_model_remove_field,
+            (CreateModel, RenameModel): self.reduce_model_create_rename,
+            (RenameModel, RenameModel): self.reduce_model_rename_self,
+
+            (AlterIndexTogether, DeleteModel): self.reduce_model_alter_delete,
+            (AlterModelTable, DeleteModel): self.reduce_model_alter_delete,
+            (AlterOrderWithRespectTo, DeleteModel): self.reduce_model_alter_delete,
+            (AlterUniqueTogether, DeleteModel): self.reduce_model_alter_delete,
+
+            (AlterIndexTogether, AlterIndexTogether): self.reduce_model_alter_alter,
+            (AlterModelTable, AlterModelTable): self.reduce_model_alter_alter,
+            (AlterOrderWithRespectTo, AlterOrderWithRespectTo): self.reduce_model_alter_alter,
+            (AlterUniqueTogether, AlterUniqueTogether): self.reduce_model_alter_alter,
+
+            (AddField, RenameField): self.reduce_add_field_rename_field,
+            (AlterField, RenameField): self.reduce_alter_field_rename_field,
+            (CreateModel, RenameField): self.reduce_create_model_rename_field,
+            (RenameField, RenameField): self.reduce_rename_field_self,
+        }
 
     def optimize(self, operations, app_label=None):
         """
@@ -197,9 +116,9 @@ class MigrationOptimizer(object):
         Either returns a list of zero, one or two operations,
         or None, meaning this pair cannot be optimized.
         """
-        for ia, ib, om in self.reduce_methods:
-            if isinstance(operation, ia) and isinstance(other, ib):
-                return om(operation, other, in_between or [])
+        method = self.reduce_methods.get((type(operation), type(other)))
+        if method:
+            return method(operation, other, in_between or [])
         return None
 
     def model_to_key(self, model):
