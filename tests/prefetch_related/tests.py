@@ -12,8 +12,8 @@ from django.utils.encoding import force_text
 from .models import (
     Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
     BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
-    Flea, House, LessonEntry, Person, Pet, Qualification, Reader, Room,
-    TaggedItem, Teacher, WordEntry,
+    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
+    Teacher, WordEntry,
 )
 
 
@@ -1161,84 +1161,3 @@ class Ticket21760Tests(TestCase):
         prefetcher = get_prefetcher(self.rooms[0], 'house')[0]
         queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
         self.assertNotIn(' JOIN ', force_text(queryset.query))
-
-
-class UUIDPrefetchRelated(TestCase):
-
-    def test_prefetch_related_from_uuid_model(self):
-        Pet.objects.create(name='Fifi').people.add(
-            Person.objects.create(name='Ellen'),
-            Person.objects.create(name='George')
-        )
-
-        with self.assertNumQueries(2):
-            pet = Pet.objects.prefetch_related('people').get(name='Fifi')
-        with self.assertNumQueries(0):
-            self.assertEqual(2, len(pet.people.all()))
-
-    def test_prefetch_related_to_uuid_model(self):
-        Person.objects.create(name='Bella').pets.add(
-            Pet.objects.create(name='Socks'),
-            Pet.objects.create(name='Coffee')
-        )
-
-        with self.assertNumQueries(2):
-            person = Person.objects.prefetch_related('pets').get(name='Bella')
-        with self.assertNumQueries(0):
-            self.assertEqual(2, len(person.pets.all()))
-
-    def test_prefetch_related_from_uuid_model_to_uuid_model(self):
-        fleas = [Flea.objects.create() for i in range(3)]
-        Pet.objects.create(name='Fifi').fleas_hosted.add(*fleas)
-        Pet.objects.create(name='Bobo').fleas_hosted.add(*fleas)
-
-        with self.assertNumQueries(2):
-            pet = Pet.objects.prefetch_related('fleas_hosted').get(name='Fifi')
-        with self.assertNumQueries(0):
-            self.assertEqual(3, len(pet.fleas_hosted.all()))
-
-        with self.assertNumQueries(2):
-            flea = Flea.objects.prefetch_related('pets_visited').get(pk=fleas[0].pk)
-        with self.assertNumQueries(0):
-            self.assertEqual(2, len(flea.pets_visited.all()))
-
-    def test_prefetch_related_with_lookups(self):
-        house = House.objects.create(name='Redwood', address='Arcata')
-        room = Room.objects.create(name='Racoon', house=house)
-        fleas = [Flea.objects.create(current_room=room) for i in range(3)]
-        pet = Pet.objects.create(name='Spooky')
-        pet.fleas_hosted.add(*fleas)
-        person = Person.objects.create(name='Bob')
-        person.houses.add(house)
-        person.pets.add(pet)
-        person.fleas_hosted.add(*fleas)
-
-        # From uuid-pk model, prefetch <uuid-pk model>.<integer-pk model>:
-        with self.assertNumQueries(4):
-            spooky = Pet.objects.prefetch_related('fleas_hosted__current_room__house').get(name='Spooky')
-        with self.assertNumQueries(0):
-            self.assertEqual('Racoon', spooky.fleas_hosted.all()[0].current_room.name)
-
-        # From uuid-pk model, prefetch <uuid-pk model>.<integer-pk model>...<uuid-pk model>:
-        with self.assertNumQueries(5):
-            spooky = Pet.objects.prefetch_related('people__houses__rooms__fleas').get(name='Spooky')
-        with self.assertNumQueries(0):
-            self.assertEqual(3, len(spooky.people.all()[0].houses.all()[0].rooms.all()[0].fleas.all()))
-
-        # From integer-pk model, prefetch <uuid-pk model>.<integer-pk model>:
-        with self.assertNumQueries(3):
-            racoon = Room.objects.prefetch_related('fleas__people_visited').get(name='Racoon')
-        with self.assertNumQueries(0):
-            self.assertEqual('Bob', racoon.fleas.all()[0].people_visited.all()[0].name)
-
-        # From integer-pk model, prefetch <integer-pk model>.<uuid-pk model>:
-        with self.assertNumQueries(3):
-            redwood = House.objects.prefetch_related('rooms__fleas').get(name='Redwood')
-        with self.assertNumQueries(0):
-            self.assertEqual(3, len(redwood.rooms.all()[0].fleas.all()))
-
-        # From integer-pk model, prefetch <uuid-pk model>.<uuid-pk model>:
-        with self.assertNumQueries(4):
-            redwood = House.objects.prefetch_related('rooms__fleas__pets_visited').get(name='Redwood')
-        with self.assertNumQueries(0):
-            self.assertEqual('Spooky', redwood.rooms.all()[0].fleas.all()[0].pets_visited.all()[0].name)
