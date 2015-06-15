@@ -36,7 +36,7 @@ Here's an example of WebSocket consumers for basic chat::
 
     redis_conn = redis.Redis("localhost", 6379)
 
-    @Channel.consumer("django.websockets.connect")
+    @Channel.consumer("django.websocket.connect")
     def ws_connect(path, send_channel, **kwargs):
         redis_conn.sadd("chatroom", send_channel)
 
