@@ -1,0 +1,7 @@
+===========================
+Django 1.4.21 release notes
+===========================
+
+*July 8, 2015*
+
+Django 1.4.21 fixes several security issues in 1.4.20.
