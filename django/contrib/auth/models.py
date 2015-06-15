@@ -290,7 +290,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     An abstract base class implementing a fully featured User model with
     admin-compliant permissions.
 
-    Username, password and email are required. Other fields are optional.
+    Username and password are required. Other fields are optional.
     """
     username = models.CharField(
         _('username'),
