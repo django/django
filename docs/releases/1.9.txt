@@ -678,6 +678,49 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 <TEMPLATES-OPTIONS>` when defining a
 :class:`~django.template.backends.django.DjangoTemplates` backend.
 
+.. _simple-tag-conditional-escape-fix:
+
+``simple_tag`` now wraps tag output in ``conditional_escape``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In general, template tags do not autoescape their contents, and this behavior is
+:ref:`documented <tags-auto-escaping>`. For tags like
+:class:`~django.template.Library.inclusion_tag`, this is not a problem because
+the included template will perform autoescaping. For
+:class:`~django.template.Library.assignment_tag` the output will get escaped at
+when it is used as a variable in the template.
+
+For the intended use cases of :class:`~django.template.Library.simple_tag`,
+however, it is very easy to end up with incorrect HTML and possibly an XSS
+exploit. For example::
+
+    @register.simple_tag(takes_context=True)
+    def greeting(context):
+        return "Hello {0}!".format(context['request'].user.first_name)
+
+In versions before 1.9, this will be an XSS issue because no escaping is done on
+``user.first_name``.
+
+In Django 1.9, this is fixed: if the template context has ``autoescape=True``
+set (the default), then ``simple_tag`` will wrap the output of the tag function
+with :func:`~django.utils.html.conditional_escape`.
+
+To fix your ``simple_tag``\s, it is best to apply the following practices:
+
+* Any code that is generating HTML should use either the template system or
+  :func:`~django.utils.html.format_html`.
+
+* If the output of a ``simple_tag`` needs escaping, use
+  :func:`~django.utils.html.escape` or
+  :func:`~django.utils.html.conditional_escape`.
+
+* If you are absolutely certain that you are outputting HTML from a trusted
+  source (e.g. a CMS field that stores HTML entered by admins), you can mark it
+  as such using :func:`~django.utils.safestring.mark_safe`.
+
+Tags that follow these rules will be correct and safe whether they are run on
+Django 1.9 or earlier.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
