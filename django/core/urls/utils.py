@@ -29,10 +29,8 @@ def resolve_dot_segments(path):
 
 class URL(object):
     def __init__(self, scheme='', host='', path='', query_string='', fragment=''):
-        # scheme and host are case-insensitive according to
-        # RFC 3986 section 3.1 and 3.2.2. Normalize these now.
-        self.scheme = scheme.lower()
-        self.host = host.lower()
+        self.scheme = scheme
+        self.host = host
         self.path = path
         self.query_string = query_string
         self.fragment = fragment
@@ -92,10 +90,13 @@ class URL(object):
         set_host = not (bits.netloc.lower() == self.host or not bits.netloc)
         if not set_scheme and not set_host:
             return self.build_absolute_path(location)
-        if not set_scheme:
-            current_uri = '//{host}{path}'.format(self.host, self.path)
+        if not set_scheme or not self.scheme:
+            current_uri = '//{host}{path}'.format(host=self.host,
+                                                  path=self.path)
         else:
-            current_uri = '{scheme}://{host}{path}'.format(self.scheme, self.host, self.path)
+            current_uri = '{scheme}://{host}{path}'.format(scheme=self.scheme,
+                                                           host=self.host,
+                                                           path=self.path)
         return urljoin(current_uri, location)
 
     def build_absolute_url(self, location=None):

@@ -79,6 +79,116 @@ build_absolute_path_data = (
 )
 
 
+build_absolute_uri_data = (
+    ('http://example.org/current/path/', '/test/', 'http://example.org/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path', 'test/', 'http://example.org/current/test/'),
+    ('http://example.org:8000/current/path/', '/test/', 'http://example.org:8000/test/'),
+    ('http://example.org:8000/current/path/', 'test/', 'http://example.org:8000/current/path/test/'),
+    ('http://example.org:8000/current/path', 'test/', 'http://example.org:8000/current/test/'),
+
+    ('http://example.org/current/path/', '//test.com/test/', 'http://test.com/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('http://example.org/current/path/', 'test/', 'http://example.org/current/path/test/'),
+    ('/test/', '/', '/'),
+    ('//example.org/', '/test/', '//example.org/test/'),
+    # Examples from RFC 3986 section 5.4
+    ("http://a/b/c/d;p?q", "g:h", "g:h"),
+    ("http://a/b/c/d;p?q", "g", "http://a/b/c/g"),
+    ("http://a/b/c/d;p?q", "./g", "http://a/b/c/g"),
+    ("http://a/b/c/d;p?q", "g/", "http://a/b/c/g/"),
+    ("http://a/b/c/d;p?q", "/g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "//g", "http://g"),
+    ("http://a/b/c/d;p?q", "?y", "http://a/b/c/d;p?y"),
+    ("http://a/b/c/d;p?q", "g?y", "http://a/b/c/g?y"),
+    ("http://a/b/c/d;p?q", "#s", "http://a/b/c/d;p?q#s"),
+    ("http://a/b/c/d;p?q", "g#s", "http://a/b/c/g#s"),
+    ("http://a/b/c/d;p?q", "g?y#s", "http://a/b/c/g?y#s"),
+    ("http://a/b/c/d;p?q", ";x", "http://a/b/c/;x"),
+    ("http://a/b/c/d;p?q", "g;x",  "http://a/b/c/g;x"),
+    ("http://a/b/c/d;p?q", "g;x?y#s", "http://a/b/c/g;x?y#s"),
+    ("http://a/b/c/d;p?q", "", "http://a/b/c/d;p?q"),
+    ("http://a/b/c/d;p?q", ".", "http://a/b/c/"),
+    ("http://a/b/c/d;p?q", "./", "http://a/b/c/"),
+    ("http://a/b/c/d;p?q", "..", "http://a/b/"),
+    ("http://a/b/c/d;p?q", "../", "http://a/b/"),
+    ("http://a/b/c/d;p?q", "../g", "http://a/b/g"),
+    ("http://a/b/c/d;p?q", "../..", "http://a/"),
+    ("http://a/b/c/d;p?q", "../../", "http://a/"),
+    ("http://a/b/c/d;p?q", "../../g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "../../../g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "../../../../g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "/./g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "/../g", "http://a/g"),
+    ("http://a/b/c/d;p?q", "g.", "http://a/b/c/g."),
+    ("http://a/b/c/d;p?q", ".g", "http://a/b/c/.g"),
+    ("http://a/b/c/d;p?q", "g..", "http://a/b/c/g.."),
+    ("http://a/b/c/d;p?q", "..g", "http://a/b/c/..g"),
+    ("http://a/b/c/d;p?q", "./../g", "http://a/b/g"),
+    ("http://a/b/c/d;p?q", "./g/.", "http://a/b/c/g/"),
+    ("http://a/b/c/d;p?q", "g/./h", "http://a/b/c/g/h"),
+    ("http://a/b/c/d;p?q", "g/../h", "http://a/b/c/h"),
+    ("http://a/b/c/d;p?q", "g;x=1/./y", "http://a/b/c/g;x=1/y"),
+    ("http://a/b/c/d;p?q", "g;x=1/../y", "http://a/b/c/y"),
+    ("http://a/b/c/d;p?q", "g?y/./x", "http://a/b/c/g?y/./x"),
+    ("http://a/b/c/d;p?q", "g?y/../x", "http://a/b/c/g?y/../x"),
+    ("http://a/b/c/d;p?q", "g#s/./x", "http://a/b/c/g#s/./x"),
+    ("http://a/b/c/d;p?q", "g#s/../x", "http://a/b/c/g#s/../x"),
+)
+
+
+build_relative_uri_data = (
+
+    # Examples from RFC 3986 section 5.4
+    ("http://a/b/c/d;p?q", "g:h", "g:h"),
+    ("http://a/b/c/d;p?q", "g", "/b/c/g"),
+    ("http://a/b/c/d;p?q", "./g", "/b/c/g"),
+    ("http://a/b/c/d;p?q", "g/", "/b/c/g/"),
+    ("http://a/b/c/d;p?q", "/g", "/g"),
+    ("http://a/b/c/d;p?q", "//g", "//g"),
+    ("http://a/b/c/d;p?q", "?y", "/b/c/d;p?y"),
+    ("http://a/b/c/d;p?q", "g?y", "/b/c/g?y"),
+    ("http://a/b/c/d;p?q", "#s", "/b/c/d;p?q#s"),
+    ("http://a/b/c/d;p?q", "g#s", "/b/c/g#s"),
+    ("http://a/b/c/d;p?q", "g?y#s", "/b/c/g?y#s"),
+    ("http://a/b/c/d;p?q", ";x", "/b/c/;x"),
+    ("http://a/b/c/d;p?q", "g;x",  "/b/c/g;x"),
+    ("http://a/b/c/d;p?q", "g;x?y#s", "/b/c/g;x?y#s"),
+    ("http://a/b/c/d;p?q", "", "/b/c/d;p?q"),
+    ("http://a/b/c/d;p?q", ".", "/b/c/"),
+    ("http://a/b/c/d;p?q", "./", "/b/c/"),
+    ("http://a/b/c/d;p?q", "..", "/b/"),
+    ("http://a/b/c/d;p?q", "../", "/b/"),
+    ("http://a/b/c/d;p?q", "../g", "/b/g"),
+    ("http://a/b/c/d;p?q", "../..", "/"),
+    ("http://a/b/c/d;p?q", "../../", "/"),
+    ("http://a/b/c/d;p?q", "../../g", "/g"),
+    ("http://a/b/c/d;p?q", "../../../g", "/g"),
+    ("http://a/b/c/d;p?q", "../../../../g", "/g"),
+    ("http://a/b/c/d;p?q", "/./g", "/g"),
+    ("http://a/b/c/d;p?q", "/../g", "/g"),
+    ("http://a/b/c/d;p?q", "g.", "/b/c/g."),
+    ("http://a/b/c/d;p?q", ".g", "/b/c/.g"),
+    ("http://a/b/c/d;p?q", "g..", "/b/c/g.."),
+    ("http://a/b/c/d;p?q", "..g", "/b/c/..g"),
+    ("http://a/b/c/d;p?q", "./../g", "/b/g"),
+    ("http://a/b/c/d;p?q", "./g/.", "/b/c/g/"),
+    ("http://a/b/c/d;p?q", "g/./h", "/b/c/g/h"),
+    ("http://a/b/c/d;p?q", "g/../h", "/b/c/h"),
+    ("http://a/b/c/d;p?q", "g;x=1/./y", "/b/c/g;x=1/y"),
+    ("http://a/b/c/d;p?q", "g;x=1/../y", "/b/c/y"),
+    ("http://a/b/c/d;p?q", "g?y/./x", "/b/c/g?y/./x"),
+    ("http://a/b/c/d;p?q", "g?y/../x", "/b/c/g?y/../x"),
+    ("http://a/b/c/d;p?q", "g#s/./x", "/b/c/g#s/./x"),
+    ("http://a/b/c/d;p?q", "g#s/../x", "/b/c/g#s/../x"),
+)
+
+
 class URLTests(SimpleTestCase):
     def test_url_get_full_path(self):
         self.assertTrue(get_full_path_data, "get_full_path_data is empty.")
@@ -94,4 +204,24 @@ class URLTests(SimpleTestCase):
                 url.build_absolute_path(location), expected,
                 'URL(path=%r).build_absolute_path(%r) did not resolve to %r' %
                 (current_path, location, expected)
+            )
+
+    def test_url_build_absolute_uri(self):
+        self.assertTrue(build_absolute_uri_data, "build_absolute_uri_data is empty.")
+        for current_uri, location, expected in build_absolute_uri_data:
+            url = URL.from_location(current_uri)
+            self.assertEqual(
+                url.build_absolute_url(location), expected,
+                "URL.from_location(%r).build_absolute_url(%r) did not resolve to %r" %
+                (current_uri, location, expected)
+            )
+
+    def test_url_build_relative_uri(self):
+        self.assertTrue(build_relative_uri_data, "build_relative_uri_data is empty.")
+        for current_uri, location, expected in build_relative_uri_data:
+            url = URL.from_location(current_uri)
+            self.assertEqual(
+                url.build_relative_url(location), expected,
+                "URL.from_location(%r).build_relative_url(%r) did not resolve to %r" %
+                (current_uri, location, expected)
             )
