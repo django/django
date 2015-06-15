@@ -229,6 +229,9 @@ def escape_uri_path(path):
     # the entire path, not a path segment.
     return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
 
+def escape_query_string(query):
+    return quote(force_bytes(query), safe=b"/:@&+$,-_.!~*'()=?;")
+
 
 def repercent_broken_unicode(path):
     """

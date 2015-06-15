@@ -29,7 +29,6 @@ from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
-from django.views.decorators.csrf import csrf_protect, requires_csrf_token
 
 from . import middleware, urlconf_outer, views
 from .views import empty_view
