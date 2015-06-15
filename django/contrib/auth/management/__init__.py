@@ -11,8 +11,8 @@ from django.contrib.auth import get_permission_codename
 from django.core import exceptions
 from django.core.management.base import CommandError
 from django.db import DEFAULT_DB_ALIAS, router
-from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 from django.utils import six
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING
 
 
 def _get_all_permissions(opts, ctype):

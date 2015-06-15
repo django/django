@@ -1,9 +1,10 @@
-from importlib import import_module
 import warnings
+from importlib import import_module
 
-from django.core.urlresolvers import (RegexURLPattern,
-    RegexURLResolver, LocaleRegexURLResolver)
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import (
+    LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
+)
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,

@@ -8,7 +8,7 @@ a list of all possible variables.
 
 import importlib
 import os
-import time     # Needed for Windows
+import time
 import warnings
 
 from django.conf import global_settings

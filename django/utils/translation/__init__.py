@@ -2,12 +2,13 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
+
 import re
+
+from django.utils import six
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
-from django.utils import six
-
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',

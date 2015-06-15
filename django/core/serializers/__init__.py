@@ -20,8 +20,8 @@ import importlib
 
 from django.apps import apps
 from django.conf import settings
-from django.utils import six
 from django.core.serializers.base import SerializerDoesNotExist
+from django.utils import six
 
 # Built-in serializers
 BUILTIN_SERIALIZERS = {
