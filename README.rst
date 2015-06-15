@@ -1,4 +1,4 @@
-django-channels
+Django Channels
 ===============
 
 This is a work-in-progress code branch of Django implemented as a third-party
@@ -20,7 +20,7 @@ Make sure you're running Django 1.8. This doesn't work with 1.7 (yet?)
 If you want to use WebSockets (and that's kind of the point) you'll need
 ``autobahn`` and ``twisted`` packages too. Python 3/asyncio support coming soon.
 
-``pip install django-channels`` and then add ``channels`` to the **TOP**
+``pip install channels`` and then add ``channels`` to the **TOP**
 of your ``INSTALLED_APPS`` list (if it is not at the top you won't get the
 new runserver command).
 

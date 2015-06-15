@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='django-channels',
+    name='channels',
     version="0.1",
     url='http://github.com/andrewgodwin/django-channels',
     author='Andrew Godwin',
