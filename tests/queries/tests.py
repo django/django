@@ -2246,17 +2246,18 @@ class QuerySetSupportsPythonIdioms(TestCase):
 
     @unittest.skipUnless(six.PY2, "Python 2 only -- Python 3 doesn't have longs.")
     def test_slicing_works_with_longs(self):
-        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')
-        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],
+        # NOQA: long undefined on PY3
+        self.assertEqual(self.get_ordered_articles()[long(0)].name, 'Article 1')  # NOQA
+        self.assertQuerysetEqual(self.get_ordered_articles()[long(1):long(3)],  # NOQA
             ["<Article: Article 2>", "<Article: Article 3>"])
-        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],
+        self.assertQuerysetEqual(self.get_ordered_articles()[::long(2)],  # NOQA
             ["<Article: Article 1>",
             "<Article: Article 3>",
             "<Article: Article 5>",
             "<Article: Article 7>"])
 
         # And can be mixed with ints.
-        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],
+        self.assertQuerysetEqual(self.get_ordered_articles()[1:long(3)],  # NOQA
             ["<Article: Article 2>", "<Article: Article 3>"])
 
     def test_slicing_without_step_is_lazy(self):

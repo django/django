@@ -206,7 +206,10 @@ class TranslationTests(TestCase):
         result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', 4)
         self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
         # Now with a long
-        result = ungettext_lazy('%(name)s has %(num)d good result', '%(name)s has %(num)d good results', long(4))
+        result = ungettext_lazy(
+            '%(name)s has %(num)d good result', '%(name)s has %(num)d good results',
+            long(4)   # NOQA: long undefined on PY3
+        )
         self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
     @override_settings(LOCALE_PATHS=extended_locale_paths)
@@ -472,7 +475,7 @@ class FormattingTests(TestCase):
         self.d = datetime.date(2009, 12, 31)
         self.dt = datetime.datetime(2009, 12, 31, 20, 50)
         self.t = datetime.time(10, 15, 48)
-        self.l = 10000 if PY3 else long(10000)
+        self.l = 10000 if PY3 else long(10000)  # NOQA: long undefined on PY3
         self.ctxt = Context({
             'n': self.n,
             't': self.t,

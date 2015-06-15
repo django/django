@@ -388,7 +388,7 @@ def html_safe(klass):
             )
         klass_unicode = klass.__unicode__
         klass.__unicode__ = lambda self: mark_safe(klass_unicode(self))
-        klass.__html__ = lambda self: unicode(self)
+        klass.__html__ = lambda self: unicode(self)  # NOQA: unicode undefined on PY3
     else:
         if '__str__' not in klass.__dict__:
             raise ValueError(

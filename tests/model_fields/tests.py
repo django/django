@@ -711,10 +711,11 @@ class PromiseTest(test.TestCase):
 
     @unittest.skipIf(six.PY3, "Python 3 has no `long` type.")
     def test_BigIntegerField(self):
-        lazy_func = lazy(lambda: long(9999999999999999999), long)
+        # NOQA: long undefined on PY3
+        lazy_func = lazy(lambda: long(9999999999999999999), long)  # NOQA
         self.assertIsInstance(
             BigIntegerField().get_prep_value(lazy_func()),
-            long)
+            long)  # NOQA
 
     def test_BinaryField(self):
         lazy_func = lazy(lambda: b'', bytes)

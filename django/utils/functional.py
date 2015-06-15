@@ -310,7 +310,7 @@ class LazyObject(object):
         __bool__ = new_method_proxy(bool)
     else:
         __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
+        __unicode__ = new_method_proxy(unicode)  # NOQA: unicode undefined on PY3
         __nonzero__ = new_method_proxy(bool)
 
     # Introspection support
