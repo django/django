@@ -245,6 +245,24 @@ The ``Func`` API is as follows:
         A class attribute that denotes the character used to join the list of
         ``expressions`` together. Defaults to ``', '``.
 
+    .. classmethod:: as_transform(cls, lookup_name, bilateral=False, expressions=None)
+
+        .. versionadded:: 1.9
+
+        Converts a function into a :class:`~django.db.models.Transform`. ``lookup_name`` is the name which will be used in queries for this transform. ``bilateral`` refers to the :attr:`~django.db.models.Transform.bilateral` attribute on the Transform.
+
+        For single valued functions (such as :class:`~django.db.models.functions.Lower`) this will be sufficient, but other functions require more values. It may make sense in some applications to freeze some of these arguments for a commonly used use case. This can be done by passing ``expressions`` to ``as_transform()``. By default, the value being transformed will be the first argument of the function. If you need a different ordering, you can include the string ``'self'`` in your expressions list.
+
+        As an example, suppose your application is storing git commit hashes, and wants to query by a seven character short hash using a transform.::
+
+            class Commit(models.Model):
+                commit_hash = models.CharField(max_length=40)
+
+            ShortHash = Substr.as_transform(lookup_name='short', expressions=[1, 7])
+            models.CharField.register_lookup(ShortHash)
+
+            Commit.objects.filter(commit_hash__short='abcdef8')
+
 The ``*expressions`` argument is a list of positional expressions that the
 function will be applied to. The expressions will be converted to strings,
 joined together with ``arg_joiner``, and then interpolated into the ``template``

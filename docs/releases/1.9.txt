@@ -143,6 +143,7 @@ Minor features
   in fields which correspond to the range fields.
 * Added :class:`~django.contrib.postgres.fields.JSONField`.
 * Added :doc:`/ref/contrib/postgres/aggregates`.
+* Added :doc:`/ref/contrib/postgres/functions`.
 
 * Fixed serialization of
   :class:`~django.contrib.postgres.fields.DateRangeField` and
@@ -313,6 +314,9 @@ Models
 
 * Added the :class:`~django.db.models.functions.Now` database function, which
   returns the current date and time.
+
+* Added :func:`~django.db.models.Func.as_transform` to convert ``Func`` objects
+  into ``Transform`` objects.
 
 CSRF
 ^^^^

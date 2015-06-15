@@ -1,0 +1,26 @@
+======================================
+PostgreSQL specific database functions
+======================================
+
+.. versionadded:: 1.9
+
+The classes documented below are PostgreSQL specific
+:doc:`/ref/models/database-functions`.
+
+Unaccent
+========
+
+.. class:: django.contrib.postgres.functions.Unaccent
+
+The ``Unaccent`` function converts accented characters into their unaccented
+counterparts using a dedicated PostgreSQL extension.
+
+To use it, you need to add ``'django.contrib.postgres'`` in your
+:setting:`INSTALLED_APPS` and activate the `unaccent extension on PostgreSQL`_.
+The :class:`~django.contrib.postgres.operations.UnaccentExtension` migration
+operation is available if you want to perform this activation using
+migrations).
+
+.. _unaccent extension on PostgreSQL: http://www.postgresql.org/docs/current/interactive/unaccent.html
+
+``unaccent`` is also available :lookup:`as a lookup <unaccent>`.
