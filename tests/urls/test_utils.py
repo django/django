@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.core.urls import URL
 from django.test import SimpleTestCase
 
-full_path_data = (
+path_data = (
     # format: (path, query_string, fragment, expected)
     ('/test/', 'query=true', 'fragment', '/test/?query=true#fragment'),
     # and empty path still returns a slash
@@ -28,12 +28,30 @@ full_path_data = (
 )
 
 
+url_data = (
+    # format: (scheme, host, path, query, fragment, expected)
+    ('http', 'example.org', '/', '', '', 'http://example.org/'),
+    ('https', 'example.org', '/test/', 'q', 'fragment', 'https://example.org/test/?q#fragment'),
+    ('', 'example.org', '', 'q', 'fragment', '//example.org/?q#fragment'),
+    ('http', '', '/test/', '', '', 'http:///test/'),
+)
+
+
 class URLTests(SimpleTestCase):
     def test_url_path(self):
-        for path, query, fragment, expected in full_path_data:
+        for path, query, fragment, expected in path_data:
             url = URL(path=path, query_string=query, fragment=fragment)
             self.assertEqual(
                 str(url), expected,
-                "URL(path=%s, query_string=%s, fragment=%s) does not match %s" %
+                "URL(path=%r, query_string=%r, fragment=%r) does not match %r" %
                 (path, query, fragment, expected),
+            )
+
+    def test_full_url(self):
+        for scheme, host, path, query, fragment, expected in url_data:
+            url = URL(scheme, host, path, query, fragment)
+            self.assertEqual(
+                str(url), expected,
+                "URL(%r, %r, %r, %r, %r) does not match %r" %
+                (scheme, host, path, query, fragment, expected)
             )
