@@ -9,6 +9,7 @@ import math
 import uuid
 import warnings
 from base64 import b64decode, b64encode
+from functools import total_ordering
 
 from django.apps import apps
 from django.db import connection
@@ -20,7 +21,7 @@ from django.core import exceptions, validators, checks
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
 from django.utils.duration import duration_string
-from django.utils.functional import cached_property, curry, total_ordering, Promise
+from django.utils.functional import cached_property, curry, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango21Warning

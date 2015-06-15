@@ -659,6 +659,10 @@ Miscellaneous
 
 * For security hardening, session keys must be at least 8 characters.
 
+* Private function ``django.utils.functional.total_ordering()`` has been
+  removed. It contained a workaround for a ``functools.total_ordering()`` bug
+  in Python versions older than 2.7.3.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

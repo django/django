@@ -6,6 +6,7 @@ import io
 import os
 import re
 import sys
+from functools import total_ordering
 from itertools import dropwhile
 
 import django
@@ -17,7 +18,7 @@ from django.core.management.utils import (
 from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
-from django.utils.functional import cached_property, total_ordering
+from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
 from django.utils.text import get_text_list
 
