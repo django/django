@@ -355,14 +355,6 @@ look better:
 
   That is, use metadata instead of titles.
 
-* Add more links -- nearly everything that's an inline code literal
-  right now can probably be turned into a xref.
-
-  See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
-  to help do this work.
-
-  This will probably be a continuing, never-ending project.
-
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
 
