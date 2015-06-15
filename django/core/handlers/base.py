@@ -113,6 +113,9 @@ class BaseHandler(object):
         urlconf = settings.ROOT_URLCONF
         urlresolvers.set_urlconf(urlconf)
         resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+        # Use a flag to check if the response was rendered to prevent
+        # multiple renderings or to force rendering if necessary.
+        rendered = False
         try:
             response = None
             # Apply request middleware
@@ -174,6 +177,7 @@ class BaseHandler(object):
                             "HttpResponse object. It returned None instead."
                             % (middleware_method.__self__.__class__.__name__))
                 response = response.render()
+                rendered = True
 
         except http.Http404 as exc:
             logger.warning('Not Found: %s', request.path,
@@ -245,6 +249,11 @@ class BaseHandler(object):
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
         response._closable_objects.append(request)
+
+        # If the exception handler returns a TemplateResponse that has not
+        # been rendered, force a rendering.
+        if not rendered and hasattr(response, 'render') and callable(response.render):
+            response = response.render()
 
         return response
 
