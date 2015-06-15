@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 import warnings
 from collections import deque
+from functools import total_ordering
 
 from django.db.migrations.state import ProjectState
 from django.utils.datastructures import OrderedSet
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.functional import total_ordering
 
 from .exceptions import CircularDependencyError, NodeNotFoundError
 
