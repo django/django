@@ -32,7 +32,10 @@ class RedisChannelBackend(BaseChannelBackend):
         self.connection.set(
             key,
             json.dumps(message),
-            ex = self.expiry + 10,
+        )
+        self.connection.expire(
+            key,
+            self.expiry + 10,
         )
         # Add key to list
         self.connection.rpush(
