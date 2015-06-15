@@ -80,7 +80,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         first_field = model._meta.get_field(fields[0])
         if first_field.get_internal_type() == 'ForeignKey':
-            constraint_names = self._constraint_names(model, fields[0], index=True)
+            constraint_names = self._constraint_names(model, [model._meta.get_field(fields[0]).column], index=True)
             if not constraint_names:
                 self.execute(
                     self._create_index_sql(model, [model._meta.get_field(fields[0])], suffix="")
