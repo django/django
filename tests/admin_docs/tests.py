@@ -8,8 +8,11 @@ from django.contrib.admindocs.views import get_return_data_type
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from django.test import TestCase, modify_settings, override_settings
+from django.test import (
+    TestCase, ignore_warnings, modify_settings, override_settings,
+)
 from django.test.utils import captured_stderr
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Company, Person
 
@@ -54,6 +57,7 @@ class MiscTests(AdminDocsTestCase):
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
+@ignore_warnings(category=RemovedInDjango20Warning)
 class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def setUp(self):
