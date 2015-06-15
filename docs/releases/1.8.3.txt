@@ -2,9 +2,9 @@
 Django 1.8.3 release notes
 ==========================
 
-*Under development*
+*July 8, 2015*
 
-Django 1.8.3 fixes several bugs in 1.8.2.
+Django 1.8.3 fixes several security issues and bugs in 1.8.2.
 
 Also, ``django.utils.deprecation.RemovedInDjango20Warning`` was renamed to
 ``RemovedInDjango110Warning`` as the version roadmap was revised to 1.9, 1.10,

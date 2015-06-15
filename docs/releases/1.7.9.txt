@@ -2,9 +2,12 @@
 Django 1.7.9 release notes
 ==========================
 
-*Under development*
+*July 8, 2015*
 
-Django 1.7.9 fixes several bugs in 1.7.8.
+Django 1.7.9 fixes several security issues and bugs in 1.7.8.
+
+Bugfixes
+========
 
 * Prevented the loss of ``null``/``not null`` column properties during field
   renaming of MySQL databases (:ticket:`24817`).
