@@ -1,6 +1,7 @@
 import re
 import sys
 
+from django.utils import six
 from django.utils.six.moves import html_parser as _html_parser
 
 current_version = sys.version_info
@@ -15,7 +16,7 @@ except AttributeError:
         pass
 
 if not use_workaround:
-    if current_version >= (3, 4):
+    if six.PY3:
         class HTMLParser(_html_parser.HTMLParser):
             """Explicitly set convert_charrefs to be False.
 

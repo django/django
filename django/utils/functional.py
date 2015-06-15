@@ -251,7 +251,7 @@ class LazyObject(object):
             self._setup()
         return self._wrapped.__dict__
 
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # Python 3 will call __reduce__ when pickling; this method is needed
     # to serialize and deserialize correctly.
     @classmethod
     def __newobj__(cls, *args):
