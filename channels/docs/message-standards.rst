@@ -73,12 +73,33 @@ Sent when a datagram is received on the WebSocket.
 Contains the same keys as WebSocket Connection, plus:
 
 * content: String content of the datagram
+* binary: If the content is to be interpreted as text or binary
 
 
-WebSocket Close
----------------
+WebSocket Client Close
+----------------------
 
 Sent when the WebSocket is closed by either the client or the server.
 
 Contains the same keys as WebSocket Connection, including send_channel,
 though nothing should be sent on it.
+
+
+WebSocket Send
+--------------
+
+Sent by a Django consumer to send a message back over the WebSocket to
+the client.
+
+Contains the keys:
+
+* content: String content of the datagram
+* binary: If the content is to be interpreted as text or binary
+
+
+WebSocket Server Close
+----------------------
+
+Sent by a Django consumer to close the client's WebSocket.
+
+Contains no keys.

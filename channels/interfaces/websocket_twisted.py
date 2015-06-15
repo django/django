@@ -14,7 +14,9 @@ class InterfaceProtocol(WebSocketServerProtocol):
 
     def onConnect(self, request):
         self.channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
-        self.request = request
+        self.request_info = {
+            "path": request.path,
+        }
 
     def onOpen(self):
         # Make sending channel
@@ -23,6 +25,7 @@ class InterfaceProtocol(WebSocketServerProtocol):
         # Send news that this channel is open
         Channel("django.websocket.connect").send(
             send_channel = self.send_channel,
+            **self.request_info
         )
 
     def onMessage(self, payload, isBinary):
@@ -31,24 +34,36 @@ class InterfaceProtocol(WebSocketServerProtocol):
                 send_channel = self.send_channel,
                 content = payload,
                 binary = True,
+                **self.request_info
             )
         else:
             Channel("django.websocket.receive").send(
                 send_channel = self.send_channel,
                 content = payload.decode("utf8"),
                 binary = False,
+                **self.request_info
             )
 
-    def onChannelSend(self, content, binary=False, **kwargs):
+    def serverSend(self, content, binary=False, **kwargs):
+        """
+        Server-side channel message to send a message.
+        """
         if binary:
             self.sendMessage(content, binary)
         else:
             self.sendMessage(content.encode("utf8"), binary)
 
+    def serverClose(self):
+        """
+        Server-side channel message to close the socket
+        """
+        self.sendClose()
+
     def onClose(self, wasClean, code, reason):
         del self.factory.protocols[self.send_channel]
         Channel("django.websocket.disconnect").send(
             send_channel = self.send_channel,
+            **self.request_info
         )
 
 
@@ -68,7 +83,10 @@ class InterfaceFactory(WebSocketServerFactory):
         return self.protocols.keys()
 
     def dispatch_send(self, channel, message):
-        self.protocols[channel].onChannelSend(**message)
+        if message.get("close", False):
+            self.protocols[channel].serverClose()
+        else:
+            self.protocols[channel].serverSend(**message)
 
 
 class WebsocketTwistedInterface(object):

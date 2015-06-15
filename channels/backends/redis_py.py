@@ -27,16 +27,24 @@ class RedisChannelBackend(BaseChannelBackend):
         return redis.Redis(host=self.host, port=self.port)
 
     def send(self, channel, message):
+        # Write out message into expiring key (avoids big items in list)
         key = uuid.uuid4()
         self.connection.set(
             key,
             json.dumps(message),
             ex = self.expiry + 10,
         )
+        # Add key to list
         self.connection.rpush(
             self.prefix + channel,
             key,
         )
+        # Set list to expire when message does (any later messages will bump this)
+        self.connection.expire(
+            self.prefix + channel,
+            self.expiry + 10,
+        )
+        # TODO: Prune expired messages from same list (in case nobody consumes)
 
     def receive_many(self, channels):
         if not channels:

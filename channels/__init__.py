@@ -1,3 +1,5 @@
+__version__ = "0.1"
+
 # Load backends, using settings if available (else falling back to a default)
 DEFAULT_CHANNEL_BACKEND = "default"
 from .backends import BackendManager
