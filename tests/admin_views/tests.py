@@ -2434,7 +2434,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         expected_link = reverse('admin:%s_modelwithstringprimarykey_history' %
             ModelWithStringPrimaryKey._meta.app_label,
             args=(quote(self.pk),))
-        self.assertContains(response, '<a href="%s" class="historylink"' % expected_link)
+        self.assertContains(response, '<a href="%s" class="historylink"' % escape(expected_link))
 
     def test_redirect_on_add_view_continue_button(self):
         """As soon as an object is added using "Save and continue editing"

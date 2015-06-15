@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.html import conditional_escape
 from django.utils.inspect import getargspec
 from django.utils.itercompat import is_iterable
 
@@ -201,6 +202,8 @@ class SimpleNode(TagHelperNode):
         if self.target_var is not None:
             context[self.target_var] = output
             return ''
+        if context.autoescape:
+            output = conditional_escape(output)
         return output
 
 
