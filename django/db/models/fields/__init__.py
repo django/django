@@ -11,31 +11,34 @@ import warnings
 from base64 import b64decode, b64encode
 from functools import total_ordering
 
-from django.apps import apps
-from django.db import connection
-from django.db.models.lookups import default_lookups, RegisterLookupMixin, Transform, Lookup
-from django.db.models.query_utils import QueryWrapper
-from django.conf import settings
 from django import forms
-from django.core import exceptions, validators, checks
-from django.utils.datastructures import DictWrapper
-from django.utils.dateparse import parse_date, parse_datetime, parse_time, parse_duration
-from django.utils.duration import duration_string
-from django.utils.functional import cached_property, curry, Promise
-from django.utils.text import capfirst
-from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import (smart_text, force_text, force_bytes,
-    python_2_unicode_compatible)
-from django.utils.ipv6 import clean_ipv6_address
-from django.utils import six
-from django.utils.itercompat import is_iterable
-
+from django.apps import apps
+from django.conf import settings
+from django.core import checks, exceptions, validators
 # When the _meta object was formalized, this exception was moved to
 # django.core.exceptions. It is retained here for backwards compatibility
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
+from django.db import connection
+from django.db.models.lookups import (
+    Lookup, RegisterLookupMixin, Transform, default_lookups,
+)
+from django.db.models.query_utils import QueryWrapper
+from django.utils import six, timezone
+from django.utils.datastructures import DictWrapper
+from django.utils.dateparse import (
+    parse_date, parse_datetime, parse_duration, parse_time,
+)
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.duration import duration_string
+from django.utils.encoding import (
+    force_bytes, force_text, python_2_unicode_compatible, smart_text,
+)
+from django.utils.functional import Promise, cached_property, curry
+from django.utils.ipv6 import clean_ipv6_address
+from django.utils.itercompat import is_iterable
+from django.utils.text import capfirst
+from django.utils.translation import ugettext_lazy as _
 
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode

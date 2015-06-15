@@ -17,10 +17,10 @@ from threading import local
 from django.conf import settings
 from django.core import signals
 from django.core.cache.backends.base import (
-    InvalidCacheBackendError, CacheKeyWarning, BaseCache)
+    BaseCache, CacheKeyWarning, InvalidCacheBackendError,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string
-
 
 __all__ = [
     'cache', 'DEFAULT_CACHE_ALIAS', 'InvalidCacheBackendError',

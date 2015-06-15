@@ -1,2 +1,4 @@
-from .config import AppConfig   # NOQA
-from .registry import apps      # NOQA
+from .config import AppConfig
+from .registry import apps
+
+__all__ = ['AppConfig', 'apps']

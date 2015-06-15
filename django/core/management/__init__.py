@@ -1,17 +1,18 @@
 from __future__ import unicode_literals
 
 import collections
-from importlib import import_module
 import os
 import pkgutil
 import sys
+from importlib import import_module
 
 import django
 from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.management.base import (BaseCommand, CommandError,
-    CommandParser, handle_default_options)
+from django.core.management.base import (
+    BaseCommand, CommandError, CommandParser, handle_default_options,
+)
 from django.core.management.color import color_style
 from django.utils import lru_cache, six
 from django.utils._os import npath, upath

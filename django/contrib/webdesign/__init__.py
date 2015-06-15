@@ -2,6 +2,7 @@ import warnings
 
 from django.utils.deprecation import RemovedInDjango110Warning
 
+
 default_app_config = 'django.contrib.webdesign.apps.WebDesignConfig'
 
 warnings.warn(

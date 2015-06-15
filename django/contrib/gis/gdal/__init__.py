@@ -31,8 +31,9 @@
  to a non-existent file location (e.g., `GDAL_LIBRARY_PATH='/null/path'`;
  setting to None/False/'' will not work as a string must be given).
 """
-from django.contrib.gis.gdal.error import (check_err, GDALException,
-    OGRException, OGRIndexError, SRSException)  # NOQA
+from django.contrib.gis.gdal.error import (  # NOQA
+    GDALException, OGRException, OGRIndexError, SRSException, check_err,
+)
 from django.contrib.gis.gdal.geomtype import OGRGeomType  # NOQA
 
 __all__ = [
