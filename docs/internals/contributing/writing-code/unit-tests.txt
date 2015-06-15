@@ -21,8 +21,8 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
-If you are on Python < 3.3, you'll first need to install a backport of the
-``unittest.mock`` module that's available in Python 3.3+. See
+If you are on Python 2, you'll first need to install a backport of the
+``unittest.mock`` module that's available in Python 3. See
 :ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
 the other optional test dependencies.
 

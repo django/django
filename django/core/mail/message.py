@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import mimetypes
 import os
 import random
-import sys
 import time
 from email import (
     charset as Charset, encoders as Encoders, generator, message_from_string,
@@ -170,13 +169,7 @@ class SafeMIMEText(MIMEMixin, MIMEText):
             # We do it manually and trigger re-encoding of the payload.
             MIMEText.__init__(self, _text, _subtype, None)
             del self['Content-Transfer-Encoding']
-            # Workaround for versions without http://bugs.python.org/issue19063
-            if (3, 2) < sys.version_info < (3, 3, 4):
-                payload = _text.encode(utf8_charset.output_charset)
-                self._payload = payload.decode('ascii', 'surrogateescape')
-                self.set_charset(utf8_charset)
-            else:
-                self.set_payload(_text, utf8_charset)
+            self.set_payload(_text, utf8_charset)
             self.replace_header('Content-Type', 'text/%s; charset="%s"' % (_subtype, _charset))
         elif _charset is None:
             # the default value of '_charset' is 'us-ascii' on Python 2
