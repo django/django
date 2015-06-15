@@ -34,6 +34,7 @@ Psycopg2 2.5 or higher is required.
     aggregates
     fields
     forms
+    functions
     lookups
     operations
     validators
