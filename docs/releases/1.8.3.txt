@@ -71,3 +71,6 @@ Bugfixes
   using UUID primary keys (:ticket:`24912`).
 
 * Fixed removing ``unique_together`` constraints on MySQL (:ticket:`24972`).
+
+* Fixed crash when uploading bitmap images in
+  :class:`forms.ImageField <django.forms.ImageField>` (:ticket:`24948`).

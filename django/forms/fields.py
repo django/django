@@ -683,7 +683,9 @@ class ImageField(FileField):
 
             # Annotating so subclasses can reuse it for their own validation
             f.image = image
-            f.content_type = Image.MIME[image.format]
+            # In case when we can not find proper content type for the
+            # valid image it will be set to None.
+            f.content_type = Image.MIME.get(image.format)
         except Exception:
             # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
