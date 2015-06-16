@@ -511,3 +511,37 @@ class TestSessionVerification(unittest.TestCase):
             warnings.filterwarnings('always')
             Settings('fake_settings_module')
         self.assertEqual(len(warn), 0)
+
+
+class TestAllowedHostsSettings(TestCase):
+    """
+    Make sure Allowed_Hosts setting raises an ImproperlyConfigured during
+    appropriate conditions.
+    """
+
+    def test_debug_off_unconfigured(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.DEBUG = False
+        settings_module.ALLOWED_HOSTS = []
+        msg = "The ALLOWED_HOSTS setting must not be empty when DEBUG = False."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            warnings.filterwarnings('always')
+            Settings(settings_module)
+
+    def test_debug_off_configured(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.DEBUG = False
+        settings_module.ALLOWED_HOSTS = ['localhost']
+        Settings(settings_module)  # should not raise an exception
+
+    def test_debug_on_configured(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.DEBUG = True
+        settings_module.ALLOWED_HOSTS = ['localhost']
+        Settings(settings_module)  # should not raise an exception
+
+    def test_debug_on_unconfigured(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.DEBUG = True
+        settings_module.ALLOWED_HOSTS = []
+        Settings(settings_module)  # should not raise an exception
