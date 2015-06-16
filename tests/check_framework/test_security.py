@@ -482,3 +482,18 @@ class CheckDebugTest(SimpleTestCase):
     @override_settings(DEBUG=False)
     def test_debug_false(self):
         self.assertEqual(self.func(None), [])
+
+
+class CheckAllowedHostsTest(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_allowed_hosts
+        return check_allowed_hosts
+
+    @override_settings(ALLOWED_HOSTS=[])
+    def test_allowed_hosts_empty(self):
+        self.assertEqual(self.func(None), [base.W020])
+
+    @override_settings(ALLOWED_HOSTS=['.example.com', ])
+    def test_allowed_hosts_set(self):
+        self.assertEqual(self.func(None), [])
