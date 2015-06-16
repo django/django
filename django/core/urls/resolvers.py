@@ -5,6 +5,8 @@ from functools import update_wrapper
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
 
+from .exceptions import Resolver404
+
 
 class ResolverMatch(object):
     def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, decorators=None):
@@ -77,3 +79,51 @@ class ResolverMatch(object):
         namespaces = ([namespace] if namespace else []) + submatch.namespaces
         decorators = (decorators or []) + submatch.decorators
         return cls(submatch.func, args, kwargs, submatch.url_name, app_names, namespaces, decorators)
+
+
+class BaseResolver(object):
+    def __init__(self, constraints=None, decorators=None):
+        self.constraints = constraints or []
+        self.decorators = decorators or []
+
+    def match(self, url, request):
+        args, kwargs = (), {}
+        for constraint in self.constraints:
+            url, new_args, new_kwargs = constraint.match(url, request)
+            args += new_args
+            kwargs.update(new_kwargs)
+        return url, args, kwargs
+
+
+class Resolver(BaseResolver):
+    def __init__(self, subresolvers, app_name=None, constraints=None, decorators=None):
+        super(Resolver, self).__init__(constraints, decorators)
+        self.subresolvers = subresolvers
+        self.app_name = app_name
+
+    def resolve(self, url, request):
+        new_url, args, kwargs = self.match(url, request)
+
+        for name, resolver in self.subresolvers:
+            try:
+                sub_match = resolver.resolve(new_url, request)
+            except Resolver404:
+                continue
+            return ResolverMatch.from_submatch(
+                sub_match, args, kwargs, self.app_name,
+                name, self.decorators
+            )
+        raise Resolver404()
+
+
+class ResolverEndpoint(BaseResolver):
+    app_name = None
+
+    def __init__(self, func, url_name=None, constraints=None, decorators=None):
+        super(ResolverEndpoint, self).__init__(constraints, decorators)
+        self.func = func
+        self.url_name = url_name
+
+    def resolve(self, url, request):
+        new_url, args, kwargs = self.match(url, request)
+        return ResolverMatch(self.func, args, kwargs, self.url_name)

@@ -1,9 +1,8 @@
 from __future__ import unicode_literals
 
-from inspect import getargspec
-
-from django.core.urls import ResolverMatch
-from django.test import SimpleTestCase
+from django.core.urls import RegexPattern, Resolver, ResolverEndpoint, ResolverMatch, Resolver404
+from django.core.urls.resolvers import BaseResolver
+from django.test import SimpleTestCase, RequestFactory
 
 from .decorators import inner_decorator, outer_decorator
 from .views import class_based_view, empty_view
@@ -108,3 +107,74 @@ class ResolverMatchTests(SimpleTestCase):
         self.assertEqual(match.func, empty_view)
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {'arg1': 42})
+
+
+class ResolverTests(SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super(ResolverTests, cls).setUpClass()
+        cls.rf = RequestFactory()
+
+    def test_match(self):
+        constraints = [
+            RegexPattern(r'^/'),
+            RegexPattern(r'^test/'),
+            RegexPattern(r'^(?P<pk>\d+)/$'),
+        ]
+        resolver = BaseResolver(constraints=constraints)
+        url = '/test/42/'
+        request = self.rf.get(url)
+        expected = '', (), {'pk': '42'}
+        self.assertEqual(resolver.match(url, request), expected)
+
+    def test_no_match(self):
+        constraints = [
+            RegexPattern(r'^/'),
+            RegexPattern(r'^test/'),
+            RegexPattern(r'^(?P<pk>\d+)/$'),
+        ]
+        resolver = BaseResolver(constraints=constraints)
+        url = '/no/match/'
+        request = self.rf.get(url)
+        with self.assertRaises(Resolver404):
+            resolver.match(url, request)
+
+    def test_empty_constraints_match(self):
+        resolver = BaseResolver()
+        url = '/test/42/'
+        request = self.rf.get(url)
+        expected = '/test/42/', (), {}
+        self.assertEqual(resolver.match(url, request), expected)
+
+    def test_resolve_to_view(self):
+        constraints = [
+            RegexPattern(r'^/'),
+            RegexPattern(r'^test/$'),
+        ]
+        resolver = ResolverEndpoint(empty_view, 'empty-view', constraints=constraints)
+        url = '/test/'
+        request = self.rf.get(url)
+        match = resolver.resolve(url, request)
+        self.assertEqual(match.__class__, ResolverMatch)
+        self.assertEqual(match.func, empty_view)
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {})
+        self.assertEqual(match.url_name, 'empty-view')
+
+    def test_nested_resolvers(self):
+        endpoint = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
+        resolver = Resolver([('ns1', endpoint)], 'app1', constraints=[
+            RegexPattern(r'^/'),
+            RegexPattern(r'^(?P<pk>\d+)/'),
+        ])
+        url = '/42/detail/'
+        request = self.rf.get(url)
+        match = resolver.resolve(url, request)
+        self.assertEqual(match.__class__, ResolverMatch)
+        self.assertEqual(match.func, empty_view)
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {'pk': '42'})
+        self.assertEqual(match.url_name, 'empty-view')
+        self.assertEqual(match.app_name, 'app1')
+        self.assertEqual(match.namespace, 'ns1')
+        self.assertEqual(match.view_name, 'ns1:empty-view')
