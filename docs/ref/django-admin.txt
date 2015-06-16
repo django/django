@@ -902,6 +902,18 @@ recipient(s) specified. For example::
 
     django-admin sendtestemail foo@example.com bar@example.com
 
+.. django-admin-option:: --managers
+
+Use the ``--managers`` option to add the email addresses specified in
+:setting:`MANAGERS` to the recipients.
+
+.. django-admin-option:: --admins
+
+Use the ``--admins`` option to add the email addresses specified in
+:setting:`ADMINS` to the recipients.
+
+Note that you may use any combination of these options together.
+
 shell
 -----
 
