@@ -161,7 +161,9 @@ class CommonPasswordValidator(object):
         try:
             common_passwords_lines = gzip.open(password_list_path).read().decode('utf-8').splitlines()
         except IOError:
-            common_passwords_lines = open(password_list_path).readlines()
+            with open(password_list_path) as f:
+                common_passwords_lines = f.readlines()
+
         self.passwords = {p.strip() for p in common_passwords_lines}
 
     def validate(self, password, user=None):

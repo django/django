@@ -41,7 +41,7 @@ class PasswordValidationTest(TestCase):
         self.assertIsNone(validate_password('sufficiently-long'))
         msg_too_short = 'This password is too short. It must contain at least 12 characters.'
 
-        with self.assertRaises(ValidationError, args=['This password is too short.']) as cm:
+        with self.assertRaises(ValidationError) as cm:
             validate_password('django4242')
         self.assertEqual(cm.exception.messages, [msg_too_short])
         self.assertEqual(cm.exception.error_list[0].code, 'password_too_short')
