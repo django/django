@@ -384,6 +384,32 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
+    .. method:: Client.force_login(user, backend=None)
+
+        .. versionadded:: 1.9
+
+        If your site uses Django's :doc:`authentication
+        system</topics/auth/index>`, you can use the ``force_login()`` method
+        to simulate the effect of a user logging into the site. Use this method
+        instead of :meth:`login` when a test requires a user be logged in and
+        the details of how a user logged in aren't important.
+
+        Unlike ``login()``, this method skips the authentication and
+        verification steps: inactive users (:attr:`is_active=False
+        <django.contrib.auth.models.User.is_active>`) are permitted to login
+        and the user's credentials don't need to be provided.
+
+        The user will have its ``backend`` attribute set to the value of the
+        ``backend`` argument (which should be a dotted Python path string), or
+        to ``settings.AUTHENTICATION_BACKENDS[0]`` if a value isn't provided.
+        The :func:`~django.contrib.auth.authenticate` function called by
+        :meth:`login` normally annotates the user like this.
+
+        This method is faster than ``login()`` since the expensive
+        password hashing algorithms are bypassed. Also, you can speed up
+        ``login()`` by :ref:`using a weaker hasher while testing
+        <speeding-up-tests-auth-hashers>`.
+
     .. method:: Client.logout()
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`,
