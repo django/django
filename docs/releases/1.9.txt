@@ -671,6 +671,9 @@ Miscellaneous
   removed. It contained a workaround for a ``functools.total_ordering()`` bug
   in Python versions older than 2.7.3.
 
+* The test :class:`~django.test.Client` now allows a successfully authenticated
+  user with ``is_active`` equal to ``False`` to login.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

@@ -406,7 +406,7 @@ class ClientTest(TestCase):
         "Request a page that is protected with @login, but use an inactive login"
 
         login = self.client.login(username='inactive', password='password')
-        self.assertFalse(login)
+        self.assertTrue(login)
 
     def test_logout(self):
         "Request a logout after logging in"

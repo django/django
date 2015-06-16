@@ -589,13 +589,11 @@ class Client(RequestFactory):
         Sets the Factory to appear as if it has successfully logged into a site.
 
         Returns True if login is possible; False if the provided credentials
-        are incorrect, or the user is inactive, or if the sessions framework is
-        not available.
+        are incorrect or if the sessions framework is not available.
         """
         from django.contrib.auth import authenticate, login
         user = authenticate(**credentials)
-        if (user and user.is_active and
-                apps.is_installed('django.contrib.sessions')):
+        if user and apps.is_installed('django.contrib.sessions'):
             engine = import_module(settings.SESSION_ENGINE)
 
             # Create a fake request to store login details.
