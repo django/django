@@ -391,6 +391,11 @@ Tests
 * Added the :meth:`json() <django.test.Response.json>` method to test client
   responses to give access to the response body as JSON.
 
+* Added the :meth:`~django.test.Client.force_login()` method to the test
+  client. Use this method to simulate the effect of a user logging into the
+  site while skipping the authentication and verification steps of
+  :meth:`~django.test.Client.login()`.
+
 URLs
 ^^^^
 
