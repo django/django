@@ -133,6 +133,9 @@ class Settings(BaseSettings):
             os.environ['TZ'] = self.TIME_ZONE
             time.tzset()
 
+        if not self.ALLOWED_HOSTS and not self.DEBUG:
+            raise ImproperlyConfigured("The ALLOWED_HOSTS setting must not be empty when DEBUG = False.")
+
     def is_overridden(self, setting):
         return setting in self._explicit_settings
 
