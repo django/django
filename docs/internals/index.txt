@@ -7,6 +7,7 @@ you'd like to help improve Django or learn about how Django is managed.
 .. toctree::
    :maxdepth: 2
 
+   api/index
    contributing/index
    mailing-lists
    organization
