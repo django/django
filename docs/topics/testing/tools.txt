@@ -344,6 +344,13 @@ Use the ``django.test.Client`` class to make requests.
         ``login()`` method to simulate the effect of a user logging into the
         site.
 
+        Inactive users (:attr:`is_active=False
+        <django.contrib.auth.models.User.is_active>`) are not permitted to
+        login as this method is meant to be equivalent to the
+        :func:`~django.contrib.auth.login` view which uses
+        :class:`~django.contrib.auth.forms.AuthenticationForm` and therefore
+        defaults to rejecting users who are inactive.
+
         After you call this method, the test client will have all the cookies
         and session data required to pass any login-based tests that may form
         part of a view.
