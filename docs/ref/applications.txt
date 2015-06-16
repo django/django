@@ -271,6 +271,8 @@ following is true:
 If neither of these conditions is met, Django will raise
 :exc:`~django.core.exceptions.ImproperlyConfigured`.
 
+.. _application-registry:
+
 Application registry
 ====================
 

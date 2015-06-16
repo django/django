@@ -1,0 +1,182 @@
+========================
+``django.db.migrations``
+========================
+
+This section outlines the components of Django's migrations framework and how
+they play together.
+
+.. currentmodule:: django.db.migrations.state
+
+``ProjectState`` and ``ModelState``
+-----------------------------------
+
+The heart of Django's migrations framework are the ``ProjectState``\s and
+``ModelState``\s. A ``ModelState`` represents an exact replica of a model at a
+certain point in time. This includes all the fields with all their attributes,
+the model's base classes, and the model's meta options, such as ``db_table``,
+``index_together``, ``order_with_respect_to``, and ``unique_together``.
+Furthermore, all model managers that are marked to be used in migrations are
+available as well.
+
+.. class:: ProjectState(models=None, real_apps=None)
+
+A ``ProjectState`` is a collection of all models at a certain point in time. It
+consists of the ``ModelState``\s of all models of apps with migrations, as well
+as a list of all apps without migrations.
+
+.. class:: ModelState(app_label, name, fields, options=None, bases=None, managers=None)
+
+Additionally, a ``ProjectState`` has an ``apps`` property  (lazily created upon
+first access) that proxies the global app registry from ``django.apps.apps``.
+Furthermore, when accessing ``project_state.apps`` for the first time -- it's a
+``cached_property`` -- all models for the apps without migrations and apps with
+migrations are *rendered*, using the newly created ``StateApps`` instance,
+which makes it a quite expensive operation.
+
+Reloading models
+~~~~~~~~~~~~~~~~
+
+Whenever the migrations framework needs to add or remove a model to or from a
+``ProjectState`` (a rename would be remove + add), the respective
+``ModelState``\s will be added or removed.
+
+Changes to models' ``_meta`` attributes, such as ``index_together`` or
+``db_table``, as well as updates of the model managers, reuse the existing
+``ModelState`` and only updates the respective attributes.
+
+The ``Field`` operations (e.g. ``AddField`` and ``AlterField``) alter the
+``fields`` attribute on a ``ModelState`` and reuse the existing ``ModelState``
+instance.
+
+.. warning::
+
+    The ``Field`` instances in the ``ModelState.fields`` attribute must not be
+    altered in any way. Those instances are reused across cloned
+    ``ModelState``\s for performance reasons. Therefore **always** replace a
+    ``Field`` instance with a new instance with adjusted attributes.
+
+Regardless of the reason for reloading a model, if the ``apps`` property of the
+``ProjectState`` is already populated all models related to the just added /
+removed one need to be *reloaded*.
+
+``get_related_models_recursive``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. function:: get_related_models_recursive(model)
+
+Takes a model class and recursively follows all relationships defined on this
+model or leading to that model.
+
+Relationships are either defined by explicit relational fields, like
+``ForeignKey``, ``ManyToManyField``, or ``OneToOneField``, or by inheriting
+from another model (a superclass is related to its subclasses, but not vice
+versa). Note, however, that a model inheriting from a concrete model is also
+related to its superclass through the implicit ``*_ptr` ``OneToOneField`` on
+the subclass.
+
+This rather expensive method is used when reloading models when ``apps`` is
+already populated. This is the only way to keep the ``StateApps`` registry
+consistent with the references between the model classes.
+
+Rendering models
+~~~~~~~~~~~~~~~~
+
+.. class:: StateApps(real_apps, models, ignore_swappable=False)
+
+In order to create the SQL code to alter the database, the database schema API
+needs actual model classes. Those model classes are dynamically constructed
+from the ``ModelState``\s which we call "rendering". That means,
+``projectState.apps`` is being populated with model classes with all models as
+of their state before the first migration operation is being run.
+
+While "normal models" (those from the ``models.py`` files) are kept in the
+global :ref:`application-registry`, the rendered models are kept in
+``StateApps`` instances. This subclass of ``django.apps.Apps`` allows for
+reloading and removal of models (something regular users should never do) as
+well as keeping track of models form apps with and without migrations. It also
+offers to render multiple models at once.
+
+Let's assume you have the following simplified migrations::
+
+    someapp.0001_initial:
+        CreateModel(ModelA)
+        CreateModel(ModelB)
+
+    someapp.0002_delete_modelb:
+        DeleteModel(ModelB)
+
+    someapp.0003_create_modelc:
+        CreateModel(ModelC)
+
+    someapp.0004_create_modeld:
+        CreateModel(ModelD)
+
+If you start off with an empty database, Django's migrations framework will go
+through all migrations in your project and create the
+``ProjectState``\s right before the first operation of each migration. Thus
+Django will have 4 ``ProjectState``\s:
+
+1. Before ``someapp.0001_initial`` without any ``ModelState``
+2. Before ``someapp.0002_delete_modelb`` with ``ModelA`` and ``ModelB``
+3. Before ``someapp.0003_create_modelc`` with ``ModelA``
+4. Before ``someapp.0004_create_modeld`` with ``ModelA`` and ``ModelC``
+
+Now assume ``someapp.0001_initial`` and ``someapp.0002_delete_modelb`` are
+already applied. Django will only render the ``ProjectState``\s before
+``someapp.0003_create_modelc`` and ``someapp.0004_create_modeld``:
+
+1. Before ``someapp.0003_create_modelc`` with ``ModelA``
+2. Before ``someapp.0004_create_modeld`` with ``ModelA`` and ``ModelC``
+
+If all model migrations are applied, Django won't render any ``ModelState``\s.
+
+Cloning states
+~~~~~~~~~~~~~~
+
+To improve the performance of the migrations framework, the ``ProjectState``,
+``ModelState``, and ``StateApps`` instances are ``cloned``.
+
+.. method:: ProjectState.clone()
+
+Clones all of its associated ``ModelState``\s and copies the list of apps
+without migrations. The latter does not need to be immutable, as the list of
+apps without migrations is a project-wide definition, unrelated to the
+migrations framework.
+
+.. method:: ModelState.clone()
+
+When cloning, Django creates a new instance of the class with all attributes,
+like ``app_label``, ``name``, ``fields``, ``options``, copied. While ``list``
+and ``dict`` attributes are wrapped in ``list()`` and ``dict()``, this does not
+prevent modifications of nested mutable objects. Thus migration operations need
+not to make changes that affect more then only the currently worked on
+``ModelState``.
+
+.. method:: StateApps.clone()
+
+Cloning a ``StateApps`` instance :func:`deepcopies<copy.deepcopy>` all its
+models and app configs. This, in turn, copies the actual model instances and
+all their fields in a memory and CPU efficient way.
+
+Creating a ``ModelState`` from a ``Model`` class
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. classmethod:: ModelState.from_model(model, exclude_rels=False)
+
+The core method to turn a model class into a ``ModelState`` is
+``ModelState.from_model()``
+
+Detecting changes -- The ``MigrationAutodetector``
+--------------------------------------------------
+
+Order in which changes are detected
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Optimizing migration operations -- The ``MigrationOptimizer``
+-------------------------------------------------------------
+
+How optimizations are detected
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When Django can't optimize
+~~~~~~~~~~~~~~~~~~~~~~~~~~
