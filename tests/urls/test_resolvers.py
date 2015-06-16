@@ -178,3 +178,84 @@ class ResolverTests(SimpleTestCase):
         self.assertEqual(match.app_name, 'app1')
         self.assertEqual(match.namespace, 'ns1')
         self.assertEqual(match.view_name, 'ns1:empty-view')
+
+    def test_decorators(self):
+        endpoint = ResolverEndpoint(
+            empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')],
+            decorators=[inner_decorator]
+        )
+        resolver = Resolver(
+            [('ns1', endpoint)], 'app1', constraints=[RegexPattern(r'^/'), RegexPattern(r'^(?P<pk>\d+)/')],
+            decorators=[outer_decorator]
+        )
+        url = '/42/detail/'
+        request = self.rf.get(url)
+        match = resolver.resolve(url, request)
+        self.assertEqual(match.func, empty_view)
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {'pk': '42'})
+        self.assertEqual(match.decorators, [outer_decorator, inner_decorator])
+
+    def test_default_kwargs(self):
+        endpoint = ResolverEndpoint(
+            empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')],
+            default_kwargs={'pk': 'overridden'}
+        )
+        resolver = Resolver(
+            [('ns1', endpoint)], 'app1', constraints=[RegexPattern(r'^/'), RegexPattern(r'^(?P<pk>\d+)/')],
+            default_kwargs={'test2': '37'}
+        )
+        url = '/42/detail/'
+        request = self.rf.get(url)
+        match = resolver.resolve(url, request)
+        self.assertEqual(match.func, empty_view)
+        self.assertEqual(match.args, ())
+        self.assertEqual(match.kwargs, {'pk': 'overridden', 'test2': '37'})
+
+    def test_search_endpoint(self):
+        endpoint = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
+        results = [x for x in endpoint.search(['empty-view'], [])]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results[0]), 1)
+        self.assertIsInstance(results[0][0], RegexPattern)
+        self.assertEqual(results[0][0].regex.pattern, r'^detail/$')
+        empty_results = [x for x in endpoint.search(['non-existent'], [])]
+        self.assertEqual(len(empty_results), 0)
+
+    def test_search_resolver(self):
+        endpoint1 = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
+        endpoint2 = ResolverEndpoint(empty_view, 'second-view', constraints=[RegexPattern(r'^edit/$')])
+        inner_resolver = Resolver(
+            [(None, endpoint1), (None, endpoint2)], 'app1', constraints=[RegexPattern(r'^(?P<pk>\d+)/')]
+        )
+        resolver = Resolver(
+            [('ns1', inner_resolver)], constraints=[RegexPattern(r'^/')]
+        )
+        results = [x for x in resolver.search(['ns1', 'empty-view'], [])]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results[0]), 3)
+        self.assertIsInstance(results[0][0], RegexPattern)
+        self.assertEqual(results[0][0].regex.pattern, r'^/')
+        self.assertIsInstance(results[0][1], RegexPattern)
+        self.assertEqual(results[0][1].regex.pattern, r'^(?P<pk>\d+)/')
+        self.assertIsInstance(results[0][2], RegexPattern)
+        self.assertEqual(results[0][2].regex.pattern, r'^detail/$')
+
+    def test_search_on_app_name(self):
+        endpoint1 = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
+        endpoint2 = ResolverEndpoint(empty_view, 'second-view', constraints=[RegexPattern(r'^edit/$')])
+        inner_resolver = Resolver(
+            [(None, endpoint1), (None, endpoint2)], 'app1', constraints=[RegexPattern(r'^(?P<pk>\d+)/')]
+        )
+        resolver = Resolver(
+            [('ns1', inner_resolver)], constraints=[RegexPattern(r'^/')]
+        )
+        results = [x for x in resolver.search(['app1', 'empty-view'], [])]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(len(results[0]), 3)
+        self.assertIsInstance(results[0][0], RegexPattern)
+        self.assertEqual(results[0][0].regex.pattern, r'^/')
+        self.assertIsInstance(results[0][1], RegexPattern)
+        self.assertEqual(results[0][1].regex.pattern, r'^(?P<pk>\d+)/')
+        self.assertIsInstance(results[0][2], RegexPattern)
+        self.assertEqual(results[0][2].regex.pattern, r'^detail/$')

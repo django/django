@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from functools import update_wrapper
 
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
 
@@ -82,9 +83,12 @@ class ResolverMatch(object):
 
 
 class BaseResolver(object):
-    def __init__(self, constraints=None, decorators=None):
+    app_name = None
+
+    def __init__(self, constraints=None, decorators=None, default_kwargs=None):
         self.constraints = constraints or []
         self.decorators = decorators or []
+        self.default_kwargs = default_kwargs or {}
 
     def match(self, url, request):
         args, kwargs = (), {}
@@ -92,19 +96,20 @@ class BaseResolver(object):
             url, new_args, new_kwargs = constraint.match(url, request)
             args += new_args
             kwargs.update(new_kwargs)
+        kwargs.update(self.default_kwargs)
         return url, args, kwargs
 
 
 class Resolver(BaseResolver):
-    def __init__(self, subresolvers, app_name=None, constraints=None, decorators=None):
-        super(Resolver, self).__init__(constraints, decorators)
-        self.subresolvers = subresolvers
+    def __init__(self, resolvers, app_name=None, constraints=None, decorators=None, default_kwargs=None):
+        super(Resolver, self).__init__(constraints, decorators, default_kwargs)
+        self.resolvers = resolvers
         self.app_name = app_name
 
     def resolve(self, url, request):
         new_url, args, kwargs = self.match(url, request)
 
-        for name, resolver in self.subresolvers:
+        for name, resolver in self.resolvers:
             try:
                 sub_match = resolver.resolve(new_url, request)
             except Resolver404:
@@ -115,15 +120,53 @@ class Resolver(BaseResolver):
             )
         raise Resolver404()
 
+    @cached_property
+    def namespace_dict(self):
+        dict_ = MultiValueDict()
+        for name, resolver in self.resolvers:
+            if name and resolver.app_name:
+                dict_.appendlist(resolver.app_name, name)
+        return dict_
+
+    def resolve_namespace(self, name, current_app):
+        if not name:
+            if current_app:
+                return current_app[0]
+            return name
+        if current_app:
+            if name in self.namespace_dict and current_app[0] in self.namespace_dict.getlist(name):
+                return current_app[0]
+        if name in self.namespace_dict and name not in self.namespace_dict.getlist(name):
+            return self.namespace_dict[name]
+        return name
+
+    def search(self, lookup, current_app):
+        if not lookup:
+            return
+        lookup_name = self.resolve_namespace(lookup[0], current_app)
+        lookup_path = lookup[1:]
+        current_app_path = current_app[1:]
+
+        for name, resolver in self.resolvers:
+            if name and name == lookup_name:
+                for constraints in resolver.search(lookup_path, current_app_path):
+                    yield self.constraints + constraints
+            elif not name:
+                for constraints in resolver.search(lookup, current_app):
+                    yield self.constraints + constraints
+
 
 class ResolverEndpoint(BaseResolver):
-    app_name = None
-
-    def __init__(self, func, url_name=None, constraints=None, decorators=None):
-        super(ResolverEndpoint, self).__init__(constraints, decorators)
+    def __init__(self, func, url_name=None, constraints=None, decorators=None, default_kwargs=None):
+        super(ResolverEndpoint, self).__init__(constraints, decorators, default_kwargs)
         self.func = func
         self.url_name = url_name
 
     def resolve(self, url, request):
         new_url, args, kwargs = self.match(url, request)
-        return ResolverMatch(self.func, args, kwargs, self.url_name)
+        return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
+
+    def search(self, lookup, current_app):
+        if len(lookup) == 1 and lookup[0] == self.url_name or lookup[0] is self.func:
+            yield self.constraints
+        return
