@@ -337,30 +337,16 @@ appropriate Python object. The details of how this happens internally are a
 little complex, but the code you need to write in your ``Field`` class is
 simple: make sure your field subclass uses a special metaclass:
 
-For example, on Python 2::
-
-    class HandField(models.Field):
-
-        description = "A hand of cards (bridge style)"
-
-        __metaclass__ = models.SubfieldBase
-
-        def __init__(self, *args, **kwargs):
-            ...
-
-On Python 3, in lieu of setting the ``__metaclass__`` attribute, add
-``metaclass`` to the class definition::
-
-    class HandField(models.Field, metaclass=models.SubfieldBase):
-        ...
-
-If you want your code to work on Python 2 & 3, you can use
-:func:`six.with_metaclass`::
+For example::
 
     from django.utils.six import with_metaclass
 
     class HandField(with_metaclass(models.SubfieldBase, models.Field)):
-        ...
+
+        description = "A hand of cards (bridge style)"
+
+        def __init__(self, *args, **kwargs):
+            ...
 
 This ensures that the :meth:`.to_python` method will always be called when the
 attribute is initialized.
