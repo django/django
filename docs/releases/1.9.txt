@@ -278,6 +278,10 @@ Management Commands
 * The :djadmin:`startapp` command creates an ``apps.py`` file and adds
   ``default_app_config`` in ``__init__.py``.
 
+* When using the PostgreSQL backend, the :djadmin:`dbshell` command can connect
+  to the database using the password from your settings file (instead of
+  requiring it to be manually entered).
+
 Models
 ^^^^^^
 
