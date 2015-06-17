@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 import tempfile
+import unittest
 import warnings
 
 from django.apps import apps
@@ -224,6 +226,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
                 "Unknown model in excludes: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
 
+    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
     def test_load_fixture_with_special_characters(self):
         management.call_command('loaddata', 'fixture?with[special]chars*', verbosity=0)
         self.assertQuerysetEqual(Article.objects.all(), ['<Article: How To Deal With Special Characters>'])
