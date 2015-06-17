@@ -37,6 +37,8 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
+.. _faq-python-version-support:
+
 What Python version can I use with Django?
 ------------------------------------------
 
