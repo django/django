@@ -2195,6 +2195,28 @@ will still be printed, but will not prevent management commands from running.
 
 See also the :doc:`/ref/checks` documentation.
 
+.. setting:: REDIRECT_WHITELIST_URLS
+
+REDIRECT_WHITELIST_URLS
+-----------------------
+
+.. versionadded:: 1.9
+
+Default: ``[]`` (Empty list)
+
+A list containing urls outside of the server host where redirections are
+allowed. For example an url where users will be redirected after their
+logout.
+
+The redirecting url must match or start with one in the list, meaning that
+if the list has ``https://www.foo.com/logout/``, a redirection to
+``https://www.foo.com/logout.html`` won't be allowed, but
+``https://www.foo.com/logout/bye.html`` will be allowed.
+
+.. warning::
+    A warning message will be displayed to the users if they are redirected
+    from a secure (HTTPS) address to a non-secure (HTTP) address.
+
 .. setting:: TEMPLATES
 
 TEMPLATES

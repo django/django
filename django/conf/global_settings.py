@@ -33,6 +33,11 @@ INTERNAL_IPS = []
 # "*" matches anything, ".example.com" matches example.com and all subdomains
 ALLOWED_HOSTS = []
 
+# List of URLs outside the current host to which a redirection should be allowed.
+# Redirecting from HTTPS to a HTTP only address will display an alert
+# to the user.
+REDIRECT_WHITELIST_URLS = []
+
 # Local time zone for this installation. All choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
