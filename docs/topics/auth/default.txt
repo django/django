@@ -723,8 +723,10 @@ documentation </topics/http/urls>` for details on using named URL patterns.
 If you want more control over your URLs, you can reference a specific view in
 your URLconf::
 
+    from django.contrib.auth import views as auth_views
+
     urlpatterns = [
-        url('^change-password/', 'django.contrib.auth.views.password_change')
+        url('^change-password/', auth_views.password_change)
     ]
 
 The views have optional arguments you can use to alter the behavior of the
@@ -735,7 +737,7 @@ arguments in the URLconf, these will be passed on to the view. For example::
     urlpatterns = [
         url(
             '^change-password/',
-            'django.contrib.auth.views.password_change',
+            auth_views.password_change,
             {'template_name': 'change-password.html'}
         )
     ]
