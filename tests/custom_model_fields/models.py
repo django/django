@@ -3,16 +3,18 @@ Most code parts from:
 https://docs.djangoproject.com/en/dev/howto/custom-model-fields/#converting-values-to-python-objects
 """
 from django.db import models
+from django.utils import six
 
-class CommaSeparatedModelField1(models.CharField):
+@six.add_metaclass(models.SubfieldBase)
+class CommaSeparatedModelField(models.CharField):
     description = "Implements comma-separated storage of lists"
 
     def __init__(self, separator=",", *args, **kwargs):
         self.separator = separator
-        super(CommaSeparatedModelField1, self).__init__(*args, **kwargs)
+        super(CommaSeparatedModelField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(CommaSeparatedModelField1, self).deconstruct()
+        name, path, args, kwargs = super(CommaSeparatedModelField, self).deconstruct()
         # Only include kwarg if it's not the default
         if self.separator != ",":
             kwargs['separator'] = self.separator
@@ -34,13 +36,5 @@ class CommaSeparatedModelField1(models.CharField):
         return value.split(self.separator)
 
 
-class TestModel1(models.Model):
-    test_data = CommaSeparatedModelField1(max_length=256)
-
-
-class CommaSeparatedModelField2(CommaSeparatedModelField1):
-    __metaclass__ = models.SubfieldBase
-
-
-class TestModel2(models.Model):
-    test_data = CommaSeparatedModelField2(max_length=256)
+class TestModel(models.Model):
+    test_data = CommaSeparatedModelField(max_length=256)
