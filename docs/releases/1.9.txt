@@ -385,6 +385,10 @@ Requests and Responses
 * The default 40x error views now accept a second positional parameter, the
   exception that triggered the view.
 
+* Error handlers now support rendering using
+  :class:`~django.template.response.TemplateResponse`, commonly used with
+  class based views.
+
 Tests
 ^^^^^
 
