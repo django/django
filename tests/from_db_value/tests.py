@@ -19,7 +19,7 @@ class FromDBValueTest(TestCase):
 
     def test_values(self):
         values = CashModel.objects.values('cash')
-        self.assertIsInstance(values_list[0]['cash'], Cash)
+        self.assertIsInstance(values[0]['cash'], Cash)
 
     def test_aggregation(self):
         maximum = CashModel.objects.aggregate(m=Max('cash'))['m']
