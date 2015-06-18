@@ -194,3 +194,15 @@ class OneToOneRestrictedModel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class AbstractPerson(models.Model):
+    abstract_persons = models.Manager()
+    objects = models.CharField(max_length=30)
+
+    class Meta:
+        abstract = True
+
+
+class PersonFromAbstract(AbstractPerson):
+    pass
