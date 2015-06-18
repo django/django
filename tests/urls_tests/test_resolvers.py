@@ -28,11 +28,11 @@ class ResolverMatchTests(SimpleTestCase):
 
     def test_function_func_path(self):
         match = self.get_resolver_match()
-        self.assertEqual(match._func_path, 'urls.views.empty_view')
+        self.assertEqual(match._func_path, 'urls_tests.views.empty_view')
 
     def test_class_func_path(self):
         match = self.get_resolver_match(func=class_based_view)
-        self.assertEqual(match._func_path, 'urls.views.ViewClass')
+        self.assertEqual(match._func_path, 'urls_tests.views.ViewClass')
 
     def test_decorators_reverse_order(self):
         match = self.get_resolver_match(decorators=[outer_decorator, inner_decorator])
@@ -46,7 +46,7 @@ class ResolverMatchTests(SimpleTestCase):
 
     def test_view_name_no_url_name(self):
         match = self.get_resolver_match(url_name=None)
-        self.assertEqual(match.view_name, 'urls.views.empty_view')
+        self.assertEqual(match.view_name, 'urls_tests.views.empty_view')
 
     def test_view_name_with_url_name(self):
         match = self.get_resolver_match(url_name='empty')
@@ -214,12 +214,14 @@ class ResolverTests(SimpleTestCase):
 
     def test_search_endpoint(self):
         endpoint = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
-        results = [x for x in endpoint.search(['empty-view'], [])]
-        self.assertEqual(len(results), 1)
-        self.assertEqual(len(results[0]), 1)
-        self.assertIsInstance(results[0][0], RegexPattern)
-        self.assertEqual(results[0][0].regex.pattern, r'^detail/$')
-        empty_results = [x for x in endpoint.search(['non-existent'], [])]
+        count = 0
+        for constraints, kwargs in endpoint.search(['empty-view']):
+            count += 1
+            self.assertEqual(len(constraints), 1)
+            self.assertIsInstance(constraints[0], RegexPattern)
+            self.assertEqual(constraints[0].regex.pattern, r'^detail/$')
+        self.assertEqual(count, 1, "Expected 1 result for endpoint.search(['empty-view']), got %s." % count)
+        empty_results = [x for x in endpoint.search(['non-existent'])]
         self.assertEqual(len(empty_results), 0)
 
     def test_search_resolver(self):
@@ -231,31 +233,15 @@ class ResolverTests(SimpleTestCase):
         resolver = Resolver(
             [('ns1', inner_resolver)], constraints=[RegexPattern(r'^/')]
         )
-        results = [x for x in resolver.search(['ns1', 'empty-view'], [])]
-        self.assertEqual(len(results), 1)
-        self.assertEqual(len(results[0]), 3)
-        self.assertIsInstance(results[0][0], RegexPattern)
-        self.assertEqual(results[0][0].regex.pattern, r'^/')
-        self.assertIsInstance(results[0][1], RegexPattern)
-        self.assertEqual(results[0][1].regex.pattern, r'^(?P<pk>\d+)/')
-        self.assertIsInstance(results[0][2], RegexPattern)
-        self.assertEqual(results[0][2].regex.pattern, r'^detail/$')
-
-    def test_search_on_app_name(self):
-        endpoint1 = ResolverEndpoint(empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')])
-        endpoint2 = ResolverEndpoint(empty_view, 'second-view', constraints=[RegexPattern(r'^edit/$')])
-        inner_resolver = Resolver(
-            [(None, endpoint1), (None, endpoint2)], 'app1', constraints=[RegexPattern(r'^(?P<pk>\d+)/')]
-        )
-        resolver = Resolver(
-            [('ns1', inner_resolver)], constraints=[RegexPattern(r'^/')]
-        )
-        results = [x for x in resolver.search(['app1', 'empty-view'], [])]
-        self.assertEqual(len(results), 1)
-        self.assertEqual(len(results[0]), 3)
-        self.assertIsInstance(results[0][0], RegexPattern)
-        self.assertEqual(results[0][0].regex.pattern, r'^/')
-        self.assertIsInstance(results[0][1], RegexPattern)
-        self.assertEqual(results[0][1].regex.pattern, r'^(?P<pk>\d+)/')
-        self.assertIsInstance(results[0][2], RegexPattern)
-        self.assertEqual(results[0][2].regex.pattern, r'^detail/$')
+        count = 0
+        for constraints, default_kwargs in resolver.search(['ns1', 'empty-view']):
+            count += 1
+            self.assertEqual(len(constraints), 3)
+            self.assertIsInstance(constraints[0], RegexPattern)
+            self.assertEqual(constraints[0].regex.pattern, r'^/')
+            self.assertIsInstance(constraints[1], RegexPattern)
+            self.assertEqual(constraints[1].regex.pattern, r'^(?P<pk>\d+)/')
+            self.assertIsInstance(constraints[2], RegexPattern)
+            self.assertEqual(constraints[2].regex.pattern, r'^detail/$')
+            self.assertEqual(default_kwargs, {})
+        self.assertEqual(count, 1)
