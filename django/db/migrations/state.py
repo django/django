@@ -465,7 +465,10 @@ class ModelState(object):
                 (name, instance) for name, (cc, instance) in
                 sorted(managers_mapping.items(), key=lambda v: v[1])
             ]
-            if managers == [(default_manager_name, models.Manager())]:
+            # If the only manager on the model is the default manager defined
+            # by Django (`objects = models.Manager()`), this manager will not
+            # be added to the model state.
+            if managers == [('objects', models.Manager())]:
                 managers = []
         else:
             managers = []
