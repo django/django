@@ -179,6 +179,10 @@ def password_reset(request, is_admin_site=False,
                     RemovedInDjango20Warning, 3
                 )
                 opts = dict(opts, domain_override=request.get_host())
+            
+            if extra_context is not None:
+                opts.update(extra_context)
+
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
     else:
