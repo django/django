@@ -175,6 +175,7 @@ def password_reset(request, is_admin_site=False,
                    post_reset_redirect=None,
                    from_email=None,
                    extra_context=None,
+                   extra_email_context=None,
                    html_email_template_name=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
@@ -200,6 +201,10 @@ def password_reset(request, is_admin_site=False,
                     RemovedInDjango110Warning, 3
                 )
                 opts = dict(opts, domain_override=request.get_host())
+
+            if extra_email_context is not None:
+                opts.update(extra_email_context)
+
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
     else:
