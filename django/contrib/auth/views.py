@@ -175,7 +175,8 @@ def password_reset(request, is_admin_site=False,
                    post_reset_redirect=None,
                    from_email=None,
                    extra_context=None,
-                   html_email_template_name=None):
+                   html_email_template_name=None,
+                   extra_email_context=None):
     if post_reset_redirect is None:
         post_reset_redirect = reverse('password_reset_done')
     else:
@@ -191,6 +192,7 @@ def password_reset(request, is_admin_site=False,
                 'subject_template_name': subject_template_name,
                 'request': request,
                 'html_email_template_name': html_email_template_name,
+                'extra_email_context': extra_email_context,
             }
             if is_admin_site:
                 warnings.warn(
