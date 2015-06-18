@@ -365,6 +365,9 @@ Management Commands
 Models
 ^^^^^^
 
+* :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
+  now works on proxy models.
+
 * Database configuration gained a :setting:`TIME_ZONE <DATABASE-TIME_ZONE>`
   option for interacting with databases that store datetimes in local time and
   don't support time zones when :setting:`USE_TZ` is ``True``.
