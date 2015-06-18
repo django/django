@@ -154,6 +154,9 @@ def get_resolver(urlconf):
     return RegexURLResolver(r'^/', urlconf)
 
 
+from django.core.urls import get_resolver  # NOQA
+
+
 @lru_cache.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent urlconf pattern.
@@ -603,6 +606,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
 reverse_lazy = lazy(reverse, six.text_type)
+
+from django.core.urls import resolve, reverse, reverse_lazy  # NOQA
 
 
 def clear_url_caches():

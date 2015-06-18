@@ -9,10 +9,8 @@ path_data = (
     ('/test/', 'query=true', 'fragment', '/test/?query=true#fragment'),
     # and empty path still returns a slash
     ('', '', '', '/'),
-    # ?, = and ; in the path must be encoded
-    ('/test/?=;', '', '', '/test/%3F%3D%3B'),
-    # other "reserved" characters don't have to be encoded
-    ('/test/@&$', '', '', '/test/@&$'),
+    # special characters? no problem.
+    ('/test/?=;@&$', '', '', '/test/?=;@&$'),
     # # in query string must be encoded
     ('/test/', 'query=#hashtag', 'fragment', '/test/?query=%23hashtag#fragment'),
     # / and ? in query string are allowed

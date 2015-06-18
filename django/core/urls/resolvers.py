@@ -4,12 +4,11 @@ from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_module
 
-from .exceptions import Resolver404
+from .exceptions import NoReverseMatch, Resolver404
 
 
 class ResolverMatch(object):
@@ -58,7 +57,7 @@ class ResolverMatch(object):
         callback = func = self.func
         for decorator in reversed(self.decorators):
             callback = decorator(callback)
-        update_wrapper(callback, func, assigned=available_attrs(func))
+        # update_wrapper(callback, func, assigned=available_attrs(func))
         return callback
 
     def __getitem__(self, index):
@@ -75,7 +74,7 @@ class ResolverMatch(object):
         submatch. Does not carry over args if there are any kwargs.
         """
         if kwargs or submatch.kwargs:
-            args = ()
+            args = submatch.args
             kwargs.update(submatch.kwargs)
         else:
             args += submatch.args
@@ -93,6 +92,12 @@ class BaseResolver(object):
         self.decorators = decorators or []
         self.default_kwargs = default_kwargs or {}
 
+    def __getitem__(self, item):
+        raise KeyError(item)
+
+    def get_namespaces(self, name):
+        return []
+
     def match(self, url, request):
         args, kwargs = (), {}
         for constraint in self.constraints:
@@ -108,6 +113,9 @@ class Resolver(BaseResolver):
         super(Resolver, self).__init__(constraints, decorators, default_kwargs)
         self.urlconf_name = urlconf_name
         self.app_name = app_name
+
+    def __repr__(self):
+        return '<Resolver app_name=%r>' % self.app_name
 
     @cached_property
     def urlconf_module(self):
@@ -131,6 +139,16 @@ class Resolver(BaseResolver):
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
         return patterns
 
+    def resolve_error_handler(self, view_type):
+        callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
+        if not callback:
+            # No handler specified in file; use default
+            # Lazy import, since django.urls imports this file
+            from django.conf import urls
+            callback = getattr(urls, 'handler%s' % view_type)
+        from django.core.urlresolvers import get_callable
+        return get_callable(callback), {}
+
     def resolve(self, url, request=None):
         new_url, args, kwargs = self.match(url, request)
         for name, resolver in self.resolvers:
@@ -144,40 +162,55 @@ class Resolver(BaseResolver):
             )
         raise Resolver404()
 
-    @cached_property
-    def app_dict(self):
-        dict_ = MultiValueDict()
+    def __getitem__(self, item):
         for name, resolver in self.resolvers:
-            if name and resolver.app_name:
-                dict_.appendlist(resolver.app_name, name)
-        return dict_
+            if name and name == item:
+                return resolver
+            elif name is None:
+                try:
+                    return resolver[item]
+                except KeyError:
+                    pass
+        raise KeyError(item)
 
-    def resolve_namespace(self, name, current_app):
-        if not name:
-            if current_app:
-                return current_app[0]
-            return name
-        if current_app:
-            if name in self.app_dict and current_app[0] in self.app_dict.getlist(name):
-                return current_app[0]
-        if name in self.app_dict and name not in self.app_dict.getlist(name):
-            return self.app_dict[name]
-        return name
+    def get_namespaces(self, name):
+        namespaces = []
+        for namespace, resolver in self.resolvers:
+            if name and (name == resolver.app_name or namespace == name):
+                namespaces.append(namespace)
+            elif namespace is None:
+                namespaces.extend(resolver.get_namespaces(name))
+        return namespaces
 
-    def search(self, lookup, current_app):
+    def resolve_namespace(self, lookup, current_app):
+        if not lookup:
+            raise NoReverseMatch()
+        namespaces = self.get_namespaces(lookup[0])
+        if current_app and current_app[0] in namespaces:
+            name = current_app[0]
+        elif lookup[0] in namespaces:
+            name = lookup[0]
+            current_app = []
+        elif namespaces:
+            name = namespaces[-1]
+            current_app = []
+        else:
+            return lookup
+
+        return [name] + self[name].resolve_namespace(lookup[1:], current_app[1:])
+
+    def search(self, lookup):
         if not lookup:
             return
-        lookup_name = self.resolve_namespace(lookup[0], current_app)
-        lookup_path = lookup[1:]
-        current_app_path = current_app[1:]
+        lookup_name, lookup_path = lookup[0], lookup[1:]
 
         for name, resolver in reversed(self.resolvers):
             if name and name == lookup_name:
-                for constraints, default_kwargs in resolver.search(lookup_path, current_app_path):
+                for constraints, default_kwargs in resolver.search(lookup_path):
                     default_kwargs.update(self.default_kwargs)
                     yield self.constraints + constraints, default_kwargs
             elif not name:
-                for constraints, default_kwargs in resolver.search(lookup, current_app):
+                for constraints, default_kwargs in resolver.search(lookup):
                     default_kwargs.update(self.default_kwargs)
                     yield self.constraints + constraints, default_kwargs
 
@@ -185,35 +218,49 @@ class Resolver(BaseResolver):
 class ResolverEndpoint(BaseResolver):
     def __init__(self, func, url_name=None, constraints=None, decorators=None, default_kwargs=None):
         super(ResolverEndpoint, self).__init__(constraints, decorators, default_kwargs)
-        self._func = func
-        if not hasattr(func, '__name__'):
-            # A class-based view
-            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+        if callable(func):
+            self._func = func
+            if not hasattr(func, '__name__'):
+                # A class-based view
+                self._func_str = '.'.join([func.__class__.__module__, func.__class__.__name__])
+            else:
+                # A function-based view
+                self._func_str = '.'.join([func.__module__, func.__name__])
         else:
-            # A function-based view
-            self._func_path = '.'.join([func.__module__, func.__name__])
+            self._func = None
+            self._func_str = func
         self.url_name = url_name
 
     def __repr__(self):
-        return "<ResolverEndpoint func=%s name=%s>" % (self._func_path, self.url_name)
+        return "<ResolverEndpoint func=%s name=%s>" % (self._func_str, self.url_name)
 
     def add_prefix(self, prefix):
         if callable(self._func) or not prefix:
             return
-        self._func = prefix + '.' + self._func
+        self._func_str = prefix + '.' + self._func_str
 
     @property
     def func(self):
-        if not callable(self._func):
+        if self._func is None:
             from django.core.urlresolvers import get_callable
-            self._func = get_callable(self._func)
+            self._func = get_callable(self._func_str)
         return self._func
 
     def resolve(self, url, request=None):
         new_url, args, kwargs = self.match(url, request)
         return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
 
-    def search(self, lookup, current_app):
-        if len(lookup) == 1 and (self.url_name and lookup[0] == self.url_name or lookup[0] == self._func_path or lookup[0] is self.func):
+    def __getitem__(self, item):
+        if item and item in (self.url_name, self._func_str):
+            return self
+        raise KeyError(item)
+
+    def resolve_namespace(self, lookup, current_app):
+        if len(lookup) == 1 and lookup[0] is not None and lookup[0] in (self.url_name, self._func, self._func_str):
+            return lookup
+        raise NoReverseMatch()
+
+    def search(self, lookup):
+        if len(lookup) == 1 and lookup[0] is not None and lookup[0] in (self.url_name, self._func, self._func_str):
             yield self.constraints, self.default_kwargs.copy()
         return

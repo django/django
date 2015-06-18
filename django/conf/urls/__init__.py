@@ -2,9 +2,7 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import (
-    LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
-)
+from django.core.urls.resolvers import BaseResolver
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
@@ -86,7 +84,10 @@ def patterns(prefix, *args):
     pattern_list = []
     for t in args:
         if isinstance(t, (list, tuple)):
-            t = url(prefix=prefix, *t)
+            if len(t) != 2 or not isinstance(t[1], BaseResolver):
+                t = url(prefix=prefix, *t)
+            elif len(t) == 2 and isinstance(t[1], ResolverEndpoint):
+                t[1].add_prefix(prefix)
         elif isinstance(t, RegexURLPattern):
             t.add_prefix(prefix)
         pattern_list.append(t)
@@ -111,3 +112,5 @@ def url(regex, view, kwargs=None, name=None, prefix=''):
             if prefix:
                 view = prefix + '.' + view
         return RegexURLPattern(regex, view, kwargs, name)
+
+from django.core.urls import url, ResolverEndpoint

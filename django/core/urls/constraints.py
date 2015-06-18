@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 import re
 
+from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
 from django.utils.functional import cached_property
 from django.utils.regex_helper import normalize
 
@@ -39,9 +41,18 @@ class RegexPattern(Constraint):
     def describe(self):
         return self.regex.pattern
 
+    def __repr__(self):
+        return '<RegexPattern %r>' % self._regex
+
     @cached_property
     def regex(self):
-        return re.compile(self._regex, re.UNICODE)
+        try:
+            compiled_regex = re.compile(self._regex, re.UNICODE)
+        except re.error as e:
+            raise ImproperlyConfigured(
+                '"%s" is not a valid regular expression: %s' %
+                (self._regex, six.text_type(e)))
+        return compiled_regex
 
     @cached_property
     def normalized_patterns(self):

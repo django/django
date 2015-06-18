@@ -30,13 +30,13 @@ class URL(object):
         return "<URL '%s'>" % urlunsplit((self.scheme, self.host, self.path, self.query_string, self.fragment))
 
     def __str__(self):
-        return urlunsplit((
+        return iri_to_uri(urlunsplit((
             self.scheme,
             self.host,
-            escape_uri_path(self.path) or '/',
+            self.path or '/',
             escape_query_string(self.query_string),
-            iri_to_uri(self.fragment)
-        ))
+            self.fragment
+        )))
 
     def copy(self):
         return type(self)(
