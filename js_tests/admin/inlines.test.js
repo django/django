@@ -30,3 +30,24 @@ test('add form', function(assert) {
     addButton.click();
     assert.ok(this.table.find('#first-1').hasClass('row2'));
 });
+
+test('add/remove form events', function(assert) {
+    assert.expect(6);
+    var $ = django.jQuery;
+    var $document = $(document);
+    var addButton = this.table.find('.add-row a');
+    $document.on('formset:added', function(event, $row, formsetName) {
+        assert.ok(true, 'event `formset:added` triggered');
+        assert.equal(true, $row.is($('.row2')));
+        assert.equal(formsetName, 'first');
+    });
+    addButton.click();
+    var deletedRow = $('.row2');
+    var deleteLink = this.table.find('.inline-deletelink');
+    $document.on('formset:removed', function(event, $row, formsetName) {
+        assert.ok(true, 'event `formset:removed` triggered');
+        assert.equal(true, $row.is(deletedRow));
+        assert.equal(formsetName, 'first');
+    });
+    deleteLink.click();
+});

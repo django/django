@@ -175,6 +175,9 @@ Minor features
   the display of empty values in admin change list. You can also customize the
   value for each field.
 
+* Added jQuery events :ref:`when an inline form is added or removed
+  <admin-javascript-inline-form-events>` on the change form page.
+
 * The time picker widget includes a '6 p.m' option for consistency of having
   predefined options every 6 hours.
 

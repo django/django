@@ -59,6 +59,7 @@ Other topics
 
    actions
    admindocs
+   javascript
 
 .. seealso::
 
@@ -1881,6 +1882,8 @@ The :doc:`staticfiles app </ref/contrib/staticfiles>` prepends
 :setting:`STATIC_URL` (or :setting:`MEDIA_URL` if :setting:`STATIC_URL` is
 ``None``) to any asset paths. The same rules apply as :ref:`regular asset
 definitions on forms <form-asset-paths>`.
+
+.. _contrib-admin-jquery:
 
 jQuery
 ~~~~~~
