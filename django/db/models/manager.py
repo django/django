@@ -15,10 +15,7 @@ def ensure_default_manager(cls):
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    if cls._meta.abstract:
-        setattr(cls, 'objects', AbstractManagerDescriptor(cls))
-        return
-    elif cls._meta.swapped:
+    if cls._meta.swapped:
         setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
