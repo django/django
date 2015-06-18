@@ -48,7 +48,7 @@ class PhoneNumber(models.Model):
 
 class Contact(models.Model):
     name = models.CharField(max_length=50)
-    phone_numbers = GenericRelation(PhoneNumber)
+    phone_numbers = GenericRelation(PhoneNumber, related_query_name='phone_numbers')
 
 
 #
