@@ -2,9 +2,12 @@ from __future__ import unicode_literals
 
 from functools import update_wrapper
 
+from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
+from django.utils.module_loading import import_module
 
 from .exceptions import Resolver404
 
@@ -101,14 +104,35 @@ class BaseResolver(object):
 
 
 class Resolver(BaseResolver):
-    def __init__(self, resolvers, app_name=None, constraints=None, decorators=None, default_kwargs=None):
+    def __init__(self, urlconf_name, app_name=None, constraints=None, decorators=None, default_kwargs=None):
         super(Resolver, self).__init__(constraints, decorators, default_kwargs)
-        self.resolvers = resolvers
+        self.urlconf_name = urlconf_name
         self.app_name = app_name
 
-    def resolve(self, url, request):
-        new_url, args, kwargs = self.match(url, request)
+    @cached_property
+    def urlconf_module(self):
+        if isinstance(self.urlconf_name, six.string_types):
+            return import_module(self.urlconf_name)
+        else:
+            return self.urlconf_name
 
+    @cached_property
+    def resolvers(self):
+        # urlconf_module might be a valid set of patterns, so we default to it
+        patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+        try:
+            iter(patterns)
+        except TypeError:
+            msg = (
+                "The included urlconf '{name}' does not appear to have any "
+                "patterns in it. If you see valid patterns in the file then "
+                "the issue is probably caused by a circular import."
+            )
+            raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
+        return patterns
+
+    def resolve(self, url, request=None):
+        new_url, args, kwargs = self.match(url, request)
         for name, resolver in self.resolvers:
             try:
                 sub_match = resolver.resolve(new_url, request)
@@ -121,7 +145,7 @@ class Resolver(BaseResolver):
         raise Resolver404()
 
     @cached_property
-    def namespace_dict(self):
+    def app_dict(self):
         dict_ = MultiValueDict()
         for name, resolver in self.resolvers:
             if name and resolver.app_name:
@@ -134,10 +158,10 @@ class Resolver(BaseResolver):
                 return current_app[0]
             return name
         if current_app:
-            if name in self.namespace_dict and current_app[0] in self.namespace_dict.getlist(name):
+            if name in self.app_dict and current_app[0] in self.app_dict.getlist(name):
                 return current_app[0]
-        if name in self.namespace_dict and name not in self.namespace_dict.getlist(name):
-            return self.namespace_dict[name]
+        if name in self.app_dict and name not in self.app_dict.getlist(name):
+            return self.app_dict[name]
         return name
 
     def search(self, lookup, current_app):
@@ -147,26 +171,49 @@ class Resolver(BaseResolver):
         lookup_path = lookup[1:]
         current_app_path = current_app[1:]
 
-        for name, resolver in self.resolvers:
+        for name, resolver in reversed(self.resolvers):
             if name and name == lookup_name:
-                for constraints in resolver.search(lookup_path, current_app_path):
-                    yield self.constraints + constraints
+                for constraints, default_kwargs in resolver.search(lookup_path, current_app_path):
+                    default_kwargs.update(self.default_kwargs)
+                    yield self.constraints + constraints, default_kwargs
             elif not name:
-                for constraints in resolver.search(lookup, current_app):
-                    yield self.constraints + constraints
+                for constraints, default_kwargs in resolver.search(lookup, current_app):
+                    default_kwargs.update(self.default_kwargs)
+                    yield self.constraints + constraints, default_kwargs
 
 
 class ResolverEndpoint(BaseResolver):
     def __init__(self, func, url_name=None, constraints=None, decorators=None, default_kwargs=None):
         super(ResolverEndpoint, self).__init__(constraints, decorators, default_kwargs)
-        self.func = func
+        self._func = func
+        if not hasattr(func, '__name__'):
+            # A class-based view
+            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+        else:
+            # A function-based view
+            self._func_path = '.'.join([func.__module__, func.__name__])
         self.url_name = url_name
 
-    def resolve(self, url, request):
+    def __repr__(self):
+        return "<ResolverEndpoint func=%s name=%s>" % (self._func_path, self.url_name)
+
+    def add_prefix(self, prefix):
+        if callable(self._func) or not prefix:
+            return
+        self._func = prefix + '.' + self._func
+
+    @property
+    def func(self):
+        if not callable(self._func):
+            from django.core.urlresolvers import get_callable
+            self._func = get_callable(self._func)
+        return self._func
+
+    def resolve(self, url, request=None):
         new_url, args, kwargs = self.match(url, request)
         return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
 
     def search(self, lookup, current_app):
-        if len(lookup) == 1 and lookup[0] == self.url_name or lookup[0] is self.func:
-            yield self.constraints
+        if len(lookup) == 1 and (self.url_name and lookup[0] == self.url_name or lookup[0] == self._func_path or lookup[0] is self.func):
+            yield self.constraints, self.default_kwargs.copy()
         return
