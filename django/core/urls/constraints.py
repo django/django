@@ -34,10 +34,14 @@ class Constraint(object):
 
 class RegexPattern(Constraint):
     def __init__(self, regex):
-        self.regex = re.compile(regex, re.UNICODE)
+        self._regex = regex
 
     def describe(self):
         return self.regex.pattern
+
+    @cached_property
+    def regex(self):
+        return re.compile(self._regex, re.UNICODE)
 
     @cached_property
     def normalized_patterns(self):
@@ -53,19 +57,21 @@ class RegexPattern(Constraint):
         raise Resolver404()
 
     def construct(self, url_object, args, kwargs):
-        for pattern, params in self.normalized_patterns:
+        for pattern, params in reversed(self.normalized_patterns):
             if kwargs:
                 if any(param not in kwargs for param in params):
-                    raise NoReverseMatch()
+                    continue
                 subs = kwargs
-                kwargs = {k: v for (k, v) in kwargs.items() if k not in params}
+                new_args = ()
+                new_kwargs = {k: v for (k, v) in kwargs.items() if k not in params}
             else:
                 if len(params) > len(args):
-                    raise NoReverseMatch()
+                    continue
                 subs = dict(zip(params, args))
-                args = args[len(params):]
+                new_args = args[len(params):]
+                new_kwargs = {}
             path = pattern % subs
             if self.regex.search(path):
                 url_object.path += path
-                return url_object, args, kwargs
+                return url_object, new_args, new_kwargs
         raise NoReverseMatch()
