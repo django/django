@@ -693,6 +693,12 @@ Miscellaneous
 * The ``django.contrib.sites.models.Site.domain`` field was changed to be
   :attr:`~django.db.models.Field.unique`.
 
+* The behavior of ``Site.objects.get_current()`` has been modified to handle
+  the case where ``HttpRequest.get_host()`` returns ``domain:port``, e.g.
+  ``example.com:80``. If the lookup fails because the host does not match a
+  record in the database and the host has a port, the port is stripped and the
+  lookup is retried with the domain part only.
+
 * In order to enforce test isolation, database queries are not allowed
   by default in :class:`~django.test.SimpleTestCase` tests anymore. You
   can disable this behavior by setting the

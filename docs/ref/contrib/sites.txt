@@ -502,3 +502,14 @@ Finally, to avoid repetitive fallback code, the framework provides a
         This function will now lookup the current site based on
         :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
         :setting:`SITE_ID` setting is not defined.
+
+    .. versionchanged:: 1.9
+
+        It is possible for both a domain and a port to be returned by
+        :meth:`request.get_host() <django.http.HttpRequest.get_host>` when the
+        Host header has a port explicitly specified, e.g. ``example.com:80``.
+        If the lookup fails because the host does not match a record in the
+        database and the host has a port, the port is stripped and the lookup
+        is retried with the domain part only. Note that this does not
+        apply to :class:`~django.contrib.sites.requests.RequestSite` which will
+        always use the unmodified host.
