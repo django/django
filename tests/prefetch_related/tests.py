@@ -626,6 +626,20 @@ class CustomPrefetchTests(TestCase):
         room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'), to_attr='main_room_of_attr')).first()
         self.assertIsNone(room.main_room_of_attr)
 
+    def test_nested_prefetch_related_are_not_overwritten(self):
+        # Regression test for #24873
+        houses_2 = House.objects.prefetch_related(Prefetch('rooms'))
+        persons = Person.objects.prefetch_related(Prefetch('houses', queryset=houses_2))
+        houses = House.objects.prefetch_related(Prefetch('occupants', queryset=persons))
+        # It seems like the queryset must be evaluated once to overwrite the Prefetch objects
+        # to cause the bug when there are ManyToManyFields.
+        list(houses)
+        # Access the nested objects now. It will break if Prefetch objects are overwritten.
+        self.assertEqual(
+            houses.all()[0].occupants.all()[0].houses.all()[1].rooms.all()[0],
+            self.room2_1
+        )
+
 
 class DefaultManagerTests(TestCase):
 
