@@ -74,3 +74,6 @@ Bugfixes
 
 * Fixed crash when uploading images with MIME types that Pillow doesn't detect,
   such as bitmap, in ``forms.ImageField`` (:ticket:`24948`).
+
+* Fixed a regression when deleting a model through the admin that has a
+  ``GenericRelation`` with a ``related_query_name`` (:ticket:`24940`).
