@@ -98,6 +98,7 @@
                     if (options.removed) {
                         options.removed(row);
                     }
+                    $(document).trigger('formset:removed', [row, options.prefix]);
                     // Update the TOTAL_FORMS form count.
                     var forms = $("." + options.formCssClass);
                     $("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
@@ -120,6 +121,7 @@
                 if (options.added) {
                     options.added(row);
                 }
+                $(document).trigger('formset:added', [row, options.prefix]);
             });
         }
         return this;
