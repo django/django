@@ -8,6 +8,8 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
+from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import (
@@ -16,7 +18,7 @@ from django.test import (
 from django.utils.deprecation import RemovedInDjango19Warning
 
 from .admin import MediaInline, MediaPermanentInline, site as admin_site
-from .models import Category, Episode, EpisodePermanent, Media
+from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
 
 
 # Set DEBUG to True to ensure {% include %} will raise exceptions.
@@ -300,6 +302,17 @@ class GenericInlineAdminWithUniqueTogetherTest(TestCase):
         self.assertEqual(response.status_code, 200)
         response = self.client.post('/generic_inline_admin/admin/generic_inline_admin/contact/add/', post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
+
+    def test_delete(self):
+        from .models import Contact
+        c = Contact.objects.create(name='foo')
+        PhoneNumber.objects.create(
+            object_id=c.id,
+            content_type=ContentType.objects.get_for_model(Contact),
+            phone_number="555-555-5555",
+        )
+        response = self.client.post(reverse('admin:generic_inline_admin_contact_delete', args=[c.pk]))
+        self.assertContains(response, 'Are you sure you want to delete')
 
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
