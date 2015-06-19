@@ -2,7 +2,7 @@
   "name": "Django",
   "private": true,
   "scripts": {
-    "pretest": "eslint django/contrib/admin/static/admin/js"
+    "pretest": "eslint django/"
   },
   "devDependencies": {
     "eslint": "^0.22.1"
