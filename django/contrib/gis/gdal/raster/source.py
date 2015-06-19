@@ -111,7 +111,7 @@ class GDALRaster(GDALBase):
                 if 'nodata_value' in band_input:
                     self.bands[i].nodata_value = band_input['nodata_value']
 
-            # Set SRID, default to 0 (this assures SRS is always instanciated)
+            # Set SRID
             self.srs = ds_input.get('srid')
 
             # Set additional properties if provided

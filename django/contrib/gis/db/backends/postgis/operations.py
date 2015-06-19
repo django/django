@@ -4,6 +4,9 @@ from django.conf import settings
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
 from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
+from django.contrib.gis.db.backends.postgis.pgraster import (
+    from_pgraster, to_pgraster,
+)
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
@@ -14,6 +17,7 @@ from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
+from .pgraster import get_pgraster_srid
 
 
 class PostGISOperator(SpatialOperator):
@@ -205,12 +209,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def geo_db_type(self, f):
         """
-        Return the database field type for the given geometry field.
-        Typically this is `None` because geometry columns are added via
-        the `AddGeometryColumn` stored procedure, unless the field
-        has been specified to be of geography type instead.
+        Return the database field type for the given spatial field.
         """
-        if f.geography:
+        if f.geom_type == 'RASTER':
+            return 'raster'
+        elif f.geography:
             if f.srid != 4326:
                 raise NotImplementedError('PostGIS only supports geography columns with an SRID of 4326.')
 
@@ -272,10 +275,21 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         SRID of the field.  Specifically, this routine will substitute in the
         ST_Transform() function call.
         """
-        if value is None or value.srid == f.srid:
-            placeholder = '%s'
+        # Get the srid for this object
+        if value is None:
+            value_srid = None
+        elif f.geom_type == 'RASTER':
+            value_srid = get_pgraster_srid(value)
         else:
-            # Adding Transform() to the SQL placeholder.
+            value_srid = value.srid
+
+        # Adding Transform() to the SQL placeholder if the value srid
+        # is not equal to the field srid.
+        if value_srid is None or value_srid == f.srid:
+            placeholder = '%s'
+        elif f.geom_type == 'RASTER':
+            placeholder = '%s((%%s)::raster, %s)' % (self.transform, f.srid)
+        else:
             placeholder = '%s(%%s, %s)' % (self.transform, f.srid)
 
         if hasattr(value, 'as_sql'):
@@ -359,3 +373,11 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     def spatial_ref_sys(self):
         return PostGISSpatialRefSys
+
+    # Methods to convert between PostGIS rasters and dicts that are
+    # readable by GDALRaster.
+    def parse_raster(self, value):
+        return from_pgraster(value)
+
+    def deconstruct_raster(self, value):
+        return to_pgraster(value)

@@ -21,6 +21,9 @@ GDAL_PIXEL_TYPES = {
     11: 'GDT_CFloat64',  # Complex Float64
 }
 
+# A list of gdal datatypes that are integers.
+GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5]
+
 # Lookup values to convert GDAL pixel type indices into ctypes objects.
 # The GDAL band-io works with ctypes arrays to hold data to be written
 # or to hold the space for data to be read into. The lookup below helps

@@ -10,10 +10,10 @@ world-class geographic Web framework.  GeoDjango strives to make it as simple
 as possible to create geographic Web applications, like location-based services.
 Its features include:
 
-* Django model fields for `OGC`_ geometries.
+* Django model fields for `OGC`_ geometries and raster data.
 * Extensions to Django's ORM for querying and manipulating spatial data.
-* Loosely-coupled, high-level Python interfaces for GIS geometry operations and
-  data formats.
+* Loosely-coupled, high-level Python interfaces for GIS geometry and raster
+  operations and data manipulation in different formats.
 * Editing geometry fields from the admin.
 
 This tutorial assumes familiarity with Django; thus, if you're brand new to

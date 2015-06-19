@@ -49,8 +49,14 @@ on a different spatial backend.
     lookups and the integrity of your data -- MyISAM tables do
     not support transactions or foreign key constraints.
 
-Creating and Saving Geographic Models
-=====================================
+Raster Support
+--------------
+
+``RasterField`` is currently only implemented for the PostGIS backend. Spatial
+queries (such as lookups and distance) are not yet available for raster fields.
+
+Creating and Saving Models with Geometry Fields
+===============================================
 
 Here is an example of how to create a geometry object (assuming the ``Zipcode``
 model)::
@@ -87,6 +93,42 @@ create a ``GEOSGeometry`` instance from the input.
 For more information creating :class:`~django.contrib.gis.geos.GEOSGeometry`
 objects, refer to the :ref:`GEOS tutorial <geos-tutorial>`.
 
+.. _creating-and-saving-raster-models:
+
+Creating and Saving Models with Raster Fields
+=============================================
+
+.. versionadded:: 1.9
+
+When creating raster models, the raster field will implicitly convert the input
+into a :class:`~django.contrib.gis.gdal.GDALRaster` using lazy-evaluation.
+The raster field will therefore accept any input that is accepted by the
+:class:`~django.contrib.gis.gdal.GDALRaster` constructor.
+
+Here is an example of how to create a raster object from a raster file
+``volcano.tif`` (assuming the ``Elevation`` model)::
+
+    >>> from elevation.models import Elevation
+    >>> dem = Elevation(name='Volcano', rast='/path/to/raster/volcano.tif')
+    >>> dem.save()
+
+:class:`~django.contrib.gis.gdal.GDALRaster` objects may also be used to save
+raster models::
+
+    >>> from django.contrib.gis.gdal import GDALRaster
+    >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
+    ...                    'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    >>> dem = Elevation(name='Canyon', rast=rast)
+    >>> dem.save()
+
+Note that this equivalent to::
+
+    >>> dem = Elevation.objects.create(
+    ...     name='Canyon',
+    ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
+    ...           'scale': [0.1, -0.1]'bands': [{"data": range(100)}]}
+    ... )
+
 .. _spatial-lookups-intro:
 
 Spatial Lookups
@@ -122,6 +164,7 @@ Distance Queries
 
 Introduction
 ------------
+
 Distance calculations with spatial data is tricky because, unfortunately,
 the Earth is not flat.  Some distance queries with fields in a geographic
 coordinate system may have to be expressed differently because of
@@ -132,6 +175,7 @@ in the :doc:`model-api` documentation for more details.
 
 Distance Lookups
 ----------------
+
 *Availability*: PostGIS, Oracle, SpatiaLite
 
 The following distance lookups are available:
