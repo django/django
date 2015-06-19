@@ -168,6 +168,12 @@ Minor features
   Setters for raster properties such as projection or pixel values have
   been added.
 
+* The :class:`~django.contrib.gis.db.models.RasterField` has been added to the
+  :ref:`GIS model API <creating-and-saving-raster-models>`. It supports
+  automatic spatial index creation and reprojection when saving a model. It
+  does not yet support spatial querying and is only implemented for the PostGIS
+  backend.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

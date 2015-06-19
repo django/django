@@ -6,7 +6,7 @@ from django.contrib.gis.shortcuts import numpy
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .const import GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
+from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
 
 
 class GDALBand(GDALBase):
@@ -64,9 +64,16 @@ class GDALBand(GDALBase):
         """
         Returns the nodata value for this band, or None if it isn't set.
         """
+        # Get value and nodata exists flag
         nodata_exists = c_int()
         value = capi.get_band_nodata_value(self._ptr, nodata_exists)
-        return value if nodata_exists else None
+        # If the flag is false, return None
+        if not nodata_exists:
+            value = None
+        # If the pixeltype is an integer, convert to int
+        elif self.datatype() in GDAL_INTEGER_TYPES:
+            value = int(value)
+        return value
 
     @nodata_value.setter
     def nodata_value(self, value):

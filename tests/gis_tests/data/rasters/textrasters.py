@@ -1,7 +1,11 @@
+"""
+Text based test rasters
+"""
+
 JSON_RASTER = """{
     "srid": 4326,
     "origin": [0, 0],
-    "scale": [1, 1],
+    "scale": [-1, 1],
     "skew": [0, 0],
     "width": 5,
     "height": 5,
