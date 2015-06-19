@@ -522,6 +522,24 @@ Daniele Procida
 
     .. _Preston Timmons: https://github.com/prestontimmons
 
+`Tomek Paczkowski`_
+    Tomek started using Django in 2007 as a tool for quickly dealing with
+    university projects. Since then, he worked with various technologies
+    like Ruby on Rails, JavaScript and Android but always returned to
+    Python and Django.
+
+    Tomek loves the Django community. He organized multiple Django
+    sprints, co-organized `DjangoCon Europe 2013`_ and has mentored at many
+    `Django Girls`_ events.
+
+    Originally from Poland, Tomek currently lives in London, where he
+    works at Squirrel_.
+
+    .. _Tomek Paczkowski: https://hauru.eu
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls: http://djangogirls.org
+    .. _Squirrel: http://squirrel.me
+
 Past team members
 =================
 
