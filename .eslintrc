@@ -2,6 +2,7 @@
     "rules": {
         "camelcase": [1, {"properties": "always"}],
         "comma-spacing": [1, {"before": false, "after": true}],
+        "dot-notation": [1, {"allowKeywords": true}],
         "curly": [1, "all"],
         "indent": [
             2,
@@ -13,6 +14,7 @@
         }],
         "new-cap": [1, {"newIsCap": true, "capIsNew": true}],
         "no-alert": [0],
+        "no-eval": [1],
         "no-extend-native": [2, {"exceptions": ["Date", "String"]}],
         "no-multi-spaces": [1],
         "no-octal-escape": [1],
