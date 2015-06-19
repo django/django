@@ -6,7 +6,7 @@ Requires core.js, SelectBox.js and addevent.js.
 (function($) {
 function findForm(node) {
     // returns the node of the form containing the given node
-    if (node.tagName.toLowerCase() != 'form') {
+    if (node.tagName.toLowerCase() !== 'form') {
         return findForm(node.parentNode);
     }
     return node;
@@ -24,10 +24,10 @@ window.SelectFilter = {
 
         var ps = from_box.parentNode.getElementsByTagName('p');
         for (var i=0; i<ps.length; i++) {
-            if (ps[i].className.indexOf("info") != -1) {
+            if (ps[i].className.indexOf("info") !== -1) {
                 // Remove <p class="info">, because it just gets in the way.
                 from_box.parentNode.removeChild(ps[i]);
-            } else if (ps[i].className.indexOf("help") != -1) {
+            } else if (ps[i].className.indexOf("help") !== -1) {
                 // Move help text up to the top so it isn't below the select
                 // boxes or wrapped off on the side to the right of the add
                 // button:
@@ -157,7 +157,7 @@ window.SelectFilter = {
     filter_key_press: function(event, field_id) {
         var from = document.getElementById(field_id + '_from');
         // don't submit form if user pressed Enter
-        if ((event.which && event.which == 13) || (event.keyCode && event.keyCode == 13)) {
+        if ((event.which && event.which === 13) || (event.keyCode && event.keyCode === 13)) {
             from.selectedIndex = 0;
             SelectBox.move(field_id + '_from', field_id + '_to');
             from.selectedIndex = 0;
@@ -175,18 +175,18 @@ window.SelectFilter = {
     filter_key_down: function(event, field_id) {
         var from = document.getElementById(field_id + '_from');
         // right arrow -- move across
-        if ((event.which && event.which == 39) || (event.keyCode && event.keyCode == 39)) {
+        if ((event.which && event.which === 39) || (event.keyCode && event.keyCode === 39)) {
             var old_index = from.selectedIndex;
             SelectBox.move(field_id + '_from', field_id + '_to');
-            from.selectedIndex = (old_index == from.length) ? from.length - 1 : old_index;
+            from.selectedIndex = (old_index === from.length) ? from.length - 1 : old_index;
             return false;
         }
         // down arrow -- wrap around
-        if ((event.which && event.which == 40) || (event.keyCode && event.keyCode == 40)) {
-            from.selectedIndex = (from.length == from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
+        if ((event.which && event.which === 40) || (event.keyCode && event.keyCode === 40)) {
+            from.selectedIndex = (from.length === from.selectedIndex + 1) ? 0 : from.selectedIndex + 1;
         }
         // up arrow -- wrap around
-        if ((event.which && event.which == 38) || (event.keyCode && event.keyCode == 38)) {
+        if ((event.which && event.which === 38) || (event.keyCode && event.keyCode === 38)) {
             from.selectedIndex = (from.selectedIndex === 0) ? from.length - 1 : from.selectedIndex - 1;
         }
         return true;

@@ -43,7 +43,7 @@
         });
         if ($this.length && showAddButton) {
             var addButton;
-            if ($this.prop("tagName") == "TR") {
+            if ($this.prop("tagName") === "TR") {
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
                 var numCols = this.eq(-1).children().length;
@@ -150,7 +150,7 @@
 
         var reinitDateTimeShortCuts = function() {
             // Reinitialize the calendar and clock widgets by force
-            if (typeof DateTimeShortcuts != "undefined") {
+            if (typeof DateTimeShortcuts !== "undefined") {
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
             }
@@ -159,7 +159,7 @@
         var updateSelectFilter = function() {
             // If any SelectFilter widgets are a part of the new form,
             // instantiate a new SelectFilter instance for it.
-            if (typeof SelectFilter != 'undefined'){
+            if (typeof SelectFilter !== 'undefined'){
                 $('.selectfilter').each(function(index, value){
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], false);
@@ -217,7 +217,7 @@
 
         var reinitDateTimeShortCuts = function() {
             // Reinitialize the calendar and clock widgets by force, yuck.
-            if (typeof DateTimeShortcuts != "undefined") {
+            if (typeof DateTimeShortcuts !== "undefined") {
                 $(".datetimeshortcuts").remove();
                 DateTimeShortcuts.init();
             }
@@ -225,7 +225,7 @@
 
         var updateSelectFilter = function() {
             // If any SelectFilter widgets were added, instantiate a new instance.
-            if (typeof SelectFilter != "undefined"){
+            if (typeof SelectFilter !== "undefined"){
                 $(".selectfilter").each(function(index, value){
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], false);

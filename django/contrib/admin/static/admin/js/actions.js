@@ -25,7 +25,7 @@
             }, true));
             $(options.allToggle).prop("checked", function() {
                 var value;
-                if (sel == actionCheckboxes.length) {
+                if (sel === actionCheckboxes.length) {
                     value = true;
                     showQuestion();
                 } else {
@@ -64,7 +64,7 @@
         $(this).filter(":checked").each(function(i) {
             $(this).parent().parent().toggleClass(options.selectedClass);
             updateCounter();
-            if ($(options.acrossInput).val() == 1) {
+            if ($(options.acrossInput).val() === 1) {
                 showClear();
             }
         });
@@ -88,12 +88,12 @@
         $(actionCheckboxes).click(function(event) {
             if (!event) { event = window.event; }
             var target = event.target ? event.target : event.srcElement;
-            if (lastChecked && $.data(lastChecked) != $.data(target) && event.shiftKey === true) {
+            if (lastChecked && $.data(lastChecked) !== $.data(target) && event.shiftKey === true) {
                 var inrange = false;
                 $(lastChecked).prop("checked", target.checked)
                     .parent().parent().toggleClass(options.selectedClass, target.checked);
                 $(actionCheckboxes).each(function() {
-                    if ($.data(this) == $.data(lastChecked) || $.data(this) == $.data(target)) {
+                    if ($.data(this) === $.data(lastChecked) || $.data(this) === $.data(target)) {
                         inrange = (inrange) ? false : true;
                     }
                     if (inrange) {

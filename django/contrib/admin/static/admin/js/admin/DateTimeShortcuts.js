@@ -26,11 +26,11 @@ var DateTimeShortcuts = {
         var inputs = document.getElementsByTagName('input');
         for (i=0; i<inputs.length; i++) {
             var inp = inputs[i];
-            if (inp.getAttribute('type') == 'text' && inp.className.match(/vTimeField/)) {
+            if (inp.getAttribute('type') === 'text' && inp.className.match(/vTimeField/)) {
                 DateTimeShortcuts.addClock(inp);
                 DateTimeShortcuts.addTimezoneWarning(inp);
             }
-            else if (inp.getAttribute('type') == 'text' && inp.className.match(/vDateField/)) {
+            else if (inp.getAttribute('type') === 'text' && inp.className.match(/vDateField/)) {
                 DateTimeShortcuts.addCalendar(inp);
                 DateTimeShortcuts.addTimezoneWarning(inp);
             }
@@ -148,7 +148,7 @@ var DateTimeShortcuts = {
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
         django.jQuery(document).bind('keyup', function(event) {
-            if (event.which == 27) {
+            if (event.which === 27) {
                 // ESC key closes popup
                 DateTimeShortcuts.dismissClock(num);
                 event.preventDefault();
@@ -161,7 +161,7 @@ var DateTimeShortcuts = {
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
-        if (getStyle(document.body,'direction')!='rtl') {
+        if (getStyle(document.body,'direction')!=='rtl') {
             clock_box.style.left = findPosX(clock_link) + 17 + 'px';
         }
         else {
@@ -183,7 +183,7 @@ var DateTimeShortcuts = {
     },
     handleClockQuicklink: function(num, val) {
        var d;
-       if (val == -1) {
+       if (val === -1) {
            d = DateTimeShortcuts.now();
        }
        else {
@@ -272,7 +272,7 @@ var DateTimeShortcuts = {
         cancel_p.className = 'calendar-cancel';
         quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
         django.jQuery(document).bind('keyup', function(event) {
-            if (event.which == 27) {
+            if (event.which === 27) {
                 // ESC key closes popup
                 DateTimeShortcuts.dismissCalendar(num);
                 event.preventDefault();
@@ -299,7 +299,7 @@ var DateTimeShortcuts = {
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
-        if (getStyle(document.body,'direction')!='rtl') {
+        if (getStyle(document.body,'direction')!=='rtl') {
             cal_box.style.left = findPosX(cal_link) + 17 + 'px';
         }
         else {

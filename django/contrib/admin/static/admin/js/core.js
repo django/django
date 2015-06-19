@@ -74,8 +74,8 @@ var xmlhttp;
 @else
     xmlhttp = false;
 @end @*/
-if (!xmlhttp && typeof XMLHttpRequest != 'undefined') {
-  xmlhttp = new XMLHttpRequest();
+if (!xmlhttp && typeof XMLHttpRequest !== 'undefined') {
+    xmlhttp = new XMLHttpRequest();
 }
 
 // ----------------------------------------------------------------------------

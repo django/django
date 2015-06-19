@@ -13,13 +13,13 @@ var CalendarNamespace = {
     },
     getDaysInMonth: function(month,year) {
         var days;
-        if (month==1 || month==3 || month==5 || month==7 || month==8 || month==10 || month==12) {
+        if (month===1 || month===3 || month===5 || month===7 || month===8 || month===10 || month===12) {
             days = 31;
         }
-        else if (month==4 || month==6 || month==9 || month==11) {
+        else if (month===4 || month===6 || month===9 || month===11) {
             days = 30;
         }
-        else if (month==2 && CalendarNamespace.isLeapYear(year)) {
+        else if (month===2 && CalendarNamespace.isLeapYear(year)) {
             days = 29;
         }
         else {
@@ -46,8 +46,8 @@ var CalendarNamespace = {
         // The day variable above will be 1 instead of 2 in, say, US Pacific time
         // zone.
         var isSelectedMonth = false;
-        if (typeof selected != 'undefined') {
-            isSelectedMonth = (selected.getUTCFullYear() == year && (selected.getUTCMonth()+1) == month);
+        if (typeof selected !== 'undefined') {
+            isSelectedMonth = (selected.getUTCFullYear() === year && (selected.getUTCMonth()+1) === month);
         }
 
         month = parseInt(month);
@@ -82,14 +82,14 @@ var CalendarNamespace = {
             if (i%7 === 0 && currentDay !== 1) {
                 tableRow = quickElement('tr', tableBody);
             }
-            if ((currentDay==todayDay) && (month==todayMonth) && (year==todayYear)) {
+            if ((currentDay===todayDay) && (month===todayMonth) && (year===todayYear)) {
                 todayClass='today';
             } else {
                 todayClass='';
             }
 
             // use UTC function; see above for explanation.
-            if (isSelectedMonth && currentDay == selected.getUTCDate()) {
+            if (isSelectedMonth && currentDay === selected.getUTCDate()) {
                 if (todayClass !== '') todayClass += " ";
                 todayClass += "selected";
             }
@@ -122,7 +122,7 @@ function Calendar(div_id, callback, selected) {
     this.today = new Date();
     this.currentMonth = this.today.getMonth() + 1;
     this.currentYear = this.today.getFullYear();
-    if (typeof selected != 'undefined') {
+    if (typeof selected !== 'undefined') {
         this.selected = selected;
     }
 }
@@ -141,7 +141,7 @@ Calendar.prototype = {
         this.drawCurrent();
     },
     drawPreviousMonth: function() {
-        if (this.currentMonth == 1) {
+        if (this.currentMonth === 1) {
             this.currentMonth = 12;
             this.currentYear--;
         }
@@ -151,7 +151,7 @@ Calendar.prototype = {
         this.drawCurrent();
     },
     drawNextMonth: function() {
-        if (this.currentMonth == 12) {
+        if (this.currentMonth === 12) {
             this.currentMonth = 1;
             this.currentYear++;
         }

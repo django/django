@@ -31,7 +31,7 @@ var SelectBox = {
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
             node.displayed = 1;
             for (var j = 0; (token = tokens[j]); j++) {
-                if (node.text.toLowerCase().indexOf(token) == -1) {
+                if (node.text.toLowerCase().indexOf(token) === -1) {
                     node.displayed = 0;
                 }
             }
@@ -41,7 +41,7 @@ var SelectBox = {
     delete_from_cache: function(id, value) {
         var node, delete_index = null;
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
-            if (node.value == value) {
+            if (node.value === value) {
                 delete_index = i;
                 break;
             }
@@ -59,7 +59,7 @@ var SelectBox = {
         // Check if an item is contained in the cache
         var node;
         for (var i = 0; (node = SelectBox.cache[id][i]); i++) {
-            if (node.value == value) {
+            if (node.value === value) {
                 return true;
             }
         }
