@@ -179,20 +179,20 @@ var DateTimeShortcuts = {
         addEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
     },
     dismissClock: function(num) {
-       document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
-       removeEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
+        document.getElementById(DateTimeShortcuts.clockDivName + num).style.display = 'none';
+        removeEvent(document, 'click', DateTimeShortcuts.dismissClockFunc[num]);
     },
     handleClockQuicklink: function(num, val) {
-       var d;
-       if (val === -1) {
-           d = DateTimeShortcuts.now();
-       }
-       else {
-           d = new Date(1970, 1, 1, val, 0, 0, 0);
-       }
-       DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
-       DateTimeShortcuts.clockInputs[num].focus();
-       DateTimeShortcuts.dismissClock(num);
+        var d;
+        if (val === -1) {
+            d = DateTimeShortcuts.now();
+        }
+        else {
+            d = new Date(1970, 1, 1, val, 0, 0, 0);
+        }
+        DateTimeShortcuts.clockInputs[num].value = d.strftime(get_format('TIME_INPUT_FORMATS')[0]);
+        DateTimeShortcuts.clockInputs[num].focus();
+        DateTimeShortcuts.dismissClock(num);
     },
     // Add calendar widget to a given field.
     addCalendar: function(inp) {
@@ -344,11 +344,11 @@ var DateTimeShortcuts = {
                ").style.display='none';}"].join('');
     },
     handleCalendarQuickLink: function(num, offset) {
-       var d = DateTimeShortcuts.now();
-       d.setDate(d.getDate() + offset);
-       DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
-       DateTimeShortcuts.calendarInputs[num].focus();
-       DateTimeShortcuts.dismissCalendar(num);
+        var d = DateTimeShortcuts.now();
+        d.setDate(d.getDate() + offset);
+        DateTimeShortcuts.calendarInputs[num].value = d.strftime(get_format('DATE_INPUT_FORMATS')[0]);
+        DateTimeShortcuts.calendarInputs[num].focus();
+        DateTimeShortcuts.dismissCalendar(num);
     }
 };
 
