@@ -720,6 +720,10 @@ Miscellaneous
 * Private function ``django.utils.functional.total_ordering()`` has been
   removed. It contained a workaround for a ``functools.total_ordering()`` bug
   in Python versions older than 2.7.3.
+* XML serialization (either through :djadmin:`dumpdata` or the syndication
+  framework) used to output any characters it received. Now if the content to
+  be serialized contains any control characters not allowed in the XML 1.0
+  standard, the serialization will fail with a :exc:`ValueError`.
 
 .. _deprecated-features-1.9:
 
