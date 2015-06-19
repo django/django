@@ -6,8 +6,8 @@ from django.test import SimpleTestCase, override_settings
 
 
 @override_settings(
-    ADMINS=(('Admin', 'admin@example.com'), ('Admin and Manager (Admin)', 'admin_and_manager@example.com')),
-    MANAGERS=(('Manager', 'manager@example.com'), ('Admin and Manager (Manager)', 'admin_and_manager@example.com')),
+    ADMINS=(('Admin', 'admin@example.com'), ('Admin and Manager', 'admin_and_manager@example.com')),
+    MANAGERS=(('Manager', 'manager@example.com'), ('Admin and Manager', 'admin_and_manager@example.com')),
 )
 class SendTestEmailManagementCommand(SimpleTestCase):
     """
