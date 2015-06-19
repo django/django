@@ -10,6 +10,7 @@ from django.db.models import Model
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
     DateTimeField, IntegerField, PositiveIntegerField, SlugField, TextField,
+    TimeField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField,
@@ -444,6 +445,19 @@ class SchemaTests(TransactionTestCase):
         old_field = Note._meta.get_field("info")
         new_field = TextField(blank=True)
         new_field.set_attributes_from_name("info")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+
+    def test_alter_text_field_to_time_field(self):
+        """
+        #25002 - Test conversion of text field to time field.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        Note.objects.create(info='3:16')
+        old_field = Note._meta.get_field('info')
+        new_field = TimeField(blank=True)
+        new_field.set_attributes_from_name('info')
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field, strict=True)
 
