@@ -60,11 +60,12 @@ class InterfaceProtocol(WebSocketServerProtocol):
         self.sendClose()
 
     def onClose(self, wasClean, code, reason):
-        del self.factory.protocols[self.send_channel]
-        Channel("django.websocket.disconnect").send(
-            send_channel = self.send_channel,
-            **self.request_info
-        )
+        if hasattr(self, "send_channel"):
+            del self.factory.protocols[self.send_channel]
+            Channel("django.websocket.disconnect").send(
+                send_channel = self.send_channel,
+                **self.request_info
+            )
 
 
 class InterfaceFactory(WebSocketServerFactory):
