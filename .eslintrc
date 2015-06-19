@@ -1,4 +1,43 @@
 {
+    "rules": {
+        "camelcase": [1, {"properties": "always"}],
+        "comma-spacing": [1, {"before": false, "after": true}],
+        "curly": [1, "all"],
+        "indent": [
+            2,
+            4
+        ],
+        "key-spacing": [1, {
+            "beforeColon": false,
+            "afterColon": true
+        }],
+        "new-cap": [1, {"newIsCap": true, "capIsNew": true}],
+        "no-alert": [0],
+        "no-extend-native": [2, {"exceptions": ["Date", "String"]}],
+        "no-multi-spaces": [1],
+        "no-octal-escape": [1],
+        "no-underscore-dangle": [1],
+        "no-unused-vars": [2, {"vars": "local", "args": "none"}],
+        "no-script-url": [1],
+        "no-shadow": [1, {"hoist": "functions"}],
+        "quotes": [
+            1,
+            "single"
+        ],
+        "linebreak-style": [
+            2,
+            "unix"
+        ],
+        "semi": [
+            2,
+            "always"
+        ],
+        "space-infix-ops": [
+            1,
+            {"int32Hint": false}
+        ],
+        "strict": [1, "function"]
+    },
     "env": {
         "browser": true
     },
