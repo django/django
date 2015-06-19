@@ -262,12 +262,12 @@
             deleteText: options.deleteText,
             emptyCssClass: "empty-form",
             removed: updateInlineLabel,
-            added: (function(row) {
+            added: function(row) {
                 initPrepopulatedFields(row);
                 reinitDateTimeShortCuts();
                 updateSelectFilter();
                 updateInlineLabel(row);
-            })
+            }
         });
 
         return $rows;
