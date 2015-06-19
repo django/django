@@ -18,20 +18,28 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     Adapter = WKTAdapter
     Adaptor = Adapter  # Backwards-compatibility alias.
 
-    gis_operators = {
-        'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
-        'bboverlaps': SpatialOperator(func='MBROverlaps'),  # .. ..
-        'contained': SpatialOperator(func='MBRWithin'),    # .. ..
-        'contains': SpatialOperator(func='MBRContains'),
-        'disjoint': SpatialOperator(func='MBRDisjoint'),
-        'equals': SpatialOperator(func='MBREqual'),
-        'exact': SpatialOperator(func='MBREqual'),
-        'intersects': SpatialOperator(func='MBRIntersects'),
-        'overlaps': SpatialOperator(func='MBROverlaps'),
-        'same_as': SpatialOperator(func='MBREqual'),
-        'touches': SpatialOperator(func='MBRTouches'),
-        'within': SpatialOperator(func='MBRWithin'),
-    }
+    @cached_property
+    def gis_operators(self):
+        if self.connection.features.supports_real_shape_operations:
+            prefix = "ST_"
+            equal = "ST_Equals"
+        else:
+            prefix = "MBR"
+            equal = "MBREqual"
+        return {
+            'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API
+            'bboverlaps': SpatialOperator(func='MBROverlaps'),  # .. ..
+            'contained': SpatialOperator(func='MBRWithin'),  # .. ..
+            'contains': SpatialOperator(func='{}Contains'.format(prefix)),
+            'disjoint': SpatialOperator(func='{}Disjoint'.format(prefix)),
+            'equals': SpatialOperator(func=equal),
+            'exact': SpatialOperator(func=equal),
+            'intersects': SpatialOperator(func='{}Intersects'.format(prefix)),
+            'overlaps': SpatialOperator(func='{}Overlaps'.format(prefix)),
+            'same_as': SpatialOperator(func=equal),
+            'touches': SpatialOperator(func='{}Touches'.format(prefix)),
+            'within': SpatialOperator(func='{}Within'.format(prefix)),
+        }
 
     function_names = {
         'Distance': 'ST_Distance',

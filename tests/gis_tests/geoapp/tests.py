@@ -237,7 +237,8 @@ class GeoLookupTest(TestCase):
     def test_disjoint_lookup(self):
         "Testing the `disjoint` lookup type."
         ptown = City.objects.get(name='Pueblo')
-        qs1 = City.objects.filter(point__disjoint=ptown.point)
+        # Using buffer to prevent rounded issues when testing point disjoint with self
+        qs1 = City.objects.filter(point__disjoint=ptown.point.buffer(5))
         self.assertEqual(7, qs1.count())
 
         if connection.features.supports_real_shape_operations:

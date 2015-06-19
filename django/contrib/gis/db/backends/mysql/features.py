@@ -10,6 +10,9 @@ class DatabaseFeatures(BaseSpatialFeatures, MySQLDatabaseFeatures):
     supports_length_geodetic = False
     supports_distances_lookups = False
     supports_transform = False
-    supports_real_shape_operations = False
     supports_null_geometries = False
     supports_num_points_poly = False
+
+    @property
+    def supports_real_shape_operations(self):
+        return self.connection.mysql_version >= (5, 6, 1)

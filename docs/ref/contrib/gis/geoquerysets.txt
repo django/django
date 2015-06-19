@@ -105,9 +105,14 @@ Backend     SQL Equivalent
 ==========  ============================
 PostGIS     ``ST_Contains(poly, geom)``
 Oracle      ``SDO_CONTAINS(poly, geom)``
-MySQL       ``MBRContains(poly, geom)``
+MySQL       ``MBRContains(poly, geom)`` (``ST_Contains(poly, geom)`` on MySQL 5.6.1+)
 SpatiaLite  ``Contains(poly, geom)``
 ==========  ============================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Contains`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 .. fieldlookup:: contains_properly
 
@@ -209,9 +214,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Disjoint(poly, geom)``
 Oracle      ``SDO_GEOM.RELATE(poly, 'DISJOINT', geom, 0.05)``
-MySQL       ``MBRDisjoint(poly, geom)``
+MySQL       ``MBRDisjoint(poly, geom)`` (``ST_Disjoint(poly, geom)`` on MySQL 5.6.1+)
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Disjoint`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 equals
 ------
@@ -244,9 +254,14 @@ Backend     SQL Equivalent
 ==========  =================================================
 PostGIS     ``ST_Intersects(poly, geom)``
 Oracle      ``SDO_OVERLAPBDYINTERSECT(poly, geom)``
-MySQL       ``MBRIntersects(poly, geom)``
+MySQL       ``MBRIntersects(poly, geom)`` (``ST_Intersects(poly, geom)`` on MySQL 5.6.1+)
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Intersects`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 .. fieldlookup:: overlaps
 
@@ -254,6 +269,22 @@ overlaps
 --------
 
 *Availability*: PostGIS, Oracle, MySQL, SpatiaLite
+
+Tests if the geometry field spatially overlaps the lookup geometry.
+
+==========  =================================================
+Backend     SQL Equivalent
+==========  =================================================
+PostGIS     ``ST_Overlaps(poly, geom)``
+Oracle      ``SDO_OVERLAPS(poly, geom)``
+MySQL       ``MBROverlaps(poly, geom)`` (``ST_Overlaps(poly, geom)`` on MySQL 5.6.1+)
+SpatiaLite  ``Overlaps(poly, geom)``
+==========  =================================================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Overlaps`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 .. fieldlookup:: relate
 
@@ -324,10 +355,15 @@ Example::
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Touches(poly, geom)``
-MySQL       ``MBRTouches(poly, geom)``
+MySQL       ``MBRTouches(poly, geom)`` (``ST_Touches(poly, geom)`` on MySQL 5.6.1+)
 Oracle      ``SDO_TOUCH(poly, geom)``
 SpatiaLite  ``Touches(poly, geom)``
 ==========  ==========================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Touches`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 .. fieldlookup:: within
 
@@ -346,10 +382,15 @@ Example::
 Backend     SQL Equivalent
 ==========  ==========================
 PostGIS     ``ST_Within(poly, geom)``
-MySQL       ``MBRWithin(poly, geom)``
+MySQL       ``MBRWithin(poly, geom)`` (``ST_Within(poly, geom)`` on MySQL 5.6.1+)
 Oracle      ``SDO_INSIDE(poly, geom)``
 SpatiaLite  ``Within(poly, geom)``
 ==========  ==========================
+
+.. versionadded:: 1.9
+
+    MySQL 5.6.1 and above now uses ``ST_Within`` and operates on real
+    geometries. Older versions of MySQL operate on bounding boxes only.
 
 .. fieldlookup:: left
 
