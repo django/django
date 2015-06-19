@@ -1,8 +1,7 @@
 import datetime
 import socket
 
-from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import mail_admins, mail_managers, send_mail
 from django.core.management.base import BaseCommand
 
 
@@ -19,17 +18,17 @@ class Command(BaseCommand):
             help='Send the test email to all addresses specified in settings.ADMINS.')
 
     def handle(self, *args, **kwargs):
-        recipients = kwargs['email']
-
-        if kwargs['managers']:
-            recipients += [email for name, email in settings.MANAGERS]
-
-        if kwargs['admins']:
-            recipients += [email for name, email in settings.ADMINS]
+        subject = 'Test email from %s on %s' % (socket.gethostname(), datetime.datetime.now())
 
         send_mail(
-            subject='Test email from %s on %s' % (socket.gethostname(), datetime.datetime.now()),
+            subject=subject,
             message="If you\'re reading this, it was successful.",
-            from_email=settings.SERVER_EMAIL,
-            recipient_list=set(recipients),
+            from_email=None,
+            recipient_list=kwargs['email'],
         )
+
+        if kwargs['managers']:
+            mail_managers(subject, "This email was sent to the site managers.")
+
+        if kwargs['admins']:
+            mail_admins(subject, "This email was sent to the site admins.")
