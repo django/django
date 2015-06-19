@@ -1,3 +1,4 @@
+/*global gettext, get_format, quickElement, removeChildren*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement

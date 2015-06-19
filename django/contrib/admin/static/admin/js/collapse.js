@@ -1,3 +1,4 @@
+/*global gettext*/
 (function($) {
     $(document).ready(function() {
         // Add anchor tag for Show/Hide link

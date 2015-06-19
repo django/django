@@ -1,3 +1,4 @@
+/*global _actions_icnt, gettext, interpolate, ngettext*/
 (function($) {
     var lastChecked;
 

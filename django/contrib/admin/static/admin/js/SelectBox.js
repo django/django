@@ -1,3 +1,4 @@
+/*eslint no-cond-assign:1*/
 var SelectBox = {
     cache: {},
     init: function(id) {

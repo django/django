@@ -1,3 +1,4 @@
+/*global DateTimeShortcuts, SelectFilter*/
 /**
  * Django admin inlines
  *

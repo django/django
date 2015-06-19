@@ -1,3 +1,4 @@
+/*global addEvent, Calendar, cancelEventPropagation, findPosX, findPosY, getStyle, get_format, gettext, interpolate, ngettext, quickElement, removeEvent*/
 // Inserts shortcut buttons after all of the following:
 //     <input type="text" class="vDateField">
 //     <input type="text" class="vTimeField">

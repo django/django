@@ -1,0 +1,8 @@
+{
+    "env": {
+        "browser": true
+    },
+    "globals": {
+        "django": false
+    }
+}
