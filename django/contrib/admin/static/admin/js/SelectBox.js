@@ -68,7 +68,6 @@ var SelectBox = {
     },
     move: function(from, to) {
         var from_box = document.getElementById(from);
-        var to_box = document.getElementById(to);
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (option.selected && SelectBox.cache_contains(from, option.value)) {
@@ -81,7 +80,6 @@ var SelectBox = {
     },
     move_all: function(from, to) {
         var from_box = document.getElementById(from);
-        var to_box = document.getElementById(to);
         var option;
         for (var i = 0; (option = from_box.options[i]); i++) {
             if (SelectBox.cache_contains(from, option.value)) {

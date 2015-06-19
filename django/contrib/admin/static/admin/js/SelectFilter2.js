@@ -62,7 +62,7 @@ window.SelectFilter = {
 
         var search_filter_label = quickElement('label', filter_p, '', 'for', field_id + "_input");
 
-        var search_selector_img = quickElement(
+        quickElement(
             'span', search_filter_label, '',
             'class', 'help-tooltip search-label-icon',
             'title', interpolate(gettext("Type into this box to filter down the list of available %s."), [field_name])
