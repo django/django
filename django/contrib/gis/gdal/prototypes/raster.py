@@ -69,3 +69,6 @@ get_band_maximum = double_output(std_call('GDALGetRasterMaximum'), [c_void_p, PO
 reproject_image = void_output(std_call('GDALReprojectImage'),
     [c_void_p, c_char_p, c_void_p, c_char_p, c_int, c_double, c_double, c_void_p, c_void_p, c_void_p]
 )
+auto_create_warped_vrt = voidptr_output(std_call('GDALAutoCreateWarpedVRT'),
+    [c_void_p, c_char_p, c_char_p, c_int, c_double, c_void_p]
+)

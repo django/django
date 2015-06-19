@@ -32,3 +32,14 @@ GDAL_TO_CTYPES = [
     None, c_byte, c_uint16, c_int16, c_uint32, c_int32,
     c_float, c_double, None, None, None, None
 ]
+
+# List of resampling algorithms that can be used to warp a GDALRaster.
+GDAL_RESAMPLE_ALGORITHMS = {
+    'NearestNeighbour': 0,
+    'Bilinear': 1,
+    'Cubic': 2,
+    'CubicSpline': 3,
+    'Lanczos': 4,
+    'Average': 5,
+    'Mode': 6,
+}
