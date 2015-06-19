@@ -136,5 +136,5 @@ function dismissDeleteRelatedObjectPopup(win, objId) {
 }
 
 // Kept for backward compatibility
-showAddAnotherPopup = showRelatedObjectPopup;
-dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
+var showAddAnotherPopup = showRelatedObjectPopup;
+var dismissAddAnotherPopup = dismissAddRelatedObjectPopup;

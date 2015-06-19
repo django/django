@@ -121,7 +121,7 @@ function findPosY(obj) {
 // ----------------------------------------------------------------------------
 
 Date.prototype.getTwelveHours = function() {
-    hours = this.getHours();
+    var hours = this.getHours();
     if (hours === 0) {
         return 12;
     }

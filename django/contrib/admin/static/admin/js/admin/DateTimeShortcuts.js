@@ -25,7 +25,7 @@ var DateTimeShortcuts = {
         }
 
         var inputs = document.getElementsByTagName('input');
-        for (i=0; i<inputs.length; i++) {
+        for (var i=0; i<inputs.length; i++) {
             var inp = inputs[i];
             if (inp.getAttribute('type') === 'text' && inp.className.match(/vTimeField/)) {
                 DateTimeShortcuts.addClock(inp);
