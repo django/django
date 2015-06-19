@@ -14,7 +14,9 @@ from django.conf import settings
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
 from django.utils.encoding import smart_text
-from django.utils.xmlutils import SimplerXMLGenerator
+from django.utils.xmlutils import (
+    SimplerXMLGenerator, UnserializableContentError,
+)
 
 
 class Serializer(base.Serializer):
@@ -78,7 +80,11 @@ class Serializer(base.Serializer):
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
-            self.xml.characters(field.value_to_string(obj))
+            try:
+                self.xml.characters(field.value_to_string(obj))
+            except UnserializableContentError:
+                raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
+                    obj.__class__.__name__, field.name, obj._get_pk_val()))
         else:
             self.xml.addQuickElement("None")
 
