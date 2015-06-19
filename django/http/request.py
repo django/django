@@ -4,7 +4,7 @@ import copy
 import re
 import sys
 from io import BytesIO
-from itertools import chain, ifilter
+from itertools import chain
 
 from django.conf import settings
 from django.core import signing
@@ -381,12 +381,6 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
-        if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None:
-            num_inserted_items = 1
-            for __ in ifilter(lambda x: x == '&', query_string or ''):
-                num_inserted_items += 1
-                if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_inserted_items:
-                    raise SuspiciousOperation('Too many fields')
         if six.PY3:
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -395,11 +389,17 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
+            if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and query_string:
+                if query_string.count('&') + 1 > settings.DATA_UPLOAD_MAX_NUMBER_FIELDS:
+                    raise SuspiciousOperation('Too many fields')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True,
                                         encoding=encoding):
                 self.appendlist(key, value)
         else:
+            if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and query_string:
+                if query_string.count(b'&') + 1 > settings.DATA_UPLOAD_MAX_NUMBER_FIELDS:
+                    raise SuspiciousOperation('Too many fields')
             for key, value in parse_qsl(query_string or '',
                                         keep_blank_values=True):
                 try:
