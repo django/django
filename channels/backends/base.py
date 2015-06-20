@@ -61,5 +61,35 @@ class BaseChannelBackend(object):
                 continue
             return channel, message
 
+    def group_add(self, group, channel, expiry=None):
+        """
+        Adds the channel to the named group for at least 'expiry'
+        seconds (expiry defaults to message expiry if not provided).
+        """
+        raise NotImplementedError()
+
+    def group_discard(self, group, channel):
+        """
+        Removes the channel from the named group if it is in the group;
+        does nothing otherwise (does not error)
+        """
+        raise NotImplementedError()
+
+    def group_channels(self, group):
+        """
+        Returns an iterable of all channels in the group.
+        """
+        raise NotImplementedError()
+
+    def send_group(self, group, message):
+        """
+        Sends a message to the entire group.
+
+        This base class provides a default implementation; can be overridden
+        to be more efficient by subclasses.
+        """
+        for channel in self.group_channels():
+            self.send(channel, message)
+
     def __str__(self):
         return self.__class__.__name__
