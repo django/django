@@ -79,22 +79,6 @@ class ResolverMatchTests(SimpleTestCase):
         self.assertEqual(match.args, ())
         self.assertEqual(match.kwargs, {'arg1': 42, 'arg2': 37})
 
-    def test_from_submatch_with_kwargs_no_inherited_args(self):
-        submatch = ResolverMatch(
-            empty_view, (42, 37), {}, 'url_name', ['app1', 'app2'],
-            ['ns1', 'ns2'], [inner_decorator]
-        )
-        match = ResolverMatch.from_submatch(submatch, (), {'arg1': 42}, decorators=[outer_decorator])
-        self.assertEqual(match.__class__, ResolverMatch)
-        self.assertEqual(match.url_name, 'url_name')
-        self.assertEqual(match.app_name, 'app1:app2')
-        self.assertEqual(match.namespace, 'ns1:ns2')
-        self.assertEqual(match.decorators, [outer_decorator, inner_decorator])
-        self.assertEqual(match.view_name, 'ns1:ns2:url_name')
-        self.assertEqual(match.func, empty_view)
-        self.assertEqual(match.args, ())
-        self.assertEqual(match.kwargs, {'arg1': 42})
-
     def test_from_submatch_ignored_args_inherited_kwargs(self):
         submatch = ResolverMatch(empty_view, (), {'arg1': 42}, 'url_name', decorators=[inner_decorator])
         match = ResolverMatch.from_submatch(submatch, (42, 37), {}, 'app1', 'ns1')

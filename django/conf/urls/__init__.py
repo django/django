@@ -2,6 +2,7 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urls.constraints import LocalePrefix
 from django.core.urls.resolvers import BaseResolver
 from django.utils import six
 from django.utils.deprecation import (
@@ -64,10 +65,10 @@ def include(arg, namespace=None, app_name=None):
     # Make sure we can iterate through the patterns (without this, some
     # testcases will break).
     if isinstance(patterns, (list, tuple)):
-        for url_pattern in patterns:
+        for name, resolver in patterns:
             # Test if the LocaleRegexURLResolver is used within the include;
             # this should throw an error since this is not allowed!
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+            if any(isinstance(constraint, LocalePrefix) for constraint in resolver.constraints):
                 raise ImproperlyConfigured(
                     'Using i18n_patterns in an included URLconf is not allowed.')
 

@@ -4,8 +4,10 @@ import re
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.regex_helper import normalize
+from django.utils.translation import get_language
 
 from .exceptions import NoReverseMatch, Resolver404
 
@@ -36,13 +38,13 @@ class Constraint(object):
 
 class RegexPattern(Constraint):
     def __init__(self, regex):
-        self._regex = regex
+        self._regex = force_text(regex)
 
     def describe(self):
         return self.regex.pattern
 
     def __repr__(self):
-        return '<RegexPattern %r>' % self._regex
+        return '<RegexPattern regex=%r>' % self._regex
 
     @cached_property
     def regex(self):
@@ -86,3 +88,48 @@ class RegexPattern(Constraint):
                 url_object.path += path
                 return url_object, new_args, new_kwargs
         raise NoReverseMatch()
+
+
+class LocalizedRegexPattern(RegexPattern):
+    def __init__(self, regex):
+        self._regex = regex
+        self._regex_dict = {}
+        self._normalized_dict = {}
+
+    @property
+    def regex(self):
+        language_code = get_language()
+        if language_code not in self._regex_dict:
+            if isinstance(self._regex, six.string_types):
+                regex = self._regex
+            else:
+                regex = force_text(self._regex)
+            try:
+                compiled_regex = re.compile(regex, re.UNICODE)
+            except re.error as e:
+                raise ImproperlyConfigured(
+                    '"%s" is not a valid regular expression: %s' %
+                    (regex, six.text_type(e)))
+
+            self._regex_dict[language_code] = compiled_regex
+        return self._regex_dict[language_code]
+
+    @property
+    def normalized_patterns(self):
+        language_code = get_language()
+        if language_code not in self._normalized_dict:
+            self._normalized_dict[language_code] = normalize(self.regex.pattern)
+        return self._normalized_dict[language_code]
+
+
+class LocalePrefix(LocalizedRegexPattern):
+    def __init__(self):
+        super(LocalePrefix, self).__init__('')
+
+    @property
+    def regex(self):
+        language_code = get_language()
+        if language_code not in self._regex_dict:
+            regex_compiled = re.compile('^%s/' % language_code, re.UNICODE)
+            self._regex_dict[language_code] = regex_compiled
+        return self._regex_dict[language_code]

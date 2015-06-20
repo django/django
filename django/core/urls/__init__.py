@@ -4,14 +4,15 @@ from django.core.exceptions import ImproperlyConfigured
 
 from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import force_text
-from django.utils.functional import lazy
+from django.utils.encoding import force_text, force_str
+from django.utils.functional import lazy, Promise
 from django.utils.http import urlquote, RFC3986_SUBDELIMS
+from django.utils.six.moves.urllib.parse import quote
 
 from .resolvers import Resolver, ResolverEndpoint, ResolverMatch  # NOQA
 from .exceptions import NoReverseMatch, Resolver404  # NOQA
 from .utils import URL  # NOQA
-from .constraints import RegexPattern
+from .constraints import RegexPattern, Constraint, LocalizedRegexPattern
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -42,16 +43,32 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
     text_kwargs = {k: force_text(v) for k, v in kwargs.items()}
 
     from django.core.urlresolvers import get_script_prefix
-    prefix = get_script_prefix()[:-1]
+    prefix = get_script_prefix()[:-1]  # Trailing slash is already there
+
+    original_lookup = viewname
+    try:
+        if resolver._is_callback(viewname):
+            from django.core.urlresolvers import get_callable
+            viewname = get_callable(viewname, True)
+    except (ImportError, AttributeError) as e:
+        raise NoReverseMatch("Error importing '%s': %s." % (viewname, e))
+    else:
+        if not callable(original_lookup) and callable(viewname):
+            warnings.warn(
+                'Reversing by dotted path is deprecated (%s).' % original_lookup,
+                RemovedInDjango20Warning, stacklevel=3
+            )
 
     if isinstance(viewname, six.string_types):
-        original_lookup = viewname.split(':')
+        lookup = viewname.split(':')
+    elif viewname:
+        lookup = [viewname]
     else:
-        original_lookup = [viewname]
+        raise NoReverseMatch()
 
     current_app = current_app.split(':') if current_app else []
 
-    lookup = resolver.resolve_namespace(original_lookup, current_app)
+    lookup = resolver.resolve_namespace(lookup, current_app)
 
     for constraints, default_kwargs in resolver.search(lookup):
         url = URL()
@@ -70,11 +87,10 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
         except NoReverseMatch:
             pass
         else:
-            url.path = urlquote(prefix + url.path, safe=RFC3986_SUBDELIMS + str('/~:@'))
-            # url.path = prefix + url.path
+            url.path = quote(prefix + force_str(url.path), safe=RFC3986_SUBDELIMS + str('/~:@'))
             if url.path.startswith('//'):
                 url.path = '/%%2F%s' % url.path[2:]
-            return force_text(url) if strings_only else url
+            return str(url) if strings_only else url
 
     raise NoReverseMatch()
 
@@ -85,6 +101,8 @@ reverse_lazy = lazy(reverse, URL)
 def url(constraints, view, kwargs=None, name=None, prefix=''):
     if isinstance(constraints, six.string_types):
         constraints = RegexPattern(constraints)
+    elif isinstance(constraints, Promise):
+        constraints = LocalizedRegexPattern(constraints)
     if not isinstance(constraints, (list, tuple)):
         constraints = [constraints]
 

@@ -344,21 +344,21 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     Each object in the returned list is a two-tuple: (view_func, regex)
     """
     views = []
-    for p in urlpatterns:
-        if hasattr(p, 'url_patterns'):
+    for name, resolver in urlpatterns:
+        if hasattr(resolver, 'resolvers'):
             try:
-                patterns = p.url_patterns
+                sub_resolvers = resolver.resolvers
             except ImportError:
                 continue
             views.extend(extract_views_from_urlpatterns(
-                patterns,
-                base + p.regex.pattern,
-                (namespace or []) + (p.namespace and [p.namespace] or [])
+                sub_resolvers,
+                base + ''.join(c.describe() for c in resolver.constraints),
+                (namespace or []) + (name and [name] or [])
             ))
-        elif hasattr(p, 'callback'):
+        elif hasattr(resolver, 'func'):
             try:
-                views.append((p.callback, base + p.regex.pattern,
-                              namespace, p.name))
+                views.append((resolver.func, base + ''.join(c.describe() for c in resolver.constraints),
+                              namespace, resolver.url_name))
             except ViewDoesNotExist:
                 continue
         else:

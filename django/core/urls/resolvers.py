@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from functools import update_wrapper
+import types
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
@@ -54,10 +55,12 @@ class ResolverMatch(object):
         """
         Return the decorated callback function.
         """
+        if not self.decorators:
+            return self.func
         callback = func = self.func
         for decorator in reversed(self.decorators):
             callback = decorator(callback)
-        # update_wrapper(callback, func, assigned=available_attrs(func))
+        update_wrapper(callback, func, assigned=available_attrs(func))
         return callback
 
     def __getitem__(self, index):
@@ -139,6 +142,31 @@ class Resolver(BaseResolver):
             raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
         return patterns
 
+    @cached_property
+    def _callback_strs(self):
+        # Remove this as soon as you can. It's ugly. I hate it.
+        # #2.0WillSetUsFree
+        callbacks = set()
+        processed = [self.urlconf_name]
+        queue = [resolver for name, resolver in self.resolvers]
+        while queue:
+            resolver = queue.pop()
+            # If neither of these conditions are true, it's a custom resolver
+            # that doesn't resemble any of the built-in ones, and we don't
+            # know what to do with it.
+            if hasattr(resolver, '_func_str'):
+                callbacks.add(resolver._func_str)
+            elif hasattr(resolver, 'urlconf_name'):
+                processed.append(resolver.urlconf_name)
+                queue.extend(
+                    resolver for name, resolver in resolver.resolvers
+                    if not hasattr(resolver, 'urlconf_name') or resolver.urlconf_name not in processed
+                )
+        return callbacks
+
+    def _is_callback(self, name):
+        return name in self._callback_strs
+
     def resolve_error_handler(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
         if not callback:
@@ -204,6 +232,7 @@ class Resolver(BaseResolver):
             return
         lookup_name, lookup_path = lookup[0], lookup[1:]
 
+        # For historical reasons we search through the patterns backwards.
         for name, resolver in reversed(self.resolvers):
             if name and name == lookup_name:
                 for constraints, default_kwargs in resolver.search(lookup_path):
@@ -246,6 +275,10 @@ class ResolverEndpoint(BaseResolver):
             self._func = get_callable(self._func_str)
         return self._func
 
+    @cached_property
+    def _callback_strs(self):
+        return {self._func_str}
+
     def resolve(self, url, request=None):
         new_url, args, kwargs = self.match(url, request)
         return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
@@ -256,11 +289,11 @@ class ResolverEndpoint(BaseResolver):
         raise KeyError(item)
 
     def resolve_namespace(self, lookup, current_app):
-        if len(lookup) == 1 and lookup[0] is not None and lookup[0] in (self.url_name, self._func, self._func_str):
+        if len(lookup) == 1 and lookup[0] and lookup[0] in (self.url_name, self._func):
             return lookup
         raise NoReverseMatch()
 
     def search(self, lookup):
-        if len(lookup) == 1 and lookup[0] is not None and lookup[0] in (self.url_name, self._func, self._func_str):
+        if len(lookup) == 1 and lookup[0] and lookup[0] in (self.url_name, self._func):
             yield self.constraints, self.default_kwargs.copy()
         return

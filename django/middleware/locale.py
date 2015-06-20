@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.urlresolvers import (
     LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
 )
+from django.core.urls.constraints import LocalePrefix
 from django.http import HttpResponseRedirect
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
@@ -65,7 +66,7 @@ class LocaleMiddleware(object):
         Returns `True` if the `LocaleRegexURLResolver` is used
         at root level of the urlpatterns, else it returns `False`.
         """
-        for url_pattern in get_resolver(None).url_patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+        for name, resolver in get_resolver(None).resolvers:
+            if resolver.constraints and isinstance(resolver.constraints[0], LocalePrefix):
                 return True
         return False
