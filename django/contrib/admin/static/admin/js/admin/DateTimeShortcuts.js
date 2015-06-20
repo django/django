@@ -124,6 +124,7 @@ var DateTimeShortcuts = {
         //         <li><a href="#">Midnight</a></li>
         //         <li><a href="#">6 a.m.</a></li>
         //         <li><a href="#">Noon</a></li>
+        //         <li><a href="#">6 p.m.</a></li>
         //     </ul>
         //     <p class="calendar-cancel"><a href="#">Cancel</a></p>
         // </div>
@@ -143,6 +144,7 @@ var DateTimeShortcuts = {
         quickElement("a", quickElement("li", time_list), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 0);");
         quickElement("a", quickElement("li", time_list), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 6);");
         quickElement("a", quickElement("li", time_list), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 12);");
+        quickElement("a", quickElement("li", time_list), gettext("6 p.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 18);");
 
         var cancel_p = quickElement('p', clock_box);
         cancel_p.className = 'calendar-cancel';

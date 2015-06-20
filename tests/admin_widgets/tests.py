@@ -645,6 +645,13 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
         # Check that the time picker is visible
         self.assertEqual(
             self.get_css_value('#clockbox0', 'display'), 'block')
+        self.assertEqual(
+            [
+                x.text for x in
+                self.selenium.find_elements_by_xpath("//ul[@class='timelist']/li/a")
+            ],
+            ['Now', 'Midnight', '6 a.m.', 'Noon', '6 p.m.']
+        )
         # Press the ESC key
         self.selenium.find_element_by_tag_name('body').send_keys([Keys.ESCAPE])
         # Check that the time picker is hidden again
