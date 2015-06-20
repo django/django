@@ -128,6 +128,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __str__(self):
+            # object defines __str__(), so __prepare_class__() won't overload
+            # a __str__() method from the proxied class.
+            return str(self.__cast())
+
         def __ne__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
