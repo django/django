@@ -112,7 +112,7 @@ any time leading up to the actual release:
 #. Double-check that the release notes index has a link to the notes
    for the new release; this will be in ``docs/releases/index.txt``.
 
-#. If this is a major release, ensure translations from Transifex have been
+#. If this is a feature release, ensure translations from Transifex have been
    integrated. This is typically done by a separate translation's manager
    rather than the releaser, but here are the steps. Provided you have an
    account on Transifex::
@@ -181,9 +181,9 @@ OK, this is the fun part, where we actually push out a release!
 
    __ https://github.com/django/django/commit/3ef4bbf495cc6c061789132e3d50a8231a89406b
 
-#. For a major version release, remove the ``UNDER DEVELOPMENT`` header at the
+#. For a feature release, remove the ``UNDER DEVELOPMENT`` header at the
    top of the release notes and add the release date on the next line. For a
-   minor release, replace ``*Under Development*`` with the release date. Make
+   patch release, replace ``*Under Development*`` with the release date. Make
    this change on all branches where the release notes for a particular version
    are located.
 
@@ -377,9 +377,9 @@ need to be done by the releaser.
    ``docs/fixtures/doc_releases.json`` JSON fixture, so people without access
    to the production DB can still run an up-to-date copy of the docs site.
 
-#. Create a stub release note for the new major version. Use the stub from the
-   previous major version or use the previous major version and delete most of
-   the contents leaving only section headings.
+#. Create a stub release note for the new feature version. Use the stub from
+   the previous feature release version or copy the contents from the previous
+   feature version and delete most of the contents leaving only the headings.
 
 #. Increase the default PBKDF2 iterations in
    ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` by about 20%

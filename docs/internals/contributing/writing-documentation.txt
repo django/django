@@ -192,7 +192,7 @@ __ http://sphinx-doc.org/markup/
 
   To link, use ``:djadminopt:`--traceback```.
 
-* Links to Trac tickets (typically reserved for minor release notes)::
+* Links to Trac tickets (typically reserved for patch release notes)::
 
         :ticket:`12345`
 

@@ -2,13 +2,12 @@
 API stability
 =============
 
-:doc:`The release of Django 1.0 </releases/1.0>` comes with a promise of API
-stability and forwards-compatibility. In a nutshell, this means that code you
-develop against a 1.X version of Django will continue to work with future
-1.X releases. You may need to make minor changes when upgrading the version of
-Django your project uses: see the "Backwards incompatible changes" section of
-the :doc:`release note </releases/index>` for the version or versions to which
-you are upgrading.
+Django promises API stability and forwards-compatibility since version 1.0. In
+a nutshell, this means that code you develop against a version of Django will
+continue to work with future releases. You may need to make minor changes when
+upgrading the version of Django your project uses: see the "Backwards
+incompatible changes" section of the :doc:`release note </releases/index>` for
+the version or versions to which you are upgrading.
 
 What "stable" means
 ===================
@@ -24,8 +23,8 @@ In this context, stable means:
 
 - If, for some reason, an API declared stable must be removed or replaced, it
   will be declared deprecated but will remain in the API for at least two
-  minor version releases. Warnings will be issued when the deprecated method
-  is called.
+  feature releases. Warnings will be issued when the deprecated method is
+  called.
 
   See :ref:`official-releases` for more details on how Django's version
   numbering scheme works, and how features will be deprecated.

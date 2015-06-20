@@ -236,11 +236,11 @@ Finally, there are a couple of updates to Django's documentation to make:
    the "Features deprecated in A.B" heading.
 
 #) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the ``A.B+2`` version describing what code will be removed.
+   under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each major release, all ``RemovedInDjangoXXWarning``\s matching the new
-version are removed.
+In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
+the new version are removed.
 
 JavaScript patches
 ------------------
