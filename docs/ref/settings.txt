@@ -2394,6 +2394,11 @@ Default: ``False``
 Whether the engine should look for template source files inside installed
 applications.
 
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` sets ``'APP_DIRS': True``.
+
 .. setting:: TEMPLATES-OPTIONS
 
 OPTIONS
