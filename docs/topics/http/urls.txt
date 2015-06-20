@@ -42,7 +42,9 @@ algorithm the system follows to determine which Python code to execute:
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has an attribute called ``urlconf`` (set by
    middleware :ref:`request processing <request-middleware>`), its value
-   will be used in place of the :setting:`ROOT_URLCONF` setting.
+   will be used in place of the :setting:`ROOT_URLCONF` setting. ``urlconf``
+   can be set to ``None`` to override any changes made by previous middleware,
+   and use the value of :setting:`ROOT_URLCONF` instead.
 
 2. Django loads that Python module and looks for the variable
    ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`
@@ -66,6 +68,12 @@ algorithm the system follows to determine which Python code to execute:
 5. If no regex matches, or if an exception is raised during any
    point in this process, Django invokes an appropriate
    error-handling view. See `Error handling`_ below.
+
+.. versionchanged:: 1.9
+
+    It is now possible to set :attr:`HttpRequest.urlconf
+    <django.http.HttpRequest.urlconf>` to ``None`` to override any changes
+    made by previous request middleware.
 
 Example
 =======

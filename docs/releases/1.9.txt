@@ -435,6 +435,11 @@ Requests and Responses
   :class:`~django.template.response.TemplateResponse`, commonly used with
   class-based views.
 
+* Request middleware can now set :attr:`HttpRequest.urlconf
+  <django.http.HttpRequest.urlconf>` to ``None`` to override any changes made
+  by previous middleware. It will use the value of :setting:`ROOT_URLCONF`
+  instead.
+
 Tests
 ^^^^^
 
