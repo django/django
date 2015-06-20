@@ -112,7 +112,7 @@ class BaseHandler(object):
         # resolver is set
         urlconf = settings.ROOT_URLCONF
         urlresolvers.set_urlconf(urlconf)
-        resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+        resolver = urlresolvers.get_resolver(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -129,7 +129,7 @@ class BaseHandler(object):
                     # Reset url resolver with a custom urlconf.
                     urlconf = request.urlconf
                     urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+                    resolver = urlresolvers.get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
