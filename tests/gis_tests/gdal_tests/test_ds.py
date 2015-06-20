@@ -27,7 +27,8 @@ if HAS_GDAL:
             },
             fids=range(5)
         ),
-        TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D', driver='VRT',
+        TestDS('test_vrt', ext='vrt', nfeat=3, nfld=3, geom='POINT', gtype='Point25D',
+            driver='OGR_VRT' if GDAL_VERSION >= (2, 0) else 'VRT',
             fields={
                 'POINT_X': OFTString,
                 'POINT_Y': OFTString,

@@ -5,7 +5,8 @@ models for GeoDjango and/or mapping dictionaries for use with the
 """
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
+    OFTTime,
 )
 from django.utils import six
 from django.utils.six.moves import zip
@@ -195,6 +196,8 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
                 yield '    %s = models.FloatField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTInteger:
             yield '    %s = models.IntegerField(%s)' % (mfield, kwargs_str[2:])
+        elif field_type is OFTInteger64:
+            yield '    %s = models.BigIntegerField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTString:
             yield '    %s = models.CharField(max_length=%s%s)' % (mfield, width, kwargs_str)
         elif field_type is OFTDate:
