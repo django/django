@@ -976,8 +976,8 @@ class TextNode(Node):
         self.s = s
 
     def __repr__(self):
-        return force_str("<Text Node: '%s'>" % self.s[:25], 'ascii',
-                errors='replace')
+        rep = "<%s: %r>" % (self.__class__.__name__, self.s[:25])
+        return force_str(rep, 'ascii', errors='replace')
 
     def render(self, context):
         return self.s
