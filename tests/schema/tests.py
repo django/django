@@ -9,14 +9,14 @@ from django.db import (
 from django.db.models import Model
 from django.db.models.fields import (
     AutoField, BigIntegerField, BinaryField, BooleanField, CharField,
-    DateTimeField, IntegerField, PositiveIntegerField, SlugField, TextField,
-    TimeField,
+    DateField, DateTimeField, IntegerField, PositiveIntegerField, SlugField,
+    TextField, TimeField,
 )
 from django.db.models.fields.related import (
     ForeignKey, ManyToManyField, OneToOneField,
 )
 from django.db.transaction import atomic
-from django.test import TransactionTestCase, skipIfDBFeature
+from django.test import TransactionTestCase, mock, skipIfDBFeature
 
 from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
@@ -1618,3 +1618,81 @@ class SchemaTests(TransactionTestCase):
             )
             if connection.features.can_introspect_default:
                 self.assertIsNone(field.default)
+
+    @mock.patch('django.db.backends.base.schema.timezone')
+    def test_add_datefield_and_datetimefield_use_effective_default(self, mocked_tz):
+        """
+        #25005 - effective_default() should be used for DateField,
+        DateTimeField and TimeField if auto_now or auto_add_now is set.
+        """
+        now = datetime.datetime(month=1, day=1, year=2000, hour=1, minute=1)
+        mocked_tz.now = mock.MagicMock(return_value=now)
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure there's no surname field
+        columns = self.column_classes(Author)
+        self.assertNotIn("date_of_birth_auto_now", columns)
+        self.assertNotIn("date_of_birth_auto_now_add", columns)
+        self.assertNotIn("date_time_of_birth_auto_now", columns)
+        self.assertNotIn("date_time_of_birth_auto_now_add", columns)
+        self.assertNotIn("time_of_birth_auto_now", columns)
+        self.assertNotIn("time_of_birth_auto_now_add", columns)
+        # Create a row
+        Author.objects.create(name='Anonymous1')
+        # Add new date and datetime fields to ensure default will be
+        # used from effective_default
+        date_of_birth_auto_now = DateField(auto_now=True)
+        date_of_birth_auto_now.set_attributes_from_name('date_of_birth_auto_now')
+
+        date_of_birth_auto_now_add = DateField(auto_now_add=True)
+        date_of_birth_auto_now_add.set_attributes_from_name('date_of_birth_auto_now_add')
+
+        date_time_of_birth_auto_now = DateTimeField(auto_now=True)
+        date_time_of_birth_auto_now.set_attributes_from_name('date_time_of_birth_auto_now')
+
+        date_time_of_birth_auto_now_add = DateTimeField(auto_now_add=True)
+        date_time_of_birth_auto_now_add.set_attributes_from_name('date_time_of_birth_auto_now_add')
+
+        time_of_birth_auto_now = TimeField(auto_now=True)
+        time_of_birth_auto_now.set_attributes_from_name('time_of_birth_auto_now')
+
+        time_of_birth_auto_now_add = TimeField(auto_now_add=True)
+        time_of_birth_auto_now_add.set_attributes_from_name('time_of_birth_auto_now_add')
+
+        # Ensure fields was added with the right defaults
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, date_of_birth_auto_now)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT date_of_birth_auto_now FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now.date())
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, date_of_birth_auto_now_add)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT date_of_birth_auto_now_add FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now.date())
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, date_time_of_birth_auto_now)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT date_time_of_birth_auto_now FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now)
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, date_time_of_birth_auto_now_add)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT date_time_of_birth_auto_now_add FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now)
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, time_of_birth_auto_now)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT time_of_birth_auto_now FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now.time())
+
+        with connection.schema_editor() as editor:
+            editor.add_field(Author, time_of_birth_auto_now_add)
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT time_of_birth_auto_now_add FROM schema_author;")
+            self.assertEqual(cursor.fetchall()[0][0], now.time())

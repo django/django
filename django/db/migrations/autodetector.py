@@ -820,7 +820,11 @@ class MigrationAutodetector(object):
         preserve_default = True
         if (not field.null and not field.has_default() and
                 not isinstance(field, models.ManyToManyField) and
-                not (field.blank and field.empty_strings_allowed)):
+                not (field.blank and field.empty_strings_allowed) and
+                not (
+                    isinstance(field, (models.DateField, models.DateTimeField, models.TimeField)) and
+                    (field.auto_now or field.auto_now_add)
+                )):
             field = field.clone()
             field.default = self.questioner.ask_not_null_addition(field_name, model_name)
             preserve_default = False

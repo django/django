@@ -3,7 +3,7 @@ import logging
 
 from django.db.backends.utils import truncate_name
 from django.db.transaction import atomic
-from django.utils import six
+from django.utils import six, timezone
 from django.utils.encoding import force_bytes
 
 logger = logging.getLogger('django.db.backends.schema')
@@ -200,6 +200,13 @@ class BaseDatabaseSchemaEditor(object):
                 default = six.binary_type()
             else:
                 default = six.text_type()
+        elif getattr(field, 'auto_now', False) or getattr(field, 'auto_now_add', False):
+            default = timezone.now()  # default for DateTimeField
+            internal_type = field.get_internal_type()
+            if internal_type == 'DateField':
+                default = default.date()
+            elif internal_type == 'TimeField':
+                default = default.time()
         else:
             default = None
         # If it's a callable, call it
