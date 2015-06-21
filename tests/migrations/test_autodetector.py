@@ -553,7 +553,7 @@ class AutodetectorTests(TestCase):
         # Use project state to make a new migration change set
         before = self.make_project_state([])
         after = self.make_project_state([self.author_empty, self.other_pony, self.other_stable, self.third_thing])
-        autodetector = MigrationAutodetector(before, after, MigrationQuestioner(defaults={"ask_initial": True}))
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_initial": True}))
         changes = autodetector._detect_changes()
         # Run through arrange_for_graph
         graph = MigrationGraph()
@@ -652,18 +652,16 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
 
-    def test_alter_field_to_not_null_with_default(self):
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_alter_field_to_not_null_with_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
         """
-        class CustomQuestioner(MigrationQuestioner):
-            def ask_not_null_alteration(self, field_name, model_name):
-                raise Exception("Should not have prompted for not null addition")
-
         # Make state
         before = self.make_project_state([self.author_name_null])
         after = self.make_project_state([self.author_name_default])
-        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
@@ -671,42 +669,36 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default='Ada Lovelace')
 
-    def test_alter_field_to_not_null_without_default(self):
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+                return_value=models.NOT_PROVIDED)
+    def test_alter_field_to_not_null_without_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
         """
-        class CustomQuestioner(MigrationQuestioner):
-            def ask_not_null_alteration(self, field_name, model_name):
-                # Ignore for now, and let me handle existing rows with NULL
-                # myself (e.g. adding a RunPython or RunSQL operation in the new
-                # migration file before the AlterField operation)
-                return models.NOT_PROVIDED
-
         # Make state
         before = self.make_project_state([self.author_name_null])
         after = self.make_project_state([self.author_name])
-        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
+        self.assertEqual(mocked_ask_method.call_count, 1)
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name", preserve_default=True)
         self.assertOperationFieldAttributes(changes, "testapp", 0, 0, default=models.NOT_PROVIDED)
 
-    def test_alter_field_to_not_null_oneoff_default(self):
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration',
+                return_value='Some Name')
+    def test_alter_field_to_not_null_oneoff_default(self, mocked_ask_method):
         """
         #23609 - Tests autodetection of nullable to non-nullable alterations.
         """
-        class CustomQuestioner(MigrationQuestioner):
-            def ask_not_null_alteration(self, field_name, model_name):
-                # Provide a one-off default now (will be set on all existing rows)
-                return 'Some Name'
-
         # Make state
         before = self.make_project_state([self.author_name_null])
         after = self.make_project_state([self.author_name])
-        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
+        self.assertEqual(mocked_ask_method.call_count, 1)
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
@@ -979,9 +971,7 @@ class AutodetectorTests(TestCase):
         # Make state
         before = self.make_project_state([self.author_with_db_table_options])
         after = self.make_project_state([self.author_renamed_with_db_table_options])
-        autodetector = MigrationAutodetector(
-            before, after, MigrationQuestioner({"ask_rename_model": True})
-        )
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True}))
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
@@ -996,9 +986,7 @@ class AutodetectorTests(TestCase):
         # Make state
         before = self.make_project_state([self.author_with_db_table_options])
         after = self.make_project_state([self.author_renamed_with_new_db_table_options])
-        autodetector = MigrationAutodetector(
-            before, after, MigrationQuestioner({"ask_rename_model": True})
-        )
+        autodetector = MigrationAutodetector(before, after, MigrationQuestioner({"ask_rename_model": True}))
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
@@ -1491,15 +1479,13 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, 'testapp', 0, 0, name="publisher")
         self.assertOperationAttributes(changes, 'testapp', 0, 1, name="Publisher")
 
-    def test_add_many_to_many(self):
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_add_many_to_many(self, mocked_ask_method):
         """#22435 - Adding a ManyToManyField should not prompt for a default."""
-        class CustomQuestioner(MigrationQuestioner):
-            def ask_not_null_addition(self, field_name, model_name):
-                raise Exception("Should not have prompted for not null addition")
-
         before = self.make_project_state([self.author_empty, self.publisher])
         after = self.make_project_state([self.author_with_m2m, self.publisher])
-        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
@@ -2044,19 +2030,18 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
         self.assertMigrationDependencies(changes, 'a', 0, [])
 
-    def test_add_blank_textfield_and_charfield(self):
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_add_blank_textfield_and_charfield(self, mocked_ask_method):
         """
         #23405 - Adding a NOT NULL and blank `CharField` or `TextField`
         without default should not prompt for a default.
         """
-        class CustomQuestioner(MigrationQuestioner):
-            def ask_not_null_addition(self, field_name, model_name):
-                raise Exception("Should not have prompted for not null addition")
-
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_with_biography_blank])
-        autodetector = MigrationAutodetector(before, after, CustomQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
+        # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
@@ -2069,11 +2054,10 @@ class AutodetectorTests(TestCase):
         """
         before = self.make_project_state([self.author_empty])
         after = self.make_project_state([self.author_with_biography_non_blank])
-        autodetector = MigrationAutodetector(before, after, MigrationQuestioner())
+        autodetector = MigrationAutodetector(before, after)
         changes = autodetector._detect_changes()
-        # need to check for questioner call
-        self.assertTrue(mocked_ask_method.called)
         self.assertEqual(mocked_ask_method.call_count, 2)
+        # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0)
