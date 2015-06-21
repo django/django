@@ -21,7 +21,8 @@ The sites framework is mainly based on a simple model:
 
     .. attribute:: domain
 
-        The domain name associated with the Web site.
+        The fully qualified domain name associated with the Web site.
+        For example, ``www.example.com``.
 
     .. attribute:: name
 
