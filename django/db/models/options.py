@@ -14,7 +14,7 @@ from django.db.models.fields.proxy import OrderWrt
 from django.db.models.fields.related import ManyToManyField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
@@ -53,7 +53,7 @@ class raise_deprecation(object):
                     fn.__name__,
                     self.suggested_alternative,
                 ),
-                RemovedInDjango20Warning, stacklevel=2
+                RemovedInDjango110Warning, stacklevel=2
             )
             return fn(*args, **kwargs)
         return wrapper
@@ -537,7 +537,7 @@ class Options(object):
         only forward fields will be returned.
 
         The many_to_many argument exists for backwards compatibility reasons;
-        it has been deprecated and will be removed in Django 2.0.
+        it has been deprecated and will be removed in Django 1.10.
         """
         m2m_in_kwargs = many_to_many is not None
         if m2m_in_kwargs:
@@ -546,7 +546,7 @@ class Options(object):
             warnings.warn(
                 "The 'many_to_many' argument on get_field() is deprecated; "
                 "use a filter on field.many_to_many instead.",
-                RemovedInDjango20Warning
+                RemovedInDjango110Warning
             )
 
         try:

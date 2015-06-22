@@ -14,7 +14,7 @@ from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 
 from ..utils import no_oracle, oracle, postgis, spatialite
@@ -435,7 +435,7 @@ class GeoLookupTest(TestCase):
 
 
 @skipUnlessDBFeature("gis_enabled")
-@ignore_warnings(category=RemovedInDjango21Warning)
+@ignore_warnings(category=RemovedInDjango20Warning)
 class GeoQuerySetTest(TestCase):
     fixtures = ['initial']
 
@@ -493,7 +493,7 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @skipUnlessDBFeature("supports_extent_aggr")
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_extent(self):
         """
         Testing the (deprecated) `extent` GeoQuerySet method and the Extent
@@ -651,7 +651,7 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_make_line(self):
         """
         Testing the (deprecated) `make_line` GeoQuerySet method and the MakeLine
@@ -863,7 +863,7 @@ class GeoQuerySetTest(TestCase):
     # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
     @no_oracle
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_unionagg(self):
         """
         Testing the (deprecated) `unionagg` (aggregate union) GeoQuerySet method

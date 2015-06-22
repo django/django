@@ -13,7 +13,7 @@ from django.db.models import (
 from django.test import TestCase, ignore_warnings
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import Author, Book, Publisher, Store
 
@@ -1068,7 +1068,7 @@ class AggregateTestCase(TestCase):
         self.assertQuerysetEqual(
             qs2, [1, 3], lambda v: v.num_awards)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_backwards_compatibility(self):
         from django.db.models.sql import aggregates as sql_aggregates
 

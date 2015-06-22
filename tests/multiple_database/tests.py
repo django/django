@@ -931,7 +931,7 @@ class RouterTestCase(TestCase):
             def allow_migrate(self, db, model):
                 """
                 Deprecated allow_migrate signature should trigger
-                RemovedInDjango20Warning.
+                RemovedInDjango110Warning.
                 """
                 assert db == 'default'
                 assert model is User
@@ -945,7 +945,7 @@ class RouterTestCase(TestCase):
                     "The signature of allow_migrate has changed from "
                     "allow_migrate(self, db, model) to "
                     "allow_migrate(self, db, app_label, model_name=None, **hints). "
-                    "Support for the old signature will be removed in Django 2.0."
+                    "Support for the old signature will be removed in Django 1.10."
                 )
 
                 self.assertTrue(router.allow_migrate_model('default', User))

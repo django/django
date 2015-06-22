@@ -433,7 +433,7 @@ class TestInlineAdminForm(TestCase):
             self.assertEqual(
                 msg,
                 'InlineAdminForm.original_content_type_id is deprecated and will be '
-                'removed in Django 2.0. If you were using this attribute to construct '
+                'removed in Django 1.10. If you were using this attribute to construct '
                 'the "view on site" URL, use the `absolute_url` attribute instead.'
             )
             self.assertEqual(iaf2.original_content_type_id, poll_ct.id)

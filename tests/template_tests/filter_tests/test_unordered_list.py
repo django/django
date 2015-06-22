@@ -1,6 +1,6 @@
 from django.template.defaultfilters import unordered_list
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
@@ -14,7 +14,7 @@ class UnorderedListTests(SimpleTestCase):
         output = self.engine.render_to_string('unordered_list01', {'a': ['x>', ['<y']]})
         self.assertEqual(output, '\t<li>x&gt;\n\t<ul>\n\t\t<li>&lt;y</li>\n\t</ul>\n\t</li>')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'unordered_list02': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list02(self):
         output = self.engine.render_to_string('unordered_list02', {'a': ['x>', ['<y']]})
@@ -36,7 +36,7 @@ class UnorderedListTests(SimpleTestCase):
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class DeprecatedUnorderedListSyntaxTests(SimpleTestCase):
 
     @setup({'unordered_list01': '{{ a|unordered_list }}'})
@@ -165,7 +165,7 @@ class FunctionTests(SimpleTestCase):
             '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-<a>c</a></li>',
         )
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_legacy(self):
         """
         Old format for unordered lists should still work

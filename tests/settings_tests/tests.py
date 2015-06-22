@@ -487,7 +487,7 @@ class TestSessionVerification(unittest.TestCase):
             Settings('fake_settings_module')
         self.assertEqual(
             force_text(warn[0].message),
-            "Session verification will become mandatory in Django 2.0. "
+            "Session verification will become mandatory in Django 1.10. "
             "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
             "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
             "reading the upgrade considerations in the 1.8 release notes.",

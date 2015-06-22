@@ -1,7 +1,7 @@
 import warnings
 
 from django.template import Library, defaulttags
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 register = Library()
 
@@ -27,8 +27,8 @@ def cycle(parser, token):
     """
     warnings.warn(
         "Loading the `cycle` tag from the `future` library is deprecated and "
-        "will be removed in Django 2.0. Use the default `cycle` tag instead.",
-        RemovedInDjango20Warning)
+        "will be removed in Django 1.10. Use the default `cycle` tag instead.",
+        RemovedInDjango110Warning)
     return defaulttags.cycle(parser, token)
 
 
@@ -62,6 +62,6 @@ def firstof(parser, token):
     """
     warnings.warn(
         "Loading the `firstof` tag from the `future` library is deprecated and "
-        "will be removed in Django 2.0. Use the default `firstof` tag instead.",
-        RemovedInDjango20Warning)
+        "will be removed in Django 1.10. Use the default `firstof` tag instead.",
+        RemovedInDjango110Warning)
     return defaulttags.firstof(parser, token)

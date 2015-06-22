@@ -5,7 +5,7 @@ Wrapper for loading templates from a plain Python dict.
 import warnings
 
 from django.template import Origin, TemplateDoesNotExist
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import Loader as BaseLoader
 
@@ -33,7 +33,7 @@ class Loader(BaseLoader):
         warnings.warn(
             'The load_template_sources() method is deprecated. Use '
             'get_template() or get_contents() instead.',
-            RemovedInDjango21Warning,
+            RemovedInDjango20Warning,
         )
         try:
             return self.templates_dict[template_name], template_name

@@ -4,7 +4,7 @@ from django.template import RequestContext
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
 from django.test import RequestFactory, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .test_dummy import TemplateStringsTests
 
@@ -36,7 +36,7 @@ class DjangoTemplatesTests(TemplateStringsTests):
         content = template.render({'processors': 'no'}, request)
         self.assertEqual(content, 'no')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_request_context_conflicts_with_request(self):
         template = self.engine.from_string('hello')
 

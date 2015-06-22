@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -33,8 +33,8 @@ class EngineHandler(object):
         if not self._templates:
             warnings.warn(
                 "You haven't defined a TEMPLATES setting. You must do so "
-                "before upgrading to Django 2.0. Otherwise Django will be "
-                "unable to load templates.", RemovedInDjango20Warning)
+                "before upgrading to Django 1.10. Otherwise Django will be "
+                "unable to load templates.", RemovedInDjango110Warning)
             self._templates = [
                 {
                     'BACKEND': 'django.template.backends.django.DjangoTemplates',

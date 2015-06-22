@@ -17,12 +17,12 @@ from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 from django.utils.log import DEFAULT_LOGGING
 
+warnings.simplefilter("error", RemovedInDjango110Warning)
 warnings.simplefilter("error", RemovedInDjango20Warning)
-warnings.simplefilter("error", RemovedInDjango21Warning)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
@@ -107,7 +107,7 @@ def setup(verbosity, test_labels):
     state = {
         'INSTALLED_APPS': settings.INSTALLED_APPS,
         'ROOT_URLCONF': getattr(settings, "ROOT_URLCONF", ""),
-        # Remove the following line in Django 2.0.
+        # Remove the following line in Django 1.10.
         'TEMPLATE_DIRS': settings.TEMPLATE_DIRS,
         'TEMPLATES': settings.TEMPLATES,
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
@@ -121,7 +121,7 @@ def setup(verbosity, test_labels):
     settings.ROOT_URLCONF = 'urls'
     settings.STATIC_URL = '/static/'
     settings.STATIC_ROOT = os.path.join(TMPDIR, 'static')
-    # Remove the following line in Django 2.0.
+    # Remove the following line in Django 1.10.
     settings.TEMPLATE_DIRS = [TEMPLATE_DIR]
     settings.TEMPLATES = [{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -161,13 +161,13 @@ def setup(verbosity, test_labels):
 
     warnings.filterwarnings(
         'ignore',
-        'django.contrib.webdesign will be removed in Django 2.0.',
-        RemovedInDjango20Warning
+        'django.contrib.webdesign will be removed in Django 1.10.',
+        RemovedInDjango110Warning
     )
     warnings.filterwarnings(
         'ignore',
         'The GeoManager class is deprecated.',
-        RemovedInDjango21Warning
+        RemovedInDjango20Warning
     )
 
     # Load all the ALWAYS_INSTALLED_APPS.

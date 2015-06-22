@@ -195,5 +195,5 @@ class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
                 msg = force_text(recorded.pop().message)
                 self.assertEqual(msg,
                     "SimpleTestCase.urls is deprecated and will be removed in "
-                    "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
+                    "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
                     "in TempTestCase instead.")

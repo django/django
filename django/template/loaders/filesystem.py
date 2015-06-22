@@ -9,7 +9,7 @@ import warnings
 from django.core.exceptions import SuspiciousFileOperation
 from django.template import Origin, TemplateDoesNotExist
 from django.utils._os import safe_join
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .base import Loader as BaseLoader
 
@@ -54,7 +54,7 @@ class Loader(BaseLoader):
         warnings.warn(
             'The load_template_sources() method is deprecated. Use '
             'get_template() or get_contents() instead.',
-            RemovedInDjango21Warning,
+            RemovedInDjango20Warning,
         )
         for origin in self.get_template_sources(template_name, template_dirs):
             try:

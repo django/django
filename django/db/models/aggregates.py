@@ -41,7 +41,7 @@ class Aggregate(Func):
     def _patch_aggregate(self, query):
         """
         Helper method for patching 3rd party aggregates that do not yet support
-        the new way of subclassing. This method should be removed in 2.0
+        the new way of subclassing. This method will be removed in Django 1.10.
 
         add_to_query(query, alias, col, source, is_summary) will be defined on
         legacy aggregates which, in turn, instantiates the SQL implementation of

@@ -24,7 +24,7 @@ from django.utils.duration import duration_string
 from django.utils.functional import cached_property, curry, Promise
 from django.utils.text import capfirst
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import (smart_text, force_text, force_bytes,
     python_2_unicode_compatible)
@@ -246,7 +246,7 @@ class Field(RegisterLookupMixin):
     def rel(self):
         warnings.warn(
             "Usage of field.rel has been deprecated. Use field.remote_field instead.",
-            RemovedInDjango21Warning, 2)
+            RemovedInDjango20Warning, 2)
         return self.remote_field
 
     def _check_choices(self):

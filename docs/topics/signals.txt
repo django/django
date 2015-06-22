@@ -285,4 +285,4 @@ may be ``None`` if ``dispatch_uid`` is used to identify the receiver.
 .. deprecated:: 1.9
 
     The ``weak`` argument is deprecated as it has no effect. It will be removed
-    in Django 2.1.
+    in Django 2.0.

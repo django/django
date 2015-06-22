@@ -3,7 +3,7 @@ Parser and utilities for the smart 'if' tag
 """
 import warnings
 
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 
 # Using a simple top down parser, as described here:
@@ -102,7 +102,7 @@ OPERATORS = {
     'not': prefix(8, lambda context, x: not x.eval(context)),
     'in': infix(9, lambda context, x, y: x.eval(context) in y.eval(context)),
     'not in': infix(9, lambda context, x, y: x.eval(context) not in y.eval(context)),
-    # This should be removed in Django 2.0:
+    # This should be removed in Django 1.10:
     '=': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '==': infix(10, lambda context, x, y: x.eval(context) == y.eval(context)),
     '!=': infix(10, lambda context, x, y: x.eval(context) != y.eval(context)),
@@ -180,8 +180,8 @@ class IfParser(object):
         else:
             if token == '=':
                 warnings.warn(
-                    "Operator '=' is deprecated and will be removed in Django 2.0. Use '==' instead.",
-                    RemovedInDjango20Warning, stacklevel=2
+                    "Operator '=' is deprecated and will be removed in Django 1.10. Use '==' instead.",
+                    RemovedInDjango110Warning, stacklevel=2
                 )
             return op()
 

@@ -9,7 +9,7 @@ from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.six import StringIO
 
 
@@ -104,7 +104,7 @@ class CommandTests(SimpleTestCase):
         self.assertNotIn("opt_3", out.getvalue())
         self.assertNotIn("opt-3", out.getvalue())
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_optparse_compatibility(self):
         """
         optparse should be supported during Django 1.8/1.9 releases.

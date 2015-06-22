@@ -2,7 +2,7 @@ import warnings
 from unittest import skipIf
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 def skipIfCustomUser(test_func):
@@ -11,6 +11,6 @@ def skipIfCustomUser(test_func):
     """
     warnings.warn(
         "django.contrib.auth.tests.utils.skipIfCustomUser is deprecated.",
-        RemovedInDjango21Warning, stacklevel=2)
+        RemovedInDjango20Warning, stacklevel=2)
 
     return skipIf(settings.AUTH_USER_MODEL != 'auth.User', 'Custom user model in use')(test_func)

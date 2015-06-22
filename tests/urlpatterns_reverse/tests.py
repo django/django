@@ -27,7 +27,7 @@ from django.test import (
 from django.test.utils import override_script_prefix
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 
 from . import middleware, urlconf_outer, views
@@ -227,7 +227,7 @@ class NoURLPatternsTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
 class URLPatternReverse(SimpleTestCase):
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
             try:
@@ -303,7 +303,7 @@ class URLPatternReverse(SimpleTestCase):
 
 
 class ResolverTests(unittest.TestCase):
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_repr(self):
         """
         Test repr of RegexURLResolver, especially when urlconf_name is a list
@@ -469,7 +469,7 @@ class ReverseShortcutTests(SimpleTestCase):
         redirect("urlpatterns_reverse.nonimported_module.view")
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
         # reversible by dotted path.
@@ -483,7 +483,7 @@ class ReverseShortcutTests(SimpleTestCase):
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
-@ignore_warnings(category=RemovedInDjango21Warning)
+@ignore_warnings(category=RemovedInDjango20Warning)
 class NamespaceTests(SimpleTestCase):
 
     def test_ambiguous_object(self):
@@ -824,7 +824,7 @@ class NoRootUrlConfTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.namespace_urls')
 class ResolverMatchTests(SimpleTestCase):
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_urlpattern_resolve(self):
         for path, url_name, app_name, namespace, view_name, func, args, kwargs in resolve_test_data:
             # Test legacy support for extracting "function, args, kwargs"
@@ -849,7 +849,7 @@ class ResolverMatchTests(SimpleTestCase):
             self.assertEqual(match[1], args)
             self.assertEqual(match[2], kwargs)
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_match_on_request(self):
         response = self.client.get('/resolver_match/')
         resolver_match = response.resolver_match
@@ -917,12 +917,12 @@ class IncludeTests(SimpleTestCase):
     def test_include_urls(self):
         self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace(self):
         # no app_name -> deprecated
         self.assertEqual(include(self.url_patterns, 'namespace'), (self.url_patterns, None, 'namespace'))
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace_app_name(self):
         # app_name argument to include -> deprecated
         self.assertEqual(
@@ -930,7 +930,7 @@ class IncludeTests(SimpleTestCase):
             (self.url_patterns, 'app_name', 'namespace')
         )
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_3_tuple(self):
         # 3-tuple -> deprecated
         self.assertEqual(

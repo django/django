@@ -1,7 +1,7 @@
 import warnings
 
 from django.conf.urls import include, patterns, url
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .views import (
     absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
@@ -13,9 +13,9 @@ other_patterns = [
     url(r'nested_path/$', nested_view),
 ]
 
-# test deprecated patterns() function. convert to list of urls() in Django 2.0
+# test deprecated patterns() function. convert to list of urls() in Django 1.10
 with warnings.catch_warnings():
-    warnings.filterwarnings('ignore', category=RemovedInDjango20Warning)
+    warnings.filterwarnings('ignore', category=RemovedInDjango110Warning)
 
     urlpatterns = patterns('',
         url(r'^places/([0-9]+)/$', empty_view, name='places'),

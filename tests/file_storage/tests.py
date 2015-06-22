@@ -568,13 +568,13 @@ class FileFieldStorageTests(TestCase):
             str(warns[0].message),
             'Backwards compatibility for storage backends without support for '
             'the `max_length` argument in Storage.save() will be removed in '
-            'Django 2.0.'
+            'Django 1.10.'
         )
         self.assertEqual(
             str(warns[1].message),
             'Backwards compatibility for storage backends without support for '
             'the `max_length` argument in Storage.get_available_name() will '
-            'be removed in Django 2.0.'
+            'be removed in Django 1.10.'
         )
         self.assertEqual(obj.old_style.name, 'tests/deprecated_storage_test.txt')
         self.assertEqual(obj.old_style.read(), b'Same Content')

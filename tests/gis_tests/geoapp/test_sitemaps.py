@@ -10,7 +10,7 @@ from django.test import (
     TestCase, ignore_warnings, modify_settings, override_settings,
     skipUnlessDBFeature,
 )
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import City, Country
 
@@ -30,7 +30,7 @@ class GeoSitemapTest(TestCase):
         expected = set(expected)
         self.assertEqual(actual, expected)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_geositemap_kml(self):
         "Tests KML/KMZ geographic sitemaps."
         for kml_type in ('kml', 'kmz'):

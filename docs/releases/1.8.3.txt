@@ -6,6 +6,11 @@ Django 1.8.3 release notes
 
 Django 1.8.3 fixes several bugs in 1.8.2.
 
+Also, ``django.utils.deprecation.RemovedInDjango20Warning`` was renamed to
+``RemovedInDjango110Warning`` as the version roadmap was revised to 1.9, 1.10,
+1.11 (LTS), 2.0 (drops Python 2 support). For backwards compatibility,
+``RemovedInDjango20Warning`` remains as an importable alias.
+
 Bugfixes
 ========
 

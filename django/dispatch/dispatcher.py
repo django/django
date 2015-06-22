@@ -4,7 +4,7 @@ import warnings
 import weakref
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.inspect import func_accepts_kwargs
 from django.utils.six.moves import range
 
@@ -145,7 +145,7 @@ class Signal(object):
         """
         if weak is not None:
             warnings.warn("Passing `weak` to disconnect has no effect.",
-                RemovedInDjango21Warning, stacklevel=2)
+                RemovedInDjango20Warning, stacklevel=2)
         if dispatch_uid:
             lookup_key = (dispatch_uid, _make_id(sender))
         else:

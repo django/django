@@ -4,12 +4,12 @@ import os
 
 from django.template import Context, Engine
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import ROOT, setup
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class SsiTagTests(SimpleTestCase):
 
     # Test normal behavior
@@ -81,7 +81,7 @@ class SsiTagTests(SimpleTestCase):
                                  'with spaces in its name. Look ma! It parsed!\n')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class SSISecurityTests(SimpleTestCase):
 
     def setUp(self):

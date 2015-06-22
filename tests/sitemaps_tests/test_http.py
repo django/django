@@ -11,7 +11,7 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import ignore_warnings, modify_settings, override_settings
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.formats import localize
 from django.utils.translation import activate, deactivate
 
@@ -21,7 +21,7 @@ from .models import TestModel
 
 class HTTPSitemapTests(SitemapTestsBase):
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_simple_sitemap_index(self):
         "A simple sitemap index can be rendered"
         # The URL for views.sitemap in tests/urls/http.py has been updated
@@ -38,7 +38,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
@@ -194,7 +194,7 @@ class HTTPSitemapTests(SitemapTestsBase):
 """ % self.base_url
         self.assertXMLEqual(response.content.decode('utf-8'), expected_content)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_x_robots_sitemap(self):
         # The URL for views.sitemap in tests/urls/http.py has been updated
         # with a name but since reversing by Python path is tried first
