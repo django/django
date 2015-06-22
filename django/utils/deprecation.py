@@ -4,7 +4,7 @@ import inspect
 import warnings
 
 
-class RemovedInDjango21Warning(PendingDeprecationWarning):
+class RemovedInDjango30Warning(PendingDeprecationWarning):
     pass
 
 

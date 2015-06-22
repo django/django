@@ -6,7 +6,7 @@ import warnings
 from django.apps import apps
 from django.template import Origin, TemplateDoesNotExist
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from .base import Loader as BaseLoader
 
@@ -62,7 +62,7 @@ class Loader(BaseLoader):
         warnings.warn(
             'The load_template_sources() method is deprecated. Use '
             'get_template() or get_contents() instead.',
-            RemovedInDjango21Warning,
+            RemovedInDjango30Warning,
         )
         for origin in self.get_template_sources(template_name):
             try:

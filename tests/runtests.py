@@ -17,12 +17,12 @@ from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango30Warning,
 )
 from django.utils.log import DEFAULT_LOGGING
 
 warnings.simplefilter("error", RemovedInDjango20Warning)
-warnings.simplefilter("error", RemovedInDjango21Warning)
+warnings.simplefilter("error", RemovedInDjango30Warning)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
@@ -167,7 +167,7 @@ def setup(verbosity, test_labels):
     warnings.filterwarnings(
         'ignore',
         'The GeoManager class is deprecated.',
-        RemovedInDjango21Warning
+        RemovedInDjango30Warning
     )
 
     # Load all the ALWAYS_INSTALLED_APPS.

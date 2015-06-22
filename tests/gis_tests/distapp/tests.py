@@ -8,7 +8,7 @@ from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 
 from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
@@ -97,7 +97,7 @@ class DistanceTest(TestCase):
                 self.assertListEqual(au_cities, self.get_names(qs.filter(point__dwithin=(self.au_pnt, dist))))
 
     @skipUnlessDBFeature("has_distance_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_distance_projected(self):
         """
         Test the `distance` GeoQuerySet method on projected coordinate systems.
@@ -141,7 +141,7 @@ class DistanceTest(TestCase):
                 self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
     @skipUnlessDBFeature("has_distance_method", "supports_distance_geodetic")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_distance_geodetic(self):
         """
         Test the `distance` GeoQuerySet method on geodetic coordinate systems.
@@ -203,7 +203,7 @@ class DistanceTest(TestCase):
 
     @no_oracle  # Oracle already handles geographic distance calculation.
     @skipUnlessDBFeature("has_distance_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_distance_transform(self):
         """
         Test the `distance` GeoQuerySet method used with `transform` on a geographic field.
@@ -324,7 +324,7 @@ class DistanceTest(TestCase):
             self.assertEqual(cities, ['Adelaide', 'Hobart', 'Shellharbour', 'Thirroul'])
 
     @skipUnlessDBFeature("has_area_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_area(self):
         """
         Test the `area` GeoQuerySet method.
@@ -338,7 +338,7 @@ class DistanceTest(TestCase):
             self.assertAlmostEqual(area_sq_m[i], z.area.sq_m, tol)
 
     @skipUnlessDBFeature("has_length_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_length(self):
         """
         Test the `length` GeoQuerySet method.
@@ -362,7 +362,7 @@ class DistanceTest(TestCase):
         self.assertAlmostEqual(len_m2, i10.length.m, 2)
 
     @skipUnlessDBFeature("has_perimeter_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_perimeter(self):
         """
         Test the `perimeter` GeoQuerySet method.
@@ -379,7 +379,7 @@ class DistanceTest(TestCase):
             self.assertEqual(0, c.perim.m)
 
     @skipUnlessDBFeature("has_area_method", "has_distance_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_measurement_null_fields(self):
         """
         Test the measurement GeoQuerySet methods on fields with NULL values.
@@ -394,7 +394,7 @@ class DistanceTest(TestCase):
         self.assertIsNone(z.area)
 
     @skipUnlessDBFeature("has_distance_method")
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_distance_order_by(self):
         qs = SouthTexasCity.objects.distance(Point(3, 3)).order_by(
             'distance'

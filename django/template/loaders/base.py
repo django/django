@@ -1,7 +1,7 @@
 import warnings
 
 from django.template import Origin, Template, TemplateDoesNotExist
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.inspect import func_supports_parameter
 
 
@@ -13,7 +13,7 @@ class Loader(object):
         self.engine = engine
 
     def __call__(self, template_name, template_dirs=None):
-        # RemovedInDjango21Warning: Allow loaders to be called like functions.
+        # RemovedInDjango30Warning: Allow loaders to be called like functions.
         return self.load_template(template_name, template_dirs)
 
     def get_template(self, template_name, template_dirs=None, skip=None):
@@ -26,7 +26,7 @@ class Loader(object):
         tried = []
 
         args = [template_name]
-        # RemovedInDjango21Warning: Add template_dirs for compatibility with
+        # RemovedInDjango30Warning: Add template_dirs for compatibility with
         # old loaders
         if func_supports_parameter(self.get_template_sources, 'template_dirs'):
             args.append(template_dirs)
@@ -51,7 +51,7 @@ class Loader(object):
     def load_template(self, template_name, template_dirs=None):
         warnings.warn(
             'The load_template() method is deprecated. Use get_template() '
-            'instead.', RemovedInDjango21Warning,
+            'instead.', RemovedInDjango30Warning,
         )
         source, display_name = self.load_template_source(
             template_name, template_dirs,
@@ -83,7 +83,7 @@ class Loader(object):
 
     def load_template_source(self, template_name, template_dirs=None):
         """
-        RemovedInDjango21Warning: Returns a tuple containing the source and
+        RemovedInDjango30Warning: Returns a tuple containing the source and
         origin for the given template name.
         """
         raise NotImplementedError(
@@ -100,7 +100,7 @@ class Loader(object):
     @property
     def supports_recursion(self):
         """
-        RemovedInDjango21Warning: This is an internal property used by the
+        RemovedInDjango30Warning: This is an internal property used by the
         ExtendsNode during the deprecation of non-recursive loaders.
         """
         return hasattr(self, 'get_contents')

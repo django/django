@@ -160,7 +160,7 @@ class Engine(object):
                 except TemplateDoesNotExist as e:
                     tried.extend(e.tried)
             else:
-                # RemovedInDjango21Warning: Use old api for non-recursive
+                # RemovedInDjango30Warning: Use old api for non-recursive
                 # loaders.
                 try:
                     return loader(name, dirs)

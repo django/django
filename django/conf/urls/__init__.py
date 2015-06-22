@@ -5,7 +5,7 @@ from django.core.urlresolvers import (RegexURLPattern,
     RegexURLResolver, LocaleRegexURLResolver)
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning, RemovedInDjango30Warning
 
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
@@ -23,7 +23,7 @@ def include(arg, namespace=None, app_name=None):
         warnings.warn(
             'The app_name argument to django.conf.urls.include() is deprecated. '
             'Set the app_name in the included URLconf instead.',
-            RemovedInDjango21Warning, stacklevel=2
+            RemovedInDjango30Warning, stacklevel=2
         )
 
     if isinstance(arg, tuple):
@@ -39,7 +39,7 @@ def include(arg, namespace=None, app_name=None):
                 'Passing a 3-tuple to django.conf.urls.include() is deprecated. '
                 'Pass a 2-tuple containing the list of patterns and app_name, '
                 'and provide the namespace argument to include() instead.',
-                RemovedInDjango21Warning, stacklevel=2
+                RemovedInDjango30Warning, stacklevel=2
             )
             urlconf_module, app_name, namespace = arg
     else:
@@ -56,7 +56,7 @@ def include(arg, namespace=None, app_name=None):
             'providing an app_name is deprecated. Set the app_name attribute '
             'in the included module, or pass a 2-tuple containing the list of '
             'patterns and app_name instead.',
-            RemovedInDjango21Warning, stacklevel=2
+            RemovedInDjango30Warning, stacklevel=2
         )
 
     namespace = namespace or app_name
