@@ -540,6 +540,22 @@ Daniele Procida
     .. _Django Girls: http://djangogirls.org
     .. _Squirrel: http://squirrel.me
 
+`Ola Sitarska`_
+    Ola started working with Django in 2009, when she discovered the power of Django admin and quickly fell in love with the beauty of Python. 
+    
+    She co-organized `DjangoCon Europe 2013`_ in Warsaw and co-authored the `Django Girls Tutorial`_, the most beginner friendly tutorial about Django out there. Together with Ola Sendecka she started `Django Girls`_, a community and series of Django workshops for women who never programmed before.
+
+    In 2015 she became a Django Software Foundation board member. Ola was also a part of the team responsible for the shipping of djangoproject.com redesign.
+
+    Originally from Poland, Ola currently lives in London, where she
+    works with friends at `Potato`_.
+
+    .. _Ola Sitarska: http://ola.sitarska.com/
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Django Girls: http://djangogirls.org
+    .. _Potato: http://p.ota.to
+
 Past team members
 =================
 
