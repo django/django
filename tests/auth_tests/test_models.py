@@ -165,6 +165,33 @@ class UserManagerTestCase(TestCase):
             User.objects.create_user, username=''
         )
 
+    def test_create_user_is_staff(self):
+        email_lowercase = 'normal@normal.com'
+        user = User.objects.create_user(
+            'user', email_lowercase, is_staff=True
+        )
+        self.assertEqual(user.email, email_lowercase)
+        self.assertEqual(user.username, 'user')
+        self.assertTrue(user.is_staff)
+
+    def test_create_super_user_raises_error_on_false_is_superuser(self):
+        self.assertRaisesMessage(
+            ValueError,
+            'Superuser needs to be superuser. is_superuser must be set to True.',
+            User.objects.create_superuser,
+            username='test', email='test@test.com',
+            password='test', is_superuser=False
+        )
+
+    def test_create_superuser_raises_error_on_false_is_staff(self):
+        self.assertRaisesMessage(
+            ValueError,
+            'Superuser needs to be staff. is_staff must be set to True.',
+            User.objects.create_superuser,
+            username='test', email='test@test.com',
+            password='test', is_staff=False
+        )
+
 
 class AbstractUserTestCase(TestCase):
     def test_email_user(self):
