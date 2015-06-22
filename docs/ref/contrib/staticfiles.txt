@@ -46,6 +46,12 @@ resolution works: the file that is first found in one of the specified
 locations will be used. If you're confused, the :djadmin:`findstatic` command
 can help show you which files are found.
 
+On subsequent ``collectstatic`` runs (if ``STATIC_ROOT`` isn't empty), files
+are copied only if they have a modified timestamp greater than the timestamp of
+the file in ``STATIC_ROOT``. Therefore if you remove an application from
+:setting:`INSTALLED_APPS`, it's a good idea to use the :djadminopt:`--clear`
+option in order to remove stale static files.
+
 Files are searched by using the :setting:`enabled finders
 <STATICFILES_FINDERS>`. The default is to look in all locations defined in
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
