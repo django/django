@@ -181,7 +181,7 @@ def password_reset(request, is_admin_site=False,
                 opts = dict(opts, domain_override=request.get_host())
             
             if extra_context is not None:
-                opts.update({'extra_context': extra_context})
+                opts.update({'extra_context':extra_context})
 
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
