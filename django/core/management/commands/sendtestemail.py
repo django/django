@@ -3,6 +3,7 @@ import socket
 
 from django.core.mail import mail_admins, mail_managers, send_mail
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 
 class Command(BaseCommand):
@@ -18,7 +19,7 @@ class Command(BaseCommand):
             help='Send the test email to all addresses specified in settings.ADMINS.')
 
     def handle(self, *args, **kwargs):
-        subject = 'Test email from %s on %s' % (socket.gethostname(), datetime.datetime.now())
+        subject = 'Test email from %s on %s' % (socket.gethostname(), timezone.now())
 
         send_mail(
             subject=subject,
