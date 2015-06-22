@@ -163,15 +163,15 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 .. deprecated:: 1.9
 
     Support for the ``app_name`` argument is deprecated and will be removed in
-    Django 2.1. Specify the ``app_name`` as explained in
+    Django 3.0. Specify the ``app_name`` as explained in
     :ref:`namespaces-and-include` instead.
 
     Support for passing a 3-tuple is also deprecated and will be removed in
-    Django 2.1. Pass a 2-tuple containing the pattern list and application
+    Django 3.0. Pass a 2-tuple containing the pattern list and application
     namespace, and use the ``namespace`` argument instead.
 
     Lastly, support for an instance namespace without an application namespace
-    has been deprecated and will be removed in Django 2.1. Specify the
+    has been deprecated and will be removed in Django 3.0. Specify the
     application namespace or remove the instance namespace.
 
 handler400

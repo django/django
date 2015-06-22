@@ -8,7 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db.backends import utils
 from django.utils import six, timezone
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_text
 
 
@@ -559,7 +559,7 @@ class BaseDatabaseOperations(object):
         warnings.warn(
             "check_aggregate_support has been deprecated. Use "
             "check_expression_support instead.",
-            RemovedInDjango21Warning, stacklevel=2)
+            RemovedInDjango30Warning, stacklevel=2)
         return self.check_expression_support(aggregate_func)
 
     def check_expression_support(self, expression):

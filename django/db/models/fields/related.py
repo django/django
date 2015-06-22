@@ -25,7 +25,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango30Warning,
 )
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
@@ -84,7 +84,7 @@ def add_lazy_relation(cls, field, relation, operation):
     warnings.warn(
         "add_lazy_relation() has been superseded by lazy_related_operation() "
         "and related methods on the Apps class.",
-        RemovedInDjango21Warning, stacklevel=2)
+        RemovedInDjango30Warning, stacklevel=2)
     # Rearrange args for new Apps.lazy_model_operation
     function = lambda local, related, field: operation(field, related, local)
     lazy_related_operation(function, cls, relation, field=field)
@@ -1306,7 +1306,7 @@ class ForeignObjectRel(object):
         warnings.warn(
             "Usage of ForeignObjectRel.to attribute has been deprecated. "
             "Use the model attribute instead.",
-            RemovedInDjango21Warning, 2)
+            RemovedInDjango30Warning, 2)
         return self.model
 
     @cached_property

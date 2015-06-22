@@ -21,7 +21,7 @@ from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.utils._os import upath
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango30Warning,
 )
 from django.utils.translation import ugettext_lazy
 
@@ -520,11 +520,11 @@ class AssertRedirectsTests(SimpleTestCase):
             with self.assertRaises(AssertionError):
                 self.assertRedirects(response, 'http://testserver/secure_view/', status_code=302)
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango30Warning)
     def test_full_path_in_expected_urls(self):
         """
         Test that specifying a full URL as assertRedirects expected_url still
-        work as backwards compatible behavior until Django 2.1.
+        work as backwards compatible behavior until Django 3.0.
         """
         response = self.client.get('/redirect_view/')
         self.assertRedirects(response, 'http://testserver/get_view/')

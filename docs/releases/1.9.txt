@@ -634,7 +634,7 @@ queries, you should turn them into naive datetimes in UTC::
     param = timezone.make_naive(param, timezone.utc)
 
 If you fail to do so, Django 1.9 and 2.0 will perform the conversion like
-earlier versions but emit a deprecation warning. Django 2.1 won't perform any
+earlier versions but emit a deprecation warning. Django 3.0 won't perform any
 conversion, which may result in data corruption.
 
 If you're reading :class:`~datetime.datetime` values from the results, they
@@ -830,7 +830,7 @@ Miscellaneous
 
 * The ``check_aggregate_support()`` method of
   ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
-  will be removed in Django 2.1. The more general ``check_expression_support()``
+  will be removed in Django 3.0. The more general ``check_expression_support()``
   should be used instead.
 
 * ``django.forms.extras`` is deprecated. You can find

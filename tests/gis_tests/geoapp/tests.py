@@ -14,7 +14,7 @@ from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango30Warning,
 )
 
 from ..utils import no_oracle, oracle, postgis, spatialite
@@ -435,7 +435,7 @@ class GeoLookupTest(TestCase):
 
 
 @skipUnlessDBFeature("gis_enabled")
-@ignore_warnings(category=RemovedInDjango21Warning)
+@ignore_warnings(category=RemovedInDjango30Warning)
 class GeoQuerySetTest(TestCase):
     fixtures = ['initial']
 

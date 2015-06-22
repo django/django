@@ -27,7 +27,7 @@ import datetime
 import warnings
 
 from django.utils import datetime_safe, six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.six import StringIO
 from django.utils.six.moves.urllib.parse import urlparse
@@ -268,7 +268,7 @@ class RssFeed(SyndicationFeed):
         warnings.warn(
             'The mime_type attribute of RssFeed is deprecated. '
             'Use content_type instead.',
-            RemovedInDjango21Warning, stacklevel=2
+            RemovedInDjango30Warning, stacklevel=2
         )
         return self.content_type
 
@@ -426,7 +426,7 @@ class Atom1Feed(SyndicationFeed):
         warnings.warn(
             'The mime_type attribute of Atom1Feed is deprecated. '
             'Use content_type instead.',
-            RemovedInDjango21Warning, stacklevel=2
+            RemovedInDjango30Warning, stacklevel=2
         )
         return self.content_type
 

@@ -20,7 +20,7 @@ from django.utils import six, timezone
 from django.utils.dateparse import (
     parse_date, parse_datetime, parse_duration, parse_time,
 )
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 from django.utils.encoding import force_text
 from django.utils.safestring import SafeBytes
 
@@ -51,13 +51,13 @@ IntegrityError = Database.IntegrityError
 
 
 def adapt_datetime_warn_on_aware_datetime(value):
-    # Remove this function and rely on the default adapter in Django 2.1.
+    # Remove this function and rely on the default adapter in Django 3.0.
     if settings.USE_TZ and timezone.is_aware(value):
         warnings.warn(
             "The SQLite database adapter received an aware datetime (%s), "
             "probably from cursor.execute(). Update your code to pass a "
             "naive datetime in the database connection's time zone (UTC by "
-            "default).", RemovedInDjango21Warning)
+            "default).", RemovedInDjango30Warning)
         # This doesn't account for the database connection's timezone,
         # which isn't known. (That's why this adapter is deprecated.)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
