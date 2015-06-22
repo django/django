@@ -150,7 +150,7 @@ You should write::
 Passing a :class:`~django.template.Context` or a
 :class:`~django.template.RequestContext` is still possible when the template
 is loaded by a :class:`~django.template.backends.django.DjangoTemplates`
-backend but it's deprecated and won't be supported in Django 2.0.
+backend but it's deprecated and won't be supported in Django 1.10.
 
 If you're loading a template while you're rendering another template with the
 Django template language and you have access to the current context, for

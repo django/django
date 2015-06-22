@@ -11,7 +11,7 @@ from django.core.files.move import file_move_safe
 from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
@@ -56,8 +56,8 @@ class Storage(object):
             warnings.warn(
                 'Backwards compatibility for storage backends without '
                 'support for the `max_length` argument in '
-                'Storage.get_available_name() will be removed in Django 2.0.',
-                RemovedInDjango20Warning, stacklevel=2
+                'Storage.get_available_name() will be removed in Django 1.10.',
+                RemovedInDjango110Warning, stacklevel=2
             )
             name = self.get_available_name(name)
 

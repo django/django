@@ -62,7 +62,7 @@ from django.template.context import (  # NOQA: imported for backwards compatibil
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils import lru_cache, six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -710,7 +710,7 @@ def resolve_variable(path, context):
     """
     warnings.warn("resolve_variable() is deprecated. Use django.template."
                   "Variable(path).resolve(context) instead",
-                  RemovedInDjango20Warning, stacklevel=2)
+                  RemovedInDjango110Warning, stacklevel=2)
     return Variable(path).resolve(context)
 
 

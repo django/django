@@ -379,7 +379,7 @@ Generic Views
 * Placeholders in :attr:`ModelFormMixin.success_url
   <django.views.generic.edit.ModelFormMixin.success_url>` now support the Python
   :py:meth:`str.format()` syntax. The legacy ``%(<foo>)s`` syntax is still
-  supported but will be removed in Django 2.0.
+  supported but will be removed in Django 1.10.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -1182,7 +1182,7 @@ Selected methods in ``django.db.models.options.Options``
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods have been
-deprecated and will be removed in Django 2.0:
+deprecated and will be removed in Django 1.10:
 
 * ``get_all_field_names()``
 * ``get_all_related_objects()``
@@ -1203,7 +1203,7 @@ Loading ``cycle`` and ``firstof`` template tags from ``future`` library
 Django 1.6 introduced ``{% load cycle from future %}`` and
 ``{% load firstof from future %}`` syntax for forward compatibility of the
 :ttag:`cycle` and :ttag:`firstof` template tags. This syntax is now deprecated
-and will be removed in Django 2.0. You can simply remove the
+and will be removed in Django 1.10. You can simply remove the
 ``{% load ... from future %}`` tags.
 
 ``django.conf.urls.patterns()``
@@ -1289,7 +1289,7 @@ Built-in template context processors have been moved to
 
 The attribute :attr:`SimpleTestCase.urls <django.test.SimpleTestCase.urls>`
 for specifying URLconf configuration in tests has been deprecated and will be
-removed in Django 2.0. Use :func:`@override_settings(ROOT_URLCONF=...)
+removed in Django 1.10. Use :func:`@override_settings(ROOT_URLCONF=...)
 <django.test.override_settings>` instead.
 
 ``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
@@ -1303,7 +1303,7 @@ Using an incorrect count of unpacked values in the :ttag:`for` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
-exception rather than fail silently in Django 2.0.
+exception rather than fail silently in Django 1.10.
 
 Passing a dotted path to :func:`~django.core.urlresolvers.reverse()` and :ttag:`url`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1321,7 +1321,7 @@ the ``url`` that references :func:`django.contrib.sitemaps.views.sitemap`::
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap')
 
-to ensure compatibility when reversing by Python path is removed in Django 2.0.
+to ensure compatibility when reversing by Python path is removed in Django 1.10.
 
 Similarly for GIS sitemaps, add ``name='django.contrib.gis.sitemaps.views.kml'``
 or ``name='django.contrib.gis.sitemaps.views.kmz'``.
@@ -1335,7 +1335,7 @@ The ``django.db.models.sql.aggregates`` and
 ``django.contrib.gis.db.models.sql.aggregates`` modules (both private API), have
 been deprecated as ``django.db.models.aggregates`` and
 ``django.contrib.gis.db.models.aggregates`` are now also responsible
-for SQL generation. The old modules will be removed in Django 2.0.
+for SQL generation. The old modules will be removed in Django 1.10.
 
 If you were using the old modules, see :doc:`Query Expressions
 </ref/models/expressions>` for instructions on rewriting custom aggregates
@@ -1343,7 +1343,7 @@ using the new stable API.
 
 The following methods and properties of ``django.db.models.sql.query.Query``
 have also been deprecated and the backwards compatibility shims will be removed
-in Django 2.0:
+in Django 1.10:
 
 * ``Query.aggregates``, replaced by ``annotations``.
 * ``Query.aggregate_select``, replaced by ``annotation_select``.
@@ -1366,14 +1366,14 @@ arguments through ``argparse.add_argument()``. See
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
-will be removed in Django 2.0. Use :class:`~django.core.management.BaseCommand`
+will be removed in Django 1.10. Use :class:`~django.core.management.BaseCommand`
 instead, which takes no arguments by default.
 
 Listing all migrations in a project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``--list`` option of the :djadmin:`migrate` management command is
-deprecated and will be removed in Django 2.0. Use :djadmin:`showmigrations`
+deprecated and will be removed in Django 1.10. Use :djadmin:`showmigrations`
 instead.
 
 ``cache_choices`` option of ``ModelChoiceField`` and ``ModelMultipleChoiceField``
@@ -1421,7 +1421,7 @@ Using the new syntax, this becomes::
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Rename this method to :meth:`~django.forms.Field.has_changed` by removing the
-leading underscore. The old name will still work until Django 2.0.
+leading underscore. The old name will still work until Django 1.10.
 
 ``django.utils.html.remove_tags()`` and ``removetags`` template filter
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1443,7 +1443,7 @@ It's a legacy option that should no longer be necessary.
 ~~~~~~~~~~~~~~~~
 
 ``django.db.models.fields.subclassing.SubfieldBase`` has been deprecated and
-will be removed in Django 2.0. Historically, it was used to handle fields where
+will be removed in Django 1.10. Historically, it was used to handle fields where
 type conversion was needed when loading from the database, but it was not used
 in ``.values()`` calls or in aggregates. It has been replaced with
 :meth:`~django.db.models.Field.from_db_value`. Note that the new approach does
@@ -1454,7 +1454,7 @@ as was the case with ``SubfieldBase``.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``django.utils.checksums`` module has been deprecated and will be removed
-in Django 2.0. The functionality it provided (validating checksum using the
+in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
 moved to the `django-localflavor`_ package (version 1.1+).
 
@@ -1464,7 +1464,7 @@ moved to the `django-localflavor`_ package (version 1.1+).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``original_content_type_id`` attribute on ``InlineAdminForm`` has been
-deprecated and will be removed in Django 2.0. Historically, it was used
+deprecated and will be removed in Django 1.10. Historically, it was used
 to construct the "view on site" URL. This URL is now accessible using the
 ``absolute_url`` attribute of the form.
 
@@ -1511,7 +1511,7 @@ for details.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following functions and classes will no longer accept a ``current_app``
-parameter to set an URL namespace in Django 2.0:
+parameter to set an URL namespace in Django 1.10:
 
 * ``django.shortcuts.render()``
 * ``django.template.Context()``
@@ -1526,7 +1526,7 @@ to these functions or classes. If you're using a plain ``Context``, use a
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following functions will no longer accept the ``dictionary`` and
-``context_instance`` parameters in Django 2.0:
+``context_instance`` parameters in Django 1.10:
 
 * ``django.shortcuts.render()``
 * ``django.shortcuts.render_to_response()``
@@ -1544,7 +1544,7 @@ pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The following functions will no longer accept a ``dirs`` parameter to override
-``TEMPLATE_DIRS`` in Django 2.0:
+``TEMPLATE_DIRS`` in Django 1.10:
 
 * :func:`django.template.loader.get_template()`
 * :func:`django.template.loader.select_template()`
@@ -1576,7 +1576,7 @@ Support for the ``max_length`` argument on custom ``Storage`` classes
 :meth:`~django.core.files.storage.Storage.get_available_name` and/or
 :meth:`~django.core.files.storage.Storage.save` if they override either method.
 Support for storages that do not accept this argument will be removed in
-Django 2.0.
+Django 1.10.
 
 ``qn`` replaced by ``compiler``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1608,7 +1608,7 @@ added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in
 :setting:`MIDDLEWARE_CLASSES`.
 
-In Django 2.0, session verification will be enabled regardless of whether or not
+In Django 1.10, session verification will be enabled regardless of whether or not
 ``SessionAuthenticationMiddleware`` is enabled (at which point
 ``SessionAuthenticationMiddleware`` will have no significance). You can add it
 to your ``MIDDLEWARE_CLASSES`` sometime before then to opt-in. Please read the
@@ -1629,7 +1629,7 @@ of ``Field.rel``.  The latter is an instance of
 ``django.db.models.fields.related.ForeignObjectRel`` which replaces
 ``django.db.models.related.RelatedObject``. The ``django.db.models.related``
 module has been removed and the ``Field.related`` attribute will be removed in
-Django 2.0.
+Django 1.10.
 
 ``ssi`` template tag
 ~~~~~~~~~~~~~~~~~~~~
@@ -1637,7 +1637,7 @@ Django 2.0.
 The :ttag:`ssi` template tag allows files to be included in a template by
 absolute path. This is of limited use in most deployment situations, and
 the :ttag:`include` tag often makes more sense. This tag is now deprecated and
-will be removed in Django 2.0.
+will be removed in Django 1.10.
 
 ``=`` as comparison operator in ``if`` template tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1650,7 +1650,7 @@ testing was undocumented and untested. It's now deprecated in favor of ``==``.
 
 The legacy ``%(<foo>)s`` syntax in :attr:`ModelFormMixin.success_url
 <django.views.generic.edit.ModelFormMixin.success_url>` is deprecated and
-will be removed in Django 2.0.
+will be removed in Django 1.10.
 
 ``GeoQuerySet`` aggregate methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

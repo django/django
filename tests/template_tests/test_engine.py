@@ -3,14 +3,14 @@ import os
 from django.template import Context
 from django.template.engine import Engine
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .utils import ROOT, TEMPLATE_DIR
 
 OTHER_DIR = os.path.join(ROOT, 'other_templates')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class DeprecatedRenderToStringTest(SimpleTestCase):
 
     def setUp(self):
@@ -100,7 +100,7 @@ class LoaderTests(SimpleTestCase):
         self.assertEqual(template.render(Context()), 'priority\n')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class TemplateDirsOverrideTests(SimpleTestCase):
     DIRS = ((OTHER_DIR, ), [OTHER_DIR])
 

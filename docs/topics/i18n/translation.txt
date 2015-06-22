@@ -1236,7 +1236,7 @@ Language prefix in URL patterns
 .. deprecated:: 1.8
 
     The ``prefix`` argument to ``i18n_patterns()`` has been deprecated and will
-    not be supported in Django 2.0. Simply pass a list of
+    not be supported in Django 1.10. Simply pass a list of
     :func:`django.conf.urls.url` instances instead.
 
 This function can be used in your root URLconf and Django will automatically

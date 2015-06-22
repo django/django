@@ -20,7 +20,7 @@ from django.template.base import (
 from django.template.defaultfilters import date
 from django.template.smartif import IfParser, Literal
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -197,9 +197,9 @@ class ForNode(Node):
                     if num_loopvars != len_item:
                         warnings.warn(
                             "Need {} values to unpack in for loop; got {}. "
-                            "This will raise an exception in Django 2.0."
+                            "This will raise an exception in Django 1.10."
                             .format(num_loopvars, len_item),
-                            RemovedInDjango20Warning)
+                            RemovedInDjango110Warning)
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
@@ -481,7 +481,7 @@ class URLNode(Node):
             current_app = context.request.current_app
         except AttributeError:
             # Change the fallback value to None when the deprecation path for
-            # Context.current_app completes in Django 2.0.
+            # Context.current_app completes in Django 1.10.
             current_app = context.current_app
 
         # Try to look up the URL twice: once given the view name, and again
@@ -1095,7 +1095,7 @@ def ssi(parser, token):
     """
     warnings.warn(
         "The {% ssi %} tag is deprecated. Use the {% include %} tag instead.",
-        RemovedInDjango20Warning,
+        RemovedInDjango110Warning,
     )
 
     bits = token.split_contents()

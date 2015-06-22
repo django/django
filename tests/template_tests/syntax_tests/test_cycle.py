@@ -1,6 +1,6 @@
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import setup
 
@@ -139,20 +139,20 @@ class CycleTagTests(SimpleTestCase):
         output = self.engine.render_to_string('cycle25', {'a': '<'})
         self.assertEqual(output, '&lt;')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'cycle26': '{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}'})
     def test_cycle26(self):
         output = self.engine.render_to_string('cycle26', {'a': '<', 'b': '>'})
         self.assertEqual(output, '&lt;&gt;')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'cycle27': '{% load cycle from future %}'
                        '{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}'})
     def test_cycle27(self):
         output = self.engine.render_to_string('cycle27', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<>')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'cycle28': '{% load cycle from future %}{% cycle a|safe b as ab %}{% cycle ab %}'})
     def test_cycle28(self):
         output = self.engine.render_to_string('cycle28', {'a': '<', 'b': '>'})

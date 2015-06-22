@@ -3,12 +3,12 @@ from unittest import skipUnless
 from django.core.management.color import no_style
 from django.db import connection
 from django.test import TestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import Article, ArticleTranslation, IndexTogetherSingleList
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class CreationIndexesTests(TestCase):
     """
     Test index handling by the to-be-deprecated connection.creation interface.

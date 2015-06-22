@@ -29,7 +29,7 @@ from django.forms.widgets import (
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
 from django.utils.deprecation import (
-    RemovedInDjango19Warning, RemovedInDjango20Warning, RenameMethodsBase,
+    RemovedInDjango19Warning, RemovedInDjango110Warning, RenameMethodsBase,
 )
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
@@ -50,7 +50,7 @@ __all__ = (
 
 class RenameFieldMethods(RenameMethodsBase):
     renamed_methods = (
-        ('_has_changed', 'has_changed', RemovedInDjango20Warning),
+        ('_has_changed', 'has_changed', RemovedInDjango110Warning),
     )
 
 
@@ -553,7 +553,7 @@ class RegexField(CharField):
             warnings.warn(
                 "The 'error_message' argument is deprecated. Use "
                 "Field.error_messages['invalid'] instead.",
-                RemovedInDjango20Warning, stacklevel=2
+                RemovedInDjango110Warning, stacklevel=2
             )
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message

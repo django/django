@@ -8,7 +8,7 @@ from django.conf import settings
 from django.core import serializers
 from django.db import router
 from django.db.backends.utils import truncate_name
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_bytes
 from django.utils.six import StringIO
 from django.utils.six.moves import input
@@ -191,7 +191,7 @@ class BaseDatabaseCreation(object):
         """
         warnings.warn("DatabaseCreation.sql_indexes_for_model is deprecated, "
                       "use the equivalent method of the schema editor instead.",
-                      RemovedInDjango20Warning)
+                      RemovedInDjango110Warning)
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []

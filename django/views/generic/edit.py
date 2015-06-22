@@ -6,14 +6,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
     BaseDetailView, SingleObjectMixin, SingleObjectTemplateResponseMixin,
 )
 
-PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango20Warning
+PERCENT_PLACEHOLDER_REGEX = re.compile(r'%\([^\)]+\)')  # RemovedInDjango110Warning
 
 
 class FormMixinBase(type):
@@ -26,7 +26,7 @@ class FormMixinBase(type):
                 warnings.warn(
                     "`%s.%s.get_form` method must define a default value for "
                     "its `form_class` argument." % (attrs['__module__'], name),
-                    RemovedInDjango20Warning, stacklevel=2
+                    RemovedInDjango110Warning, stacklevel=2
                 )
 
                 def get_form_with_form_class(self, form_class=None):
@@ -172,7 +172,7 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
                     "Please replace them by the {} Python format syntax.",
-                    RemovedInDjango20Warning, stacklevel=2
+                    RemovedInDjango110Warning, stacklevel=2
                 )
                 url = self.success_url % self.object.__dict__
             else:
@@ -308,7 +308,7 @@ class DeletionMixin(object):
                 warnings.warn(
                     "%()s placeholder style in success_url is deprecated. "
                     "Please replace them by the {} Python format syntax.",
-                    RemovedInDjango20Warning, stacklevel=2
+                    RemovedInDjango110Warning, stacklevel=2
                 )
                 return self.success_url % self.object.__dict__
             else:

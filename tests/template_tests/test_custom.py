@@ -7,7 +7,7 @@ from django.template.base import Node
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import extend_sys_path
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .templatetags import custom, inclusion
 from .utils import ROOT
@@ -249,7 +249,7 @@ class CustomTagTests(SimpleTestCase):
         self.verify_tag(inclusion.inclusion_tag_current_app, 'inclusion_tag_current_app')
         self.verify_tag(inclusion.inclusion_unlimited_args_kwargs, 'inclusion_unlimited_args_kwargs')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_15070_current_app(self):
         """
         Test that inclusion tag passes down `current_app` of context to the

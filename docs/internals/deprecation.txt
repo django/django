@@ -7,10 +7,10 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
-.. _deprecation-removed-in-2.0:
+.. _deprecation-removed-in-1.10:
 
-2.0
----
+1.10
+----
 
 See the :ref:`Django 1.8 release notes<deprecated-features-1.8>` for more
 details on these changes.

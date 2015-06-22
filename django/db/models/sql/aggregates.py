@@ -6,7 +6,7 @@ import warnings
 
 from django.db.models.fields import FloatField, IntegerField
 from django.db.models.lookups import RegisterLookupMixin
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 
 __all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
@@ -15,7 +15,7 @@ __all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance
 warnings.warn(
     "django.db.models.sql.aggregates is deprecated. Use "
     "django.db.models.aggregates instead.",
-    RemovedInDjango20Warning, stacklevel=2)
+    RemovedInDjango110Warning, stacklevel=2)
 
 
 class Aggregate(RegisterLookupMixin):

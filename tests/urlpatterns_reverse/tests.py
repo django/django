@@ -25,7 +25,7 @@ from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from . import middleware, urlconf_outer, views
 from .views import empty_view
@@ -198,7 +198,7 @@ class NoURLPatternsTests(TestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
 class URLPatternReverse(TestCase):
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
             try:
@@ -416,7 +416,7 @@ class ReverseShortcutTests(TestCase):
         redirect("urlpatterns_reverse.nonimported_module.view")
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_reverse_by_path_nested(self):
         # Views that are added to urlpatterns using include() should be
         # reversible by dotted path.

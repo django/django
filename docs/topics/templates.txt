@@ -273,7 +273,7 @@ templates, Django provides a shortcut function which automates the process.
         .. versionchanged:: 1.8
 
             The ``context`` argument used to be called ``dictionary``. That name
-            is deprecated in Django 1.8 and will be removed in Django 2.0.
+            is deprecated in Django 1.8 and will be removed in Django 1.10.
 
             ``context`` is now optional. An empty context will be used if it
             isn't provided.

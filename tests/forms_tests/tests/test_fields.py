@@ -47,7 +47,7 @@ from django.forms import (
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils import formats, six, translation
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.duration import duration_string
 
 try:
@@ -490,7 +490,7 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # for _has_changed
+    @ignore_warnings(category=RemovedInDjango110Warning)  # for _has_changed
     def test_datefield_changed(self):
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
@@ -669,7 +669,7 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, ' 2A2')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)  # error_message deprecation
+    @ignore_warnings(category=RemovedInDjango110Warning)  # error_message deprecation
     def test_regexfield_4(self):
         f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
         self.assertEqual('1234', f.clean('1234'))

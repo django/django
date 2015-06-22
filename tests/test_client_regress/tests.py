@@ -18,7 +18,7 @@ from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
 from django.utils._os import upath
 from django.utils.deprecation import (
-    RemovedInDjango19Warning, RemovedInDjango20Warning,
+    RemovedInDjango19Warning, RemovedInDjango110Warning,
 )
 from django.utils.translation import ugettext_lazy
 
@@ -1003,7 +1003,7 @@ class ContextTests(TestCase):
                           'python', 'dolly'},
                          l.keys())
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_15368(self):
         # Need to insert a context processor that assumes certain things about
         # the request instance. This triggers a bug caused by some ways of

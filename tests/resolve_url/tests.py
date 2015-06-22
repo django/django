@@ -5,7 +5,7 @@ from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.shortcuts import resolve_url
 from django.test import TestCase, ignore_warnings, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import UnimportantThing
 
@@ -66,7 +66,7 @@ class ResolveUrlTests(TestCase):
         self.assertIsInstance(resolved_url, six.text_type)
         self.assertEqual('/accounts/logout/', resolved_url)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_valid_view_name(self):
         """
         Tests that passing a view function to ``resolve_url`` will result in

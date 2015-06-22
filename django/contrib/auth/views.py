@@ -16,7 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
@@ -175,8 +175,8 @@ def password_reset(request, is_admin_site=False,
                 warnings.warn(
                     "The is_admin_site argument to "
                     "django.contrib.auth.views.password_reset() is deprecated "
-                    "and will be removed in Django 2.0.",
-                    RemovedInDjango20Warning, 3
+                    "and will be removed in Django 1.10.",
+                    RemovedInDjango110Warning, 3
                 )
                 opts = dict(opts, domain_override=request.get_host())
             form.save(**opts)

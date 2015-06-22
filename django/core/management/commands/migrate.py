@@ -20,7 +20,7 @@ from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.loader import AmbiguityError
 from django.db.migrations.state import ProjectState
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.module_loading import module_has_submodule
 
 
@@ -73,7 +73,7 @@ class Command(BaseCommand):
         if options.get("list", False):
             warnings.warn(
                 "The 'migrate --list' command is deprecated. Use 'showmigrations' instead.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
             self.stdout.ending = None  # Remove when #21429 is fixed
             return call_command(
                 'showmigrations',

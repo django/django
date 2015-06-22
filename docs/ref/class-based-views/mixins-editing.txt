@@ -157,7 +157,7 @@ ModelFormMixin
 
             Support for the new brace-based Python formatting syntax has been
             added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
+            deprecated and will be removed in Django 1.10.
 
     .. method:: get_form_class()
 
@@ -251,7 +251,7 @@ DeletionMixin
 
             Support for the new brace-based Python formatting syntax has been
             added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
+            deprecated and will be removed in Django 1.10.
 
     .. method:: get_success_url()
 

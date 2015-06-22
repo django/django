@@ -8,7 +8,7 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import HAS_GEOS
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 if HAS_GEOS:
     from django.contrib.gis.db.models import Union, Extent3D
@@ -207,7 +207,7 @@ class Geo3DTest(TestCase):
         # Ordering of points in the resulting geometry may vary between implementations
         self.assertSetEqual({p.ewkt for p in ref_union}, {p.ewkt for p in union})
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_extent(self):
         """
         Testing the Extent3D aggregate for 3D models.

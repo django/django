@@ -119,7 +119,7 @@ parameter is useful.
 .. deprecated:: 1.8
 
     Support for string ``view`` arguments is deprecated and will be removed in
-    Django 2.0. Pass the callable  instead.
+    Django 1.10. Pass the callable  instead.
 
     The ``prefix`` parameter has the same meaning as the first argument to
     ``patterns()`` and is only relevant when you're passing a string as the

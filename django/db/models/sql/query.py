@@ -31,7 +31,7 @@ from django.db.models.sql.where import (
 )
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango19Warning, RemovedInDjango20Warning,
+    RemovedInDjango19Warning, RemovedInDjango110Warning,
 )
 from django.utils.encoding import force_text
 from django.utils.tree import Node
@@ -201,7 +201,7 @@ class Query(object):
     def aggregates(self):
         warnings.warn(
             "The aggregates property is deprecated. Use annotations instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         return self.annotations
 
     def __str__(self):
@@ -971,7 +971,7 @@ class Query(object):
     def add_aggregate(self, aggregate, model, alias, is_summary):
         warnings.warn(
             "add_aggregate() is deprecated. Use add_annotation() instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         self.add_annotation(aggregate, alias, is_summary)
 
     def add_annotation(self, annotation, alias, is_summary=False):
@@ -1887,7 +1887,7 @@ class Query(object):
     def set_aggregate_mask(self, names):
         warnings.warn(
             "set_aggregate_mask() is deprecated. Use set_annotation_mask() instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         self.set_annotation_mask(names)
 
     def set_annotation_mask(self, names):
@@ -1901,7 +1901,7 @@ class Query(object):
     def append_aggregate_mask(self, names):
         warnings.warn(
             "append_aggregate_mask() is deprecated. Use append_annotation_mask() instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         self.append_annotation_mask(names)
 
     def append_annotation_mask(self, names):
@@ -1944,7 +1944,7 @@ class Query(object):
     def aggregate_select(self):
         warnings.warn(
             "aggregate_select() is deprecated. Use annotation_select() instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         return self.annotation_select
 
     @property

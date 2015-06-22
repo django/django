@@ -1,6 +1,6 @@
 import warnings
 
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from . import engines
 from .backends.django import DjangoTemplates
@@ -30,7 +30,7 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
     for engine in engines:
         try:
             # This is required for deprecating the dirs argument. Simply
-            # return engine.get_template(template_name) in Django 2.0.
+            # return engine.get_template(template_name) in Django 1.10.
             if isinstance(engine, DjangoTemplates):
                 return engine.get_template(template_name, dirs)
             elif dirs is not _dirs_undefined:
@@ -59,7 +59,7 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
         for engine in engines:
             try:
                 # This is required for deprecating the dirs argument. Simply
-                # use engine.get_template(template_name) in Django 2.0.
+                # use engine.get_template(template_name) in Django 1.10.
                 if isinstance(engine, DjangoTemplates):
                     return engine.get_template(template_name, dirs)
                 elif dirs is not _dirs_undefined:
@@ -104,7 +104,7 @@ def render_to_string(template_name, context=None,
             try:
                 # This is required for deprecating properly arguments specific
                 # to Django templates. Remove Engine.render_to_string() at the
-                # same time as this code path in Django 2.0.
+                # same time as this code path in Django 1.10.
                 if isinstance(engine, DjangoTemplates):
                     if request is not None:
                         raise ValueError(
@@ -151,5 +151,5 @@ class BaseLoader(base.Loader):
         warnings.warn(
             "django.template.loader.BaseLoader was superseded by "
             "django.template.loaders.base.Loader.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         super(BaseLoader, self).__init__(*args, **kwargs)

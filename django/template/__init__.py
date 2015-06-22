@@ -62,7 +62,7 @@ from .context import ContextPopException                                # NOQA
 from .base import (Context, Node, NodeList, RequestContext,             # NOQA
                    StringOrigin, Template, Variable)
 
-# Deprecated in Django 1.8, will be removed in Django 2.0.
+# Deprecated in Django 1.8, will be removed in Django 1.10.
 from .base import resolve_variable                                      # NOQA
 
 # Library management

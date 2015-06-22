@@ -6,7 +6,7 @@ import warnings
 from django.conf import settings
 from django.template.context import Context, RequestContext, make_context
 from django.template.engine import Engine, _dirs_undefined
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .base import BaseEngine
 
@@ -49,7 +49,7 @@ class Template(object):
         # >>> template.render(Context({'name': 'world'}))
         # In Django 1.7 get_template() returned a django.template.Template.
         # In Django 1.8 it returns a django.template.backends.django.Template.
-        # In Django 2.0 the isinstance checks should be removed. If passing a
+        # In Django 1.10 the isinstance checks should be removed. If passing a
         # Context or a RequestContext works by accident, it won't be an issue
         # per se, but it won't be officially supported either.
         if isinstance(context, RequestContext):
@@ -61,12 +61,12 @@ class Template(object):
                     "the two arguments refer to the same request.")
             warnings.warn(
                 "render() must be called with a dict, not a RequestContext.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
 
         elif isinstance(context, Context):
             warnings.warn(
                 "render() must be called with a dict, not a Context.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
 
         else:
             context = make_context(context, request)

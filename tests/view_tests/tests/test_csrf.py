@@ -63,7 +63,7 @@ class CsrfViewTests(TestCase):
                             "by third parties.",
                             status_code=403)
 
-    # In Django 2.0, this can be changed to TEMPLATES=[] because the code path
+    # In Django 1.10, this can be changed to TEMPLATES=[] because the code path
     # that reads the TEMPLATE_* settings in that case will have been removed.
     @override_settings(TEMPLATES=[{
         'BACKEND': 'django.template.backends.dummy.TemplateStrings',

@@ -14,7 +14,7 @@ from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
@@ -284,9 +284,9 @@ class InlineAdminForm(AdminForm):
     def original_content_type_id(self):
         warnings.warn(
             'InlineAdminForm.original_content_type_id is deprecated and will be '
-            'removed in Django 2.0. If you were using this attribute to construct '
+            'removed in Django 1.10. If you were using this attribute to construct '
             'the "view on site" URL, use the `absolute_url` attribute instead.',
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         if self.original is not None:
             # Since this module gets imported in the application's root package,

@@ -49,7 +49,7 @@ Optional arguments
     .. versionchanged:: 1.8
 
        The ``context`` argument used to be called ``dictionary``. That name
-       is deprecated in Django 1.8 and will be removed in Django 2.0.
+       is deprecated in Django 1.8 and will be removed in Django 1.10.
 
 ``context_instance``
     The context instance to render the template with. By default, the template
@@ -146,7 +146,7 @@ Optional arguments
     .. versionchanged:: 1.8
 
        The ``context`` argument used to be called ``dictionary``. That name
-       is deprecated in Django 1.8 and will be removed in Django 2.0.
+       is deprecated in Django 1.8 and will be removed in Django 1.10.
 
 ``context_instance``
     The context instance to render the template with. By default, the template

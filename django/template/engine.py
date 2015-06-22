@@ -2,7 +2,7 @@ import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache, six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -117,7 +117,7 @@ class Engine(object):
                 warnings.warn(
                     "%s inherits from django.template.loader.BaseLoader "
                     "instead of django.template.loaders.base.Loader. " %
-                    loader, RemovedInDjango20Warning, stacklevel=2)
+                    loader, RemovedInDjango110Warning, stacklevel=2)
 
             loader_instance = loader_class(*args)
 
@@ -162,7 +162,7 @@ class Engine(object):
         else:
             warnings.warn(
                 "The dirs argument of get_template is deprecated.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
 
         template, origin = self.find_template(template_name, dirs)
         if not hasattr(template, 'render'):
@@ -173,7 +173,7 @@ class Engine(object):
     # This method was originally a function defined in django.template.loader.
     # It was moved here in Django 1.8 when encapsulating the Django template
     # engine in this Engine class. It's still called by deprecated code but it
-    # will be removed in Django 2.0. It's superseded by a new render_to_string
+    # will be removed in Django 1.10. It's superseded by a new render_to_string
     # function in django.template.loader.
 
     def render_to_string(self, template_name, context=None,
@@ -185,7 +185,7 @@ class Engine(object):
         else:
             warnings.warn(
                 "The context_instance argument of render_to_string is "
-                "deprecated.", RemovedInDjango20Warning, stacklevel=2)
+                "deprecated.", RemovedInDjango110Warning, stacklevel=2)
         if dirs is _dirs_undefined:
             # Do not set dirs to None here to avoid triggering the deprecation
             # warning in select_template or get_template.
@@ -193,13 +193,13 @@ class Engine(object):
         else:
             warnings.warn(
                 "The dirs argument of render_to_string is deprecated.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
         if dictionary is _dictionary_undefined:
             dictionary = None
         else:
             warnings.warn(
                 "The dictionary argument of render_to_string was renamed to "
-                "context.", RemovedInDjango20Warning, stacklevel=2)
+                "context.", RemovedInDjango110Warning, stacklevel=2)
             context = dictionary
 
         if isinstance(template_name, (list, tuple)):
@@ -231,7 +231,7 @@ class Engine(object):
         else:
             warnings.warn(
                 "The dirs argument of select_template is deprecated.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
 
         if not template_name_list:
             raise TemplateDoesNotExist("No template names provided")
