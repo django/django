@@ -312,8 +312,8 @@ class ResolverTests(unittest.TestCase):
         """
         # Pick a resolver from a namespaced urlconf
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
-        sub_resolver = resolver.namespace_dict['test-ns1'][1]
-        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+        sub_resolver = resolver['test-ns1']
+        self.assertIn('<ResolverEndpoint list>', repr(sub_resolver))
 
     def test_reverse_lazy_object_coercion_by_resolve(self):
         """
@@ -879,8 +879,9 @@ class ErroneousViewTests(SimpleTestCase):
         Ensure that a useful exception is raised when a regex is invalid in the
         URLConf (#6170).
         """
-        # The regex error will be hit before NoReverseMatch can be raised
-        self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
+        # The regex error will be hit before NoReverseMatch can be
+        # raised
+        self.assertRaises(ImproperlyConfigured, reverse, empty_view)
 
 
 class ViewLoadingTests(SimpleTestCase):

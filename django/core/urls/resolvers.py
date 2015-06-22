@@ -118,7 +118,11 @@ class Resolver(BaseResolver):
         self.app_name = app_name
 
     def __repr__(self):
-        return '<Resolver app_name=%r>' % self.app_name
+        if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
+            urlconf_repr = '<%s list>' % self.urlconf_name[0][1].__class__.__name__
+        else:
+            urlconf_repr = repr(self.urlconf_name)
+        return '<%s %s (%s)>' % (self.__class__.__name__, urlconf_repr, self.app_name)
 
     @cached_property
     def urlconf_module(self):
@@ -261,7 +265,7 @@ class ResolverEndpoint(BaseResolver):
         self.url_name = url_name
 
     def __repr__(self):
-        return "<ResolverEndpoint func=%s name=%s>" % (self._func_str, self.url_name)
+        return "<%s %s (%s)>" % (self.__class__.__name__, self.url_name, self._func_str)
 
     def add_prefix(self, prefix):
         if callable(self._func) or not prefix:
