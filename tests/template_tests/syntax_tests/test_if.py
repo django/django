@@ -3,7 +3,7 @@ import warnings
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import reset_warning_registry
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import TestObj, setup
 
@@ -537,15 +537,15 @@ class IfTagTests(SimpleTestCase):
         self.assertEqual(len(warns), 1)
         self.assertEqual(
             str(warns[0].message),
-            "Operator '=' is deprecated and will be removed in Django 2.0. "
+            "Operator '=' is deprecated and will be removed in Django 1.10. "
             "Use '==' instead."
         )
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class TestEqualitySingleEqualsSign(SimpleTestCase):
     # The following tests should be changed to template.TemplateSyntaxError
-    # (or simply removed) when the deprecation path ends in Django 2.0.
+    # (or simply removed) when the deprecation path ends in Django 1.10.
     @setup({'if-tag-eq01': '{% if foo = bar %}yes{% else %}no{% endif %}'})
     def test_if_tag_eq01(self):
         output = self.engine.render_to_string('if-tag-eq01', {'foo': 1})

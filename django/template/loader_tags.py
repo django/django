@@ -101,7 +101,7 @@ class ExtendsNode(Node):
         passed as the skip argument. This enables extends to work recursively
         without extending the same template twice.
         """
-        # RemovedInDjango21Warning: If any non-recursive loaders are installed
+        # RemovedInDjango20Warning: If any non-recursive loaders are installed
         # do a direct template lookup. If the same template name appears twice,
         # raise an exception to avoid system recursion.
         for loader in context.template.engine.template_loaders:

@@ -17,7 +17,7 @@ from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
@@ -342,7 +342,7 @@ class OracleParam(object):
                     "The Oracle database adapter received an aware datetime (%s), "
                     "probably from cursor.execute(). Update your code to pass a "
                     "naive datetime in the database connection's time zone (UTC by "
-                    "default).", RemovedInDjango21Warning)
+                    "default).", RemovedInDjango20Warning)
                 param = param.astimezone(timezone.utc).replace(tzinfo=None)
             param = Oracle_datetime.from_datetime(param)
 

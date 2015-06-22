@@ -11,7 +11,7 @@ from pprint import pformat
 from django.conf import settings
 from django.utils import formats, six
 from django.utils.dateformat import format, time_format
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
@@ -716,8 +716,8 @@ def unordered_list(value, autoescape=True):
     if converted:
         warnings.warn(
             "The old style syntax in `unordered_list` is deprecated and will "
-            "be removed in Django 2.0. Use the the new format instead.",
-            RemovedInDjango20Warning)
+            "be removed in Django 1.10. Use the the new format instead.",
+            RemovedInDjango110Warning)
     return mark_safe(list_formatter(value))
 
 

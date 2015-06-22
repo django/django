@@ -151,7 +151,7 @@ Migrating from the old API
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods and
-properties have been deprecated and will be removed in Django 2.0.
+properties have been deprecated and will be removed in Django 1.10.
 
 These old APIs can be replicated by either:
 
