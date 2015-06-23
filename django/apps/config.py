@@ -11,14 +11,22 @@ MODELS_MODULE_NAME = 'models'
 class AppConfig(object):
     """
     Class representing a Django application and its configuration.
+    当前类表示一个Django应用程序及配置
     """
 
     def __init__(self, app_name, app_module):
+        """
+        初始化配置
+        :param app_name: APP名称
+        :param app_module: APP模块
+        """
         # Full Python path to the application eg. 'django.contrib.admin'.
+        # 应用程序根模块名，使用完整的PYTHON应用程序路径， 如：'django.contrib.admin'
         self.name = app_name
 
         # Root module for the application eg. <module 'django.contrib.admin'
         # from 'django/contrib/admin/__init__.pyc'>.
+        # 加载后的当前应用程序根模块
         self.module = app_module
 
         # The following attributes could be defined at the class level in a
@@ -26,33 +34,45 @@ class AppConfig(object):
 
         # Last component of the Python path to the application eg. 'admin'.
         # This value must be unique across a Django project.
+        # Python应用程序路径最后一级， 如：'admin'
+        # 此值在Django项目中必须唯一
         if not hasattr(self, 'label'):
             self.label = app_name.rpartition(".")[2]
 
         # Human-readable name for the application eg. "Admin".
+        # 人类可读应用程序程序名称， 如：'Admin'
         if not hasattr(self, 'verbose_name'):
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory eg.
         # u'/usr/lib/python2.7/dist-packages/django/contrib/admin'. Unicode on
         # Python 2 and a str on Python 3.
+        # 文件系统路径的应用程序目录
         if not hasattr(self, 'path'):
             self.path = self._path_from_module(app_module)
 
         # Module containing models eg. <module 'django.contrib.admin.models'
         # from 'django/contrib/admin/models.pyc'>. Set by import_models().
         # None if the application doesn't have a models module.
+        # 当前应用程序包含的数据模型
+        # 设置见方法 import_models()
+        # 如果当前应用程序没有数据模型，则为None
         self.models_module = None
 
         # Mapping of lower case model names to model classes. Initially set to
         # None to prevent accidental access before import_models() runs.
+        # 数据模型映射小写模型名称
+        # 初始值为None，防止 import_models() 运行之前意外访问
         self.models = None
 
     def __repr__(self):
         return '<%s: %s>' % (self.__class__.__name__, self.label)
 
     def _path_from_module(self, module):
-        """Attempt to determine app's filesystem path from its module."""
+        """
+        Attempt to determine app's filesystem path from its module.
+        尝试从当前模块取得应用程序的文件系统路径
+        """
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
         # Convert paths to list because Python 3's _NamespacePath does not
@@ -78,11 +98,14 @@ class AppConfig(object):
     def create(cls, entry):
         """
         Factory that creates an app config from an entry in INSTALLED_APPS.
+        工厂模式， 通过INSTALLED_APPS配置，创建应用程序配置
         """
         try:
             # If import_module succeeds, entry is a path to an app module,
             # which may specify an app config class with default_app_config.
             # Otherwise, entry is a path to an app config class or an error.
+            # 如果导入模块成功，entry是一个APP模块的路径
+            # 它可以指定使用 default_app_config 属性
             module = import_module(entry)
 
         except ImportError:
@@ -143,6 +166,7 @@ class AppConfig(object):
     def check_models_ready(self):
         """
         Raises an exception if models haven't been imported yet.
+        如果模块没有导入，将抛出异常 AppRegistryNotReady
         """
         if self.models is None:
             raise AppRegistryNotReady(

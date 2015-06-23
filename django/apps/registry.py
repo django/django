@@ -91,6 +91,7 @@ class Apps(object):
                 self.app_configs[app_config.label] = app_config
 
             # Check for duplicate app names.
+            # 检查重复的应用名称
             counts = Counter(
                 app_config.name for app_config in self.app_configs.values())
             duplicates = [
@@ -103,6 +104,7 @@ class Apps(object):
             self.apps_ready = True
 
             # Load models.
+            # 加载数据模型
             for app_config in self.app_configs.values():
                 all_models = self.all_models[app_config.label]
                 app_config.import_models(all_models)
