@@ -82,3 +82,6 @@ Bugfixes
 
 * Fixed a regression when deleting a model through the admin that has a
   ``GenericRelation`` with a ``related_query_name`` (:ticket:`24940`).
+
+* Reallowed non-ASCII values for ``ForeignKey.related_name`` on Python 3 by
+  fixing the false positive system check (:ticket:`25016`).
