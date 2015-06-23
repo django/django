@@ -1,7 +1,7 @@
 from django.contrib.gis import forms
 from django.contrib.gis.db.models.lookups import gis_lookups
 from django.contrib.gis.db.models.proxy import SpatialProxy
-from django.contrib.gis.gdal.raster.source import GDALRaster
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geometry.backend import Geometry, GeometryException
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.expressions import Expression
@@ -405,6 +405,11 @@ class RasterField(BaseSpatialField):
     description = _("Raster Field")
     geom_type = 'RASTER'
 
+    def __init__(self, *args, **kwargs):
+        if not HAS_GDAL:
+            raise ImproperlyConfigured('RasterField requires GDAL.')
+        super(RasterField, self).__init__(*args, **kwargs)
+
     def _check_connection(self, connection):
         # Make sure raster fields are used only on backends with raster support.
         if not connection.features.gis_enabled or not connection.features.supports_raster:
@@ -426,6 +431,9 @@ class RasterField(BaseSpatialField):
 
     def contribute_to_class(self, cls, name, **kwargs):
         super(RasterField, self).contribute_to_class(cls, name, **kwargs)
+        # For systems without gdal, importing GDALRaster would raise an
+        # exception, so it can only be imported here.
+        from django.contrib.gis.gdal import GDALRaster
         # Setup for lazy-instantiated Raster object. For large querysets, the
         # instantiation of all GDALRasters can potentially be expensive. This
         # delays the instantiation of the objects to the moment of evaluation
