@@ -122,10 +122,18 @@ class RelatedField(Field):
         import re
         import keyword
         related_name = self.rel.related_name
-
-        is_valid_id = (related_name and re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', related_name)
-                       and not keyword.iskeyword(related_name))
-        if related_name and not (is_valid_id or related_name.endswith('+')):
+        if not related_name:
+            return []
+        is_valid_id = True
+        if keyword.iskeyword(related_name):
+            is_valid_id = False
+        if six.PY3:
+            if not related_name.isidentifier():
+                is_valid_id = False
+        else:
+            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\Z', related_name):
+                is_valid_id = False
+        if not (is_valid_id or related_name.endswith('+')):
             return [
                 checks.Error(
                     "The name '%s' is invalid related_name for field %s.%s" %
