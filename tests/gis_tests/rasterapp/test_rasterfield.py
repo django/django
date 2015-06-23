@@ -1,9 +1,13 @@
 import json
+from unittest import skipIf
 
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.shortcuts import numpy
-from django.test import TransactionTestCase, skipUnlessDBFeature
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from ..data.rasters.textrasters import JSON_RASTER
+from ..models import models
 from .models import RasterModel
 
 
@@ -70,3 +74,21 @@ class RasterFieldTest(TransactionTestCase):
             [-87.9298551266551, 9.459646421449934e-06, 0.0,
              23.94249275457565, 0.0, -9.459646421449934e-06]
         )
+
+    def test_verbose_name_arg(self):
+        """
+        RasterField should accept a positional verbose name argument.
+        """
+        self.assertEqual(
+            RasterModel._meta.get_field('rast').verbose_name,
+            'A Verbose Raster Name'
+        )
+
+
+@skipIf(HAS_GDAL, 'Test raster field exception on systems without GDAL.')
+class RasterFieldWithoutGDALTest(TestCase):
+
+    def test_raster_field_without_gdal_exception(self):
+        msg = 'RasterField requires GDAL.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            models.OriginalRasterField()
