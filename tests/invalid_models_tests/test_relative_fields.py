@@ -5,6 +5,7 @@ from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.test.testcases import skipIfDBFeature
 from django.test.utils import override_settings
+from django.utils import six
 
 from .base import IsolatedModelsTestCase
 
@@ -559,9 +560,13 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             'contains_%s_whitespace' % whitespace,
             'ends_with_with_illegal_non_alphanumeric_%s' % illegal_non_alphanumeric,
             'ends_with_whitespace_%s' % whitespace,
-            # Python's keyword
-            'with',
+            'with',  # Python's keyword
+            'related_name\n',
         ]
+        # The type fuction of Python 2 doesn't support the unicode strings.
+        # So only testing in Python 3.
+        if six.PY3:
+            invalid_related_names.append('，')
 
         class Parent(models.Model):
             pass
@@ -600,6 +605,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             '_+',
             '+',
         ]
+        # The type fuction of Python 2 doesn't support the unicode strings.
+        # So only testing in Python 3.
+        if six.PY3:
+            related_names.extend(['試', '試驗+'])
 
         class Parent(models.Model):
             pass
