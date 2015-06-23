@@ -1246,7 +1246,7 @@ implementation details see :ref:`using-the-views`.
     * ``token``: Token to check that the reset link is valid.
 
     Sample ``registration/password_reset_email.html`` (email body template):
-    
+
     .. versionadded:: 1.9 
        
     Passes ``extra_context`` parameter to the opt dictionary used for email template
