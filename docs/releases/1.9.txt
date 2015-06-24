@@ -426,6 +426,10 @@ Requests and Responses
   :class:`~django.template.response.TemplateResponse`, commonly used with
   class-based views.
 
+* The check against settings.DISALLOWED_USER_AGENTS now throws a 
+  PermissionDenied exception as opposed to returning an 
+  HttpResponseForbidden() so that handle403 is invoked.
+
 Tests
 ^^^^^
 
