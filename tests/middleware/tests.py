@@ -9,6 +9,7 @@ from unittest import skipIf
 
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import PermissionDenied
 from django.http import (
     FileResponse, HttpRequest, HttpResponse, HttpResponsePermanentRedirect,
     HttpResponseRedirect, StreamingHttpResponse,
@@ -256,9 +257,9 @@ class CommonMiddlewareTest(SimpleTestCase):
         with patch_logger('django.request', 'warning') as log_messages:
             request = self.rf.get('/slash')
             request.META['HTTP_USER_AGENT'] = 'foo'
-            r = CommonMiddleware().process_request(request)
-            self.assertEqual(r.status_code, 403)
-            self.assertEqual(log_messages, ['Forbidden (User agent): /slash'])
+            with self.assertRaisesMessage(PermissionDenied, 'Forbidden User agent'):
+                CommonMiddleware().process_request(request)
+                self.assertEqual(log_messages, ['Forbidden (User agent): /slash'])
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
