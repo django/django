@@ -452,6 +452,12 @@ Requests and Responses
   <django.http.HttpRequest.urlconf>` to ``None`` to revert any changes made
   by previous middleware and return to using the :setting:`ROOT_URLCONF`.
 
+* The :setting:`DISALLOWED_USER_AGENTS` check in
+  :class:`~django.middleware.common.CommonMiddleware` now raises a
+  :class:`~django.core.exceptions.PermissionDenied` exception as opposed to
+  returning an :class:`~django.http.HttpResponseForbidden` so that
+  :data:`~django.conf.urls.handler403` is invoked.
+
 Tests
 ^^^^^
 
