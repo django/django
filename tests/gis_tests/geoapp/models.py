@@ -64,6 +64,7 @@ class MultiFields(NamedModel):
     class Meta:
         unique_together = ('city', 'point')
         required_db_features = ['gis_enabled']
+        app_label = 'geoapp'
 
 
 class Truth(models.Model):
