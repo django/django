@@ -19,9 +19,9 @@ class Constraint(object):
         """
         return ""
 
-    def match(self, url, request):
+    def match(self, path, request):
         """
-        If this constraint matches, return (new_url, args, kwargs).
+        If this constraint matches, return (new_path, args, kwargs).
         Otherwise, raise a Resolver404.
         """
         raise NotImplementedError("Constraint subclasses should implement match()")
@@ -60,13 +60,13 @@ class RegexPattern(Constraint):
     def normalized_patterns(self):
         return normalize(self.regex.pattern)
 
-    def match(self, url, request):
-        match = self.regex.search(url)
+    def match(self, path, request):
+        match = self.regex.search(path)
         if match:
             kwargs = match.groupdict()
             args = match.groups() if not kwargs else ()
-            new_url = url[match.end():]
-            return new_url, args, kwargs
+            new_path = path[match.end():]
+            return new_path, args, kwargs
         raise Resolver404()
 
     def construct(self, url_object, args, kwargs):

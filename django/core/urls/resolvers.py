@@ -101,14 +101,14 @@ class BaseResolver(object):
     def get_namespaces(self, name):
         return []
 
-    def match(self, url, request):
+    def match(self, path, request):
         args, kwargs = (), {}
         for constraint in self.constraints:
-            url, new_args, new_kwargs = constraint.match(url, request)
+            path, new_args, new_kwargs = constraint.match(path, request)
             args += new_args
             kwargs.update(new_kwargs)
         kwargs.update(self.default_kwargs)
-        return url, args, kwargs
+        return path, args, kwargs
 
 
 class Resolver(BaseResolver):
@@ -181,11 +181,11 @@ class Resolver(BaseResolver):
         from django.core.urlresolvers import get_callable
         return get_callable(callback), {}
 
-    def resolve(self, url, request=None):
-        new_url, args, kwargs = self.match(url, request)
+    def resolve(self, path, request=None):
+        new_path, args, kwargs = self.match(path, request)
         for name, resolver in self.resolvers:
             try:
-                sub_match = resolver.resolve(new_url, request)
+                sub_match = resolver.resolve(new_path, request)
             except Resolver404:
                 continue
             return ResolverMatch.from_submatch(
@@ -283,8 +283,8 @@ class ResolverEndpoint(BaseResolver):
     def _callback_strs(self):
         return {self._func_str}
 
-    def resolve(self, url, request=None):
-        new_url, args, kwargs = self.match(url, request)
+    def resolve(self, path, request=None):
+        new_path, args, kwargs = self.match(path, request)
         return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
 
     def __getitem__(self, item):
