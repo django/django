@@ -7,7 +7,6 @@ from django.contrib.gis.geos.prototypes.errcheck import (
     check_geom, check_sized_string, check_string,
 )
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
-from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 from django.utils import six
 from django.utils.encoding import force_bytes
 
@@ -35,16 +34,14 @@ WKB_WRITE_PTR = POINTER(WKBReader_st)
 
 # WKTReader routines
 wkt_reader_create = GEOSFuncFactory('GEOSWKTReader_create', restype=WKT_READ_PTR)
-wkt_reader_destroy = GEOSFunc('GEOSWKTReader_destroy')
-wkt_reader_destroy.argtypes = [WKT_READ_PTR]
+wkt_reader_destroy = GEOSFuncFactory('GEOSWKTReader_destroy', argtypes=[WKT_READ_PTR])
 
 wkt_reader_read = GEOSFuncFactory(
     'GEOSWKTReader_read', argtypes=[WKT_READ_PTR, c_char_p], restype=GEOM_PTR, errcheck=check_geom
 )
 # WKTWriter routines
 wkt_writer_create = GEOSFuncFactory('GEOSWKTWriter_create', restype=WKT_WRITE_PTR)
-wkt_writer_destroy = GEOSFunc('GEOSWKTWriter_destroy')
-wkt_writer_destroy.argtypes = [WKT_WRITE_PTR]
+wkt_writer_destroy = GEOSFuncFactory('GEOSWKTWriter_destroy', argtypes=[WKT_WRITE_PTR])
 
 wkt_writer_write = GEOSFuncFactory(
     'GEOSWKTWriter_write', argtypes=[WKT_WRITE_PTR, GEOM_PTR], restype=geos_char_p, errcheck=check_string
@@ -72,8 +69,7 @@ wkt_writer_set_outdim = WKTOutputDim(
 
 # WKBReader routines
 wkb_reader_create = GEOSFuncFactory('GEOSWKBReader_create', restype=WKB_READ_PTR)
-wkb_reader_destroy = GEOSFunc('GEOSWKBReader_destroy')
-wkb_reader_destroy.argtypes = [WKB_READ_PTR]
+wkb_reader_destroy = GEOSFuncFactory('GEOSWKBReader_destroy', argtypes=[WKB_READ_PTR])
 
 
 class WKBReadFunc(GEOSFuncFactory):
@@ -92,8 +88,7 @@ wkb_reader_read_hex = WKBReadFunc('GEOSWKBReader_readHEX')
 
 # WKBWriter routines
 wkb_writer_create = GEOSFuncFactory('GEOSWKBWriter_create', restype=WKB_WRITE_PTR)
-wkb_writer_destroy = GEOSFunc('GEOSWKBWriter_destroy')
-wkb_writer_destroy.argtypes = [WKB_WRITE_PTR]
+wkb_writer_destroy = GEOSFuncFactory('GEOSWKBWriter_destroy', argtypes=[WKB_WRITE_PTR])
 
 
 # WKB Writing prototypes.
