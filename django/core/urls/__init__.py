@@ -37,7 +37,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
         urlconf = get_urlconf()
 
     resolver = get_resolver(urlconf)
-    args = args or []
+    args = args or ()
     text_args = [force_text(x) for x in args]
     kwargs = kwargs or {}
     text_kwargs = {k: force_text(v) for k, v in kwargs.items()}
@@ -92,7 +92,11 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
                 url.path = '/%%2F%s' % url.path[2:]
             return str(url) if strings_only else url
 
-    raise NoReverseMatch()
+    raise NoReverseMatch(
+        "Reverse for '%s' with arguments '%s' and keyword "
+        "arguments '%s' not found." %
+        (viewname, args, kwargs)
+    )
 
 
 reverse_lazy = lazy(reverse, URL)

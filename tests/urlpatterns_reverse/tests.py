@@ -17,6 +17,7 @@ from django.core.urlresolvers import (
     NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
+from django.core.urls import ResolverEndpoint, Resolver
 from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
@@ -352,30 +353,37 @@ class ResolverTests(unittest.TestCase):
         # you try to resolve a non-existent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/non-existent-url')
         url_types_names = [
-            [{'type': RegexURLPattern, 'name': 'named-url1'}],
-            [{'type': RegexURLPattern, 'name': 'named-url2'}],
-            [{'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+            [{'type': ResolverEndpoint, 'name': 'named-url1'}],
+            [{'type': ResolverEndpoint, 'name': 'named-url2'}],
+            [{'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url3'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url4'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': Resolver}],
         ]
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
         except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
-            self.assertIn('tried', e.args[0])
-            tried = e.args[0]['tried']
-            self.assertEqual(len(e.args[0]['tried']), len(url_types_names), 'Wrong number of tried URLs returned.  Expected %s, got %s.' % (len(url_types_names), len(e.args[0]['tried'])))
-            for tried, expected in zip(e.args[0]['tried'], url_types_names):
-                for t, e in zip(tried, expected):
+            self.assertTrue(hasattr(e, 'tried'))
+            tried = e.tried
+            self.assertEqual(
+                len(e.tried), len(url_types_names),
+                'Wrong number of tried URLs returned.  Expected %s, got %s.' %
+                (len(url_types_names), len(e.tried))
+            )
+            for tried, expected in zip(e.tried, url_types_names):
+                for (n, t), e in zip(tried, expected):
                     self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
                     if 'name' in e:
                         if not e['name']:
-                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
+                            self.assertIsNone(t.url_name, 'Expected no URL name but found %s.' % t.url_name)
                         else:
-                            self.assertEqual(t.name, e['name'], 'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name))
+                            self.assertEqual(
+                                t.url_name, e['name'],
+                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.url_name)
+                            )
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.reverse_lazy_urls')

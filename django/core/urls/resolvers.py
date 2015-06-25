@@ -91,8 +91,10 @@ class BaseResolver(object):
     app_name = None
 
     def __init__(self, constraints=None, decorators=None, default_kwargs=None):
-        self.constraints = constraints or []
-        self.decorators = decorators or []
+        # We will be appending constraints and decorators to other constraints
+        # and decorators, so normalize them to a list now.
+        self.constraints = list(constraints or [])
+        self.decorators = list(decorators or [])
         self.default_kwargs = default_kwargs or {}
 
     def __getitem__(self, item):
@@ -183,16 +185,22 @@ class Resolver(BaseResolver):
 
     def resolve(self, path, request=None):
         new_path, args, kwargs = self.match(path, request)
+
+        tried = []
         for name, resolver in self.resolvers:
             try:
                 sub_match = resolver.resolve(new_path, request)
-            except Resolver404:
+            except Resolver404 as e:
+                if e.tried:
+                    tried.extend([(name, resolver)] + t for t in e.tried)
+                else:
+                    tried.append([(name, resolver)])
                 continue
             return ResolverMatch.from_submatch(
                 sub_match, args, kwargs, self.app_name,
                 name, self.decorators
             )
-        raise Resolver404()
+        raise Resolver404(path=new_path, tried=tried)
 
     def __getitem__(self, item):
         for name, resolver in self.resolvers:

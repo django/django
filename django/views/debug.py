@@ -459,20 +459,20 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        error_url = exception.args[0]['path']
-    except (IndexError, TypeError, KeyError):
+        error_url = exception.path
+    except AttributeError:
         error_url = request.path_info[1:]  # Trim leading slash
 
     try:
-        tried = exception.args[0]['tried']
-    except (IndexError, TypeError, KeyError):
+        tried = exception.tried
+    except AttributeError:
         tried = []
     else:
         if (not tried                           # empty URLconf
             or (request.path == '/'
                 and len(tried) == 1             # default URLconf
                 and len(tried[0]) == 1
-                and getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin')):
+                and getattr(tried[0][0][1], 'app_name', '') == tried[0][0][0] == 'admin')):
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
