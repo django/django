@@ -41,7 +41,8 @@ class RegexPattern(Constraint):
         self._regex = force_text(regex)
 
     def describe(self):
-        return self.regex.pattern
+        pattern = self.regex.pattern
+        return pattern[1:] if pattern.startswith('^') else pattern
 
     def __repr__(self):
         return '<RegexPattern regex=%r>' % self._regex

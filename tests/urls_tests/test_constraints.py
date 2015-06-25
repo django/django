@@ -64,7 +64,9 @@ class RegexPatternTests(ConstraintTestCase):
 
     def test_describe(self):
         pattern = RegexPattern(r'^test/$')
-        self.assertEqual(pattern.describe(), r'^test/$')
+        self.assertEqual(pattern.describe(), r'test/$')
+        other_pattern = RegexPattern(r'test/$')
+        self.assertEqual(other_pattern.describe(), r'test/$')
 
     def test_regex_match(self):
         for regex, url, expected in regex_match_data:

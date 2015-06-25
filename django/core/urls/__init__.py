@@ -3,10 +3,10 @@ import warnings
 from django.core.exceptions import ImproperlyConfigured
 
 from django.utils import lru_cache, six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, force_str
 from django.utils.functional import lazy, Promise
-from django.utils.http import urlquote, RFC3986_SUBDELIMS
+from django.utils.http import RFC3986_SUBDELIMS
 from django.utils.six.moves.urllib.parse import quote
 
 from .resolvers import Resolver, ResolverEndpoint, ResolverMatch  # NOQA
@@ -21,6 +21,11 @@ def get_resolver(urlconf):
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
     return Resolver(urlconf, constraints=[RegexPattern(r'^/')])
+
+
+def get_callable(lookup_view, can_fail=False):
+    from django.core.urlresolvers import get_callable as orig_get_callable
+    return orig_get_callable(lookup_view, can_fail)
 
 
 def resolve(path, urlconf=None, request=None):
@@ -56,7 +61,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
         if not callable(original_lookup) and callable(viewname):
             warnings.warn(
                 'Reversing by dotted path is deprecated (%s).' % original_lookup,
-                RemovedInDjango20Warning, stacklevel=3
+                RemovedInDjango110Warning, stacklevel=3
             )
 
     if isinstance(viewname, six.string_types):
@@ -70,6 +75,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
 
     lookup = resolver.resolve_namespace(lookup, current_app)
 
+    patterns = []
     for constraints, default_kwargs in resolver.search(lookup):
         url = URL()
         new_args, new_kwargs = text_args, text_kwargs
@@ -85,7 +91,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
             if new_args:
                 raise NoReverseMatch()
         except NoReverseMatch:
-            pass
+            # We don't need the leading slash of the root pattern here
+            patterns.append(constraints[1:])
         else:
             url.path = quote(prefix + force_str(url.path), safe=RFC3986_SUBDELIMS + str('/~:@'))
             if url.path.startswith('//'):
@@ -94,8 +101,8 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
 
     raise NoReverseMatch(
         "Reverse for '%s' with arguments '%s' and keyword "
-        "arguments '%s' not found." %
-        (viewname, args, kwargs)
+        "arguments '%s' not found. %d pattern(s) tried: %s" %
+        (viewname, args, kwargs, len(patterns), [''.join(c.describe() for c in constraints) for constraints in patterns])
     )
 
 
@@ -119,7 +126,7 @@ def url(constraints, view, kwargs=None, name=None, prefix=''):
                 'Support for string view arguments to url() is deprecated and '
                 'will be removed in Django 2.0 (got %s). Pass the callable '
                 'instead.' % view,
-                RemovedInDjango20Warning, stacklevel=2
+                RemovedInDjango110Warning, stacklevel=2
             )
             if not view:
                 raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % constraints)

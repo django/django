@@ -13,11 +13,10 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urlresolvers import (
-    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
+from django.core.urls import (
+    NoReverseMatch, ResolverEndpoint, Resolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
-from django.core.urls import ResolverEndpoint, Resolver
 from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
@@ -275,7 +274,6 @@ class URLPatternReverse(SimpleTestCase):
         # character. Tests whether % is escaped.
         self.assertEqual('/%257Eme/places/1/', reverse('places', args=[1]))
 
-    @unittest.expectedFailure
     def test_patterns_reported(self):
         # Regression for #17076
         try:
