@@ -895,6 +895,12 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
+  nor :class:`Context.current_app <django.template.Context>` are set, the
+  :ttag:`url` template tag will now use the namespace of the current request.
+  Set ``request.current_app`` to ``None`` if you don't want to use a namespace
+  hint.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

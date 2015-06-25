@@ -479,9 +479,16 @@ class URLNode(Node):
         try:
             current_app = context.request.current_app
         except AttributeError:
-            # Change the fallback value to None when the deprecation path for
+            # Leave only the else block when the deprecation path for
             # Context.current_app completes in Django 1.10.
-            current_app = context.current_app
+            # Can also remove the Context.is_current_app_set property.
+            if context.is_current_app_set:
+                current_app = context.current_app
+            else:
+                try:
+                    current_app = context.request.resolver_match.namespace
+                except AttributeError:
+                    current_app = None
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,

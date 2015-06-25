@@ -152,6 +152,10 @@ class Context(BaseContext):
     def current_app(self):
         return None if self._current_app is _current_app_undefined else self._current_app
 
+    @property
+    def is_current_app_set(self):
+        return self._current_app is not _current_app_undefined
+
     @contextmanager
     def bind_template(self, template):
         if self.template is not None:
