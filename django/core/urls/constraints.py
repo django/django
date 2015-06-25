@@ -42,7 +42,7 @@ class RegexPattern(Constraint):
 
     def describe(self):
         pattern = self.regex.pattern
-        return pattern[1:] if pattern.startswith('^') else pattern
+        return str(pattern[1:]) if pattern.startswith('^') else str(pattern)
 
     def __repr__(self):
         return '<RegexPattern regex=%r>' % self._regex

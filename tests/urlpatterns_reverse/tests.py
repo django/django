@@ -211,16 +211,16 @@ class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
-        RegexURLResolver should raise an exception when no urlpatterns exist.
+        Resolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
+        resolver = get_resolver(settings.ROOT_URLCONF)
 
         self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included urlconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import.",
-            getattr, resolver, 'url_patterns'
+            getattr, resolver, 'resolvers'
         )
 
 
@@ -306,7 +306,7 @@ class ResolverTests(unittest.TestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_repr(self):
         """
-        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        Test repr of Resolver, especially when urlconf_name is a list
         (#17892).
         """
         # Pick a resolver from a namespaced urlconf
@@ -786,8 +786,8 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
     def setUp(self):
         urlconf = 'urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
-        self.resolver = RegexURLResolver(r'^$', urlconf)
-        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+        self.resolver = get_resolver(urlconf)
+        self.callable_resolver = get_resolver(urlconf_callables)
 
     def test_named_handlers(self):
         handler = (empty_view, {})

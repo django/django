@@ -4,10 +4,9 @@ from django.core.exceptions import ImproperlyConfigured
 
 from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango110Warning
-from django.utils.encoding import force_text, force_str
+from django.utils.encoding import force_text
 from django.utils.functional import lazy, Promise
-from django.utils.http import RFC3986_SUBDELIMS
-from django.utils.six.moves.urllib.parse import quote
+from django.utils.http import urlquote, RFC3986_SUBDELIMS
 
 from .resolvers import Resolver, ResolverEndpoint, ResolverMatch  # NOQA
 from .exceptions import NoReverseMatch, Resolver404  # NOQA
@@ -94,15 +93,15 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
             # We don't need the leading slash of the root pattern here
             patterns.append(constraints[1:])
         else:
-            url.path = quote(prefix + force_str(url.path), safe=RFC3986_SUBDELIMS + str('/~:@'))
+            url.path = urlquote(prefix + force_text(url.path), safe=RFC3986_SUBDELIMS + str('/~:@'))
             if url.path.startswith('//'):
                 url.path = '/%%2F%s' % url.path[2:]
-            return str(url) if strings_only else url
+            return force_text(url) if strings_only else url
 
     raise NoReverseMatch(
         "Reverse for '%s' with arguments '%s' and keyword "
         "arguments '%s' not found. %d pattern(s) tried: %s" %
-        (viewname, args, kwargs, len(patterns), [''.join(c.describe() for c in constraints) for constraints in patterns])
+        (viewname, args, kwargs, len(patterns), [str('').join(c.describe() for c in constraints) for constraints in patterns])
     )
 
 
