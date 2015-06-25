@@ -89,3 +89,6 @@ Bugfixes
 * Fixed inline forms that use a parent object that has a ``UUIDField`` primary
   key and a child object that has an ``AutoField`` primary key
   (:ticket:`24958`).
+
+* Fixed a regression in the ``unordered_list`` template filter on certain
+  inputs (:ticket:`25031`).
