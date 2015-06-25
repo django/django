@@ -209,6 +209,13 @@ All attributes should be considered read-only, unless stated otherwise below.
     are executed before url resolving takes place (like ``process_request``, you
     can use ``process_view`` instead).
 
+.. attribute:: HttpRequest.current_app
+
+    .. versionadded:: 1.8
+
+    Not defined by Django itself, but if set, the :ttag:`url` template tag
+    will use its value as the ``current_app`` argument to
+    :func:`~django.core.urlresolvers.reverse()`.
 
 Methods
 -------
