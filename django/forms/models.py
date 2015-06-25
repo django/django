@@ -922,10 +922,15 @@ class BaseInlineFormSet(BaseModelFormSet):
             if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
                 kwargs['to_field'] = self.fk.rel.field_name
 
-        # If we're adding a new object, ignore a parent's auto-generated pk
+        # If we're adding a new object, ignore a parent's auto-generated key
         # as it will be regenerated on the save request.
-        if self.instance._state.adding and form._meta.model._meta.pk.has_default():
-            self.instance.pk = None
+        if self.instance._state.adding:
+            if kwargs.get('to_field') is not None:
+                to_field = self.instance._meta.get_field(kwargs['to_field'])
+            else:
+                to_field = self.instance._meta.pk
+            if to_field.has_default():
+                setattr(self.instance, to_field.attname, None)
 
         form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
 
