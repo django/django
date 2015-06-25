@@ -23,7 +23,10 @@ def get_normalized_value(value, lhs):
     from django.db.models import Model
     if isinstance(value, Model):
         value_list = []
-        # Account for one-to-one relations when sent a different model
+        # A case like Restaurant.objects.filter(place=restaurant_instance),
+        # where place is a OneToOneField and the primary key of Restaurant.
+        if getattr(lhs.output_field, 'primary_key', False):
+            return (value.pk,)
         sources = lhs.output_field.get_path_info()[-1].target_fields
         for source in sources:
             while not isinstance(value, source.model) and source.remote_field:

@@ -18,7 +18,9 @@ from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.fields.related_lookups import MultiColSource
-from django.db.models.query_utils import Q, PathInfo, refs_expression
+from django.db.models.query_utils import (
+    Q, PathInfo, check_rel_lookup_compatibility, refs_expression,
+)
 from django.db.models.sql.constants import (
     INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
 )
@@ -1040,15 +1042,13 @@ class Query(object):
                     (lookup, self.get_meta().model.__name__))
         return lookup_parts, field_parts, False
 
-    def check_query_object_type(self, value, opts):
+    def check_query_object_type(self, value, opts, field):
         """
         Checks whether the object passed while querying is of the correct type.
         If not, it raises a ValueError specifying the wrong object.
         """
         if hasattr(value, '_meta'):
-            if not (value._meta.concrete_model == opts.concrete_model
-                    or opts.concrete_model in value._meta.get_parent_list()
-                    or value._meta.concrete_model in opts.get_parent_list()):
+            if not check_rel_lookup_compatibility(value._meta.model, opts, field):
                 raise ValueError(
                     'Cannot query "%s": Must be "%s" instance.' %
                     (value, opts.object_name))
@@ -1061,16 +1061,16 @@ class Query(object):
             # QuerySets implement is_compatible_query_object_type() to
             # determine compatibility with the given field.
             if hasattr(value, 'is_compatible_query_object_type'):
-                if not value.is_compatible_query_object_type(opts):
+                if not value.is_compatible_query_object_type(opts, field):
                     raise ValueError(
                         'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
                         (value.model._meta.model_name, opts.object_name)
                     )
             elif hasattr(value, '_meta'):
-                self.check_query_object_type(value, opts)
+                self.check_query_object_type(value, opts, field)
             elif hasattr(value, '__iter__'):
                 for v in value:
-                    self.check_query_object_type(v, opts)
+                    self.check_query_object_type(v, opts, field)
 
     def build_lookup(self, lookups, lhs, rhs):
         """
