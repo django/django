@@ -82,3 +82,7 @@ Bugfixes
 
 * Fixed a regression when deleting a model through the admin that has a
   ``GenericRelation`` with a ``related_query_name`` (:ticket:`24940`).
+
+* Fixed inline forms that use a parent object that has a ``UUIDField`` primary
+  key and a child object that has a ``AutoField`` primary key
+  (:ticket:`24958`).
