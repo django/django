@@ -108,7 +108,7 @@ class DiscoverRunner(object):
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
         for extension in self._extensions:
-            extension.setup_test_environment()
+            extension.setup_environment()
         settings.DEBUG = False
         unittest.installHandler()
 
@@ -211,7 +211,7 @@ class DiscoverRunner(object):
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
         for extension in reversed(self._extensions):
-            extension.teardown_test_environment()
+            extension.teardown_environment()
         teardown_test_environment()
 
     def suite_result(self, suite, result, **kwargs):

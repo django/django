@@ -227,7 +227,7 @@ class SimpleTestCase(unittest.TestCase):
         self.client = self.client_class()
         self._urlconf_setup()
         for extension in self._extensions:
-            extension.pre_setup()
+            extension.setup_test()
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -248,7 +248,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         self._urlconf_teardown()
         for extension in reversed(self._extensions):
-            extension.post_teardown()
+            extension.teardown_test()
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):

@@ -3,29 +3,29 @@ from django.core import mail
 
 
 class TestExtension(object):
-    def setup_test_environment(self):
+    def setup_environment(self):
         pass
 
-    def teardown_test_environment(self):
+    def teardown_environment(self):
         pass
 
-    def pre_setup(self):
+    def setup_test(self):
         pass
 
-    def post_teardown(self):
+    def teardown_test(self):
         pass
 
 
 class MailOutbox(TestExtension):
-    def setup_test_environment(self):
+    def setup_environment(self):
         self._original_email_backend = settings.EMAIL_BACKEND
         settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
         mail.outbox = []
 
-    def teardown_test_environment(self):
+    def teardown_environment(self):
         settings.EMAIL_BACKEND = self._original_email_backend
         del self._original_email_backend
         del mail.outbox
 
-    def pre_setup(self):
+    def setup_test(self):
         mail.outbox = []
