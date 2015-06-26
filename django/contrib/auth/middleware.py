@@ -53,6 +53,7 @@ class RemoteUserMiddleware(object):
     # used in the request.META dictionary, i.e. the normalization of headers to
     # all uppercase and the addition of "HTTP_" prefix apply.
     header = "REMOTE_USER"
+    force_logout_if_no_header = True
 
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
@@ -69,7 +70,7 @@ class RemoteUserMiddleware(object):
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
             # AnonymousUser by the AuthenticationMiddleware).
-            if request.user.is_authenticated():
+            if self.force_logout_if_no_header and request.user.is_authenticated():
                 self._remove_invalid_user(request)
             return
         # If the user is already authenticated and that user is the user we are
@@ -118,3 +119,16 @@ class RemoteUserMiddleware(object):
         else:
             if isinstance(stored_backend, RemoteUserBackend):
                 auth.logout(request)
+
+
+class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
+    """
+    Middleware for Web-server provided authentication on logon pages.
+
+    Like RemoteUserMiddleware but keeps the user authenticated even if
+    the header (``REMOTE_USER``) is not found in the request. Useful
+    for setups when the external authentication via ``REMOTE_USER``
+    is only expected to happen on some "logon" URL and the rest of
+    the application wants to use Django's authentication mechanism.
+    """
+    force_logout_if_no_header = False

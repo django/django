@@ -374,6 +374,14 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 Middleware for utilizing Web server provided authentication. See
 :doc:`/howto/auth-remote-user` for usage details.
 
+.. class:: PersistentRemoteUserMiddleware
+
+.. versionadded:: 1.9
+
+Middleware for utilizing Web server provided authentication when enabled only
+on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
+details.
+
 .. class:: SessionAuthenticationMiddleware
 
 Allows a user's sessions to be invalidated when their password changes. See

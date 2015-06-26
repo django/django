@@ -172,6 +172,10 @@ Minor features
   :func:`~django.contrib.auth.decorators.permission_required()` accepts all
   kinds of iterables, not only list and tuples.
 
+* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+  makes it possible to use ``REMOTE_USER`` for setups where the header is only
+  populated on login pages instead of every request in the session.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

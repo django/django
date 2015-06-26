@@ -232,3 +232,26 @@ class CustomHeaderRemoteUserTest(RemoteUserTest):
         'auth_tests.test_remote_user.CustomHeaderMiddleware'
     )
     header = 'HTTP_AUTHUSER'
+
+
+class PersistentRemoteUserTest(RemoteUserTest):
+    """
+    PersistentRemoteUserMiddleware keeps the user logged in even if the
+    subsequent calls do not contain the header value.
+    """
+    middleware = 'django.contrib.auth.middleware.PersistentRemoteUserMiddleware'
+    require_header = False
+
+    def test_header_disappears(self):
+        """
+        A logged in user is kept logged in even if the REMOTE_USER header
+        disappears during the same browser session.
+        """
+        User.objects.create(username='knownuser')
+        # Known user authenticates
+        response = self.client.get('/remote_user/', **{self.header: self.known_user})
+        self.assertEqual(response.context['user'].username, 'knownuser')
+        # Should stay logged in if the REMOTE_USER header disappears.
+        response = self.client.get('/remote_user/')
+        self.assertEqual(response.context['user'].is_anonymous(), False)
+        self.assertEqual(response.context['user'].username, 'knownuser')
