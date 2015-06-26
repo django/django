@@ -211,6 +211,7 @@ class GDALRasterTests(unittest.TestCase):
              12.0, 13.0, 14.0, 15.0]
         )
 
+    @unittest.skipIf(GDAL_VERSION < (1, 8, 1), "GDAL >= 1.8.1 is required for this test")
     def test_raster_transform(self):
         # Prepare tempfile and nodata value
         rstfile = tempfile.NamedTemporaryFile(suffix='.tif')
