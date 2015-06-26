@@ -247,7 +247,7 @@ class SimpleTestCase(unittest.TestCase):
         """
         self._urlconf_teardown()
         for extension in reversed(self._extensions):
-            extension.pre_setup()
+            extension.post_teardown()
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):

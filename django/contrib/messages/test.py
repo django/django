@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.test.extensions import TestExtension
 
 
-class messagesOutbox(TestExtension):
+class MessagesOutbox(TestExtension):
     def setup_test_environment(self):
         self._original_message_storage = settings.MESSAGE_STORAGE
         settings.MESSAGE_STORAGE = 'django.contrib.messages.storage.locmem.MemoryStorage'
