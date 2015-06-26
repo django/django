@@ -1421,7 +1421,7 @@ class AdminViewPermissionsTest(TestCase):
         login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         # Super User
         response = self.client.get(self.index_url)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, login_url)
         login = self.client.post(login_url, self.super_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
@@ -1479,6 +1479,15 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(login.status_code, 200)
         form = login.context[0].get('form')
         self.assertEqual(form.errors['username'][0], 'This field is required.')
+
+    def test_login_redirect_for_direct_get(self):
+        """
+        Login redirect should be to the admin index page when going directly to
+        /admin/login/.
+        """
+        response = self.client.get(reverse('admin:login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context[REDIRECT_FIELD_NAME], reverse('admin:index'))
 
     def test_login_has_permission(self):
         # Regular User should not be able to login.
