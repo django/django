@@ -357,10 +357,9 @@ class ModelState(object):
                 continue
             if isinstance(field, OrderWrt):
                 continue
-            name, path, args, kwargs = field.deconstruct()
-            field_class = import_string(path)
+            name = force_text(field.name, strings_only=True)
             try:
-                fields.append((name, field_class(*args, **kwargs)))
+                fields.append((name, field.clone()))
             except TypeError as e:
                 raise TypeError("Couldn't reconstruct field %s on %s: %s" % (
                     name,
@@ -369,10 +368,9 @@ class ModelState(object):
                 ))
         if not exclude_rels:
             for field in model._meta.local_many_to_many:
-                name, path, args, kwargs = field.deconstruct()
-                field_class = import_string(path)
+                name = force_text(field.name, strings_only=True)
                 try:
-                    fields.append((name, field_class(*args, **kwargs)))
+                    fields.append((name, field.clone()))
                 except TypeError as e:
                     raise TypeError("Couldn't reconstruct m2m field %s on %s: %s" % (
                         name,
@@ -499,13 +497,6 @@ class ModelState(object):
             }
         return value
 
-    def construct_fields(self):
-        "Deep-clone the fields using deconstruction"
-        for name, field in self.fields:
-            _, path, args, kwargs = field.deconstruct()
-            field_class = import_string(path)
-            yield name, field_class(*args, **kwargs)
-
     def construct_managers(self):
         "Deep-clone the managers using deconstruction"
         # Sort all managers by their creation counter
@@ -546,7 +537,7 @@ class ModelState(object):
         except LookupError:
             raise InvalidBasesError("Cannot resolve one or more bases from %r" % (self.bases,))
         # Turn fields into a dict for the body, add other bits
-        body = dict(self.construct_fields())
+        body = {name: field.clone() for name, field in self.fields}
         body['Meta'] = meta
         body['__module__'] = "__fake__"
 
