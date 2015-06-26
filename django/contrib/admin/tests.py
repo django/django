@@ -136,16 +136,21 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
                 return option
         raise NoSuchElementException('Option "%s" not found in "%s"' % (value, selector))
 
-    def assertSelectOptions(self, selector, values):
+    def assertSelectOptions(self, selector, values, order_matters=True):
         """
         Asserts that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
+        :param order_matters: controls if the order of the options is taken in
+        account to decide if the expected widget contents is correct.
         """
         options = self.selenium.find_elements_by_css_selector('%s > option' % selector)
         actual_values = []
         for option in options:
             actual_values.append(option.get_attribute('value'))
-        self.assertEqual(values, actual_values)
+        if order_matters:
+            self.assertEqual(values, actual_values)
+        else:
+            self.assertEqual(set(values), set(actual_values))
 
     def has_css_class(self, selector, klass):
         """
