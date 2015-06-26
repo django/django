@@ -988,6 +988,16 @@ class AggregateTestCase(TestCase):
         with six.assertRaisesRegex(self, FieldError, "Cannot compute Sum\('id__max'\): 'id__max' is an aggregate"):
             Book.objects.annotate(Max('id')).annotate(Sum('id__max'))
 
+    def test_mulit_arg_aggregate(self):
+        class MyMax(Max):
+            def as_sql(self, compiler, connection):
+                self.set_source_expressions(
+                    self.get_source_expressions()[0:1])
+                return super(MyMax, self).as_sql(compiler, connection)
+
+        Book.objects.aggregate(MyMax('pages', 'price'))
+        Book.objects.aggregate(max_field=MyMax('pages', 'price'))
+
     def test_add_implementation(self):
         class MySum(Sum):
             pass
