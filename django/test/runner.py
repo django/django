@@ -9,7 +9,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.six import StringIO
+from django.utils.module_loading import import_string
+from django.utils.six import StringIO, string_types
 
 
 class DebugSQLTextTestResult(unittest.TextTestResult):
@@ -61,6 +62,7 @@ class DiscoverRunner(object):
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
+    extensions = ['django.test.extensions.MailOutbox']
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
@@ -75,6 +77,7 @@ class DiscoverRunner(object):
         self.keepdb = keepdb
         self.reverse = reverse
         self.debug_sql = debug_sql
+        self._extensions = self.setup_extensions()
 
     @classmethod
     def add_arguments(cls, parser):
@@ -94,8 +97,18 @@ class DiscoverRunner(object):
             default=False,
             help='Prints logged SQL queries on failure.')
 
+    def setup_extensions(self):
+        extensions = []
+        for extension in self.extensions:
+            if isinstance(extension, string_types):
+                extension = import_string(extension)
+            extensions.append(extension())
+        return extensions
+
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
+        for extension in self._extensions:
+            extension.setup_test_environment()
         settings.DEBUG = False
         unittest.installHandler()
 
@@ -158,7 +171,16 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
+        self.add_extensions_to_tests(suite, self._extensions)
+
         return reorder_suite(suite, self.reorder_by, self.reverse)
+
+    def add_extensions_to_tests(self, suite, extensions):
+        for test in suite._tests:
+            if hasattr(test, '_tests'):
+                self.add_extensions_to_tests(test, extensions)
+            else:
+                test._extensions = extensions
 
     def setup_databases(self, **kwargs):
         return setup_databases(
@@ -188,6 +210,8 @@ class DiscoverRunner(object):
 
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
+        for extension in reversed(self._extensions):
+            extension.teardown_test_environment()
         teardown_test_environment()
 
     def suite_result(self, suite, result, **kwargs):

@@ -10,7 +10,6 @@ from xml.dom.minidom import Node, parseString
 
 from django.apps import apps
 from django.conf import UserSettingsHolder, settings
-from django.core import mail
 from django.core.signals import request_started
 from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
@@ -96,7 +95,6 @@ def setup_test_environment():
     """Perform any global pre-test setup. This involves:
 
         - Installing the instrumented test renderer
-        - Set the email backend to the locmem email backend.
         - Setting the active locale to match the LANGUAGE_CODE setting.
     """
     Template._original_render = Template._render
@@ -105,13 +103,8 @@ def setup_test_environment():
     # Storing previous values in the settings module itself is problematic.
     # Store them in arbitrary (but related) modules instead. See #20636.
 
-    mail._original_email_backend = settings.EMAIL_BACKEND
-    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
-
     request._original_allowed_hosts = settings.ALLOWED_HOSTS
     settings.ALLOWED_HOSTS = ['*']
-
-    mail.outbox = []
 
     deactivate()
 
@@ -120,19 +113,13 @@ def teardown_test_environment():
     """Perform any global post-test teardown. This involves:
 
         - Restoring the original test renderer
-        - Restoring the email sending functions
 
     """
     Template._render = Template._original_render
     del Template._original_render
 
-    settings.EMAIL_BACKEND = mail._original_email_backend
-    del mail._original_email_backend
-
     settings.ALLOWED_HOSTS = request._original_allowed_hosts
     del request._original_allowed_hosts
-
-    del mail.outbox
 
 
 def get_runner(settings, test_runner_class=None):
