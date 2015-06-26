@@ -26,7 +26,7 @@ What is a channel?
 
 The core of Channels is, unsurprisingly, a datastructure called a *channel*.
 What is a channel? It is an *ordered*, *first-in first-out queue* with
-*at-most-once delivery* to *only one listener at a time*.
+*message expiry* and *at-most-once delivery* to *only one listener at a time*.
 
 You can think of it as analagous to a task queue - messages are put onto
 the channel by *producers*, and then given to just one of the *consumers*
@@ -147,9 +147,9 @@ the message - but response channels would have to have their messages sent
 to the channel server they're listening on.
 
 For this reason, Channels treats these as two different *channel types*, and
-denotes a response channel by having the first character of the channel name
-be the character ``!`` - e.g. ``!django.wsgi.response.f5G3fE21f``. Normal
-channels have no special prefix, but along with the rest of the response
+denotes a *response channel* by having the first character of the channel name
+be the character ``!`` - e.g. ``!django.wsgi.response.f5G3fE21f``. *Normal
+channels* have no special prefix, but along with the rest of the response
 channel name, they must contain only the characters ``a-z A-Z 0-9 - _``,
 and be less than 200 characters long.
 
@@ -167,6 +167,85 @@ keep track of which response channels of those you wish to send to.
 
 Say I had a live blog where I wanted to push out updates whenever a new post is
 saved, I would register a handler for the ``post_save`` signal and keep a
-set of channels to send updates to::
+set of channels (here, using Redis) to send updates to::
 
-    (todo)
+    
+    redis_conn = redis.Redis("localhost", 6379)
+
+    @receiver(post_save, sender=BlogUpdate)
+    def send_update(sender, instance, **kwargs):
+        # Loop through all response channels and send the update
+        for send_channel in redis_conn.smembers("readers"):
+            Channel(send_channel).send(
+                id=instance.id,
+                content=instance.content,
+            )
+
+    @Channel.consumer("django.websocket.connect")
+    def ws_connect(path, send_channel, **kwargs):
+        # Add to reader set
+        redis_conn.sadd("readers", send_channel)
+
+While this will work, there's a small problem - we never remove people from
+the ``readers`` set when they disconnect. We could add a consumer that
+listens to ``django.websocket.disconnect`` to do that, but we'd also need to
+have some kind of expiry in case an interface server is forced to quit or
+loses power before it can send disconnect signals - your code will never
+see any disconnect notification but the response channel is completely
+invalid and messages you send there will never get consumed and just expire.
+
+Because the basic design of channels is stateless, the channel server has no
+concept of "closing" a channel if an interface server goes away - after all,
+channels are meant to hold messages until a consumer comes along (and some
+types of interface server, e.g. an SMS gateway, could theoretically serve
+any client from any interface server).
+
+That means that we need to follow a keepalive model, where the interface server
+(or, if you want even better accuracy, the client browser/connection) sends
+a periodic message saying it's still connected (though only for persistent
+connection types like WebSockets; normal HTTP doesn't need this as it won't
+stay connected for more than its own timeout).
+
+Now, we could go back into our example above and add an expiring set and keep
+track of expiry times and so forth, but this is such a common pattern that
+we don't need to; Channels has it built in, as a feature called Groups::
+
+    @receiver(post_save, sender=BlogUpdate)
+    def send_update(sender, instance, **kwargs):
+        Group("liveblog").send(
+            id=instance.id,
+            content=instance.content,
+        )
+
+    @Channel.consumer("django.websocket.connect")
+    @Channel.consumer("django.websocket.keepalive")
+    def ws_connect(path, send_channel, **kwargs):
+        # Add to reader group
+        Group("liveblog").add(send_channel)
+
+Not only do groups have their own ``send()`` method (which backends can provide
+an efficient implementation of), they also automatically manage expiry of 
+the group members. You'll have to re-call ``Group.add()`` every so often to
+keep existing members from expiring, but that's easy, and can be done in the
+same handler for both ``connect`` and ``keepalive``, as you can see above.
+
+Groups are generally only useful for response channels (ones starting with
+the character ``!``), as these are unique-per-client.
+
+Next Steps
+----------
+
+That's the high-level overview of channels and groups, and how you should
+starting thinking about them - remember, Django provides some channels
+but you're free to make and consume your own, and all channels are
+network-transparent.
+
+One thing channels are not, however, is guaranteed delivery. If you want tasks
+you're sure will complete, use a system designed for this with retries and
+persistence like Celery, or you'll need to make a management command that
+checks for completion and re-submits a message to the channel if nothing
+is completed (rolling your own retry logic, essentially).
+
+We'll cover more about what kind of tasks fit well into Channels in the rest
+of the documentation, but for now, let's progress to :doc:`getting-started`
+and writing some code.
