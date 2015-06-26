@@ -160,6 +160,7 @@ class SimpleTestCase(unittest.TestCase):
     client_class = Client
     _overridden_settings = None
     _modified_settings = None
+    _extensions = []
 
     # Tests shouldn't be allowed to query the database since
     # this base class doesn't enforce any isolation.
