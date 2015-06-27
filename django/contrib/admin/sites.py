@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.urls import NoReverseMatch, reverse
 from django.db.models.base import ModelBase
 from django.http import Http404, HttpResponseRedirect
 from django.template.engine import Engine

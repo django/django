@@ -7,11 +7,10 @@ import warnings
 
 from django import http
 from django.conf import settings
-from django.core import signals, urlresolvers
+from django.core import signals, urls
 from django.core.exceptions import (
     MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
 )
-from django.core.urls.utils import resolve_error_handler
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
 from django.utils import six
@@ -85,7 +84,7 @@ class BaseHandler(object):
 
     def get_exception_response(self, request, resolver, status_code, exception):
         try:
-            callback, param_dict = resolve_error_handler(resolver.urlconf_module, status_code)
+            callback, param_dict = urls.resolve_error_handler(resolver.urlconf_module, status_code)
             # Unfortunately, inspect.getargspec result is not trustable enough
             # depending on the callback wrapping in decorators (frequent for handlers).
             # Falling back on try/except:
@@ -112,8 +111,8 @@ class BaseHandler(object):
         # variable" exception in the event an exception is raised before
         # resolver is set
         urlconf = settings.ROOT_URLCONF
-        urlresolvers.set_urlconf(urlconf)
-        resolver = urlresolvers.get_resolver(urlconf)
+        urls.set_urlconf(urlconf)
+        resolver = urls.get_resolver(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -129,8 +128,8 @@ class BaseHandler(object):
                 if hasattr(request, 'urlconf'):
                     # Reset url resolver with a custom urlconf.
                     urlconf = request.urlconf
-                    urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.get_resolver(urlconf)
+                    urls.set_urlconf(urlconf)
+                    resolver = urls.get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
@@ -293,7 +292,7 @@ class BaseHandler(object):
         if resolver.urlconf_module is None:
             six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolve_error_handler(resolver.urlconf_module, 500)
+        callback, param_dict = urls.resolve_error_handler(resolver.urlconf_module, 500)
         return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):

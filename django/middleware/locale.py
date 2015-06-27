@@ -1,7 +1,7 @@
 "This is the locale selecting middleware that will look at accept headers"
 
 from django.conf import settings
-from django.core.urlresolvers import (
+from django.core.urls import (
     get_resolver, get_script_prefix, is_valid_path,
 )
 from django.core.urls.constraints import LocalePrefix

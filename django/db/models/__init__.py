@@ -27,7 +27,7 @@ from django.db.models.fields.related import (  # NOQA isort:skip
 
 def permalink(func):
     """
-    Decorator that calls urlresolvers.reverse() to return a URL using
+    Decorator that calls urls.reverse() to return a URL using
     parameters returned by the decorated function "func".
 
     "func" should be a function that returns a tuple in one of the
@@ -35,7 +35,7 @@ def permalink(func):
         (viewname, viewargs)
         (viewname, viewargs, viewkwargs)
     """
-    from django.core.urlresolvers import reverse
+    from django.core.urls import reverse
 
     @wraps(func)
     def inner(*args, **kwargs):

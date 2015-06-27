@@ -4,7 +4,7 @@ import re
 
 from django import http
 from django.conf import settings
-from django.core import urlresolvers
+from django.core import urls
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.utils.encoding import force_text
@@ -64,8 +64,8 @@ class CommonMiddleware(object):
         # trailing slash and there is no pattern for the current path
         if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
             urlconf = getattr(request, 'urlconf', None)
-            if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
-                    urlresolvers.is_valid_path("%s/" % request.path_info, urlconf)):
+            if (not urls.is_valid_path(request.path_info, urlconf) and
+                    urls.is_valid_path("%s/" % request.path_info, urlconf)):
                 new_url[1] = request.get_full_path(force_append_slash=True)
                 if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
                     raise RuntimeError((""

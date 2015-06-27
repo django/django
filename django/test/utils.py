@@ -12,7 +12,7 @@ from django.apps import apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
-from django.core.urlresolvers import get_script_prefix, set_script_prefix
+from django.core.urls import get_script_prefix, set_script_prefix
 from django.db import reset_queries
 from django.http import request
 from django.template import Template

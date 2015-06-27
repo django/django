@@ -11,7 +11,7 @@ from django.contrib.admin.views.main import (
     ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import NoReverseMatch
+from django.core.urls import NoReverseMatch
 from django.db import models
 from django.template import Library
 from django.template.loader import get_template

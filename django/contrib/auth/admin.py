@@ -9,7 +9,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse

@@ -1,17 +1,27 @@
 from __future__ import unicode_literals
 
 import warnings
+from threading import local
 
 from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango110Warning
-from django.utils.encoding import force_text
+from django.utils.encoding import force_text, iri_to_uri, escape_query_string
 from django.utils.functional import lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 
 from .constraints import RegexPattern
 from .exceptions import NoReverseMatch
 from .resolvers import Resolver
-from .utils import URL
+
+
+# SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
+# the current thread (which is the only one we ever access), it is assumed to
+# be empty.
+_prefixes = local()
+
+# Overridden URLconfs for each thread are stored here.
+_urlconfs = local()
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -25,14 +35,53 @@ def get_resolver(urlconf):
 def resolve(path, urlconf=None, request=None):
     path = force_text(path)
     if urlconf is None:
-        from django.core.urlresolvers import get_urlconf
         urlconf = get_urlconf()
     return get_resolver(urlconf).resolve(path, request)
 
 
+class URL(object):
+    def __init__(self, scheme='', host='', path='', query_string='', fragment=''):
+        self.scheme = scheme
+        self.host = host
+        self.path = path
+        self.query_string = query_string
+        self.fragment = fragment
+
+    @classmethod
+    def from_location(cls, location):
+        return cls(*urlsplit(location))
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            request.scheme,
+            request.get_host(),
+            request.path,
+            request.META.get('QUERY_STRING', ''),
+            ''
+        )
+
+    def __repr__(self):
+        return "<URL '%s'>" % urlunsplit((self.scheme, self.host, self.path, self.query_string, self.fragment))
+
+    def __str__(self):
+        return iri_to_uri(urlunsplit((
+            self.scheme,
+            self.host,
+            self.path or '/',
+            escape_query_string(self.query_string),
+            self.fragment
+        )))
+
+    def copy(self):
+        return type(self)(
+            self.scheme, self.host, self.path,
+            self.query_string, self.fragment
+        )
+
+
 def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, strings_only=True):
     if urlconf is None:
-        from django.core.urlresolvers import get_urlconf
         urlconf = get_urlconf()
 
     resolver = get_resolver(urlconf)
@@ -41,13 +90,12 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
     kwargs = kwargs or {}
     text_kwargs = {k: force_text(v) for k, v in kwargs.items()}
 
-    from django.core.urlresolvers import get_script_prefix
     prefix = get_script_prefix()[:-1]  # Trailing slash is already there
 
     original_lookup = viewname
     try:
         if resolver._is_callback(viewname):
-            from django.core.urlresolvers import get_callable
+            from django.core.urls.utils import get_callable
             viewname = get_callable(viewname, True)
     except (ImportError, AttributeError) as e:
         raise NoReverseMatch("Error importing '%s': %s." % (viewname, e))
@@ -100,4 +148,52 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
     )
 
 
-reverse_lazy = lazy(reverse, URL)
+reverse_lazy = lazy(reverse, URL, six.text_type)
+
+
+def set_script_prefix(prefix):
+    """
+    Sets the script prefix for the current thread.
+    """
+    if not prefix.endswith('/'):
+        prefix += '/'
+    _prefixes.value = prefix
+
+
+def get_script_prefix():
+    """
+    Returns the currently active script prefix. Useful for client code that
+    wishes to construct their own URLs manually (although accessing the request
+    instance is normally going to be a lot cleaner).
+    """
+    return getattr(_prefixes, "value", '/')
+
+
+def clear_script_prefix():
+    """
+    Unsets the script prefix for the current thread.
+    """
+    try:
+        del _prefixes.value
+    except AttributeError:
+        pass
+
+
+def set_urlconf(urlconf_name):
+    """
+    Sets the URLconf for the current thread (overriding the default one in
+    settings). Set to None to revert back to the default.
+    """
+    if urlconf_name:
+        _urlconfs.value = urlconf_name
+    else:
+        if hasattr(_urlconfs, "value"):
+            del _urlconfs.value
+
+
+def get_urlconf(default=None):
+    """
+    Returns the root URLconf to use for the current thread if it has been
+    changed from the default one.
+    """
+    return getattr(_urlconfs, "value", default)

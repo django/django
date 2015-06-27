@@ -25,7 +25,7 @@ from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
-from django.core.urlresolvers import clear_url_caches, set_urlconf
+from django.core.urls import clear_url_caches, set_urlconf
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict

@@ -4,9 +4,9 @@ from importlib import import_module
 
 from django.core.exceptions import ViewDoesNotExist
 from django.utils import lru_cache, six
-from django.utils.encoding import escape_query_string, iri_to_uri
 from django.utils.module_loading import module_has_submodule
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+from django.utils.translation import override
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -94,42 +94,47 @@ def resolve_error_handler(urlconf, view_type):
     return get_callable(callback), {}
 
 
-class URL(object):
-    def __init__(self, scheme='', host='', path='', query_string='', fragment=''):
-        self.scheme = scheme
-        self.host = host
-        self.path = path
-        self.query_string = query_string
-        self.fragment = fragment
+def is_valid_path(path, urlconf=None):
+    """
+    Returns True if the given path resolves against the default URL resolver,
+    False otherwise.
 
-    @classmethod
-    def from_location(cls, location):
-        return cls(*urlsplit(location))
+    This is a convenience method to make working with "is this a match?" cases
+    easier, avoiding unnecessarily indented try...except blocks.
+    """
+    from django.core.urls import Resolver404, resolve
+    try:
+        resolve(path, urlconf)
+        return True
+    except Resolver404:
+        return False
 
-    @classmethod
-    def from_request(cls, request):
-        return cls(
-            request.scheme,
-            request.get_host(),
-            request.path,
-            request.META.get('QUERY_STRING', ''),
-            ''
-        )
 
-    def __repr__(self):
-        return "<URL '%s'>" % urlunsplit((self.scheme, self.host, self.path, self.query_string, self.fragment))
+def translate_url(url, lang_code):
+    """
+    Given a URL (absolute or relative), try to get its translated version in
+    the `lang_code` language (either by i18n_patterns or by translated regex).
+    Return the original URL if no translated version is found.
+    """
+    from django.core.urls import Resolver404, NoReverseMatch, resolve, reverse
+    parsed = urlsplit(url)
+    try:
+        match = resolve(parsed.path)
+    except Resolver404:
+        pass
+    else:
+        to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
+        with override(lang_code):
+            try:
+                url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
+            except NoReverseMatch:
+                pass
+            else:
+                url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+    return url
 
-    def __str__(self):
-        return iri_to_uri(urlunsplit((
-            self.scheme,
-            self.host,
-            self.path or '/',
-            escape_query_string(self.query_string),
-            self.fragment
-        )))
 
-    def copy(self):
-        return type(self)(
-            self.scheme, self.host, self.path,
-            self.query_string, self.fragment
-        )
+def clear_url_caches():
+    from django.core.urls import get_resolver
+    get_callable.cache_clear()
+    get_resolver.cache_clear()

@@ -9,6 +9,7 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_module
 
 from .exceptions import NoReverseMatch, Resolver404
+from .utils import get_callable
 
 
 class ResolverMatch(object):
@@ -269,7 +270,6 @@ class ResolverEndpoint(BaseResolver):
     @property
     def func(self):
         if self._func is None:
-            from django.core.urlresolvers import get_callable
             self._func = get_callable(self._func_str)
         return self._func
 

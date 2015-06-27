@@ -6,7 +6,9 @@ import types
 
 from django.conf import settings
 from django.core.urlresolvers import Resolver404, resolve
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import (
+    HttpResponse, HttpResponseNotFound,
+)
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone

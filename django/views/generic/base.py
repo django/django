@@ -5,7 +5,7 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.urls import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
 from django.utils import six
 from django.utils.decorators import classonlymethod

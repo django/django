@@ -13,7 +13,7 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse

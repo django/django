@@ -11,7 +11,7 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.core import urlresolvers
+from django.core import urls
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (
@@ -478,7 +478,7 @@ class Client(RequestFactory):
 
             # Attach the ResolverMatch instance to the response
             response.resolver_match = SimpleLazyObject(
-                lambda: urlresolvers.resolve(request['PATH_INFO']))
+                lambda: urls.resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case

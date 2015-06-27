@@ -22,7 +22,7 @@ from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
 )
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
