@@ -683,22 +683,28 @@ def unordered_list(value, autoescape=True):
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
-        for item in item_iterator:
-            try:
-                next_item = next(item_iterator)
-            except StopIteration:
-                next_item = None
-            if not isinstance(next_item, six.string_types):
+        try:
+            item = next(item_iterator)
+            while True:
                 try:
-                    iter(next_item)
-                except TypeError:
-                    pass
-                else:
-                    yield item, next_item
-                    continue
-            yield item, None
-            if next_item:
-                yield next_item, None
+                    next_item = next(item_iterator)
+                except StopIteration:
+                    yield item, None
+                    break
+                if not isinstance(next_item, six.string_types):
+                    try:
+                        iter(next_item)
+                    except TypeError:
+                        pass
+                    else:
+                        yield item, next_item
+                        item = next(item_iterator)
+                        continue
+
+                yield item, None
+                item = next_item
+        except StopIteration:
+            pass
 
     def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
