@@ -35,6 +35,7 @@
             "always"
         ],
         "space-before-blocks": [2, "always"],
+        "space-before-function-paren": [1, {"anonymous": "always", "named": "never"}],
         "space-infix-ops": [
             1,
             {"int32Hint": false}
