@@ -183,13 +183,15 @@ class DiscoverRunner(object):
             if hasattr(test, '_tests'):
                 self.add_extensions_to_tests(test, extensions, global_extensions)
             else:
-                test_level_extensions = getattr(test, 'extensions', [])
-                test_level_extensions = [e for e in test_level_extensions if e not in global_extensions]
+                test_level_extensions = []
+                for extension in getattr(test, 'extensions', []):
+                    if isinstance(extension, string_types):
+                        extension = import_string(extension)
+                    if extension not in global_extensions:
+                        test_level_extensions.append(extension)
                 test._extensions = []
                 for extension in global_extensions + test_level_extensions:
                     if extension not in extensions:
-                        if isinstance(extension, string_types):
-                            extension = import_string(extension)
                         extensions[extension] = extension()
                     test._extensions.append(extensions[extension])
 

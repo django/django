@@ -64,6 +64,12 @@ class TestExtensions(TestCase):
         def runTest(self):
             self.assertEqual(state['count'], 1)
 
+    class ClassExtendedCountOneTest(TestCase):
+        extensions = [EnvironmentExtension]
+
+        def runTest(self):
+            self.assertEqual(state['count'], 1)
+
     class CountTwoTest(TestCase):
         extensions = ['test_runner.test_extensions.TestCaseExtension']
 
@@ -80,6 +86,11 @@ class TestExtensions(TestCase):
         self.assertEqual(result, 0)
         self.assertEqual(state['count'], 0)
 
+    def test_setup_environment_testcase_class(self):
+        result = self._run_tests(PlainRunner, [self.ClassExtendedCountOneTest()])
+        self.assertEqual(result, 0)
+        self.assertEqual(state['count'], 0)
+
     def test_setup_test_runner(self):
         result = self._run_tests(TestCaseRunner, [self.CountOneTest()])
         self.assertEqual(result, 0)
@@ -92,5 +103,10 @@ class TestExtensions(TestCase):
 
     def test_deduplication(self):
         result = self._run_tests(EnvironmentRunner, [self.ExtendedCountOneTest()])
+        self.assertEqual(result, 0)
+        self.assertEqual(state['count'], 0)
+
+    def test_deduplication_classes(self):
+        result = self._run_tests(EnvironmentRunner, [self.ClassExtendedCountOneTest()])
         self.assertEqual(result, 0)
         self.assertEqual(state['count'], 0)
