@@ -27,7 +27,8 @@ For reference, here are the requirements:
    :mod:`django.contrib.sessions`.  If these applications are not
    in your :setting:`INSTALLED_APPS` list, add them.
 
-3. Add ``django.contrib.messages.context_processors.messages`` to
+3. Add ``django.contrib.auth.context_processors.auth`` and
+   ``django.contrib.messages.context_processors.messages`` to
    the ``'context_processors'`` option of the ``DjangoTemplates`` backend
    defined in your :setting:`TEMPLATES` as well as
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
