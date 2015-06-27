@@ -21,7 +21,6 @@ from django.middleware.common import (
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.utils import patch_logger
 from django.utils import six
 from django.utils.encoding import force_str
 from django.utils.six.moves import range
@@ -254,11 +253,10 @@ class CommonMiddlewareTest(SimpleTestCase):
 
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
     def test_disallowed_user_agents(self):
-        with patch_logger('django.request', 'warning') as log_messages:
-            request = self.rf.get('/slash')
-            request.META['HTTP_USER_AGENT'] = 'foo'
-            with self.assertRaisesMessage(PermissionDenied, 'Forbidden user agent'):
-                CommonMiddleware().process_request(request)
+        request = self.rf.get('/slash')
+        request.META['HTTP_USER_AGENT'] = 'foo'
+        with self.assertRaisesMessage(PermissionDenied, 'Forbidden user agent'):
+            CommonMiddleware().process_request(request)
 
     def test_non_ascii_query_string_does_not_crash(self):
         """Regression test for #15152"""
