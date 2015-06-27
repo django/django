@@ -247,7 +247,8 @@ version are removed.
 JavaScript patches
 ------------------
 
-For information on JavaScript patches see the :ref:`javascript-patches` documentation.
+For information on JavaScript patches, see the :ref:`javascript-patches`
+documentation.
 
 .. _patch-review-checklist:
 

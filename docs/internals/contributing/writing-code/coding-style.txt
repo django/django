@@ -48,7 +48,8 @@ Python style
 JavaScript style
 ----------------
 
-For details about the JavaScript code style used by Django, see :doc:`javascript`.
+For details about the JavaScript code style used by Django, see
+:doc:`javascript`.
 
 Imports
 -------
