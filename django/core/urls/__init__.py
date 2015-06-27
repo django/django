@@ -118,7 +118,7 @@ def url(constraints, view, kwargs=None, name=None, prefix=''):
 
     if isinstance(view, (list, tuple)):
         resolvers, app_name, namespace = view
-        return namespace, Resolver(resolvers, app_name, constraints=constraints, default_kwargs=kwargs)
+        return namespace, Resolver(resolvers, app_name, constraints=constraints, kwargs=kwargs)
     else:
         if isinstance(view, six.string_types):
             warnings.warn(
@@ -131,4 +131,4 @@ def url(constraints, view, kwargs=None, name=None, prefix=''):
                 raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % constraints)
             if prefix:
                 view = prefix + '.' + view
-        return None, ResolverEndpoint(view, name, constraints=constraints, default_kwargs=kwargs)
+        return None, ResolverEndpoint(view, name, constraints=constraints, kwargs=kwargs)

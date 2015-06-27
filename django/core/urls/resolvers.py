@@ -90,12 +90,12 @@ class ResolverMatch(object):
 class BaseResolver(object):
     app_name = None
 
-    def __init__(self, constraints=None, decorators=None, default_kwargs=None):
+    def __init__(self, constraints=None, decorators=None, kwargs=None):
         # We will be appending constraints and decorators to other constraints
         # and decorators, so normalize them to a list now.
         self.constraints = list(constraints or [])
         self.decorators = list(decorators or [])
-        self.default_kwargs = default_kwargs or {}
+        self.kwargs = kwargs or {}
 
     def __getitem__(self, item):
         raise KeyError(item)
@@ -109,13 +109,13 @@ class BaseResolver(object):
             path, new_args, new_kwargs = constraint.match(path, request)
             args += new_args
             kwargs.update(new_kwargs)
-        kwargs.update(self.default_kwargs)
+        kwargs.update(self.kwargs)
         return path, args, kwargs
 
 
 class Resolver(BaseResolver):
-    def __init__(self, urlconf_name, app_name=None, constraints=None, decorators=None, default_kwargs=None):
-        super(Resolver, self).__init__(constraints, decorators, default_kwargs)
+    def __init__(self, urlconf_name, app_name=None, constraints=None, decorators=None, kwargs=None):
+        super(Resolver, self).__init__(constraints, decorators, kwargs)
         self.urlconf_name = urlconf_name
         self.app_name = app_name
 
@@ -150,8 +150,8 @@ class Resolver(BaseResolver):
 
     @cached_property
     def _callback_strs(self):
-        # Remove this as soon as you can. It's ugly. I hate it.
-        # #2.0WillSetUsFree
+        # I'm afraid this is absolutely necessary until 1.10 removes string
+        # references for functions.
         callbacks = set()
         processed = [self.urlconf_name]
         queue = [resolver for name, resolver in self.resolvers]
@@ -236,19 +236,16 @@ class Resolver(BaseResolver):
 
         # For historical reasons we search through the patterns backwards.
         for name, resolver in reversed(self.resolvers):
-            if name and name == lookup_name:
-                for constraints, default_kwargs in resolver.search(lookup_path):
-                    default_kwargs.update(self.default_kwargs)
-                    yield self.constraints + constraints, default_kwargs
-            elif not name:
-                for constraints, default_kwargs in resolver.search(lookup):
-                    default_kwargs.update(self.default_kwargs)
+            if name and name == lookup_name or not name:
+                path = lookup_path if name else lookup
+                for constraints, default_kwargs in resolver.search(path):
+                    default_kwargs.update(self.kwargs)
                     yield self.constraints + constraints, default_kwargs
 
 
 class ResolverEndpoint(BaseResolver):
-    def __init__(self, func, url_name=None, constraints=None, decorators=None, default_kwargs=None):
-        super(ResolverEndpoint, self).__init__(constraints, decorators, default_kwargs)
+    def __init__(self, func, url_name=None, constraints=None, decorators=None, kwargs=None):
+        super(ResolverEndpoint, self).__init__(constraints, decorators, kwargs)
         if callable(func):
             self._func = func
             if not hasattr(func, '__name__'):
@@ -277,10 +274,6 @@ class ResolverEndpoint(BaseResolver):
             self._func = get_callable(self._func_str)
         return self._func
 
-    @cached_property
-    def _callback_strs(self):
-        return {self._func_str}
-
     def resolve(self, path, request=None):
         new_path, args, kwargs = self.match(path, request)
         return ResolverMatch(self.func, args, kwargs, self.url_name, decorators=self.decorators)
@@ -297,5 +290,5 @@ class ResolverEndpoint(BaseResolver):
 
     def search(self, lookup):
         if len(lookup) == 1 and lookup[0] and lookup[0] in (self.url_name, self._func):
-            yield self.constraints, self.default_kwargs.copy()
+            yield self.constraints, self.kwargs.copy()
         return

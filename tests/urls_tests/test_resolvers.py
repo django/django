@@ -183,11 +183,11 @@ class ResolverTests(SimpleTestCase):
     def test_default_kwargs(self):
         endpoint = ResolverEndpoint(
             empty_view, 'empty-view', constraints=[RegexPattern(r'^detail/$')],
-            default_kwargs={'pk': 'overridden'}
+            kwargs={'pk': 'overridden'}
         )
         resolver = Resolver(
             [('ns1', endpoint)], 'app1', constraints=[RegexPattern(r'^/'), RegexPattern(r'^(?P<pk>\d+)/')],
-            default_kwargs={'test2': '37'}
+            kwargs={'test2': '37'}
         )
         url = '/42/detail/'
         request = self.rf.get(url)
