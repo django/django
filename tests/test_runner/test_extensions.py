@@ -2,7 +2,6 @@ from django.test import TestCase, TestExtension
 from django.test.runner import DiscoverRunner
 from django.utils import six
 
-
 state = {
     'count': 0,
 }

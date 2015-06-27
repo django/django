@@ -1,7 +1,7 @@
-from collections import OrderedDict
 import logging
 import os
 import unittest
+from collections import OrderedDict
 from importlib import import_module
 from unittest import TestSuite, defaultTestLoader
 
