@@ -34,6 +34,7 @@
             2,
             "always"
         ],
+        "space-before-blocks": [2, "always"],
         "space-infix-ops": [
             1,
             {"int32Hint": false}

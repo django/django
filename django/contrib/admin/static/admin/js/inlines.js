@@ -161,12 +161,12 @@
         var updateSelectFilter = function() {
             // If any SelectFilter widgets are a part of the new form,
             // instantiate a new SelectFilter instance for it.
-            if (typeof SelectFilter !== 'undefined'){
-                $('.selectfilter').each(function(index, value){
+            if (typeof SelectFilter !== 'undefined') {
+                $('.selectfilter').each(function(index, value) {
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], false);
                 });
-                $('.selectfilterstacked').each(function(index, value){
+                $('.selectfilterstacked').each(function(index, value) {
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], true);
                 });
@@ -227,12 +227,12 @@
 
         var updateSelectFilter = function() {
             // If any SelectFilter widgets were added, instantiate a new instance.
-            if (typeof SelectFilter !== "undefined"){
-                $(".selectfilter").each(function(index, value){
+            if (typeof SelectFilter !== "undefined") {
+                $(".selectfilter").each(function(index, value) {
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], false);
                 });
-                $(".selectfilterstacked").each(function(index, value){
+                $(".selectfilterstacked").each(function(index, value) {
                     var namearr = value.name.split('-');
                     SelectFilter.init(value.id, namearr[namearr.length-1], true);
                 });

@@ -90,7 +90,7 @@ function findPosX(obj) {
             obj = obj.offsetParent;
         }
         // IE offsetParent does not include the top-level
-        if (isIE && obj.parentElement){
+        if (isIE && obj.parentElement) {
             curleft += obj.offsetLeft - obj.scrollLeft;
         }
     } else if (obj.x) {
@@ -107,7 +107,7 @@ function findPosY(obj) {
             obj = obj.offsetParent;
         }
         // IE offsetParent does not include the top-level
-        if (isIE && obj.parentElement){
+        if (isIE && obj.parentElement) {
             curtop += obj.offsetTop - obj.scrollTop;
         }
     } else if (obj.y) {
@@ -232,13 +232,13 @@ String.prototype.strptime = function(format) {
 // ----------------------------------------------------------------------------
 // Get the computed style for and element
 // ----------------------------------------------------------------------------
-function getStyle(oElm, strCssRule){
+function getStyle(oElm, strCssRule) {
     var strValue = "";
-    if(document.defaultView && document.defaultView.getComputedStyle){
+    if(document.defaultView && document.defaultView.getComputedStyle) {
         strValue = document.defaultView.getComputedStyle(oElm, "").getPropertyValue(strCssRule);
     }
-    else if(oElm.currentStyle){
-        strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1){
+    else if(oElm.currentStyle) {
+        strCssRule = strCssRule.replace(/\-(\w)/g, function (strMatch, p1) {
             return p1.toUpperCase();
         });
         strValue = oElm.currentStyle[strCssRule];
