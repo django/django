@@ -108,7 +108,7 @@ class DiscoverRunner(object):
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         suite = self.test_suite()
-        test_labels = test_labels if test_labels is not None else ['.']
+        test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
 
         discover_kwargs = {}

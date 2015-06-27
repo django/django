@@ -2,6 +2,8 @@ from django.test import TestCase, TestExtension
 from django.test.runner import DiscoverRunner
 from django.utils import six
 
+from .test_discover_runner import change_cwd
+
 state = {
     'count': 0,
 }
@@ -50,9 +52,10 @@ class TestCaseRunner(PlainRunner):
 
 class TestExtensions(TestCase):
     def _run_tests(self, runner_class, tests):
-        runner = runner_class()
-        stream = six.StringIO()
-        return runner.run_tests(test_labels=[], extra_tests=tests, stream=stream)
+        with change_cwd('no_tests'):
+            runner = runner_class()
+            stream = six.StringIO()
+            return runner.run_tests(test_labels=[], extra_tests=tests, stream=stream)
 
     class CountOneTest(TestCase):
         def runTest(self):
