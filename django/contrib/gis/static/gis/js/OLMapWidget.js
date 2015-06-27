@@ -1,10 +1,12 @@
+/*global OpenLayers*/
+/*eslint indent:1*/
 (function() {
-/**
- * Transforms an array of features to a single feature with the merged
- * geometry of geom_type
- */
+ /**
+  * Transforms an array of features to a single feature with the merged
+  * geometry of geom_type
+  */
 OpenLayers.Util.properFeatures = function(features, geom_type) {
-    if (features.constructor == Array) {
+        if (features.constructor === Array) {
         var geoms = [];
         for (var i=0; i<features.length; i++) {
             geoms.push(features[i].geometry);
@@ -13,7 +15,7 @@ OpenLayers.Util.properFeatures = function(features, geom_type) {
         features = new OpenLayers.Feature.Vector(geom);
     }
     return features;
-}
+};
 
 /**
  * @requires OpenLayers/Format/WKT.js
@@ -128,7 +130,7 @@ OpenLayers.Format.DjangoWKT = OpenLayers.Class(OpenLayers.Format.WKT, {
             geometry = geometry.clone();
             geometry.transform(this.internalProjection, this.externalProjection);
         }
-        var wktType = type == 'collection' ? 'GEOMETRYCOLLECTION' : type.toUpperCase();
+        var wktType = type === 'collection' ? 'GEOMETRYCOLLECTION' : type.toUpperCase();
         var data = wktType + '(' + this.extract[type].apply(this, [geometry]) + ')';
         return data;
     },
@@ -138,8 +140,8 @@ OpenLayers.Format.DjangoWKT = OpenLayers.Class(OpenLayers.Format.WKT, {
      * geometrycollections.
      */
     write: function(features) {
-        var collection, geometry, type, data, isCollection;
-        isCollection = features.geometry.CLASS_NAME == "OpenLayers.Geometry.Collection";
+        var collection, isCollection;
+        isCollection = features.geometry.CLASS_NAME === "OpenLayers.Geometry.Collection";
         var pieces = [];
         if (isCollection) {
             collection = features.geometry.components;
@@ -168,8 +170,8 @@ function MapWidget(options) {
     this.wkt_f = new OpenLayers.Format.DjangoWKT();
 
     // Mapping from OGRGeomType name to OpenLayers.Geometry name
-    if (options['geom_name'] == 'Unknown') options['geom_type'] = OpenLayers.Geometry;
-    else if (options['geom_name'] == 'GeometryCollection') options['geom_type'] = OpenLayers.Geometry.Collection;
+    if (options['geom_name'] === 'Unknown') options['geom_type'] = OpenLayers.Geometry;
+    else if (options['geom_name'] === 'GeometryCollection') options['geom_type'] = OpenLayers.Geometry.Collection;
     else options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
 
     // Default options
@@ -204,7 +206,7 @@ function MapWidget(options) {
         'fillOpacity': this.options.opacity,
         'strokeColor': '#' + this.options.color
     };
-    if (this.options.geom_name == 'LineString') {
+    if (this.options.geom_name === 'LineString') {
         defaults_style['strokeWidth'] = 3;
     }
     var styleMap = new OpenLayers.StyleMap({'default': OpenLayers.Util.applyDefaults(defaults_style, OpenLayers.Feature.Vector.style['default'])});
@@ -222,7 +224,7 @@ function MapWidget(options) {
             this.layers.vector.addFeatures([feat]);
         }
         this.map.zoomToExtent(feat.geometry.getBounds());
-        if (this.options.geom_name == 'Point') {
+        if (this.options.geom_name === 'Point') {
             this.map.zoomTo(this.options.point_zoom);
         }
     } else {
@@ -262,7 +264,7 @@ MapWidget.prototype.create_map = function() {
     if (this.options.base_layer) this.layers.base = this.options.base_layer;
     else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
     map.addLayer(this.layers.base);
-    return map
+    return map;
 };
 
 MapWidget.prototype.get_ewkt = function(feat) {
@@ -270,7 +272,7 @@ MapWidget.prototype.get_ewkt = function(feat) {
 };
 
 MapWidget.prototype.read_wkt = function(wkt) {
-    var prefix = 'SRID=' + this.options.map_srid + ';'
+    var prefix = 'SRID=' + this.options.map_srid + ';';
     if (wkt.indexOf(prefix) === 0) {
         wkt = wkt.slice(prefix.length);
     }
@@ -296,7 +298,7 @@ MapWidget.prototype.add_wkt = function(event) {
         this.write_wkt(feat);
     } else {
         if (this.layers.vector.features.length > 1) {
-            old_feats = [this.layers.vector.features[0]];
+            var old_feats = [this.layers.vector.features[0]];
             this.layers.vector.removeFeatures(old_feats);
             this.layers.vector.destroyFeatures(old_feats);
         }
@@ -306,7 +308,7 @@ MapWidget.prototype.add_wkt = function(event) {
 
 MapWidget.prototype.modify_wkt = function(event) {
     if (this.options.is_collection) {
-        if (this.options.geom_name == 'MultiPoint') {
+        if (this.options.geom_name === 'MultiPoint') {
             this.add_wkt(event);
             return;
         } else {
@@ -359,13 +361,13 @@ MapWidget.prototype.getControls = function(layer) {
     this.controls = [new OpenLayers.Control.Navigation()];
     if (!this.options.modifiable && layer.features.length)
         return;
-    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name === 'GeometryCollection' || this.options.geom_name === 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
     }
-    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Polygon') >= 0 || this.options.geom_name === 'GeometryCollection' || this.options.geom_name === 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Polygon, {'displayClass': 'olControlDrawFeaturePolygon'}));
     }
-    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name == 'GeometryCollection' || this.options.geom_name == 'Unknown') {
+    if (this.options.geom_name.indexOf('Point') >= 0 || this.options.geom_name === 'GeometryCollection' || this.options.geom_name === 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Point, {'displayClass': 'olControlDrawFeaturePoint'}));
     }
     if (this.options.modifiable) {
