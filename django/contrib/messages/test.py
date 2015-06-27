@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.test.extensions import TestExtension
+from django.test import TestExtension
 
 
 class MessagesOutbox(TestExtension):
