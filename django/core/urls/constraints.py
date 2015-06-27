@@ -19,14 +19,14 @@ class Constraint(object):
         """
         return ""
 
-    def match(self, path, request):
+    def match(self, path, request=None):
         """
         If this constraint matches, return (new_path, args, kwargs).
         Otherwise, raise a Resolver404.
         """
         raise NotImplementedError("Constraint subclasses should implement match()")
 
-    def construct(self, url_object, args, kwargs):
+    def construct(self, url_object, *args, **kwargs):
         """
         (Partially) reconstruct url_object based on args and kwargs.
         Return (url_object, leftover_args, leftover_kwargs).
@@ -61,7 +61,7 @@ class RegexPattern(Constraint):
     def normalized_patterns(self):
         return normalize(self.regex.pattern)
 
-    def match(self, path, request):
+    def match(self, path, request=None):
         match = self.regex.search(path)
         if match:
             kwargs = match.groupdict()
@@ -70,7 +70,7 @@ class RegexPattern(Constraint):
             return new_path, args, kwargs
         raise Resolver404()
 
-    def construct(self, url_object, args, kwargs):
+    def construct(self, url_object, *args, **kwargs):
         for pattern, params in reversed(self.normalized_patterns):
             if kwargs:
                 if any(param not in kwargs for param in params):

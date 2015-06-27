@@ -173,16 +173,6 @@ class Resolver(BaseResolver):
     def _is_callback(self, name):
         return name in self._callback_strs
 
-    def resolve_error_handler(self, view_type):
-        callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
-        if not callback:
-            # No handler specified in file; use default
-            # Lazy import, since django.urls imports this file
-            from django.conf import urls
-            callback = getattr(urls, 'handler%s' % view_type)
-        from django.core.urlresolvers import get_callable
-        return get_callable(callback), {}
-
     def resolve(self, path, request=None):
         new_path, args, kwargs = self.match(path, request)
 

@@ -11,6 +11,7 @@ from django.core import signals, urlresolvers
 from django.core.exceptions import (
     MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
 )
+from django.core.urls.utils import resolve_error_handler
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
 from django.utils import six
@@ -84,7 +85,7 @@ class BaseHandler(object):
 
     def get_exception_response(self, request, resolver, status_code, exception):
         try:
-            callback, param_dict = resolver.resolve_error_handler(status_code)
+            callback, param_dict = resolve_error_handler(resolver.urlconf_module, status_code)
             # Unfortunately, inspect.getargspec result is not trustable enough
             # depending on the callback wrapping in decorators (frequent for handlers).
             # Falling back on try/except:
@@ -292,7 +293,7 @@ class BaseHandler(object):
         if resolver.urlconf_module is None:
             six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve_error_handler(500)
+        callback, param_dict = resolve_error_handler(resolver.urlconf_module, 500)
         return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):

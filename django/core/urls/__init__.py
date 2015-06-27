@@ -80,7 +80,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
         new_args, new_kwargs = text_args, text_kwargs
         try:
             for constraint in constraints:
-                url, new_args, new_kwargs = constraint.construct(url, new_args, new_kwargs)
+                url, new_args, new_kwargs = constraint.construct(url, *new_args, **new_kwargs)
             if new_kwargs:
                 if any(name not in default_kwargs for name in new_kwargs):
                     raise NoReverseMatch()

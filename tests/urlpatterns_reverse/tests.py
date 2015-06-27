@@ -17,6 +17,7 @@ from django.core.urls import (
     NoReverseMatch, ResolverEndpoint, Resolver, Resolver404,
     ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
+from django.core.urls.utils import resolve_error_handler
 from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
@@ -791,15 +792,17 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
 
     def test_named_handlers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.resolver.resolve_error_handler(400), handler)
-        self.assertEqual(self.resolver.resolve_error_handler(404), handler)
-        self.assertEqual(self.resolver.resolve_error_handler(500), handler)
+        urlconf_module = self.resolver.urlconf_module
+        self.assertEqual(resolve_error_handler(urlconf_module, 400), handler)
+        self.assertEqual(resolve_error_handler(urlconf_module, 404), handler)
+        self.assertEqual(resolve_error_handler(urlconf_module, 500), handler)
 
     def test_callable_handers(self):
         handler = (empty_view, {})
-        self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
-        self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)
-        self.assertEqual(self.callable_resolver.resolve_error_handler(500), handler)
+        urlconf_module = self.callable_resolver.urlconf_module
+        self.assertEqual(resolve_error_handler(urlconf_module, 400), handler)
+        self.assertEqual(resolve_error_handler(urlconf_module, 404), handler)
+        self.assertEqual(resolve_error_handler(urlconf_module, 500), handler)
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls_without_full_import')

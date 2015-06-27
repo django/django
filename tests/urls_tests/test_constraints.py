@@ -78,7 +78,7 @@ class RegexPatternTests(ConstraintTestCase):
             pattern = RegexPattern(regex)
             url = URL()
             try:
-                url, args, kwargs = pattern.construct(url, args, kwargs)
+                url, args, kwargs = pattern.construct(url, *args, **kwargs)
             except NoReverseMatch:
                 self.assertEqual(expected, NoReverseMatch)
             else:
