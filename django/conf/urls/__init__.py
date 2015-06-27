@@ -2,12 +2,16 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urls.constraints import LocalePrefix
+from django.core.urls import (
+    LocalePrefix, LocalizedRegexPattern, RegexPattern, Resolver,
+    ResolverEndpoint,
+)
 from django.core.urls.resolvers import BaseResolver
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
+from django.utils.functional import Promise
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
 
@@ -89,29 +93,31 @@ def patterns(prefix, *args):
                 t = url(prefix=prefix, *t)
             elif len(t) == 2 and isinstance(t[1], ResolverEndpoint):
                 t[1].add_prefix(prefix)
-        elif isinstance(t, RegexURLPattern):
-            t.add_prefix(prefix)
         pattern_list.append(t)
     return pattern_list
 
 
-def url(regex, view, kwargs=None, name=None, prefix=''):
+def url(constraints, view, kwargs=None, name=None, prefix=''):
+    if isinstance(constraints, six.string_types):
+        constraints = RegexPattern(constraints)
+    elif isinstance(constraints, Promise):
+        constraints = LocalizedRegexPattern(constraints)
+    if not isinstance(constraints, (list, tuple)):
+        constraints = [constraints]
+
     if isinstance(view, (list, tuple)):
-        # For include(...) processing.
-        urlconf_module, app_name, namespace = view
-        return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
+        resolvers, app_name, namespace = view
+        return namespace, Resolver(resolvers, app_name, constraints=constraints, kwargs=kwargs)
     else:
         if isinstance(view, six.string_types):
             warnings.warn(
                 'Support for string view arguments to url() is deprecated and '
-                'will be removed in Django 1.10 (got %s). Pass the callable '
+                'will be removed in Django 2.0 (got %s). Pass the callable '
                 'instead.' % view,
                 RemovedInDjango110Warning, stacklevel=2
             )
             if not view:
-                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
+                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % constraints)
             if prefix:
                 view = prefix + '.' + view
-        return RegexURLPattern(regex, view, kwargs, name)
-
-from django.core.urls import url, ResolverEndpoint
+        return None, ResolverEndpoint(view, name, constraints=constraints, kwargs=kwargs)

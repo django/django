@@ -2,7 +2,7 @@
 
 from django.conf import settings
 from django.core.urlresolvers import (
-    LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
+    get_resolver, get_script_prefix, is_valid_path,
 )
 from django.core.urls.constraints import LocalePrefix
 from django.http import HttpResponseRedirect

@@ -2,7 +2,6 @@ import warnings
 
 from django.conf import settings
 from django.conf.urls import patterns, url
-from django.core.urlresolvers import LocaleRegexURLResolver
 from django.core.urls import Resolver
 from django.core.urls.constraints import LocalePrefix
 from django.utils import six

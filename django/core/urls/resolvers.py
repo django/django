@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from functools import update_wrapper
-import types
 
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six

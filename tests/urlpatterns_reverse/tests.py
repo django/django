@@ -14,8 +14,8 @@ from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.core.urls import (
-    NoReverseMatch, ResolverEndpoint, Resolver, Resolver404,
-    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    NoReverseMatch, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
+    get_callable, get_resolver, resolve, reverse, reverse_lazy,
 )
 from django.core.urls.utils import resolve_error_handler
 from django.http import (

@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 
 import re
 
-from django.core.urls import RegexPattern, Resolver404, URL, NoReverseMatch
+from django.core.urls import URL, NoReverseMatch, RegexPattern, Resolver404
 from django.test import SimpleTestCase
-
 
 regex_match_data = (
     # format: (regex, url, new_url, captured_args, captured_kwargs)

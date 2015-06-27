@@ -9,7 +9,6 @@ from datetime import datetime
 from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
-from django.core.urls import URL
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text

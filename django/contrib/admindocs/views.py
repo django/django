@@ -362,7 +362,7 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
             except ViewDoesNotExist:
                 continue
         else:
-            raise TypeError(_("%s does not appear to be a urlpattern object") % p)
+            raise TypeError(_("%s does not appear to be a resolver object") % resolver)
     return views
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')
