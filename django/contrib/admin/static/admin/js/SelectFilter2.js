@@ -50,8 +50,8 @@ Requires core.js, SelectBox.js and addevent.js.
                 'title', interpolate(
                     gettext(
                         'This is the list of available %s. You may choose some by ' +
-                            'selecting them in the box below and then clicking the ' +
-                            '"Choose" arrow between the two boxes.'
+                        'selecting them in the box below and then clicking the ' +
+                        '"Choose" arrow between the two boxes.'
                     ),
                     [field_name]
                 )
@@ -95,8 +95,8 @@ Requires core.js, SelectBox.js and addevent.js.
                 'title', interpolate(
                     gettext(
                         'This is the list of chosen %s. You may remove some by ' +
-                            'selecting them in the box below and then clicking the ' +
-                            '"Remove" arrow between the two boxes.'
+                        'selecting them in the box below and then clicking the ' +
+                        '"Remove" arrow between the two boxes.'
                     ),
                     [field_name]
                 )
