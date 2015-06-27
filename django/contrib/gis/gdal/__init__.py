@@ -53,7 +53,8 @@ try:
     HAS_GDAL = True
     __all__ += [
         'Driver', 'DataSource', 'gdal_version', 'gdal_full_version',
-        'GDAL_VERSION', 'SpatialReference', 'CoordTransform', 'OGRGeometry',
+        'GDALRaster', 'GDAL_VERSION', 'SpatialReference', 'CoordTransform',
+        'OGRGeometry',
     ]
 except GDALException:
     HAS_GDAL = False

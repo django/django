@@ -25,7 +25,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
@@ -84,7 +84,7 @@ def add_lazy_relation(cls, field, relation, operation):
     warnings.warn(
         "add_lazy_relation() has been superseded by lazy_related_operation() "
         "and related methods on the Apps class.",
-        RemovedInDjango21Warning, stacklevel=2)
+        RemovedInDjango20Warning, stacklevel=2)
     # Rearrange args for new Apps.lazy_model_operation
     function = lambda local, related, field: operation(field, related, local)
     lazy_related_operation(function, cls, relation, field=field)
@@ -119,10 +119,18 @@ class RelatedField(Field):
         import re
         import keyword
         related_name = self.remote_field.related_name
-
-        is_valid_id = (related_name and re.match('^[a-zA-Z_][a-zA-Z0-9_]*$', related_name)
-                       and not keyword.iskeyword(related_name))
-        if related_name and not (is_valid_id or related_name.endswith('+')):
+        if not related_name:
+            return []
+        is_valid_id = True
+        if keyword.iskeyword(related_name):
+            is_valid_id = False
+        if six.PY3:
+            if not related_name.isidentifier():
+                is_valid_id = False
+        else:
+            if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\Z', related_name):
+                is_valid_id = False
+        if not (is_valid_id or related_name.endswith('+')):
             return [
                 checks.Error(
                     "The name '%s' is invalid related_name for field %s.%s" %
@@ -328,7 +336,7 @@ class RelatedField(Field):
     def related(self):
         warnings.warn(
             "Usage of field.related has been deprecated. Use field.remote_field instead.",
-            RemovedInDjango20Warning, 2)
+            RemovedInDjango110Warning, 2)
         return self.remote_field
 
     def do_related_class(self, other, cls):
@@ -1306,7 +1314,7 @@ class ForeignObjectRel(object):
         warnings.warn(
             "Usage of ForeignObjectRel.to attribute has been deprecated. "
             "Use the model attribute instead.",
-            RemovedInDjango21Warning, 2)
+            RemovedInDjango20Warning, 2)
         return self.model
 
     @cached_property

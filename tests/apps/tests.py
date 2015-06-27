@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import sys
 import warnings
 from unittest import skipUnless
 
@@ -367,9 +366,7 @@ class AppConfigTests(SimpleTestCase):
             AppConfig('label', Stub(__path__=['a', 'b']))
 
 
-@skipUnless(
-    sys.version_info > (3, 3, 0),
-    "Namespace packages sans __init__.py were added in Python 3.3")
+@skipUnless(six.PY3, "Namespace packages sans __init__.py were added in Python 3.3")
 class NamespacePackageAppTests(SimpleTestCase):
     # We need nsapp to be top-level so our multiple-paths tests can add another
     # location for it (if its inside a normal package with an __init__.py that

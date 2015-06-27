@@ -1,12 +1,12 @@
 from django.template.defaultfilters import removetags
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class RemovetagsTests(SimpleTestCase):
 
     @setup({'removetags01': '{{ a|removetags:"a b" }} {{ b|removetags:"a b" }}'})
@@ -33,7 +33,7 @@ class RemovetagsTests(SimpleTestCase):
         self.assertEqual(output, 'x <p>y</p> x <p>y</p>')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class FunctionTests(SimpleTestCase):
 
     def test_removetags(self):

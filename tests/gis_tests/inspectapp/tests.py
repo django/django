@@ -14,7 +14,7 @@ from django.utils.six import StringIO
 from ..test_data import TEST_DATA
 
 if HAS_GDAL:
-    from django.contrib.gis.gdal import Driver, GDALException
+    from django.contrib.gis.gdal import Driver, GDALException, GDAL_VERSION
     from django.contrib.gis.utils.ogrinspect import ogrinspect
 
     from .models import AllOGRFields
@@ -79,7 +79,7 @@ class OGRInspectTest(TestCase):
             '',
             'class MyModel(models.Model):',
             '    float = models.FloatField()',
-            '    int = models.FloatField()',
+            '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    str = models.CharField(max_length=80)',
             '    geom = models.PolygonField(srid=-1)',
             '    objects = models.GeoManager()',
@@ -106,7 +106,7 @@ class OGRInspectTest(TestCase):
             '',
             'class City(models.Model):',
             '    name = models.CharField(max_length=80)',
-            '    population = models.FloatField()',
+            '    population = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    density = models.FloatField()',
             '    created = models.DateField()',
             '    geom = models.PointField(srid=-1)',

@@ -10,7 +10,7 @@ from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -117,7 +117,7 @@ class MigrateTests(MigrationTestBase):
         with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
             call_command("migrate", "migrations")
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_list(self):
         """
@@ -843,7 +843,7 @@ class MakeMigrationsTests(MigrationTestBase):
             content = cmd("0001", migration_name_0001)
             self.assertIn("dependencies=[\n]", content)
 
-            # Python 3.3+ importlib caches os.listdir() on some platforms like
+            # Python 3 importlib caches os.listdir() on some platforms like
             # Mac OS X (#23850).
             if hasattr(importlib, 'invalidate_caches'):
                 importlib.invalidate_caches()

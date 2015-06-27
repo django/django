@@ -5,7 +5,7 @@ import warnings
 from django.apps import apps
 from django.db import models
 from django.db.utils import IntegrityError, OperationalError, ProgrammingError
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
@@ -41,7 +41,7 @@ class ContentTypeManager(models.Manager):
             del kwargs['name']
             warnings.warn(
                 "ContentType.name field doesn't exist any longer. Please remove it from your code.",
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
         return super(ContentTypeManager, self).create(**kwargs)
 
     def get_for_model(self, model, for_concrete_model=True):

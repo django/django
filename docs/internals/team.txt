@@ -166,10 +166,10 @@ Karen Tracey
     .. _Andrew Godwin: http://www.aeracode.org/
 
 `Carl Meyer`_
-    Carl has been working with Django since 2007 (long enough to remember
-    queryset-refactor, but not magic-removal), and works as a freelance
-    developer with OddBird_.  He became a Django contributor by accident,
-    because fixing bugs is more interesting than working around them.
+    Carl has been a Django user since 2007 (long enough to remember
+    queryset-refactor, but not magic-removal), and builds web apps at OddBird_.
+    He became a Django contributor by accident, because fixing bugs is more
+    interesting than working around them.
 
     Carl lives in Rapid City, SD, USA.
 
@@ -521,6 +521,45 @@ Daniele Procida
     Dallas, TX.
 
     .. _Preston Timmons: https://github.com/prestontimmons
+
+`Tomek Paczkowski`_
+    Tomek started using Django in 2007 as a tool for quickly dealing with
+    university projects. Since then, he worked with various technologies
+    like Ruby on Rails, JavaScript and Android but always returned to
+    Python and Django.
+
+    Tomek loves the Django community. He organized multiple Django
+    sprints, co-organized `DjangoCon Europe 2013`_ and has mentored at many
+    `Django Girls`_ events.
+
+    Originally from Poland, Tomek currently lives in London, where he
+    works at Squirrel_.
+
+    .. _Tomek Paczkowski: https://hauru.eu
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls: http://djangogirls.org
+    .. _Squirrel: http://squirrel.me
+
+`Ola Sitarska`_
+    Ola started working with Django in 2009, when she discovered the power of
+    the Django admin and quickly fell in love with the beauty of Python.
+
+    She co-organized `DjangoCon Europe 2013`_ in Warsaw and co-authored the
+    `Django Girls Tutorial`_, the most beginner friendly Django tutorial out
+    there. Together with Ola Sendecka, she started `Django Girls`_, a community
+    and series of Django workshops for women who've never programmed before.
+
+    In 2015, she became a Django Software Foundation board member. Ola was also
+    a part of the team responsible for shipping the djangoproject.com redesign.
+
+    Originally from Poland, Ola currently lives in London, where she
+    works with friends at `Potato`_.
+
+    .. _Ola Sitarska: http://ola.sitarska.com/
+    .. _DjangoCon Europe 2013: http://love.djangocircus.com
+    .. _Django Girls Tutorial: http://tutorial.djangogirls.org
+    .. _Django Girls: http://djangogirls.org
+    .. _Potato: http://p.ota.to
 
 Past team members
 =================

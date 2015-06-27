@@ -109,7 +109,7 @@ Default: ``[]`` (Empty list)
 .. deprecated:: 1.8
 
     This setting, along with the :ttag:`ssi` template tag, is deprecated and
-    will be removed in Django 2.0.
+    will be removed in Django 1.10.
 
 .. versionchanged:: 1.8
 
@@ -2270,6 +2270,11 @@ Default: ``False``
 
 Whether the engine should look for template source files inside installed
 applications.
+
+.. note::
+
+    The default :file:`settings.py` file created by :djadmin:`django-admin
+    startproject <startproject>` sets ``'APP_DIRS': True``.
 
 .. setting:: TEMPLATES-OPTIONS
 

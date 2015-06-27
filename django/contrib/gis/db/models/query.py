@@ -16,7 +16,7 @@ from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.utils import six
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 
 
@@ -71,7 +71,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The collect GeoQuerySet method is deprecated. Use the Collect() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Collect, **kwargs)
 
@@ -116,7 +116,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The extent GeoQuerySet method is deprecated. Use the Extent() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Extent, **kwargs)
 
@@ -129,7 +129,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The extent3d GeoQuerySet method is deprecated. Use the Extent3D() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
 
@@ -236,7 +236,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The make_line GeoQuerySet method is deprecated. Use the MakeLine() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.MakeLine, geo_field_type=PointField, **kwargs)
 
@@ -424,7 +424,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The unionagg GeoQuerySet method is deprecated. Use the Union() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Union, **kwargs)
 
@@ -518,7 +518,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The %s GeoQuerySet method is deprecated. See GeoDjango Functions "
             "documentation to find the expression-based replacement." % att,
-            RemovedInDjango21Warning, stacklevel=2
+            RemovedInDjango20Warning, stacklevel=2
         )
         # Default settings.
         settings.setdefault('desc', None)

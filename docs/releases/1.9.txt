@@ -20,7 +20,7 @@ Python compatibility
 
 Like Django 1.8, Django 1.9 requires Python 2.7 or above, though we
 **highly recommend** the latest minor release. We've dropped support for
-Python 3.2 and added support for Python 3.5.
+Python 3.2 and 3.3, and added support for Python 3.5.
 
 What's new in Django 1.9
 ========================
@@ -127,12 +127,16 @@ Minor features
   applications for the current user, has been added to the
   :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
   method.
+
 * :attr:`AdminSite.empty_value_display
   <django.contrib.admin.AdminSite.empty_value_display>` and
   :attr:`ModelAdmin.empty_value_display
   <django.contrib.admin.ModelAdmin.empty_value_display>` were added to override
   the display of empty values in admin change list. You can also customize the
   value for each field.
+
+* The time picker widget includes a '6 p.m' option for consistency of having
+  predefined options every 6 hours.
 
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -167,6 +171,20 @@ Minor features
   :ref:`GDALRaster objects <raster-data-source-objects>` from raw data.
   Setters for raster properties such as projection or pixel values have
   been added.
+
+* For PostGIS users, the new :class:`~django.contrib.gis.db.models.RasterField`
+  allows :ref:`storing GDALRaster objects <creating-and-saving-raster-models>`.
+  It supports automatic spatial index creation and reprojection when saving a
+  model. It does not yet support spatial querying.
+
+* The new :meth:`GDALRaster.warp() <django.contrib.gis.gdal.GDALRaster.warp>`
+  method allows warping a raster by specifying target raster properties such as
+  origin, width, height, or pixel size (amongst others).
+
+* The new :meth:`GDALRaster.transform()
+  <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a
+  raster into a different spatial reference system by specifying a target
+  ``srid``.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -208,7 +226,11 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :func:`~django.contrib.sites.shortcuts.get_current_site` now handles the case
+  where ``request.get_host()`` returns ``domain:port``, e.g.
+  ``example.com:80``. If the lookup fails because the host does not match a
+  record in the database and the host has a port, the port is stripped and the
+  lookup is retried with the domain part only.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -426,6 +448,16 @@ Requests and Responses
   :class:`~django.template.response.TemplateResponse`, commonly used with
   class-based views.
 
+* Request middleware can now set :attr:`HttpRequest.urlconf
+  <django.http.HttpRequest.urlconf>` to ``None`` to revert any changes made
+  by previous middleware and return to using the :setting:`ROOT_URLCONF`.
+
+* The :setting:`DISALLOWED_USER_AGENTS` check in
+  :class:`~django.middleware.common.CommonMiddleware` now raises a
+  :class:`~django.core.exceptions.PermissionDenied` exception as opposed to
+  returning an :class:`~django.http.HttpResponseForbidden` so that
+  :data:`~django.conf.urls.handler403` is invoked.
+
 Tests
 ^^^^^
 
@@ -617,7 +649,7 @@ queries, you should turn them into naive datetimes in UTC::
     param = timezone.make_naive(param, timezone.utc)
 
 If you fail to do so, Django 1.9 and 2.0 will perform the conversion like
-earlier versions but emit a deprecation warning. Django 2.1 won't perform any
+earlier versions but emit a deprecation warning. Django 2.0 won't perform any
 conversion, which may result in data corruption.
 
 If you're reading :class:`~datetime.datetime` values from the results, they
@@ -711,6 +743,10 @@ Miscellaneous
 * Private function ``django.utils.functional.total_ordering()`` has been
   removed. It contained a workaround for a ``functools.total_ordering()`` bug
   in Python versions older than 2.7.3.
+* XML serialization (either through :djadmin:`dumpdata` or the syndication
+  framework) used to output any characters it received. Now if the content to
+  be serialized contains any control characters not allowed in the XML 1.0
+  standard, the serialization will fail with a :exc:`ValueError`.
 
 .. _deprecated-features-1.9:
 
@@ -809,7 +845,7 @@ Miscellaneous
 
 * The ``check_aggregate_support()`` method of
   ``django.db.backends.base.BaseDatabaseOperations`` has been deprecated and
-  will be removed in Django 2.1. The more general ``check_expression_support()``
+  will be removed in Django 2.0. The more general ``check_expression_support()``
   should be used instead.
 
 * ``django.forms.extras`` is deprecated. You can find

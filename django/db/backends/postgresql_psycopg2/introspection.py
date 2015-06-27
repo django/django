@@ -34,6 +34,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
+    _get_indexes_query = """
+        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+        WHERE c.oid = idx.indrelid
+            AND idx.indexrelid = c2.oid
+            AND attr.attrelid = c.oid
+            AND attr.attnum = idx.indkey[0]
+            AND c.relname = %s"""
+
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
         if field_type == 'IntegerField' and description.default and 'nextval' in description.default:
@@ -108,15 +118,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_indexes(self, cursor, table_name):
         # This query retrieves each index on the given table, including the
         # first associated field name
-        cursor.execute("""
-            SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-            FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-                pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
-            WHERE c.oid = idx.indrelid
-                AND idx.indexrelid = c2.oid
-                AND attr.attrelid = c.oid
-                AND attr.attnum = idx.indkey[0]
-                AND c.relname = %s""", [table_name])
+        cursor.execute(self._get_indexes_query, [table_name])
         indexes = {}
         for row in cursor.fetchall():
             # row[1] (idx.indkey) is stored in the DB as an array. It comes out as

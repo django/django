@@ -4,7 +4,7 @@ from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.loader_tags import ExtendsError
 from django.template.loaders.base import Loader
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import ROOT
 
@@ -132,7 +132,7 @@ class NonRecursiveLoader(Loader):
             raise TemplateDoesNotExist(template_name)
 
 
-@ignore_warnings(category=RemovedInDjango21Warning)
+@ignore_warnings(category=RemovedInDjango20Warning)
 class NonRecursiveLoaderExtendsTests(SimpleTestCase):
 
     loaders = [

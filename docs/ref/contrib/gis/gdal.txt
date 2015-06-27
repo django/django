@@ -1119,11 +1119,11 @@ blue.
     values defining the properties of a new raster (such as size and name). If the
     input is a file path, the second parameter specifies if the raster should
     be opened with write access. If the input is raw data, the parameters ``width``,
-    ``heigth``, and ``srid`` are required. The following example shows how rasters
+    ``height``, and ``srid`` are required. The following example shows how rasters
     can be created from different input sources (using the sample data from the
     GeoDjango tests, see also the :ref:`gdal_sample_data` section)::
 
-        >>> from django.contrib.gis.gdal.raster.source import GDALRaster
+        >>> from django.contrib.gis.gdal import GDALRaster
         >>> rst = GDALRaster('/path/to/your/raster.tif', write=False)
         >>> rst.name
         '/path/to/your/raster.tif'
@@ -1288,6 +1288,89 @@ blue.
             >>> rst.bands[1].data()
             array([[ 2.,  3.]], dtype=float32)
 
+    .. method:: warp(ds_input, resampling='NearestNeighbour', max_error=0.0)
+
+        .. versionadded:: 1.9
+
+        Returns a warped version of this raster.
+
+        The warping parameters can be specified through the ``ds_input``
+        argument. The use of ``ds_input`` is analogous to the corresponding
+        argument of the class constructor. It is a dictionary with the
+        characteristics of the target raster. Allowed dictionary key values are
+        width, height, SRID, origin, scale, skew, datatype, driver, and name
+        (filename).
+
+        By default, the warp functions keeps most parameters equal to the
+        values of the original source raster, so only parameters that should be
+        changed need to be specified. Note that this includes the driver, so
+        for file-based rasters the warp function will create a new raster on
+        disk.
+
+        The only parameter that is set differently from the source raster is the
+        name. The default value of the the raster name is the name of the source
+        raster appended with ``'_copy' + source_driver_name``. For file-based
+        rasters it is recommended to provide the file path of the target raster.
+
+        The resampling algorithm used for warping can be specified with the
+        ``resampling`` argument. The default is ``NearestNeighbor``, and the
+        other allowed values are ``Bilinear``, ``Cubic``, ``CubicSpline``,
+        ``Lanczos``, ``Average``, and ``Mode``.
+
+        The ``max_error`` argument can be used to specify the maximum error
+        measured in input pixels that is allowed in approximating the
+        transformation. The default is 0.0 for exact calculations.
+
+        For users familiar with ``GDAL``, this function has a similar
+        functionality to the ``gdalwarp`` command-line utility.
+
+        For example, the warp function can be used for aggregating a raster to
+        the double of its original pixel scale:
+
+            >>> rst = GDALRaster({
+            ...     "width": 6, "height": 6, "srid": 3086,
+            ...     "origin": [500000, 400000],
+            ...     "scale": [100, -100],
+            ...     "bands": [{"data": range(36), "nodata_value": 99}]
+            ... })
+            >>> target = rst.warp({"scale": [200, -200], "width": 3, "height": 3})
+            >>> target.bands[0].data()
+            array([[  7.,   9.,  11.],
+                   [ 19.,  21.,  23.],
+                   [ 31.,  33.,  35.]], dtype=float32)
+
+    .. method:: transform(srid, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
+
+        .. versionadded:: 1.9
+
+        Returns a transformed version of this raster with the specified SRID.
+
+        This function transforms the current raster into a new spatial reference
+        system that can be specified with an ``srid``. It calculates the bounds
+        and scale of the current raster in the new spatial reference system and
+        warps the raster using the :attr:`~GDALRaster.warp` function.
+
+        By default, the driver of the source raster is used and the name of the
+        raster is the original name appended with
+        ``'_copy' + source_driver_name``. A different driver or name can be
+        specified with the ``driver`` and ``name`` arguments.
+
+        The default resampling algorithm is ``NearestNeighbour`` but can be
+        changed using the ``resampling`` argument. The default maximum allowed
+        error for resampling is 0.0 and can be changed using the ``max_error``
+        argument. Consult the :attr:`~GDALRaster.warp` documentation for detail
+        on those arguments.
+
+            >>> rst = GDALRaster({
+            ...     "width": 6, "height": 6, "srid": 3086,
+            ...     "origin": [500000, 400000],
+            ...     "scale": [100, -100],
+            ...     "bands": [{"data": range(36), "nodata_value": 99}]
+            ... })
+            >>> target = rst.transform(4326)
+            >>> target.origin
+            [-82.98492744885776, 27.601924753080144]
+
 ``GDALBand``
 ------------
 
@@ -1384,7 +1467,6 @@ blue.
                    [  4, -99, -88,   7],
                    [  8, -77, -66,  11],
                    [ 12,  13,  14,  15]], dtype=int8)
-
 
 Settings
 ========

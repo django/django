@@ -352,8 +352,8 @@ class DeprecationDisplayTest(AdminScriptTestCase):
         args = ['test', '--settings=test_project.settings', 'test_runner_deprecation_app']
         out, err = self.run_django_admin(args)
         self.assertIn("Ran 1 test", force_text(err))
-        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: warning from test")
-        six.assertRegex(self, err, r"RemovedInDjango\d\dWarning: module-level warning from deprecation_app")
+        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: warning from test")
+        six.assertRegex(self, err, r"RemovedInDjango\d+Warning: module-level warning from deprecation_app")
 
     def test_runner_deprecation_verbosity_zero(self):
         args = ['test', '--settings=test_project.settings', '--verbosity=0', 'test_runner_deprecation_app']

@@ -14,7 +14,7 @@ from django.core.exceptions import (
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.module_loading import import_string
 from django.views import debug
@@ -93,8 +93,8 @@ class BaseHandler(object):
             except TypeError:
                 warnings.warn(
                     "Error handlers should accept an exception parameter. Update "
-                    "your code as this parameter will be required in Django 2.1",
-                    RemovedInDjango21Warning, stacklevel=2
+                    "your code as this parameter will be required in Django 2.0",
+                    RemovedInDjango20Warning, stacklevel=2
                 )
                 response = callback(request, **param_dict)
         except:
@@ -112,7 +112,7 @@ class BaseHandler(object):
         # resolver is set
         urlconf = settings.ROOT_URLCONF
         urlresolvers.set_urlconf(urlconf)
-        resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+        resolver = urlresolvers.get_resolver(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -129,7 +129,7 @@ class BaseHandler(object):
                     # Reset url resolver with a custom urlconf.
                     urlconf = request.urlconf
                     urlresolvers.set_urlconf(urlconf)
-                    resolver = urlresolvers.RegexURLResolver(r'^/', urlconf)
+                    resolver = urlresolvers.get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match

@@ -376,9 +376,10 @@ similar to the following::
             'id': 'fields.W900',  # pick a unique ID for your field.
         }
 
-After a deprecation period of your choosing (two major releases for fields in
-Django itself), change the ``system_check_deprecated_details`` attribute to
-``system_check_removed_details`` and update the dictionary similar to::
+After a deprecation period of your choosing (two or three feature releases for
+fields in Django itself), change the ``system_check_deprecated_details``
+attribute to ``system_check_removed_details`` and update the dictionary similar
+to::
 
     class IPAddressField(Field):
         system_check_removed_details = {

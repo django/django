@@ -5,7 +5,7 @@ related data structures.
 from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
 from functools import partial
 
-from django.contrib.gis.gdal.libgdal import std_call
+from django.contrib.gis.gdal.libgdal import GDAL_VERSION, std_call
 from django.contrib.gis.gdal.prototypes.generation import (
     const_string_output, double_output, int_output, void_output,
     voidptr_output,
@@ -30,7 +30,10 @@ get_driver_description = const_string_output(std_call('GDALGetDescription'), [c_
 # Raster Data Source Routines
 create_ds = voidptr_output(std_call('GDALCreate'), [c_void_p, c_char_p, c_int, c_int, c_int, c_int, c_void_p])
 open_ds = voidptr_output(std_call('GDALOpen'), [c_char_p, c_int])
-close_ds = void_output(std_call('GDALClose'), [c_void_p])
+if GDAL_VERSION >= (2, 0):
+    close_ds = voidptr_output(std_call('GDALClose'), [c_void_p])
+else:
+    close_ds = void_output(std_call('GDALClose'), [c_void_p])
 flush_ds = int_output(std_call('GDALFlushCache'), [c_void_p])
 copy_ds = voidptr_output(std_call('GDALCreateCopy'),
     [c_void_p, c_char_p, c_void_p, c_int, POINTER(c_char_p), c_void_p, c_void_p]
@@ -65,4 +68,7 @@ get_band_maximum = double_output(std_call('GDALGetRasterMaximum'), [c_void_p, PO
 # Reprojection routine
 reproject_image = void_output(std_call('GDALReprojectImage'),
     [c_void_p, c_char_p, c_void_p, c_char_p, c_int, c_double, c_double, c_void_p, c_void_p, c_void_p]
+)
+auto_create_warped_vrt = voidptr_output(std_call('GDALAutoCreateWarpedVRT'),
+    [c_void_p, c_char_p, c_char_p, c_int, c_double, c_void_p]
 )

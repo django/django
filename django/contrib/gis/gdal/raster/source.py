@@ -1,12 +1,13 @@
 import json
 import os
-from ctypes import addressof, byref, c_double
+from ctypes import addressof, byref, c_double, c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import GDALBand
+from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
 from django.utils import six
@@ -111,7 +112,7 @@ class GDALRaster(GDALBase):
                 if 'nodata_value' in band_input:
                     self.bands[i].nodata_value = band_input['nodata_value']
 
-            # Set SRID, default to 0 (this assures SRS is always instanciated)
+            # Set SRID
             self.srs = ds_input.get('srid')
 
             # Set additional properties if provided
@@ -123,6 +124,9 @@ class GDALRaster(GDALBase):
 
             if 'skew' in ds_input:
                 self.skew.x, self.skew.y = ds_input['skew']
+        elif isinstance(ds_input, c_void_p):
+            # Instantiate the object using an existing pointer to a gdal raster.
+            self._ptr = ds_input
         else:
             raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
 
@@ -278,3 +282,113 @@ class GDALRaster(GDALBase):
         for idx in range(1, capi.get_ds_raster_count(self._ptr) + 1):
             bands.append(GDALBand(self, idx))
         return bands
+
+    def warp(self, ds_input, resampling='NearestNeighbour', max_error=0.0):
+        """
+        Returns a warped GDALRaster with the given input characteristics.
+
+        The input is expected to be a dictionary containing the parameters
+        of the target raster. Allowed values are width, height, SRID, origin,
+        scale, skew, datatype, driver, and name (filename).
+
+        By default, the warp functions keeps all parameters equal to the values
+        of the original source raster. For the name of the target raster, the
+        name of the source raster will be used and appended with
+        _copy. + source_driver_name.
+
+        In addition, the resampling algorithm can be specified with the "resampling"
+        input parameter. The default is NearestNeighbor. For a list of all options
+        consult the GDAL_RESAMPLE_ALGORITHMS constant.
+        """
+        # Get the parameters defining the geotransform, srid, and size of the raster
+        if 'width' not in ds_input:
+            ds_input['width'] = self.width
+
+        if 'height' not in ds_input:
+            ds_input['height'] = self.height
+
+        if 'srid' not in ds_input:
+            ds_input['srid'] = self.srs.srid
+
+        if 'origin' not in ds_input:
+            ds_input['origin'] = self.origin
+
+        if 'scale' not in ds_input:
+            ds_input['scale'] = self.scale
+
+        if 'skew' not in ds_input:
+            ds_input['skew'] = self.skew
+
+        # Get the driver, name, and datatype of the target raster
+        if 'driver' not in ds_input:
+            ds_input['driver'] = self.driver.name
+
+        if 'name' not in ds_input:
+            ds_input['name'] = self.name + '_copy.' + self.driver.name
+
+        if 'datatype' not in ds_input:
+            ds_input['datatype'] = self.bands[0].datatype()
+
+        # Set the number of bands
+        ds_input['nr_of_bands'] = len(self.bands)
+
+        # Create target raster
+        target = GDALRaster(ds_input, write=True)
+
+        # Copy nodata values to warped raster
+        for index, band in enumerate(self.bands):
+            target.bands[index].nodata_value = band.nodata_value
+
+        # Select resampling algorithm
+        algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
+
+        # Reproject image
+        capi.reproject_image(
+            self._ptr, self.srs.wkt.encode(),
+            target._ptr, target.srs.wkt.encode(),
+            algorithm, 0.0, max_error,
+            c_void_p(), c_void_p(), c_void_p()
+        )
+
+        # Make sure all data is written to file
+        target._flush()
+
+        return target
+
+    def transform(self, srid, driver=None, name=None, resampling='NearestNeighbour',
+                  max_error=0.0):
+        """
+        Returns a copy of this raster reprojected into the given SRID.
+        """
+        # Convert the resampling algorithm name into an algorithm id
+        algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
+
+        # Instantiate target spatial reference system
+        target_srs = SpatialReference(srid)
+
+        # Create warped virtual dataset in the target reference system
+        target = capi.auto_create_warped_vrt(
+            self._ptr, self.srs.wkt.encode(), target_srs.wkt.encode(),
+            algorithm, max_error, c_void_p()
+        )
+        target = GDALRaster(target)
+
+        # Construct the target warp dictionary from the virtual raster
+        data = {
+            'srid': srid,
+            'width': target.width,
+            'height': target.height,
+            'origin': [target.origin.x, target.origin.y],
+            'scale': [target.scale.x, target.scale.y],
+            'skew': [target.skew.x, target.skew.y],
+        }
+
+        # Set the driver and filepath if provided
+        if driver:
+            data['driver'] = driver
+
+        if name:
+            data['name'] = name
+
+        # Warp the raster into new srid
+        return self.warp(data, resampling=resampling, max_error=max_error)

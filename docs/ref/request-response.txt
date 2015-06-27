@@ -184,6 +184,14 @@ All attributes should be considered read-only, unless stated otherwise below.
     URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
     setting. See :ref:`how-django-processes-a-request` for details.
 
+    ``urlconf`` can be set to ``None`` to revert any changes made by previous
+    middleware and return to using the :setting:`ROOT_URLCONF`.
+
+    .. versionchanged:: 1.9
+
+        Setting ``urlconf=None`` raised
+        :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
+
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
@@ -192,6 +200,13 @@ All attributes should be considered read-only, unless stated otherwise below.
     are executed before url resolving takes place (like ``process_request``, you
     can use ``process_view`` instead).
 
+.. attribute:: HttpRequest.current_app
+
+    .. versionadded:: 1.8
+
+    Not defined by Django itself, but if set, the :ttag:`url` template tag
+    will use its value as the ``current_app`` argument to
+    :func:`~django.core.urlresolvers.reverse()`.
 
 Methods
 -------

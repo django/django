@@ -9,7 +9,7 @@ from django.contrib import admin
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import (
     NestedObjects, display_for_field, flatten, flatten_fieldsets,
-    label_for_field, lookup_field,
+    label_for_field, lookup_field, quote,
 )
 from django.db import DEFAULT_DB_ALIAS, models
 from django.test import TestCase, override_settings
@@ -379,3 +379,6 @@ class UtilsTests(TestCase):
             }),
         )
         self.assertEqual(flatten_fieldsets(fieldsets), ['url', 'title', 'content', 'sites'])
+
+    def test_quote(self):
+        self.assertEqual(quote('something\nor\nother'), 'something_0Aor_0Aother')

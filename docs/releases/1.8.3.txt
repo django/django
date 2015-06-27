@@ -6,6 +6,11 @@ Django 1.8.3 release notes
 
 Django 1.8.3 fixes several bugs in 1.8.2.
 
+Also, ``django.utils.deprecation.RemovedInDjango20Warning`` was renamed to
+``RemovedInDjango110Warning`` as the version roadmap was revised to 1.9, 1.10,
+1.11 (LTS), 2.0 (drops Python 2 support). For backwards compatibility,
+``RemovedInDjango20Warning`` remains as an importable alias.
+
 Bugfixes
 ========
 
@@ -74,3 +79,16 @@ Bugfixes
 
 * Fixed crash when uploading images with MIME types that Pillow doesn't detect,
   such as bitmap, in ``forms.ImageField`` (:ticket:`24948`).
+
+* Fixed a regression when deleting a model through the admin that has a
+  ``GenericRelation`` with a ``related_query_name`` (:ticket:`24940`).
+
+* Reallowed non-ASCII values for ``ForeignKey.related_name`` on Python 3 by
+  fixing the false positive system check (:ticket:`25016`).
+
+* Fixed inline forms that use a parent object that has a ``UUIDField`` primary
+  key and a child object that has an ``AutoField`` primary key
+  (:ticket:`24958`).
+
+* Fixed a regression in the ``unordered_list`` template filter on certain
+  inputs (:ticket:`25031`).

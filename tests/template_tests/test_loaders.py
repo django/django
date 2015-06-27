@@ -12,7 +12,7 @@ from django.template import Context, TemplateDoesNotExist
 from django.template.engine import Engine
 from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .utils import TEMPLATE_DIR
 
@@ -55,7 +55,7 @@ class CachedLoaderTests(SimpleTestCase):
         e = self.engine.template_loaders[0].get_template_cache['doesnotexist.html']
         self.assertEqual(e.args[0], 'doesnotexist.html')
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template(self):
         loader = self.engine.template_loaders[0]
         template, origin = loader.load_template('index.html')
@@ -69,7 +69,7 @@ class CachedLoaderTests(SimpleTestCase):
         source, name = loader.load_template('index.html')
         self.assertEqual(template.origin.template_name, 'index.html')
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template_missing(self):
         """
         #19949 -- TemplateDoesNotExist exceptions should be cached.
@@ -176,7 +176,7 @@ class EggLoaderTests(SimpleTestCase):
         output = template.render(Context({}))
         self.assertEqual(output, "y")
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template_source(self):
         loader = self.engine.template_loaders[0]
         templates = {
@@ -249,7 +249,7 @@ class FileSystemLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
         self.assertEqual(template.origin.loader_name, 'django.template.loaders.filesystem.Loader')
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template_source(self):
         loader = self.engine.template_loaders[0]
         source, name = loader.load_template_source('index.html')
@@ -336,7 +336,7 @@ class AppDirectoriesLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     @override_settings(INSTALLED_APPS=['template_tests'])
     def test_load_template_source(self):
         loader = self.engine.template_loaders[0]
@@ -367,7 +367,7 @@ class LocmemLoaderTests(SimpleTestCase):
         self.assertEqual(template.origin.template_name, 'index.html')
         self.assertEqual(template.origin.loader, self.engine.template_loaders[0])
 
-    @ignore_warnings(category=RemovedInDjango21Warning)
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_load_template_source(self):
         loader = self.engine.template_loaders[0]
         source, name = loader.load_template_source('index.html')

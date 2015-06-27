@@ -39,7 +39,7 @@ from django.test.utils import (
 from django.utils import six
 from django.utils.decorators import classproperty
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango21Warning,
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
@@ -233,9 +233,9 @@ class SimpleTestCase(unittest.TestCase):
         if hasattr(self, 'urls'):
             warnings.warn(
                 "SimpleTestCase.urls is deprecated and will be removed in "
-                "Django 2.0. Use @override_settings(ROOT_URLCONF=...) "
+                "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
                 "in %s instead." % self.__class__.__name__,
-                RemovedInDjango20Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=2)
             set_urlconf(None)
             self._old_root_urlconf = settings.ROOT_URLCONF
             settings.ROOT_URLCONF = self.urls
@@ -280,7 +280,7 @@ class SimpleTestCase(unittest.TestCase):
         if host is not None:
             warnings.warn(
                 "The host argument is deprecated and no longer used by assertRedirects",
-                RemovedInDjango21Warning, stacklevel=2
+                RemovedInDjango20Warning, stacklevel=2
             )
 
         if msg_prefix:
@@ -337,7 +337,7 @@ class SimpleTestCase(unittest.TestCase):
                     "expected URL, as it was always added automatically to URLs "
                     "before Django 1.9. Please update your expected URLs by "
                     "removing the scheme and domain.",
-                    RemovedInDjango21Warning, stacklevel=2)
+                    RemovedInDjango20Warning, stacklevel=2)
                 expected_url = relative_url
 
         self.assertEqual(url, expected_url,

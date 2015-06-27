@@ -7,7 +7,7 @@ from datetime import datetime
 from django.test import SimpleTestCase, ignore_warnings
 from django.utils import html, safestring, six
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 
 
@@ -123,7 +123,7 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_strip_entities(self):
         f = html.strip_entities
         # Strings that should come out untouched.
@@ -154,7 +154,7 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_remove_tags(self):
         f = html.remove_tags
         items = (

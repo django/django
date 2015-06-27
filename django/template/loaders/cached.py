@@ -7,7 +7,7 @@ import hashlib
 import warnings
 
 from django.template import Origin, Template, TemplateDoesNotExist
-from django.utils.deprecation import RemovedInDjango21Warning
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.inspect import func_supports_parameter
 
@@ -18,7 +18,7 @@ class Loader(BaseLoader):
 
     def __init__(self, engine, loaders):
         self.template_cache = {}
-        self.find_template_cache = {}  # RemovedInDjango21Warning
+        self.find_template_cache = {}  # RemovedInDjango20Warning
         self.get_template_cache = {}
         self.loaders = engine.get_template_loaders(loaders)
         super(Loader, self).__init__(engine)
@@ -49,7 +49,7 @@ class Loader(BaseLoader):
     def get_template_sources(self, template_name, template_dirs=None):
         for loader in self.loaders:
             args = [template_name]
-            # RemovedInDjango21Warning: Add template_dirs for compatibility
+            # RemovedInDjango20Warning: Add template_dirs for compatibility
             # with old loaders
             if func_supports_parameter(loader.get_template_sources, 'template_dirs'):
                 args.append(template_dirs)
@@ -87,14 +87,14 @@ class Loader(BaseLoader):
     @property
     def supports_recursion(self):
         """
-        RemovedInDjango21Warning: This is an internal property used by the
+        RemovedInDjango20Warning: This is an internal property used by the
         ExtendsNode during the deprecation of non-recursive loaders.
         """
         return all(hasattr(loader, 'get_contents') for loader in self.loaders)
 
     def find_template(self, name, dirs=None):
         """
-        RemovedInDjango21Warning: An internal method to lookup the template
+        RemovedInDjango20Warning: An internal method to lookup the template
         name in all the configured loaders.
         """
         key = self.cache_key(name, dirs)
@@ -125,7 +125,7 @@ class Loader(BaseLoader):
     def load_template(self, template_name, template_dirs=None):
         warnings.warn(
             'The load_template() method is deprecated. Use get_template() '
-            'instead.', RemovedInDjango21Warning,
+            'instead.', RemovedInDjango20Warning,
         )
         key = self.cache_key(template_name, template_dirs)
         template_tuple = self.template_cache.get(key)
@@ -149,5 +149,5 @@ class Loader(BaseLoader):
     def reset(self):
         "Empty the template cache."
         self.template_cache.clear()
-        self.find_template_cache.clear()  # RemovedInDjango21Warning
+        self.find_template_cache.clear()  # RemovedInDjango20Warning
         self.get_template_cache.clear()

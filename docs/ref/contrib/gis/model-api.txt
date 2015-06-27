@@ -6,8 +6,8 @@ GeoDjango Model API
    :synopsis: GeoDjango model and field API.
 
 This document explores the details of the GeoDjango Model API.  Throughout this
-section, we'll be using the following geographic model of a `ZIP code`__ as our
-example::
+section, we'll be using the following geographic model of a `ZIP code`__ and
+of a `Digital Elevation Model`__ as our examples::
 
     from django.contrib.gis.db import models
 
@@ -16,13 +16,19 @@ example::
         poly = models.PolygonField()
         objects = models.GeoManager()
 
+    class Elevation(models.Model):
+        name = models.CharField(max_length=100)
+        rast = models.RasterField()
+
 __ http://en.wikipedia.org/wiki/ZIP_code
+__ https://en.wikipedia.org/wiki/Digital_elevation_model
 
-Geometry Field Types
-====================
+Spatial Field Types
+===================
 
-Each of the following geometry field types correspond with the
-OpenGIS Simple Features specification [#fnogc]_.
+Spatial fields consist of a series of geometry field types and one raster field
+type. Each of the geometry field types correspond to the OpenGIS Simple
+Features specification [#fnogc]_. There is no such standard for raster data.
 
 ``GeometryField``
 -----------------
@@ -64,19 +70,31 @@ OpenGIS Simple Features specification [#fnogc]_.
 
 .. class:: GeometryCollectionField
 
-.. _geometry-field-options:
+``RasterField``
+---------------
 
-Geometry Field Options
-======================
+.. versionadded:: 1.9
+
+.. class:: RasterField
+
+``RasterField`` is currently only implemented for the PostGIS backend.
+
+Spatial Field Options
+=====================
+
+.. versionchanged:: 1.9
+
+    The geometry field options ``srid`` and ``spatial_index`` are now shared by
+    ``GeometryField`` and ``RasterField`` through the ``BaseSpatialField``.
 
 In addition to the regular :ref:`common-model-field-options` available for
-Django model fields, geometry fields have the following additional options.
+Django model fields, spatial fields have the following additional options.
 All are optional.
 
 ``srid``
 --------
 
-.. attribute:: GeometryField.srid
+.. attribute:: BaseSpatialField.srid
 
 Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry field to
 the given value. Defaults to 4326 (also known as `WGS84`__, units are in degrees
@@ -144,7 +162,7 @@ __ http://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.
 ``spatial_index``
 -----------------
 
-.. attribute:: GeometryField.spatial_index
+.. attribute:: BaseSpatialField.spatial_index
 
 Defaults to ``True``.  Creates a spatial index for the given geometry
 field.
@@ -156,6 +174,14 @@ field.
     indexes.  Specifically, spatial indexes are typically created using
     a variant of the R-Tree, while regular database indexes typically
     use B-Trees.
+
+.. _geometry-field-options:
+
+Geometry Field Options
+======================
+
+There are additional options available for Geometry fields. All the following
+options are optional.
 
 ``dim``
 -------
@@ -223,7 +249,14 @@ determining `when to use geography data type over geometry data type
 In order to conduct geographic queries, each geographic model requires
 a ``GeoManager`` model manager.  This manager allows for the proper SQL
 construction for geographic queries; thus, without it, all geographic filters
-will fail.  It should also be noted that ``GeoManager`` is required even if the
+will fail.
+
+.. note::
+
+    Geographic filtering support is limited to geometry fields. ``RasterField``
+    does not currently allow spatial querying.
+
+It should also be noted that ``GeoManager`` is required even if the
 model does not have a geographic field itself, e.g., in the case of a
 ``ForeignKey`` relation to a model with a geographic field.  For example,
 if we had an ``Address`` model with a ``ForeignKey`` to our ``Zipcode``

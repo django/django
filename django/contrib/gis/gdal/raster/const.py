@@ -21,6 +21,9 @@ GDAL_PIXEL_TYPES = {
     11: 'GDT_CFloat64',  # Complex Float64
 }
 
+# A list of gdal datatypes that are integers.
+GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5]
+
 # Lookup values to convert GDAL pixel type indices into ctypes objects.
 # The GDAL band-io works with ctypes arrays to hold data to be written
 # or to hold the space for data to be read into. The lookup below helps
@@ -29,3 +32,14 @@ GDAL_TO_CTYPES = [
     None, c_byte, c_uint16, c_int16, c_uint32, c_int32,
     c_float, c_double, None, None, None, None
 ]
+
+# List of resampling algorithms that can be used to warp a GDALRaster.
+GDAL_RESAMPLE_ALGORITHMS = {
+    'NearestNeighbour': 0,
+    'Bilinear': 1,
+    'Cubic': 2,
+    'CubicSpline': 3,
+    'Lanczos': 4,
+    'Average': 5,
+    'Mode': 6,
+}

@@ -1,6 +1,6 @@
 from django.template.defaultfilters import unordered_list
 from django.test import SimpleTestCase, ignore_warnings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 
@@ -14,7 +14,7 @@ class UnorderedListTests(SimpleTestCase):
         output = self.engine.render_to_string('unordered_list01', {'a': ['x>', ['<y']]})
         self.assertEqual(output, '\t<li>x&gt;\n\t<ul>\n\t\t<li>&lt;y</li>\n\t</ul>\n\t</li>')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'unordered_list02': '{% autoescape off %}{{ a|unordered_list }}{% endautoescape %}'})
     def test_unordered_list02(self):
         output = self.engine.render_to_string('unordered_list02', {'a': ['x>', ['<y']]})
@@ -36,7 +36,7 @@ class UnorderedListTests(SimpleTestCase):
         self.assertEqual(output, '\t<li>x>\n\t<ul>\n\t\t<li><y</li>\n\t</ul>\n\t</li>')
 
 
-@ignore_warnings(category=RemovedInDjango20Warning)
+@ignore_warnings(category=RemovedInDjango110Warning)
 class DeprecatedUnorderedListSyntaxTests(SimpleTestCase):
 
     @setup({'unordered_list01': '{{ a|unordered_list }}'})
@@ -81,6 +81,13 @@ class FunctionTests(SimpleTestCase):
             unordered_list(['item 1', ['item 1.1', 'item1.2'], 'item 2']),
             '\t<li>item 1\n\t<ul>\n\t\t<li>item 1.1</li>\n\t\t<li>item1.2'
             '</li>\n\t</ul>\n\t</li>\n\t<li>item 2</li>',
+        )
+
+    def test_nested3(self):
+        self.assertEqual(
+            unordered_list(['item 1', 'item 2', ['item 2.1']]),
+            '\t<li>item 1</li>\n\t<li>item 2\n\t<ul>\n\t\t<li>item 2.1'
+            '</li>\n\t</ul>\n\t</li>',
         )
 
     def test_nested_multiple(self):
@@ -165,7 +172,7 @@ class FunctionTests(SimpleTestCase):
             '\t<li>ulitem-a</li>\n\t<li>ulitem-b</li>\n\t<li>ulitem-<a>c</a></li>',
         )
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_legacy(self):
         """
         Old format for unordered lists should still work

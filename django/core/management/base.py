@@ -15,7 +15,7 @@ import django
 from django.core import checks
 from django.core.management.color import color_style, no_style
 from django.db import connections
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str
 
 
@@ -170,7 +170,7 @@ class BaseCommand(object):
     ``option_list``
         This is the list of ``optparse`` options which will be fed
         into the command's ``OptionParser`` for parsing arguments.
-        Deprecated and will be removed in Django 2.0.
+        Deprecated and will be removed in Django 1.10.
 
     ``output_transaction``
         A boolean indicating whether the command outputs SQL
@@ -263,7 +263,7 @@ class BaseCommand(object):
             # Backwards compatibility: use deprecated optparse module
             warnings.warn("OptionParser usage for Django management commands "
                           "is deprecated, use ArgumentParser instead",
-                          RemovedInDjango20Warning)
+                          RemovedInDjango110Warning)
             parser = OptionParser(prog=prog_name,
                                 usage=self.usage(subcommand),
                                 version=self.get_version())
@@ -578,9 +578,9 @@ class NoArgsCommand(BaseCommand):
 
     def __init__(self):
         warnings.warn(
-            "NoArgsCommand class is deprecated and will be removed in Django 2.0. "
+            "NoArgsCommand class is deprecated and will be removed in Django 1.10. "
             "Use BaseCommand instead, which takes no arguments by default.",
-            RemovedInDjango20Warning
+            RemovedInDjango110Warning
         )
         super(NoArgsCommand, self).__init__()
 

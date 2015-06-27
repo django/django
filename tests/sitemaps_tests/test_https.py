@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from datetime import date
 
 from django.test import ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .base import SitemapTestsBase
 
@@ -12,7 +12,7 @@ from .base import SitemapTestsBase
 class HTTPSSitemapTests(SitemapTestsBase):
     protocol = 'https'
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_secure_sitemap_index(self):
         "A secure sitemap index can be rendered"
         # The URL for views.sitemap in tests/urls/https.py has been updated
@@ -44,7 +44,7 @@ class HTTPSSitemapTests(SitemapTestsBase):
 class HTTPSDetectionSitemapTests(SitemapTestsBase):
     extra = {'wsgi.url_scheme': 'https'}
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_sitemap_index_with_https_request(self):
         "A sitemap index requested in HTTPS is rendered with HTTPS links"
         # The URL for views.sitemap in tests/urls/https.py has been updated

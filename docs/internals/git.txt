@@ -36,8 +36,8 @@ The Git repository includes several `branches`_:
   activity is focused.
 
 * ``stable/A.B.x`` are the branches where release preparation work happens.
-  They are also used for support and bugfix releases which occur as necessary
-  after the initial release of a major or minor version.
+  They are also used for bugfix and security releases which occur as necessary
+  after the initial release of a feature version.
 
 * ``soc20XX/<project>`` branches were used by students who worked on Django
   during the 2009 and 2010 Google Summer of Code programs.
@@ -84,8 +84,7 @@ coding style and how to generate and submit a patch.
 Other branches
 ==============
 
-Django uses branches to prepare for releases of Django (whether they be
-:term:`major <Major release>` or :term:`minor <Minor release>`).
+Django uses branches to prepare for releases of Django.
 
 In the past when Django was hosted on Subversion, branches were also used for
 feature development. Now Django is hosted on Git and feature development is

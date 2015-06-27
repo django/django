@@ -9,7 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -304,8 +304,8 @@ class ConnectionRouter(object):
                     "The signature of allow_migrate has changed from "
                     "allow_migrate(self, db, model) to "
                     "allow_migrate(self, db, app_label, model_name=None, **hints). "
-                    "Support for the old signature will be removed in Django 2.0.",
-                    RemovedInDjango20Warning)
+                    "Support for the old signature will be removed in Django 1.10.",
+                    RemovedInDjango110Warning)
                 model = hints.get('model')
                 allow = None if model is None else method(db, model)
             else:

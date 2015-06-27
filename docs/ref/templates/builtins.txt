@@ -994,7 +994,7 @@ ssi
 
 .. deprecated:: 1.8
 
-    This tag has been deprecated and will be removed in Django 2.0. Use the
+    This tag has been deprecated and will be removed in Django 1.10. Use the
     :ttag:`include` tag instead.
 
 Outputs the contents of a given file into the page.
@@ -1139,7 +1139,7 @@ by the context as to the current application.
 .. deprecated:: 1.8
 
     The dotted Python path syntax is deprecated and will be removed in
-    Django 2.0::
+    Django 1.10::
 
         {% url 'path.to.some_view' v1 v2 %}
 
@@ -2320,7 +2320,7 @@ contains ``['States', ['Kansas', ['Lawrence', 'Topeka'], 'Illinois']]``, then
 
     An older, more restrictive and verbose input format is also supported:
     ``['States', [['Kansas', [['Lawrence', []], ['Topeka', []]]], ['Illinois', []]]]``.
-    Support for this syntax will be removed in Django 2.0.
+    Support for this syntax will be removed in Django 1.10.
 
 .. templatefilter:: upper
 
