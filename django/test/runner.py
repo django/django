@@ -175,8 +175,8 @@ class DiscoverRunner(object):
             if isinstance(extension, string_types):
                 extension = import_string(extension)
             extensions[extension] = extension()
-        self.add_extensions_to_tests(suite, extensions, extensions.keys())
-        self._extensions = extensions.values()
+        self.add_extensions_to_tests(suite, extensions, list(extensions.keys()))
+        self._extensions = list(extensions.values())
 
     def add_extensions_to_tests(self, suite, extensions, global_extensions):
         for test in suite._tests:
