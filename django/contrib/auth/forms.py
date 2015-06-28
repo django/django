@@ -266,7 +266,7 @@ class SetPasswordForm(forms.Form):
     }
     new_password1 = forms.CharField(label=_("New password"),
                                     widget=forms.PasswordInput,
-                                    help_text=password_validation.password_validators_help_text_html())
+                                    help_text=mark_safe(password_validation.password_validators_help_text_html()))
     new_password2 = forms.CharField(label=_("New password confirmation"),
                                     widget=forms.PasswordInput)
 
@@ -333,7 +333,7 @@ class AdminPasswordChangeForm(forms.Form):
     password1 = forms.CharField(
         label=_("Password"),
         widget=forms.PasswordInput,
-        help_text=password_validation.password_validators_help_text_html(),
+        help_text=mark_safe(password_validation.password_validators_help_text_html()),
     )
     password2 = forms.CharField(
         label=_("Password (again)"),
