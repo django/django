@@ -10,7 +10,7 @@ from xml.dom.minidom import parseString
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.db import connection, connections
 from django.db.models import Max, Min
 from django.http import HttpRequest

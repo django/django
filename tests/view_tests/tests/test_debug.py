@@ -13,7 +13,7 @@ from unittest import skipIf
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.db import DatabaseError, connection
 from django.template import TemplateDoesNotExist
 from django.test import RequestFactory, SimpleTestCase, override_settings

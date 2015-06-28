@@ -419,7 +419,7 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     """
     def setUp(self):
         self.write_settings('settings.py', extra="""
-from django.core.urlresolvers import reverse_lazy
+from django.core.urls import reverse_lazy
 LOGIN_URL = reverse_lazy('login')""")
 
     def tearDown(self):

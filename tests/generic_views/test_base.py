@@ -4,7 +4,7 @@ import time
 import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import resolve
+from django.core.urls import resolve
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2

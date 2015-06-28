@@ -10,7 +10,7 @@ import os
 
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.urls import NoReverseMatch, reverse
 from django.http import HttpResponse
 from django.template import Context, TemplateSyntaxError, engines
 from django.template.response import SimpleTemplateResponse

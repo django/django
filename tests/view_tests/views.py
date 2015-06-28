@@ -6,7 +6,7 @@ import logging
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
-from django.core.urlresolvers import get_resolver
+from django.core.urls import get_resolver
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 from django.template import TemplateDoesNotExist

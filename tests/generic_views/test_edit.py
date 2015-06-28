@@ -4,7 +4,7 @@ import warnings
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )

@@ -22,7 +22,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core import mail
 from django.core.checks import Error
 from django.core.files import temp as tempfile
-from django.core.urlresolvers import NoReverseMatch, resolve, reverse
+from django.core.urls import NoReverseMatch, resolve, reverse
 from django.forms.utils import ErrorList
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse

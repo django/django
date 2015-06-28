@@ -2,7 +2,7 @@ from django import forms
 from django.conf.urls import url
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import engines
 from django.template.response import TemplateResponse

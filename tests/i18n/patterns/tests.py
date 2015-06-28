@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import clear_url_caches, reverse, translate_url
+from django.core.urls import clear_url_caches, reverse, translate_url
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template

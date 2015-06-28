@@ -7,7 +7,7 @@ from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.core.urlresolvers import NoReverseMatch, reverse
+from django.core.urls import NoReverseMatch, reverse
 from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse

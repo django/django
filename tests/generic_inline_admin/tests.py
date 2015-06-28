@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
 from django.test import (

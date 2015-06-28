@@ -7,7 +7,7 @@ from django.contrib.admindocs import utils
 from django.contrib.admindocs.views import get_return_data_type
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stderr
 

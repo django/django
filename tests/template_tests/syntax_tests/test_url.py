@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.core.urlresolvers import NoReverseMatch
+from django.core.urls import NoReverseMatch
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase, ignore_warnings, override_settings
 from django.utils.deprecation import RemovedInDjango110Warning

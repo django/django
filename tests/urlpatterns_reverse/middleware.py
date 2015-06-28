@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.http import HttpResponse, StreamingHttpResponse
 
 from . import urlconf_inner

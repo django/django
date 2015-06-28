@@ -6,7 +6,7 @@ import datetime
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.forms import (
     BooleanField, CharField, CheckboxInput, CheckboxSelectMultiple,
     ChoiceField, ClearableFileInput, DateField, DateInput, DateTimeInput,

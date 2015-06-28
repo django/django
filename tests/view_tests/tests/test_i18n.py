@@ -8,7 +8,7 @@ import unittest
 from os import path
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.core.urls import reverse
 from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
     override_settings,
