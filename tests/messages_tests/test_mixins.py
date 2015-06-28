@@ -4,7 +4,10 @@ from django.test import SimpleTestCase, override_settings
 from .urls import ContactFormViewWithMsg
 
 
-@override_settings(ROOT_URLCONF='messages_tests.urls')
+@override_settings(
+    ROOT_URLCONF='messages_tests.urls',
+    MESSAGE_STORAGE='django.contrib.messages.storage.cookie.CookieStorage',
+)
 class SuccessMessageMixinTests(SimpleTestCase):
 
     def test_set_messages_success(self):

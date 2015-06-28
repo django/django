@@ -11,7 +11,7 @@ class MessagesOutbox(TestExtension):
 
     def teardown_environment(self):
         settings.MESSAGE_STORAGE = self._original_message_storage
-        del self._original_message_storge
+        del self._original_message_storage
         del messages.outbox
 
     def setup_test(self):
