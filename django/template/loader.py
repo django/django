@@ -110,7 +110,6 @@ def render_to_string(template_name, context=None,
                         raise ValueError(
                             "render_to_string doesn't support the request argument "
                             "when some deprecated arguments are passed.")
-                        continue
                     # Hack -- use the internal Engine instance of DjangoTemplates.
                     return engine.engine.render_to_string(
                         template_name, context, context_instance, dirs, dictionary)

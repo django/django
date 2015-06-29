@@ -776,15 +776,6 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field_name not in cls.list_display:
                 return refer_to_missing_field(field=field_name, option=label,
                                               model=model, obj=cls, id='admin.E122')
-
-                checks.Error(
-                    "The value of '%s' refers to '%s', which is not contained in 'list_display'." % (
-                        label, field_name
-                    ),
-                    hint=None,
-                    obj=cls,
-                    id='admin.E122',
-                ),
             elif cls.list_display_links and field_name in cls.list_display_links:
                 return [
                     checks.Error(
