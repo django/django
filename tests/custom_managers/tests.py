@@ -6,8 +6,8 @@ from django.utils import six
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
-    FunPerson, OneToOneRestrictedModel, Person, PersonManager,
-    PublishedBookManager, RelatedModel, RestrictedModel,
+    FunPerson, OneToOneRestrictedModel, Person, PersonFromAbstract,
+    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel,
 )
 
 
@@ -511,6 +511,17 @@ class CustomManagerTests(TestCase):
                "dynamically generated with 'from_queryset()'.")
         with self.assertRaisesMessage(ValueError, msg):
             mgr.deconstruct()
+
+    def test_abstract_model_with_custom_manager_name(self):
+        """
+        A custom manager may be defined on an abstract model.
+        It will be inherited by the abstract model's children.
+        """
+        PersonFromAbstract.abstract_persons.create(objects='Test')
+        self.assertQuerysetEqual(
+            PersonFromAbstract.abstract_persons.all(), ["Test"],
+            lambda c: c.objects,
+        )
 
 
 class TestCars(TestCase):
