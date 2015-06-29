@@ -429,11 +429,11 @@ class CheckSSLRedirectTest(SimpleTestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckSecretKeyTest(SimpleTestCase):
+class CheckSecretKeyLengthTest(SimpleTestCase):
     @property
     def func(self):
-        from django.core.checks.security.base import check_secret_key
-        return check_secret_key
+        from django.core.checks.security.base import check_secret_key_length
+        return check_secret_key_length
 
     @override_settings(SECRET_KEY=('abcdefghijklmnopqrstuvwx' * 2) + 'ab')
     def test_okay_secret_key(self):
@@ -464,6 +464,18 @@ class CheckSecretKeyTest(SimpleTestCase):
         self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
         self.assertLess(len(set(settings.SECRET_KEY)), base.SECRET_KEY_MIN_UNIQUE_CHARACTERS)
         self.assertEqual(self.func(None), [base.W009])
+
+
+class CheckSecretKeyValidUnicodeTest(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_secret_key_valid_unicode
+        return check_secret_key_valid_unicode
+
+    @override_settings(SECRET_KEY=(b'\xffabcdefghijklmnopqrstuvwxyz' * 2))
+    def test_invalid_unicode_secret_key(self):
+        self.assertGreater(len(settings.SECRET_KEY), base.SECRET_KEY_MIN_LENGTH)
+        self.assertEqual(self.func(None), [base.W020])
 
 
 class CheckDebugTest(SimpleTestCase):

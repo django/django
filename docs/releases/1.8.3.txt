@@ -92,3 +92,6 @@ Bugfixes
 
 * Fixed a regression in the ``unordered_list`` template filter on certain
   inputs (:ticket:`25031`).
+
+* Checked and documented that ``settings.SECRET_KEY`` is a valid unicode
+  string (:ticket:`24994`).
