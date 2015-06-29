@@ -21,7 +21,7 @@ class EggOrigin(Origin):
     def __init__(self, app_name, pkg_name, *args, **kwargs):
         self.app_name = app_name
         self.pkg_name = pkg_name
-        return super(EggOrigin, self).__init__(*args, **kwargs)
+        super(EggOrigin, self).__init__(*args, **kwargs)
 
 
 class Loader(BaseLoader):
