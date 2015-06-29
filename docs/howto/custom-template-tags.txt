@@ -441,6 +441,21 @@ A few things to note about the ``simple_tag`` helper function:
 * If the argument was a template variable, our function is passed the
   current value of the variable, not the variable itself.
 
+Unlike the other tag utilities ``simple_tag`` passes its output through
+:func:`~django.utils.html.conditional_escape` if the template context is in
+autoescape mode, to ensure correct HTML and protect you from XSS
+vulnerabilities.
+
+If additional escaping is not desired, you will need to use
+:func:`~django.utils.safestring.mark_safe` if you are absolutely sure your code
+does not contain XSS vulnerabilities. For building up small HTML snippets, use
+of :func:`~django.utils.html.format_html` is strongly recommended instead of
+``mark_safe()``.
+
+.. versionchanged:: 1.9
+
+   Auto-escaping for ``simple_tag`` was added.
+
 If your template tag needs to access the current context, you can use the
 ``takes_context`` argument when registering your tag::
 
@@ -792,12 +807,16 @@ Ultimately, this decoupling of compilation and rendering results in an
 efficient template system, because a template can render multiple contexts
 without having to be parsed multiple times.
 
+.. _tags-auto-escaping:
+
 Auto-escaping considerations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The output from template tags is **not** automatically run through the
-auto-escaping filters. However, there are still a couple of things you should
-keep in mind when writing a template tag.
+auto-escaping filters (with the exception of
+:meth:`~django.template.Library.simple_tag` as described above). However, there
+are still a couple of things you should keep in mind when writing a template
+tag.
 
 If the ``render()`` function of your template stores the result in a context
 variable (rather than returning the result in a string), it should take care

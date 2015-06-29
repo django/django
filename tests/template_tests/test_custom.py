@@ -104,6 +104,28 @@ class SimpleTagTests(TagTestCase):
             with self.assertRaisesMessage(TemplateSyntaxError, entry[0]):
                 self.engine.from_string("%s as var %%}" % entry[1][0:-2])
 
+    def test_simple_tag_escaping_autoescape_off(self):
+        c = Context({'name': "Jack & Jill"}, autoescape=False)
+        t = self.engine.from_string("{% load custom %}{% escape_naive %}")
+        self.assertEqual(t.render(c), "Hello Jack & Jill!")
+
+    def test_simple_tag_naive_escaping(self):
+        c = Context({'name': "Jack & Jill"})
+        t = self.engine.from_string("{% load custom %}{% escape_naive %}")
+        self.assertEqual(t.render(c), "Hello Jack &amp; Jill!")
+
+    def test_simple_tag_explicit_escaping(self):
+        # Check we don't double escape
+        c = Context({'name': "Jack & Jill"})
+        t = self.engine.from_string("{% load custom %}{% escape_explicit %}")
+        self.assertEqual(t.render(c), "Hello Jack &amp; Jill!")
+
+    def test_simple_tag_format_html_escaping(self):
+        # Check we don't double escape
+        c = Context({'name': "Jack & Jill"})
+        t = self.engine.from_string("{% load custom %}{% escape_format_html %}")
+        self.assertEqual(t.render(c), "Hello Jack &amp; Jill!")
+
     def test_simple_tag_registration(self):
         # Test that the decorators preserve the decorated function's docstring, name and attributes.
         self.verify_tag(custom.no_params, 'no_params')
