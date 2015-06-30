@@ -72,6 +72,12 @@ class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySe
         super(DeconstructibleCustomManager, self).__init__(a)
 
 
+class CustomCtorQuerySet(models.QuerySet):
+    # QuerySet with ctor that takes optional argument, designed to test #24911
+    def __init__(self, custom_optional_arg=None, model=None, query=None, using=None, hints=None):
+        super().__init__(model=model, query=query, using=using, hints=hints)
+
+
 class FunPeopleManager(models.Manager):
     def get_queryset(self):
         return super(FunPeopleManager, self).get_queryset().filter(fun=True)
@@ -99,6 +105,7 @@ class Person(models.Model):
 
     custom_queryset_default_manager = CustomQuerySet.as_manager()
     custom_queryset_custom_manager = CustomManager('hello')
+    custom_ctor_queryset_manager = CustomCtorQuerySet.as_manager()
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)

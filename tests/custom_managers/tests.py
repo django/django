@@ -597,3 +597,19 @@ class CustomManagersRegressTestCase(TestCase):
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
         self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
+
+
+class TestTicket24911(TestCase):
+    """
+    #24911 - QuerySet is initiated with model=None as kwarg, but is called in BaseManager.get_queryset() as arg.
+
+    Uses QuerySet with a custom constructor. When accessing it through the default manager, the model should be
+    specified as keyword argument, not as positional one.
+    """
+
+    def test_queryset_with_custom_ctor(self):
+        # First, ensure we can use the queryset with custom constructor at all.
+        qs_custom = Person.custom_ctor_queryset_manager.all()
+        # Then, ensure that it still gives us the same result as default queryset.
+        qs_default = Person.objects.all()
+        self.assertQuerysetEqual(qs_custom, qs_default)
