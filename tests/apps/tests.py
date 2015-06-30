@@ -235,7 +235,7 @@ class AppsTests(TestCase):
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
             self.assertEqual(str(w[-1].message),
-                 "Model 'southponies.apps' was already registered. "
+                 "Model 'apps.southponies' was already registered. "
                  "Reloading models is not advised as it can lead to inconsistencies, "
                  "most notably with related models.")
 
