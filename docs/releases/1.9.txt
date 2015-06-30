@@ -25,6 +25,19 @@ Python 3.2 and 3.3, and added support for Python 3.5.
 What's new in Django 1.9
 ========================
 
+Performing actions after a transaction commit
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The new :func:`~django.db.transaction.on_commit` hook allows performing actions
+after a database transaction is successfully committed. This is useful for
+tasks such as sending notification emails, creating queued tasks, or
+invalidating caches.
+
+This functionality from the `django-transaction-hooks`_ package has been
+integrated into Django.
+
+.. _django-transaction-hooks: https://pypi.python.org/pypi/django-transaction-hooks
+
 Password validation
 ~~~~~~~~~~~~~~~~~~~
 
