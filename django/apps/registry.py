@@ -213,7 +213,7 @@ class Apps(object):
                 warnings.warn(
                     "Model '%s.%s' was already registered. "
                     "Reloading models is not advised as it can lead to inconsistencies, "
-                    "most notably with related models." % (model_name, app_label),
+                    "most notably with related models." % (app_label, model_name),
                     RuntimeWarning, stacklevel=2)
             else:
                 raise RuntimeError(
