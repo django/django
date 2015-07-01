@@ -4,6 +4,7 @@ Tests for django.core.servers.
 """
 from __future__ import unicode_literals
 
+import contextlib
 import os
 import socket
 
@@ -114,16 +115,16 @@ class LiveServerViews(LiveServerBase):
         Ensure that the LiveServerTestCase serves views.
         Refs #2879.
         """
-        f = self.urlopen('/example_view/')
-        self.assertEqual(f.read(), b'example view')
+        with contextlib.closing(self.urlopen('/example_view/')) as f:
+            self.assertEqual(f.read(), b'example view')
 
     def test_static_files(self):
         """
         Ensure that the LiveServerTestCase serves static files.
         Refs #2879.
         """
-        f = self.urlopen('/static/example_static_file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
+        with contextlib.closing(self.urlopen('/static/example_static_file.txt')) as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'example static file')
 
     def test_no_collectstatic_emulation(self):
         """
@@ -143,12 +144,12 @@ class LiveServerViews(LiveServerBase):
         Ensure that the LiveServerTestCase serves media files.
         Refs #2879.
         """
-        f = self.urlopen('/media/example_media_file.txt')
-        self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
+        with contextlib.closing(self.urlopen('/media/example_media_file.txt')) as f:
+            self.assertEqual(f.read().rstrip(b'\r\n'), b'example media file')
 
     def test_environ(self):
-        f = self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))
-        self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
+        with contextlib.closing(self.urlopen('/environ_view/?%s' % urlencode({'q': 'тест'}))) as f:
+            self.assertIn(b"QUERY_STRING: 'q=%D1%82%D0%B5%D1%81%D1%82'", f.read())
 
 
 class LiveServerDatabase(LiveServerBase):
@@ -159,8 +160,8 @@ class LiveServerDatabase(LiveServerBase):
         live server thread.
         Refs #2879.
         """
-        f = self.urlopen('/model_view/')
-        self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
+        with contextlib.closing(self.urlopen('/model_view/')) as f:
+            self.assertEqual(f.read().splitlines(), [b'jane', b'robert'])
 
     def test_database_writes(self):
         """

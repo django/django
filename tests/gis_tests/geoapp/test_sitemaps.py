@@ -60,10 +60,10 @@ class GeoSitemapTest(TestCase):
                 elif kml_type == 'kmz':
                     # Have to decompress KMZ before parsing.
                     buf = BytesIO(self.client.get(kml_url).content)
-                    zf = zipfile.ZipFile(buf)
-                    self.assertEqual(1, len(zf.filelist))
-                    self.assertEqual('doc.kml', zf.filelist[0].filename)
-                    kml_doc = minidom.parseString(zf.read('doc.kml'))
+                    with zipfile.ZipFile(buf) as zf:
+                        self.assertEqual(1, len(zf.filelist))
+                        self.assertEqual('doc.kml', zf.filelist[0].filename)
+                        kml_doc = minidom.parseString(zf.read('doc.kml'))
 
                 # Ensuring the correct number of placemarks are in the KML doc.
                 if 'city' in kml_url:
