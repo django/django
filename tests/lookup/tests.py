@@ -6,12 +6,60 @@ from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db import models
+from django.db.models import Value
+from django.db.models.lookups import Exact
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
 
 class LookupTests(TestCase):
+    def test_foobar(self):
+        from django.db.models import F
+        print(Article.objects.filter(Exact(F('headline'), Value('Article1'))).query)
+
+        class Ref(object):
+            def __init__(self, ref):
+                self.lookups = []
+                self.ref = F(ref)
+
+            def __getattr__(self, attr):
+                if not attr.startswith('_'):
+                    def callme(*args, **kwargs):
+                        self.lookups.append((attr, args, kwargs))
+                        return self
+                    return callme
+                return super().__getattr__(attr)
+
+            def resolve_expression(self, *args, **kwargs):
+                lhs = self.ref.resolve_expression(*args, **kwargs)
+                for pos, (attr, args, kwargs) in enumerate(self.lookups):
+                    last = pos == len(self.lookups) - 1
+                    if last:
+                        next = lhs.get_lookup(attr)
+                        if next:
+                            return next(lhs, *args, **kwargs)
+                    next = lhs.get_transform(attr)
+                    if next:
+                        lhs = next(lhs, [], *args, **kwargs)
+                    else:
+                        raise Exception("Transform %s not found from %s" % (attr, lhs))
+                return lhs
+
+        class Collate(models.Transform):
+            lookup_name = 'collate'
+
+            def __init__(self, lhs, lookups, lang):
+                super(Collate, self).__init__(lhs, lookups)
+                self.lang = lang
+
+            def as_sql(self, compiler, connection):
+                lhs, lhs_params = compiler.compile(self.lhs)
+                return 'collate(%s, %%s)' % lhs, lhs_params + [self.lang]
+        models.CharField.register_lookup(Collate)
+
+        print(Article.objects.filter(Ref('headline').collate('fi').exact(Value('Article1'))).query)
 
     def setUp(self):
         # Create a few Authors.

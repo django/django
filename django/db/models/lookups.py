@@ -1,6 +1,8 @@
 import inspect
 from copy import copy
 
+from django.db.models.expressions import BaseExpression
+
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
@@ -55,31 +57,23 @@ class RegisterLookupMixin(object):
         del cls.class_lookups[lookup.lookup_name]
 
 
-class Transform(RegisterLookupMixin):
+class Transform(RegisterLookupMixin, BaseExpression):
 
     bilateral = False
+
+    def set_source_expressions(self, lhs):
+        self.lhs = lhs[0]
+
+    def get_source_expressions(self):
+        return [self.lhs]
 
     def __init__(self, lhs, lookups):
         self.lhs = lhs
         self.init_lookups = lookups[:]
 
-    def as_sql(self, compiler, connection):
-        raise NotImplementedError
-
     @cached_property
     def output_field(self):
         return self.lhs.output_field
-
-    def copy(self):
-        return copy(self)
-
-    def relabeled_clone(self, relabels):
-        copy = self.copy()
-        copy.lhs = self.lhs.relabeled_clone(relabels)
-        return copy
-
-    def get_group_by_cols(self):
-        return self.lhs.get_group_by_cols()
 
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, 'get_bilateral_transforms'):
@@ -90,16 +84,18 @@ class Transform(RegisterLookupMixin):
             bilateral_transforms.append((self.__class__, self.init_lookups))
         return bilateral_transforms
 
-    @cached_property
-    def contains_aggregate(self):
-        return self.lhs.contains_aggregate
 
-
-class Lookup(RegisterLookupMixin):
+class Lookup(RegisterLookupMixin, BaseExpression):
     lookup_name = None
 
+    def set_source_expressions(self, exprs):
+        self.lhs, self.rhs = exprs
+
+    def get_source_expressions(self):
+        return [self.lhs, self.rhs]
+
     def __init__(self, lhs, rhs):
-        self.lhs, self.rhs = lhs, rhs
+        self.set_source_expressions([lhs, rhs])
         self.rhs = self.get_prep_lookup()
         if hasattr(self.lhs, 'get_bilateral_transforms'):
             bilateral_transforms = self.lhs.get_bilateral_transforms()
@@ -113,6 +109,11 @@ class Lookup(RegisterLookupMixin):
             if isinstance(rhs, QuerySet):
                 raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
         self.bilateral_transforms = bilateral_transforms
+
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        self.lhs = self.lhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        self.rhs = self.rhs.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+        return self
 
     def apply_bilateral_transforms(self, value):
         for transform, lookups in self.bilateral_transforms:
@@ -138,7 +139,10 @@ class Lookup(RegisterLookupMixin):
         return sqls, sqls_params
 
     def get_prep_lookup(self):
-        return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        if hasattr(self.lhs, 'output_field'):
+            return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        else:
+            return self.rhs
 
     def get_db_prep_lookup(self, value, connection):
         return (
