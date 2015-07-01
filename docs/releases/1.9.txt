@@ -332,6 +332,9 @@ Internationalization
   project and it will find all the app message files that were created by
   :djadmin:`makemessages`.
 
+* :ttag:`blocktrans` supports assigning its output to a variable using
+  ``asvar``.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

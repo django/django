@@ -435,6 +435,35 @@ class I18nTagTests(SimpleTestCase):
             'fr: French/français/francouzsky bidi=False; '
         )
 
+    # blocktrans tag with asvar
+    @setup({'i18n39': '{% load i18n %}'
+                      '{% blocktrans asvar page_not_found %}Page not found{% endblocktrans %}'
+                      '>{{ page_not_found }}<'})
+    def test_i18n39(self):
+        with translation.override('de'):
+            output = self.engine.render_to_string('i18n39')
+        self.assertEqual(output, '>Seite nicht gefunden<')
+
+    @setup({'i18n40': '{% load i18n %}'
+                      '{% trans "Page not found" as pg_404 %}'
+                      '{% blocktrans with page_not_found=pg_404 asvar output %}'
+                      'Error: {{ page_not_found }}'
+                      '{% endblocktrans %}'})
+    def test_i18n40(self):
+        output = self.engine.render_to_string('i18n40')
+        self.assertEqual(output, '')
+
+    @setup({'i18n41': '{% load i18n %}'
+                      '{% trans "Page not found" as pg_404 %}'
+                      '{% blocktrans with page_not_found=pg_404 asvar output %}'
+                      'Error: {{ page_not_found }}'
+                      '{% endblocktrans %}'
+                      '>{{ output }}<'})
+    def test_i18n41(self):
+        with translation.override('de'):
+            output = self.engine.render_to_string('i18n41')
+        self.assertEqual(output, '>Error: Seite nicht gefunden<')
+
     @setup({'template': '{% load i18n %}{% trans %}A}'})
     def test_syntax_error_no_arguments(self):
         msg = "'trans' takes at least one argument"
@@ -450,6 +479,12 @@ class I18nTagTests(SimpleTestCase):
     @setup({'template': '{% load i18n %}{% trans "Yes" as %}'})
     def test_syntax_error_missing_assignment(self):
         msg = "No argument provided to the 'trans' tag for the as option."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% blocktrans asvar %}Yes{% endblocktrans %}'})
+    def test_blocktrans_syntax_error_missing_assignment(self):
+        msg = "No argument provided to the 'blocktrans' tag for the asvar option."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
 
