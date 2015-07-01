@@ -195,7 +195,7 @@ If you've used the :djadmin:`makemigrations` command you've probably
 already seen ``dependencies`` in action because auto-created
 migrations have this defined as part of their creation process.
 
-The ``dependecies`` property is declared like this::
+The ``dependencies`` property is declared like this::
 
     from django.db import migrations
 
