@@ -364,6 +364,20 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    def test_view_with_force_login(self):
+        "Request a page that is protected with @login_required"
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
+
+        # Log in
+        self.client.force_login(self.u1)
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
     def test_view_with_method_login(self):
         "Request a page that is protected with a @login_required method"
 
@@ -374,6 +388,20 @@ class ClientTest(TestCase):
         # Log in
         login = self.client.login(username='testclient', password='password')
         self.assertTrue(login, 'Could not log in')
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_method_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
+    def test_view_with_method_force_login(self):
+        "Request a page that is protected with a @login_required method"
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/login_protected_method_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_method_view/')
+
+        # Log in
+        self.client.force_login(self.u1)
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_method_view/')
@@ -396,6 +424,23 @@ class ClientTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['user'].username, 'testclient')
 
+    def test_view_with_force_login_and_custom_redirect(self):
+        """
+        Request a page that is protected with
+        @login_required(redirect_field_name='redirect_to')
+        """
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/login_protected_view_custom_redirect/')
+        self.assertRedirects(response, '/accounts/login/?redirect_to=/login_protected_view_custom_redirect/')
+
+        # Log in
+        self.client.force_login(self.u1)
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view_custom_redirect/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
     def test_view_with_bad_login(self):
         "Request a page that is protected with @login, but use bad credentials"
 
@@ -407,6 +452,21 @@ class ClientTest(TestCase):
 
         login = self.client.login(username='inactive', password='password')
         self.assertFalse(login)
+
+    def test_view_with_inactive_force_login(self):
+        "Request a page that is protected with @login, but use an inactive login"
+
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
+
+        # Log in
+        self.client.force_login(self.u2)
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'inactive')
 
     def test_logout(self):
         "Request a logout after logging in"
@@ -424,6 +484,47 @@ class ClientTest(TestCase):
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')
         self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
+
+    def test_logout_with_force_login(self):
+        "Request a logout after logging in"
+        # Log in
+        self.client.force_login(self.u1)
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
+
+        # Log out
+        self.client.logout()
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
+
+    @override_settings(
+        AUTHENTICATION_BACKENDS=[
+            'django.contrib.auth.backends.ModelBackend',
+            'test_client.auth_backends.TestClientBackend',
+        ],
+    )
+    def test_force_login_with_backend(self):
+        """
+        Request a page that is protected with @login_required when using
+        force_login() and passing a backend.
+        """
+        # Get the page without logging in. Should result in 302.
+        response = self.client.get('/login_protected_view/')
+        self.assertRedirects(response, '/accounts/login/?next=/login_protected_view/')
+
+        # Log in
+        self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
+        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
+
+        # Request a page that requires a login
+        response = self.client.get('/login_protected_view/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['user'].username, 'testclient')
 
     @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.signed_cookies")
     def test_logout_cookie_sessions(self):
