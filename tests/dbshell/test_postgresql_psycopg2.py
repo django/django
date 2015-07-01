@@ -23,7 +23,8 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
         def _mock_subprocess_call(*args):
             self.subprocess_args = list(*args)
             if 'PGPASSFILE' in os.environ:
-                self.pgpass = open(os.environ['PGPASSFILE'], 'rb').read()
+                with open(os.environ['PGPASSFILE'], 'rb') as f:
+                    self.pgpass = f.read()
             else:
                 self.pgpass = None
             return 0
