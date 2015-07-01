@@ -164,6 +164,18 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.widget_attrs(PasswordInput()), {'maxlength': '10'})
         self.assertEqual(f.widget_attrs(Textarea()), {'maxlength': '10'})
 
+    def test_charfield_strip(self):
+        """
+        Ensure that values have whitespace stripped and that strip=False works.
+        """
+        f = CharField()
+        self.assertEqual(f.clean(' 1'), '1')
+        self.assertEqual(f.clean('1 '), '1')
+
+        f = CharField(strip=False)
+        self.assertEqual(f.clean(' 1'), ' 1')
+        self.assertEqual(f.clean('1 '), '1 ')
+
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
