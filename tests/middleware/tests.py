@@ -633,7 +633,8 @@ class GZipMiddlewareTest(SimpleTestCase):
 
     @staticmethod
     def decompress(gzipped_string):
-        return gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)).read()
+        with gzip.GzipFile(mode='rb', fileobj=BytesIO(gzipped_string)) as f:
+            return f.read()
 
     def test_compress_response(self):
         """
