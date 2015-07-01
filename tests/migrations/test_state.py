@@ -1,4 +1,5 @@
 from django.apps.registry import Apps
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.db import models
 from django.db.migrations.operations import (
     AddField, AlterField, DeleteModel, RemoveField,
@@ -975,6 +976,12 @@ class RelatedModelsTests(SimpleTestCase):
         self.assertRelated(B, [A, S, T])
         self.assertRelated(S, [A, B, T])
         self.assertRelated(T, [A, B, S])
+
+    def test_generic_fk(self):
+        A = self.create_model("A", foreign_keys=[models.ForeignKey('B'), GenericForeignKey()])
+        B = self.create_model("B", foreign_keys=[models.ForeignKey('C')])
+        self.assertRelated(A, [B])
+        self.assertRelated(B, [A])
 
     def test_abstract_base(self):
         A = self.create_model("A", abstract=True)

@@ -11,3 +11,5 @@ Bugfixes
 
 * Fixed ``AssertionError`` in some delete queries with a model containing a
   field that is both a foreign and primary key (:ticket:`24951`).
+
+* Fixed a migrations crash with ``GenericForeignKey`` (:ticket:`25040`).

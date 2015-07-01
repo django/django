@@ -45,7 +45,7 @@ def get_related_models_recursive(model):
     def _related_models(m):
         return [
             f.related_model for f in m._meta.get_fields(include_parents=True, include_hidden=True)
-            if f.is_relation and not isinstance(f.related_model, six.string_types)
+            if f.is_relation and f.related_model is not None and not isinstance(f.related_model, six.string_types)
         ] + [
             subclass for subclass in m.__subclasses__()
             if issubclass(subclass, models.Model)
