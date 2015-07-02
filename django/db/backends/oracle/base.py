@@ -92,6 +92,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # output (the "qn_" prefix is stripped before the lookup is performed.
     data_types = {
         'AutoField': 'NUMBER(11)',
+        'BigAutoField': 'NUMBER(19)',
         'BinaryField': 'BLOB',
         'BooleanField': 'NUMBER(1)',
         'CharField': 'NVARCHAR2(%(max_length)s)',
