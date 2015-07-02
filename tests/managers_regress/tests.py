@@ -113,7 +113,7 @@ class ManagersRegressionTests(TestCase):
                 SwappableModel.objects.all()
                 self.fail('Should raise an AttributeError')
             except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+                self.assertEqual(str(e), "Manager isn't available; 'managers_regress.SwappableModel' has been swapped for 'managers_regress.Parent'")
 
         finally:
             apps.app_configs['managers_regress'].models = _old_models
@@ -141,7 +141,7 @@ class ManagersRegressionTests(TestCase):
                 SwappableModel.stuff.all()
                 self.fail('Should raise an AttributeError')
             except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+                self.assertEqual(str(e), "Manager isn't available; 'managers_regress.SwappableModel' has been swapped for 'managers_regress.Parent'")
 
         finally:
             apps.app_configs['managers_regress'].models = _old_models
@@ -169,7 +169,7 @@ class ManagersRegressionTests(TestCase):
                 SwappableModel.objects.all()
                 self.fail('Should raise an AttributeError')
             except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
+                self.assertEqual(str(e), "Manager isn't available; 'managers_regress.SwappableModel' has been swapped for 'managers_regress.Parent'")
 
         finally:
             apps.app_configs['managers_regress'].models = _old_models
