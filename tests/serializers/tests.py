@@ -224,6 +224,13 @@ class SerializersTestBase(object):
                                                 serial_str))
         self.assertEqual(deserial_objs[0].object.score, Approximate(3.4, places=1))
 
+    def test_deferred_field_serialization(self):
+        author = Author.objects.create(name='Victor Hugo')
+        author = Author.objects.defer('name').get(pk=author.pk)
+        serial_str = serializers.serialize(self.serializer_name, [author])
+        deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))
+        self.assertIsInstance(deserial_objs[0].object, Author)
+
     def test_custom_field_serialization(self):
         """Tests that custom fields serialize and deserialize intact"""
         team_str = "Spartak Moskva"
