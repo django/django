@@ -66,35 +66,29 @@ class ManagersRegressionTests(TestCase):
     def test_abstract_manager(self):
         # Accessing the manager on an abstract model should
         # raise an attribute error with an appropriate message.
-        try:
+        # This error message isn't ideal, but if the model is abstract and
+        # a lot of the class instantiation logic isn't invoked; if the
+        # manager is implied, then we don't get a hook to install the
+        # error-raising manager.
+        msg = "type object 'AbstractBase3' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase3.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            # This error message isn't ideal, but if the model is abstract and
-            # a lot of the class instantiation logic isn't invoked; if the
-            # manager is implied, then we don't get a hook to install the
-            # error-raising manager.
-            self.assertEqual(str(e), "type object 'AbstractBase3' has no attribute 'objects'")
 
     def test_custom_abstract_manager(self):
         # Accessing the manager on an abstract model with an custom
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase2 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase2.restricted.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase2 is abstract")
 
     def test_explicit_abstract_manager(self):
         # Accessing the manager on an abstract model with an explicit
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase1 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase1.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_swappable_manager(self):
