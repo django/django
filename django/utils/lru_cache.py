@@ -27,7 +27,10 @@ except ImportError:
                  kwd_mark = (object(),),
                  fasttypes = {int, str, frozenset, type(None)},
                  sorted=sorted, tuple=tuple, type=type, len=len):
-        'Make a cache key from optionally typed positional and keyword arguments'
+        '''
+        Make a cache key from optionally typed positional and keyword arguments
+        通过类型和参数生成缓存key
+        '''
         key = args
         if kwds:
             sorted_items = sorted(kwds.items())
@@ -60,6 +63,15 @@ except ImportError:
 
         See:  http://en.wikipedia.org/wiki/Cache_algorithms#Least_Recently_Used
 
+        最近最少使用的高速缓存装饰器
+        如果 maxsize 设置为None, 则不限缓存总数
+        如果 typed 为 True, 不同类型的参数将会分别保存， 如：f(3.0)和地f(3)将被认为是不同的结果
+
+        缓存的函数必需是可以哈希的
+
+        f.cache_info() 查看缓存统计信息 named tuple（hits, misses, maxsize, currsize）
+        f.cache_clear() 清除缓存统计信息
+        f.__wrapped__ 访问底层函数
         """
 
         # Users should only access the lru_cache through its public API:
@@ -85,6 +97,7 @@ except ImportError:
 
                 def wrapper(*args, **kwds):
                     # no caching, just do a statistics update after a successful call
+                    # 没有缓存，成功调用后只做了缓存信息的更新
                     result = user_function(*args, **kwds)
                     stats[MISSES] += 1
                     return result
@@ -93,6 +106,7 @@ except ImportError:
 
                 def wrapper(*args, **kwds):
                     # simple caching without ordering or size limit
+                    # 没有排序和大小的简单缓存
                     key = make_key(args, kwds, typed)
                     result = cache_get(key, root)   # root used here as a unique not-found sentinel
                     if result is not root:
@@ -107,6 +121,7 @@ except ImportError:
 
                 def wrapper(*args, **kwds):
                     # size limited caching that tracks accesses by recency
+                    # 有大小限制的缓存， 由访问的新旧顺序排序， 移除超出限制的历史缓存
                     key = make_key(args, kwds, typed) if kwds or typed else args
                     with lock:
                         link = cache_get(key)

@@ -31,19 +31,30 @@ class Apps(object):
         # and whether the registry has been populated. Since it isn't possible
         # to reimport a module safely (it could reexecute initialization code)
         # all_models is never overridden or reset.
+        # 映射方式 app labels => model names => model classes
+        # 每一次导入模型， ModelBase.__new__ 将调用 apps.register_mode 来创建一个条目
+        # 所有导入的模型都会被注册，无论他们是否定义到 INSTALLED_APPS ，以及是否注册被填充
+        # 因为它不可以重新导入的一个安全模块（它可以重新执行初始化代码）， all_models 是不能被重写或重置
         self.all_models = defaultdict(OrderedDict)
 
         # Mapping of labels to AppConfig instances for installed apps.
+        # 保存通过 INSTALLED_APPS 导入的路径和配置， 使用 labels 做 key
         self.app_configs = OrderedDict()
 
         # Stack of app_configs. Used to store the current state in
         # set_available_apps and set_installed_apps.
+        # app_configs 栈， 用来保存 set_available_apps 和 set_installed_apps 的当前状态
         self.stored_app_configs = []
 
         # Whether the registry is populated.
+        # 判断当前注册是否被填充
+        # apps_ready APP应用程序是否填充状态
+        # models_ready 模型是否填充状态
+        # ready 当前注册是否被填充
         self.apps_ready = self.models_ready = self.ready = False
 
         # Lock for thread-safe population.
+        # 线程安全填充的锁
         self._lock = threading.Lock()
 
         # Maps ("app_label", "modelname") tuples to lists of functions to be
@@ -52,6 +63,7 @@ class Apps(object):
         self._pending_operations = defaultdict(list)
 
         # Populate apps and models, unless it's the master registry.
+        # 填充应用程序程序和模块， 除非他是主注册表
         if installed_apps is not None:
             self.populate(installed_apps)
 
@@ -62,22 +74,30 @@ class Apps(object):
         This method imports each application module and then each model module.
 
         It is thread safe and idempotent, but not reentrant.
+
+        加载应用程序配置和模型
+        这个方法导入所有应用程序模块和所有模型模块
+        它是线程安全和幂等，但不能重复执行
         """
         if self.ready:
             return
 
         # populate() might be called by two threads in parallel on servers
         # that create threads before initializing the WSGI callable.
+        # populate() 可能会调用两个并行线程运行在服务器上，因为初始化WSGI调用之前会创建线程
         with self._lock:
             if self.ready:
                 return
 
             # app_config should be pristine, otherwise the code below won't
             # guarantee that the order matches the order in INSTALLED_APPS.
+            # app_configs应该为空， 如果有值将不能保证 INSTALLED_APPS 的导入顺序
             if self.app_configs:
                 raise RuntimeError("populate() isn't reentrant")
 
             # Load app configs and app modules.
+            # 加载应用程序配置和应用程序模块
+            # 原来在 installed_apps 里面还能放 AppConfig
             for entry in installed_apps:
                 if isinstance(entry, AppConfig):
                     app_config = entry
@@ -121,6 +141,7 @@ class Apps(object):
     def check_apps_ready(self):
         """
         Raises an exception if all apps haven't been imported yet.
+        如果所有应用程序都尚未导入，将抛出异常
         """
         if not self.apps_ready:
             raise AppRegistryNotReady("Apps aren't loaded yet.")
@@ -128,6 +149,7 @@ class Apps(object):
     def check_models_ready(self):
         """
         Raises an exception if all models haven't been imported yet.
+        如果所有模块都尚未导入，将抛出异常
         """
         if not self.models_ready:
             raise AppRegistryNotReady("Models aren't loaded yet.")
@@ -135,6 +157,7 @@ class Apps(object):
     def get_app_configs(self):
         """
         Imports applications and returns an iterable of app configs.
+        返回可迭代的所有应用程序配置
         """
         self.check_apps_ready()
         return self.app_configs.values()
@@ -144,6 +167,9 @@ class Apps(object):
         Imports applications and returns an app config for the given label.
 
         Raises LookupError if no application exists with this label.
+        通过指定 label 返回应用程序配置
+
+        如果 label 不存在，将抛出异常
         """
         self.check_apps_ready()
         try:
@@ -157,6 +183,7 @@ class Apps(object):
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
+    # 这个方法是提高性能的， 至少能提高 Django 测试的性能
     @lru_cache.lru_cache(maxsize=None)
     def get_models(self, include_auto_created=False,
                    include_deferred=False, include_swapped=False):

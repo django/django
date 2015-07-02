@@ -4,9 +4,13 @@ Django 源代码阅读笔记
 
 ## apps APP配置管理
 
-### config
+### config Django应用程序配置
 
-### registry
+### registry Django应用程序注册
+
+原来在 installed_apps 里面除了使用应用程序路径外，还能直接使用AppConfig
+
+## bin Django管理命令行
 
 ## conf
 
@@ -34,7 +38,11 @@ Django 源代码阅读笔记
 
 ## test
 
-## utils
+## utils 共用工程
+
+### lru_cache 缓存
+
+
 
 ## views
 
