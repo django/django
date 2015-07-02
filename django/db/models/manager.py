@@ -270,9 +270,13 @@ class SwappedManagerDescriptor(object):
         self.model = model
 
     def __get__(self, instance, type=None):
-        raise AttributeError("Manager isn't available; %s has been swapped for '%s'" % (
-            self.model._meta.object_name, self.model._meta.swapped
-        ))
+        raise AttributeError(
+            "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
+                self.model._meta.app_label,
+                self.model._meta.object_name,
+                self.model._meta.swapped,
+            )
+        )
 
 
 class EmptyManager(Manager):

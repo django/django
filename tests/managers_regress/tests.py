@@ -109,12 +109,12 @@ class ManagersRegressionTests(TestCase):
 
             # Accessing the manager on a swappable model should
             # raise an attribute error with a helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
@@ -128,7 +128,6 @@ class ManagersRegressionTests(TestCase):
 
         try:
             class SwappableModel(models.Model):
-
                 stuff = models.Manager()
 
                 class Meta:
@@ -137,12 +136,12 @@ class ManagersRegressionTests(TestCase):
             # Accessing the manager on a swappable model with an
             # explicit manager should raise an attribute error with a
             # helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.stuff.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
@@ -156,7 +155,6 @@ class ManagersRegressionTests(TestCase):
 
         try:
             class SwappableModel(models.Model):
-
                 objects = models.Manager()
 
                 class Meta:
@@ -165,12 +163,12 @@ class ManagersRegressionTests(TestCase):
             # Accessing the manager on a swappable model with an
             # explicit manager should raise an attribute error with a
             # helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
