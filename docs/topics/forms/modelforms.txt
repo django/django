@@ -56,6 +56,8 @@ Model field                         Form field
 =================================== ==================================================
 :class:`AutoField`                  Not represented in the form
 
+:class:`BigAutoField`               Not represented in the form
+
 :class:`BigIntegerField`            :class:`~django.forms.IntegerField` with
                                     ``min_value`` set to -9223372036854775808
                                     and ``max_value`` set to 9223372036854775807.

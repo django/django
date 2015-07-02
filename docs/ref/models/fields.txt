@@ -388,12 +388,22 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
+``BigAutoField``
+----------------
+
+.. class:: BigAutoField(**options)
+
+.. versionadded:: 1.10
+
+A 64-bit integer, much like an :class:`AutoField` except that it is
+guaranteed to fit numbers from ``1`` to ``9223372036854775807``.
+
 ``BigIntegerField``
 -------------------
 
 .. class:: BigIntegerField(**options)
 
-A 64 bit integer, much like an :class:`IntegerField` except that it is
+A 64-bit integer, much like an :class:`IntegerField` except that it is
 guaranteed to fit numbers from ``-9223372036854775808`` to
 ``9223372036854775807``. The default form widget for this field is a
 :class:`~django.forms.TextInput`.

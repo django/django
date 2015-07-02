@@ -202,6 +202,9 @@ Models
   :class:`~django.db.models.ForeignKey` pointing to a proxy model is now
   accessible as a descriptor on the proxied model class and may be referenced in
   queryset filtering.
+* Added the :class:`~django.db.models.BigAutoField` that acts much like
+  an :class:`~django.db.models.AutoField` except that it is guaranteed
+  to fit numbers from ``1`` to ``9223372036854775807``.
 
 * The new :meth:`Field.rel_db_type() <django.db.models.Field.rel_db_type>`
   method returns the database column data type for fields such as ``ForeignKey``

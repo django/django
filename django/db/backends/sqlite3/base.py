@@ -93,6 +93,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # schema inspection is more useful.
     data_types = {
         'AutoField': 'integer',
+        'BigAutoField': 'integer',
         'BinaryField': 'BLOB',
         'BooleanField': 'bool',
         'CharField': 'varchar(%(max_length)s)',
