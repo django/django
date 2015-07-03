@@ -6,6 +6,7 @@ http://.com
 http://invalid-.com
 http://-invalid.com
 http://invalid.com-
+http://invalid.c-m
 http://inv-.alid-.com
 http://inv-.-alid.com
 file://localhost/path
