@@ -1,6 +1,6 @@
 bcrypt
 docutils
-jinja2
+jinja2 >= 2.7
 numpy
 Pillow
 PyYAML
