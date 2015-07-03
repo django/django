@@ -145,7 +145,7 @@ dependencies:
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python < 3.3)
+*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
