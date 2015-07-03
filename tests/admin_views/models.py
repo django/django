@@ -36,9 +36,9 @@ class Article(models.Model):
     """
     A simple article to test admin views. Test backwards compatibility.
     """
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, verbose_name='¿Name?')
     content = models.TextField()
-    date = models.DateTimeField()
+    date = models.DateTimeField(verbose_name='¿Date published?')
     section = models.ForeignKey(Section, null=True, blank=True)
     sub_section = models.ForeignKey(Section, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
 

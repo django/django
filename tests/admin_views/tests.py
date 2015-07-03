@@ -1790,6 +1790,32 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get(reverse('admin:logout'))
 
+    def test_history_view_verbose_model_name(self):
+        login_url = '%s?next=%s' % (
+            reverse('admin:login'), reverse('admin:index')
+        )
+        change_dict = {
+            'title': 'Ikke fordømt',
+            'content': '<p>edited article</p>',
+            'date_0': '2008-03-18', 'date_1': '10:54:39',
+            'section': self.s1.pk
+        }
+        article_change_url = reverse(
+            'admin:admin_views_article_change', args=(self.a1.pk,)
+        )
+
+        self.client.post(login_url, self.changeuser_login)
+        self.client.post(article_change_url, change_dict)
+
+        response = self.client.get(
+            reverse('admin:admin_views_article_history', args=(self.a1.pk,))
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, u'<td>changeuser (Change User)</td>')
+        self.assertContains(
+            response, u'<td>Changed ¿Name?, content and ¿Date published?.</td>'
+        )
+
     def test_history_view_bad_url(self):
         self.client.post(reverse('admin:login'), self.changeuser_login)
         response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
