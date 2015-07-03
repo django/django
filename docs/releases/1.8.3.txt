@@ -92,3 +92,6 @@ Bugfixes
 
 * Fixed a regression in the ``unordered_list`` template filter on certain
   inputs (:ticket:`25031`).
+
+* Fixed a regression in ``URLValidator`` that invalidated Punycode TLDs
+  (:ticket:`25059`).
