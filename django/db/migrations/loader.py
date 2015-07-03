@@ -12,6 +12,9 @@ from django.utils import six
 
 from .exceptions import AmbiguityError, BadMigrationError, NodeNotFoundError
 
+import logging
+logger = logging.getLogger(__name__)
+
 MIGRATIONS_MODULE_NAME = 'migrations'
 
 
@@ -74,6 +77,9 @@ class MigrationLoader(object):
                 # Might be better to try a directory check directly.
                 if "No module named" in str(e) and MIGRATIONS_MODULE_NAME in str(e):
                     self.unmigrated_apps.add(app_config.label)
+                    if app_config.label in settings.MIGRATION_MODULES:
+                        logger.warn('No migrations found for {}, which is configured explicitly in MIGRATION_MODULES ({}).'.format(
+                            app_config.label, module_name))
                     continue
                 raise
             else:
