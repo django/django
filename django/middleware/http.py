@@ -17,7 +17,7 @@ class ConditionalGetMiddleware(object):
         # If-None-Match must be ignored if original result would be anything
         # other than a 2XX or 304 status. 304 status would result in no change.
         # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
-        if 200 <= response.status_code < 300 and response.has_header('ETag'):
+        if 200 <= response.status_code <= 304 and response.has_header('ETag'):
             if_none_match = request.META.get('HTTP_IF_NONE_MATCH')
             if if_none_match == response['ETag']:
                 # Setting the status is enough here. The response handling path
