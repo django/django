@@ -86,7 +86,7 @@ def authenticate(**credentials):
             credentials=_clean_credentials(credentials))
 
 
-def login(request, user):
+def login(request, user, backend=None):
     """
     Persist a user id and a backend in the request. This way a user doesn't
     have to reauthenticate on every request. Note that data set during
@@ -108,8 +108,22 @@ def login(request, user):
             request.session.flush()
     else:
         request.session.cycle_key()
+
+    try:
+        backend = backend or user.backend
+    except AttributeError:
+        backends = _get_backends(return_tuples=True)
+        if len(backends) == 1:
+            _, backend = backends[0]
+        else:
+            raise ValueError(
+                'You have multiple authentication backends configured and '
+                'therefore must provide the `backend` argument or set the '
+                '`backend` attribute on the user.'
+            )
+
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
-    request.session[BACKEND_SESSION_KEY] = user.backend
+    request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
         request.user = user

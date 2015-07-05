@@ -68,6 +68,9 @@ Minor features
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
+* Added the optional ``backend`` argument to :func:`~django.contrib.auth.login`
+  to allowing using it without credentials.
+
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

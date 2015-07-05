@@ -603,12 +603,9 @@ class Client(RequestFactory):
             return False
 
     def force_login(self, user, backend=None):
-        if backend is None:
-            backend = settings.AUTHENTICATION_BACKENDS[0]
-        user.backend = backend
-        self._login(user)
+        self._login(user, backend)
 
-    def _login(self, user):
+    def _login(self, user, backend=None):
         from django.contrib.auth import login
         engine = import_module(settings.SESSION_ENGINE)
 
@@ -619,7 +616,7 @@ class Client(RequestFactory):
             request.session = self.session
         else:
             request.session = engine.SessionStore()
-        login(request, user)
+        login(request, user, backend)
 
         # Save the session values.
         request.session.save()
