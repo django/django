@@ -67,6 +67,7 @@ Minor features
 * The :func:`~django.contrib.auth.views.logout` view sends "no-cache" headers
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
+* Added the optional ``backend`` argument to :func:`~django.contrib.auth.login()`.
 
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

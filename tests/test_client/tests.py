@@ -522,7 +522,6 @@ class ClientTest(TestCase):
 
         # Log in
         self.client.force_login(self.u1, backend='test_client.auth_backends.TestClientBackend')
-        self.assertEqual(self.u1.backend, 'test_client.auth_backends.TestClientBackend')
 
         # Request a page that requires a login
         response = self.client.get('/login_protected_view/')

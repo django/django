@@ -605,12 +605,19 @@ class ImportedModelBackend(ModelBackend):
     pass
 
 
+class CustomModelBackend(ModelBackend):
+    pass
+
+
+class OtherModelBackend(ModelBackend):
+    pass
+
+
 class ImportedBackendTests(TestCase):
     """
     #23925 - The backend path added to the session should be the same
     as the one defined in AUTHENTICATION_BACKENDS setting.
     """
-
     backend = 'auth_tests.backend_alias.ImportedModelBackend'
 
     @override_settings(AUTHENTICATION_BACKENDS=[backend])
@@ -622,3 +629,38 @@ class ImportedBackendTests(TestCase):
         request = HttpRequest()
         request.session = self.client.session
         self.assertEqual(request.session[BACKEND_SESSION_KEY], self.backend)
+
+
+class SelectingBackendTest(TestCase):
+    backend = 'auth_tests.test_auth_backends.CustomModelBackend'
+    other_backend = 'auth_tests.test_auth_backends.OtherModelBackend'
+    username = 'username'
+    password = 'password'
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend])
+    def test_backend_path_login_without_authenticate_single_backend(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user)
+        self.assertBackendInSession(self.backend)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_without_authenticate_multiple_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        expected_message = (
+            'You have multiple authentication backends configured; '
+            'you must provide the `backend` argument or set the `backend` '
+            'attribute on the user.'
+        )
+        with self.assertRaisesMessage(ValueError, expected_message):
+            self.client._login(user)
+
+    @override_settings(AUTHENTICATION_BACKENDS=[backend, other_backend])
+    def test_backend_path_login_with_explicit_backends(self):
+        user = User.objects.create_user(self.username, 'email', self.password)
+        self.client._login(user, self.other_backend)
+        self.assertBackendInSession(self.other_backend)
+
+    def assertBackendInSession(self, backend):
+        request = HttpRequest()
+        request.session = self.client.session
+        self.assertEqual(request.session[BACKEND_SESSION_KEY], backend)
