@@ -103,9 +103,6 @@ TRANSLATOR_COMMENT_MARK = 'Translators'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
 
-ALLOWED_VARIABLE_CHARS = ('abcdefghijklmnopqrstuvwxyz'
-                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.')
-
 # what to report as the origin for templates that come from non-loader sources
 # (e.g. strings)
 UNKNOWN_SOURCE = '<unknown source>'
