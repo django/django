@@ -1,0 +1,61 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <option name="myLocal" value="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="47">
+            <item index="0" class="java.lang.String" itemvalue="django_crontab" />
+            <item index="1" class="java.lang.String" itemvalue="shortuuid" />
+            <item index="2" class="java.lang.String" itemvalue="jpush" />
+            <item index="3" class="java.lang.String" itemvalue="mysql-python" />
+            <item index="4" class="java.lang.String" itemvalue="django" />
+            <item index="5" class="java.lang.String" itemvalue="flup" />
+            <item index="6" class="java.lang.String" itemvalue="django-celery-with-redis" />
+            <item index="7" class="java.lang.String" itemvalue="fabric" />
+            <item index="8" class="java.lang.String" itemvalue="South" />
+            <item index="9" class="java.lang.String" itemvalue="pytz" />
+            <item index="10" class="java.lang.String" itemvalue="upyun" />
+            <item index="11" class="java.lang.String" itemvalue="django-redis-cache" />
+            <item index="12" class="java.lang.String" itemvalue="redis" />
+            <item index="13" class="java.lang.String" itemvalue="cache" />
+            <item index="14" class="java.lang.String" itemvalue="billiard" />
+            <item index="15" class="java.lang.String" itemvalue="hiredis" />
+            <item index="16" class="java.lang.String" itemvalue="django-htmlmin" />
+            <item index="17" class="java.lang.String" itemvalue="protobuf" />
+            <item index="18" class="java.lang.String" itemvalue="Django" />
+            <item index="19" class="java.lang.String" itemvalue="jieba" />
+            <item index="20" class="java.lang.String" itemvalue="django-cachemodel" />
+            <item index="21" class="java.lang.String" itemvalue="amqp" />
+            <item index="22" class="java.lang.String" itemvalue="kombu" />
+            <item index="23" class="java.lang.String" itemvalue="django-bmemcached" />
+            <item index="24" class="java.lang.String" itemvalue="django-crontab" />
+            <item index="25" class="java.lang.String" itemvalue="protobuf-to-dict" />
+            <item index="26" class="java.lang.String" itemvalue="django-celery" />
+            <item index="27" class="java.lang.String" itemvalue="celery" />
+            <item index="28" class="java.lang.String" itemvalue="south" />
+            <item index="29" class="java.lang.String" itemvalue="django_compressor" />
+            <item index="30" class="java.lang.String" itemvalue="python-dateutil" />
+            <item index="31" class="java.lang.String" itemvalue="argparse" />
+            <item index="32" class="java.lang.String" itemvalue="wsgiref" />
+            <item index="33" class="java.lang.String" itemvalue="django-cms" />
+            <item index="34" class="java.lang.String" itemvalue="django-sekizai" />
+            <item index="35" class="java.lang.String" itemvalue="easy_thumbnails" />
+            <item index="36" class="java.lang.String" itemvalue="django-filer" />
+            <item index="37" class="java.lang.String" itemvalue="django-appconf" />
+            <item index="38" class="java.lang.String" itemvalue="oss" />
+            <item index="39" class="java.lang.String" itemvalue="py-amqp" />
+            <item index="40" class="java.lang.String" itemvalue="django-jinja" />
+            <item index="41" class="java.lang.String" itemvalue="django-subdomains" />
+            <item index="42" class="java.lang.String" itemvalue="python-memcached" />
+            <item index="43" class="java.lang.String" itemvalue="django-aliyun-oss" />
+            <item index="44" class="java.lang.String" itemvalue="alioss" />
+            <item index="45" class="java.lang.String" itemvalue="enum34" />
+            <item index="46" class="java.lang.String" itemvalue="python-geohash" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
