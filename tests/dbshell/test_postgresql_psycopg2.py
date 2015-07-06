@@ -24,7 +24,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             self.subprocess_args = list(*args)
             if 'PGPASSFILE' in os.environ:
                 with open(os.environ['PGPASSFILE'], 'rb') as f:
-                    self.pgpass = f.read()
+                    self.pgpass = f.read().strip()  # ignore line endings
             else:
                 self.pgpass = None
             return 0
@@ -44,7 +44,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'PORT': 444,
             }), (
                 ['psql', '-U', 'someuser', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:someuser:somepassword\n',
+                b'somehost:444:dbname:someuser:somepassword',
             )
         )
 
@@ -71,7 +71,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'PORT': 444,
             }), (
                 ['psql', '-U', 'some:user', '-h', '::1', '-p', '444', 'dbname'],
-                b'\\:\\:1:444:dbname:some\\:user:some\\:password\n',
+                b'\\:\\:1:444:dbname:some\\:user:some\\:password',
             )
         )
 
@@ -85,7 +85,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
                 'PORT': 444,
             }), (
                 ['psql', '-U', 'some\\user', '-h', 'somehost', '-p', '444', 'dbname'],
-                b'somehost:444:dbname:some\\\\user:some\\\\password\n',
+                b'somehost:444:dbname:some\\\\user:some\\\\password',
             )
         )
 
@@ -98,7 +98,7 @@ class PostgreSqlDbshellCommandTestCase(SimpleTestCase):
             username_str = force_str(username, encoding)
             password_str = force_str(password, encoding)
             pgpass_bytes = force_bytes(
-                'somehost:444:dbname:%s:%s\n' % (username, password),
+                'somehost:444:dbname:%s:%s' % (username, password),
                 encoding=encoding,
             )
         except UnicodeEncodeError:
