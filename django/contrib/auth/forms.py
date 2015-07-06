@@ -289,7 +289,6 @@ class SetPasswordForm(forms.Form):
     def save(self, commit=True):
         password = self.cleaned_data["new_password1"]
         self.user.set_password(password)
-        password_validation.password_changed(password, self.user)
         if commit:
             self.user.save()
         return self.user
@@ -363,7 +362,6 @@ class AdminPasswordChangeForm(forms.Form):
         """
         password = self.cleaned_data["password1"]
         self.user.set_password(password)
-        password_validation.password_changed(password, self.user)
         if commit:
             self.user.save()
         return self.user
