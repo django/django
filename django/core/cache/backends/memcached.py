@@ -53,10 +53,11 @@ class BaseMemcachedCache(BaseCache):
             timeout = -1
 
         if timeout > 2592000:  # 60*60*24*30, 30 days
-            # See http://code.google.com/p/memcached/wiki/FAQ
-            # "You can set expire times up to 30 days in the future. After that
-            # memcached interprets it as a date, and will expire the item after
-            # said date. This is a simple (but obscure) mechanic."
+            # See http://code.google.com/p/memcached/wiki/NewProgramming#Expiration
+            # "Expiration times can be set from 0, meaning "never expire", to
+            # 30 days. Any time higher than 30 days is interpreted as a Unix
+            # timestamp date. If you want to expire an object on January 1st of
+            # next year, this is how you do that."
             #
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
