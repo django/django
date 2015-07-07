@@ -313,6 +313,9 @@ Forms
   and trailing whitespace.  As this defaults to ``True`` this is different
   behavior from previous releases.
 
+* Form fields now support the :attr:`~django.forms.Field.disabled` argument,
+  allowing the field widget to be displayed disabled by browsers.
+
 Generic Views
 ^^^^^^^^^^^^^
 

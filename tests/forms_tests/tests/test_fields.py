@@ -176,6 +176,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean(' 1'), ' 1')
         self.assertEqual(f.clean('1 '), '1 ')
 
+    def test_charfield_disabled(self):
+        f = CharField(disabled=True)
+        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled />')
+
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
@@ -1075,6 +1079,12 @@ class FieldsTests(SimpleTestCase):
         choices = [('P', 'Paul')]
         form = ChoiceFieldForm()
         self.assertEqual([('P', 'Paul')], list(form.fields['choicefield'].choices))
+
+    def test_choicefield_disabled(self):
+        f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')], disabled=True)
+        self.assertWidgetRendersTo(f,
+            '<select id="id_f" name="f" disabled><option value="J">John</option>'
+            '<option value="P">Paul</option></select>')
 
     # TypedChoiceField ############################################################
     # TypedChoiceField is just like ChoiceField, except that coerced types will
