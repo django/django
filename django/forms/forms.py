@@ -386,7 +386,10 @@ class BaseForm(object):
             # value_from_datadict() gets the data from the data dictionaries.
             # Each widget type knows how to retrieve its own data, because some
             # widgets split data over several HTML fields.
-            value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
+            if field.disabled:
+                value = self.initial.get(name, field.initial)
+            else:
+                value = field.widget.value_from_datadict(self.data, self.files, self.add_prefix(name))
             try:
                 if isinstance(field, FileField):
                     initial = self.initial.get(name, field.initial)
@@ -567,6 +570,8 @@ class BoundField(object):
             widget.is_localized = True
 
         attrs = attrs or {}
+        if self.field.disabled:
+            attrs['disabled'] = True
         auto_id = self.auto_id
         if auto_id and 'id' not in attrs and 'id' not in widget.attrs:
             if not only_initial:
