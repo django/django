@@ -407,10 +407,7 @@ based on :class:`~django.views.generic.list.ListView`:
             """Return the last five published questions."""
             return Question.objects.order_by('-pub_date')[:5]
 
-``response.context_data['latest_question_list']`` extracts the data this view
-places into the context.
-
-We need to amend the ``get_queryset`` method and change it so that it also
+We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
 an import:
 
