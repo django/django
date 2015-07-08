@@ -1133,7 +1133,8 @@ a ``get_queryset_compat`` method as below and use it internally to your manager:
         def get_queryset(self):
             return YourCustomQuerySet() # for example
 
-        get_query_set = get_queryset
+        if django.VERSION < (1, 6):
+            get_query_set = get_queryset
 
         def active(self): # for example
             return self.get_queryset_compat().filter(active=True)
