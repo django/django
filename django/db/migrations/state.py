@@ -15,6 +15,7 @@ from django.db.models.options import DEFAULT_NAMES, normalize_together
 from django.utils import six
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
+from django.utils.metaclassmaker import metaclassmaker
 from django.utils.module_loading import import_string
 from django.utils.version import get_docs_version
 
@@ -540,7 +541,7 @@ class ModelState(object):
         body.update(self.construct_managers())
 
         # Then, make a Model object (apps.register_model is called in __new__)
-        return type(
+        return metaclassmaker()(
             str(self.name),
             bases,
             body,
