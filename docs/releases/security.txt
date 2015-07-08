@@ -623,3 +623,43 @@ Versions affected
 -----------------
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/31cb25adecba930bdeee4556709f5a1c42d88fd6>`__
+
+July 8, 2015 - CVE-2015-5143
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-5143 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5143&cid=2>`_:
+Denial-of-service possibility by filling session store.
+`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/66d12d1ababa8f062857ee5eb43276493720bf16>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/1828f4341ec53a8684112d24031b767eba557663>`__
+* Django 1.4 `(patch) <https://github.com/django/django/commit/2e47f3e401c29bc2ba5ab794d483cb0820855fb9>`__
+
+July 8, 2015 - CVE-2015-5144
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-5144 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5144&cid=2>`_:
+Header injection possibility since validators accept newlines in input.
+`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/574dd5e0b0fbb877ae5827b1603d298edc9bb2a0>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/ae49b4d994656bc037513dcd064cb9ce5bb85649>`__
+* Django 1.4 `(patch) <https://github.com/django/django/commit/1ba1cdce7d58e6740fe51955d945b56ae51d072a>`__
+
+July 8, 2015 - CVE-2015-5145
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-5145 <http://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5145&cid=2>`_:
+Denial-of-service possibility in URL validation.
+`Full description <https://www.djangoproject.com/weblog/2015/jul/08/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/8f9a4d3a2bc42f14bb437defd30c7315adbff22c>`__
