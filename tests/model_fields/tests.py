@@ -995,3 +995,13 @@ class CustomFieldTests(unittest.TestCase):
             'exact', 'TEST', connection=connection, prepared=False
         )
         self.assertEqual(field.prep_value_count, 1)
+
+
+class AssignAttributesTest(unittest.TestCase):
+
+    def test_assign_attributes(self):
+        my_model = Foo()
+        my_model.a = 'Hi'
+        my_model.assign_attributes({'a': 'Updated!', 'd': 20.00})
+        self.assertEqual('Updated!', my_model.a)
+        self.assertEqual(20.00, my_model.d)
