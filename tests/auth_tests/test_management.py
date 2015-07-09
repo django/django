@@ -107,6 +107,9 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
+@override_settings(AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
@@ -139,7 +142,18 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         mismatched passwords three times.
         """
         command = changepassword.Command()
-        command._get_pass = lambda *args: args or 'foo'
+        command._get_pass = lambda *args: str(args) or 'foo'
+
+        with self.assertRaises(CommandError):
+            command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
+
+    def test_password_validation(self):
+        """
+        A CommandError should be thrown by handle() if the user enters in
+        passwords which fail validation three times.
+        """
+        command = changepassword.Command()
+        command._get_pass = lambda *args: '1234567890'
 
         with self.assertRaises(CommandError):
             command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
