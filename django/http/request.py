@@ -5,7 +5,6 @@ import re
 import sys
 from io import BytesIO
 from itertools import chain
-from pprint import pformat
 
 from django.conf import settings
 from django.core import signing
@@ -463,52 +462,6 @@ class QueryDict(MultiValueDict):
             output.extend(encode(k, force_bytes(v, self.encoding))
                           for v in list_)
         return '&'.join(output)
-
-
-def build_request_repr(request, path_override=None, GET_override=None,
-                       POST_override=None, COOKIES_override=None,
-                       META_override=None):
-    """
-    Builds and returns the request's representation string. The request's
-    attributes may be overridden by pre-processed values.
-    """
-    # Since this is called as part of error handling, we need to be very
-    # robust against potentially malformed input.
-    try:
-        get = (pformat(GET_override)
-               if GET_override is not None
-               else pformat(request.GET))
-    except Exception:
-        get = '<could not parse>'
-    if request._post_parse_error:
-        post = '<could not parse>'
-    else:
-        try:
-            post = (pformat(POST_override)
-                    if POST_override is not None
-                    else pformat(request.POST))
-        except Exception:
-            post = '<could not parse>'
-    try:
-        cookies = (pformat(COOKIES_override)
-                   if COOKIES_override is not None
-                   else pformat(request.COOKIES))
-    except Exception:
-        cookies = '<could not parse>'
-    try:
-        meta = (pformat(META_override)
-                if META_override is not None
-                else pformat(request.META))
-    except Exception:
-        meta = '<could not parse>'
-    path = path_override if path_override is not None else request.path
-    return force_str('<%s\npath:%s,\nGET:%s,\nPOST:%s,\nCOOKIES:%s,\nMETA:%s>' %
-                     (request.__class__.__name__,
-                      path,
-                      six.text_type(get),
-                      six.text_type(post),
-                      six.text_type(cookies),
-                      six.text_type(meta)))
 
 
 # It's neither necessary nor appropriate to use
