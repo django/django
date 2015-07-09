@@ -1997,3 +1997,18 @@ class SelectDateWidgetTests(SimpleTestCase):
         # label tag is correctly associated with first rendered dropdown
         a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
         self.assertIn('<label for="id_mydate_day">', a.as_p())
+
+
+class SelectWidgetTests(SimpleTestCase):
+
+    def test_deepcopy(self):
+        """
+        __deepcopy__() should copy all attributes properly (#25085).
+        """
+        widget = Select()
+        obj = copy.deepcopy(widget)
+        self.assertTrue(widget is not obj)
+        self.assertEqual(widget.choices, obj.choices)
+        self.assertTrue(widget.choices is not obj.choices)
+        self.assertEqual(widget.attrs, obj.attrs)
+        self.assertTrue(widget.attrs is not obj.attrs)
