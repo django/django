@@ -87,7 +87,7 @@ def make_immutable_fields_list(name, data):
 
 def get_full_default_permissions():
     perms = ['add', 'change', 'delete']
-    perms.extend([ x for x in settings.CUSTOM_DEFAULT_PERMISSIONS if not x in perms ])
+    perms.extend([x for x in settings.CUSTOM_DEFAULT_PERMISSIONS if x not in perms])
     return perms
 
 
