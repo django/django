@@ -6,7 +6,7 @@ from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
-from django.contrib.gis.gdal.raster.band import GDALBand
+from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.const import GDAL_RESAMPLE_ALGORITHMS
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry.regex import json_regex
@@ -15,7 +15,6 @@ from django.utils.encoding import (
     force_bytes, force_text, python_2_unicode_compatible,
 )
 from django.utils.functional import cached_property
-from django.utils.six.moves import range
 
 
 class TransformPoint(list):
@@ -108,9 +107,10 @@ class GDALRaster(GDALBase):
 
             # Set band data if provided
             for i, band_input in enumerate(ds_input.get('bands', [])):
-                self.bands[i].data(band_input['data'])
+                band = self.bands[i]
+                band.data(band_input['data'])
                 if 'nodata_value' in band_input:
-                    self.bands[i].nodata_value = band_input['nodata_value']
+                    band.nodata_value = band_input['nodata_value']
 
             # Set SRID
             self.srs = ds_input.get('srid')
@@ -273,15 +273,9 @@ class GDALRaster(GDALBase):
 
         return xmin, ymin, xmax, ymax
 
-    @cached_property
+    @property
     def bands(self):
-        """
-        Returns the bands of this raster as a list of GDALBand instances.
-        """
-        bands = []
-        for idx in range(1, capi.get_ds_raster_count(self._ptr) + 1):
-            bands.append(GDALBand(self, idx))
-        return bands
+        return BandList(self)
 
     def warp(self, ds_input, resampling='NearestNeighbour', max_error=0.0):
         """

@@ -23,6 +23,11 @@ class RasterFieldTest(TransactionTestCase):
         r.refresh_from_db()
         self.assertIsNone(r.rast)
 
+    def test_access_band_data_directly_from_queryset(self):
+        RasterModel.objects.create(rast=JSON_RASTER)
+        qs = RasterModel.objects.all()
+        qs[0].rast.bands[0].data()
+
     def test_model_creation(self):
         """
         Test RasterField through a test model.
