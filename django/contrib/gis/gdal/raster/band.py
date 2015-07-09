@@ -1,10 +1,12 @@
 from ctypes import byref, c_int
 
 from django.contrib.gis.gdal.base import GDALBase
+from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.shortcuts import numpy
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.six.moves import range
 
 from .const import GDAL_INTEGER_TYPES, GDAL_PIXEL_TYPES, GDAL_TO_CTYPES
 
@@ -148,3 +150,22 @@ class GDALBand(GDALBase):
                 return list(data_array)
         else:
             self.source._flush()
+
+
+class BandList(list):
+    def __init__(self, source):
+        self.source = source
+        list.__init__(self)
+
+    def __iter__(self):
+        for idx in range(1, len(self) + 1):
+            yield GDALBand(self.source, idx)
+
+    def __len__(self):
+        return capi.get_ds_raster_count(self.source._ptr)
+
+    def __getitem__(self, index):
+        try:
+            return GDALBand(self.source, index + 1)
+        except GDALException:
+            raise GDALException('Unable to get band index %d' % index)
