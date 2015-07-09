@@ -37,6 +37,9 @@ class OrderedSet(object):
     def __nonzero__(self):      # Python 2 compatibility
         return type(self).__bool__(self)
 
+    def __len__(self):
+        return len(self.dict)
+
 
 class MultiValueDictKeyError(KeyError):
     pass
