@@ -69,7 +69,8 @@ class UserCreationForm(forms.ModelForm):
         'password_mismatch': _("The two password fields didn't match."),
     }
     password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput)
+        widget=forms.PasswordInput,
+        help_text=mark_safe(password_validation.password_validators_help_text_html()))
     password2 = forms.CharField(label=_("Password confirmation"),
         widget=forms.PasswordInput,
         help_text=_("Enter the same password as above, for verification."))
@@ -86,6 +87,11 @@ class UserCreationForm(forms.ModelForm):
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
+
+        # enables password validation against user attributes
+        fake_user = User(**{k: v for k, v in self.cleaned_data.items() if k not in ('password1', 'password2')})
+        password_validation.validate_password(password2, fake_user)
+
         return password2
 
     def save(self, commit=True):
