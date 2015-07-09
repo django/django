@@ -376,7 +376,7 @@ class QuerySet(object):
         keyword arguments.
         """
         clone = self.filter(*args, **kwargs)
-        if self.query.can_filter():
+        if self.query.can_filter() and not self.query.distinct_fields:
             clone = clone.order_by()
         num = len(clone)
         if num == 1:
