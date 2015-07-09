@@ -109,7 +109,7 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
-@override_settings(AUTH_PASSWORD_VALIDATORS = [
+@override_settings(AUTH_PASSWORD_VALIDATORS=[
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ])
 class ChangepasswordManagementCommandTestCase(TestCase):
@@ -176,7 +176,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
 
 @override_settings(
     SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
-    AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
+    AUTH_PASSWORD_VALIDATORS=[{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
 )
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
@@ -490,9 +490,10 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
             command_output = new_io.getvalue().strip()
             self.assertEqual(command_output, ugettext("This password is entirely numeric.")
-                                             + "\nSuperuser created successfully.")
+                    + "\nSuperuser created successfully.")
 
         test(self)
+
 
 class CustomUserModelValidationTestCase(SimpleTestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
