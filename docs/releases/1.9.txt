@@ -673,6 +673,19 @@ console, for example.
 If you are overriding Django's default logging, you should check to see how
 your configuration merges with the new defaults.
 
+Error reporting
+~~~~~~~~~~~~~~~
+
+It was excessive to display full details of :class:`~django.http.HttpRequest`
+in local variables for every frame in the traceback in HTML version of the
+error email. Thus, the HTTP request will now display its standard
+representation as other variables. As a result the method
+``ExceptionReporterFilter.get_request_repr()`` was removed.
+
+The contents of the text version of the email were modified to provide
+traceback of the same structure as in case of an AJAX requests. The traceback
+details are rendered by the ``ExceptionReporter.get_traceback_text()`` method.
+
 Removal of time zone aware global adapters and converters for datetimes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
