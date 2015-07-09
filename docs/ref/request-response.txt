@@ -170,6 +170,12 @@ All attributes should be considered read-only, unless stated otherwise below.
     header called ``X-Bender`` would be mapped to the ``META`` key
     ``HTTP_X_BENDER``.
 
+    Note that :djadmin:`runserver` strips all headers with underscores in the
+    name, so you won't see them in ``META``. This prevents header-spoofing
+    based on ambiguity between underscores and dashes both being normalizing to
+    underscores in WSGI environment variables. It matches the behavior of
+    Web servers like Nginx and Apache 2.4+.
+
 .. attribute:: HttpRequest.user
 
     An object of type :setting:`AUTH_USER_MODEL` representing the currently
