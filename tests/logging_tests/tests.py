@@ -334,7 +334,7 @@ class AdminEmailHandlerTest(SimpleTestCase):
         msg = mail.outbox[0]
         self.assertEqual(msg.to, ['admin@example.com'])
         self.assertEqual(msg.subject, "[Django] ERROR (EXTERNAL IP): message")
-        self.assertIn("path:%s" % url_path, msg.body)
+        self.assertIn("Report at %s" % url_path, msg.body)
 
     @override_settings(
         MANAGERS=[('manager', 'manager@example.com')],
@@ -419,7 +419,7 @@ class SecurityLoggerTest(SimpleTestCase):
     def test_suspicious_email_admins(self):
         self.client.get('/suspicious/')
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('path:/suspicious/,', mail.outbox[0].body)
+        self.assertIn('Report at /suspicious/', mail.outbox[0].body)
 
 
 class SettingsCustomLoggingTest(AdminScriptTestCase):
