@@ -536,7 +536,7 @@ PASSWORD_HASHERS = [
 
 AUTH_PASSWORD_VALIDATORS = []
 
-# By default Django provides permissions - “add”, “change” and “delete”.
+# By default Django provides permissions - "add", "change" and "delete".
 # In the next set you can add additional permissions that are required
 # for all project models.
 CUSTOM_DEFAULT_PERMISSIONS = []
