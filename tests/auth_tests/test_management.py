@@ -22,7 +22,7 @@ from django.test import (
 )
 from django.utils import six
 from django.utils.encoding import force_str
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 from .models import (
     CustomUserBadRequiredFields, CustomUserNonListRequiredFields,
@@ -43,6 +43,8 @@ def mock_inputs(inputs):
                     if six.PY2:
                         # getpass on Windows only supports prompt as bytestring (#19807)
                         assert isinstance(prompt, six.binary_type)
+                    if callable(inputs['password']):
+                        return inputs['password']()
                     return inputs['password']
 
             def mock_input(prompt):
@@ -172,7 +174,10 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command.execute(username="J\xfalia", stdout=self.stdout)
 
 
-@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
+@override_settings(
+    SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
+    AUTH_PASSWORD_VALIDATORS = [{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
+)
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_basic_usage(self):
@@ -457,6 +462,37 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_password_validation(self):
+        """
+        Creation should fail if the password fails validation.
+        """
+        new_io = six.StringIO()
+
+        # returns '1234567890' the first two times it is called, then 'password' subsequently
+        def bad_then_good_password(index=[0]):
+            index[0] += 1
+            if index[0] <= 2:
+                return '1234567890'
+            return 'password'
+
+        @mock_inputs({
+            'password': bad_then_good_password,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+
+            command_output = new_io.getvalue().strip()
+            self.assertEqual(command_output, ugettext("This password is entirely numeric.")
+                                             + "\nSuperuser created successfully.")
+
+        test(self)
 
 class CustomUserModelValidationTestCase(SimpleTestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
