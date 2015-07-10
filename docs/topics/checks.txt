@@ -122,7 +122,9 @@ Registering and labeling checks
 -------------------------------
 
 Lastly, your check function must be registered explicitly with system check
-registry.
+registry. Checks should be registered in a file that's loaded when your
+application is loaded; for example, in the :meth:`AppConfig.ready()
+<django.apps.AppConfig.ready>` method.
 
 .. function:: register(*tags)(function)
 
