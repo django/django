@@ -9,4 +9,5 @@ Django 1.8.4 fixes several bugs in 1.8.3.
 Bugfixes
 ========
 
-* ...
+* Added the ability to serialize values from the newly added
+  :class:`~django.db.models.UUIDField` (:ticket:`25019`).
