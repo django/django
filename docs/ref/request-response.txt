@@ -1047,7 +1047,7 @@ Attributes
 FileResponse objects
 ====================
 
-.. versionadded:: 1.8
+.. versionadded:: 1.7.4
 
 .. class:: FileResponse
 
