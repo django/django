@@ -67,11 +67,21 @@ def metaclassmaker(left_metas=(), right_metas=()):
     return make_class
 
 
-def six_with_metaclassmaker(*bases):
+def six_with_metaclassmaker(*bases, **kwargs):
     """Creates a base class type with a metaclassmaker.
     It's like six.with_metaclass but adjusted to work properly
-    with metaclassmaker"""
+    with metaclassmaker
+    Usage:
+        class SomeClass(six_with_metaclassmaker(BaseClassA, BaseClassB, metaclass=MetaClass)):
+            ...
+    """
+    left_metas = kwargs.get('left_metas', tuple())
+    right_metas = kwargs.get('right_metas', tuple())
+    if 'metaclass' in kwargs:
+        right_metas += (kwargs['metaclass'],)
+
     class Metaclass(type):
         def __new__(cls, name, this_bases, adict):
-            return metaclassmaker()(name, bases, adict)
+            return metaclassmaker(left_metas, right_metas)(name, bases, adict)
+
     return type.__new__(Metaclass, 'temporary_class', (), {})
