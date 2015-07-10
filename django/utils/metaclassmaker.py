@@ -56,9 +56,9 @@ def _get_noconflict_metaclass(bases, left_metas, right_metas):
 
 def metaclassmaker(left_metas=(), right_metas=()):
     """metaclass maker, has to be used as base metaclass if you inherit
-    from more then one class with custom metaclass.
-    It merges metaclasses from class bases and return new one.
-    If there is only one custom metaclass it just returns it.
+    from more than one class with custom metaclass.
+    It merges metaclasses from class bases and returns a new one.
+    If there is only one custom metaclass, it just returns it.
     If there is no custom metaclass then type is returned.
     """
     def make_class(name, bases, adict):
