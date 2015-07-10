@@ -3,9 +3,9 @@ from django.test import TestCase
 
 
 class ValidationTestCase(TestCase):
-    def assertFailsValidation(self, clean, failed_fields):
+    def assertFailsValidation(self, clean, failed_fields, **kwargs):
         with self.assertRaises(ValidationError) as cm:
-            clean()
+            clean(**kwargs)
         self.assertEqual(sorted(failed_fields), sorted(cm.exception.message_dict))
 
     def assertFieldFailsValidationWithMessage(self, clean, field_name, message):

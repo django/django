@@ -2,18 +2,18 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
-from django.forms.fields import IntegerField, BooleanField
+from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
+from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.six.moves import xrange
-from django.utils.translation import ungettext, ugettext as _
+from django.utils.six.moves import range
+from django.utils.translation import ugettext as _, ungettext
 
-
-__all__ = ('BaseFormSet', 'all_valid')
+__all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
@@ -47,19 +47,21 @@ class ManagementForm(Form):
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 
+@html_safe
 @python_2_unicode_compatible
 class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList, form_kwargs=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
         self.data = data or {}
         self.files = files or {}
         self.initial = initial
+        self.form_kwargs = form_kwargs or {}
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
@@ -114,7 +116,7 @@ class BaseFormSet(object):
             return min(self.management_form.cleaned_data[TOTAL_FORM_COUNT], self.absolute_max)
         else:
             initial_forms = self.initial_form_count()
-            total_forms = initial_forms + self.extra
+            total_forms = max(initial_forms, self.min_num) + self.extra
             # Allow all existing related objects/inlines to be displayed,
             # but don't allow extra beyond max_num.
             if initial_forms > self.max_num >= 0:
@@ -138,8 +140,18 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i, **self.get_form_kwargs(i))
+                 for i in range(self.total_form_count())]
         return forms
+
+    def get_form_kwargs(self, index):
+        """
+        Return additional keyword arguments for each individual formset form.
+
+        index will be None if the form being constructed is a new empty
+        form.
+        """
+        return self.form_kwargs.copy()
 
     def _construct_form(self, i, **kwargs):
         """
@@ -153,13 +165,14 @@ class BaseFormSet(object):
         if self.is_bound:
             defaults['data'] = self.data
             defaults['files'] = self.files
-        if self.initial and not 'initial' in kwargs:
+        if self.initial and 'initial' not in kwargs:
             try:
                 defaults['initial'] = self.initial[i]
             except IndexError:
                 pass
-        # Allow extra forms to be empty.
-        if i >= self.initial_form_count():
+        # Allow extra forms to be empty, unless they're part of
+        # the minimum forms.
+        if i >= self.initial_form_count() and i >= self.min_num:
             defaults['empty_permitted'] = True
         defaults.update(kwargs)
         form = self.form(**defaults)
@@ -182,6 +195,7 @@ class BaseFormSet(object):
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
+            **self.get_form_kwargs(None)
         )
         self.add_fields(form, None)
         return form
@@ -308,7 +322,7 @@ class BaseFormSet(object):
                     # should not cause the entire formset to be invalid.
                     continue
             forms_valid &= form.is_valid()
-        return forms_valid and not bool(self.non_form_errors())
+        return forms_valid and not self.non_form_errors()
 
     def full_clean(self):
         """
@@ -325,15 +339,15 @@ class BaseFormSet(object):
             self._errors.append(form.errors)
         try:
             if (self.validate_max and
-                self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
-                self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
+                    self.total_form_count() - len(self.deleted_forms) > self.max_num) or \
+                    self.management_form.cleaned_data[TOTAL_FORM_COUNT] > self.absolute_max:
                 raise ValidationError(ungettext(
                     "Please submit %d or fewer forms.",
                     "Please submit %d or fewer forms.", self.max_num) % self.max_num,
                     code='too_many_forms',
                 )
             if (self.validate_min and
-                self.total_form_count() - len(self.deleted_forms) < self.min_num):
+                    self.total_form_count() - len(self.deleted_forms) < self.min_num):
                 raise ValidationError(ungettext(
                     "Please submit %d or more forms.",
                     "Please submit %d or more forms.", self.min_num) % self.min_num,
@@ -341,13 +355,13 @@ class BaseFormSet(object):
             # Give self.clean() a chance to do cross-form validation.
             self.clean()
         except ValidationError as e:
-            self._non_form_errors = self.error_class(e.messages)
+            self._non_form_errors = self.error_class(e.error_list)
 
     def clean(self):
         """
         Hook for doing any extra formset-wide cleaning after Form.clean() has
         been called on every form. Any ValidationError raised by this method
-        will not be associated with a particular form; it will be accesible
+        will not be associated with a particular form; it will be accessible
         via formset.non_form_errors()
         """
         pass
@@ -422,7 +436,6 @@ def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
     # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
     # if max_num is None in the first place)
     absolute_max = max_num + DEFAULT_MAX_NUM
-    extra += min_num
     attrs = {'form': form, 'extra': extra,
              'can_order': can_order, 'can_delete': can_delete,
              'min_num': min_num, 'max_num': max_num,

@@ -1,10 +1,9 @@
 from django.conf import settings
-from django.core.handlers.wsgi import get_path_info, WSGIHandler
-from django.utils.six.moves.urllib.parse import urlparse
-from django.utils.six.moves.urllib.request import url2pathname
-
 from django.contrib.staticfiles import utils
 from django.contrib.staticfiles.views import serve
+from django.core.handlers.wsgi import WSGIHandler, get_path_info
+from django.utils.six.moves.urllib.parse import urlparse
+from django.utils.six.moves.urllib.request import url2pathname
 
 
 class StaticFilesHandler(WSGIHandler):
@@ -12,17 +11,14 @@ class StaticFilesHandler(WSGIHandler):
     WSGI middleware that intercepts calls to the static files directory, as
     defined by the STATIC_URL setting, and serves those files.
     """
-    def __init__(self, application, base_dir=None):
+    # May be used to differentiate between handler types (e.g. in a
+    # request_finished signal)
+    handles_files = True
+
+    def __init__(self, application):
         self.application = application
-        if base_dir:
-            self.base_dir = base_dir
-        else:
-            self.base_dir = self.get_base_dir()
         self.base_url = urlparse(self.get_base_url())
         super(StaticFilesHandler, self).__init__()
-
-    def get_base_dir(self):
-        return settings.STATIC_ROOT
 
     def get_base_url(self):
         utils.check_settings()

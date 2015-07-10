@@ -1,8 +1,9 @@
-from ctypes import c_char_p, c_float, c_int, string_at, Structure, POINTER
-from django.contrib.gis.geoip.libgeoip import lgeoip, free
+from ctypes import POINTER, Structure, c_char_p, c_float, c_int, string_at
+
+from django.contrib.gis.geoip.libgeoip import free, lgeoip
 
 
-#### GeoIP C Structure definitions ####
+# #### GeoIP C Structure definitions ####
 
 class GeoIPRecord(Structure):
     _fields_ = [('country_code', c_char_p),
@@ -23,6 +24,7 @@ class GeoIPRecord(Structure):
                 ('continent_code', c_char_p),
                 ]
 geoip_char_fields = [name for name, ctype in GeoIPRecord._fields_ if ctype is c_char_p]
+GEOIP_DEFAULT_ENCODING = 'iso-8859-1'
 geoip_encodings = {
     0: 'iso-8859-1',
     1: 'utf8',
@@ -35,7 +37,7 @@ class GeoIPTag(Structure):
 RECTYPE = POINTER(GeoIPRecord)
 DBTYPE = POINTER(GeoIPTag)
 
-#### ctypes function prototypes ####
+# #### ctypes function prototypes ####
 
 # GeoIP_lib_version appeared in version 1.4.7.
 if hasattr(lgeoip, 'GeoIP_lib_version'):
@@ -55,9 +57,9 @@ GeoIPRecord_delete.restype = None
 def check_record(result, func, cargs):
     if result:
         # Checking the pointer to the C structure, if valid pull out elements
-        # into a dicionary.
+        # into a dictionary.
         rec = result.contents
-        record = dict((fld, getattr(rec, fld)) for fld, ctype in rec._fields_)
+        record = {fld: getattr(rec, fld) for fld, ctype in rec._fields_}
 
         # Now converting the strings to unicode using the proper encoding.
         encoding = geoip_encodings[record['charset']]
@@ -100,7 +102,7 @@ def check_string(result, func, cargs):
         free(result)
     else:
         s = ''
-    return s.decode()
+    return s.decode(GEOIP_DEFAULT_ENCODING)
 
 GeoIP_database_info = lgeoip.GeoIP_database_info
 GeoIP_database_info.restype = geoip_char_p
@@ -111,7 +113,7 @@ GeoIP_database_info.errcheck = check_string
 def string_output(func):
     def _err_check(result, func, cargs):
         if result:
-            return result.decode()
+            return result.decode(GEOIP_DEFAULT_ENCODING)
         return result
     func.restype = c_char_p
     func.errcheck = _err_check

@@ -29,8 +29,8 @@ into account when building its cache key. Requests with the same path but
 different header content for headers named in ``Vary`` need to get different
 cache keys to prevent delivery of wrong content.
 
-For example, :doc:`internationalization </topics/i18n/index>` middleware would need
-to distinguish caches by the ``Accept-language`` header.
+For example, :doc:`internationalization </topics/i18n/index>` middleware would
+need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: patch_cache_control(response, **kwargs)
 
@@ -65,7 +65,13 @@ to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
-    Adds headers to a response to indicate that a page should never be cached.
+    Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate``
+    header to a response to indicate that a page should never be cached.
+
+    .. versionchanged:: 1.9
+
+        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
+        reliably prevent caching in all browsers.
 
 .. function:: patch_vary_headers(response, newheaders)
 
@@ -97,34 +103,6 @@ to distinguish caches by the ``Accept-language`` header.
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
 
-``django.utils.datastructures``
-===============================
-
-.. module:: django.utils.datastructures
-   :synopsis: Data structures that aren't in Python's standard library.
-
-.. class:: SortedDict
-
-.. deprecated:: 1.7
-    ``SortedDict`` is deprecated and will be removed in Django 1.9. Use
-    :class:`collections.OrderedDict` instead.
-
-    The :class:`django.utils.datastructures.SortedDict` class is a dictionary
-    that keeps its keys in the order in which they're inserted.
-
-Creating a new SortedDict
--------------------------
-
-Creating a new ``SortedDict`` must be done in a way where ordering is
-guaranteed. For example::
-
-    SortedDict({'b': 1, 'a': 2, 'c': 3})
-
-will not work. Passing in a basic Python ``dict`` could produce unreliable
-results. Instead do::
-
-    SortedDict([('b', 1), ('a', 2), ('c', 3)])
-
 ``django.utils.dateparse``
 ==========================
 
@@ -133,8 +111,8 @@ results. Instead do::
 
 The functions defined in this module share the following properties:
 
-- They raise :exc:`~exceptions.ValueError` if their input is well formatted but
-  isn't a valid date or time.
+- They raise :exc:`ValueError` if their input is well formatted but isn't a
+  valid date or time.
 - They return ``None`` if it isn't well formatted at all.
 - They accept up to picosecond resolution in input, but they truncate it to
   microseconds, since that's what Python supports.
@@ -155,8 +133,17 @@ The functions defined in this module share the following properties:
     Parses a string and returns a :class:`datetime.datetime`.
 
     UTC offsets are supported; if ``value`` describes one, the result's
-    ``tzinfo`` attribute is a :class:`~django.utils.tzinfo.FixedOffset`
+    ``tzinfo`` attribute is a :class:`~django.utils.timezone.FixedOffset`
     instance.
+
+.. function:: parse_duration(value)
+
+    .. versionadded:: 1.8
+
+    Parses a string and returns a :class:`datetime.timedelta`.
+
+    Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
+    8601 (e.g. ``P4DT1H15M20S`` which is equivalent to ``4 1:15:20``).
 
 ``django.utils.decorators``
 ===========================
@@ -271,7 +258,20 @@ The functions defined in this module share the following properties:
     since we are assuming input is either UTF-8 or unicode already, we can
     simplify things a little from the full method.
 
-    Returns an ASCII string containing the encoded result.
+    Takes an IRI in UTF-8 bytes and returns ASCII bytes containing the encoded
+    result.
+
+.. function:: uri_to_iri(uri)
+
+    .. versionadded:: 1.8
+
+    Converts a Uniform Resource Identifier into an Internationalized Resource
+    Identifier.
+
+    This is an algorithm from section 3.2 of :rfc:`3987#section-3.2`.
+
+    Takes a URI in ASCII bytes and returns a unicode string containing the
+    encoded result.
 
 .. function:: filepath_to_uri(path)
 
@@ -285,6 +285,13 @@ The functions defined in this module share the following properties:
 
     Returns an ASCII string containing the encoded result.
 
+.. function:: escape_uri_path(path)
+
+    .. versionadded:: 1.8
+
+    Escapes the unsafe characters from the path portion of a Uniform Resource
+    Identifier (URI).
+
 ``django.utils.feedgenerator``
 ==============================
 
@@ -295,14 +302,14 @@ Sample usage::
 
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
-    ...     title=u"Poynter E-Media Tidbits",
-    ...     link=u"http://www.poynter.org/column.asp?id=31",
-    ...     description=u"A group Weblog by the sharpest minds in online media/journalism/publishing.",
-    ...     language=u"en",
+    ...     title="Poynter E-Media Tidbits",
+    ...     link="http://www.poynter.org/column.asp?id=31",
+    ...     description="A group Weblog by the sharpest minds in online media/journalism/publishing.",
+    ...     language="en",
     ... )
     >>> feed.add_item(
     ...     title="Hello",
-    ...     link=u"http://www.holovaty.com/test/",
+    ...     link="http://www.holovaty.com/test/",
     ...     description="Testing."
     ... )
     >>> with open('test.rss', 'w') as fp:
@@ -343,10 +350,6 @@ SyndicationFeed
         Adds an item to the feed. All args are expected to be Python ``unicode``
         objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
         objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
-
-        .. versionadded:: 1.7
-
-            The optional ``updateddate`` argument was added.
 
     .. method:: num_items()
 
@@ -423,7 +426,7 @@ Atom1Feed
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(object)
+.. class:: cached_property(object, name)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
@@ -432,9 +435,7 @@ Atom1Feed
 
     Consider a typical case, where a view might need to call a model's method
     to perform some computation, before placing the model instance into the
-    context, where the template might invoke the method once more:
-
-    .. code-block:: python
+    context, where the template might invoke the method once more::
 
         # the model
         class Person(models.Model):
@@ -446,8 +447,12 @@ Atom1Feed
 
         # in the view:
         if person.friends():
+            ...
 
-        # in the template:
+    And in the template you would have:
+
+    .. code-block:: html+django
+
         {% for friend in person.friends %}
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
@@ -467,6 +472,7 @@ Atom1Feed
 
         # in the view:
         if person.friends:
+            ...
 
     The cached value can be treated like an ordinary attribute of the instance::
 
@@ -483,17 +489,36 @@ Atom1Feed
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
 
+    .. versionadded:: 1.8
+
+    You can use the ``name`` argument to make cached properties of other
+    methods. For example, if you had an expensive ``get_friends()`` method and
+    wanted to allow calling it without retrieving the cached value, you could
+    write::
+
+        friends = cached_property(get_friends, name='friends')
+
+    While ``person.get_friends()`` will recompute the friends on each call, the
+    value of the cached property will persist until you delete it as described
+    above::
+
+        x = person.friends         # calls first time
+        y = person.get_friends()   # calls again
+        z = person.friends         # does not call
+        x is z                     # is True
+
 .. function:: allow_lazy(func, *resultclasses)
 
-    Django offers many utility functions (particularly in ``django.utils``) that
-    take a string as their first argument and do something to that string. These
-    functions are used by template filters as well as directly in other code.
+    Django offers many utility functions (particularly in ``django.utils``)
+    that take a string as their first argument and do something to that string.
+    These functions are used by template filters as well as directly in other
+    code.
 
     If you write your own similar functions and deal with translations, you'll
-    face the problem of what to do when the first argument is a lazy translation
-    object. You don't want to convert it to a string immediately, because you might
-    be using this function outside of a view (and hence the current thread's locale
-    setting will not be correct).
+    face the problem of what to do when the first argument is a lazy
+    translation object. You don't want to convert it to a string immediately,
+    because you might be using this function outside of a view (and hence the
+    current thread's locale setting will not be correct).
 
     For cases like this, use the ``django.utils.functional.allow_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
@@ -510,15 +535,15 @@ Atom1Feed
         # Replace unicode by str on Python 3
         fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
 
-    The ``allow_lazy()`` decorator takes, in addition to the function to decorate,
-    a number of extra arguments (``*args``) specifying the type(s) that the
-    original function can return. Usually, it's enough to include ``unicode``
-    (or ``str`` on Python 3) here and ensure that your function returns only
-    Unicode strings.
+    The ``allow_lazy()`` decorator takes, in addition to the function to
+    decorate, a number of extra arguments (``*args``) specifying the type(s)
+    that the original function can return. Usually, it's enough to include
+    ``unicode`` (or ``str`` on Python 3) here and ensure that your function
+    returns only Unicode strings.
 
     Using this decorator means you can write your function and assume that the
-    input is a proper string, then add support for lazy translation objects at the
-    end.
+    input is a proper string, then add support for lazy translation objects at
+    the end.
 
 ``django.utils.html``
 =====================
@@ -540,8 +565,8 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped strings,
-    so it will not double escape.
+    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
 
@@ -554,20 +579,16 @@ escaping HTML.
     because it applies escaping to all arguments - just like the Template system
     applies escaping by default.
 
-    So, instead of writing:
+    So, instead of writing::
 
-    .. code-block:: python
-
-        mark_safe(u"%s <b>%s</b> %s" % (some_html,
+        mark_safe("%s <b>%s</b> %s" % (some_html,
                                         escape(some_text),
                                         escape(some_other_text),
                                         ))
 
-    you should instead use:
+    You should instead use::
 
-    .. code-block:: python
-
-        format_html(u"{0} <b>{1}</b> {2}",
+        format_html("{} <b>{}</b> {}",
                     mark_safe(some_html), some_text, some_other_text)
 
     This has the advantage that you don't need to apply :func:`escape` to each
@@ -589,44 +610,72 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join('\n', "<li>{0} {1}</li>", ((u.first_name, u.last_name)
+        format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                     for u in users))
 
 .. function:: strip_tags(value)
 
-    Removes anything that looks like an html tag from the string, that is
-    anything contained within ``<>``.
+    Tries to remove anything that looks like an HTML tag from the string, that
+    is anything contained within ``<>``.
+
+    Absolutely NO guarantee is provided about the resulting string being
+    HTML safe. So NEVER mark safe the result of a ``strip_tag`` call without
+    escaping it first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
         strip_tags(value)
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel is a slug"``. Note that ``strip_tags`` result
-    may still contain unsafe HTML content, so you might use
-    :func:`~django.utils.html.escape` to make it a safe string.
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"Joel is a slug"``.
 
-    .. versionchanged:: 1.6
-
-        For improved safety, ``strip_tags`` is now parser-based.
+    If you are looking for a more robust solution, take a look at the `bleach`_
+    Python library.
 
 .. function:: remove_tags(value, tags)
 
+    .. deprecated:: 1.8
+
+        ``remove_tags()`` cannot guarantee HTML safe output and has been
+        deprecated due to security concerns. Consider using `bleach`_ instead.
+
     Removes a space-separated list of [X]HTML tag names from the output.
+
+    Absolutely NO guarantee is provided about the resulting string being HTML
+    safe. In particular, it doesn't work recursively, so the output of
+    ``remove_tags("<sc<script>ript>alert('XSS')</sc</script>ript>", "script")``
+    won't remove the "nested" script tags. So if the ``value`` is untrusted,
+    NEVER mark safe the result of a ``remove_tags()`` call without escaping it
+    first, for example with :func:`~django.utils.html.escape`.
 
     For example::
 
         remove_tags(value, "b span")
 
-    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"Joel <button>is</button> a slug"``.
+    If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"Joel <button>is</button> a slug"``.
 
     Note that this filter is case-sensitive.
 
-    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"`` the
-    return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
+    If ``value`` is ``"<B>Joel</B> <button>is</button> a <span>slug</span>"``
+    the return value will be ``"<B>Joel</B> <button>is</button> a slug"``.
 
-.. _str.format: http://docs.python.org/library/stdtypes.html#str.format
+.. _str.format: https://docs.python.org/library/stdtypes.html#str.format
+.. _bleach: https://pypi.python.org/pypi/bleach
+
+.. function:: html_safe()
+
+    .. versionadded:: 1.8
+
+    The ``__html__()`` method on a class helps non-Django templates detect
+    classes whose output doesn't require HTML escaping.
+
+    This decorator defines the ``__html__()`` method on the decorated class
+    by wrapping the ``__unicode__()`` (Python 2) or ``__str__()`` (Python 3)
+    in :meth:`~django.utils.safestring.mark_safe`. Ensure the ``__unicode__()``
+    or ``__str__()`` method does indeed return text that doesn't require HTML
+    escaping.
+
 
 ``django.utils.http``
 =====================
@@ -653,7 +702,7 @@ escaping HTML.
 .. function:: urlencode(query, doseq=0)
 
     A version of Python's urllib.urlencode() function that can operate on
-    unicode strings. The parameters are first case to UTF-8 encoded strings
+    unicode strings. The parameters are first cast to UTF-8 encoded strings
     and then encoded as per normal.
 
 .. function:: cookie_date(epoch_seconds=None)
@@ -685,18 +734,16 @@ escaping HTML.
 .. function:: int_to_base36(i)
 
     Converts a positive integer to a base 36 string. On Python 2 ``i`` must be
-    smaller than :data:`sys.maxint`.
+    smaller than `sys.maxint`_.
+
+    .. _sys.maxint: https://docs.python.org/2/library/sys.html#sys.maxint
 
 .. function:: urlsafe_base64_encode(s)
-
-    .. versionadded:: 1.6
 
     Encodes a bytestring in base64 for use in URLs, stripping any trailing
     equal signs.
 
 .. function::  urlsafe_base64_decode(s)
-
-    .. versionadded:: 1.6
 
     Decodes a base64 encoded string, adding back any trailing equal signs that
     might have been stripped.
@@ -709,21 +756,18 @@ escaping HTML.
 
 Functions for working with Python modules.
 
-.. function:: import_by_path(dotted_path, error_prefix='')
-
-    .. versionadded:: 1.6
+.. function:: import_string(dotted_path)
 
     Imports a dotted module path and returns the attribute/class designated by
-    the last name in the path. Raises
-    :exc:`~django.core.exceptions.ImproperlyConfigured` if something goes
-    wrong. For example::
+    the last name in the path. Raises ``ImportError`` if the import failed. For
+    example::
 
-        from django.utils.module_loading import import_by_path
-        ImproperlyConfigured = import_by_path('django.core.exceptions.ImproperlyConfigured')
+        from django.utils.module_loading import import_string
+        ValidationError = import_string('django.core.exceptions.ValidationError')
 
     is equivalent to::
 
-        from django.core.exceptions import ImproperlyConfigured
+        from django.core.exceptions import ValidationError
 
 ``django.utils.safestring``
 ===========================
@@ -764,6 +808,9 @@ appropriate entities.
 
     Can be called multiple times on a single string.
 
+    For building up fragments of HTML, you should normally be using
+    :func:`django.utils.html.format_html` instead.
+
     String marked safe will become unsafe again if modified. For example::
 
         >>> mystr = '<b>Hello World</b>   '
@@ -791,15 +838,164 @@ appropriate entities.
 
 .. function:: slugify
 
-    Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and trailing
-    whitespace.
+    Converts to ASCII. Converts spaces to hyphens. Removes characters that
+    aren't alphanumerics, underscores, or hyphens. Converts to lowercase. Also
+    strips leading and trailing whitespace.
 
     For example::
 
         slugify(value)
 
-    If ``value`` is ``"Joel is a slug"``, the output will be ``"joel-is-a-slug"``.
+    If ``value`` is ``"Joel is a slug"``, the output will be
+    ``"joel-is-a-slug"``.
+
+.. _time-zone-selection-functions:
+
+``django.utils.timezone``
+=========================
+
+.. module:: django.utils.timezone
+    :synopsis: Timezone support.
+
+.. data:: utc
+
+    :class:`~datetime.tzinfo` instance that represents UTC.
+
+.. class:: FixedOffset(offset=None, name=None)
+
+    A :class:`~datetime.tzinfo` subclass modeling a fixed offset from UTC.
+    ``offset`` is an integer number of minutes east of UTC.
+
+.. function:: get_fixed_timezone(offset)
+
+    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
+    with a fixed offset from UTC.
+
+    ``offset`` is a :class:`datetime.timedelta` or an integer number of
+    minutes. Use positive values for time zones east of UTC and negative
+    values for west of UTC.
+
+.. function:: get_default_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`default time zone <default-current-time-zone>`.
+
+.. function:: get_default_timezone_name()
+
+    Returns the name of the :ref:`default time zone
+    <default-current-time-zone>`.
+
+.. function:: get_current_timezone()
+
+    Returns a :class:`~datetime.tzinfo` instance that represents the
+    :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: get_current_timezone_name()
+
+    Returns the name of the :ref:`current time zone
+    <default-current-time-zone>`.
+
+.. function:: activate(timezone)
+
+    Sets the :ref:`current time zone <default-current-time-zone>`. The
+    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
+    subclass or, if pytz_ is available, a time zone name.
+
+.. function:: deactivate()
+
+    Unsets the :ref:`current time zone <default-current-time-zone>`.
+
+.. function:: override(timezone)
+
+    This is a Python context manager that sets the :ref:`current time zone
+    <default-current-time-zone>` on entry with :func:`activate()`, and restores
+    the previously active time zone on exit. If the ``timezone`` argument is
+    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
+    on entry with :func:`deactivate()` instead.
+
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
+
+.. function:: localtime(value, timezone=None)
+
+    Converts an aware :class:`~datetime.datetime` to a different time zone,
+    by default the :ref:`current time zone <default-current-time-zone>`.
+
+    This function doesn't work on naive datetimes; use :func:`make_aware`
+    instead.
+
+.. function:: now()
+
+    Returns a :class:`~datetime.datetime` that represents the
+    current point in time. Exactly what's returned depends on the value of
+    :setting:`USE_TZ`:
+
+    * If :setting:`USE_TZ` is ``False``, this will be a
+      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
+      without an associated timezone) that represents the current time
+      in the system's local timezone.
+
+    * If :setting:`USE_TZ` is ``True``, this will be an
+      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
+      current time in UTC. Note that :func:`now` will always return
+      times in UTC regardless of the value of :setting:`TIME_ZONE`;
+      you can use :func:`localtime` to convert to a time in the current
+      time zone.
+
+.. function:: is_aware(value)
+
+    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: is_naive(value)
+
+    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
+    function assumes that ``value`` is a :class:`~datetime.datetime`.
+
+.. function:: make_aware(value, timezone=None, is_dst=None)
+
+    Returns an aware :class:`~datetime.datetime` that represents the same
+    point in time as ``value`` in ``timezone``, ``value`` being a naive
+    :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
+
+    When pytz_ is installed, the exception ``pytz.AmbiguousTimeError``
+    will be raised if you try to make ``value`` aware during a DST transition
+    where the same time occurs twice (when reverting from DST). Setting
+    ``is_dst`` to ``True`` or ``False`` will avoid the exception by choosing if
+    the time is pre-transition or post-transition respectively.
+
+    When pytz_ is installed, the exception ``pytz.NonExistentTimeError``
+    will be raised if you try to make ``value`` aware during a DST transition
+    such that the time never occurred (when entering into DST). Setting
+    ``is_dst`` to ``True`` or ``False`` will avoid the exception by moving the
+    hour backwards or forwards by 1 respectively. For example, ``is_dst=True``
+    would change a non-existent time of 2:30 to 1:30 and ``is_dst=False``
+    would change the time to 3:30.
+
+    ``is_dst`` has no effect when ``pytz`` is not installed.
+
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
+
+    .. versionchanged:: 1.9
+
+        The ``is_dst`` argument was added.
+
+.. function:: make_naive(value, timezone=None)
+
+    Returns an naive :class:`~datetime.datetime` that represents in
+    ``timezone``  the same point in time as ``value``, ``value`` being an
+    aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
+    defaults to the :ref:`current time zone <default-current-time-zone>`.
+
+    .. versionchanged:: 1.8
+
+        In older versions of Django, ``timezone`` was a required argument.
+
+.. _pytz: http://pytz.sourceforge.net/
 
 ``django.utils.translation``
 ============================
@@ -871,34 +1067,45 @@ For a complete discussion on the usage of the following see the
 
 .. function:: activate(language)
 
-    Fetches the translation object for a given language and installs it as
+    Fetches the translation object for a given language and activates it as
     the current translation object for the current thread.
 
 .. function:: deactivate()
 
-    De-installs the currently active translation object so that further _ calls
+    Deactivates the currently active translation object so that further _ calls
     will resolve against the default translation object, again.
 
 .. function:: deactivate_all()
 
-    Makes the active translation object a NullTranslations() instance. This is
-    useful when we want delayed translations to appear as the original string
-    for some reason.
+    Makes the active translation object a ``NullTranslations()`` instance.
+    This is useful when we want delayed translations to appear as the original
+    string for some reason.
 
 .. function:: override(language, deactivate=False)
 
     A Python context manager that uses
     :func:`django.utils.translation.activate` to fetch the translation object
-    for a given language, installing it as the translation object for the
-    current thread and reinstall the previous active language on exit.
-    Optionally it can simply deinstall the temporary translation on exit with
-    :func:`django.utils.translation.deactivate` if the deactivate argument is
-    True. If you pass None as the language argument, a NullTranslations()
-    instance is installed while the context is active.
+    for a given language, activates it as the translation object for the
+    current thread and reactivates the previous active language on exit.
+    Optionally, it can simply deactivate the temporary translation on exit with
+    :func:`django.utils.translation.deactivate` if the ``deactivate`` argument
+    is ``True``. If you pass ``None`` as the language argument, a
+    ``NullTranslations()`` instance is activated within the context.
+
+    .. versionchanged:: 1.8
+
+        ``override`` is now usable as a function decorator.
 
 .. function:: get_language()
 
-    Returns the currently selected language code.
+    Returns the currently selected language code. Returns ``None`` if
+    translations are temporarily deactivated (by :func:`deactivate_all()` or
+    when ``None`` is passed to :func:`override()`).
+
+    .. versionchanged:: 1.8
+
+        Before Django 1.8, ``get_language()`` always returned
+        :setting:`LANGUAGE_CODE` when translations were deactivated.
 
 .. function:: get_language_bidi()
 
@@ -909,10 +1116,10 @@ For a complete discussion on the usage of the following see the
 
 .. function:: get_language_from_request(request, check_path=False)
 
-    Analyzes the request to find what language the user wants the system to show.
-    Only languages listed in settings.LANGUAGES are taken into account. If the user
-    requests a sublanguage where we have a main language, we send out the main
-    language.
+    Analyzes the request to find what language the user wants the system to
+    show. Only languages listed in settings.LANGUAGES are taken into account.
+    If the user requests a sublanguage where we have a main language, we send
+    out the main language.
 
     If ``check_path`` is ``True``, the function first checks the requested URL
     for whether its path begins with a language code listed in the
@@ -924,143 +1131,11 @@ For a complete discussion on the usage of the following see the
 
 .. function:: templatize(src)
 
-    Turns a Django template into something that is understood by xgettext. It does
-    so by translating the Django translation tags into standard gettext function
-    invocations.
+    Turns a Django template into something that is understood by ``xgettext``.
+    It does so by translating the Django translation tags into standard
+    ``gettext`` function invocations.
 
-.. _time-zone-selection-functions:
+.. data:: LANGUAGE_SESSION_KEY
 
-``django.utils.timezone``
-=========================
-
-.. module:: django.utils.timezone
-    :synopsis: Timezone support.
-
-.. data:: utc
-
-    :class:`~datetime.tzinfo` instance that represents UTC.
-
-.. function:: get_fixed_timezone(offset)
-
-    .. versionadded:: 1.7
-
-    Returns a :class:`~datetime.tzinfo` instance that represents a time zone
-    with a fixed offset from UTC.
-
-    ``offset`` is a :class:`datetime.timedelta` or an integer number of
-    minutes. Use positive values for time zones east of UTC and negative
-    values for west of UTC.
-
-.. function:: get_default_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`default time zone <default-current-time-zone>`.
-
-.. function:: get_default_timezone_name()
-
-    Returns the name of the :ref:`default time zone
-    <default-current-time-zone>`.
-
-.. function:: get_current_timezone()
-
-    Returns a :class:`~datetime.tzinfo` instance that represents the
-    :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: get_current_timezone_name()
-
-    Returns the name of the :ref:`current time zone
-    <default-current-time-zone>`.
-
-.. function:: activate(timezone)
-
-    Sets the :ref:`current time zone <default-current-time-zone>`. The
-    ``timezone`` argument must be an instance of a :class:`~datetime.tzinfo`
-    subclass or, if pytz_ is available, a time zone name.
-
-.. function:: deactivate()
-
-    Unsets the :ref:`current time zone <default-current-time-zone>`.
-
-.. function:: override(timezone)
-
-    This is a Python context manager that sets the :ref:`current time zone
-    <default-current-time-zone>` on entry with :func:`activate()`, and restores
-    the previously active time zone on exit. If the ``timezone`` argument is
-    ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
-    on entry with :func:`deactivate()` instead.
-
-.. function:: localtime(value, timezone=None)
-
-    Converts an aware :class:`~datetime.datetime` to a different time zone,
-    by default the :ref:`current time zone <default-current-time-zone>`.
-
-    This function doesn't work on naive datetimes; use :func:`make_aware`
-    instead.
-
-.. function:: now()
-
-    Returns a :class:`~datetime.datetime` that represents the
-    current point in time. Exactly what's returned depends on the value of
-    :setting:`USE_TZ`:
-
-    * If :setting:`USE_TZ` is ``False``, this will be be a
-      :ref:`naive <naive_vs_aware_datetimes>` datetime (i.e. a datetime
-      without an associated timezone) that represents the current time
-      in the system's local timezone.
-
-    * If :setting:`USE_TZ` is ``True``, this will be an
-      :ref:`aware <naive_vs_aware_datetimes>` datetime representing the
-      current time in UTC. Note that :func:`now` will always return
-      times in UTC regardless of the value of :setting:`TIME_ZONE`;
-      you can use :func:`localtime` to convert to a time in the current
-      time zone.
-
-.. function:: is_aware(value)
-
-    Returns ``True`` if ``value`` is aware, ``False`` if it is naive. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: is_naive(value)
-
-    Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
-    function assumes that ``value`` is a :class:`~datetime.datetime`.
-
-.. function:: make_aware(value, timezone)
-
-    Returns an aware :class:`~datetime.datetime` that represents the same
-    point in time as ``value`` in ``timezone``, ``value`` being a naive
-    :class:`~datetime.datetime`.
-
-    This function can raise an exception if ``value`` doesn't exist or is
-    ambiguous because of DST transitions.
-
-.. function:: make_naive(value, timezone)
-
-    Returns an naive :class:`~datetime.datetime` that represents in
-    ``timezone``  the same point in time as ``value``, ``value`` being an
-    aware :class:`~datetime.datetime`
-
-.. _pytz: http://pytz.sourceforge.net/
-
-``django.utils.tzinfo``
-=======================
-
-.. deprecated:: 1.7
-    Use :mod:`~django.utils.timezone` instead.
-
-.. module:: django.utils.tzinfo
-   :synopsis: Implementation of ``tzinfo`` classes for use with ``datetime.datetime``.
-
-.. class:: FixedOffset
-
-    Fixed offset in minutes east from UTC.
-
-    .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_fixed_timezone` instead.
-
-.. class:: LocalTimezone
-
-    Proxy timezone information from time module.
-
-    .. deprecated:: 1.7
-        Use :func:`~django.utils.timezone.get_default_timezone` instead.
+    Session key under which the active language for the current session is
+    stored.

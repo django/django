@@ -1,0 +1,230 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Ḷḷumex03 <tornes@opmbx.org>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Asturian (http://www.transifex.com/projects/p/django/language/"
+"ast/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ast\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Información personal"
+
+msgid "Permissions"
+msgstr "Permisos"
+
+msgid "Important dates"
+msgstr "Dates importantes"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr "Contraseña camudada con ésitu."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Camudar contraseña: %s"
+
+msgid "Authentication and Authorization"
+msgstr ""
+
+msgid "No password set."
+msgstr "Nun s'afitó la contraseña."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Formatu de contraseña inválidu o algoritmu hash inválidu."
+
+msgid "The two password fields didn't match."
+msgstr "Nun concasen los dos campos de contraseña."
+
+msgid "Password"
+msgstr "Contraseña"
+
+msgid "Password confirmation"
+msgstr "Confirmación de contraseña"
+
+msgid "Enter the same password as above, for verification."
+msgstr "Pon la mesma contraseña qu'enriba, pa la verificación."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Nun s'atroxen contraseñes en crudu, asina que nun hai mou de ver la "
+"contraseña d'esti usuariu, pero pues camudar la contraseña usando <a href="
+"\"password/\">esti formulariu</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+
+msgid "This account is inactive."
+msgstr "Esta cuenta ta inactiva"
+
+msgid "Email"
+msgstr "Corréu"
+
+msgid "New password"
+msgstr "Contraseña nueva"
+
+msgid "New password confirmation"
+msgstr ""
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+
+msgid "Old password"
+msgstr ""
+
+msgid "Password (again)"
+msgstr ""
+
+msgid "algorithm"
+msgstr "algoritmu"
+
+msgid "iterations"
+msgstr ""
+
+msgid "salt"
+msgstr ""
+
+msgid "hash"
+msgstr ""
+
+msgid "work factor"
+msgstr ""
+
+msgid "checksum"
+msgstr "suma de comprobación"
+
+msgid "name"
+msgstr "nome"
+
+msgid "codename"
+msgstr ""
+
+msgid "permission"
+msgstr "permisu"
+
+msgid "permissions"
+msgstr "permisos"
+
+msgid "group"
+msgstr "grupu"
+
+msgid "groups"
+msgstr "grupos"
+
+msgid "password"
+msgstr "contraseña"
+
+msgid "last login"
+msgstr "aniciu de sesión caberu"
+
+msgid "superuser status"
+msgstr "estáu de superusuariu"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+
+msgid "user permissions"
+msgstr "permisos d'usuariu"
+
+msgid "Specific permissions for this user."
+msgstr ""
+
+msgid "username"
+msgstr "nome d'usuariu"
+
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Yá esiste un usuariu con esi nome d'usuariu."
+
+msgid "first name"
+msgstr "nome"
+
+msgid "last name"
+msgstr "apellíos"
+
+msgid "email address"
+msgstr "direición de corréu"
+
+msgid "staff status"
+msgstr ""
+
+msgid "Designates whether the user can log into this admin site."
+msgstr ""
+
+msgid "active"
+msgstr "activu"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+msgid "date joined"
+msgstr ""
+
+msgid "user"
+msgstr "usuariu"
+
+msgid "users"
+msgstr "usuarios"
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr ""
+
+msgid "Logged out"
+msgstr ""
+
+msgid "Password reset"
+msgstr ""
+
+msgid "Password reset sent"
+msgstr ""
+
+msgid "Enter new password"
+msgstr ""
+
+msgid "Password reset unsuccessful"
+msgstr ""
+
+msgid "Password reset complete"
+msgstr ""
+
+msgid "Password change"
+msgstr ""
+
+msgid "Password change successful"
+msgstr ""

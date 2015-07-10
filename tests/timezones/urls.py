@@ -1,8 +1,7 @@
-from django.conf.urls import patterns, include
-from django.contrib import admin
+from django.conf.urls import url
 
 from . import admin as tz_admin  # NOQA: register tz_admin
 
-urlpatterns = patterns('',
-    (r'^admin/', include(admin.site.urls)),
-)
+urlpatterns = [
+    url(r'^admin/', tz_admin.site.urls),
+]

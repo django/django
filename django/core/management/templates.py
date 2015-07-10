@@ -8,18 +8,15 @@ import shutil
 import stat
 import sys
 import tempfile
-
-from optparse import make_option
 from os import path
 
 import django
-from django.template import Template, Context
-from django.utils import archive
-from django.utils.six.moves.urllib.request import urlretrieve
-from django.utils._os import rmtree_errorhandler
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
-
+from django.template import Context, Engine
+from django.utils import archive, six
+from django.utils.six.moves.urllib.request import urlretrieve
+from django.utils.version import get_docs_version
 
 _drive_re = re.compile('^([a-z]):', re.I)
 _url_drive_re = re.compile('^([a-z])[:|]', re.I)
@@ -36,23 +33,7 @@ class TemplateCommand(BaseCommand):
     :param directory: The directory to which the template should be copied.
     :param options: The additional variables passed to project or app templates
     """
-    args = "[name] [optional destination directory]"
-    option_list = BaseCommand.option_list + (
-        make_option('--template',
-                    action='store', dest='template',
-                    help='The path or URL to load the template from.'),
-        make_option('--extension', '-e', dest='extensions',
-                    action='append', default=['py'],
-                    help='The file extension(s) to render (default: "py"). '
-                         'Separate multiple extensions with commas, or use '
-                         '-e multiple times.'),
-        make_option('--name', '-n', dest='files',
-                    action='append', default=[],
-                    help='The file name(s) to render. '
-                         'Separate multiple extensions with commas, or use '
-                         '-n multiple times.')
-    )
-    requires_model_validation = False
+    requires_system_checks = False
     # Can't import settings during this command, because they haven't
     # necessarily been created.
     can_import_settings = False
@@ -62,10 +43,26 @@ class TemplateCommand(BaseCommand):
     # setting might not be available at all.
     leave_locale_alone = True
 
+    def add_arguments(self, parser):
+        parser.add_argument('name', help='Name of the application or project.')
+        parser.add_argument('directory', nargs='?', help='Optional destination directory')
+        parser.add_argument('--template',
+            help='The path or URL to load the template from.')
+        parser.add_argument('--extension', '-e', dest='extensions',
+            action='append', default=['py'],
+            help='The file extension(s) to render (default: "py"). '
+                 'Separate multiple extensions with commas, or use '
+                 '-e multiple times.')
+        parser.add_argument('--name', '-n', dest='files',
+            action='append', default=[],
+            help='The file name(s) to render. '
+                 'Separate multiple extensions with commas, or use '
+                 '-n multiple times.')
+
     def handle(self, app_or_project, name, target=None, **options):
         self.app_or_project = app_or_project
         self.paths_to_remove = []
-        self.verbosity = int(options.get('verbosity'))
+        self.verbosity = options['verbosity']
 
         self.validate_name(name, app_or_project)
 
@@ -86,10 +83,9 @@ class TemplateCommand(BaseCommand):
                 raise CommandError("Destination directory '%s' does not "
                                    "exist, please create it first." % top_dir)
 
-        extensions = tuple(
-            handle_extensions(options.get('extensions'), ignored=()))
+        extensions = tuple(handle_extensions(options['extensions']))
         extra_files = []
-        for file in options.get('files'):
+        for file in options['files']:
             extra_files.extend(map(lambda x: x.strip(), file.split(',')))
         if self.verbosity >= 2:
             self.stdout.write("Rendering %s template files with "
@@ -102,15 +98,16 @@ class TemplateCommand(BaseCommand):
         base_name = '%s_name' % app_or_project
         base_subdir = '%s_template' % app_or_project
         base_directory = '%s_directory' % app_or_project
-        if django.VERSION[-2] != 'final':
-            docs_version = 'dev'
-        else:
-            docs_version = '%d.%d' % django.VERSION[:2]
+        camel_case_name = 'camel_case_%s_name' % app_or_project
+        camel_case_value = ''.join(x for x in name.title() if x != '_')
 
         context = Context(dict(options, **{
             base_name: name,
             base_directory: top_dir,
-            'docs_version': docs_version,
+            camel_case_name: camel_case_value,
+            'docs_version': get_docs_version(),
+            'django_version': django.__version__,
+            'unicode_literals': '' if six.PY3 else 'from __future__ import unicode_literals\n\n',
         }), autoescape=False)
 
         # Setup a stub settings environment for template rendering
@@ -118,7 +115,7 @@ class TemplateCommand(BaseCommand):
         if not settings.configured:
             settings.configure()
 
-        template_dir = self.handle_template(options.get('template'),
+        template_dir = self.handle_template(options['template'],
                                             base_subdir)
         prefix_length = len(template_dir) + 1
 
@@ -154,7 +151,7 @@ class TemplateCommand(BaseCommand):
                     content = template_file.read()
                 if filename.endswith(extensions) or filename in extra_files:
                     content = content.decode('utf-8')
-                    template = Template(content)
+                    template = Engine().from_string(content)
                     content = template.render(context)
                     content = content.encode('utf-8')
                 with open(new_path, 'wb') as new_file:
@@ -178,8 +175,7 @@ class TemplateCommand(BaseCommand):
                 if path.isfile(path_to_remove):
                     os.remove(path_to_remove)
                 else:
-                    shutil.rmtree(path_to_remove,
-                                  onerror=rmtree_errorhandler)
+                    shutil.rmtree(path_to_remove)
 
     def handle_template(self, template, subdir):
         """
@@ -266,7 +262,7 @@ class TemplateCommand(BaseCommand):
                 guessed_filename += ext
 
         # Move the temporary file to a filename that has better
-        # chances of being recognnized by the archive utils
+        # chances of being recognized by the archive utils
         if used_name != guessed_filename:
             guessed_path = path.join(tempdir, guessed_filename)
             shutil.move(the_path, guessed_path)

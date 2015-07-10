@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <prudhviy@gmail.com>, 2011.
+# bhaskar teja yerneni <prudhviy@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: bhaskar teja yerneni <prudhviy@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Telugu (http://www.transifex.com/projects/p/django/language/"
 "te/)\n"
 "MIME-Version: 1.0\n"
@@ -18,153 +18,130 @@ msgstr ""
 "Language: te\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "ఆందుబాతులోఉన్న %s "
 
-#: static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "వడపోత"
 
-#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "అన్నీ ఎన్నుకోండి"
 
-#: static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "తీసివేయండి"
 
-#: static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "ఎన్నుకున్న %s"
 
-#: static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr ""
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] ""
 msgstr[1] ""
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 
-#: static/admin/js/calendar.js:26
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Now"
+msgstr "ఇప్పుడు"
+
+msgid "Clock"
+msgstr "గడియారము"
+
+msgid "Choose a time"
+msgstr "ఒక సమయము ఎన్నుకోండి"
+
+msgid "Midnight"
+msgstr "ఆర్ధరాత్రి"
+
+msgid "6 a.m."
+msgstr "6 a.m"
+
+msgid "Noon"
+msgstr "మధ్యాహ్నము"
+
+msgid "Cancel"
+msgstr "రద్దు చేయు"
+
+msgid "Today"
+msgstr "ఈనాడు"
+
+msgid "Calendar"
+msgstr "కాలెండర్"
+
+msgid "Yesterday"
+msgstr "నిన్న"
+
+msgid "Tomorrow"
+msgstr "రేపు"
+
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr "ఙాన్వరి ఫిబ్రవరి మార్చి ఎప్రిల్ మే ఙూను ఙులై ఆగష్టు సెప్టెంబర్ అక్టోబర్ నవంబర్ డిసెంబర్"
 
-#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "ఆ సో మం భు గు శు శ"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "చూపించుము"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "దాచు"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "ఇప్పుడు"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "గడియారము"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "ఒక సమయము ఎన్నుకోండి"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "ఆర్ధరాత్రి"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 a.m"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "మధ్యాహ్నము"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "రద్దు చేయు"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "ఈనాడు"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "కాలెండర్"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "నిన్న"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "రేపు"

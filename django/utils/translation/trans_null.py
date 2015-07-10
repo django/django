@@ -4,7 +4,6 @@
 
 from django.conf import settings
 from django.utils.encoding import force_text
-from django.utils.safestring import mark_safe, SafeData
 
 
 def ngettext(singular, plural, number):
@@ -31,23 +30,9 @@ get_language = lambda: settings.LANGUAGE_CODE
 get_language_bidi = lambda: settings.LANGUAGE_CODE in settings.LANGUAGES_BIDI
 check_for_language = lambda x: True
 
-# date formats shouldn't be used using gettext anymore. This
-# is kept for backward compatibility
-TECHNICAL_ID_MAP = {
-    "DATE_WITH_TIME_FULL": settings.DATETIME_FORMAT,
-    "DATE_FORMAT": settings.DATE_FORMAT,
-    "DATETIME_FORMAT": settings.DATETIME_FORMAT,
-    "TIME_FORMAT": settings.TIME_FORMAT,
-    "YEAR_MONTH_FORMAT": settings.YEAR_MONTH_FORMAT,
-    "MONTH_DAY_FORMAT": settings.MONTH_DAY_FORMAT,
-}
-
 
 def gettext(message):
-    result = TECHNICAL_ID_MAP.get(message, message)
-    if isinstance(message, SafeData):
-        return mark_safe(result)
-    return result
+    return message
 
 
 def ugettext(message):
@@ -68,5 +53,5 @@ def get_language_from_request(request, check_path=False):
     return settings.LANGUAGE_CODE
 
 
-def get_language_from_path(request, supported=None):
+def get_language_from_path(request):
     return None

@@ -2,10 +2,9 @@
 Geographic Sitemaps
 ===================
 
-Google's sitemap protocol used to include geospatial content support. [#]_
-This included the addition of the ``<url>`` child element
-``<geo:geo>``, which tells Google that the content located at the URL is
-geographic in nature. This is now obsolete.
+KML is an XML language focused on geographic visualization [#]_. ``KMLSitemap``
+and its compressed counterpart ``KMZSitemap`` allow you to present geolocated
+data in a machine-readable format.
 
 Example
 =======
@@ -19,8 +18,5 @@ Reference
 ``KMZSitemap``
 --------------
 
-``GeoRSSSitemap``
------------------
-
 .. rubric:: Footnotes
-.. [#] Google, Inc., `What is a Geo Sitemap? <http://support.google.com/webmasters/bin/answer.py?answer=94555>`_.
+.. [#] http://www.opengeospatial.org/standards/kml

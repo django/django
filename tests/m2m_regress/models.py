@@ -54,13 +54,17 @@ class SelfReferChildSibling(SelfRefer):
 
 
 # Many-to-Many relation between models, where one of the PK's isn't an Autofield
+@python_2_unicode_compatible
 class Line(models.Model):
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Worksheet(models.Model):
     id = models.CharField(primary_key=True, max_length=100)
-    lines = models.ManyToManyField(Line, blank=True, null=True)
+    lines = models.ManyToManyField(Line, blank=True)
 
 
 # Regression for #11226 -- A model with the same name that another one to
@@ -87,3 +91,10 @@ class RegressionModelSplit(BadModelWithSplit):
     Model with a split method should not cause an error in add_lazy_relation
     """
     others = models.ManyToManyField('self')
+
+
+# Regression for #24505 -- Two ManyToManyFields with the same "to" model
+# and related_name set to '+'.
+class Post(models.Model):
+    primary_lines = models.ManyToManyField(Line, related_name='+')
+    secondary_lines = models.ManyToManyField(Line, related_name='+')

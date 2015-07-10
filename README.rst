@@ -2,8 +2,8 @@ Django is a high-level Python Web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
 All documentation is in the "docs" directory and online at
-http://docs.djangoproject.com/en/dev/. If you're just getting started, here's
-how we recommend you read the docs:
+https://docs.djangoproject.com/en/stable/. If you're just getting started,
+here's how we recommend you read the docs:
 
 * First, read docs/intro/install.txt for instructions on installing Django.
 
@@ -19,11 +19,9 @@ how we recommend you read the docs:
 
 * See docs/README for instructions on building an HTML version of the docs.
 
-Docs are updated rigorously. If you find any problems in the docs, or think they
-should be clarified in any way, please take 30 seconds to fill out a ticket
-here:
-
-http://code.djangoproject.com/newticket
+Docs are updated rigorously. If you find any problems in the docs, or think
+they should be clarified in any way, please take 30 seconds to fill out a
+ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
@@ -31,12 +29,12 @@ To get more help:
   there. Read the archives at http://django-irc-logs.com/.
 
 * Join the django-users mailing list, or read the archives, at
-  http://groups.google.com/group/django-users.
+  https://groups.google.com/group/django-users.
 
 To contribute to Django:
 
-* Check out http://www.djangoproject.com/community/ for information about
-  getting involved.
+* Check out https://docs.djangoproject.com/en/dev/internals/contributing/ for
+  information about getting involved.
 
 To run Django's test suite:
 

@@ -8,8 +8,8 @@ or output.
 
 Each middleware component is responsible for doing some specific function. For
 example, Django includes a middleware component,
-:class:`~django.middleware.transaction.TransactionMiddleware`, that wraps the
-processing of each HTTP request in a database transaction.
+:class:`~django.contrib.auth.middleware.AuthenticationMiddleware`, that
+associates users with requests using sessions.
 
 This document explains how middleware works, how you activate middleware, and
 how to write your own middleware. Django ships with some built-in middleware
@@ -20,21 +20,23 @@ Activating middleware
 =====================
 
 To activate a middleware component, add it to the
-:setting:`MIDDLEWARE_CLASSES` tuple in your Django settings.
+:setting:`MIDDLEWARE_CLASSES` list in your Django settings.
 
 In :setting:`MIDDLEWARE_CLASSES`, each middleware component is represented by
 a string: the full Python path to the middleware's class name. For example,
-here's the default value created by :djadmin:`django-admin.py startproject
+here's the default value created by :djadmin:`django-admin startproject
 <startproject>`::
 
-    MIDDLEWARE_CLASSES = (
+    MIDDLEWARE_CLASSES = [
+        'django.middleware.security.SecurityMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    )
+    ]
 
 A Django installation doesn't require any middleware —
 :setting:`MIDDLEWARE_CLASSES` can be empty, if you'd like — but it's strongly
@@ -45,7 +47,9 @@ The order in :setting:`MIDDLEWARE_CLASSES` matters because a middleware can
 depend on other middleware. For instance,
 :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` stores the
 authenticated user in the session; therefore, it must run after
-:class:`~django.contrib.sessions.middleware.SessionMiddleware`.
+:class:`~django.contrib.sessions.middleware.SessionMiddleware`. See
+:ref:`middleware-ordering` for some common hints about ordering of Django
+middleware classes.
 
 Hooks and application order
 ===========================
@@ -85,7 +89,7 @@ Python class that defines one or more of the following methods:
 ``process_request``
 -------------------
 
-.. method:: process_request(self, request)
+.. method:: process_request(request)
 
 ``request`` is an :class:`~django.http.HttpRequest` object.
 
@@ -106,7 +110,7 @@ return the result.
 ``process_view``
 ----------------
 
-.. method:: process_view(self, request, view_func, view_args, view_kwargs)
+.. method:: process_view(request, view_func, view_args, view_kwargs)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``view_func`` is
 the Python function that Django is about to use. (It's the actual function
@@ -128,12 +132,11 @@ view; it'll apply response middleware to that
 
 .. note::
 
-    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` or
-    :attr:`request.REQUEST <django.http.HttpRequest.REQUEST>` inside middleware
-    from ``process_request`` or ``process_view`` will prevent any view running
-    after the middleware from being able to :ref:`modify the upload handlers
-    for the request <modifying_upload_handlers_on_the_fly>`, and should
-    normally be avoided.
+    Accessing :attr:`request.POST <django.http.HttpRequest.POST>` inside
+    middleware from ``process_request`` or ``process_view`` will prevent any
+    view running after the middleware from being able to :ref:`modify the
+    upload handlers for the request <modifying_upload_handlers_on_the_fly>`,
+    and should normally be avoided.
 
     The :class:`~django.middleware.csrf.CsrfViewMiddleware` class can be
     considered an exception, as it provides the
@@ -146,7 +149,7 @@ view; it'll apply response middleware to that
 ``process_template_response``
 -----------------------------
 
-.. method:: process_template_response(self, request, response)
+.. method:: process_template_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
 the :class:`~django.template.response.TemplateResponse` object (or equivalent)
@@ -173,7 +176,7 @@ includes ``process_template_response()``.
 ``process_response``
 --------------------
 
-.. method:: process_response(self, request, response)
+.. method:: process_response(request, response)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``response`` is
 the :class:`~django.http.HttpResponse` or
@@ -221,7 +224,7 @@ must test for streaming responses and adjust their behavior accordingly::
     Response middleware may wrap it in a new generator, but must not consume
     it. Wrapping is typically implemented as follows::
 
-        def wrap_streaming_content(content)
+        def wrap_streaming_content(content):
             for chunk in content:
                 yield alter_content(chunk)
 
@@ -230,7 +233,7 @@ must test for streaming responses and adjust their behavior accordingly::
 ``process_exception``
 ---------------------
 
-.. method:: process_exception(self, request, exception)
+.. method:: process_exception(request, exception)
 
 ``request`` is an :class:`~django.http.HttpRequest` object. ``exception`` is an
 ``Exception`` object raised by the view function.
@@ -267,7 +270,14 @@ Marking middleware as unused
 It's sometimes useful to determine at run-time whether a piece of middleware
 should be used. In these cases, your middleware's ``__init__`` method may
 raise :exc:`django.core.exceptions.MiddlewareNotUsed`. Django will then remove
-that piece of middleware from the middleware process.
+that piece of middleware from the middleware process and a debug message will
+be logged to the ``django.request`` logger when :setting:`DEBUG` is set to
+``True``.
+
+.. versionchanged:: 1.8
+
+    Previously, :exc:`~django.core.exceptions.MiddlewareNotUsed` exceptions
+    weren't logged.
 
 Guidelines
 ----------

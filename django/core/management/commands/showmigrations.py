@@ -1,0 +1,116 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.core.management.base import BaseCommand, CommandError
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.migrations.loader import MigrationLoader
+
+
+class Command(BaseCommand):
+    help = "Shows all available migrations for the current project"
+
+    def add_arguments(self, parser):
+        parser.add_argument('app_labels', nargs='*',
+            help='App labels of applications to limit the output to.')
+        parser.add_argument('--database', action='store', dest='database', default=DEFAULT_DB_ALIAS,
+            help='Nominates a database to synchronize. Defaults to the "default" database.')
+
+        formats = parser.add_mutually_exclusive_group()
+        formats.add_argument('--list', '-l', action='store_const', dest='format', const='list',
+            help='Shows a list of all migrations and which are applied.')
+        formats.add_argument('--plan', '-p', action='store_const', dest='format', const='plan',
+            help='Shows all migrations in the order they will be applied.')
+
+        parser.set_defaults(format='list')
+
+    def handle(self, *args, **options):
+        self.verbosity = options.get('verbosity')
+
+        # Get the database we're operating from
+        db = options.get('database')
+        connection = connections[db]
+
+        if options['format'] == "plan":
+            return self.show_plan(connection)
+        else:
+            return self.show_list(connection, options['app_labels'])
+
+    def show_list(self, connection, app_names=None):
+        """
+        Shows a list of all migrations on the system, or only those of
+        some named apps.
+        """
+        # Load migrations from disk/DB
+        loader = MigrationLoader(connection, ignore_no_migrations=True)
+        graph = loader.graph
+        # If we were passed a list of apps, validate it
+        if app_names:
+            invalid_apps = []
+            for app_name in app_names:
+                if app_name not in loader.migrated_apps:
+                    invalid_apps.append(app_name)
+            if invalid_apps:
+                raise CommandError("No migrations present for: %s" % (", ".join(invalid_apps)))
+        # Otherwise, show all apps in alphabetic order
+        else:
+            app_names = sorted(loader.migrated_apps)
+        # For each app, print its migrations in order from oldest (roots) to
+        # newest (leaves).
+        for app_name in app_names:
+            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+            shown = set()
+            for node in graph.leaf_nodes(app_name):
+                for plan_node in graph.forwards_plan(node):
+                    if plan_node not in shown and plan_node[0] == app_name:
+                        # Give it a nice title if it's a squashed one
+                        title = plan_node[1]
+                        if graph.nodes[plan_node].replaces:
+                            title += " (%s squashed migrations)" % len(graph.nodes[plan_node].replaces)
+                        # Mark it as applied/unapplied
+                        if plan_node in loader.applied_migrations:
+                            self.stdout.write(" [X] %s" % title)
+                        else:
+                            self.stdout.write(" [ ] %s" % title)
+                        shown.add(plan_node)
+            # If we didn't print anything, then a small message
+            if not shown:
+                self.stdout.write(" (no migrations)", self.style.MIGRATE_FAILURE)
+
+    def show_plan(self, connection):
+        """
+        Shows all known migrations in the order they will be applied
+        """
+        # Load migrations from disk/DB
+        loader = MigrationLoader(connection)
+        graph = loader.graph
+        targets = graph.leaf_nodes()
+        plan = []
+        seen = set()
+
+        # Generate the plan
+        for target in targets:
+            for migration in graph.forwards_plan(target):
+                if migration not in seen:
+                    plan.append(graph.nodes[migration])
+                    seen.add(migration)
+
+        # Output
+        def print_deps(migration):
+            out = []
+            for dep in migration.dependencies:
+                if dep[1] == "__first__":
+                    roots = graph.root_nodes(dep[0])
+                    dep = roots[0] if roots else (dep[0], "__first__")
+                out.append("%s.%s" % dep)
+            if out:
+                return " ... (%s)" % ", ".join(out)
+            return ""
+
+        for migration in plan:
+            deps = ""
+            if self.verbosity >= 2:
+                deps = print_deps(migration)
+            if (migration.app_label, migration.name) in loader.applied_migrations:
+                self.stdout.write("[X]  %s%s" % (migration, deps))
+            else:
+                self.stdout.write("[ ]  %s%s" % (migration, deps))

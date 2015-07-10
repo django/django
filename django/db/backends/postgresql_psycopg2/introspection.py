@@ -1,7 +1,13 @@
 from __future__ import unicode_literals
 
-from django.db.backends import BaseDatabaseIntrospection, FieldInfo
+from collections import namedtuple
+
+from django.db.backends.base.introspection import (
+    BaseDatabaseIntrospection, FieldInfo, TableInfo,
+)
 from django.utils.encoding import force_text
+
+FieldInfo = namedtuple('FieldInfo', FieldInfo._fields + ('default',))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -28,46 +34,68 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     ignored_tables = []
 
+    _get_indexes_query = """
+        SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+        WHERE c.oid = idx.indrelid
+            AND idx.indexrelid = c2.oid
+            AND attr.attrelid = c.oid
+            AND attr.attnum = idx.indkey[0]
+            AND c.relname = %s"""
+
+    def get_field_type(self, data_type, description):
+        field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
+        if field_type == 'IntegerField' and description.default and 'nextval' in description.default:
+            return 'AutoField'
+        return field_type
+
     def get_table_list(self, cursor):
-        "Returns a list of table names in the current database."
+        """
+        Returns a list of table and view names in the current database.
+        """
         cursor.execute("""
-            SELECT c.relname
+            SELECT c.relname, c.relkind
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-            WHERE c.relkind IN ('r', 'v', '')
+            WHERE c.relkind IN ('r', 'v')
                 AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
                 AND pg_catalog.pg_table_is_visible(c.oid)""")
-        return [row[0] for row in cursor.fetchall() if row[0] not in self.ignored_tables]
+        return [TableInfo(row[0], {'r': 't', 'v': 'v'}.get(row[1]))
+                for row in cursor.fetchall()
+                if row[0] not in self.ignored_tables]
 
     def get_table_description(self, cursor, table_name):
         "Returns a description of the table, with the DB-API cursor.description interface."
         # As cursor.description does not return reliably the nullable property,
         # we have to query the information_schema (#7783)
         cursor.execute("""
-            SELECT column_name, is_nullable
+            SELECT column_name, is_nullable, column_default
             FROM information_schema.columns
             WHERE table_name = %s""", [table_name])
-        null_map = dict(cursor.fetchall())
+        field_map = {line[0]: line[1:] for line in cursor.fetchall()}
         cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
-        return [FieldInfo(*((force_text(line[0]),) + line[1:6] + (null_map[force_text(line[0])] == 'YES',)))
+        return [FieldInfo(*((force_text(line[0]),) + line[1:6]
+                            + (field_map[force_text(line[0])][0] == 'YES', field_map[force_text(line[0])][1])))
                 for line in cursor.description]
 
     def get_relations(self, cursor, table_name):
         """
-        Returns a dictionary of {field_index: (field_index_other_table, other_table)}
-        representing all relationships to the given table. Indexes are 0-based.
+        Returns a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all relationships to the given table.
         """
         cursor.execute("""
-            SELECT con.conkey, con.confkey, c2.relname
-            FROM pg_constraint con, pg_class c1, pg_class c2
-            WHERE c1.oid = con.conrelid
-                AND c2.oid = con.confrelid
-                AND c1.relname = %s
+            SELECT c2.relname, a1.attname, a2.attname
+            FROM pg_constraint con
+            LEFT JOIN pg_class c1 ON con.conrelid = c1.oid
+            LEFT JOIN pg_class c2 ON con.confrelid = c2.oid
+            LEFT JOIN pg_attribute a1 ON c1.oid = a1.attrelid AND a1.attnum = con.conkey[1]
+            LEFT JOIN pg_attribute a2 ON c2.oid = a2.attrelid AND a2.attnum = con.confkey[1]
+            WHERE c1.relname = %s
                 AND con.contype = 'f'""", [table_name])
         relations = {}
         for row in cursor.fetchall():
-            # row[0] and row[1] are single-item lists, so grab the single item.
-            relations[row[0][0] - 1] = (row[1][0] - 1, row[2])
+            relations[row[1]] = (row[2], row[0])
         return relations
 
     def get_key_columns(self, cursor, table_name):
@@ -90,15 +118,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     def get_indexes(self, cursor, table_name):
         # This query retrieves each index on the given table, including the
         # first associated field name
-        cursor.execute("""
-            SELECT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
-            FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
-                pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
-            WHERE c.oid = idx.indrelid
-                AND idx.indexrelid = c2.oid
-                AND attr.attrelid = c.oid
-                AND attr.attnum = idx.indkey[0]
-                AND c.relname = %s""", [table_name])
+        cursor.execute(self._get_indexes_query, [table_name])
         indexes = {}
         for row in cursor.fetchall():
             # row[1] (idx.indkey) is stored in the DB as an array. It comes out as
@@ -128,7 +148,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 kc.constraint_name,
                 kc.column_name,
                 c.constraint_type,
-                array(SELECT table_name::text || '.' || column_name::text FROM information_schema.constraint_column_usage WHERE constraint_name = kc.constraint_name)
+                array(SELECT table_name::text || '.' || column_name::text
+                      FROM information_schema.constraint_column_usage
+                      WHERE constraint_name = kc.constraint_name)
             FROM information_schema.key_column_usage AS kc
             JOIN information_schema.table_constraints AS c ON
                 kc.table_schema = c.table_schema AND

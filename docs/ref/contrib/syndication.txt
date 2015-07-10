@@ -77,14 +77,14 @@ a feed of the latest five news items::
 To connect a URL to this feed, put an instance of the Feed object in
 your :doc:`URLconf </topics/http/urls>`. For example::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from myproject.feeds import LatestEntriesFeed
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ...
-        (r'^latest/feed/$', LatestEntriesFeed()),
+        url(r'^latest/feed/$', LatestEntriesFeed()),
         # ...
-    )
+    ]
 
 Note:
 
@@ -118,7 +118,7 @@ into those elements.
   both.
 
   If you want to do any special formatting for either the title or
-  description, :doc:`Django templates </topics/templates>` can be used
+  description, :doc:`Django templates </ref/templates/language>` can be used
   instead. Their paths can be specified with the ``title_template`` and
   ``description_template`` attributes on the
   :class:`~django.contrib.syndication.views.Feed` class. The templates are
@@ -131,15 +131,13 @@ into those elements.
     representing the current site. This is useful for ``{{ site.domain
     }}`` or ``{{ site.name }}``. If you do *not* have the Django sites
     framework installed, this will be set to a
-    :class:`django.contrib.sites.models.RequestSite` object. See the
+    :class:`~django.contrib.sites.requests.RequestSite` object. See the
     :ref:`RequestSite section of the sites framework documentation
     <requestsite-objects>` for more.
 
   See `a complex example`_ below that uses a description template.
 
-  .. method:: Feed.get_context_data(self, **kwargs)
-
-    .. versionadded:: 1.6
+  .. method:: Feed.get_context_data(**kwargs)
 
       There is also a way to pass additional information to title and description
       templates, if you need to supply more than the two variables mentioned
@@ -219,14 +217,14 @@ The police beat feeds could be accessible via URLs like this:
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
-    (r'^beats/(?P<beat_id>\d+)/rss/$', BeatFeed()),
+    url(r'^beats/(?P<beat_id>[0-9]+)/rss/$', BeatFeed()),
 
 Like a view, the arguments in the URL are passed to the ``get_object()``
 method along with the request object.
 
 Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication.views import FeedDoesNotExist
+    from django.contrib.syndication.views import Feed
     from django.shortcuts import get_object_or_404
 
     class BeatFeed(Feed):
@@ -368,15 +366,15 @@ Here's a full example::
 
 And the accompanying URLconf::
 
-    from django.conf.urls import patterns
+    from django.conf.urls import url
     from myproject.feeds import RssSiteNewsFeed, AtomSiteNewsFeed
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ...
-        (r'^sitenews/rss/$', RssSiteNewsFeed()),
-        (r'^sitenews/atom/$', AtomSiteNewsFeed()),
+        url(r'^sitenews/rss/$', RssSiteNewsFeed()),
+        url(r'^sitenews/atom/$', AtomSiteNewsFeed()),
         # ...
-    )
+    ]
 
 Feed class reference
 --------------------
@@ -921,7 +919,10 @@ They share this interface:
     ``self.feed`` for use with `custom feed generators`_.
 
     All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects.
+    should be a sequence of Unicode objects. Beware that some control characters
+    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    in XML documents. If your content has some of them, you might encounter a
+    :exc:`ValueError` when producing the feed.
 
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
@@ -956,10 +957,6 @@ They share this interface:
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
 
-    .. versionadded:: 1.7
-
-        The optional ``updateddate`` argument was added.
-
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.
 
@@ -971,16 +968,16 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     >>> from django.utils import feedgenerator
     >>> from datetime import datetime
     >>> f = feedgenerator.Atom1Feed(
-    ...     title=u"My Weblog",
-    ...     link=u"http://www.example.com/",
-    ...     description=u"In which I write about what I ate today.",
-    ...     language=u"en",
-    ...     author_name=u"Myself",
-    ...     feed_url=u"http://example.com/atom.xml")
-    >>> f.add_item(title=u"Hot dog today",
-    ...     link=u"http://www.example.com/entries/1/",
+    ...     title="My Weblog",
+    ...     link="http://www.example.com/",
+    ...     description="In which I write about what I ate today.",
+    ...     language="en",
+    ...     author_name="Myself",
+    ...     feed_url="http://example.com/atom.xml")
+    >>> f.add_item(title="Hot dog today",
+    ...     link="http://www.example.com/entries/1/",
     ...     pubdate=datetime.now(),
-    ...     description=u"<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
+    ...     description="<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
     >>> print(f.writeString('UTF-8'))
     <?xml version="1.0" encoding="UTF-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">

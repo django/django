@@ -1,5 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
-    url(r'^guitarists/(\w{1,50})/$', 'unimplemented_view_placeholder', name='guitarist_detail'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^guitarists/(\w{1,50})/$', views.empty_view, name='guitarist_detail'),
+]

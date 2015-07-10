@@ -1,10 +1,14 @@
-from django.contrib.contenttypes import generic
+import uuid
+
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-## Basic tests
 
+# Basic tests
 
 @python_2_unicode_compatible
 class Author(models.Model):
@@ -64,6 +68,11 @@ class BookWithYear(Book):
         AuthorWithAge, related_name='books_with_year')
 
 
+class Bio(models.Model):
+    author = models.OneToOneField(Author)
+    books = models.ManyToManyField(Book, blank=True)
+
+
 @python_2_unicode_compatible
 class Reader(models.Model):
     name = models.CharField(max_length=50)
@@ -80,8 +89,8 @@ class BookReview(models.Model):
     book = models.ForeignKey(BookWithYear)
     notes = models.TextField(null=True, blank=True)
 
-## Models for default manager tests
 
+# Models for default manager tests
 
 class Qualification(models.Model):
     name = models.CharField(max_length=10)
@@ -117,22 +126,22 @@ class Department(models.Model):
         ordering = ['id']
 
 
-## GenericRelation/GenericForeignKey tests
+# GenericRelation/GenericForeignKey tests
 
 @python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
     content_type = models.ForeignKey(ContentType, related_name="taggeditem_set2")
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
     created_by_ct = models.ForeignKey(ContentType, null=True,
                                       related_name='taggeditem_set3')
     created_by_fkey = models.PositiveIntegerField(null=True)
-    created_by = generic.GenericForeignKey('created_by_ct', 'created_by_fkey',)
+    created_by = GenericForeignKey('created_by_ct', 'created_by_fkey',)
     favorite_ct = models.ForeignKey(ContentType, null=True,
                                     related_name='taggeditem_set4')
     favorite_fkey = models.CharField(max_length=64, null=True)
-    favorite = generic.GenericForeignKey('favorite_ct', 'favorite_fkey')
+    favorite = GenericForeignKey('favorite_ct', 'favorite_fkey')
 
     def __str__(self):
         return self.tag
@@ -143,11 +152,11 @@ class TaggedItem(models.Model):
 
 class Bookmark(models.Model):
     url = models.URLField()
-    tags = generic.GenericRelation(TaggedItem, related_name='bookmarks')
-    favorite_tags = generic.GenericRelation(TaggedItem,
+    tags = GenericRelation(TaggedItem, related_query_name='bookmarks')
+    favorite_tags = GenericRelation(TaggedItem,
                                     content_type_field='favorite_ct',
                                     object_id_field='favorite_fkey',
-                                    related_name='favorite_bookmarks')
+                                    related_query_name='favorite_bookmarks')
 
     class Meta:
         ordering = ['id']
@@ -159,18 +168,19 @@ class Comment(models.Model):
     # Content-object field
     content_type = models.ForeignKey(ContentType)
     object_pk = models.TextField()
-    content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
+    content_object = GenericForeignKey(ct_field="content_type", fk_field="object_pk")
 
     class Meta:
         ordering = ['id']
 
 
-## Models for lookup ordering tests
-
+# Models for lookup ordering tests
 
 class House(models.Model):
+    name = models.CharField(max_length=50)
     address = models.CharField(max_length=255)
     owner = models.ForeignKey('Person', null=True)
+    main_room = models.OneToOneField('Room', related_name='main_room_of', null=True)
 
     class Meta:
         ordering = ['id']
@@ -193,11 +203,15 @@ class Person(models.Model):
         # Assume business logic forces every person to have at least one house.
         return sorted(self.houses.all(), key=lambda house: -house.rooms.count())[0]
 
+    @property
+    def all_houses(self):
+        return list(self.houses.all())
+
     class Meta:
         ordering = ['id']
 
 
-## Models for nullable FK tests
+# Models for nullable FK tests
 
 @python_2_unicode_compatible
 class Employee(models.Model):
@@ -212,7 +226,7 @@ class Employee(models.Model):
         ordering = ['id']
 
 
-### Ticket 19607
+# Ticket #19607
 
 @python_2_unicode_compatible
 class LessonEntry(models.Model):
@@ -230,3 +244,33 @@ class WordEntry(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.id)
+
+
+# Ticket #21410: Regression when related_name="+"
+
+@python_2_unicode_compatible
+class Author2(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    first_book = models.ForeignKey('Book', related_name='first_time_authors+')
+    favorite_books = models.ManyToManyField('Book', related_name='+')
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['id']
+
+
+# Models for many-to-many with UUID pk test:
+
+class Pet(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=20)
+    people = models.ManyToManyField(Person, related_name='pets')
+
+
+class Flea(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    current_room = models.ForeignKey(Room, related_name='fleas', null=True)
+    pets_visited = models.ManyToManyField(Pet, related_name='fleas_hosted')
+    people_visited = models.ManyToManyField(Person, related_name='fleas_hosted')

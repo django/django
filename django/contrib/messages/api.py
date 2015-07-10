@@ -1,10 +1,12 @@
 from django.contrib.messages import constants
 from django.contrib.messages.storage import default_storage
+from django.http import HttpRequest
 
 __all__ = (
     'add_message', 'get_messages',
     'get_level', 'set_level',
     'debug', 'info', 'success', 'warning', 'error',
+    'MessageFailure',
 )
 
 
@@ -16,6 +18,9 @@ def add_message(request, level, message, extra_tags='', fail_silently=False):
     """
     Attempts to add a message to the request using the 'messages' app.
     """
+    if not isinstance(request, HttpRequest):
+        raise TypeError("add_message() argument must be an HttpRequest object, "
+                        "not '%s'." % request.__class__.__name__)
     if hasattr(request, '_messages'):
         return request._messages.add(level, message, extra_tags)
     if not fail_silently:

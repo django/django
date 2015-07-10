@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Person, Movie, Event, Screening, ScreeningNullFK, Package, PackageNullFK
+from .models import (
+    Event, Movie, Package, PackageNullFK, Person, Screening, ScreeningNullFK,
+)
 
 
 # These are tests for #16715. The basic scheme is always the same: 3 models with
@@ -31,7 +33,7 @@ class NestedForeignKeysTests(TestCase):
 
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
-    def testInheritance(self):
+    def test_inheritance(self):
         Event.objects.create()
         Screening.objects.create(movie=self.movie)
 
@@ -52,7 +54,7 @@ class NestedForeignKeysTests(TestCase):
         self.assertEqual(Event.objects.exclude(screening__movie=self.movie).count(), 1)
 
     # These all work because the second foreign key in the chain has null=True.
-    def testInheritanceNullFK(self):
+    def test_inheritance_null_FK(self):
         Event.objects.create()
         ScreeningNullFK.objects.create(movie=None)
         ScreeningNullFK.objects.create(movie=self.movie)
@@ -79,7 +81,7 @@ class NestedForeignKeysTests(TestCase):
 
     # This test failed in #16715 because in some cases INNER JOIN was selected
     # for the second foreign key relation instead of LEFT OUTER JOIN.
-    def testExplicitForeignKey(self):
+    def test_explicit_ForeignKey(self):
         Package.objects.create()
         screening = Screening.objects.create(movie=self.movie)
         Package.objects.create(screening=screening)
@@ -99,7 +101,7 @@ class NestedForeignKeysTests(TestCase):
         self.assertEqual(Package.objects.exclude(screening__movie=self.movie).count(), 1)
 
     # These all work because the second foreign key in the chain has null=True.
-    def testExplicitForeignKeyNullFK(self):
+    def test_explicit_ForeignKey_NullFK(self):
         PackageNullFK.objects.create()
         screening = ScreeningNullFK.objects.create(movie=None)
         screening_with_movie = ScreeningNullFK.objects.create(movie=self.movie)
@@ -128,7 +130,7 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.director = Person.objects.create(name='Terry Gilliam / Terry Jones')
         self.movie = Movie.objects.create(title='Monty Python and the Holy Grail', director=self.director)
 
-    def testInheritance(self):
+    def test_inheritance(self):
         Event.objects.create()
         Screening.objects.create(movie=self.movie)
 
@@ -147,7 +149,7 @@ class DeeplyNestedForeignKeysTests(TestCase):
         self.assertEqual(Event.objects.filter(screening__movie__director=self.director).count(), 1)
         self.assertEqual(Event.objects.exclude(screening__movie__director=self.director).count(), 1)
 
-    def testExplicitForeignKey(self):
+    def test_explicit_ForeignKey(self):
         Package.objects.create()
         screening = Screening.objects.create(movie=self.movie)
         Package.objects.create(screening=screening)

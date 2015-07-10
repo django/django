@@ -13,11 +13,14 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousMultipartForm
+from django.core.files.uploadhandler import (
+    SkipFile, StopFutureHandlers, StopUpload,
+)
+from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
-from django.utils import six
+from django.utils.six.moves.urllib.parse import unquote
 from django.utils.text import unescape_entities
-from django.core.files.uploadhandler import StopUpload, SkipFile, StopFutureHandlers
 
 __all__ = ('MultiPartParser', 'MultiPartParserError', 'InputStreamExhausted')
 
@@ -62,7 +65,7 @@ class MultiPartParser(object):
         """
 
         #
-        # Content-Type should containt multipart and the boundary information.
+        # Content-Type should contain multipart and the boundary information.
         #
 
         content_type = META.get('HTTP_CONTENT_TYPE', META.get('CONTENT_TYPE', ''))
@@ -205,14 +208,19 @@ class MultiPartParser(object):
                         for chunk in field_stream:
                             if transfer_encoding == 'base64':
                                 # We only special-case base64 transfer encoding
-                                # We should always read base64 streams by multiple of 4
-                                over_bytes = len(chunk) % 4
-                                if over_bytes:
-                                    over_chunk = field_stream.read(4 - over_bytes)
-                                    chunk += over_chunk
+                                # We should always decode base64 chunks by multiple of 4,
+                                # ignoring whitespace.
+
+                                stripped_chunk = b"".join(chunk.split())
+
+                                remaining = len(stripped_chunk) % 4
+                                while remaining != 0:
+                                    over_chunk = field_stream.read(4 - remaining)
+                                    stripped_chunk += b"".join(over_chunk.split())
+                                    remaining = len(stripped_chunk) % 4
 
                                 try:
-                                    chunk = base64.b64decode(chunk)
+                                    chunk = base64.b64decode(stripped_chunk)
                                 except Exception as e:
                                     # Since this is only a chunk, any error is an unfixable error.
                                     msg = "Could not decode base64 data: %r" % e
@@ -228,6 +236,7 @@ class MultiPartParser(object):
                                     break
 
                     except SkipFile:
+                        self._close_files()
                         # Just use up the rest of this file...
                         exhaust(field_stream)
                     else:
@@ -237,6 +246,7 @@ class MultiPartParser(object):
                     # If this is neither a FIELD or a FILE, just exhaust the stream.
                     exhaust(stream)
         except StopUpload as e:
+            self._close_files()
             if not e.connection_reset:
                 exhaust(self._input_data)
         else:
@@ -253,21 +263,28 @@ class MultiPartParser(object):
 
     def handle_file_complete(self, old_field_name, counters):
         """
-        Handle all the signalling that takes place when a file is complete.
+        Handle all the signaling that takes place when a file is complete.
         """
         for i, handler in enumerate(self._upload_handlers):
             file_obj = handler.file_complete(counters[i])
             if file_obj:
                 # If it returns a file object, then set the files dict.
-                self._files.appendlist(force_text(old_field_name,
-                                                     self._encoding,
-                                                     errors='replace'),
-                                       file_obj)
+                self._files.appendlist(
+                    force_text(old_field_name, self._encoding, errors='replace'),
+                    file_obj)
                 break
 
     def IE_sanitize(self, filename):
         """Cleanup filename from Internet Explorer full paths."""
         return filename and filename[filename.rfind("\\") + 1:].strip()
+
+    def _close_files(self):
+        # Free up all file handles.
+        # FIXME: this currently assumes that upload handlers store the file as 'file'
+        # We should document that... (Maybe add handler.free_file to complement new_file)
+        for handler in self._upload_handlers:
+            if hasattr(handler, 'file'):
+                handler.file.close()
 
 
 class LazyStream(six.Iterator):
@@ -310,12 +327,15 @@ class LazyStream(six.Iterator):
             while remaining != 0:
                 assert remaining > 0, 'remaining bytes to read should never go negative'
 
-                chunk = next(self)
-
-                emitting = chunk[:remaining]
-                self.unget(chunk[remaining:])
-                remaining -= len(emitting)
-                yield emitting
+                try:
+                    chunk = next(self)
+                except StopIteration:
+                    return
+                else:
+                    emitting = chunk[:remaining]
+                    self.unget(chunk[remaining:])
+                    remaining -= len(emitting)
+                    yield emitting
 
         out = b''.join(parts())
         return out
@@ -485,7 +505,7 @@ class BoundaryIter(six.Iterator):
             self._done = True
             return chunk[:end]
         else:
-            # make sure we dont treat a partial boundary (and
+            # make sure we don't treat a partial boundary (and
             # its separators) as data
             if not chunk[:-rollback]:  # and len(chunk) >= (len(self._boundary) + 6):
                 # There's nothing left, we should just return and mark as done.
@@ -499,7 +519,7 @@ class BoundaryIter(six.Iterator):
         """
         Finds a multipart boundary in data.
 
-        Should no boundry exist in the data None is returned instead. Otherwise
+        Should no boundary exist in the data None is returned instead. Otherwise
         a tuple containing the indices of the following are returned:
 
          * the end of current encapsulation
@@ -622,8 +642,21 @@ def parse_header(line):
     for p in plist:
         i = p.find(b'=')
         if i >= 0:
+            has_encoding = False
             name = p[:i].strip().lower().decode('ascii')
+            if name.endswith('*'):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # http://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count(b"'") == 2:
+                    has_encoding = True
             value = p[i + 1:].strip()
+            if has_encoding:
+                encoding, lang, value = value.split(b"'")
+                if six.PY3:
+                    value = unquote(value.decode(), encoding=encoding.decode())
+                else:
+                    value = unquote(value).decode(encoding)
             if len(value) >= 2 and value[:1] == value[-1:] == b'"':
                 value = value[1:-1]
                 value = value.replace(b'\\\\', b'\\').replace(b'\\"', b'"')

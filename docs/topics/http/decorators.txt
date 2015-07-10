@@ -16,7 +16,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
 .. function:: require_http_methods(request_method_list)
 
-    Decorator to require that a view only accept particular request
+    Decorator to require that a view only accepts particular request
     methods. Usage::
 
         from django.views.decorators.http import require_http_methods
@@ -31,15 +31,15 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
 .. function:: require_GET()
 
-    Decorator to require that a view only accept the GET method.
+    Decorator to require that a view only accepts the GET method.
 
 .. function:: require_POST()
 
-    Decorator to require that a view only accept the POST method.
+    Decorator to require that a view only accepts the POST method.
 
 .. function:: require_safe()
 
-    Decorator to require that a view only accept the GET and HEAD methods.
+    Decorator to require that a view only accepts the GET and HEAD methods.
     These methods are commonly considered "safe" because they should not have
     the significance of taking an action other than retrieving the requested
     resource.
@@ -97,3 +97,22 @@ caching based on specific request headers.
     into account when building its cache key.
 
     See :ref:`using vary headers <using-vary-headers>`.
+
+.. module:: django.views.decorators.cache
+
+Caching
+=======
+
+The decorators in :mod:`django.views.decorators.cache` control server and
+client-side caching.
+
+.. function:: never_cache(view_func)
+
+    This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
+    must-revalidate`` header to a response to indicate that a page should never
+    be cached.
+
+    .. versionchanged:: 1.9
+
+        Before Django 1.9, ``Cache-Control: max-age=0`` was sent. This didn't
+        reliably prevent caching in all browsers.

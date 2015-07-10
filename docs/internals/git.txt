@@ -36,8 +36,8 @@ The Git repository includes several `branches`_:
   activity is focused.
 
 * ``stable/A.B.x`` are the branches where release preparation work happens.
-  They are also used for support and bugfix releases which occur as necessary
-  after the initial release of a major or minor version.
+  They are also used for bugfix and security releases which occur as necessary
+  after the initial release of a feature version.
 
 * ``soc20XX/<project>`` branches were used by students who worked on Django
   during the 2009 and 2010 Google Summer of Code programs.
@@ -84,9 +84,7 @@ coding style and how to generate and submit a patch.
 Other branches
 ==============
 
-Django uses branches to prepare for releases of Django (whether they be
-:term:`major <Major release>`, :term:`minor <Minor release>`, or
-:term:`micro <Micro release>`).
+Django uses branches to prepare for releases of Django.
 
 In the past when Django was hosted on Subversion, branches were also used for
 feature development. Now Django is hosted on Git and feature development is
@@ -135,8 +133,8 @@ Feature-development branches
 .. admonition:: Historical information
 
     Since Django moved to Git in 2012, anyone can clone the repository and
-    create his own branches, alleviating the need for official branches in the
-    source code repository.
+    create their own branches, alleviating the need for official branches in
+    the source code repository.
 
     The following section is mostly useful if you're exploring the repository's
     history, for example if you're trying to understand how some features were
@@ -244,7 +242,8 @@ branches, used for Google Summer of Code projects.
 Tags
 ====
 
-Each Django release is tagged and signed by Django's release manager.
+Each Django release is tagged and signed by a :ref:`releaser
+<releasers-list>`.
 
 The tags can be found on GitHub's `tags`_ page.
 

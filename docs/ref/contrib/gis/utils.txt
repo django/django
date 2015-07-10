@@ -1,5 +1,3 @@
-.. _ref-gis-utils:
-
 ===================
 GeoDjango Utilities
 ===================
@@ -15,3 +13,4 @@ useful in creating geospatial Web applications.
 
    layermapping
    ogrinspect
+   serializers

@@ -1,26 +1,32 @@
 """Default variable filters."""
 from __future__ import unicode_literals
 
-import re
 import random as random_module
-from decimal import Decimal, InvalidOperation, Context, ROUND_HALF_UP
+import re
+import warnings
+from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
 from functools import wraps
 from pprint import pformat
 
-from django.template.base import Variable, Library, VariableDoesNotExist
 from django.conf import settings
-from django.utils import formats
+from django.utils import formats, six
 from django.utils.dateformat import format, time_format
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, iri_to_uri
-from django.utils.html import (conditional_escape, escapejs, fix_ampersands,
-    escape, urlize as urlize_impl, linebreaks, strip_tags, avoid_wrapping)
+from django.utils.html import (
+    avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
+    remove_tags, strip_tags, urlize as _urlize,
+)
 from django.utils.http import urlquote
-from django.utils.text import Truncator, wrap, phone2numeric
-from django.utils.safestring import mark_safe, SafeData, mark_for_escaping
-from django.utils import six
+from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
+from django.utils.text import (
+    Truncator, normalize_newlines, phone2numeric, slugify as _slugify, wrap,
+)
 from django.utils.timesince import timesince, timeuntil
 from django.utils.translation import ugettext, ungettext
-from django.utils.text import normalize_newlines
+
+from .base import Variable, VariableDoesNotExist
+from .library import Library
 
 register = Library()
 
@@ -40,7 +46,7 @@ def stringfilter(func):
             args = list(args)
             args[0] = force_text(args[0])
             if (isinstance(args[0], SafeData) and
-                getattr(_dec._decorated_function, 'is_safe', False)):
+                    getattr(_dec._decorated_function, 'is_safe', False)):
                 return mark_safe(func(*args, **kwargs))
         return func(*args, **kwargs)
 
@@ -80,12 +86,6 @@ def escapejs_filter(value):
     """Hex encodes characters for use in JavaScript strings."""
     return escapejs(value)
 
-
-@register.filter("fix_ampersands", is_safe=True)
-@stringfilter
-def fix_ampersands_filter(value):
-    """Replaces ampersands with ``&amp;`` entities."""
-    return fix_ampersands(value)
 
 # Values for testing floatformat input against infinity and NaN representations,
 # which differ across platforms and Python versions.  Some (i.e. old Windows
@@ -193,7 +193,7 @@ def iriencode(value):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linenumbers(value, autoescape=None):
+def linenumbers(value, autoescape=True):
     """Displays text with line numbers."""
     lines = value.split('\n')
     # Find the maximum width of the line count, for use with zero padding
@@ -231,12 +231,11 @@ def make_list(value):
 @stringfilter
 def slugify(value):
     """
-    Converts to lowercase, removes non-word characters (alphanumerics and
-    underscores) and converts spaces to hyphens. Also strips leading and
-    trailing whitespace.
+    Converts to ASCII. Converts spaces to hyphens. Removes characters that
+    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
+    Also strips leading and trailing whitespace.
     """
-    from django.utils.text import slugify
-    return slugify(value)
+    return _slugify(value)
 
 
 @register.filter(is_safe=True)
@@ -277,6 +276,23 @@ def truncatechars(value, arg):
     except ValueError:  # Invalid literal for int().
         return value  # Fail silently.
     return Truncator(value).chars(length)
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def truncatechars_html(value, arg):
+    """
+    Truncates HTML after a certain number of chars.
+
+    Argument: Number of chars to truncate after.
+
+    Newlines in the HTML are preserved.
+    """
+    try:
+        length = int(arg)
+    except ValueError:  # invalid literal for int()
+        return value  # Fail silently.
+    return Truncator(value).chars(length, html=True)
 
 
 @register.filter(is_safe=True)
@@ -339,21 +355,21 @@ def urlencode(value, safe=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlize(value, autoescape=None):
+def urlize(value, autoescape=True):
     """Converts URLs in plain text into clickable links."""
-    return mark_safe(urlize_impl(value, nofollow=True, autoescape=autoescape))
+    return mark_safe(_urlize(value, nofollow=True, autoescape=autoescape))
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def urlizetrunc(value, limit, autoescape=None):
+def urlizetrunc(value, limit, autoescape=True):
     """
     Converts URLs into clickable links, truncating URLs to the given character
     limit, and adding 'rel=nofollow' attribute to discourage spamming.
 
     Argument: Length to truncate URLs to.
     """
-    return mark_safe(urlize_impl(value, trim_url_limit=int(limit), nofollow=True,
+    return mark_safe(_urlize(value, trim_url_limit=int(limit), nofollow=True,
                             autoescape=autoescape))
 
 
@@ -425,7 +441,7 @@ def cut(value, arg):
 @stringfilter
 def escape_filter(value):
     """
-    Marks the value as a string that should not be auto-escaped.
+    Marks the value as a string that should be auto-escaped.
     """
     return mark_for_escaping(value)
 
@@ -443,7 +459,7 @@ def force_escape(value):
 
 @register.filter("linebreaks", is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaks_filter(value, autoescape=None):
+def linebreaks_filter(value, autoescape=True):
     """
     Replaces line breaks in plain text with appropriate HTML; a single
     newline becomes an HTML line break (``<br />``) and a new line
@@ -455,7 +471,7 @@ def linebreaks_filter(value, autoescape=None):
 
 @register.filter(is_safe=True, needs_autoescape=True)
 @stringfilter
-def linebreaksbr(value, autoescape=None):
+def linebreaksbr(value, autoescape=True):
     """
     Converts all newlines in a piece of plain text to HTML line breaks
     (``<br />``).
@@ -490,7 +506,6 @@ def safeseq(value):
 @stringfilter
 def removetags(value, tags):
     """Removes a space separated list of [X]HTML tags from the output."""
-    from django.utils.html import remove_tags
     return remove_tags(value, tags)
 
 
@@ -539,7 +554,7 @@ def first(value):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def join(value, arg, autoescape=None):
+def join(value, arg, autoescape=True):
     """
     Joins a list with a string, like Python's ``str.join(list)``.
     """
@@ -562,13 +577,13 @@ def last(value):
         return ''
 
 
-@register.filter(is_safe=True)
+@register.filter(is_safe=False)
 def length(value):
     """Returns the length of the value - useful for lists."""
     try:
         return len(value)
     except (ValueError, TypeError):
-        return ''
+        return 0
 
 
 @register.filter(is_safe=False)
@@ -609,7 +624,7 @@ def slice_filter(value, arg):
 
 
 @register.filter(is_safe=True, needs_autoescape=True)
-def unordered_list(value, autoescape=None):
+def unordered_list(value, autoescape=True):
     """
     Recursively takes a self-nested list and returns an HTML unordered list --
     WITHOUT opening and closing <ul> tags.
@@ -666,36 +681,49 @@ def unordered_list(value, autoescape=None):
             second_item = new_second_item
         return [first_item, second_item], old_style_list
 
-    def _helper(list_, tabs=1):
+    def walk_items(item_list):
+        item_iterator = iter(item_list)
+        try:
+            item = next(item_iterator)
+            while True:
+                try:
+                    next_item = next(item_iterator)
+                except StopIteration:
+                    yield item, None
+                    break
+                if not isinstance(next_item, six.string_types):
+                    try:
+                        iter(next_item)
+                    except TypeError:
+                        pass
+                    else:
+                        yield item, next_item
+                        item = next(item_iterator)
+                        continue
+                yield item, None
+                item = next_item
+        except StopIteration:
+            pass
+
+    def list_formatter(item_list, tabs=1):
         indent = '\t' * tabs
         output = []
-
-        list_length = len(list_)
-        i = 0
-        while i < list_length:
-            title = list_[i]
+        for item, children in walk_items(item_list):
             sublist = ''
-            sublist_item = None
-            if isinstance(title, (list, tuple)):
-                sublist_item = title
-                title = ''
-            elif i < list_length - 1:
-                next_item = list_[i + 1]
-                if next_item and isinstance(next_item, (list, tuple)):
-                    # The next item is a sub-list.
-                    sublist_item = next_item
-                    # We've processed the next item now too.
-                    i += 1
-            if sublist_item:
-                sublist = _helper(sublist_item, tabs + 1)
-                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (indent, sublist,
-                                                         indent, indent)
-            output.append('%s<li>%s%s</li>' % (indent,
-                    escaper(force_text(title)), sublist))
-            i += 1
+            if children:
+                sublist = '\n%s<ul>\n%s\n%s</ul>\n%s' % (
+                    indent, list_formatter(children, tabs + 1), indent, indent)
+            output.append('%s<li>%s%s</li>' % (
+                indent, escaper(force_text(item)), sublist))
         return '\n'.join(output)
+
     value, converted = convert_old_style_list(value)
-    return mark_safe(_helper(value))
+    if converted:
+        warnings.warn(
+            "The old style syntax in `unordered_list` is deprecated and will "
+            "be removed in Django 1.10. Use the the new format instead.",
+            RemovedInDjango110Warning)
+    return mark_safe(list_formatter(value))
 
 
 ###################
@@ -916,7 +944,7 @@ def pluralize(value, arg='s'):
     * If value is 1, cand{{ value|pluralize:"y,ies" }} displays "1 candy".
     * If value is 2, cand{{ value|pluralize:"y,ies" }} displays "2 candies".
     """
-    if not ',' in arg:
+    if ',' not in arg:
         arg = ',' + arg
     bits = arg.split(',')
     if len(bits) > 2:
@@ -924,7 +952,7 @@ def pluralize(value, arg='s'):
     singular_suffix, plural_suffix = bits[:2]
 
     try:
-        if int(value) != 1:
+        if float(value) != 1:
             return plural_suffix
     except ValueError:  # Invalid string that's not a number.
         pass
@@ -949,4 +977,4 @@ def pprint(value):
     try:
         return pformat(value)
     except Exception as e:
-        return "Error in formatting: %s" % force_text(e, errors="replace")
+        return "Error in formatting: %s: %s" % (e.__class__.__name__, force_text(e, errors="replace"))

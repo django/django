@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Tran Van <vantxm@yahoo.co.uk>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Thanh Le Viet <lethanhx2k@gmail.com>, 2013
+# Tran Van <vantxm@yahoo.co.uk>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Tran Van <vantxm@yahoo.co.uk>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:13+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Vietnamese (http://www.transifex.com/projects/p/django/"
 "language/vi/)\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +19,20 @@ msgstr ""
 "Language: vi\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:38
+msgid "Sessions"
+msgstr ""
+
 msgid "session key"
-msgstr "Mã phiên"
+msgstr "session key"
 
-#: models.py:40
 msgid "session data"
-msgstr "Dữ liệu phiên"
+msgstr "session data"
 
-#: models.py:41
 msgid "expire date"
 msgstr "Ngày hết hạn"
 
-#: models.py:46
 msgid "session"
 msgstr "Phiên"
 
-#: models.py:47
 msgid "sessions"
-msgstr "Phiên"
+msgstr "session"

@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Dimitris Glezos <glezos@indifex.com>, 2011.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Yorgos Pagles <y.pagles@gmail.com>, 2011.
+# Dimitris Glezos <glezos@transifex.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Panos Laganakos <panos.laganakos@gmail.com>, 2014
+# Yorgos Pagles <y.pagles@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: Yorgos Pagles <y.pagles@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -19,97 +20,21 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "ετικέτα:"
+msgid "Administrative Documentation"
+msgstr "Διαχειριστική Τεκμηρίωση"
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "φίλτρο:"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "προβολή:"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "Δε βρέθηκε η εφαρμογή %r"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
-"Το μοντέλο %(model_name)r δεν μπορεί να βρεθεί στην εφαρμογή %(app_label)r"
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "το συσχετισμένο `%(app_label)s.%(data_type)s`  αντικείμενο"
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "μοντέλο:"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "συσχετισμένα `%(app_label)s.%(object_name)s` αντικείμενα"
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "όλα %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "πλήθος number of %s"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Πεδία στα αντικείμενα %s"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "Το %s δε φαίνεται να είναι ένα αντικείμενο urlpattern"
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Αρχική"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "Σελιδοδείκτες"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Σελιδοδείκτες τεκμηρίωσης"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -130,11 +55,9 @@ msgstr ""
 "Απευθυνθείτε στον διαχειριστή σας αν δεν γνωρίζεται αν ο υπολογιστής σας "
 "θερείται \"εσωτερικός\".</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Τεκμηρίωση για αυτήν τη σελίδα"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -142,11 +65,9 @@ msgstr ""
 "Μεταπήδηση από οποιαδήποτε σελίδα στην τεκμηρίωση για το view που "
 "δημιούργησε τη σελίδα αυτή."
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Εμφάνιση ID αντικειμένου"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -154,52 +75,244 @@ msgstr ""
 "Εμφάνιση του content-type και του μοναδικού αναγνωριστικού για τις σελίδες "
 "που αντιπροσωπεύουν ένα μοναδικό αντικείμενο."
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (τρέχον παράθυρο)"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Αν η σελίδα αναπαριστά ένα και μοναδικό αντικείμενο τότε οδηγεί στην "
 "αντίστοιχη σελίδα διαχείρισης."
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Επεξεργασία αυτού του αντικειμένου (νέο παράθυρο)"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 "Όπως και παραπάνω, αλλά άνοιγμα της σελίδας διαχείρισης σε νέο παράθυρο."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr ""
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr ""
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr ""
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
-msgstr ""
+msgstr "Ετικέτες"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr "Λίστα όλωςν τον ετικετών περιγραμμάτων και των λειτουργιών τους."
+
+msgid "Filters"
+msgstr " Φίλτρα"
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"Τα φίλτρα είναι ενέργειες που μπορούν να εφαρμοστούν σε μεταβλητές μέσα σε "
+"ένα περίγραμμα για να αλλάξουν το αποτέλεσμα."
+
+msgid "Models"
+msgstr "Μοντέλα"
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"Τα μοντέλα είναι περιγραφές όλωςν τον αντικειμένων στο σύστημα και των "
+"συνδεδεμένων πεδίων. Κάθε μοντέλο έχει μια λίστα πεδιών που είναι προσβάσιμα "
+"ως μεταβλητές περιγραμμάτων"
+
 msgid "Views"
-msgstr ""
+msgstr "Οπτικές"
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"Κάθε σελίδα στη δημόσια ιστοσελίδα παράγεται από μια οπτική. Η οπτική ορίζει "
+"ποιό περίγραμμα θα χρησιμοποιηθεί για να παραχθεί η σελίδα και ποιά "
+"αντικείμενα είναι διαθέσιμα σε αυτό το περίγραμμα."
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+"Εργαλεία για το πρόγραμμα περιήγησης για γρήγορη πρόσβαση σε διαχειριστική "
+"λειτουργικότητα. "
+
+msgid "Please install docutils"
+msgstr "Παρακαλώ εγκαταστείστε τα docutils"
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"Το σύστημα διαχειριστικής τεκμηρίωσης απαιτεί την βιβλιοθήκη της Python <a "
+"href=\"%(link)s\">docutils</a>."
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Παρακαλώ ζητήστε απο τον διαχειριστή σας να εγκαταστήσει τα <a href="
+"\"%(link)s\">docutils</a>."
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Μοντέλο: %(name)s"
+
+msgid "Field"
+msgstr "Πεδίο"
+
+msgid "Type"
+msgstr "Τύπος"
+
+msgid "Description"
+msgstr "Περιγραφή"
+
+msgid "Back to Model Documentation"
+msgstr "Πίσω στην Τεκμηρίωση Μοντέλων"
+
+msgid "Model documentation"
+msgstr "Τεκμηρίωση Μοντέλων"
+
+msgid "Model groups"
+msgstr "Ομάδες μοντέλου"
+
+msgid "Templates"
+msgstr "Περιγράμματα"
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Περίγραμμα: %(name)s"
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Περίγραμμα: \"%(name)s\""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr "Αναζήτηση μονοπατιού για περίγραμμα \"%(name)s\":"
+
+msgid "(does not exist)"
+msgstr "(δεν υπάρχει)"
+
+msgid "Back to Documentation"
+msgstr "Επιστροφή στην Τεκμηρίωση"
+
+msgid "Template filters"
+msgstr "Φίλτρα περιγραμμάτων"
+
+msgid "Template filter documentation"
+msgstr "Τεκμηρίωση φίλτρων περιγραμμάτων"
+
+msgid "Built-in filters"
+msgstr "Ενσωματωμένα φίλτρα"
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"Για να χρησιμοποιήσετε αυτά τα φίλτρα, βάλτε <code>%(code)s</code> στο "
+"περίγραμμα σας, προτού χρησιμοποιήσετε το φίλτρο."
+
+msgid "Template tags"
+msgstr "Ετικέτες περιγραμμάτων"
+
+msgid "Template tag documentation"
+msgstr "Τεκμηρίωση ετικετών περιγραμμάτων"
+
+msgid "Built-in tags"
+msgstr "Ενσωματωμένες ετικέτες"
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"Για να χρησιμοποιήσετε αυτές τις ετικέτες, βάλτε <code>%(code)s</code> στο "
+"περίγραμμα σας, προτού χρησιμοποιήσετε την ετικέτα."
+
+#, python-format
+msgid "View: %(name)s"
+msgstr "Οπτική: %(name)s"
+
+msgid "Context:"
+msgstr "Πλαίσιο:"
+
+msgid "Templates:"
+msgstr "Περιγράμματα:"
+
+msgid "Back to Views Documentation"
+msgstr "Πίσω στην Τεκμηρίωση Οπτικών"
+
+msgid "View documentation"
+msgstr "Προβολή Τεκμηρίωσης"
+
+msgid "Jump to namespace"
+msgstr "Μεταφερθείτε στο namespace"
+
+msgid "Empty namespace"
+msgstr "Άδειο namespace"
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr "Οπτικές ανά namespace %(name)s"
+
+msgid "Views by empty namespace"
+msgstr "Οπτικές ανά κενό namespace"
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+"\n"
+"Συνάρτηση οπτικής: <code>%(full_name)s</code>. Όνομα: <code>%(url_name)s</"
+"code>.\n"
+
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Είτε Αληθές ή Ψευδές)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Είδος πεδίου: %(field_type)s"
+
+msgid "tag:"
+msgstr "ετικέτα:"
+
+msgid "filter:"
+msgstr "φίλτρο:"
+
+msgid "view:"
+msgstr "προβολή:"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr "Η εφαρμογή %(app_label)r δεν βρέθηκε"
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+"Το μοντέλο %(model_name)r δεν μπορεί να βρεθεί στην εφαρμογή %(app_label)r"
+
+msgid "model:"
+msgstr "μοντέλο:"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "το συσχετισμένο `%(app_label)s.%(data_type)s`  αντικείμενο"
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "συσχετισμένα `%(app_label)s.%(object_name)s` αντικείμενα"
+
+#, python-format
+msgid "all %s"
+msgstr "όλα %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "πλήθος number of %s"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "Το %s δε φαίνεται να είναι ένα αντικείμενο urlpattern"

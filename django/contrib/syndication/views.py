@@ -3,15 +3,14 @@ from __future__ import unicode_literals
 from calendar import timegm
 
 from django.conf import settings
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
-from django.http import HttpResponse, Http404
-from django.template import loader, TemplateDoesNotExist, RequestContext
-from django.utils import feedgenerator
+from django.http import Http404, HttpResponse
+from django.template import TemplateDoesNotExist, loader
+from django.utils import feedgenerator, six
 from django.utils.encoding import force_text, iri_to_uri, smart_text
 from django.utils.html import escape
 from django.utils.http import http_date
-from django.utils import six
 from django.utils.timezone import get_default_timezone, is_naive, make_aware
 
 
@@ -20,9 +19,7 @@ def add_domain(domain, url, secure=False):
     if url.startswith('//'):
         # Support network-path reference (see #16753) - RSS requires a protocol
         url = '%s:%s' % (protocol, url)
-    elif not (url.startswith('http://')
-            or url.startswith('https://')
-            or url.startswith('mailto:')):
+    elif not url.startswith(('http://', 'https://', 'mailto:')):
         url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
@@ -42,7 +39,7 @@ class Feed(object):
         except ObjectDoesNotExist:
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
-        response = HttpResponse(content_type=feedgen.mime_type)
+        response = HttpResponse(content_type=feedgen.content_type)
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
             # if item_pubdate or item_updateddate is defined for the feed, set
             # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED
@@ -62,7 +59,10 @@ class Feed(object):
         try:
             return item.get_absolute_url()
         except AttributeError:
-            raise ImproperlyConfigured('Give your %s class a get_absolute_url() method, or define an item_link() method in your Feed class.' % item.__class__.__name__)
+            raise ImproperlyConfigured(
+                'Give your %s class a get_absolute_url() method, or define an '
+                'item_link() method in your Feed class.' % item.__class__.__name__
+            )
 
     def __get_dynamic_attr(self, attname, obj, default=None):
         try:
@@ -159,11 +159,11 @@ class Feed(object):
             context = self.get_context_data(item=item, site=current_site,
                                             obj=obj, request=request)
             if title_tmp is not None:
-                title = title_tmp.render(RequestContext(request, context))
+                title = title_tmp.render(context, request)
             else:
                 title = self.__get_dynamic_attr('item_title', item)
             if description_tmp is not None:
-                description = description_tmp.render(RequestContext(request, context))
+                description = description_tmp.render(context, request)
             else:
                 description = self.__get_dynamic_attr('item_description', item)
             link = add_domain(

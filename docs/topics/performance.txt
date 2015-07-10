@@ -67,7 +67,7 @@ report on cache performance and template rendering times.
 Third-party services
 ^^^^^^^^^^^^^^^^^^^^
 
-There are a number of free services that will analyse and report on the
+There are a number of free services that will analyze and report on the
 performance of your site's pages from the perspective of a remote HTTP client,
 in effect simulating the experience of an actual user.
 
@@ -75,7 +75,7 @@ These can't report on the internals of your code, but can provide a useful
 insight into your site's overall performance, including aspects that can't be
 adequately measured from within Django environment. Examples include:
 
-* `Yahoo's Yslow <http://developer.yahoo.com/yslow/>`_
+* `Yahoo's Yslow <http://yslow.org/>`_
 * `Google PageSpeed <https://developers.google.com/speed/pagespeed/>`_
 
 There are also several paid-for services that perform a similar analysis,
@@ -286,7 +286,7 @@ memory.
 Static files
 ------------
 
-Static files, which by defintion are not dynamic, make an excellent target for
+Static files, which by definition are not dynamic, make an excellent target for
 optimization gains.
 
 :class:`~django.contrib.staticfiles.storage.CachedStaticFilesStorage`
@@ -305,7 +305,7 @@ tag, so browsers will reload the asset automatically.
 ^^^^^^^^^^^^^^
 
 Several third-party Django tools and packages provide the ability to "minify"
-HTML, CSS, and JavaScript. They remove uneccessary whitespace, newlines, and
+HTML, CSS, and JavaScript. They remove unnecessary whitespace, newlines, and
 comments, and shorten variable names, and thus reduce the size of the documents
 that your site publishes.
 
@@ -417,7 +417,7 @@ With these caveats in mind, you should be aware of:
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<http:://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<http://pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 
@@ -425,5 +425,5 @@ C implementations of Python libraries
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some Python libraries are also implemented in C, and can be much faster. They
-aim to offer the same APIs. Note that compatibility issues and behaviour
+aim to offer the same APIs. Note that compatibility issues and behavior
 differences are not unknown (and not always immediately evident).

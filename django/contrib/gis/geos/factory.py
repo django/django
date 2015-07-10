@@ -1,6 +1,4 @@
-from django.contrib.gis import memoryview
-from django.contrib.gis.geos.geometry import GEOSGeometry, wkt_regex, hex_regex
-
+from django.contrib.gis.geos.geometry import GEOSGeometry, hex_regex, wkt_regex
 from django.utils import six
 
 
@@ -27,7 +25,7 @@ def fromfile(file_h):
     else:
         return GEOSGeometry(buf)
 
-    return GEOSGeometry(memoryview(buf))
+    return GEOSGeometry(six.memoryview(buf))
 
 
 def fromstr(string, **kwargs):

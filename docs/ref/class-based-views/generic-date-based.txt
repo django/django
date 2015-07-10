@@ -63,18 +63,18 @@ ArchiveIndexView
       month or day using the attribute ``date_list_period``. This also applies
       to all subclass views.
 
-    **Example myapp/views.py**::
+    **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.dates import ArchiveIndexView
 
         from myapp.models import Article
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^archive/$',
                 ArchiveIndexView.as_view(model=Article, date_field="pub_date"),
                 name="article_archive"),
-        )
+        ]
 
     **Example myapp/article_archive.html**:
 
@@ -166,15 +166,15 @@ YearArchiveView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import ArticleYearArchiveView
 
-        urlpatterns = patterns('',
-            url(r'^(?P<year>\d{4})/$',
+        urlpatterns = [
+            url(r'^(?P<year>[0-9]{4})/$',
                 ArticleYearArchiveView.as_view(),
                 name="article_year_archive"),
-        )
+        ]
 
     **Example myapp/article_archive_year.html**:
 
@@ -256,25 +256,24 @@ MonthArchiveView
         class ArticleMonthArchiveView(MonthArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import ArticleMonthArchiveView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             # Example: /2012/aug/
-            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/$',
                 ArticleMonthArchiveView.as_view(),
                 name="archive_month"),
             # Example: /2012/08/
-            url(r'^(?P<year>\d{4})/(?P<month>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[0-9]+)/$',
                 ArticleMonthArchiveView.as_view(month_format='%m'),
                 name="archive_month_numeric"),
-        )
+        ]
 
     **Example myapp/article_archive_month.html**:
 
@@ -349,22 +348,21 @@ WeekArchiveView
         class ArticleWeekArchiveView(WeekArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             week_format = "%W"
             allow_future = True
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import ArticleWeekArchiveView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             # Example: /2012/week/23/
-            url(r'^(?P<year>\d{4})/week/(?P<week>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/week/(?P<week>[0-9]+)/$',
                 ArticleWeekArchiveView.as_view(),
                 name="archive_week"),
-        )
+        ]
 
     **Example myapp/article_archive_week.html**:
 
@@ -464,21 +462,20 @@ DayArchiveView
         class ArticleDayArchiveView(DayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import ArticleDayArchiveView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             # Example: /2012/nov/10/
-            url(r'^(?P<year>\d{4})/(?P<month>[-\w]+)/(?P<day>\d+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/$',
                 ArticleDayArchiveView.as_view(),
                 name="archive_day"),
-        )
+        ]
 
     **Example myapp/article_archive_day.html**:
 
@@ -538,20 +535,19 @@ TodayArchiveView
         class ArticleTodayArchiveView(TodayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import ArticleTodayArchiveView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^today/$',
                 ArticleTodayArchiveView.as_view(),
                 name="archive_today"),
-        )
+        ]
 
     .. admonition:: Where is the example template for ``TodayArchiveView``?
 
@@ -593,14 +589,14 @@ DateDetailView
 
     **Example myapp/urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.dates import DateDetailView
 
-        urlpatterns = patterns('',
-            url(r'^(?P<year>\d+)/(?P<month>[-\w]+)/(?P<day>\d+)/(?P<pk>\d+)/$',
+        urlpatterns = [
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
                 DateDetailView.as_view(model=Article, date_field="pub_date"),
                 name="archive_date_detail"),
-        )
+        ]
 
     **Example myapp/article_detail.html**:
 
@@ -612,7 +608,10 @@ DateDetailView
 
     All of the generic views listed above have matching ``Base`` views that
     only differ in that they do not include the
-    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`:
+    :class:`~django.views.generic.list.MultipleObjectTemplateResponseMixin`
+    (for the archive views) or
+    :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`
+    (for the :class:`DateDetailView`):
 
     .. class:: BaseArchiveIndexView
 

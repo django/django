@@ -21,7 +21,7 @@ class GeoFeedMixin(object):
     def add_georss_point(self, handler, coords, w3c_geo=False):
         """
         Adds a GeoRSS point with the given coords using the given handler.
-        Handles the differences between simple GeoRSS and the more pouplar
+        Handles the differences between simple GeoRSS and the more popular
         W3C Geo specification.
         """
         if w3c_geo:
@@ -36,8 +36,8 @@ class GeoFeedMixin(object):
         This routine adds a GeoRSS XML element using the given item and handler.
         """
         # Getting the Geometry object.
-        geom = item.get('geometry', None)
-        if not geom is None:
+        geom = item.get('geometry')
+        if geom is not None:
             if isinstance(geom, (list, tuple)):
                 # Special case if a tuple/list was passed in.  The tuple may be
                 # a point or a box
@@ -58,7 +58,7 @@ class GeoFeedMixin(object):
                     else:
                         raise ValueError('Only should be 2 or 4 numeric elements.')
                 # If a GeoRSS box was given via tuple.
-                if not box_coords is None:
+                if box_coords is not None:
                     if w3c_geo:
                         raise ValueError('Cannot use simple GeoRSS box in W3C Geo feeds.')
                     handler.addQuickElement('georss:box', self.georss_coords(box_coords))
@@ -81,7 +81,7 @@ class GeoFeedMixin(object):
                         raise ValueError('Geometry type "%s" not supported.' % geom.geom_type)
 
 
-### SyndicationFeed subclasses ###
+# ### SyndicationFeed subclasses ###
 class GeoRSSFeed(Rss201rev2Feed, GeoFeedMixin):
     def rss_attributes(self):
         attrs = super(GeoRSSFeed, self).rss_attributes()
@@ -127,7 +127,7 @@ class W3CGeoFeed(Rss201rev2Feed, GeoFeedMixin):
         self.add_georss_element(handler, self.feed, w3c_geo=True)
 
 
-### Feed subclass ###
+# ### Feed subclass ###
 class Feed(BaseFeed):
     """
     This is a subclass of the `Feed` from `django.contrib.syndication`.

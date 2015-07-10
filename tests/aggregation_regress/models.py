@@ -1,5 +1,7 @@
-# coding: utf-8
-from django.contrib.contenttypes import generic
+# -*- coding: utf-8 -*-
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -28,7 +30,7 @@ class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 @python_2_unicode_compatible
@@ -42,7 +44,7 @@ class Book(models.Model):
     contact = models.ForeignKey(Author, related_name='book_contact_set')
     publisher = models.ForeignKey(Publisher)
     pubdate = models.DateField()
-    tags = generic.GenericRelation(ItemTag)
+    tags = GenericRelation(ItemTag)
 
     class Meta:
         ordering = ('name',)
@@ -102,3 +104,8 @@ class Bravo(models.Model):
 class Charlie(models.Model):
     alfa = models.ForeignKey(Alfa, null=True)
     bravo = models.ForeignKey(Bravo, null=True)
+
+
+class SelfRefFK(models.Model):
+    name = models.CharField(max_length=50)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')

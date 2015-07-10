@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-01 19:16+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -18,157 +19,148 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
-msgstr ""
+msgstr "%s sydd ar gael"
 
-#: static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
+"Dyma restr o'r %s sydd ar gael.  Gellir dewis rhai drwyeu dewis yn y blwch "
+"isod ac yna clicio'r saeth \"Dewis\" rhwng y ddau flwch."
 
-#: static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Teipiwch yn y blwch i hidlo'r rhestr o %s sydd ar gael."
 
-#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
-msgstr ""
+msgstr "Hidl"
 
-#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
-msgstr ""
+msgstr "Dewis y cyfan"
 
-#: static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
-msgstr ""
+msgstr "Cliciwch i ddewis pob %s yr un pryd."
 
-#: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
-msgstr ""
+msgstr "Dewis"
 
-#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
-msgstr ""
+msgstr "Gwaredu"
 
-#: static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Y %s a ddewiswyd"
 
-#: static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
+"Dyma restr o'r %s a ddewiswyd. Gellir gwaredu rhai drwy eu dewis yn y blwch "
+"isod ac yna clicio'r saeth \"Gwaredu\" rhwng y ddau flwch."
 
-#: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
-msgstr ""
+msgstr "Gwaredu'r cyfan"
 
-#: static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
-msgstr ""
+msgstr "Cliciwch i waredu pob %s sydd wedi ei ddewis yr un pryd."
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Dewiswyd %(sel)s o %(cnt)s"
+msgstr[1] "Dewiswyd %(sel)s o %(cnt)s"
+msgstr[2] "Dewiswyd %(sel)s o %(cnt)s"
+msgstr[3] "Dewiswyd %(sel)s o %(cnt)s"
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"Mae ganddoch newidiadau heb eu cadw mewn meysydd golygadwy.  Os rhedwch y "
+"weithred fe gollwch y newidiadau."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
 "action."
 msgstr ""
+"Rydych wedi dewis gweithred ond nid ydych wedi newid eich newidiadau i rai "
+"meysydd eto.  Cliciwch 'Iawn' i gadw.  Bydd rhaid i chi ail-redeg y weithred."
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"Rydych wedi dewis gweithred ac nid ydych wedi newid unrhyw faes.  Rydych "
+"siwr o fod yn edrych am y botwm 'Ewch' yn lle'r botwm 'Cadw'."
 
-#: static/admin/js/calendar.js:26
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Noder: Rydych %s awr o flaen amser y gweinydd."
+msgstr[1] "Noder: Rydych %s awr o flaen amser y gweinydd."
+msgstr[2] "Noder: Rydych %s awr o flaen amser y gweinydd."
+msgstr[3] "Noder: Rydych %s awr o flaen amser y gweinydd."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Noder: Rydych %s awr tu ôl amser y gweinydd."
+msgstr[1] "Noder: Rydych %s awr tu ôl amser y gweinydd."
+msgstr[2] "Noder: Rydych %s awr tu ôl amser y gweinydd."
+msgstr[3] "Noder: Rydych %s awr tu ôl amser y gweinydd."
+
+msgid "Now"
+msgstr "Nawr"
+
+msgid "Clock"
+msgstr "Cloc"
+
+msgid "Choose a time"
+msgstr "Dewiswch amser"
+
+msgid "Midnight"
+msgstr "Canol nos"
+
+msgid "6 a.m."
+msgstr "6 y.b."
+
+msgid "Noon"
+msgstr "Canol dydd"
+
+msgid "Cancel"
+msgstr "Diddymu"
+
+msgid "Today"
+msgstr "Heddiw"
+
+msgid "Calendar"
+msgstr "Calendr"
+
+msgid "Yesterday"
+msgstr "Ddoe"
+
+msgid "Tomorrow"
+msgstr "Fory"
+
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
-"Ionawr Chwefror Mawrth Ebrill Mai Mehefin Gorffennaf Medi Hydref Tachwedd "
-"Rhagfyr"
+"Ionawr Chwefror Mawrth Ebrill Mai Mehefin Gorffennaf Awst Medi Hydref "
+"Tachwedd Rhagfyr"
 
-#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "S Ll M M I G S"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
 msgid "Show"
-msgstr ""
+msgstr "Dangos"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
-msgstr ""
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Nawr"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Cloc"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Dewis amser"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Hanner nos"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 y.b."
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "Hanner dydd"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Diddymu"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Heddiw"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Calendr"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Ddoe"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Yfory"
+msgstr "Cuddio"

@@ -39,13 +39,13 @@ View
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import MyView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^mine/$', MyView.as_view(), name='my-view'),
-        )
+        ]
 
     **Attributes**
 
@@ -64,6 +64,11 @@ View
         Returns a callable view that takes a request and returns a response::
 
             response = MyView.as_view()(request)
+
+        .. versionadded:: 1.9
+
+        The returned view has ``view_class`` and ``view_initkwargs``
+        attributes.
 
     .. method:: dispatch(request, *args, **kwargs)
 
@@ -105,6 +110,7 @@ TemplateView
     This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.base.TemplateResponseMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.base.View`
 
     **Method Flowchart**
@@ -130,18 +136,18 @@ TemplateView
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
 
         from myapp.views import HomePageView
 
-        urlpatterns = patterns('',
+        urlpatterns = [
             url(r'^$', HomePageView.as_view(), name='home'),
-        )
+        ]
 
     **Context**
 
-    * ``params``: The dictionary of keyword arguments captured from the URL
-      pattern that served the view.
+    * Populated (through :class:`~django.views.generic.base.ContextMixin`) with
+      the keyword arguments captured from the URL pattern that served the view.
 
 RedirectView
 ------------
@@ -185,23 +191,22 @@ RedirectView
             pattern_name = 'article-detail'
 
             def get_redirect_url(self, *args, **kwargs):
-                article = get_object_or_404(Article, pk=pk)
+                article = get_object_or_404(Article, pk=kwargs['pk'])
                 article.update_counter()
                 return super(ArticleCounterRedirectView, self).get_redirect_url(*args, **kwargs)
 
     **Example urls.py**::
 
-        from django.conf.urls import patterns, url
+        from django.conf.urls import url
         from django.views.generic.base import RedirectView
 
         from article.views import ArticleCounterRedirectView, ArticleDetail
 
-        urlpatterns = patterns('',
-
-            url(r'^counter/(?P<pk>\d+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            url(r'^details/(?P<pk>\d+)/$', ArticleDetail.as_view(), name='article-detail'),
+        urlpatterns = [
+            url(r'^counter/(?P<pk>[0-9]+)/$', ArticleCounterRedirectView.as_view(), name='article-counter'),
+            url(r'^details/(?P<pk>[0-9]+)/$', ArticleDetail.as_view(), name='article-detail'),
             url(r'^go-to-django/$', RedirectView.as_view(url='http://djangoproject.com'), name='go-to-django'),
-        )
+        ]
 
     **Attributes**
 
@@ -212,8 +217,6 @@ RedirectView
 
     .. attribute:: pattern_name
 
-        .. versionadded:: 1.6
-
         The name of the URL pattern to redirect to. Reversing will be done
         using the same args and kwargs as are passed in for this view.
 
@@ -222,7 +225,12 @@ RedirectView
         Whether the redirect should be permanent. The only difference here is
         the HTTP status code returned. If ``True``, then the redirect will use
         status code 301. If ``False``, then the redirect will use status code
-        302. By default, ``permanent`` is ``True``.
+        302. By default, ``permanent`` is ``False``.
+
+        .. versionchanged:: 1.9
+
+            The default value of the ``permanent`` attribute changed from
+            ``True`` to ``False``.
 
     .. attribute:: query_string
 
@@ -236,10 +244,6 @@ RedirectView
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
-
-        .. versionchanged:: 1.6
-
-            The signature of this method was changed to include ``*args``.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

@@ -1,14 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <kristjan.schmidt@googlemail.com>, 2011.
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2013
+# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014
+# kristjan <kristjan.schmidt@googlemail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: kristjan <kristjan.schmidt@googlemail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -17,18 +19,20 @@ msgstr ""
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:39
+msgid "Sites"
+msgstr "Retejoj"
+
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Tiu domajna nomo ne povas enteni nek spacojn nek tabojn."
+
 msgid "domain name"
 msgstr "domajna nomo"
 
-#: models.py:40
 msgid "display name"
 msgstr "vidiga nomo"
 
-#: models.py:45
 msgid "site"
 msgstr "retejo"
 
-#: models.py:46
 msgid "sites"
 msgstr "retejoj"

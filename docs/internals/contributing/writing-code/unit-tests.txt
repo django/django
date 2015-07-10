@@ -2,19 +2,16 @@
 Unit tests
 ==========
 
+.. highlight:: console
+
 Django comes with a test suite of its own, in the ``tests`` directory of the
 code base. It's our policy to make sure all tests pass at all times.
-
-The tests cover:
-
-* Models, the database API and everything else in core Django core (``tests/``),
-* :ref:`contrib-apps` (``django/contrib/<app>/tests`` or ``tests/<app>_...``).
 
 We appreciate any and all contributions to the test suite!
 
 The Django tests all use the testing infrastructure that ships with Django for
-testing applications. See :doc:`Testing Django applications
-</topics/testing/overview>` for an explanation of how to write new tests.
+testing applications. See :doc:`/topics/testing/overview` for an explanation of
+how to write new tests.
 
 .. _running-unit-tests:
 
@@ -24,28 +21,29 @@ Running the unit tests
 Quickstart
 ~~~~~~~~~~
 
+If you are on Python 2, you'll first need to install a backport of the
+``unittest.mock`` module that's available in Python 3. See
+:ref:`running-unit-tests-dependencies` for details on installing `mock`_ and
+the other optional test dependencies.
+
 Running the tests requires a Django settings module that defines the
 databases to use. To make it easy to get started, Django provides and uses a
-sample settings module that uses the SQLite database. To run the tests:
+sample settings module that uses the SQLite database. To run the tests::
 
-.. code-block:: bash
+   $ git clone https://github.com/django/django.git django-repo
+   $ cd django-repo/tests
+   $ PYTHONPATH=..:$PYTHONPATH ./runtests.py
 
-    git clone git@github.com:django/django.git django-repo
-    cd django-repo/tests
-    PYTHONPATH=..:$PYTHONPATH ./runtests.py
+.. admonition:: Windows users
 
-.. versionchanged:: 1.7
-
-Older versions of Django required specifying a settings file::
-
-    PYTHONPATH=..:$PYTHONPATH python ./runtests.py --settings=test_sqlite
-
-``runtests.py`` now uses ``test_sqlite`` by default if settings aren't provided
-through either ``--settings`` or :envvar:`DJANGO_SETTINGS_MODULE`.
+    We recommend something like `Git Bash <https://msysgit.github.io/>`_ to run
+    the tests using the above approach.
 
 You can avoid typing the ``PYTHONPATH`` bit each time by adding your Django
 checkout to your ``PYTHONPATH`` or by installing the source checkout using pip.
 See :ref:`installing-development-version`.
+
+Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 
 .. _running-unit-tests-settings:
 
@@ -86,16 +84,12 @@ Test databases get their names by prepending ``test_`` to the value of the
 :setting:`NAME` settings for the databases defined in :setting:`DATABASES`.
 These test databases are deleted when the tests are finished.
 
-.. versionchanged:: 1.7
-
-    Before Django 1.7, the :setting:`NAME` setting was mandatory and had to
-    be the name of an existing database to which the given user had permission
-    to connect.
-
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
 you will need to include a value for :setting:`TEST_CHARSET` in the settings
 dictionary for the applicable database.
+
+.. _runtests-specifying-labels:
 
 Running only some of the tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -107,42 +101,32 @@ tests by appending the names of the test modules to ``runtests.py`` on the
 command line.
 
 For example, if you'd like to run tests only for generic relations and
-internationalization, type:
+internationalization, type::
 
-.. code-block:: bash
-
-    ./runtests.py --settings=path.to.settings generic_relations i18n
+   $ ./runtests.py --settings=path.to.settings generic_relations i18n
 
 How do you find out the names of individual tests? Look in ``tests/`` — each
-directory name there is the name of a test. Contrib app names are also valid
-test names.
+directory name there is the name of a test.
 
 If you just want to run a particular class of tests, you can specify a list of
 paths to individual test classes. For example, to run the ``TranslationTests``
-of the ``i18n`` module, type:
+of the ``i18n`` module, type::
 
-.. code-block:: bash
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
 
-    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests
+Going beyond that, you can specify an individual test method like this::
 
-Going beyond that, you can specify an individual test method like this:
-
-.. code-block:: bash
-
-    ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
+   $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some admin tests require Selenium 2, Firefox and Python >= 2.6 to work via a
-real Web browser. To allow those tests to run and not be skipped, you must
-install the selenium_ package (version > 2.13) into your Python path and run
-the tests with the ``--selenium`` option:
+Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
+Internet Explorer). To allow those tests to be run rather than skipped, you must
+install the selenium_ package into your Python path and run the tests with the
+``--selenium`` option::
 
-.. code-block:: bash
-
-    ./runtests.py --settings=test_sqlite --selenium admin_inlines
-
+   $ ./runtests.py --settings=test_sqlite --selenium admin_inlines
 
 .. _running-unit-tests-dependencies:
 
@@ -154,19 +138,23 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  jinja2_ 2.7+
+*  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
+*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
+*  sqlparse_
 
 You can find these dependencies in `pip requirements files`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so::
 
-    pip install -r tests/requirements/py2.txt  # Python 3: py3.txt
+   $ pip install -r tests/requirements/py3.txt  # Python 2: py2.txt
 
 You can also install the database adapter(s) of your choice using
 ``oracle.txt``, ``mysql.txt``, or ``postgres.txt``.
@@ -182,14 +170,18 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _jinja2: https://pypi.python.org/pypi/jinja2
+.. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML
 .. _pytz: https://pypi.python.org/pypi/pytz/
-.. _setuptools: http://pypi.python.org/pypi/setuptools/
+.. _setuptools: https://pypi.python.org/pypi/setuptools/
 .. _memcached: http://memcached.org/
+.. _mock: https://pypi.python.org/pypi/mock
 .. _gettext: http://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: http://pypi.python.org/pypi/selenium
-.. _pip requirements files: http://www.pip-installer.org/en/latest/requirements.html
+.. _selenium: https://pypi.python.org/pypi/selenium
+.. _sqlparse: https://pypi.python.org/pypi/sqlparse
+.. _pip requirements files: http://www.pip-installer.org/en/latest/user_guide.html#requirements-files
 
 Code coverage
 ~~~~~~~~~~~~~
@@ -200,11 +192,11 @@ in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
 To run coverage on the Django test suite using the standard test settings::
 
-    coverage run ./runtests.py --settings=test_sqlite
+   $ coverage run ./runtests.py --settings=test_sqlite
 
 After running coverage, generate the html report by running::
 
-    coverage html
+   $ coverage html
 
 When running coverage for the Django tests, the included ``.coveragerc``
 settings file  defines ``coverage_html`` as the output directory for the report
@@ -216,14 +208,77 @@ and also excludes several directories not relevant to the results
 Contrib apps
 ------------
 
-Tests for contrib apps go in their respective directories under
-``django/contrib``, in a ``tests.py`` file. You can split the tests over
-multiple modules by using a ``tests`` directory in the normal Python way.
+Tests for contrib apps can be found in the ``tests/`` directory, typically
+under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
+in ``tests/auth_tests``.
 
-For the tests to be found, a ``models.py`` file must exist, even if it's empty.
-If you have URLs that need to be mapped, put them in ``tests/urls.py``.
+.. _troubleshooting-unit-tests:
 
-To run tests for just one contrib app (e.g. ``auth``), use the same
-method as above::
+Troubleshooting
+---------------
 
-    ./runtests.py --settings=settings django.contrib.auth
+Many test failures with ``UnicodeEncodeError``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If the ``locales`` package is not installed, some tests will fail with a
+``UnicodeEncodeError``.
+
+You can resolve this on Debian-based systems, for example, by running::
+
+    $ apt-get install locales
+    $ dpkg-reconfigure locales
+
+Tests that only fail in combination
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In case a test passes when run in isolation but fails within the whole suite,
+we have some tools to help analyze the problem.
+
+The ``--bisect`` option of ``runtests.py`` will run the failing test while
+halving the test set it is run together with on each iteration, often making
+it possible to identify a small number of tests that may be related to the
+failure.
+
+For example, suppose that the failing test that works on its own is
+``ModelTest.test_eq``, then using::
+
+    $ ./runtests.py --bisect basic.tests.ModelTest.test_eq
+
+will try to determine a test that interferes with the given one. First, the
+test is run with the first half of the test suite. If a failure occurs, the
+first half of the test suite is split in two groups and each group is then run
+with the specified test. If there is no failure with the first half of the test
+suite, the second half of the test suite is run with the specified test and
+split appropriately as described earlier. The process repeats until the set of
+failing tests is minimized.
+
+The ``--pair`` option runs the given test alongside every other test from the
+suite, letting you check if another test has side-effects that cause the
+failure. So::
+
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq
+
+will pair ``test_eq`` with every test label.
+
+With both ``--bisect`` and ``--pair``, if you already suspect which cases
+might be responsible for the failure, you may limit tests to be cross-analyzed
+by :ref:`specifying further test labels <runtests-specifying-labels>` after
+the first one::
+
+    $ ./runtests.py --pair basic.tests.ModelTest.test_eq queries transactions
+
+You can also try running any set of tests in reverse using the ``--reverse``
+option in order to verify that executing tests in a different order does not
+cause any trouble::
+
+    $ ./runtests.py basic --reverse
+
+If you wish to examine the SQL being run in failing tests, you can turn on
+:ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
+combine this with ``--verbosity=2``, all SQL queries will be output::
+
+    $ ./runtests.py basic --debug-sql
+
+.. versionadded:: 1.8
+
+    The ``--reverse`` and ``--debug-sql`` options were added.

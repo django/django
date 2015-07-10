@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.db import models
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -63,7 +63,7 @@ class Inventory(models.Model):
 
 class Event(models.Model):
     main_band = models.ForeignKey(Band, limit_choices_to=models.Q(pk__gt=0), related_name='events_main_band_at')
-    supporting_bands = models.ManyToManyField(Band, null=True, blank=True, related_name='events_supporting_band_at')
+    supporting_bands = models.ManyToManyField(Band, blank=True, related_name='events_supporting_band_at')
     start_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     description = models.TextField(blank=True)
@@ -108,7 +108,8 @@ class Individual(models.Model):
     related instances (rendering will be called programmatically in this case).
     """
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', null=True, on_delete=models.SET_NULL)
+    soulmate = models.ForeignKey('self', null=True, on_delete=models.CASCADE, related_name='soulmates')
 
 
 class Company(models.Model):

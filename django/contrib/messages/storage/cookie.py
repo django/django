@@ -3,9 +3,9 @@ import json
 from django.conf import settings
 from django.contrib.messages.storage.base import BaseStorage, Message
 from django.http import SimpleCookie
-from django.utils.crypto import salted_hmac, constant_time_compare
-from django.utils.safestring import SafeData, mark_safe
 from django.utils import six
+from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.safestring import SafeData, mark_safe
 
 
 class MessageEncoder(json.JSONEncoder):
@@ -33,13 +33,16 @@ class MessageDecoder(json.JSONDecoder):
     def process_messages(self, obj):
         if isinstance(obj, list) and obj:
             if obj[0] == MessageEncoder.message_key:
+                if len(obj) == 3:
+                    # Compatibility with previously-encoded messages
+                    return Message(*obj[1:])
                 if obj[1]:
                     obj[3] = mark_safe(obj[3])
                 return Message(*obj[2:])
             return [self.process_messages(item) for item in obj]
         if isinstance(obj, dict):
-            return dict((key, self.process_messages(value))
-                         for key, value in six.iteritems(obj))
+            return {key: self.process_messages(value)
+                    for key, value in six.iteritems(obj)}
         return obj
 
     def decode(self, s, **kwargs):
@@ -100,7 +103,7 @@ class CookieStorage(BaseStorage):
         encoded_data = self._encode(messages)
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
-            # adds it's own overhead, which we must account for.
+            # adds its own overhead, which we must account for.
             cookie = SimpleCookie()  # create outside the loop
 
             def stored_length(val):
@@ -139,7 +142,7 @@ class CookieStorage(BaseStorage):
 
     def _decode(self, data):
         """
-        Safely decodes a encoded text stream back into a list of messages.
+        Safely decodes an encoded text stream back into a list of messages.
 
         If the encoded text stream contained an invalid hash or was in an
         invalid format, ``None`` is returned.

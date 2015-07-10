@@ -119,7 +119,7 @@ to publish your work. If you use the Git workflow, then you should
 announce your branch in the ticket by including a link to your branch.
 When you think your work is ready to be merged in create a pull request.
 
-See the :doc:`working-with-git` documentation for mode details.
+See the :doc:`working-with-git` documentation for more details.
 
 You can also use patches in Trac. When using this style, follow these
 guidelines.
@@ -145,6 +145,8 @@ Regardless of the way you submit your work, follow these steps.
   obvious that the ticket includes a patch, and it will add the ticket to
   the `list of tickets with patches`_.
 
+.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _ticket tracker: https://code.djangoproject.com/newticket
 
 Non-trivial patches
 -------------------
@@ -157,6 +159,8 @@ been discussed on |django-developers|.
 
 If you're not sure whether your patch should be considered non-trivial, just
 ask.
+
+.. _deprecating-a-feature:
 
 Deprecating a feature
 ---------------------
@@ -173,36 +177,55 @@ There are a couple reasons that code in Django might be deprecated:
 
 As the :ref:`deprecation policy<internal-release-deprecation-policy>` describes,
 the first release of Django that deprecates a feature (``A.B``) should raise a
-``PendingDeprecationWarning`` when the deprecated feature is invoked. Assuming
-we have a good test coverage, these warnings will be shown by the test suite
-when :ref:`running it <running-unit-tests>` with warnings enabled:
-``python -Wall runtests.py``. This is annoying and the output of the test suite
-should remain clean. Thus, when adding a ``PendingDeprecationWarning`` you need
-to eliminate or silence any warnings generated when running the tests.
+``RemovedInDjangoXXWarning`` (where XX is the Django version where the feature
+will be removed) when the deprecated feature is invoked. Assuming we have good
+test coverage, these warnings are converted to errors when :ref:`running the
+test suite <running-unit-tests>` with warnings enabled:
+``python -Wall runtests.py``. Thus, when adding a ``RemovedInDjangoXXWarning``
+you need to eliminate or silence any warnings generated when running the tests.
 
 The first step is to remove any use of the deprecated behavior by Django itself.
 Next you can silence warnings in tests that actually test the deprecated
-behavior in one of two ways:
+behavior by using the ``ignore_warnings`` decorator, either at the test or class
+level:
 
 #) In a particular test::
 
+    from django.test import ignore_warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+
+    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    def test_foo(self):
+        ...
+
+#) For an entire test case::
+
+    from django.test import ignore_warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+
+    @ignore_warnings(category=RemovedInDjangoXXWarning)
+    class MyDeprecatedTests(unittest.TestCase):
+        ...
+
+.. versionchanged:: 1.8
+
+    Previous versions of Django had some ``Ignore*DeprecationWarningsMixin``
+    classes to prevent warnings from appearing. These have been replaced by the
+    ``ignore_warnings`` decorator.
+
+You can also add a test for the deprecation warning. You'll have to disable the
+"warning as error" behavior in your test by doing::
+
     import warnings
 
-    def test_foo(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+    def test_foo_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
             # invoke deprecated behavior
-        # go ahead with the rest of the test
 
-#) For an entire test case, ``django.test.utils`` contains three helpful
-   mixins to silence warnings: ``IgnorePendingDeprecationWarningsMixin``,
-   ``IgnoreDeprecationWarningsMixin``, and
-   ``IgnoreAllDeprecationWarningsMixin``. For example::
-
-    from django.test.utils import IgnorePendingDeprecationWarningsMixin
-
-    class MyDeprecatedTests(IgnorePendingDeprecationWarningsMixin, unittest.TestCase):
-        ...
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertEqual(msg, 'Expected deprecation message')
 
 Finally, there are a couple of updates to Django's documentation to make:
 
@@ -215,52 +238,85 @@ Finally, there are a couple of updates to Django's documentation to make:
    the "Features deprecated in A.B" heading.
 
 #) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the ``A.B+2`` version describing what code will be removed.
+   under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each minor release, all ``PendingDeprecationWarning``\s are promoted to
-``DeprecationWarning``\s and any features marked with ``DeprecationWarning``
-are removed.
+In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
+the new version are removed.
 
-Javascript patches
+JavaScript patches
 ------------------
 
-Django's admin system leverages the jQuery framework to increase the
-capabilities of the admin interface. In conjunction, there is an emphasis on
-admin javascript performance and minimizing overall admin media file size.
-Serving compressed or "minified" versions of javascript files is considered
-best practice in this regard.
+For information on JavaScript patches, see the :ref:`javascript-patches`
+documentation.
 
-To that end, patches for javascript files should include both the original
-code for future development (e.g. ``foo.js``), and a compressed version for
-production use (e.g. ``foo.min.js``). Any links to the file in the codebase
-should point to the compressed version.
+.. _patch-review-checklist:
 
-Compressing JavaScript
-~~~~~~~~~~~~~~~~~~~~~~
+Patch review checklist
+----------------------
 
-To simplify the process of providing optimized javascript code, Django
-includes a handy python script which should be used to create a "minified"
-version. To run it::
+Use this checklist to review a pull request. If you are reviewing a pull
+request that is not your own and it passes all the criteria below, please set
+the "Triage Stage" on the corresponding Trac ticket to "Ready for checkin".
+If you've left comments for improvement on the pull request, please tick the
+appropriate flags on the Trac ticket based on the results of your review:
+"Patch needs improvement", "Needs documentation", and/or "Needs tests". As time
+and interest permits, core developers do final reviews of "Ready for checkin"
+tickets and will either commit the patch or bump it back to "Accepted" if
+further works need to be done. If you're looking to become a core developer,
+doing thorough reviews of patches is a great way to earn trust.
 
-    python django/contrib/admin/bin/compress.py
+Looking for a patch to review? Check out the "Patches needing review" section
+of the `Django Development Dashboard <https://dashboard.djangoproject.com/>`_.
+Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
+set so that the ticket appears in that queue.
 
-Behind the scenes, ``compress.py`` is a front-end for Google's
-`Closure Compiler`_ which is written in Java. However, the Closure Compiler
-library is not bundled with Django directly, so those wishing to contribute
-complete javascript patches will need to download and install the library
-independently.
+Documentation
+~~~~~~~~~~~~~
 
-The Closure Compiler library requires Java version 6 or higher (Java 1.6 or
-higher on Mac OS X. Note that Mac OS X 10.5 and earlier did not ship with
-Java 1.6 by default, so it may be necessary to upgrade your Java installation
-before the tool will be functional. Also note that even after upgrading Java,
-the default ``/usr/bin/java`` command may remain linked to the previous Java
-binary, so relinking that command may be necessary as well.)
+* Does the documentation build without any errors (``make html``, or
+  ``make.bat html`` on Windows, from the ``docs`` directory)?
+* Does the documentation follow the writing style guidelines in
+  :doc:`/internals/contributing/writing-documentation`?
+* Are there any :ref:`spelling errors <documentation-spelling-check>`?
 
-Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's javascript.
+Bugs
+~~~~
 
-.. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _ticket tracker: https://code.djangoproject.com/newticket
+* Is there a proper regression test (the test should fail before the fix
+  is applied)?
+
+New Features
+~~~~~~~~~~~~
+
+* Are there tests to "exercise" all of the new code?
+* Is there a release note in ``docs/releases/A.B.txt``?
+* Is there documentation for the feature and is it :ref:`annotated
+  appropriately <documenting-new-features>` with
+  ``.. versionadded:: A.B`` or ``.. versionchanged:: A.B``?
+
+Deprecating a feature
+~~~~~~~~~~~~~~~~~~~~~
+
+See the :ref:`deprecating-a-feature` guide.
+
+All code changes
+~~~~~~~~~~~~~~~~
+
+* Does the :doc:`coding style
+  </internals/contributing/writing-code/coding-style>` conform to our
+  guidelines? Are there any ``flake8`` errors?
+* If the change is backwards incompatible in any way, is there a note
+  in the release notes (``docs/releases/A.B.txt``)?
+* Is Django's test suite passing? Ask in ``#django-dev`` for a core dev
+  to build the pull request against our continuous integration server.
+
+All tickets
+~~~~~~~~~~~
+
+* Is the pull request a single squashed commit with a message that follows our
+  :ref:`commit message format <committing-guidelines>`?
+* Are you the patch author and a new contributor? Please add yourself to the
+  ``AUTHORS`` file and submit a `Contributor License Agreement`_.
+
+.. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/

@@ -1,12 +1,24 @@
 from __future__ import unicode_literals
 
+from psycopg2.extras import Inet
+
 from django.conf import settings
-from django.db.backends import BaseDatabaseOperations
+from django.db.backends.base.operations import BaseDatabaseOperations
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    def __init__(self, connection):
-        super(DatabaseOperations, self).__init__(connection)
+    def unification_cast_sql(self, output_field):
+        internal_type = output_field.get_internal_type()
+        if internal_type in ("GenericIPAddressField", "IPAddressField", "TimeField", "UUIDField"):
+            # PostgreSQL will resolve a union as type 'text' if input types are
+            # 'unknown'.
+            # http://www.postgresql.org/docs/9.4/static/typeconv-union-case.html
+            # These fields cannot be implicitly cast back in the default
+            # PostgreSQL configuration so we need to explicitly cast them.
+            # We must also remove components of the type within brackets:
+            # varchar(255) -> varchar.
+            return 'CAST(%%s AS %s)' % output_field.db_type(self.connection).split('(')[0]
+        return '%s'
 
     def date_extract_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
@@ -16,47 +28,30 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
 
-    def date_interval_sql(self, sql, connector, timedelta):
-        """
-        implements the interval functionality for expressions
-        format for Postgres:
-            (datefield + interval '3 days 200 seconds 5 microseconds')
-        """
-        modifiers = []
-        if timedelta.days:
-            modifiers.append('%s days' % timedelta.days)
-        if timedelta.seconds:
-            modifiers.append('%s seconds' % timedelta.seconds)
-        if timedelta.microseconds:
-            modifiers.append('%s microseconds' % timedelta.microseconds)
-        mods = ' '.join(modifiers)
-        conn = ' %s ' % connector
-        return '(%s)' % conn.join([sql, 'interval \'%s\'' % mods])
-
     def date_trunc_sql(self, lookup_type, field_name):
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         return "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+    def _convert_field_to_tz(self, field_name, tzname):
         if settings.USE_TZ:
             field_name = "%s AT TIME ZONE %%s" % field_name
             params = [tzname]
         else:
             params = []
-        # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
-        if lookup_type == 'week_day':
-            # For consistency across backends, we return Sunday=1, Saturday=7.
-            sql = "EXTRACT('dow' FROM %s) + 1" % field_name
-        else:
-            sql = "EXTRACT('%s' FROM %s)" % (lookup_type, field_name)
+        return field_name, params
+
+    def datetime_cast_date_sql(self, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = '(%s)::date' % field_name
+        return sql, params
+
+    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
+        sql = self.date_extract_sql(lookup_type, field_name)
         return sql, params
 
     def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        if settings.USE_TZ:
-            field_name = "%s AT TIME ZONE %%s" % field_name
-            params = [tzname]
-        else:
-            params = []
+        field_name, params = self._convert_field_to_tz(field_name, tzname)
         # http://www.postgresql.org/docs/current/static/functions-datetime.html#FUNCTIONS-DATETIME-TRUNC
         sql = "DATE_TRUNC('%s', %s)" % (lookup_type, field_name)
         return sql, params
@@ -64,24 +59,22 @@ class DatabaseOperations(BaseDatabaseOperations):
     def deferrable_sql(self):
         return " DEFERRABLE INITIALLY DEFERRED"
 
-    def lookup_cast(self, lookup_type):
+    def lookup_cast(self, lookup_type, internal_type=None):
         lookup = '%s'
 
         # Cast text lookups to text to allow things like filter(x__contains=4)
         if lookup_type in ('iexact', 'contains', 'icontains', 'startswith',
                            'istartswith', 'endswith', 'iendswith', 'regex', 'iregex'):
-            lookup = "%s::text"
+            if internal_type in ('IPAddressField', 'GenericIPAddressField'):
+                lookup = "HOST(%s)"
+            else:
+                lookup = "%s::text"
 
         # Use UPPER(x) for case-insensitive lookups; it's faster.
         if lookup_type in ('iexact', 'icontains', 'istartswith', 'iendswith'):
             lookup = 'UPPER(%s)' % lookup
 
         return lookup
-
-    def field_cast_sql(self, db_type, internal_type):
-        if internal_type == "GenericIPAddressField" or internal_type == "IPAddressField":
-            return 'HOST(%s)'
-        return '%s'
 
     def last_insert_id(self, cursor, table_name, pk_name):
         # Use pg_get_serial_sequence to get the underlying sequence name
@@ -93,15 +86,13 @@ class DatabaseOperations(BaseDatabaseOperations):
     def no_limit_value(self):
         return None
 
+    def prepare_sql_script(self, sql):
+        return [sql]
+
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
         return '"%s"' % name
-
-    def quote_parameter(self, value):
-        # Inner import so backend fails nicely if it's not present
-        import psycopg2
-        return psycopg2.extensions.adapt(value)
 
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
@@ -166,27 +157,35 @@ class DatabaseOperations(BaseDatabaseOperations):
 
             for f in model._meta.local_fields:
                 if isinstance(f, models.AutoField):
-                    output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" %
-                        (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(qn(model._meta.db_table)),
-                        style.SQL_FIELD(f.column),
-                        style.SQL_FIELD(qn(f.column)),
-                        style.SQL_FIELD(qn(f.column)),
-                        style.SQL_KEYWORD('IS NOT'),
-                        style.SQL_KEYWORD('FROM'),
-                        style.SQL_TABLE(qn(model._meta.db_table))))
+                    output.append(
+                        "%s setval(pg_get_serial_sequence('%s','%s'), "
+                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
+                            style.SQL_KEYWORD('SELECT'),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                            style.SQL_FIELD(f.column),
+                            style.SQL_FIELD(qn(f.column)),
+                            style.SQL_FIELD(qn(f.column)),
+                            style.SQL_KEYWORD('IS NOT'),
+                            style.SQL_KEYWORD('FROM'),
+                            style.SQL_TABLE(qn(model._meta.db_table)),
+                        )
+                    )
                     break  # Only one AutoField is allowed per model, so don't bother continuing.
             for f in model._meta.many_to_many:
-                if not f.rel.through:
-                    output.append("%s setval(pg_get_serial_sequence('%s','%s'), coalesce(max(%s), 1), max(%s) %s null) %s %s;" %
-                        (style.SQL_KEYWORD('SELECT'),
-                        style.SQL_TABLE(qn(f.m2m_db_table())),
-                        style.SQL_FIELD('id'),
-                        style.SQL_FIELD(qn('id')),
-                        style.SQL_FIELD(qn('id')),
-                        style.SQL_KEYWORD('IS NOT'),
-                        style.SQL_KEYWORD('FROM'),
-                        style.SQL_TABLE(qn(f.m2m_db_table()))))
+                if not f.remote_field.through:
+                    output.append(
+                        "%s setval(pg_get_serial_sequence('%s','%s'), "
+                        "coalesce(max(%s), 1), max(%s) %s null) %s %s;" % (
+                            style.SQL_KEYWORD('SELECT'),
+                            style.SQL_TABLE(qn(f.m2m_db_table())),
+                            style.SQL_FIELD('id'),
+                            style.SQL_FIELD(qn('id')),
+                            style.SQL_FIELD(qn('id')),
+                            style.SQL_KEYWORD('IS NOT'),
+                            style.SQL_KEYWORD('FROM'),
+                            style.SQL_TABLE(qn(f.m2m_db_table()))
+                        )
+                    )
         return output
 
     def prep_for_iexact_query(self, x):
@@ -225,3 +224,17 @@ class DatabaseOperations(BaseDatabaseOperations):
     def bulk_insert_sql(self, fields, num_values):
         items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
         return "VALUES " + ", ".join([items_sql] * num_values)
+
+    def adapt_datefield_value(self, value):
+        return value
+
+    def adapt_datetimefield_value(self, value):
+        return value
+
+    def adapt_timefield_value(self, value):
+        return value
+
+    def adapt_ipaddressfield_value(self, value):
+        if value:
+            return Inet(value)
+        return None

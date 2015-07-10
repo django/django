@@ -1,0 +1,234 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kevin Sze <leiarix@gmail.com>, 2012
+# Lele Long <schemacs@gmail.com>, 2011,2015
+# pylemon <leeway1985@gmail.com>, 2012-2013
+# Ziang Song <songziang@gmail.com>, 2011
+# Kevin Sze <leiarix@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 12:28+0000\n"
+"Last-Translator: Lele Long <schemacs@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Personal info"
+msgstr "个人信息"
+
+msgid "Permissions"
+msgstr "权限"
+
+msgid "Important dates"
+msgstr "重要日期"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+
+msgid "Password changed successfully."
+msgstr "密码修改成功。"
+
+#, python-format
+msgid "Change password: %s"
+msgstr "修改密码：%s"
+
+msgid "Authentication and Authorization"
+msgstr "认证和授权"
+
+msgid "No password set."
+msgstr "密码未设置。"
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "不可用的密码格式或未知的哈希算法。"
+
+msgid "The two password fields didn't match."
+msgstr "两个密码字段不一致。"
+
+msgid "Password"
+msgstr "密码"
+
+msgid "Password confirmation"
+msgstr "密码确认"
+
+msgid "Enter the same password as above, for verification."
+msgstr "为了校验，输入与上面相同的密码。"
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"原始密码不会存储到数据库，因此没有办法看到这个用户的密码，但您可以使用<a "
+"href=\"password/\">这个表单</a>来更改密码。"
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是大区分大小写的."
+
+msgid "This account is inactive."
+msgstr "该帐号未激活。"
+
+msgid "Email"
+msgstr "电子邮件"
+
+msgid "New password"
+msgstr "新密码"
+
+msgid "New password confirmation"
+msgstr "新密码确认"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "你的旧密码不正确。请重新输入。"
+
+msgid "Old password"
+msgstr "旧密码"
+
+msgid "Password (again)"
+msgstr "密码(重复)"
+
+msgid "algorithm"
+msgstr "算法"
+
+msgid "iterations"
+msgstr "迭代次数"
+
+msgid "salt"
+msgstr "盐"
+
+msgid "hash"
+msgstr "哈希"
+
+msgid "work factor"
+msgstr "加密因子"
+
+msgid "checksum"
+msgstr "校验和"
+
+msgid "name"
+msgstr "名称"
+
+msgid "codename"
+msgstr "代码名称"
+
+msgid "permission"
+msgstr "权限"
+
+msgid "permissions"
+msgstr "权限"
+
+msgid "group"
+msgstr "组"
+
+msgid "groups"
+msgstr "组"
+
+msgid "password"
+msgstr "密码"
+
+msgid "last login"
+msgstr "上次登录"
+
+msgid "superuser status"
+msgstr "超级用户状态"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr "指明该用户缺省拥有所有权限。"
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr "该用户归属的组。一个用户将得到其归属的组的所有权限。"
+
+msgid "user permissions"
+msgstr "用户权限"
+
+msgid "Specific permissions for this user."
+msgstr "为该用户声明权限。"
+
+msgid "username"
+msgstr "用户名"
+
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "必填。不多于30个字符。只能用字母、数字和字符 @/./+/-/_ 。"
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr "请输入合法用户名。只能包含字母，数字和@/./+/-/_ 字符。"
+
+msgid "A user with that username already exists."
+msgstr "已存在一位使用该名字的用户。"
+
+msgid "first name"
+msgstr "名字"
+
+msgid "last name"
+msgstr "姓氏"
+
+msgid "email address"
+msgstr "电子邮件地址"
+
+msgid "staff status"
+msgstr "职员状态"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "指明用户是否可以登录到这个管理站点。"
+
+msgid "active"
+msgstr "有效"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr "指明用户是否被认为活跃的。以反选代替删除帐号。"
+
+msgid "date joined"
+msgstr "加入日期"
+
+msgid "user"
+msgstr "用户"
+
+msgid "users"
+msgstr "用户"
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "重置 %(site_name)s 的密码"
+
+msgid "Logged out"
+msgstr "退出登录"
+
+msgid "Password reset"
+msgstr "密码重置"
+
+msgid "Password reset sent"
+msgstr "密码重置链接已经发送。"
+
+msgid "Enter new password"
+msgstr "输入新密码"
+
+msgid "Password reset unsuccessful"
+msgstr "密码重置失败"
+
+msgid "Password reset complete"
+msgstr "密码重置完成"
+
+msgid "Password change"
+msgstr "密码更改"
+
+msgid "Password change successful"
+msgstr "密码更改成功"

@@ -1,12 +1,12 @@
+import datetime
 from calendar import timegm
 from functools import wraps
 
-from django.contrib.sites.models import get_current_site
+from django.contrib.sites.shortcuts import get_current_site
 from django.core import urlresolvers
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.utils import six
 from django.utils.http import http_date
 
 
@@ -55,7 +55,7 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("No sitemap available for section: %r" % section)
         maps = [sitemaps[section]]
     else:
-        maps = list(six.itervalues(sitemaps))
+        maps = sitemaps.values()
     page = request.GET.get("p", 1)
 
     urls = []
@@ -74,6 +74,11 @@ def sitemap(request, sitemaps, section=None,
     if hasattr(site, 'latest_lastmod'):
         # if latest_lastmod is defined for site, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
+        lastmod = site.latest_lastmod
         response['Last-Modified'] = http_date(
-            timegm(site.latest_lastmod.utctimetuple()))
+            timegm(
+                lastmod.utctimetuple() if isinstance(lastmod, datetime.datetime)
+                else lastmod.timetuple()
+            )
+        )
     return response

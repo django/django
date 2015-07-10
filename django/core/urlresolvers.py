@@ -8,21 +8,24 @@ a string) and returns a tuple in this format:
 """
 from __future__ import unicode_literals
 
-from importlib import import_module
+import functools
 import re
+import warnings
+from importlib import import_module
 from threading import local
 
-from django.http import Http404
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.http import Http404
+from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
-from django.utils.functional import lazy
-from django.utils.http import urlquote
+from django.utils.functional import cached_property, lazy
+from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
 from django.utils.regex_helper import normalize
-from django.utils import six, lru_cache
-from django.utils.translation import get_language
-
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
+from django.utils.translation import get_language, override
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -34,38 +37,39 @@ _urlconfs = local()
 
 
 class ResolverMatch(object):
-    def __init__(self, func, args, kwargs, url_name=None, app_name=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
-        self.app_name = app_name
+        self.url_name = url_name
+
+        # If a URLRegexResolver doesn't have a namespace or app_name, it passes
+        # in an empty value.
+        self.app_names = [x for x in app_names if x] if app_names else []
+        self.app_name = ':'.join(self.app_names)
+
         if namespaces:
             self.namespaces = [x for x in namespaces if x]
         else:
             self.namespaces = []
-        if not url_name:
-            if not hasattr(func, '__name__'):
-                # An instance of a callable class
-                url_name = '.'.join([func.__class__.__module__, func.__class__.__name__])
-            else:
-                # A function
-                url_name = '.'.join([func.__module__, func.__name__])
-        self.url_name = url_name
+        self.namespace = ':'.join(self.namespaces)
 
-    @property
-    def namespace(self):
-        return ':'.join(self.namespaces)
+        if not hasattr(func, '__name__'):
+            # A class-based view
+            self._func_path = '.'.join([func.__class__.__module__, func.__class__.__name__])
+        else:
+            # A function-based view
+            self._func_path = '.'.join([func.__module__, func.__name__])
 
-    @property
-    def view_name(self):
-        return ':'.join(filter(bool, (self.namespace, self.url_name)))
+        view_path = url_name or self._func_path
+        self.view_name = ':'.join(self.namespaces + [view_path])
 
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name='%s', app_name='%s', namespace='%s')" % (
-            self.func, self.args, self.kwargs, self.url_name, self.app_name, self.namespace)
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
+            self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces)
 
 
 class Resolver404(Http404):
@@ -79,43 +83,66 @@ class NoReverseMatch(Exception):
 @lru_cache.lru_cache(maxsize=None)
 def get_callable(lookup_view, can_fail=False):
     """
-    Convert a string version of a function name to the callable object.
+    Return a callable corresponding to lookup_view. This function is used
+    by both resolve() and reverse(), so can_fail allows the caller to choose
+    between returning the input as is and raising an exception when the input
+    string can't be interpreted as an import path.
 
-    If the lookup_view is not an import path, it is assumed to be a URL pattern
-    label and the original string is returned.
-
-    If can_fail is True, lookup_view might be a URL pattern label, so errors
-    during the import fail and the string is returned.
+    If lookup_view is already a callable, return it.
+    If lookup_view is a string import path that can be resolved to a callable,
+      import that callable and return it.
+    If lookup_view is some other kind of string and can_fail is True, the string
+      is returned as is. If can_fail is False, an exception is raised (either
+      ImportError or ViewDoesNotExist).
     """
-    if not callable(lookup_view):
-        mod_name, func_name = get_mod_func(lookup_view)
-        if func_name == '':
-            return lookup_view
+    if callable(lookup_view):
+        return lookup_view
 
-        try:
-            mod = import_module(mod_name)
-        except ImportError:
-            parentmod, submod = get_mod_func(mod_name)
-            if (not can_fail and submod != '' and
-                    not module_has_submodule(import_module(parentmod), submod)):
-                raise ViewDoesNotExist(
-                    "Could not import %s. Parent module %s does not exist." %
-                    (lookup_view, mod_name))
-            if not can_fail:
-                raise
+    if not isinstance(lookup_view, six.string_types):
+        raise ViewDoesNotExist(
+            "'%s' is not a callable or a dot-notation path" % lookup_view
+        )
+
+    mod_name, func_name = get_mod_func(lookup_view)
+    if not func_name:  # No '.' in lookup_view
+        if can_fail:
+            return lookup_view
         else:
-            try:
-                lookup_view = getattr(mod, func_name)
-                if not callable(lookup_view):
-                    raise ViewDoesNotExist(
-                        "Could not import %s.%s. View is not callable." %
-                        (mod_name, func_name))
-            except AttributeError:
-                if not can_fail:
-                    raise ViewDoesNotExist(
-                        "Could not import %s. View does not exist in module %s." %
-                        (lookup_view, mod_name))
-    return lookup_view
+            raise ImportError(
+                "Could not import '%s'. The path must be fully qualified." %
+                lookup_view)
+
+    try:
+        mod = import_module(mod_name)
+    except ImportError:
+        if can_fail:
+            return lookup_view
+        else:
+            parentmod, submod = get_mod_func(mod_name)
+            if submod and not module_has_submodule(import_module(parentmod), submod):
+                raise ViewDoesNotExist(
+                    "Could not import '%s'. Parent module %s does not exist." %
+                    (lookup_view, mod_name))
+            else:
+                raise
+    else:
+        try:
+            view_func = getattr(mod, func_name)
+        except AttributeError:
+            if can_fail:
+                return lookup_view
+            else:
+                raise ViewDoesNotExist(
+                    "Could not import '%s'. View does not exist in module %s." %
+                    (lookup_view, mod_name))
+        else:
+            if not callable(view_func):
+                # For backwards compatibility this is raised regardless of can_fail
+                raise ViewDoesNotExist(
+                    "Could not import '%s.%s'. View is not callable." %
+                    (mod_name, func_name))
+
+            return view_func
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -131,8 +158,7 @@ def get_ns_resolver(ns_pattern, resolver):
     # Build a namespaced resolver for the given parent urlconf pattern.
     # This makes it possible to have captured parameters in the parent
     # urlconf pattern.
-    ns_resolver = RegexURLResolver(ns_pattern,
-                                          resolver.url_patterns)
+    ns_resolver = RegexURLResolver(ns_pattern, resolver.url_patterns)
     return RegexURLResolver(r'^/', [ns_resolver])
 
 
@@ -235,10 +261,10 @@ class RegexURLPattern(LocaleRegexProvider):
 class RegexURLResolver(LocaleRegexProvider):
     def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
         LocaleRegexProvider.__init__(self, regex)
-        # urlconf_name is a string representing the module containing URLconfs.
+        # urlconf_name is the dotted Python path to the module defining
+        # urlpatterns. It may also be an object with an urlpatterns attribute
+        # or urlpatterns itself.
         self.urlconf_name = urlconf_name
-        if not isinstance(urlconf_name, six.string_types):
-            self._urlconf_module = self.urlconf_name
         self.callback = None
         self.default_kwargs = default_kwargs or {}
         self.namespace = namespace
@@ -246,6 +272,10 @@ class RegexURLResolver(LocaleRegexProvider):
         self._reverse_dict = {}
         self._namespace_dict = {}
         self._app_dict = {}
+        # set of dotted paths to all functions and classes that are used in
+        # urlpatterns
+        self._callback_strs = set()
+        self._populated = False
 
     def __repr__(self):
         if isinstance(self.urlconf_name, list) and len(self.urlconf_name):
@@ -263,6 +293,18 @@ class RegexURLResolver(LocaleRegexProvider):
         apps = {}
         language_code = get_language()
         for pattern in reversed(self.url_patterns):
+            if hasattr(pattern, '_callback_str'):
+                self._callback_strs.add(pattern._callback_str)
+            elif hasattr(pattern, '_callback'):
+                callback = pattern._callback
+                if isinstance(callback, functools.partial):
+                    callback = callback.func
+
+                if not hasattr(callback, '__name__'):
+                    lookup_str = callback.__module__ + "." + callback.__class__.__name__
+                else:
+                    lookup_str = callback.__module__ + "." + callback.__name__
+                self._callback_strs.add(lookup_str)
             p_pattern = pattern.regex.pattern
             if p_pattern.startswith('^'):
                 p_pattern = p_pattern[1:]
@@ -272,17 +314,23 @@ class RegexURLResolver(LocaleRegexProvider):
                     if pattern.app_name:
                         apps.setdefault(pattern.app_name, []).append(pattern.namespace)
                 else:
-                    parent = normalize(pattern.regex.pattern)
+                    parent_pat = pattern.regex.pattern
                     for name in pattern.reverse_dict:
                         for matches, pat, defaults in pattern.reverse_dict.getlist(name):
-                            new_matches = []
-                            for piece, p_args in parent:
-                                new_matches.extend((piece + suffix, p_args + args) for (suffix, args) in matches)
-                            lookups.appendlist(name, (new_matches, p_pattern + pat, dict(defaults, **pattern.default_kwargs)))
+                            new_matches = normalize(parent_pat + pat)
+                            lookups.appendlist(
+                                name,
+                                (
+                                    new_matches,
+                                    p_pattern + pat,
+                                    dict(defaults, **pattern.default_kwargs),
+                                )
+                            )
                     for namespace, (prefix, sub_pattern) in pattern.namespace_dict.items():
                         namespaces[namespace] = (p_pattern + prefix, sub_pattern)
                     for app_name, namespace_list in pattern.app_dict.items():
                         apps.setdefault(app_name, []).extend(namespace_list)
+                    self._callback_strs.update(pattern._callback_strs)
             else:
                 bits = normalize(p_pattern)
                 lookups.appendlist(pattern.callback, (bits, p_pattern, pattern.default_args))
@@ -291,6 +339,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self._reverse_dict[language_code] = lookups
         self._namespace_dict[language_code] = namespaces
         self._app_dict[language_code] = apps
+        self._populated = True
 
     @property
     def reverse_dict(self):
@@ -313,6 +362,11 @@ class RegexURLResolver(LocaleRegexProvider):
             self._populate()
         return self._app_dict[language_code]
 
+    def _is_callback(self, name):
+        if not self._populated:
+            self._populate()
+        return name in self._callback_strs
+
     def resolve(self, path):
         path = force_text(path)  # path may be a reverse_lazy object
         tried = []
@@ -330,31 +384,51 @@ class RegexURLResolver(LocaleRegexProvider):
                         tried.append([pattern])
                 else:
                     if sub_match:
+                        # Merge captured arguments in match with submatch
                         sub_match_dict = dict(match.groupdict(), **self.default_kwargs)
                         sub_match_dict.update(sub_match.kwargs)
-                        return ResolverMatch(sub_match.func, sub_match.args, sub_match_dict, sub_match.url_name, self.app_name or sub_match.app_name, [self.namespace] + sub_match.namespaces)
+
+                        # If there are *any* named groups, ignore all non-named groups.
+                        # Otherwise, pass all non-named arguments as positional arguments.
+                        sub_match_args = sub_match.args
+                        if not sub_match_dict:
+                            sub_match_args = match.groups() + sub_match.args
+
+                        return ResolverMatch(
+                            sub_match.func,
+                            sub_match_args,
+                            sub_match_dict,
+                            sub_match.url_name,
+                            [self.app_name] + sub_match.app_names,
+                            [self.namespace] + sub_match.namespaces
+                        )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
         raise Resolver404({'path': path})
 
-    @property
+    @cached_property
     def urlconf_module(self):
-        try:
-            return self._urlconf_module
-        except AttributeError:
-            self._urlconf_module = import_module(self.urlconf_name)
-            return self._urlconf_module
+        if isinstance(self.urlconf_name, six.string_types):
+            return import_module(self.urlconf_name)
+        else:
+            return self.urlconf_name
 
-    @property
+    @cached_property
     def url_patterns(self):
+        # urlconf_module might be a valid set of patterns, so we default to it
         patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
         try:
             iter(patterns)
         except TypeError:
-            raise ImproperlyConfigured("The included urlconf %s doesn't have any patterns in it" % self.urlconf_name)
+            msg = (
+                "The included urlconf '{name}' does not appear to have any "
+                "patterns in it. If you see valid patterns in the file then "
+                "the issue is probably caused by a circular import."
+            )
+            raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
         return patterns
 
-    def _resolve_special(self, view_type):
+    def resolve_error_handler(self, view_type):
         callback = getattr(self.urlconf_module, 'handler%s' % view_type, None)
         if not callback:
             # No handler specified in file; use default
@@ -363,18 +437,6 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
-    def resolve400(self):
-        return self._resolve_special('400')
-
-    def resolve403(self):
-        return self._resolve_special('403')
-
-    def resolve404(self):
-        return self._resolve_special('404')
-
-    def resolve500(self):
-        return self._resolve_special('500')
-
     def reverse(self, lookup_view, *args, **kwargs):
         return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
 
@@ -382,23 +444,34 @@ class RegexURLResolver(LocaleRegexProvider):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
         text_args = [force_text(v) for v in args]
-        text_kwargs = dict((k, force_text(v)) for (k, v) in kwargs.items())
+        text_kwargs = {k: force_text(v) for (k, v) in kwargs.items()}
 
+        if not self._populated:
+            self._populate()
+
+        original_lookup = lookup_view
         try:
-            lookup_view = get_callable(lookup_view, True)
+            if self._is_callback(lookup_view):
+                lookup_view = get_callable(lookup_view, True)
         except (ImportError, AttributeError) as e:
             raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
+        else:
+            if not callable(original_lookup) and callable(lookup_view):
+                warnings.warn(
+                    'Reversing by dotted path is deprecated (%s).' % original_lookup,
+                    RemovedInDjango110Warning, stacklevel=3
+                )
         possibilities = self.reverse_dict.getlist(lookup_view)
 
-        prefix_norm, prefix_args = normalize(urlquote(_prefix))[0]
         for possibility, pattern, defaults in possibilities:
             for result, params in possibility:
                 if args:
-                    if len(args) != len(params) + len(prefix_args):
+                    if len(args) != len(params):
                         continue
-                    candidate_subs = dict(zip(prefix_args + params, text_args))
+                    candidate_subs = dict(zip(params, text_args))
                 else:
-                    if set(kwargs.keys()) | set(defaults.keys()) != set(params) | set(defaults.keys()) | set(prefix_args):
+                    if (set(kwargs.keys()) | set(defaults.keys()) != set(params) |
+                            set(defaults.keys())):
                         continue
                     matches = True
                     for k, v in defaults.items():
@@ -413,10 +486,14 @@ class RegexURLResolver(LocaleRegexProvider):
                 # without quoting to build a decoded URL and look for a match.
                 # Then, if we have a match, redo the substitution with quoted
                 # arguments in order to return a properly encoded URL.
-                candidate_pat = prefix_norm.replace('%', '%%') + result
-                if re.search('^%s%s' % (prefix_norm, pattern), candidate_pat % candidate_subs, re.UNICODE):
-                    candidate_subs = dict((k, urlquote(v)) for (k, v) in candidate_subs.items())
-                    return candidate_pat % candidate_subs
+                candidate_pat = _prefix.replace('%', '%%') + result
+                if re.search('^%s%s' % (re.escape(_prefix), pattern), candidate_pat % candidate_subs, re.UNICODE):
+                    # safe characters from `pchar` definition of RFC 3986
+                    url = urlquote(candidate_pat % candidate_subs, safe=RFC3986_SUBDELIMS + str('/~:@'))
+                    # Don't allow construction of scheme relative urls.
+                    if url.startswith('//'):
+                        url = '/%%2F%s' % url[2:]
+                    return url
         # lookup_view can be URL label, or dotted path, or callable, Any of
         # these can be passed in at the top, but callables are not friendly in
         # error messages.
@@ -459,15 +536,14 @@ def resolve(path, urlconf=None):
     return get_resolver(urlconf).resolve(path)
 
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current_app=None):
+def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if urlconf is None:
         urlconf = get_urlconf()
     resolver = get_resolver(urlconf)
     args = args or []
     kwargs = kwargs or {}
 
-    if prefix is None:
-        prefix = get_script_prefix()
+    prefix = get_script_prefix()
 
     if not isinstance(viewname, six.string_types):
         view = viewname
@@ -477,19 +553,26 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         view = parts[0]
         path = parts[1:]
 
+        if current_app:
+            current_path = current_app.split(':')
+            current_path.reverse()
+        else:
+            current_path = None
+
         resolved_path = []
         ns_pattern = ''
         while path:
             ns = path.pop()
+            current_ns = current_path.pop() if current_path else None
 
             # Lookup the name to see if it could be an app identifier
             try:
                 app_list = resolver.app_dict[ns]
                 # Yes! Path part matches an app in the current Resolver
-                if current_app and current_app in app_list:
+                if current_ns and current_ns in app_list:
                     # If we are reversing for a particular app,
                     # use that namespace
-                    ns = current_app
+                    ns = current_ns
                 elif ns not in app_list:
                     # The name isn't shared by one of the instances
                     # (i.e., the default) so just pick the first instance
@@ -497,6 +580,9 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
                     ns = app_list[0]
             except KeyError:
                 pass
+
+            if ns != current_ns:
+                current_path = None
 
             try:
                 extra, resolver = resolver.namespace_dict[ns]
@@ -513,9 +599,9 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None, current
         if ns_pattern:
             resolver = get_ns_resolver(ns_pattern, resolver)
 
-    return iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs))
+    return force_text(iri_to_uri(resolver._reverse_with_prefix(view, prefix, *args, **kwargs)))
 
-reverse_lazy = lazy(reverse, str)
+reverse_lazy = lazy(reverse, six.text_type)
 
 
 def clear_url_caches():
@@ -585,3 +671,26 @@ def is_valid_path(path, urlconf=None):
         return True
     except Resolver404:
         return False
+
+
+def translate_url(url, lang_code):
+    """
+    Given a URL (absolute or relative), try to get its translated version in
+    the `lang_code` language (either by i18n_patterns or by translated regex).
+    Return the original URL if no translated version is found.
+    """
+    parsed = urlsplit(url)
+    try:
+        match = resolve(parsed.path)
+    except Resolver404:
+        pass
+    else:
+        to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
+        with override(lang_code):
+            try:
+                url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
+            except NoReverseMatch:
+                pass
+            else:
+                url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+    return url

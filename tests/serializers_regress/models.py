@@ -2,13 +2,14 @@
 A test spanning all the capabilities of all the serializers.
 
 This class sets up a model for each model field type
-(except for image types, because of the Pillow/PIL dependency).
+(except for image types, because of the Pillow dependency).
 """
-import warnings
-
-from django.db import models
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
@@ -65,12 +66,6 @@ class BigIntegerData(models.Model):
 #    data = models.ImageField(null=True)
 
 
-class IPAddressData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(null=True)
-
-
 class GenericIPAddressData(models.Model):
     data = models.GenericIPAddressField(null=True)
 
@@ -109,7 +104,7 @@ class Tag(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
 
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
 
     class Meta:
         ordering = ["data"]
@@ -118,7 +113,7 @@ class Tag(models.Model):
 class GenericData(models.Model):
     data = models.CharField(max_length=30)
 
-    tags = generic.GenericRelation(Tag)
+    tags = GenericRelation(Tag)
 
 # The following test classes are all for validation
 # of related objects; in particular, forward, backward,
@@ -166,7 +161,7 @@ class FKDataNaturalKey(models.Model):
 
 
 class M2MData(models.Model):
-    data = models.ManyToManyField(Anchor, null=True)
+    data = models.ManyToManyField(Anchor)
 
 
 class O2OData(models.Model):
@@ -179,7 +174,7 @@ class FKSelfData(models.Model):
 
 
 class M2MSelfData(models.Model):
-    data = models.ManyToManyField('self', null=True, symmetrical=False)
+    data = models.ManyToManyField('self', symmetrical=False)
 
 
 class FKDataToField(models.Model):
@@ -191,7 +186,7 @@ class FKDataToO2O(models.Model):
 
 
 class M2MIntermediateData(models.Model):
-    data = models.ManyToManyField(Anchor, null=True, through='Intermediate')
+    data = models.ManyToManyField(Anchor, through='Intermediate')
 
 
 class Intermediate(models.Model):
@@ -247,12 +242,6 @@ class IntegerPKData(models.Model):
 #    data = models.ImageField(primary_key=True)
 
 
-class IPAddressPKData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(primary_key=True)
-
-
 class GenericIPAddressPKData(models.Model):
     data = models.GenericIPAddressField(primary_key=True)
 
@@ -281,6 +270,14 @@ class SmallPKData(models.Model):
 
 # class TimePKData(models.Model):
 #    data = models.TimeField(primary_key=True)
+
+
+class UUIDData(models.Model):
+    data = models.UUIDField(primary_key=True)
+
+
+class FKToUUID(models.Model):
+    data = models.ForeignKey(UUIDData)
 
 
 class ComplexModel(models.Model):

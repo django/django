@@ -5,13 +5,17 @@ import datetime
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
-from django.forms import Form, ModelForm, FileField, ModelChoiceField, CharField
+from django.forms import (
+    CharField, FileField, Form, ModelChoiceField, ModelForm,
+)
 from django.forms.models import ModelFormMetaclass
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
-from ..models import (ChoiceModel, ChoiceOptionModel, ChoiceFieldModel,
-    FileModel, Group, BoundaryModel, Defaults, OptionalMultiChoiceModel)
+from ..models import (
+    BoundaryModel, ChoiceFieldModel, ChoiceModel, ChoiceOptionModel, Defaults,
+    FileModel, Group, OptionalMultiChoiceModel,
+)
 
 
 class ChoiceFieldForm(ModelForm):
@@ -111,12 +115,12 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+</select><input type="hidden" name="initial-multi_choice" value="1" id="initial-id_multi_choice_0" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1" selected="selected">ChoiceOption 1</option>
 <option value="2">ChoiceOption 2</option>
 <option value="3">ChoiceOption 3</option>
-</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+</select><input type="hidden" name="initial-multi_choice_int" value="1" id="initial-id_multi_choice_int_0" /></p>""")
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
@@ -143,13 +147,13 @@ class ModelFormCallableModelDefault(TestCase):
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice" value="2" id="initial-id_multi_choice_0" />
-<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>
+<input type="hidden" name="initial-multi_choice" value="3" id="initial-id_multi_choice_1" /></p>
 <p><label for="id_multi_choice_int">Multi choice int:</label> <select multiple="multiple" name="multi_choice_int" id="id_multi_choice_int">
 <option value="1">ChoiceOption 1</option>
 <option value="2" selected="selected">ChoiceOption 2</option>
 <option value="3" selected="selected">ChoiceOption 3</option>
 </select><input type="hidden" name="initial-multi_choice_int" value="2" id="initial-id_multi_choice_int_0" />
-<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /> <span class="helptext"> Hold down "Control", or "Command" on a Mac, to select more than one.</span></p>""")
+<input type="hidden" name="initial-multi_choice_int" value="3" id="initial-id_multi_choice_int_1" /></p>""")
 
 
 class FormsModelTestCase(TestCase):
@@ -157,7 +161,7 @@ class FormsModelTestCase(TestCase):
         # FileModel with unicode filename and data #########################
         f = FileForm(data={}, files={'file1': SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))}, auto_id=False)
         self.assertTrue(f.is_valid())
-        self.assertTrue('file1' in f.cleaned_data)
+        self.assertIn('file1', f.cleaned_data)
         m = FileModel.objects.create(file=f.cleaned_data['file1'])
         self.assertEqual(m.file.name, 'tests/\u6211\u96bb\u6c23\u588a\u8239\u88dd\u6eff\u6652\u9c54.txt')
         m.delete()
@@ -218,7 +222,7 @@ class FormsModelTestCase(TestCase):
         self.assertEqual(obj.def_date, datetime.date(1999, 3, 2))
 
 
-class RelatedModelFormTests(TestCase):
+class RelatedModelFormTests(SimpleTestCase):
     def test_invalid_loading_order(self):
         """
         Test for issue 10405
@@ -239,14 +243,14 @@ class RelatedModelFormTests(TestCase):
         """
         Test for issue 10405
         """
-        class A(models.Model):
-            ref = models.ForeignKey("B")
+        class C(models.Model):
+            ref = models.ForeignKey("D")
 
-        class B(models.Model):
+        class D(models.Model):
             pass
 
         class Meta:
-            model = A
+            model = C
             fields = '__all__'
 
         self.assertTrue(issubclass(ModelFormMetaclass(str('Form'), (ModelForm,), {'Meta': Meta}), ModelForm))
@@ -316,7 +320,7 @@ class EmptyLabelTestCase(TestCase):
             m = f.save()
             self.assertEqual(expected, getattr(m, key))
             self.assertEqual('No Preference',
-                             getattr(m, 'get_{0}_display'.format(key))())
+                             getattr(m, 'get_{}_display'.format(key))())
 
     def test_empty_field_integer(self):
         f = EmptyIntegerLabelChoiceForm()
@@ -330,7 +334,7 @@ class EmptyLabelTestCase(TestCase):
 
     def test_get_display_value_on_none(self):
         m = ChoiceModel.objects.create(name='test', choice='', choice_integer=None)
-        self.assertEqual(None, m.choice_integer)
+        self.assertIsNone(m.choice_integer)
         self.assertEqual('No Preference', m.get_choice_integer_display())
 
     def test_html_rendering_of_prepopulated_models(self):

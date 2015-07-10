@@ -4,11 +4,10 @@ import logging
 
 from django.conf import settings
 from django.contrib.gis import gdal
-from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.template import loader
-from django.utils import six
-from django.utils import translation
+from django.utils import six, translation
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -60,13 +59,14 @@ class BaseGeometryWidget(Widget):
                     ogr = value.ogr
                     ogr.transform(self.map_srid)
                     value = ogr
-                except gdal.OGRException as err:
+                except gdal.GDALException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
                             value.srid, self.map_srid, err)
                     )
 
-        context = self.build_attrs(attrs,
+        context = self.build_attrs(
+            attrs,
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
@@ -102,20 +102,18 @@ class OSMWidget(BaseGeometryWidget):
             'gis/js/OLMapWidget.js',
         )
 
+    def __init__(self, attrs=None):
+        super(OSMWidget, self).__init__()
+        for key in ('default_lon', 'default_lat'):
+            self.attrs[key] = getattr(self, key)
+        if attrs:
+            self.attrs.update(attrs)
+
     @property
     def map_srid(self):
-        # Use the official spherical mercator projection SRID on versions
-        # of GDAL that support it; otherwise, fallback to 900913.
-        if gdal.HAS_GDAL and gdal.GDAL_VERSION >= (1, 7):
+        # Use the official spherical mercator projection SRID when GDAL is
+        # available; otherwise, fallback to 900913.
+        if gdal.HAS_GDAL:
             return 3857
         else:
             return 900913
-
-    def render(self, name, value, attrs=None):
-        default_attrs = {
-            'default_lon': self.default_lon,
-            'default_lat': self.default_lat,
-        }
-        if attrs:
-            default_attrs.update(attrs)
-        return super(OSMWidget, self).render(name, value, default_attrs)

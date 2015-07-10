@@ -2,19 +2,23 @@
 Classes to represent the default SQL aggregate functions
 """
 import copy
+import warnings
 
-from django.db.models.fields import IntegerField, FloatField
-
+from django.db.models.fields import FloatField, IntegerField
+from django.db.models.lookups import RegisterLookupMixin
+from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.functional import cached_property
 
 __all__ = ['Aggregate', 'Avg', 'Count', 'Max', 'Min', 'StdDev', 'Sum', 'Variance']
 
 
-# Fake fields used to identify aggregate types in data-conversion operations.
-ordinal_aggregate_field = IntegerField()
-computed_aggregate_field = FloatField()
+warnings.warn(
+    "django.db.models.sql.aggregates is deprecated. Use "
+    "django.db.models.aggregates instead.",
+    RemovedInDjango110Warning, stacklevel=2)
 
 
-class Aggregate(object):
+class Aggregate(RegisterLookupMixin):
     """
     Default SQL Aggregate.
     """
@@ -60,13 +64,22 @@ class Aggregate(object):
 
         while tmp and isinstance(tmp, Aggregate):
             if getattr(tmp, 'is_ordinal', False):
-                tmp = ordinal_aggregate_field
+                tmp = self._ordinal_aggregate_field
             elif getattr(tmp, 'is_computed', False):
-                tmp = computed_aggregate_field
+                tmp = self._computed_aggregate_field
             else:
                 tmp = tmp.source
 
         self.field = tmp
+
+    # Two fake fields used to identify aggregate types in data-conversion operations.
+    @cached_property
+    def _ordinal_aggregate_field(self):
+        return IntegerField()
+
+    @cached_property
+    def _computed_aggregate_field(self):
+        return FloatField()
 
     def relabeled_clone(self, change_map):
         clone = copy.copy(self)
@@ -74,16 +87,16 @@ class Aggregate(object):
             clone.col = (change_map.get(self.col[0], self.col[0]), self.col[1])
         return clone
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
         "Return the aggregate, rendered as SQL with parameters."
         params = []
 
         if hasattr(self.col, 'as_sql'):
-            field_name, params = self.col.as_sql(qn, connection)
+            field_name, params = self.col.as_sql(compiler, connection)
         elif isinstance(self.col, (list, tuple)):
-            field_name = '.'.join(qn(c) for c in self.col)
+            field_name = '.'.join(compiler(c) for c in self.col)
         else:
-            field_name = qn(self.col)
+            field_name = compiler(self.col)
 
         substitutions = {
             'function': self.sql_function,
@@ -92,6 +105,13 @@ class Aggregate(object):
         substitutions.update(self.extra)
 
         return self.sql_template % substitutions, params
+
+    def get_group_by_cols(self):
+        return []
+
+    @property
+    def output_field(self):
+        return self.field
 
 
 class Avg(Aggregate):

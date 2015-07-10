@@ -1,0 +1,47 @@
+==========================
+Django 1.5.8 release notes
+==========================
+
+*May 14, 2014*
+
+Django 1.5.8 fixes two security issues in 1.5.8.
+
+Caches may incorrectly be allowed to store and serve private data
+=================================================================
+
+In certain situations, Django may allow caches to store private data
+related to a particular session and then serve that data to requests
+with a different session, or no session at all. This can lead to
+information disclosure and can be a vector for cache poisoning.
+
+When using Django sessions, Django will set a ``Vary: Cookie`` header to
+ensure caches do not serve cached data to requests from other sessions.
+However, older versions of Internet Explorer (most likely only Internet
+Explorer 6, and Internet Explorer 7 if run on Windows XP or Windows Server
+2003) are unable to handle the ``Vary`` header in combination with many content
+types. Therefore, Django would remove the header if the request was made by
+Internet Explorer.
+
+To remedy this, the special behavior for these older Internet Explorer versions
+has been removed, and the ``Vary`` header is no longer stripped from the response.
+In addition, modifications to the ``Cache-Control`` header for all Internet Explorer
+requests with a ``Content-Disposition`` header have also been removed as they
+were found to have similar issues.
+
+Malformed redirect URLs from user input not correctly validated
+===============================================================
+
+The validation for redirects did not correctly validate some malformed URLs,
+which are accepted by some browsers. This allows a user to be redirected to
+an unsafe URL unexpectedly.
+
+Django relies on user input in some cases (e.g.
+:func:`django.contrib.auth.views.login`, ``django.contrib.comments``, and
+:doc:`i18n </topics/i18n/index>`) to redirect the user to an "on success" URL.
+The security checks for these redirects (namely
+``django.utils.http.is_safe_url()``) did not correctly validate some malformed
+URLs, such as `http:\\\\\\djangoproject.com`, which are accepted by some browsers
+with more liberal URL parsing.
+
+To remedy this, the validation in ``is_safe_url()`` has been tightened to be able
+to handle and correctly validate these malformed URLs.

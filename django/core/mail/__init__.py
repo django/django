@@ -4,18 +4,17 @@ Tools for sending email.
 from __future__ import unicode_literals
 
 from django.conf import settings
-from django.utils.module_loading import import_by_path
-
-# Imported for backwards compatibility, and for the sake
+# Imported for backwards compatibility and for the sake
 # of a cleaner namespace. These symbols used to be in
 # django/core/mail.py before the introduction of email
 # backends and the subsequent reorganization (See #10355)
-from django.core.mail.utils import CachedDnsName, DNS_NAME
 from django.core.mail.message import (
-    EmailMessage, EmailMultiAlternatives,
-    SafeMIMEText, SafeMIMEMultipart,
-    DEFAULT_ATTACHMENT_MIME_TYPE, make_msgid,
-    BadHeaderError, forbid_multi_line_headers)
+    DEFAULT_ATTACHMENT_MIME_TYPE, BadHeaderError, EmailMessage,
+    EmailMultiAlternatives, SafeMIMEMultipart, SafeMIMEText,
+    forbid_multi_line_headers, make_msgid,
+)
+from django.core.mail.utils import DNS_NAME, CachedDnsName
+from django.utils.module_loading import import_string
 
 __all__ = [
     'CachedDnsName', 'DNS_NAME', 'EmailMessage', 'EmailMultiAlternatives',
@@ -34,7 +33,7 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     Both fail_silently and other keyword arguments are used in the
     constructor of the backend.
     """
-    klass = import_by_path(backend or settings.EMAIL_BACKEND)
+    klass = import_string(backend or settings.EMAIL_BACKEND)
     return klass(fail_silently=fail_silently, **kwds)
 
 

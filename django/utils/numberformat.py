@@ -1,6 +1,10 @@
+from __future__ import unicode_literals
+
+from decimal import Decimal
+
 from django.conf import settings
-from django.utils.safestring import mark_safe
 from django.utils import six
+from django.utils.safestring import mark_safe
 
 
 def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
@@ -22,7 +26,10 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         return mark_safe(six.text_type(number))
     # sign
     sign = ''
-    str_number = six.text_type(number)
+    if isinstance(number, Decimal):
+        str_number = '{:f}'.format(number)
+    else:
+        str_number = six.text_type(number)
     if str_number[0] == '-':
         sign = '-'
         str_number = str_number[1:]
@@ -42,7 +49,7 @@ def format(number, decimal_sep, decimal_pos=None, grouping=0, thousand_sep='',
         int_part_gd = ''
         for cnt, digit in enumerate(int_part[::-1]):
             if cnt and not cnt % grouping:
-                int_part_gd += thousand_sep
+                int_part_gd += thousand_sep[::-1]
             int_part_gd += digit
         int_part = int_part_gd[::-1]
     return sign + int_part + dec_part

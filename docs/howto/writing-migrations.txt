@@ -1,0 +1,226 @@
+===========================
+Writing database migrations
+===========================
+
+This document explains how to structure and write database migrations for
+different scenarios you might encounter. For introductory material on
+migrations, see :doc:`the topic guide </topics/migrations>`.
+
+.. _data-migrations-and-multiple-databases:
+
+Data migrations and multiple databases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When using multiple databases, you may need to figure out whether or not to
+run a migration against a particular database. For example, you may want to
+**only** run a migration on a particular database.
+
+In order to do that you can check the database connection's alias inside a
+``RunPython`` operation by looking at the ``schema_editor.connection.alias``
+attribute::
+
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        if not schema_editor.connection.alias == 'default':
+            return
+        # Your migration code goes here
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards),
+        ]
+
+.. versionadded:: 1.8
+
+You can also provide hints that will be passed to the :meth:`allow_migrate()`
+method of database routers as ``**hints``:
+
+.. snippet::
+    :filename: myapp/dbrouters.py
+
+    class MyRouter(object):
+
+        def allow_migrate(self, db, app_label, model_name=None, **hints):
+            if 'target_db' in hints:
+                return db == hints['target_db']
+            return True
+
+Then, to leverage this in your migrations, do the following::
+
+    from django.db import migrations
+
+    def forwards(apps, schema_editor):
+        # Your migration code goes here
+        ...
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            # Dependencies to other migrations
+        ]
+
+        operations = [
+            migrations.RunPython(forwards, hints={'target_db': 'default'}),
+        ]
+
+If your ``RunPython`` or ``RunSQL`` operation only affects one model, it's good
+practice to pass ``model_name`` as a hint to make it as transparent as possible
+to the router. This is especially important for reusable and third-party apps.
+
+Migrations that add unique fields
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Applying a "plain" migration that adds a unique non-nullable field to a table
+with existing rows will raise an error because the value used to populate
+existing rows is generated only once, thus breaking the unique constraint.
+
+Therefore, the following steps should be taken. In this example, we'll add a
+non-nullable :class:`~django.db.models.UUIDField` with a default value. Modify
+the respective field according to your needs.
+
+* Add the field on your model with ``default=uuid.uuid4`` and ``unique=True``
+  arguments (choose an appropriate default for the type of the field you're
+  adding).
+
+* Run the :djadmin:`makemigrations` command. This should generate a migration
+  with an ``AddField`` operation.
+
+* Generate two empty migration files for the same app by running
+  ``makemigrations myapp --empty`` twice. We've renamed the migration files to
+  give them meaningful names in the examples below.
+
+* Copy the ``AddField`` operation from the auto-generated migration (the first
+  of the three new files) to the last migration and change ``AddField`` to
+  ``AlterField``. For example:
+
+  .. snippet::
+    :filename: 0006_remove_uuid_null.py
+
+    # -*- coding: utf-8 -*-
+    from __future__ import unicode_literals
+
+    from django.db import migrations, models
+    import uuid
+
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0005_populate_uuid_values'),
+        ]
+
+        operations = [
+            migrations.AlterField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(default=uuid.uuid4, unique=True),
+            ),
+        ]
+
+* Edit the first migration file. The generated migration class should look
+  similar to this:
+
+  .. snippet::
+    :filename: 0004_add_uuid_field.py
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0003_auto_20150129_1705'),
+        ]
+
+        operations = [
+            migrations.AddField(
+                model_name='mymodel',
+                name='uuid',
+                field=models.UUIDField(default=uuid.uuid4, unique=True),
+            ),
+        ]
+
+  Change ``unique=True`` to ``null=True`` -- this will create the intermediary
+  null field and defer creating the unique constraint until we've populated
+  unique values on all the rows.
+
+* In the first empty migration file, add a
+  :class:`~django.db.migrations.operations.RunPython` or
+  :class:`~django.db.migrations.operations.RunSQL` operation to generate a
+  unique value (UUID in the example) for each existing row. For example:
+
+  .. snippet::
+    :filename: 0005_populate_uuid_values.py
+
+    # -*- coding: utf-8 -*-
+    from __future__ import unicode_literals
+
+    from django.db import migrations, models
+    import uuid
+
+    def gen_uuid(apps, schema_editor):
+        MyModel = apps.get_model('myapp', 'MyModel')
+        for row in MyModel.objects.all():
+            row.uuid = uuid.uuid4()
+            row.save()
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0004_add_uuid_field'),
+        ]
+
+        operations = [
+            # omit reverse_code=... if you don't want the migration to be reversible.
+            migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
+        ]
+
+* Now you can apply the migrations as usual with the :djadmin:`migrate` command.
+
+  Note there is a race condition if you allow objects to be created while this
+  migration is running. Objects created after the ``AddField`` and before
+  ``RunPython`` will have their original ``uuid``’s overwritten.
+
+Controlling the order of migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django determines the order in which migrations should be applied not by the
+filename of each migration, but by building a graph using two properties on the
+``Migration`` class: ``dependencies`` and ``run_before``.
+
+If you've used the :djadmin:`makemigrations` command you've probably
+already seen ``dependencies`` in action because auto-created
+migrations have this defined as part of their creation process.
+
+The ``dependencies`` property is declared like this::
+
+    from django.db import migrations
+
+    class Migration(migrations.Migration):
+
+        dependencies = [
+            ('myapp', '0123_the_previous_migration'),
+        ]
+
+Usually this will be enough, but from time to time you may need to
+ensure that your migration runs *before* other migrations. This is
+useful, for example, to make third-party apps' migrations run *after*
+your :setting:`AUTH_USER_MODEL` replacement.
+
+To achieve this, place all migrations that should depend on yours in
+the ``run_before`` attribute on your ``Migration`` class::
+
+    class Migration(migrations.Migration):
+        ...
+
+        run_before = [
+            ('third_party_app', '0001_do_awesome'),
+        ]
+
+Prefer using ``dependencies`` over ``run_before`` when possible. You should
+only use ``run_before`` if it is undesirable or impractical to specify
+``dependencies`` in the migration which you want to run after the one you are
+writing.

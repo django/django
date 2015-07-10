@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
@@ -17,18 +18,20 @@ msgstr ""
 "Language: mk\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
 
-#: models.py:39
+msgid "Sites"
+msgstr "Сајтови"
+
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Домејнот не може да содржи празни места и табови."
+
 msgid "domain name"
 msgstr "домејн"
 
-#: models.py:40
 msgid "display name"
-msgstr "име кое се прикажува"
+msgstr "име за приказ"
 
-#: models.py:45
 msgid "site"
 msgstr "сајт"
 
-#: models.py:46
 msgid "sites"
 msgstr "сајтови"

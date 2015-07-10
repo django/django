@@ -1,4 +1,5 @@
-from django.core.management.commands.inspectdb import Command as InspectDBCommand
+from django.core.management.commands.inspectdb import \
+    Command as InspectDBCommand
 
 
 class Command(InspectDBCommand):
@@ -21,8 +22,8 @@ class Command(InspectDBCommand):
                 self.gis_tables[table_name] = [geo_col]
         return field_type, field_params, field_notes
 
-    def get_meta(self, table_name):
-        meta_lines = super(Command, self).get_meta(table_name)
+    def get_meta(self, table_name, constraints):
+        meta_lines = super(Command, self).get_meta(table_name, constraints)
         if table_name in self.gis_tables:
             # If the table is a geographic one, then we need make
             # GeoManager the default manager for the model.

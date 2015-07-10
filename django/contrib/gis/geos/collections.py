@@ -2,15 +2,17 @@
  This module houses the Geometry Collection objects:
  GeometryCollection, MultiPoint, MultiLineString, and MultiPolygon
 """
-from ctypes import c_int, c_uint, byref
-from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOS_PREPARE
-from django.contrib.gis.geos.linestring import LineString, LinearRing
+from ctypes import byref, c_int, c_uint
+
+from django.contrib.gis.geos import prototypes as capi
+from django.contrib.gis.geos.geometry import (
+    GEOSGeometry, ProjectInterpolateMixin,
+)
+from django.contrib.gis.geos.libgeos import get_pointer_arr
+from django.contrib.gis.geos.linestring import LinearRing, LineString
 from django.contrib.gis.geos.point import Point
 from django.contrib.gis.geos.polygon import Polygon
-from django.contrib.gis.geos import prototypes as capi
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class GeometryCollection(GEOSGeometry):
@@ -43,14 +45,14 @@ class GeometryCollection(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each Geometry in the Collection."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
         "Returns the number of geometries in this Collection."
         return self.num_geom
 
-    ### Methods for compatibility with ListMixin ###
+    # ### Methods for compatibility with ListMixin ###
     def _create_collection(self, length, items):
         # Creating the geometry pointer array.
         geoms = get_pointer_arr(length)
@@ -99,7 +101,7 @@ class MultiPoint(GeometryCollection):
     _typeid = 4
 
 
-class MultiLineString(GeometryCollection):
+class MultiLineString(ProjectInterpolateMixin, GeometryCollection):
     _allowed = (LineString, LinearRing)
     _typeid = 5
 
@@ -119,10 +121,7 @@ class MultiPolygon(GeometryCollection):
     @property
     def cascaded_union(self):
         "Returns a cascaded union of this MultiPolygon."
-        if GEOS_PREPARE:
-            return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
-        else:
-            raise GEOSException('The cascaded union operation requires GEOS 3.1+.')
+        return GEOSGeometry(capi.geos_cascaded_union(self.ptr), self.srid)
 
 # Setting the allowed types here since GeometryCollection is defined before
 # its subclasses.

@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Jeong Seongtae <magno79@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Korean (http://www.transifex.com/projects/p/django/language/"
 "ko/)\n"
@@ -17,18 +18,20 @@ msgstr ""
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:39
+msgid "Sites"
+msgstr ""
+
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "도메인 이름은 공백이나 탭을 포함 할 수 없습니다."
+
 msgid "domain name"
 msgstr "도메인 명"
 
-#: models.py:40
 msgid "display name"
 msgstr "표시명"
 
-#: models.py:45
 msgid "site"
 msgstr "사이트"
 
-#: models.py:46
 msgid "sites"
 msgstr "사이트(들)"

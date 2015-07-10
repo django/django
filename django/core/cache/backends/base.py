@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import time
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
-from django.utils.module_loading import import_by_path
+from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
+from django.utils.module_loading import import_string
 
 
 class InvalidCacheBackendError(ImproperlyConfigured):
@@ -45,17 +45,18 @@ def get_key_func(key_func):
         if callable(key_func):
             return key_func
         else:
-            return import_by_path(key_func)
+            return import_string(key_func)
     return default_key_func
 
 
 class BaseCache(object):
     def __init__(self, params):
         timeout = params.get('timeout', params.get('TIMEOUT', 300))
-        try:
-            timeout = int(timeout)
-        except (ValueError, TypeError):
-            timeout = 300
+        if timeout is not None:
+            try:
+                timeout = int(timeout)
+            except (ValueError, TypeError):
+                timeout = 300
         self.default_timeout = timeout
 
         options = params.get('OPTIONS', {})
@@ -73,7 +74,7 @@ class BaseCache(object):
 
         self.key_prefix = params.get('KEY_PREFIX', '')
         self.version = params.get('VERSION', 1)
-        self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
+        self.key_func = get_key_func(params.get('KEY_FUNCTION'))
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -145,6 +146,27 @@ class BaseCache(object):
             if val is not None:
                 d[k] = val
         return d
+
+    def get_or_set(self, key, default=None, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Fetch a given key from the cache. If the key does not exist,
+        the key is added and set to the default value. The default value can
+        also be any callable. If timeout is given, that timeout will be used
+        for the key; otherwise the default cache timeout will be used.
+
+        Returns the value of the key stored or retrieved on success,
+        False on error.
+        """
+        if default is None:
+            raise ValueError('You need to specify a value.')
+        val = self.get(key, version=version)
+        if val is None:
+            if callable(default):
+                default = default()
+            val = self.add(key, default, timeout=timeout, version=version)
+            if val:
+                return self.get(key, version=version)
+        return val
 
     def has_key(self, key, version=None):
         """

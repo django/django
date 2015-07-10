@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-01 19:15+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -18,18 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: models.py:39
-msgid "domain name"
-msgstr "parth-enw"
+msgid "Sites"
+msgstr "Safleoedd"
 
-#: models.py:40
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "Ni all yr enw parth gynnwys bylchau neu dabiau."
+
+msgid "domain name"
+msgstr "enw parth"
+
 msgid "display name"
 msgstr "enw arddangos"
 
-#: models.py:45
 msgid "site"
 msgstr "safle"
 
-#: models.py:46
 msgid "sites"
 msgstr "safleoedd"

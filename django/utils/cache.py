@@ -23,8 +23,8 @@ import re
 import time
 
 from django.conf import settings
-from django.core.cache import get_cache
-from django.utils.encoding import iri_to_uri, force_bytes, force_text
+from django.core.cache import caches
+from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.http import http_date
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
@@ -134,6 +134,7 @@ def add_never_cache_headers(response):
     Adds headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
+    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
 
 
 def patch_vary_headers(response, newheaders):
@@ -188,28 +189,28 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     ctx = hashlib.md5()
     for header in headerlist:
-        value = request.META.get(header, None)
+        value = request.META.get(header)
         if value is not None:
             ctx.update(force_bytes(value))
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
-        key_prefix, method, path.hexdigest(), ctx.hexdigest())
+        key_prefix, method, url.hexdigest(), ctx.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
-    path = hashlib.md5(force_bytes(iri_to_uri(request.get_full_path())))
+    url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
-        key_prefix, path.hexdigest())
+        key_prefix, url.hexdigest())
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     """
-    Returns a cache key based on the request path and query. It can be used
+    Returns a cache key based on the request URL and query. It can be used
     in the request phase because it pulls the list of headers to take into
-    account from the global path registry and uses those to build a cache key
+    account from the global URL registry and uses those to build a cache key
     to check against.
 
     If there is no headerlist stored, the page needs to be rebuilt, so this
@@ -219,8 +220,8 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
-    headerlist = cache.get(cache_key, None)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
+    headerlist = cache.get(cache_key)
     if headerlist is not None:
         return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
@@ -229,9 +230,9 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
 
 def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cache=None):
     """
-    Learns what headers to take into account for some request path from the
-    response object. It stores those headers in a global path registry so that
-    later access to that path will know what headers to take into account
+    Learns what headers to take into account for some request URL from the
+    response object. It stores those headers in a global URL registry so that
+    later access to that URL will know what headers to take into account
     without building the response object itself. The headers are named in the
     Vary header of the response, but we want to prevent response generation.
 
@@ -246,7 +247,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
-        cache = get_cache(settings.CACHE_MIDDLEWARE_ALIAS)
+        cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
     if response.has_header('Vary'):
         is_accept_language_redundant = settings.USE_I18N or settings.USE_L10N
         # If i18n or l10n are used, the generated cache key will be suffixed
@@ -264,7 +265,7 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
         return _generate_cache_key(request, request.method, headerlist, key_prefix)
     else:
         # if there is no Vary header, we still need a cache key
-        # for the request.get_full_path()
+        # for the request.build_absolute_uri()
         cache.set(cache_key, [], cache_timeout)
         return _generate_cache_key(request, request.method, [], key_prefix)
 

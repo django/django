@@ -2,11 +2,7 @@
 Many-to-one relationships
 #########################
 
-.. highlight:: pycon
-
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
-
-.. code-block:: python
+To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`::
 
     from django.db import models
 
@@ -15,17 +11,15 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
         last_name = models.CharField(max_length=30)
         email = models.EmailField()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
-            return u"%s %s" % (self.first_name, self.last_name)
+        def __str__(self):              # __unicode__ on Python 2
+            return "%s %s" % (self.first_name, self.last_name)
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         pub_date = models.DateField()
         reporter = models.ForeignKey(Reporter)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.headline
 
         class Meta:
@@ -33,6 +27,8 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
+
+.. highlight:: pycon
 
 Create a few Reporters::
 
@@ -53,6 +49,25 @@ Create an Article::
 
     >>> a.reporter
     <Reporter: John Smith>
+
+Note that you must save an object before it can be assigned to a foreign key
+relationship. For example, creating an ``Article`` with unsaved ``Reporter``
+raises ``ValueError``::
+
+    >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
+    >>> Article(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    Traceback (most recent call last):
+    ...
+    ValueError: 'Cannot assign "<Reporter: John Smith>": "Reporter" instance isn't saved in the database.'
+
+If you want to disable the unsaved instance check, you can use the
+:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
+attribute.
+
+.. versionchanged:: 1.8
+
+    Previously, assigning unsaved objects did not raise an error and could
+    result in silent data loss.
 
 Article objects have access to their related Reporter objects::
 
@@ -123,7 +138,7 @@ This works as many levels deep as you want. There's no limit. For example::
     [<Article: This is a test>]
 
     # Find all Articles for any Reporter whose first name is "John".
-    >>> Article.objects.filter(reporter__first_name__exact='John')
+    >>> Article.objects.filter(reporter__first_name='John')
     [<Article: John's second story>, <Article: This is a test>]
 
 Exact match is implied here::
@@ -134,7 +149,7 @@ Exact match is implied here::
 Query twice over the related field. This translates to an AND condition in the
 WHERE clause::
 
-    >>> Article.objects.filter(reporter__first_name__exact='John', reporter__last_name__exact='Smith')
+    >>> Article.objects.filter(reporter__first_name='John', reporter__last_name='Smith')
     [<Article: John's second story>, <Article: This is a test>]
 
 For the related lookup you can supply a primary key value or pass the related
@@ -184,7 +199,7 @@ Queries can go round in circles::
     [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]
     >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
     [<Reporter: John Smith>]
-    >>> Reporter.objects.filter(article__reporter__exact=r).distinct()
+    >>> Reporter.objects.filter(article__reporter=r).distinct()
     [<Reporter: John Smith>]
 
 If you delete a reporter, his articles will be deleted (assuming that the

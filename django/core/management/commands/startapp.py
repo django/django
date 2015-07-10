@@ -8,8 +8,10 @@ class Command(TemplateCommand):
     help = ("Creates a Django app directory structure for the given app "
             "name in the current directory or optionally in the given "
             "directory.")
+    missing_args_message = "You must provide an application name."
 
-    def handle(self, app_name=None, target=None, **options):
+    def handle(self, **options):
+        app_name, target = options.pop('name'), options.pop('directory')
         self.validate_name(app_name, "app")
 
         # Check that the app_name cannot be imported.

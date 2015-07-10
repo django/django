@@ -1,86 +1,27 @@
 from __future__ import unicode_literals
 
 import datetime
-import time
+import json
+import re
 import sys
+import time
 from email.header import Header
-try:
-    from urllib.parse import urlparse
-except ImportError:
-    from urlparse import urlparse
 
 from django.conf import settings
-from django.core import signals
-from django.core import signing
+from django.core import signals, signing
 from django.core.exceptions import DisallowedRedirect
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http.cookie import SimpleCookie
 from django.utils import six, timezone
-from django.utils.encoding import force_bytes, force_text, iri_to_uri
+from django.utils.encoding import (
+    force_bytes, force_str, force_text, iri_to_uri,
+)
 from django.utils.http import cookie_date
 from django.utils.six.moves import map
+from django.utils.six.moves.http_client import responses
+from django.utils.six.moves.urllib.parse import urlparse
 
-
-# See http://www.iana.org/assignments/http-status-codes
-REASON_PHRASES = {
-    100: 'CONTINUE',
-    101: 'SWITCHING PROTOCOLS',
-    102: 'PROCESSING',
-    200: 'OK',
-    201: 'CREATED',
-    202: 'ACCEPTED',
-    203: 'NON-AUTHORITATIVE INFORMATION',
-    204: 'NO CONTENT',
-    205: 'RESET CONTENT',
-    206: 'PARTIAL CONTENT',
-    207: 'MULTI-STATUS',
-    208: 'ALREADY REPORTED',
-    226: 'IM USED',
-    300: 'MULTIPLE CHOICES',
-    301: 'MOVED PERMANENTLY',
-    302: 'FOUND',
-    303: 'SEE OTHER',
-    304: 'NOT MODIFIED',
-    305: 'USE PROXY',
-    306: 'RESERVED',
-    307: 'TEMPORARY REDIRECT',
-    400: 'BAD REQUEST',
-    401: 'UNAUTHORIZED',
-    402: 'PAYMENT REQUIRED',
-    403: 'FORBIDDEN',
-    404: 'NOT FOUND',
-    405: 'METHOD NOT ALLOWED',
-    406: 'NOT ACCEPTABLE',
-    407: 'PROXY AUTHENTICATION REQUIRED',
-    408: 'REQUEST TIMEOUT',
-    409: 'CONFLICT',
-    410: 'GONE',
-    411: 'LENGTH REQUIRED',
-    412: 'PRECONDITION FAILED',
-    413: 'REQUEST ENTITY TOO LARGE',
-    414: 'REQUEST-URI TOO LONG',
-    415: 'UNSUPPORTED MEDIA TYPE',
-    416: 'REQUESTED RANGE NOT SATISFIABLE',
-    417: 'EXPECTATION FAILED',
-    418: "I'M A TEAPOT",
-    422: 'UNPROCESSABLE ENTITY',
-    423: 'LOCKED',
-    424: 'FAILED DEPENDENCY',
-    426: 'UPGRADE REQUIRED',
-    428: 'PRECONDITION REQUIRED',
-    429: 'TOO MANY REQUESTS',
-    431: 'REQUEST HEADER FIELDS TOO LARGE',
-    500: 'INTERNAL SERVER ERROR',
-    501: 'NOT IMPLEMENTED',
-    502: 'BAD GATEWAY',
-    503: 'SERVICE UNAVAILABLE',
-    504: 'GATEWAY TIMEOUT',
-    505: 'HTTP VERSION NOT SUPPORTED',
-    506: 'VARIANT ALSO NEGOTIATES',
-    507: 'INSUFFICIENT STORAGE',
-    508: 'LOOP DETECTED',
-    510: 'NOT EXTENDED',
-    511: 'NETWORK AUTHENTICATION REQUIRED',
-}
+_charset_from_content_type_re = re.compile(r';\s*charset=(?P<charset>[^\s;]+)', re.I)
 
 
 class BadHeaderError(ValueError):
@@ -96,30 +37,53 @@ class HttpResponseBase(six.Iterator):
     """
 
     status_code = 200
-    reason_phrase = None        # Use default reason phrase for status code.
 
-    def __init__(self, content_type=None, status=None, reason=None):
+    def __init__(self, content_type=None, status=None, reason=None, charset=None):
         # _headers is a mapping of the lower-case name to the original case of
         # the header (required for working with legacy systems) and the header
         # value. Both the name of the header and its value are ASCII strings.
         self._headers = {}
-        self._charset = settings.DEFAULT_CHARSET
         self._closable_objects = []
         # This parameter is set by the handler. It's necessary to preserve the
         # historical behavior of request_finished.
         self._handler_class = None
-        if not content_type:
-            content_type = "%s; charset=%s" % (settings.DEFAULT_CONTENT_TYPE,
-                    self._charset)
         self.cookies = SimpleCookie()
+        self.closed = False
         if status is not None:
             self.status_code = status
-        if reason is not None:
-            self.reason_phrase = reason
-        elif self.reason_phrase is None:
-            self.reason_phrase = REASON_PHRASES.get(self.status_code,
-                                                    'UNKNOWN STATUS CODE')
+        self._reason_phrase = reason
+        self._charset = charset
+        if content_type is None:
+            content_type = '%s; charset=%s' % (settings.DEFAULT_CONTENT_TYPE,
+                                               self.charset)
         self['Content-Type'] = content_type
+
+    @property
+    def reason_phrase(self):
+        if self._reason_phrase is not None:
+            return self._reason_phrase
+        # Leave self._reason_phrase unset in order to use the default
+        # reason phrase for status code.
+        return responses.get(self.status_code, 'Unknown Status Code')
+
+    @reason_phrase.setter
+    def reason_phrase(self, value):
+        self._reason_phrase = value
+
+    @property
+    def charset(self):
+        if self._charset is not None:
+            return self._charset
+        content_type = self.get('Content-Type', '')
+        matched = _charset_from_content_type_re.search(content_type)
+        if matched:
+            # Extract the charset and strip its double quotes
+            return matched.group('charset').replace('"', '')
+        return settings.DEFAULT_CHARSET
+
+    @charset.setter
+    def charset(self, value):
+        self._charset = value
 
     def serialize_headers(self):
         """HTTP headers as a bytestring."""
@@ -141,11 +105,14 @@ class HttpResponseBase(six.Iterator):
         """Converts headers key/value to ascii/latin-1 native strings.
 
         `charset` must be 'ascii' or 'latin-1'. If `mime_encode` is True and
-        `value` value can't be represented in the given charset, MIME-encoding
+        `value` can't be represented in the given charset, MIME-encoding
         is applied.
         """
         if not isinstance(value, (bytes, six.text_type)):
             value = str(value)
+        if ((isinstance(value, bytes) and (b'\n' in value or b'\r' in value)) or
+                isinstance(value, six.text_type) and ('\n' in value or '\r' in value)):
+            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         try:
             if six.PY3:
                 if isinstance(value, str):
@@ -168,8 +135,6 @@ class HttpResponseBase(six.Iterator):
             else:
                 e.reason += ', HTTP response headers must be in %s format' % charset
                 raise
-        if str('\n') in value or str('\r') in value:
-            raise BadHeaderError("Header values can't contain newlines (got %r)" % value)
         return value
 
     def __setitem__(self, header, value):
@@ -185,17 +150,6 @@ class HttpResponseBase(six.Iterator):
 
     def __getitem__(self, header):
         return self._headers[header.lower()][1]
-
-    def __getstate__(self):
-        # SimpleCookie is not pickeable with pickle.HIGHEST_PROTOCOL, so we
-        # serialise to a string instead
-        state = self.__dict__.copy()
-        state['cookies'] = str(state['cookies'])
-        return state
-
-    def __setstate__(self, state):
-        self.__dict__.update(state)
-        self.cookies = SimpleCookie(self.cookies)
 
     def has_header(self, header):
         """Case-insensitive check for a header."""
@@ -221,6 +175,7 @@ class HttpResponseBase(six.Iterator):
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
 
         """
+        value = force_str(value)
         self.cookies[key] = value
         if expires is not None:
             if isinstance(expires, datetime.datetime):
@@ -251,6 +206,11 @@ class HttpResponseBase(six.Iterator):
         if httponly:
             self.cookies[key]['httponly'] = True
 
+    def setdefault(self, key, value):
+        """Sets a header unless it has already been set."""
+        if key not in self:
+            self[key] = value
+
     def set_signed_cookie(self, key, value, salt='', **kwargs):
         value = signing.get_cookie_signer(salt=key + salt).sign(value)
         return self.set_cookie(key, value, **kwargs)
@@ -267,27 +227,16 @@ class HttpResponseBase(six.Iterator):
         # an instance of a subclass, this function returns `bytes(value)`.
         # This doesn't make a copy when `value` already contains bytes.
 
-        # If content is already encoded (eg. gzip), assume bytes.
-        if self.has_header('Content-Encoding'):
-            return bytes(value)
-
         # Handle string types -- we can't rely on force_bytes here because:
-        # - under Python 3 it attemps str conversion first
+        # - under Python 3 it attempts str conversion first
         # - when self._charset != 'utf-8' it re-encodes the content
         if isinstance(value, bytes):
             return bytes(value)
         if isinstance(value, six.text_type):
-            return bytes(value.encode(self._charset))
+            return bytes(value.encode(self.charset))
 
         # Handle non-string types (#16494)
-        return force_bytes(value, self._charset)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        # Subclasses must define self._iterator for this function.
-        return self.make_bytes(next(self._iterator))
+        return force_bytes(value, self.charset)
 
     # These methods partially implement the file-like object interface.
     # See http://docs.python.org/lib/bltin-file-objects.html
@@ -300,16 +249,26 @@ class HttpResponseBase(six.Iterator):
                 closable.close()
             except Exception:
                 pass
+        self.closed = True
         signals.request_finished.send(sender=self._handler_class)
 
     def write(self, content):
-        raise Exception("This %s instance is not writable" % self.__class__.__name__)
+        raise IOError("This %s instance is not writable" % self.__class__.__name__)
 
     def flush(self):
         pass
 
     def tell(self):
-        raise Exception("This %s instance cannot tell its position" % self.__class__.__name__)
+        raise IOError("This %s instance cannot tell its position" % self.__class__.__name__)
+
+    # These methods partially implement a stream-like object interface.
+    # See https://docs.python.org/library/io.html#io.IOBase
+
+    def writable(self):
+        return False
+
+    def writelines(self, lines):
+        raise IOError("This %s instance is not writable" % self.__class__.__name__)
 
 
 class HttpResponse(HttpResponseBase):
@@ -337,26 +296,38 @@ class HttpResponse(HttpResponseBase):
 
     @property
     def content(self):
-        return b''.join(self.make_bytes(e) for e in self._container)
+        return b''.join(self._container)
 
     @content.setter
     def content(self, value):
+        # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
             if hasattr(value, 'close'):
                 self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(e) for e in value)
+            value = b''.join(self.make_bytes(chunk) for chunk in value)
+        else:
+            value = self.make_bytes(value)
+        # Create a list of properly encoded bytestrings to support write().
         self._container = [value]
 
     def __iter__(self):
-        if not hasattr(self, '_iterator'):
-            self._iterator = iter(self._container)
-        return self
+        return iter(self._container)
 
     def write(self, content):
-        self._container.append(content)
+        self._container.append(self.make_bytes(content))
 
     def tell(self):
         return len(self.content)
+
+    def getvalue(self):
+        return self.content
+
+    def writable(self):
+        return True
+
+    def writelines(self, lines):
+        for line in lines:
+            self.write(line)
 
 
 class StreamingHttpResponse(HttpResponseBase):
@@ -387,10 +358,37 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @streaming_content.setter
     def streaming_content(self, value):
+        self._set_streaming_content(value)
+
+    def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
         self._iterator = iter(value)
         if hasattr(value, 'close'):
             self._closable_objects.append(value)
+
+    def __iter__(self):
+        return self.streaming_content
+
+    def getvalue(self):
+        return b''.join(self.streaming_content)
+
+
+class FileResponse(StreamingHttpResponse):
+    """
+    A streaming HTTP response class optimized for files.
+    """
+    block_size = 4096
+
+    def _set_streaming_content(self, value):
+        if hasattr(value, 'read'):
+            self.file_to_stream = value
+            filelike = value
+            if hasattr(filelike, 'close'):
+                self._closable_objects.append(filelike)
+            value = iter(lambda: filelike.read(self.block_size), b'')
+        else:
+            self.file_to_stream = None
+        super(FileResponse, self)._set_streaming_content(value)
 
 
 class HttpResponseRedirectBase(HttpResponse):
@@ -458,3 +456,25 @@ class HttpResponseServerError(HttpResponse):
 
 class Http404(Exception):
     pass
+
+
+class JsonResponse(HttpResponse):
+    """
+    An HTTP response class that consumes data to be serialized to JSON.
+
+    :param data: Data to be dumped into json. By default only ``dict`` objects
+      are allowed to be passed due to a security flaw before EcmaScript 5. See
+      the ``safe`` parameter for more information.
+    :param encoder: Should be an json encoder class. Defaults to
+      ``django.core.serializers.json.DjangoJSONEncoder``.
+    :param safe: Controls if only ``dict`` objects may be serialized. Defaults
+      to ``True``.
+    """
+
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+        if safe and not isinstance(data, dict):
+            raise TypeError('In order to allow non-dict objects to be '
+                'serialized set the safe parameter to False')
+        kwargs.setdefault('content_type', 'application/json')
+        data = json.dumps(data, cls=encoder)
+        super(JsonResponse, self).__init__(content=data, **kwargs)

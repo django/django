@@ -1,15 +1,17 @@
 from __future__ import unicode_literals
 
-from unittest import TestCase
-
-from django.core.urlresolvers import NoReverseMatch
 from django.contrib.auth.views import logout
+from django.core.urlresolvers import NoReverseMatch, reverse_lazy
 from django.shortcuts import resolve_url
+from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.utils import six
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import UnimportantThing
 
 
-class ResolveUrlTests(TestCase):
+@override_settings(ROOT_URLCONF='resolve_url.urls')
+class ResolveUrlTests(SimpleTestCase):
     """
     Tests for the ``resolve_url`` function.
     """
@@ -20,6 +22,16 @@ class ResolveUrlTests(TestCase):
         same url.
         """
         self.assertEqual('/something/', resolve_url('/something/'))
+
+    def test_relative_path(self):
+        """
+        Tests that passing a relative URL path to ``resolve_url`` will result
+        in the same url.
+        """
+        self.assertEqual('../', resolve_url('../'))
+        self.assertEqual('../relative/', resolve_url('../relative/'))
+        self.assertEqual('./', resolve_url('./'))
+        self.assertEqual('./relative/', resolve_url('./relative/'))
 
     def test_full_url(self):
         """
@@ -45,6 +57,16 @@ class ResolveUrlTests(TestCase):
         resolved_url = resolve_url(logout)
         self.assertEqual('/accounts/logout/', resolved_url)
 
+    def test_lazy_reverse(self):
+        """
+        Tests that passing the result of reverse_lazy is resolved to a real URL
+        string.
+        """
+        resolved_url = resolve_url(reverse_lazy('logout'))
+        self.assertIsInstance(resolved_url, six.text_type)
+        self.assertEqual('/accounts/logout/', resolved_url)
+
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_valid_view_name(self):
         """
         Tests that passing a view function to ``resolve_url`` will result in

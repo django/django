@@ -11,6 +11,7 @@ class Reporter(models.Model):
     email = models.EmailField()
     facebook_user_id = models.BigIntegerField(null=True)
     raw_data = models.BinaryField(null=True)
+    small_int = models.SmallIntegerField()
 
     class Meta:
         unique_together = ('first_name', 'last_name')
@@ -23,6 +24,7 @@ class Reporter(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
+    body = models.TextField(default='')
     reporter = models.ForeignKey(Reporter)
     response_to = models.ForeignKey('self', null=True)
 

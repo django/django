@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import io
 import gzip
+import io
 
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.http.utils import conditional_content_removal
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 
 # based on Python 3.3's gzip.compress
@@ -19,7 +19,7 @@ def gzip_compress(data):
     return buf.getvalue()
 
 
-class HttpUtilTests(TestCase):
+class HttpUtilTests(SimpleTestCase):
 
     def test_conditional_content_removal(self):
         """

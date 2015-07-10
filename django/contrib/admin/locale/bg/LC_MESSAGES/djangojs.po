@@ -1,15 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Todor Lubenov <tlubenov@gmail.com>, 2011-2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-08-30 15:03+0000\n"
-"Last-Translator: Todor Lubenov <tlubenov@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -18,13 +17,11 @@ msgstr ""
 "Language: bg\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "Налични %s"
 
-#: static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -33,39 +30,31 @@ msgstr ""
 "полето по-долу и след това кликнете върху \"Избор\" стрелка между двете "
 "кутии."
 
-#: static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "Въведете в това поле, за да филтрирате списъка на наличните %s."
 
-#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Филтър"
 
-#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Избери всички"
 
-#: static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Кликнете, за да изберете всички %s наведнъж."
 
-#: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Избирам"
 
-#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Премахни"
 
-#: static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Избрахме %s"
 
-#: static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -74,22 +63,18 @@ msgstr ""
 "полето по-долу и след това щракнете върху \"Премахни\" стрелка между двете "
 "кутии."
 
-#: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Премахване на всички"
 
-#: static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Кликнете, за да премахнете всички избрани %s наведнъж."
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s на %(cnt)s е избран"
 msgstr[1] "%(sel)s на %(cnt)s са избрани"
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -97,7 +82,6 @@ msgstr ""
 "Имате незапазени промени по отделни полета за редактиране. Ако започнете "
 "друго, незаписаните промени ще бъдат загубени."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -106,7 +90,6 @@ msgstr ""
 "Вие сте избрали действие, но не сте записали промените по полета. Моля, "
 "кликнете ОК, за да се запишат. Трябва отново да започнете действие."
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -115,7 +98,51 @@ msgstr ""
 "Вие сте избрали дадена дейност, а не сте направили някакви промени по "
 "полетата. Вероятно търсите Go бутон, а не бутона Save."
 
-#: static/admin/js/calendar.js:26
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+msgstr[1] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Now"
+msgstr "Сега"
+
+msgid "Clock"
+msgstr "Часовник"
+
+msgid "Choose a time"
+msgstr "Избери време"
+
+msgid "Midnight"
+msgstr "Полунощ"
+
+msgid "6 a.m."
+msgstr "6 a.m."
+
+msgid "Noon"
+msgstr "По обяд"
+
+msgid "Cancel"
+msgstr "Отказ"
+
+msgid "Today"
+msgstr "Днес"
+
+msgid "Calendar"
+msgstr "Календар"
+
+msgid "Yesterday"
+msgstr "Вчера"
+
+msgid "Tomorrow"
+msgstr "Утре"
+
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -123,62 +150,11 @@ msgstr ""
 "Януари Февруари Март Април Май Юни Юли Август Септември Октомври Ноември "
 "Декември"
 
-#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "Н П В С Ч П С"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Покажи"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Скрий"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Сега"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Часовник"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Избери време"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Полунощ"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 a.m."
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "По обяд"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Отказ"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Днес"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Календар"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Вчера"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Утре"

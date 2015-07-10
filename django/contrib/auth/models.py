@@ -1,20 +1,17 @@
 from __future__ import unicode_literals
 
-from django.core.mail import send_mail
-from django.core import validators
-from django.db import models
-from django.db.models.manager import EmptyManager
-from django.utils.crypto import get_random_string
-from django.utils import six
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
-
 from django.contrib import auth
-from django.contrib.auth.hashers import (
-    check_password, make_password, is_password_usable)
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.signals import user_logged_in
 from django.contrib.contenttypes.models import ContentType
+from django.core import validators
+from django.core.exceptions import PermissionDenied
+from django.core.mail import send_mail
+from django.db import models
+from django.db.models.manager import EmptyManager
+from django.utils import six, timezone
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 
 def update_last_login(sender, user, **kwargs):
@@ -28,11 +25,12 @@ user_logged_in.connect(update_last_login)
 
 
 class PermissionManager(models.Manager):
+    use_in_migrations = True
+
     def get_by_natural_key(self, codename, app_label, model):
         return self.get(
             codename=codename,
-            content_type=ContentType.objects.get_by_natural_key(app_label,
-                                                                model),
+            content_type=ContentType.objects.db_manager(self.db).get_by_natural_key(app_label, model),
         )
 
 
@@ -60,7 +58,7 @@ class Permission(models.Model):
     Three basic permissions -- add, change and delete -- are automatically
     created for each Django model.
     """
-    name = models.CharField(_('name'), max_length=50)
+    name = models.CharField(_('name'), max_length=255)
     content_type = models.ForeignKey(ContentType)
     codename = models.CharField(_('codename'), max_length=100)
     objects = PermissionManager()
@@ -87,6 +85,8 @@ class GroupManager(models.Manager):
     """
     The manager for the auth's Group model.
     """
+    use_in_migrations = True
+
     def get_by_natural_key(self, name):
         return self.get(name=name)
 
@@ -110,8 +110,11 @@ class Group(models.Model):
     messages.
     """
     name = models.CharField(_('name'), max_length=80, unique=True)
-    permissions = models.ManyToManyField(Permission,
-        verbose_name=_('permissions'), blank=True)
+    permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('permissions'),
+        blank=True,
+    )
 
     objects = GroupManager()
 
@@ -126,128 +129,36 @@ class Group(models.Model):
         return (self.name,)
 
 
-class BaseUserManager(models.Manager):
-
-    @classmethod
-    def normalize_email(cls, email):
-        """
-        Normalize the address by lowercasing the domain part of the email
-        address.
-        """
-        email = email or ''
-        try:
-            email_name, domain_part = email.strip().rsplit('@', 1)
-        except ValueError:
-            pass
-        else:
-            email = '@'.join([email_name, domain_part.lower()])
-        return email
-
-    def make_random_password(self, length=10,
-                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
-                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
-                                           '23456789'):
-        """
-        Generates a random password with the given length and given
-        allowed_chars. Note that the default value of allowed_chars does not
-        have "I" or "O" or letters and digits that look similar -- just to
-        avoid confusion.
-        """
-        return get_random_string(length, allowed_chars)
-
-    def get_by_natural_key(self, username):
-        return self.get(**{self.model.USERNAME_FIELD: username})
-
-
 class UserManager(BaseUserManager):
+    use_in_migrations = True
 
-    def _create_user(self, username, email, password,
-                     is_staff, is_superuser, **extra_fields):
+    def _create_user(self, username, email, password, **extra_fields):
         """
         Creates and saves a User with the given username, email and password.
         """
-        now = timezone.now()
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
-        user = self.model(username=username, email=email,
-                          is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
-                          date_joined=now, **extra_fields)
+        user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_user(self, username, email=None, password=None, **extra_fields):
-        return self._create_user(username, email, password, False, False,
-                                 **extra_fields)
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(username, email, password, **extra_fields)
 
     def create_superuser(self, username, email, password, **extra_fields):
-        return self._create_user(username, email, password, True, True,
-                                 **extra_fields)
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
 
-@python_2_unicode_compatible
-class AbstractBaseUser(models.Model):
-    password = models.CharField(_('password'), max_length=128)
-    last_login = models.DateTimeField(_('last login'), default=timezone.now)
-
-    is_active = True
-
-    REQUIRED_FIELDS = []
-
-    class Meta:
-        abstract = True
-
-    def get_username(self):
-        "Return the identifying username for this User"
-        return getattr(self, self.USERNAME_FIELD)
-
-    def __str__(self):
-        return self.get_username()
-
-    def natural_key(self):
-        return (self.get_username(),)
-
-    def is_anonymous(self):
-        """
-        Always returns False. This is a way of comparing User objects to
-        anonymous users.
-        """
-        return False
-
-    def is_authenticated(self):
-        """
-        Always return True. This is a way to tell if the user has been
-        authenticated in templates.
-        """
-        return True
-
-    def set_password(self, raw_password):
-        self.password = make_password(raw_password)
-
-    def check_password(self, raw_password):
-        """
-        Returns a boolean of whether the raw_password was correct. Handles
-        hashing formats behind the scenes.
-        """
-        def setter(raw_password):
-            self.set_password(raw_password)
-            self.save(update_fields=["password"])
-        return check_password(raw_password, self.password, setter)
-
-    def set_unusable_password(self):
-        # Sets a value that will never be a valid hash
-        self.password = make_password(None)
-
-    def has_usable_password(self):
-        return is_password_usable(self.password)
-
-    def get_full_name(self):
-        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_full_name() method')
-
-    def get_short_name(self):
-        raise NotImplementedError('subclasses of AbstractBaseUser must provide a get_short_name() method.')
+        return self._create_user(username, email, password, **extra_fields)
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -260,18 +171,32 @@ def _user_get_all_permissions(user, obj):
 
 
 def _user_has_perm(user, perm, obj):
+    """
+    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    """
     for backend in auth.get_backends():
-        if hasattr(backend, "has_perm"):
+        if not hasattr(backend, 'has_perm'):
+            continue
+        try:
             if backend.has_perm(user, perm, obj):
                 return True
+        except PermissionDenied:
+            return False
     return False
 
 
 def _user_has_module_perms(user, app_label):
+    """
+    A backend can raise `PermissionDenied` to short-circuit permission checking.
+    """
     for backend in auth.get_backends():
-        if hasattr(backend, "has_module_perms"):
+        if not hasattr(backend, 'has_module_perms'):
+            continue
+        try:
             if backend.has_module_perms(user, app_label):
                 return True
+        except PermissionDenied:
+            return False
     return False
 
 
@@ -280,25 +205,40 @@ class PermissionsMixin(models.Model):
     A mixin class that adds the fields and methods necessary to support
     Django's Group and Permission model using the ModelBackend.
     """
-    is_superuser = models.BooleanField(_('superuser status'), default=False,
-        help_text=_('Designates that this user has all permissions without '
-                    'explicitly assigning them.'))
-    groups = models.ManyToManyField(Group, verbose_name=_('groups'),
-        blank=True, help_text=_('The groups this user belongs to. A user will '
-                                'get all permissions granted to each of '
-                                'his/her group.'),
-        related_name="user_set", related_query_name="user")
-    user_permissions = models.ManyToManyField(Permission,
-        verbose_name=_('user permissions'), blank=True,
+    is_superuser = models.BooleanField(
+        _('superuser status'),
+        default=False,
+        help_text=_(
+            'Designates that this user has all permissions without '
+            'explicitly assigning them.'
+        ),
+    )
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        blank=True,
+        help_text=_(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+        ),
+        related_name="user_set",
+        related_query_name="user",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('user permissions'),
+        blank=True,
         help_text=_('Specific permissions for this user.'),
-        related_name="user_set", related_query_name="user")
+        related_name="user_set",
+        related_query_name="user",
+    )
 
     class Meta:
         abstract = True
 
     def get_group_permissions(self, obj=None):
         """
-        Returns a list of permission strings that this user has through his/her
+        Returns a list of permission strings that this user has through their
         groups. This method queries all available auth backends. If an object
         is passed in, only permissions matching this object are returned.
         """
@@ -355,23 +295,40 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
     An abstract base class implementing a fully featured User model with
     admin-compliant permissions.
 
-    Username, password and email are required. Other fields are optional.
+    Username and password are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=30, unique=True,
-        help_text=_('Required. 30 characters or fewer. Letters, digits and '
-                    '@/./+/-/_ only.'),
+    username = models.CharField(
+        _('username'),
+        max_length=30,
+        unique=True,
+        help_text=_('Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         validators=[
-            validators.RegexValidator(r'^[\w.@+-]+$', _('Enter a valid username.'), 'invalid')
-        ])
+            validators.RegexValidator(
+                r'^[\w.@+-]+$',
+                _('Enter a valid username. This value may contain only '
+                  'letters, numbers ' 'and @/./+/-/_ characters.')
+            ),
+        ],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
+    )
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
     email = models.EmailField(_('email address'), blank=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-        help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+    is_staff = models.BooleanField(
+        _('staff status'),
+        default=False,
+        help_text=_('Designates whether the user can log into this admin site.'),
+    )
+    is_active = models.BooleanField(
+        _('active'),
+        default=True,
+        help_text=_(
+            'Designates whether this user should be treated as active. '
+            'Unselect this instead of deleting accounts.'
+        ),
+    )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
     objects = UserManager()
@@ -482,3 +439,6 @@ class AnonymousUser(object):
 
     def is_authenticated(self):
         return False
+
+    def get_username(self):
+        return self.username

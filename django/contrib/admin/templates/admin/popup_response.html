@@ -3,7 +3,13 @@
   <head><title></title></head>
   <body>
     <script type="text/javascript">
-      opener.dismissAddAnotherPopup(window, "{{ value }}", "{{ obj }}");
+      {% if action == 'change' %}
+        opener.dismissChangeRelatedObjectPopup(window, "{{ value|escapejs }}", "{{ obj|escapejs }}", "{{ new_value|escapejs }}");
+      {% elif action == 'delete' %}
+        opener.dismissDeleteRelatedObjectPopup(window, "{{ value|escapejs }}");
+      {% else %}
+        opener.dismissAddRelatedObjectPopup(window, "{{ value|escapejs }}", "{{ obj|escapejs }}");
+      {% endif %}
     </script>
   </body>
 </html>

@@ -1,12 +1,16 @@
 from __future__ import unicode_literals
 
-from django.db import models, IntegrityError, connection
-from django.test import TestCase, skipUnlessDBFeature, skipIfDBFeature
-from django.utils.six.moves import xrange
+from math import ceil
 
-from .models import (R, RChild, S, T, A, M, MR, MRNull,
-    create_a, get_default_r, User, Avatar, HiddenUser, HiddenUserProfile,
-    M2MTo, M2MFrom, Parent, Child, Base)
+from django.db import IntegrityError, connection, models
+from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.utils.six.moves import range
+
+from .models import (
+    A, M, MR, R, S, T, Avatar, Base, Child, HiddenUser, HiddenUserProfile,
+    M2MFrom, M2MTo, MRNull, Parent, RChild, User, create_a, get_default_r,
+)
 
 
 class OnDeleteTests(TestCase):
@@ -33,7 +37,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setnull')
         a.setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setnull)
+        self.assertIsNone(a.setnull)
 
     def test_setdefault(self):
         a = create_a('setdefault')
@@ -45,7 +49,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setdefault_none')
         a.setdefault_none.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.setdefault_none)
+        self.assertIsNone(a.setdefault_none)
 
     def test_cascade(self):
         a = create_a('cascade')
@@ -115,7 +119,7 @@ class OnDeleteTests(TestCase):
         self.assertFalse(R.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_setnull_from_parent(self):
         a = create_a('child_setnull')
@@ -123,16 +127,17 @@ class OnDeleteTests(TestCase):
         self.assertFalse(RChild.objects.filter(pk=a.child_setnull_id).exists())
 
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.child_setnull)
+        self.assertIsNone(a.child_setnull)
 
     def test_o2o_setnull(self):
         a = create_a('o2o_setnull')
         a.o2o_setnull.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(None, a.o2o_setnull)
+        self.assertIsNone(a.o2o_setnull)
 
 
 class DeletionTests(TestCase):
+
     def test_m2m(self):
         m = M.objects.create()
         r = R.objects.create()
@@ -149,7 +154,7 @@ class DeletionTests(TestCase):
         r = R.objects.create()
         m.m2m.add(r)
         r.delete()
-        through = M._meta.get_field('m2m').rel.through
+        through = M._meta.get_field('m2m').remote_field.through
         self.assertFalse(through.objects.exists())
 
         r = R.objects.create()
@@ -165,9 +170,8 @@ class DeletionTests(TestCase):
         self.assertFalse(m.m2m_through_null.exists())
 
     def test_bulk(self):
-        from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
         s = S.objects.create(r=R.objects.create())
-        for i in xrange(2 * GET_ITERATOR_CHUNK_SIZE):
+        for i in range(2 * GET_ITERATOR_CHUNK_SIZE):
             T.objects.create(s=s)
         #   1 (select related `T` instances)
         # + 1 (select related `U` instances)
@@ -194,11 +198,11 @@ class DeletionTests(TestCase):
         a.cascade.delete()
 
         for obj in deleted:
-            self.assertEqual(None, obj.pk)
+            self.assertIsNone(obj.pk)
 
         for pk_list in related_setnull_sets:
             for a in A.objects.filter(id__in=pk_list):
-                self.assertEqual(None, a.setnull)
+                self.assertIsNone(a.setnull)
 
         models.signals.pre_delete.disconnect(pre_delete)
 
@@ -311,6 +315,104 @@ class DeletionTests(TestCase):
         r.delete()
         self.assertEqual(HiddenUserProfile.objects.count(), 0)
 
+    def test_large_delete(self):
+        TEST_SIZE = 2000
+        objs = [Avatar() for i in range(0, TEST_SIZE)]
+        Avatar.objects.bulk_create(objs)
+        # Calculate the number of queries needed.
+        batch_size = connection.ops.bulk_batch_size(['pk'], objs)
+        # The related fetches are done in batches.
+        batches = int(ceil(float(len(objs)) / batch_size))
+        # One query for Avatar.objects.all() and then one related fast delete for
+        # each batch.
+        fetches_to_mem = 1 + batches
+        # The Avatar objects are going to be deleted in batches of GET_ITERATOR_CHUNK_SIZE
+        queries = fetches_to_mem + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE
+        self.assertNumQueries(queries, Avatar.objects.all().delete)
+        self.assertFalse(Avatar.objects.exists())
+
+    def test_large_delete_related(self):
+        TEST_SIZE = 2000
+        s = S.objects.create(r=R.objects.create())
+        for i in range(TEST_SIZE):
+            T.objects.create(s=s)
+
+        batch_size = max(connection.ops.bulk_batch_size(['pk'], range(TEST_SIZE)), 1)
+
+        # TEST_SIZE // batch_size (select related `T` instances)
+        # + 1 (select related `U` instances)
+        # + TEST_SIZE // GET_ITERATOR_CHUNK_SIZE (delete `T` instances in batches)
+        # + 1 (delete `s`)
+        expected_num_queries = (ceil(TEST_SIZE // batch_size) +
+                                ceil(TEST_SIZE // GET_ITERATOR_CHUNK_SIZE) + 2)
+
+        self.assertNumQueries(expected_num_queries, s.delete)
+        self.assertFalse(S.objects.exists())
+        self.assertFalse(T.objects.exists())
+
+    def test_delete_with_keeping_parents(self):
+        child = RChild.objects.create()
+        parent_id = child.r_ptr_id
+        child.delete(keep_parents=True)
+        self.assertFalse(RChild.objects.filter(id=child.id).exists())
+        self.assertTrue(R.objects.filter(id=parent_id).exists())
+
+    def test_queryset_delete_returns_num_rows(self):
+        """
+        QuerySet.delete() should return the number of deleted rows and a
+        dictionary with the number of deletions for each object type.
+        """
+        Avatar.objects.bulk_create([Avatar(desc='a'), Avatar(desc='b'), Avatar(desc='c')])
+        avatars_count = Avatar.objects.count()
+        deleted, rows_count = Avatar.objects.all().delete()
+        self.assertEqual(deleted, avatars_count)
+
+        # more complex example with multiple object types
+        r = R.objects.create()
+        h1 = HiddenUser.objects.create(r=r)
+        HiddenUser.objects.create(r=r)
+        HiddenUserProfile.objects.create(user=h1)
+        existed_objs = {
+            R._meta.label: R.objects.count(),
+            HiddenUser._meta.label: HiddenUser.objects.count(),
+            A._meta.label: A.objects.count(),
+            MR._meta.label: MR.objects.count(),
+            HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
+        }
+        deleted, deleted_objs = R.objects.all().delete()
+        for k, v in existed_objs.items():
+            self.assertEqual(deleted_objs[k], v)
+
+    def test_model_delete_returns_num_rows(self):
+        """
+        Model.delete() should return the number of deleted rows and a
+        dictionary with the number of deletions for each object type.
+        """
+        r = R.objects.create()
+        h1 = HiddenUser.objects.create(r=r)
+        h2 = HiddenUser.objects.create(r=r)
+        HiddenUser.objects.create(r=r)
+        HiddenUserProfile.objects.create(user=h1)
+        HiddenUserProfile.objects.create(user=h2)
+        m1 = M.objects.create()
+        m2 = M.objects.create()
+        MR.objects.create(r=r, m=m1)
+        r.m_set.add(m1)
+        r.m_set.add(m2)
+        r.save()
+        existed_objs = {
+            R._meta.label: R.objects.count(),
+            HiddenUser._meta.label: HiddenUser.objects.count(),
+            A._meta.label: A.objects.count(),
+            MR._meta.label: MR.objects.count(),
+            HiddenUserProfile._meta.label: HiddenUserProfile.objects.count(),
+            M.m2m.through._meta.label: M.m2m.through.objects.count(),
+        }
+        deleted, deleted_objs = r.delete()
+        self.assertEqual(deleted, sum(existed_objs.values()))
+        for k, v in existed_objs.items():
+            self.assertEqual(deleted_objs[k], v)
+
 
 class FastDeleteTests(TestCase):
 
@@ -377,3 +479,15 @@ class FastDeleteTests(TestCase):
         self.assertNumQueries(2, p.delete)
         self.assertFalse(Parent.objects.exists())
         self.assertFalse(Child.objects.exists())
+
+    def test_fast_delete_large_batch(self):
+        User.objects.bulk_create(User() for i in range(0, 2000))
+        # No problems here - we aren't going to cascade, so we will fast
+        # delete the objects in a single query.
+        self.assertNumQueries(1, User.objects.all().delete)
+        a = Avatar.objects.create(desc='a')
+        User.objects.bulk_create(User(avatar=a) for i in range(0, 2000))
+        # We don't hit parameter amount limits for a, so just one query for
+        # that + fast delete of the related objs.
+        self.assertNumQueries(2, a.delete)
+        self.assertEqual(User.objects.count(), 0)

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import uuid
 
 from django.db import models
 from django.utils import six
@@ -241,3 +242,45 @@ class Post(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# Models for testing UUID primary keys
+class UUIDPKParent(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+
+
+class UUIDPKChild(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(UUIDPKParent)
+
+
+class ChildWithEditablePK(models.Model):
+    name = models.CharField(max_length=255, primary_key=True)
+    parent = models.ForeignKey(UUIDPKParent)
+
+
+class AutoPKChildOfUUIDPKParent(models.Model):
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(UUIDPKParent)
+
+
+class AutoPKParent(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class UUIDPKChildOfAutoPKParent(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(AutoPKParent)
+
+
+class ParentWithUUIDAlternateKey(models.Model):
+    uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=50)
+
+
+class ChildRelatedViaAK(models.Model):
+    name = models.CharField(max_length=255)
+    parent = models.ForeignKey(to=ParentWithUUIDAlternateKey, to_field='uuid')

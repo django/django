@@ -1,16 +1,13 @@
+from __future__ import unicode_literals
+
 import os
-import stat
 import sys
-from os.path import join, normcase, normpath, abspath, isabs, sep, dirname
+import tempfile
+from os.path import abspath, dirname, isabs, join, normcase, normpath, sep
 
-from django.utils.encoding import force_text
+from django.core.exceptions import SuspiciousFileOperation
 from django.utils import six
-
-try:
-    WindowsError = WindowsError
-except NameError:
-    class WindowsError(Exception):
-        pass
+from django.utils.encoding import force_text
 
 if six.PY2:
     fs_encoding = sys.getfilesystemencoding() or sys.getdefaultencoding()
@@ -74,28 +71,32 @@ def safe_join(base, *paths):
     #  b) The final path must be the same as the base path.
     #  c) The base path must be the most root path (meaning either "/" or "C:\\")
     if (not normcase(final_path).startswith(normcase(base_path + sep)) and
-        normcase(final_path) != normcase(base_path) and
-        dirname(normcase(base_path)) != normcase(base_path)):
-        raise ValueError('The joined path (%s) is located outside of the base '
-                         'path component (%s)' % (final_path, base_path))
+            normcase(final_path) != normcase(base_path) and
+            dirname(normcase(base_path)) != normcase(base_path)):
+        raise SuspiciousFileOperation(
+            'The joined path ({}) is located outside of the base path '
+            'component ({})'.format(final_path, base_path))
     return final_path
 
 
-def rmtree_errorhandler(func, path, exc_info):
+def symlinks_supported():
     """
-    On Windows, some files are read-only (e.g. in in .svn dirs), so when
-    rmtree() tries to remove them, an exception is thrown.
-    We catch that here, remove the read-only attribute, and hopefully
-    continue without problems.
+    A function to check if creating symlinks are supported in the
+    host platform and/or if they are allowed to be created (e.g.
+    on Windows it requires admin permissions).
     """
-    exctype, value = exc_info[:2]
-    # looking for a windows error
-    if exctype is not WindowsError or 'Access is denied' not in str(value):
-        raise
-    # file type should currently be read only
-    if ((os.stat(path).st_mode & stat.S_IREAD) != stat.S_IREAD):
-        raise
-    # convert to read/write
-    os.chmod(path, stat.S_IWRITE)
-    # use the original function to repeat the operation
-    func(path)
+    tmpdir = tempfile.mkdtemp()
+    original_path = os.path.join(tmpdir, 'original')
+    symlink_path = os.path.join(tmpdir, 'symlink')
+    os.makedirs(original_path)
+    try:
+        os.symlink(original_path, symlink_path)
+        supported = True
+    except (OSError, NotImplementedError, AttributeError):
+        supported = False
+    else:
+        os.remove(symlink_path)
+    finally:
+        os.rmdir(original_path)
+        os.rmdir(tmpdir)
+        return supported

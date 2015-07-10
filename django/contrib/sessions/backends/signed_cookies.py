@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.core import signing
-
 from django.contrib.sessions.backends.base import SessionBase
+from django.core import signing
 
 
 class SessionStore(SessionBase):
@@ -18,7 +17,9 @@ class SessionStore(SessionBase):
                 # This doesn't handle non-default expiry dates, see #19201
                 max_age=settings.SESSION_COOKIE_AGE,
                 salt='django.contrib.sessions.backends.signed_cookies')
-        except (signing.BadSignature, ValueError):
+        except Exception:
+            # BadSignature, ValueError, or unpickling exceptions. If any of
+            # these happen, reset the session.
             self.create()
         return {}
 

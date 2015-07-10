@@ -73,8 +73,13 @@ class ParkingLot4B(Place, ParkingLot4):
     pass
 
 
+@python_2_unicode_compatible
 class Supplier(models.Model):
+    name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant)
+
+    def __str__(self):
+        return self.name
 
 
 class Wholesaler(Supplier):
@@ -233,3 +238,17 @@ class User(models.Model):
 class Profile(User):
     profile_id = models.AutoField(primary_key=True)
     extra = models.CharField(max_length=30, blank=True)
+
+
+# Check concrete + concrete -> concrete -> concrete
+class Politician(models.Model):
+    politician_id = models.AutoField(primary_key=True)
+    title = models.CharField(max_length=50)
+
+
+class Congressman(Person, Politician):
+    state = models.CharField(max_length=2)
+
+
+class Senator(Congressman):
+    pass

@@ -141,10 +141,10 @@ class TarArchive(BaseArchive):
         self._archive.list(*args, **kwargs)
 
     def extract(self, to_path):
-        # note: python<=2.5 doesnt seem to know about pax headers, filter them
+        # note: python<=2.5 doesn't seem to know about pax headers, filter them
         members = [member for member in self._archive.getmembers()
                    if member.name != 'pax_global_header']
-        leading = self.has_leading_dir(members)
+        leading = self.has_leading_dir(x.name for x in members)
         for member in members:
             name = member.name
             if leading:
@@ -160,7 +160,7 @@ class TarArchive(BaseArchive):
                     # Some corrupt tar files seem to produce this
                     # (specifically bad symlinks)
                     print("In the tar file %s the member %s is invalid: %s" %
-                            (name, member.name, exc))
+                          (name, member.name, exc))
                 else:
                     dirname = os.path.dirname(filename)
                     if dirname and not os.path.exists(dirname):

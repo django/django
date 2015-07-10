@@ -1,6 +1,6 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 """
-1. Bare-bones model
+Bare-bones model
 
 This is a basic model with only two non-primary-key fields.
 """
@@ -32,4 +32,6 @@ class SelfRef(models.Model):
                                 related_name='+')
 
     def __str__(self):
+        # This method intentionally doesn't work for all cases - part
+        # of the test for ticket #20278
         return SelfRef.objects.get(selfref=self).pk

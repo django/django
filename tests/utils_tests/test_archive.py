@@ -3,9 +3,8 @@ import shutil
 import tempfile
 import unittest
 
-from django.utils.archive import Archive, extract
 from django.utils._os import upath
-
+from django.utils.archive import Archive, extract
 
 TEST_DIR = os.path.join(os.path.dirname(upath(__file__)), 'archives')
 
@@ -21,6 +20,7 @@ class ArchiveTester(object):
         self.tmpdir = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.tmpdir)
         self.archive_path = os.path.join(TEST_DIR, self.archive)
+        self.archive_lead_path = os.path.join(TEST_DIR, "leadpath_%s" % self.archive)
         # Always start off in TEST_DIR.
         os.chdir(TEST_DIR)
 
@@ -40,6 +40,10 @@ class ArchiveTester(object):
 
     def test_extract_function(self):
         extract(self.archive_path, self.tmpdir)
+        self.check_files(self.tmpdir)
+
+    def test_extract_function_with_leadpath(self):
+        extract(self.archive_lead_path, self.tmpdir)
         self.check_files(self.tmpdir)
 
     def test_extract_function_no_to_path(self):

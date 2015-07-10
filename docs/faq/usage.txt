@@ -19,7 +19,7 @@ I can't stand your template language. Do I have to use it?
 We happen to think our template engine is the best thing since chunky bacon,
 but we recognize that choosing a template language runs close to religion.
 There's nothing about Django that requires using the template language, so
-if you're attached to ZPT, Cheetah, or whatever, feel free to use those.
+if you're attached to Jinja2, Mako, or whatever, feel free to use those.
 
 Do I have to use your model/database layer?
 -------------------------------------------

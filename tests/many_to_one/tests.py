@@ -1,13 +1,16 @@
-from copy import deepcopy
 import datetime
+from copy import deepcopy
 
-from django.core.exceptions import MultipleObjectsReturned, FieldError
-from django.db import transaction
+from django.core.exceptions import FieldError, MultipleObjectsReturned
+from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import Article, Reporter
+from .models import (
+    Article, Category, Child, First, Parent, Record, Relation, Reporter,
+    School, Student, Third, ToFieldChild,
+)
 
 
 class ManyToOneTests(TestCase):
@@ -79,11 +82,49 @@ class ManyToOneTests(TestCase):
                 "<Article: This is a test>",
             ])
 
+    def test_set(self):
+        new_article = self.r.article_set.create(headline="John's second story",
+                                                pub_date=datetime.date(2005, 7, 29))
+        new_article2 = self.r2.article_set.create(headline="Paul's story",
+                                                  pub_date=datetime.date(2006, 1, 17))
+
+        # Assign the article to the reporter.
+        new_article2.reporter = self.r
+        new_article2.save()
+        self.assertEqual(repr(new_article2.reporter), "<Reporter: John Smith>")
+        self.assertEqual(new_article2.reporter.id, self.r.id)
+        self.assertQuerysetEqual(self.r.article_set.all(), [
+            "<Article: John's second story>",
+            "<Article: Paul's story>",
+            "<Article: This is a test>",
+        ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
+        # Set the article back again.
+        self.r2.article_set.set([new_article, new_article2])
+        self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
+        self.assertQuerysetEqual(self.r2.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+            ])
+
+        # Funny case - because the ForeignKey cannot be null,
+        # existing members of the set must remain.
+        self.r.article_set.set([new_article])
+        self.assertQuerysetEqual(self.r.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: This is a test>",
+            ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
         new_article2 = self.r2.article_set.create(headline="Paul's story",
                                                   pub_date=datetime.date(2006, 1, 17))
+
         # Assign the article to the reporter directly using the descriptor.
         new_article2.reporter = self.r
         new_article2.save()
@@ -95,6 +136,7 @@ class ManyToOneTests(TestCase):
             "<Article: This is a test>",
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
         # Set the article back again using set descriptor.
         self.r2.article_set = [new_article, new_article2]
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
@@ -116,6 +158,31 @@ class ManyToOneTests(TestCase):
         # Reporter cannot be null - there should not be a clear or remove method
         self.assertFalse(hasattr(self.r2.article_set, 'remove'))
         self.assertFalse(hasattr(self.r2.article_set, 'clear'))
+
+    def test_assign_unsaved_check_override(self):
+        """
+        #24495 - Assigning an unsaved object to a ForeignKey
+        should be allowed when the allow_unsaved_instance_assignment
+        attribute has been set to True.
+        """
+        class UnsavedForeignKey(models.ForeignKey):
+            # A ForeignKey which can point to an unsaved object
+            allow_unsaved_instance_assignment = True
+
+        class Band(models.Model):
+            name = models.CharField(max_length=50)
+
+        class BandMember(models.Model):
+            band = UnsavedForeignKey(Band)
+            first_name = models.CharField(max_length=50)
+            last_name = models.CharField(max_length=50)
+
+        beatles = Band(name='The Beatles')
+        john = BandMember(first_name='John', last_name='Lennon')
+        # This should not raise an exception as the ForeignKey between member
+        # and band has allow_unsaved_instance_assignment=True.
+        john.band = beatles
+        self.assertEqual(john.band, beatles)
 
     def test_selects(self):
         self.r.article_set.create(headline="John's second story",
@@ -178,8 +245,9 @@ class ManyToOneTests(TestCase):
             ])
         # ... and should work fine with the unicode that comes out of forms.Form.cleaned_data
         self.assertQuerysetEqual(
-            Article.objects.filter(reporter__first_name__exact='John'
-                                  ).extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith']),
+            (Article.objects
+                .filter(reporter__first_name__exact='John')
+                .extra(where=["many_to_one_reporter.last_name='%s'" % 'Smith'])),
             [
                 "<Article: John's second story>",
                 "<Article: This is a test>",
@@ -337,7 +405,7 @@ class ManyToOneTests(TestCase):
 
     def test_delete(self):
         self.r.article_set.create(headline="John's second story",
-                                                pub_date=datetime.date(2005, 7, 29))
+                                  pub_date=datetime.date(2005, 7, 29))
         self.r2.article_set.create(headline="Paul's story",
                                    pub_date=datetime.date(2006, 1, 17))
         Article.objects.create(id=None, headline="Third article",
@@ -373,12 +441,6 @@ class ManyToOneTests(TestCase):
         self.assertQuerysetEqual(Reporter.objects.all(), [])
         self.assertQuerysetEqual(Article.objects.all(), [])
 
-    def test_regression_12876(self):
-        # Regression for #12876 -- Model methods that include queries that
-        # recursive don't cause recursion depth problems under deepcopy.
-        self.r.cached_query = Article.objects.filter(reporter=self.r)
-        self.assertEqual(repr(deepcopy(self.r)), "<Reporter: John Smith>")
-
     def test_explicit_fk(self):
         # Create a new Article with get_or_create using an explicit value
         # for a ForeignKey.
@@ -410,15 +472,21 @@ class ManyToOneTests(TestCase):
                          repr(Article.objects.get(reporter_id=self.r2.id,
                                              pub_date=datetime.date(2011, 5, 7))))
 
+    def test_deepcopy_and_circular_references(self):
+        # Regression for #12876 -- Model methods that include queries that
+        # recursive don't cause recursion depth problems under deepcopy.
+        self.r.cached_query = Article.objects.filter(reporter=self.r)
+        self.assertEqual(repr(deepcopy(self.r)), "<Reporter: John Smith>")
+
     def test_manager_class_caching(self):
         r1 = Reporter.objects.create(first_name='Mike')
         r2 = Reporter.objects.create(first_name='John')
 
         # Same twice
-        self.assertTrue(r1.article_set.__class__ is r1.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r1.article_set.__class__)
 
         # Same as each other
-        self.assertTrue(r1.article_set.__class__ is r2.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
     def test_create_relation_with_ugettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John',
@@ -435,10 +503,161 @@ class ManyToOneTests(TestCase):
         expected_message = "Cannot resolve keyword 'notafield' into field. Choices are: %s"
 
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(Reporter._meta.get_all_field_names()),
+                                 expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields())),
                                  Article.objects.values_list,
                                  'reporter__notafield')
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
+                                 expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')
+
+    def test_fk_assignment_and_related_object_cache(self):
+        # Tests of ForeignKey assignment and the related-object cache (see #6886).
+
+        p = Parent.objects.create(name="Parent")
+        c = Child.objects.create(name="Child", parent=p)
+
+        # Look up the object again so that we get a "fresh" object.
+        c = Child.objects.get(name="Child")
+        p = c.parent
+
+        # Accessing the related object again returns the exactly same object.
+        self.assertIs(c.parent, p)
+
+        # But if we kill the cache, we get a new object.
+        del c._parent_cache
+        self.assertIsNot(c.parent, p)
+
+        # Assigning a new object results in that object getting cached immediately.
+        p2 = Parent.objects.create(name="Parent 2")
+        c.parent = p2
+        self.assertIs(c.parent, p2)
+
+        # Assigning None succeeds if field is null=True.
+        p.bestchild = None
+        self.assertIsNone(p.bestchild)
+
+        # bestchild should still be None after saving.
+        p.save()
+        self.assertIsNone(p.bestchild)
+
+        # bestchild should still be None after fetching the object again.
+        p = Parent.objects.get(name="Parent")
+        self.assertIsNone(p.bestchild)
+
+        # Assigning None fails: Child.parent is null=False.
+        self.assertRaises(ValueError, setattr, c, "parent", None)
+
+        # You also can't assign an object of the wrong type here
+        self.assertRaises(ValueError, setattr, c, "parent", First(id=1, second=1))
+
+        # Nor can you explicitly assign None to Child.parent during object
+        # creation (regression for #9649).
+        self.assertRaises(ValueError, Child, name='xyzzy', parent=None)
+        self.assertRaises(ValueError, Child.objects.create, name='xyzzy', parent=None)
+
+        # Creation using keyword argument should cache the related object.
+        p = Parent.objects.get(name="Parent")
+        c = Child(parent=p)
+        self.assertIs(c.parent, p)
+
+        # Creation using keyword argument and unsaved related instance (#8070).
+        p = Parent()
+        with self.assertRaisesMessage(ValueError,
+                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                % (p, Child.parent.field.remote_field.model._meta.object_name)):
+            Child(parent=p)
+
+        with self.assertRaisesMessage(ValueError,
+                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
+                % (p, Child.parent.field.remote_field.model._meta.object_name)):
+            ToFieldChild(parent=p)
+
+        # Creation using attname keyword argument and an id will cause the
+        # related object to be fetched.
+        p = Parent.objects.get(name="Parent")
+        c = Child(parent_id=p.id)
+        self.assertIsNot(c.parent, p)
+        self.assertEqual(c.parent, p)
+
+    def test_multiple_foreignkeys(self):
+        # Test of multiple ForeignKeys to the same model (bug #7125).
+        c1 = Category.objects.create(name='First')
+        c2 = Category.objects.create(name='Second')
+        c3 = Category.objects.create(name='Third')
+        r1 = Record.objects.create(category=c1)
+        r2 = Record.objects.create(category=c1)
+        r3 = Record.objects.create(category=c2)
+        r4 = Record.objects.create(category=c2)
+        r5 = Record.objects.create(category=c3)
+        Relation.objects.create(left=r1, right=r2)
+        Relation.objects.create(left=r3, right=r4)
+        Relation.objects.create(left=r1, right=r3)
+        Relation.objects.create(left=r5, right=r2)
+        Relation.objects.create(left=r3, right=r2)
+
+        q1 = Relation.objects.filter(left__category__name__in=['First'], right__category__name__in=['Second'])
+        self.assertQuerysetEqual(q1, ["<Relation: First - Second>"])
+
+        q2 = Category.objects.filter(record__left_set__right__category__name='Second').order_by('name')
+        self.assertQuerysetEqual(q2, ["<Category: First>", "<Category: Second>"])
+
+        p = Parent.objects.create(name="Parent")
+        c = Child.objects.create(name="Child", parent=p)
+        self.assertRaises(ValueError, Child.objects.create, name="Grandchild", parent=c)
+
+    def test_fk_instantiation_outside_model(self):
+        # Regression for #12190 -- Should be able to instantiate a FK outside
+        # of a model, and interrogate its related field.
+        cat = models.ForeignKey(Category)
+        self.assertEqual('id', cat.remote_field.get_related_field().name)
+
+    def test_relation_unsaved(self):
+        # Test that the <field>_set manager does not join on Null value fields (#17541)
+        Third.objects.create(name='Third 1')
+        Third.objects.create(name='Third 2')
+        th = Third(name="testing")
+        # The object isn't saved an thus the relation field is null - we won't even
+        # execute a query in this case.
+        with self.assertNumQueries(0):
+            self.assertEqual(th.child_set.count(), 0)
+        th.save()
+        # Now the model is saved, so we will need to execute an query.
+        with self.assertNumQueries(1):
+            self.assertEqual(th.child_set.count(), 0)
+
+    def test_related_object(self):
+        public_school = School.objects.create(is_public=True)
+        public_student = Student.objects.create(school=public_school)
+
+        private_school = School.objects.create(is_public=False)
+        private_student = Student.objects.create(school=private_school)
+
+        # Only one school is available via all() due to the custom default manager.
+        self.assertQuerysetEqual(
+            School.objects.all(),
+            ["<School: School object>"]
+        )
+
+        self.assertEqual(public_student.school, public_school)
+
+        # Make sure the base manager is used so that an student can still access
+        # its related school even if the default manager doesn't normally
+        # allow it.
+        self.assertEqual(private_student.school, private_school)
+
+        # If the manager is marked "use_for_related_fields", it'll get used instead
+        # of the "bare" queryset. Usually you'd define this as a property on the class,
+        # but this approximates that in a way that's easier in tests.
+        School.objects.use_for_related_fields = True
+        try:
+            private_student = Student.objects.get(pk=private_student.pk)
+            self.assertRaises(School.DoesNotExist, lambda: private_student.school)
+        finally:
+            School.objects.use_for_related_fields = False
+
+    def test_hasattr_related_object(self):
+        # The exception raised on attribute access when a related object
+        # doesn't exist should be an instance of a subclass of `AttributeError`
+        # refs #21563
+        self.assertFalse(hasattr(Article(), 'reporter'))

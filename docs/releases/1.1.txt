@@ -50,7 +50,7 @@ Following this change, all platforms, regardless of word size, will generate a
 
 As a result of this change, you will not be able to use the ``reset``
 management command on any table made by a 64-bit machine. This is because the
-the new generated name will not match the historically generated name; as a
+new generated name will not match the historically generated name; as a
 result, the SQL constructed by the reset command will be invalid.
 
 If you need to reset an application that was created with 64-bit constraints,
@@ -224,7 +224,7 @@ A number of features have been added to Django's model layer:
 You can now control whether or not Django manages the life-cycle of the database
 tables for a model using the :attr:`~Options.managed` model option. This
 defaults to ``True``, meaning that Django will create the appropriate database
-tables in :djadmin:`syncdb` and remove them as part of the ``reset``
+tables in ``syncdb`` and remove them as part of the ``reset``
 command. That is, Django *manages* the database table's lifecycle.
 
 If you set this to ``False``, however, no database table creating or deletion
@@ -362,18 +362,17 @@ features:
 
 * A new list interface methods for ``GEOSGeometry`` objects.
 
-For more details, see the `GeoDjango documentation`_.
+For more details, see the GeoDjango documentation.
 
 .. _geodjango: http://geodjango.org/
 .. _spatialite: http://www.gaia-gis.it/gaia-sins/
-.. _geodjango documentation: http://geodjango.org/docs/
 
 Other improvements
 ------------------
 
 Other new features and changes introduced since Django 1.0 include:
 
-* The :doc:`CSRF protection middleware </ref/contrib/csrf>` has been split into
+* The :doc:`CSRF protection middleware </ref/csrf>` has been split into
   two classes -- ``CsrfViewMiddleware`` checks incoming requests, and
   ``CsrfResponseMiddleware`` processes outgoing responses. The combined
   ``CsrfMiddleware`` class (which does both) remains for

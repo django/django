@@ -5,7 +5,8 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
+from django.core.mail.backends.console import \
+    EmailBackend as ConsoleEmailBackend
 from django.utils import six
 
 
@@ -22,13 +23,17 @@ class EmailBackend(ConsoleEmailBackend):
         self.file_path = os.path.abspath(self.file_path)
         # Make sure that self.file_path is an directory if it exists.
         if os.path.exists(self.file_path) and not os.path.isdir(self.file_path):
-            raise ImproperlyConfigured('Path for saving email messages exists, but is not a directory: %s' % self.file_path)
+            raise ImproperlyConfigured(
+                'Path for saving email messages exists, but is not a directory: %s' % self.file_path
+            )
         # Try to create it, if it not exists.
         elif not os.path.exists(self.file_path):
             try:
                 os.makedirs(self.file_path)
             except OSError as err:
-                raise ImproperlyConfigured('Could not create directory for saving email messages: %s (%s)' % (self.file_path, err))
+                raise ImproperlyConfigured(
+                    'Could not create directory for saving email messages: %s (%s)' % (self.file_path, err)
+                )
         # Make sure that self.file_path is writable.
         if not os.access(self.file_path, os.W_OK):
             raise ImproperlyConfigured('Could not write to directory: %s' % self.file_path)
@@ -37,6 +42,11 @@ class EmailBackend(ConsoleEmailBackend):
         # force the stream to be None, so we don't default to stdout
         kwargs['stream'] = None
         super(EmailBackend, self).__init__(*args, **kwargs)
+
+    def write_message(self, message):
+        self.stream.write(message.message().as_bytes() + b'\n')
+        self.stream.write(b'-' * 79)
+        self.stream.write(b'\n')
 
     def _get_filename(self):
         """Return a unique file name."""
@@ -48,7 +58,7 @@ class EmailBackend(ConsoleEmailBackend):
 
     def open(self):
         if self.stream is None:
-            self.stream = open(self._get_filename(), 'a')
+            self.stream = open(self._get_filename(), 'ab')
             return True
         return False
 

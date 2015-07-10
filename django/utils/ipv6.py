@@ -2,26 +2,26 @@
 # Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
+from django.utils.six.moves import range
 from django.utils.translation import ugettext_lazy as _
-from django.utils.six.moves import xrange
 
 
 def clean_ipv6_address(ip_str, unpack_ipv4=False,
         error_message=_("This is not a valid IPv6 address.")):
     """
-    Cleans a IPv6 address string.
+    Cleans an IPv6 address string.
 
     Validity is checked by calling is_valid_ipv6_address() - if an
     invalid address is passed, ValidationError is raised.
 
-    Replaces the longest continious zero-sequence with "::" and
+    Replaces the longest continuous zero-sequence with "::" and
     removes leading zeroes and makes sure all hextets are lowercase.
 
     Args:
         ip_str: A valid IPv6 address.
         unpack_ipv4: if an IPv4-mapped address is found,
         return the plain IPv4 address (default=False).
-        error_message: A error message for in the ValidationError.
+        error_message: An error message used in the ValidationError.
 
     Returns:
         A compressed IPv6 address, or the same value
@@ -90,7 +90,7 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
 
 def _sanitize_ipv4_mapping(ip_str):
     """
-    Sanitize IPv4 mapping in a expanded IPv6 address.
+    Sanitize IPv4 mapping in an expanded IPv6 address.
 
     This converts ::ffff:0a0a:0a0a to ::ffff:10.10.10.10.
     If there is nothing to sanitize, returns an unchanged
@@ -239,7 +239,7 @@ def _explode_shorthand_ip_string(ip_str):
         sep = len(hextet[0].split(':')) + len(hextet[1].split(':'))
         new_ip = hextet[0].split(':')
 
-        for _ in xrange(fill_to - sep):
+        for __ in range(fill_to - sep):
             new_ip.append('0000')
         new_ip += hextet[1].split(':')
 

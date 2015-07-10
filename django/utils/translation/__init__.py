@@ -2,11 +2,13 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
+
 import re
+
+from django.utils import six
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
-from django.utils import six
-
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
@@ -19,7 +21,10 @@ __all__ = [
     'ungettext', 'ungettext_lazy',
     'pgettext', 'pgettext_lazy',
     'npgettext', 'npgettext_lazy',
+    'LANGUAGE_SESSION_KEY',
 ]
+
+LANGUAGE_SESSION_KEY = '_language'
 
 
 class TranslatorCommentWarning(SyntaxWarning):
@@ -97,7 +102,7 @@ pgettext_lazy = lazy(pgettext, six.text_type)
 
 
 def lazy_number(func, resultclass, number=None, **kwargs):
-    if isinstance(number, int):
+    if isinstance(number, six.integer_types):
         kwargs['number'] = number
         proxy = lazy(func, resultclass)(**kwargs)
     else:
@@ -146,13 +151,13 @@ def deactivate():
     return _trans.deactivate()
 
 
-class override(object):
+class override(ContextDecorator):
     def __init__(self, language, deactivate=False):
         self.language = language
         self.deactivate = deactivate
-        self.old_language = get_language()
 
     def __enter__(self):
+        self.old_language = get_language()
         if self.language is not None:
             activate(self.language)
         else:
@@ -185,8 +190,8 @@ def get_language_from_request(request, check_path=False):
     return _trans.get_language_from_request(request, check_path)
 
 
-def get_language_from_path(path, supported=None):
-    return _trans.get_language_from_path(path, supported=supported)
+def get_language_from_path(path):
+    return _trans.get_language_from_path(path)
 
 
 def templatize(src, origin=None):
@@ -209,15 +214,23 @@ string_concat = lazy(_string_concat, six.text_type)
 def get_language_info(lang_code):
     from django.conf.locale import LANG_INFO
     try:
-        return LANG_INFO[lang_code]
+        lang_info = LANG_INFO[lang_code]
+        if 'fallback' in lang_info and 'name' not in lang_info:
+            info = get_language_info(lang_info['fallback'][0])
+        else:
+            info = lang_info
     except KeyError:
         if '-' not in lang_code:
             raise KeyError("Unknown language code %s." % lang_code)
         generic_lang_code = lang_code.split('-')[0]
         try:
-            return LANG_INFO[generic_lang_code]
+            info = LANG_INFO[generic_lang_code]
         except KeyError:
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
+
+    if info:
+        info['name_translated'] = ugettext_lazy(info['name'])
+    return info
 
 trim_whitespace_re = re.compile('\s*\n\s*')
 

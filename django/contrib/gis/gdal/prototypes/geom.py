@@ -1,12 +1,15 @@
-from ctypes import c_char_p, c_double, c_int, c_void_p, POINTER
+from ctypes import POINTER, c_char_p, c_double, c_int, c_void_p
+
 from django.contrib.gis.gdal.envelope import OGREnvelope
 from django.contrib.gis.gdal.libgdal import lgdal
 from django.contrib.gis.gdal.prototypes.errcheck import check_envelope
-from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
-    double_output, geom_output, int_output, srs_output, string_output, void_output)
+from django.contrib.gis.gdal.prototypes.generation import (
+    const_string_output, double_output, geom_output, int_output, srs_output,
+    string_output, void_output,
+)
 
 
-### Generation routines specific to this module ###
+# ### Generation routines specific to this module ###
 def env_func(f, argtypes):
     "For getting OGREnvelopes."
     f.argtypes = argtypes
@@ -26,7 +29,7 @@ def topology_func(f):
     f.errchck = bool
     return f
 
-### OGR_G ctypes function prototypes ###
+# ### OGR_G ctypes function prototypes ###
 
 # GeoJSON routines.
 from_json = geom_output(lgdal.OGR_G_CreateGeometryFromJson, [c_char_p])
@@ -79,7 +82,9 @@ get_geom_count = int_output(lgdal.OGR_G_GetGeometryCount, [c_void_p])
 get_geom_name = const_string_output(lgdal.OGR_G_GetGeometryName, [c_void_p], decoding='ascii')
 get_geom_type = int_output(lgdal.OGR_G_GetGeometryType, [c_void_p])
 get_point_count = int_output(lgdal.OGR_G_GetPointCount, [c_void_p])
-get_point = void_output(lgdal.OGR_G_GetPoint, [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False)
+get_point = void_output(lgdal.OGR_G_GetPoint,
+    [c_void_p, c_int, POINTER(c_double), POINTER(c_double), POINTER(c_double)], errcheck=False
+)
 geom_close_rings = void_output(lgdal.OGR_G_CloseRings, [c_void_p], errcheck=False)
 
 # Topology routines.

@@ -1,6 +1,8 @@
-from django.contrib.sites.models import Site
-from django.core import urlresolvers, paginator
+from django.apps import apps as django_apps
+from django.conf import settings
+from django.core import paginator, urlresolvers
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -32,6 +34,9 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
     if sitemap_url is None:
         raise SitemapNotFound("You didn't provide a sitemap_url, and the sitemap URL couldn't be auto-detected.")
 
+    if not django_apps.is_installed('django.contrib.sites'):
+        raise ImproperlyConfigured("ping_google requires django.contrib.sites, which isn't installed.")
+    Site = django_apps.get_model('sites.Site')
     current_site = Site.objects.get_current()
     url = "http://%s%s" % (current_site.domain, sitemap_url)
     params = urlencode({'sitemap': url})
@@ -75,32 +80,49 @@ class Sitemap(object):
 
         # Determine domain
         if site is None:
-            if Site._meta.installed:
+            if django_apps.is_installed('django.contrib.sites'):
+                Site = django_apps.get_model('sites.Site')
                 try:
                     site = Site.objects.get_current()
                 except Site.DoesNotExist:
                     pass
             if site is None:
-                raise ImproperlyConfigured("To use sitemaps, either enable the sites framework or pass a Site/RequestSite object in your view.")
+                raise ImproperlyConfigured(
+                    "To use sitemaps, either enable the sites framework or pass "
+                    "a Site/RequestSite object in your view."
+                )
         domain = site.domain
 
+        if getattr(self, 'i18n', False):
+            urls = []
+            current_lang_code = translation.get_language()
+            for lang_code, lang_name in settings.LANGUAGES:
+                translation.activate(lang_code)
+                urls += self._urls(page, protocol, domain)
+            translation.activate(current_lang_code)
+        else:
+            urls = self._urls(page, protocol, domain)
+
+        return urls
+
+    def _urls(self, page, protocol, domain):
         urls = []
         latest_lastmod = None
         all_items_lastmod = True  # track if all items have a lastmod
         for item in self.paginator.page(page).object_list:
             loc = "%s://%s%s" % (protocol, domain, self.__get('location', item))
-            priority = self.__get('priority', item, None)
-            lastmod = self.__get('lastmod', item, None)
+            priority = self.__get('priority', item)
+            lastmod = self.__get('lastmod', item)
             if all_items_lastmod:
                 all_items_lastmod = lastmod is not None
                 if (all_items_lastmod and
-                    (latest_lastmod is None or lastmod > latest_lastmod)):
+                        (latest_lastmod is None or lastmod > latest_lastmod)):
                     latest_lastmod = lastmod
             url_info = {
                 'item': item,
                 'location': loc,
                 'lastmod': lastmod,
-                'changefreq': self.__get('changefreq', item, None),
+                'changefreq': self.__get('changefreq', item),
                 'priority': str(priority if priority is not None else ''),
             }
             urls.append(url_info)
@@ -109,19 +131,13 @@ class Sitemap(object):
         return urls
 
 
-class FlatPageSitemap(Sitemap):
-    def items(self):
-        current_site = Site.objects.get_current()
-        return current_site.flatpage_set.filter(registration_required=False)
-
-
 class GenericSitemap(Sitemap):
     priority = None
     changefreq = None
 
     def __init__(self, info_dict, priority=None, changefreq=None):
         self.queryset = info_dict['queryset']
-        self.date_field = info_dict.get('date_field', None)
+        self.date_field = info_dict.get('date_field')
         self.priority = priority
         self.changefreq = changefreq
 
@@ -133,3 +149,6 @@ class GenericSitemap(Sitemap):
         if self.date_field is not None:
             return getattr(item, self.date_field)
         return None
+
+
+default_app_config = 'django.contrib.sitemaps.apps.SiteMapsConfig'

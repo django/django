@@ -1,5 +1,5 @@
 """
-9. Many-to-many relationships via an intermediary table
+Many-to-many relationships via an intermediary table
 
 For many-to-many relationships that need extra fields on the intermediary
 table, use an intermediary model.

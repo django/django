@@ -7,8 +7,9 @@ Format localization
 Overview
 ========
 
-Django's formatting system is capable to display dates, times and numbers in templates using the format specified for the current :term:`locale <locale
-name>`. It also handles localized input in forms.
+Django's formatting system is capable of displaying dates, times and numbers in
+templates using the format specified for the current
+:term:`locale <locale name>`. It also handles localized input in forms.
 
 When it's enabled, two users accessing the same content may see dates, times and
 numbers formatted in different ways, depending on the formats for their current
@@ -19,7 +20,7 @@ necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
 
 .. note::
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin.py
+    The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes :setting:`USE_L10N = True <USE_L10N>`
     for convenience.  Note, however, that to enable number formatting with
     thousand separators it is necessary to set :setting:`USE_THOUSAND_SEPARATOR
@@ -63,7 +64,7 @@ will try to use a locale specific format whenever it outputs a value
 in a template.
 
 However, it may not always be appropriate to use localized values --
-for example, if you're outputting Javascript or XML that is designed
+for example, if you're outputting JavaScript or XML that is designed
 to be machine-readable, you will always want unlocalized values. You
 may also want to use localization in selected templates, rather than
 using localization everywhere.
@@ -153,11 +154,20 @@ Django provides format definitions for many locales, but sometimes you might
 want to create your own, because a format files doesn't exist for your locale,
 or because you want to overwrite some of the values.
 
-To use custom formats, specify the path where you'll place format files first.
-To do that, just set your :setting:`FORMAT_MODULE_PATH` setting to the package
-where format files will exist, for instance::
 
-    FORMAT_MODULE_PATH = 'mysite.formats'
+.. versionchanged:: 1.8
+
+    The ability to specify :setting:`FORMAT_MODULE_PATH` as a list was added.
+    Previously, only a single string value was supported.
+
+To use custom formats, specify the path where you'll place format files
+first. To do that, just set your :setting:`FORMAT_MODULE_PATH` setting to
+the package where format files will exist, for instance::
+
+    FORMAT_MODULE_PATH = [
+        'mysite.formats',
+        'some_app.formats',
+    ]
 
 Files are not placed directly in this directory, but in a directory named as
 the locale, and must be named ``formats.py``.
@@ -173,7 +183,9 @@ To customize the English formats, a structure like this would be needed::
 
 where :file:`formats.py` contains custom format definitions. For example::
 
-    THOUSAND_SEPARATOR = u'\xa0'
+    from __future__ import unicode_literals
+
+    THOUSAND_SEPARATOR = '\xa0'
 
 to use a non-breaking space (Unicode ``00A0``) as a thousand separator,
 instead of the default for English, a comma.

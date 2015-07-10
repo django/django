@@ -21,6 +21,11 @@ class RelatedItem(models.Model):
     item = models.ForeignKey(Item)
 
 
+class ProxyRelated(RelatedItem):
+    class Meta:
+        proxy = True
+
+
 class Child(models.Model):
     name = models.CharField(max_length=10)
     value = models.IntegerField()
@@ -82,10 +87,6 @@ class Location(models.Model):
     location1 = models.CharField(max_length=1000, default='location1')
 
 
-class Item(models.Model):
-    pass
-
-
 class Request(models.Model):
     profile = models.ForeignKey(Profile, null=True, blank=True)
     location = models.ForeignKey(Location)
@@ -95,3 +96,11 @@ class Request(models.Model):
     request2 = models.CharField(default='request2', max_length=1000)
     request3 = models.CharField(default='request3', max_length=1000)
     request4 = models.CharField(default='request4', max_length=1000)
+
+
+class Base(models.Model):
+    text = models.TextField()
+
+
+class Derived(Base):
+    other_text = models.TextField()

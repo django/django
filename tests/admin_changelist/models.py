@@ -44,6 +44,11 @@ class Group(models.Model):
         return self.name
 
 
+class Concert(models.Model):
+    name = models.CharField(max_length=30)
+    group = models.ForeignKey(Group)
+
+
 class Membership(models.Model):
     music = models.ForeignKey(Musician)
     group = models.ForeignKey(Group)
@@ -76,6 +81,10 @@ class Swallow(models.Model):
 
     class Meta:
         ordering = ('speed', 'load')
+
+
+class SwallowOneToOne(models.Model):
+    swallow = models.OneToOneField(Swallow)
 
 
 class UnorderedObject(models.Model):

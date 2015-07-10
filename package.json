@@ -1,0 +1,14 @@
+{
+  "name": "Django",
+  "private": true,
+  "scripts": {
+    "pretest": "eslint django/",
+    "test": "grunt test --verbose"
+  },
+  "devDependencies": {
+    "eslint": "^0.22.1",
+    "grunt": "^0.4.5",
+    "grunt-blanket-qunit": "^0.2.0",
+    "grunt-cli": "^0.1.13"
+  }
+}

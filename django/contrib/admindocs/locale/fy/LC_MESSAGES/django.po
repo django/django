@@ -1,109 +1,36 @@
 # This file is distributed under the same license as the Django package.
 #
+# Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:36+0100\n"
-"PO-Revision-Date: 2011-03-15 15:27+0000\n"
-"Last-Translator: Django team\n"
-"Language-Team: English <en@li.org>\n"
-"Language: fy_NL\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Western Frisian (http://www.transifex.com/projects/p/django/"
+"language/fy/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Language: fy\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:57 views.py:59 views.py:61
-msgid "tag:"
+msgid "Administrative Documentation"
 msgstr ""
 
-#: views.py:92 views.py:94 views.py:96
-msgid "filter:"
-msgstr ""
-
-#: views.py:155 views.py:157 views.py:159
-msgid "view:"
-msgstr ""
-
-#: views.py:187
-#, python-format
-msgid "App %r not found"
-msgstr ""
-
-#: views.py:194
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
-
-#: views.py:206
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
-
-#: views.py:206 views.py:225 views.py:230 views.py:244 views.py:258
-#: views.py:263
-msgid "model:"
-msgstr ""
-
-#: views.py:221 views.py:253
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
-
-#: views.py:225 views.py:258
-#, python-format
-msgid "all %s"
-msgstr ""
-
-#: views.py:230 views.py:263
-#, python-format
-msgid "number of %s"
-msgstr ""
-
-#: views.py:268
-#, python-format
-msgid "Fields on %s objects"
-msgstr ""
-
-#: views.py:360
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr ""
-
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Home"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:8 templates/admin_doc/index.html:8
-#: templates/admin_doc/missing_docutils.html:8
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-#: templates/admin_doc/template_detail.html:8
-#: templates/admin_doc/template_filter_index.html:9
-#: templates/admin_doc/template_tag_index.html:9
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
 msgid "Documentation"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:9
 msgid "Bookmarklets"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:12
 msgid "Documentation bookmarklets"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:16
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -114,60 +41,235 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid "Documentation for this page"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:27
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid "Show object ID"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:30
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Edit this object (current window)"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:33
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "Edit this object (new window)"
 msgstr ""
 
-#: templates/admin_doc/bookmarklets.html:36
 msgid "As above, but opens the admin page in a new window."
 msgstr ""
 
-#: templates/admin_doc/model_detail.html:17
-#: templates/admin_doc/model_index.html:11
-msgid "Models"
-msgstr ""
-
-#: templates/admin_doc/template_detail.html:9
-msgid "Templates"
-msgstr ""
-
-#: templates/admin_doc/template_filter_index.html:10
-msgid "Filters"
-msgstr ""
-
-#: templates/admin_doc/template_tag_index.html:10
 msgid "Tags"
 msgstr ""
 
-#: templates/admin_doc/view_detail.html:9
-#: templates/admin_doc/view_index.html:10
+msgid "List of all the template tags and their functions."
+msgstr ""
+
+msgid "Filters"
+msgstr ""
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+
+msgid "Models"
+msgstr ""
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+
 msgid "Views"
+msgstr ""
+
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+
+msgid "Please install docutils"
+msgstr ""
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr ""
+
+msgid "Field"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Back to Model Documentation"
+msgstr ""
+
+msgid "Model documentation"
+msgstr ""
+
+msgid "Model groups"
+msgstr ""
+
+msgid "Templates"
+msgstr ""
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr ""
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr ""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr ""
+
+msgid "(does not exist)"
+msgstr ""
+
+msgid "Back to Documentation"
+msgstr ""
+
+msgid "Template filters"
+msgstr ""
+
+msgid "Template filter documentation"
+msgstr ""
+
+msgid "Built-in filters"
+msgstr ""
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+
+msgid "Template tags"
+msgstr ""
+
+msgid "Template tag documentation"
+msgstr ""
+
+msgid "Built-in tags"
+msgstr ""
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+
+#, python-format
+msgid "View: %(name)s"
+msgstr ""
+
+msgid "Context:"
+msgstr ""
+
+msgid "Templates:"
+msgstr ""
+
+msgid "Back to Views Documentation"
+msgstr ""
+
+msgid "View documentation"
+msgstr ""
+
+msgid "Jump to namespace"
+msgstr ""
+
+msgid "Empty namespace"
+msgstr ""
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr ""
+
+msgid "Views by empty namespace"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+
+msgid "Boolean (Either True or False)"
+msgstr ""
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr ""
+
+msgid "tag:"
+msgstr ""
+
+msgid "filter:"
+msgstr ""
+
+msgid "view:"
+msgstr ""
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr ""
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+
+msgid "model:"
+msgstr ""
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr ""
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr ""
+
+#, python-format
+msgid "all %s"
+msgstr ""
+
+#, python-format
+msgid "number of %s"
+msgstr ""
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
 msgstr ""

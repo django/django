@@ -2,66 +2,79 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+from django.db import models
 from django.test import TestCase
 
-from .models import Post, Question, Answer
+from .models import Answer, Post, Question
 
 
 class OrderWithRespectToTests(TestCase):
-    def test_basic(self):
-        q1 = Question.objects.create(text="Which Beatle starts with the letter 'R'?")
-        q2 = Question.objects.create(text="What is your name?")
 
-        Answer.objects.create(text="John", question=q1)
-        Answer.objects.create(text="Jonno", question=q2)
-        Answer.objects.create(text="Paul", question=q1)
-        Answer.objects.create(text="Paulo", question=q2)
-        Answer.objects.create(text="George", question=q1)
-        Answer.objects.create(text="Ringo", question=q1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.q1 = Question.objects.create(text="Which Beatle starts with the letter 'R'?")
+        Answer.objects.create(text="John", question=cls.q1)
+        Answer.objects.create(text="Paul", question=cls.q1)
+        Answer.objects.create(text="George", question=cls.q1)
+        Answer.objects.create(text="Ringo", question=cls.q1)
 
-        # The answers will always be ordered in the order they were inserted.
+    def test_default_to_insertion_order(self):
+        # Answers will always be ordered in the order they were inserted.
         self.assertQuerysetEqual(
-            q1.answer_set.all(), [
+            self.q1.answer_set.all(), [
                 "John", "Paul", "George", "Ringo",
             ],
             attrgetter("text"),
         )
 
+    def test_previous_and_next_in_order(self):
         # We can retrieve the answers related to a particular object, in the
         # order they were created, once we have a particular object.
-        a1 = Answer.objects.filter(question=q1)[0]
+        a1 = Answer.objects.filter(question=self.q1)[0]
         self.assertEqual(a1.text, "John")
-        a2 = a1.get_next_in_order()
-        self.assertEqual(a2.text, "Paul")
-        a4 = list(Answer.objects.filter(question=q1))[-1]
-        self.assertEqual(a4.text, "Ringo")
-        self.assertEqual(a4.get_previous_in_order().text, "George")
+        self.assertEqual(a1.get_next_in_order().text, "Paul")
 
-        # Determining (and setting) the ordering for a particular item is also
-        # possible.
-        id_list = [o.pk for o in q1.answer_set.all()]
-        self.assertEqual(a2.question.get_answer_order(), id_list)
+        a2 = list(Answer.objects.filter(question=self.q1))[-1]
+        self.assertEqual(a2.text, "Ringo")
+        self.assertEqual(a2.get_previous_in_order().text, "George")
 
-        a5 = Answer.objects.create(text="Number five", question=q1)
+    def test_item_ordering(self):
+        # We can retrieve the ordering of the queryset from a particular item.
+        a1 = Answer.objects.filter(question=self.q1)[1]
+        id_list = [o.pk for o in self.q1.answer_set.all()]
+        self.assertEqual(a1.question.get_answer_order(), id_list)
 
         # It doesn't matter which answer we use to check the order, it will
         # always be the same.
+        a2 = Answer.objects.create(text="Number five", question=self.q1)
         self.assertEqual(
-            a2.question.get_answer_order(), a5.question.get_answer_order()
+            a1.question.get_answer_order(), a2.question.get_answer_order()
         )
 
-        # The ordering can be altered:
-        id_list = [o.pk for o in q1.answer_set.all()]
+    def test_change_ordering(self):
+        # The ordering can be altered
+        a = Answer.objects.create(text="Number five", question=self.q1)
+
+        # Swap the last two items in the order list
+        id_list = [o.pk for o in self.q1.answer_set.all()]
         x = id_list.pop()
         id_list.insert(-1, x)
-        self.assertNotEqual(a5.question.get_answer_order(), id_list)
-        a5.question.set_answer_order(id_list)
+
+        # By default, the ordering is different from the swapped version
+        self.assertNotEqual(a.question.get_answer_order(), id_list)
+
+        # Change the ordering to the swapped version -
+        # this changes the ordering of the queryset.
+        a.question.set_answer_order(id_list)
         self.assertQuerysetEqual(
-            q1.answer_set.all(), [
+            self.q1.answer_set.all(), [
                 "John", "Paul", "George", "Number five", "Ringo"
             ],
             attrgetter("text")
         )
+
+
+class OrderWithRespectToTests2(TestCase):
 
     def test_recursive_ordering(self):
         p1 = Post.objects.create(title='1')
@@ -71,3 +84,22 @@ class OrderWithRespectToTests(TestCase):
         Post.objects.create(title="2.1", parent=p2)
         p1_3 = Post.objects.create(title="1.3", parent=p1)
         self.assertEqual(p1.get_post_order(), [p1_1.pk, p1_2.pk, p1_3.pk])
+
+    def test_duplicate_order_field(self):
+
+        class Bar(models.Model):
+            pass
+
+        class Foo(models.Model):
+            bar = models.ForeignKey(Bar)
+            order = models.OrderWrt()
+
+            class Meta:
+                order_with_respect_to = 'bar'
+
+        count = 0
+        for field in Foo._meta.local_fields:
+            if isinstance(field, models.OrderWrt):
+                count += 1
+
+        self.assertEqual(count, 1)

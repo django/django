@@ -1,15 +1,12 @@
 from __future__ import unicode_literals
 
-from django.utils.six import StringIO
+from swappable_models.models import Article
 
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import management
-from django.db.models.loading import cache
-from django.test import TestCase
-from django.test.utils import override_settings
-
-from swappable_models.models import Article
+from django.test import TestCase, override_settings
+from django.utils.six import StringIO
 
 
 class SwappableModelTests(TestCase):
@@ -19,16 +16,6 @@ class SwappableModelTests(TestCase):
         'django.contrib.auth',
         'django.contrib.contenttypes',
     ]
-
-    def setUp(self):
-        # This test modifies the installed apps, so we need to make sure
-        # we're not dealing with a cached app list.
-        cache._get_models_cache.clear()
-
-    def tearDown(self):
-        # By fiddling with swappable models, we alter the installed models
-        # cache, so flush it to make sure there are no side effects.
-        cache._get_models_cache.clear()
 
     @override_settings(TEST_ARTICLE_MODEL='swappable_models.AlternateArticle')
     def test_generated_data(self):
@@ -40,7 +27,7 @@ class SwappableModelTests(TestCase):
 
         # Re-run migrate. This will re-build the permissions and content types.
         new_io = StringIO()
-        management.call_command('migrate', load_initial_data=False, interactive=False, stdout=new_io)
+        management.call_command('migrate', interactive=False, stdout=new_io)
 
         # Check that content types and permissions exist for the swapped model,
         # but not for the swappable model.

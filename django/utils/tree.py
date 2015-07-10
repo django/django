@@ -27,6 +27,7 @@ class Node(object):
 
     # We need this because of django.db.models.query_utils.Q. Q. __init__() is
     # problematic, but it is a natural Node subclass in all other respects.
+    @classmethod
     def _new_instance(cls, children=None, connector=None, negated=False):
         """
         This is called to create a new instance of this class when we need new
@@ -39,14 +40,16 @@ class Node(object):
         obj = Node(children, connector, negated)
         obj.__class__ = cls
         return obj
-    _new_instance = classmethod(_new_instance)
 
     def __str__(self):
         if self.negated:
-            return '(NOT (%s: %s))' % (self.connector, ', '.join([str(c) for c
-                    in self.children]))
-        return '(%s: %s)' % (self.connector, ', '.join([str(c) for c in
-                self.children]))
+            return '(NOT (%s: %s))' % (self.connector, ', '.join(str(c) for c
+                    in self.children))
+        return '(%s: %s)' % (self.connector, ', '.join(str(c) for c in
+                self.children))
+
+    def __repr__(self):
+        return "<%s: %s>" % (self.__class__.__name__, self)
 
     def __deepcopy__(self, memodict):
         """
@@ -78,13 +81,6 @@ class Node(object):
         """
         return other in self.children
 
-    def _prepare_data(self, data):
-        """
-        A subclass hook for doing subclass specific transformations of the
-        given data on combine() or add().
-        """
-        return data
-
     def add(self, data, conn_type, squash=True):
         """
         Combines this tree and the data represented by data using the
@@ -102,7 +98,6 @@ class Node(object):
         """
         if data in self.children:
             return data
-        data = self._prepare_data(data)
         if not squash:
             self.children.append(data)
             return data

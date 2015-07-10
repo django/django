@@ -1,32 +1,17 @@
 """
  Error checking functions for GEOS ctypes prototype functions.
 """
-import os
-from ctypes import c_void_p, string_at, CDLL
+from ctypes import c_void_p, string_at
+
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOS_VERSION
-from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
+from django.contrib.gis.geos.libgeos import GEOSFuncFactory
 
 # Getting the `free` routine used to free the memory allocated for
 # string pointers returned by GEOS.
-if GEOS_VERSION >= (3, 1, 1):
-    # In versions 3.1.1 and above, `GEOSFree` was added to the C API
-    # because `free` isn't always available on all platforms.
-    free = GEOSFunc('GEOSFree')
-    free.argtypes = [c_void_p]
-    free.restype = None
-else:
-    # Getting the `free` routine from the C library of the platform.
-    if os.name == 'nt':
-        # On NT, use the MS C library.
-        libc = CDLL('msvcrt')
-    else:
-        # On POSIX platforms C library is obtained by passing None into `CDLL`.
-        libc = CDLL(None)
-    free = libc.free
+free = GEOSFuncFactory('GEOSFree')
+free.argtypes = [c_void_p]
 
 
-### ctypes error checking routines ###
 def last_arg_byref(args):
     "Returns the last C argument's value by reference."
     return args[-1]._obj.value

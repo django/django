@@ -1,23 +1,25 @@
 from __future__ import unicode_literals
-from collections import OrderedDict
+
 import hashlib
-from importlib import import_module
+import json
 import os
 import posixpath
 import re
+from collections import OrderedDict
 
 from django.conf import settings
-from django.core.cache import (get_cache, InvalidCacheBackendError,
-                               cache as default_cache)
+from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.core.cache import (
+    InvalidCacheBackendError, cache as default_cache, caches,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
-from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-from django.utils._os import upath
-
-from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.utils.six.moves.urllib.parse import (
+    unquote, urldefrag, urlsplit, urlunsplit,
+)
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -35,6 +37,11 @@ class StaticFilesStorage(FileSystemStorage):
         check_settings(base_url)
         super(StaticFilesStorage, self).__init__(location, base_url,
                                                  *args, **kwargs)
+        # FileSystemStorage fallbacks to MEDIA_ROOT when location
+        # is empty, so we restore the empty value.
+        if not location:
+            self.base_location = None
+            self.location = None
 
     def path(self, name):
         if not self.location:
@@ -44,7 +51,7 @@ class StaticFilesStorage(FileSystemStorage):
         return super(StaticFilesStorage, self).path(name)
 
 
-class CachedFilesMixin(object):
+class HashedFilesMixin(object):
     default_template = """url("%s")"""
     patterns = (
         ("*.css", (
@@ -54,13 +61,9 @@ class CachedFilesMixin(object):
     )
 
     def __init__(self, *args, **kwargs):
-        super(CachedFilesMixin, self).__init__(*args, **kwargs)
-        try:
-            self.cache = get_cache('staticfiles')
-        except InvalidCacheBackendError:
-            # Use the default backend
-            self.cache = default_cache
+        super(HashedFilesMixin, self).__init__(*args, **kwargs)
         self._patterns = OrderedDict()
+        self.hashed_files = {}
         for extension, patterns in self.patterns:
             for pattern in patterns:
                 if isinstance(pattern, (tuple, list)):
@@ -72,7 +75,7 @@ class CachedFilesMixin(object):
 
     def file_hash(self, name, content=None):
         """
-        Retuns a hash of the file with the given name and optional content.
+        Returns a hash of the file with the given name and optional content.
         """
         if content is None:
             return None
@@ -114,9 +117,6 @@ class CachedFilesMixin(object):
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
 
-    def cache_key(self, name):
-        return 'staticfiles:%s' % hashlib.md5(force_bytes(name)).hexdigest()
-
     def url(self, name, force=False):
         """
         Returns the real URL in DEBUG mode.
@@ -128,15 +128,9 @@ class CachedFilesMixin(object):
             if urlsplit(clean_name).path.endswith('/'):  # don't hash paths
                 hashed_name = name
             else:
-                cache_key = self.cache_key(name)
-                hashed_name = self.cache.get(cache_key)
-                if hashed_name is None:
-                    hashed_name = self.hashed_name(clean_name).replace('\\', '/')
-                    # set the cache if there was a miss
-                    # (e.g. if cache server goes down)
-                    self.cache.set(cache_key, hashed_name)
+                hashed_name = self.stored_name(clean_name)
 
-        final_url = super(CachedFilesMixin, self).url(hashed_name)
+        final_url = super(HashedFilesMixin, self).url(hashed_name)
 
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
@@ -215,7 +209,7 @@ class CachedFilesMixin(object):
             return
 
         # where to store the new paths
-        hashed_paths = {}
+        hashed_files = OrderedDict()
 
         # build a list of adjustable files
         matches = lambda path: matches_patterns(path, self._patterns.keys())
@@ -256,7 +250,7 @@ class CachedFilesMixin(object):
                     # then save the processed result
                     content_file = ContentFile(force_bytes(content))
                     saved_name = self._save(hashed_name, content_file)
-                    hashed_name = force_text(saved_name.replace('\\', '/'))
+                    hashed_name = force_text(self.clean_name(saved_name))
                     processed = True
                 else:
                     # or handle the case in which neither processing nor
@@ -264,14 +258,119 @@ class CachedFilesMixin(object):
                     if not hashed_file_exists:
                         processed = True
                         saved_name = self._save(hashed_name, original_file)
-                        hashed_name = force_text(saved_name.replace('\\', '/'))
+                        hashed_name = force_text(self.clean_name(saved_name))
 
                 # and then set the cache accordingly
-                hashed_paths[self.cache_key(name.replace('\\', '/'))] = hashed_name
+                hashed_files[self.hash_key(name)] = hashed_name
                 yield name, hashed_name, processed
 
-        # Finally set the cache
-        self.cache.set_many(hashed_paths)
+        # Finally store the processed paths
+        self.hashed_files.update(hashed_files)
+
+    def clean_name(self, name):
+        return name.replace('\\', '/')
+
+    def hash_key(self, name):
+        return name
+
+    def stored_name(self, name):
+        hash_key = self.hash_key(name)
+        cache_name = self.hashed_files.get(hash_key)
+        if cache_name is None:
+            cache_name = self.clean_name(self.hashed_name(name))
+            # store the hashed name if there was a miss, e.g.
+            # when the files are still processed
+            self.hashed_files[hash_key] = cache_name
+        return cache_name
+
+
+class ManifestFilesMixin(HashedFilesMixin):
+    manifest_version = '1.0'  # the manifest format standard
+    manifest_name = 'staticfiles.json'
+
+    def __init__(self, *args, **kwargs):
+        super(ManifestFilesMixin, self).__init__(*args, **kwargs)
+        self.hashed_files = self.load_manifest()
+
+    def read_manifest(self):
+        try:
+            with self.open(self.manifest_name) as manifest:
+                return manifest.read().decode('utf-8')
+        except IOError:
+            return None
+
+    def load_manifest(self):
+        content = self.read_manifest()
+        if content is None:
+            return OrderedDict()
+        try:
+            stored = json.loads(content, object_pairs_hook=OrderedDict)
+        except ValueError:
+            pass
+        else:
+            version = stored.get('version')
+            if version == '1.0':
+                return stored.get('paths', OrderedDict())
+        raise ValueError("Couldn't load manifest '%s' (version %s)" %
+                         (self.manifest_name, self.manifest_version))
+
+    def post_process(self, *args, **kwargs):
+        self.hashed_files = OrderedDict()
+        all_post_processed = super(ManifestFilesMixin,
+                                   self).post_process(*args, **kwargs)
+        for post_processed in all_post_processed:
+            yield post_processed
+        self.save_manifest()
+
+    def save_manifest(self):
+        payload = {'paths': self.hashed_files, 'version': self.manifest_version}
+        if self.exists(self.manifest_name):
+            self.delete(self.manifest_name)
+        contents = json.dumps(payload).encode('utf-8')
+        self._save(self.manifest_name, ContentFile(contents))
+
+
+class _MappingCache(object):
+    """
+    A small dict-like wrapper for a given cache backend instance.
+    """
+    def __init__(self, cache):
+        self.cache = cache
+
+    def __setitem__(self, key, value):
+        self.cache.set(key, value)
+
+    def __getitem__(self, key):
+        value = self.cache.get(key)
+        if value is None:
+            raise KeyError("Couldn't find a file name '%s'" % key)
+        return value
+
+    def clear(self):
+        self.cache.clear()
+
+    def update(self, data):
+        self.cache.set_many(data)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
+
+class CachedFilesMixin(HashedFilesMixin):
+    def __init__(self, *args, **kwargs):
+        super(CachedFilesMixin, self).__init__(*args, **kwargs)
+        try:
+            self.hashed_files = _MappingCache(caches['staticfiles'])
+        except InvalidCacheBackendError:
+            # Use the default backend
+            self.hashed_files = _MappingCache(default_cache)
+
+    def hash_key(self, name):
+        key = hashlib.md5(force_bytes(self.clean_name(name))).hexdigest()
+        return 'staticfiles:%s' % key
 
 
 class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage):
@@ -282,23 +381,12 @@ class CachedStaticFilesStorage(CachedFilesMixin, StaticFilesStorage):
     pass
 
 
-class AppStaticStorage(FileSystemStorage):
+class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
     """
-    A file system storage backend that takes an app module and works
-    for the ``static`` directory of it.
+    A static file system storage backend which also saves
+    hashed copies of the files it saves.
     """
-    prefix = None
-    source_dir = 'static'
-
-    def __init__(self, app, *args, **kwargs):
-        """
-        Returns a static file storage if available in the given app.
-        """
-        # app is the actual app module
-        mod = import_module(app)
-        mod_path = os.path.dirname(upath(mod.__file__))
-        location = os.path.join(mod_path, self.source_dir)
-        super(AppStaticStorage, self).__init__(location, *args, **kwargs)
+    pass
 
 
 class ConfiguredStorage(LazyObject):

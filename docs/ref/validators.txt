@@ -19,7 +19,7 @@ For example, here's a validator that only allows even numbers::
 
     def validate_even(value):
         if value % 2 != 0:
-            raise ValidationError(u'%s is not an even number' % value)
+            raise ValidationError('%s is not an even number' % value)
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
@@ -36,6 +36,14 @@ use the same validator with forms::
 
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
+
+You can also use a class with a ``__call__()`` method for more complex or
+configurable validators. :class:`RegexValidator`, for example, uses this
+technique. If a class-based validator is used in the
+:attr:`~django.db.models.Field.validators` model field option, you should make
+sure it is :ref:`serializable by the migration framework
+<migration-serializing>` by adding :ref:`deconstruct()
+<custom-deconstruct-method>` and ``__eq__()`` methods.
 
 How validators are run
 ======================
@@ -59,20 +67,28 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``RegexValidator``
 ------------------
-.. class:: RegexValidator([regex=None, message=None, code=None])
+
+.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None, flags=0])
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
         expression string or a pre-compiled regular expression.
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
+    :param inverse_match: If not ``None``, overrides :attr:`inverse_match`.
+    :param flags: If not ``None``, overrides :attr:`flags`. In that case,
+        :attr:`regex` must be a regular expression string, or
+        :exc:`TypeError` is raised.
 
     .. attribute:: regex
 
         The regular expression pattern to search for the provided ``value``,
-        or a pre-compiled regular expression. Raises a
+        or a pre-compiled regular expression. By default, raises a
         :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
-        and :attr:`code` if no match is found. By default, matches any string
-        (including an empty string).
+        and :attr:`code` if a match is not found. That standard behavior can
+        be reversed by setting :attr:`inverse_match` to ``True``, in which case
+        the :exc:`~django.core.exceptions.ValidationError` is raised when a
+        match **is** found. By default, matches any string (including an empty
+        string).
 
     .. attribute:: message
 
@@ -85,22 +101,83 @@ to, or in lieu of custom ``field.clean()`` methods.
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"invalid"``.
 
+    .. attribute:: inverse_match
+
+        The match mode for :attr:`regex`. Defaults to ``False``.
+
+    .. attribute:: flags
+
+        The flags used when compiling the regular expression string
+        :attr:`regex`. If :attr:`regex` is a pre-compiled regular expression,
+        and :attr:`flags` is overridden, :exc:`TypeError` is raised. Defaults
+        to ``0``.
+
+``EmailValidator``
+------------------
+
+.. class:: EmailValidator([message=None, code=None, whitelist=None])
+
+    :param message: If not ``None``, overrides :attr:`.message`.
+    :param code: If not ``None``, overrides :attr:`code`.
+    :param whitelist: If not ``None``, overrides :attr:`whitelist`.
+
+    .. attribute:: message
+
+        The error message used by
+        :exc:`~django.core.exceptions.ValidationError` if validation fails.
+        Defaults to ``"Enter a valid email address"``.
+
+    .. attribute:: code
+
+        The error code used by :exc:`~django.core.exceptions.ValidationError`
+        if validation fails. Defaults to ``"invalid"``.
+
+    .. attribute:: whitelist
+
+        Whitelist of email domains to allow. By default, a regular expression
+        (the ``domain_regex`` attribute) is used to validate whatever appears
+        after the @ sign. However, if that string appears in the whitelist, this
+        validation is bypassed. If not provided, the default whitelist is
+        ``['localhost']``. Other domains that don't contain a dot won't pass
+        validation, so you'd need to whitelist them as necessary.
+
 ``URLValidator``
 ----------------
-.. class:: URLValidator()
+
+.. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
     an error code of ``'invalid'`` if it doesn't.
 
+    Loopback addresses and reserved IP spaces are considered valid. Literal
+    IPv6 addresses (:rfc:`2732`) and unicode domains are both supported.
+
+    In addition to the optional arguments of its parent :class:`RegexValidator`
+    class, ``URLValidator`` accepts an extra optional attribute:
+
+    .. attribute:: schemes
+
+        URL/URI scheme list to validate against. If not provided, the default
+        list is ``['http', 'https', 'ftp', 'ftps']``. As a reference, the IANA
+        Web site provides a full list of `valid URI schemes`_.
+
+        .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+
+    .. versionchanged:: 1.8
+
+        Support for IPv6 addresses, unicode domains, and URLs containing
+        authentication data was added.
+
 ``validate_email``
 ------------------
+
 .. data:: validate_email
 
-    An ``EmailValidator`` instance that ensures a value looks like an
-    email address.
+    An :class:`EmailValidator` instance without any customizations.
 
 ``validate_slug``
 -----------------
+
 .. data:: validate_slug
 
     A :class:`RegexValidator` instance that ensures a value consists of only
@@ -108,6 +185,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_ipv4_address``
 -------------------------
+
 .. data:: validate_ipv4_address
 
     A :class:`RegexValidator` instance that ensures a value looks like an IPv4
@@ -130,35 +208,66 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``validate_comma_separated_integer_list``
 -----------------------------------------
+
 .. data:: validate_comma_separated_integer_list
 
     A :class:`RegexValidator` instance that ensures a value is a
     comma-separated list of integers.
 
+``int_list_validator``
+----------------------
+
+.. function:: int_list_validator(sep=',', message=None, code='invalid')
+
+    .. versionadded:: 1.9
+
+    Returns a :class:`RegexValidator` instance that ensures a string
+    consists of integers separated by ``sep``.
+
 ``MaxValueValidator``
 ---------------------
-.. class:: MaxValueValidator(max_value)
+
+.. class:: MaxValueValidator(max_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_value'`` if ``value`` is greater than ``max_value``.
 
+    .. versionchanged:: 1.8
+
+       The ``message`` parameter was added.
+
 ``MinValueValidator``
 ---------------------
-.. class:: MinValueValidator(min_value)
+
+.. class:: MinValueValidator(min_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_value'`` if ``value`` is less than ``min_value``.
 
+    .. versionchanged:: 1.8
+
+       The ``message`` parameter was added.
+
 ``MaxLengthValidator``
 ----------------------
-.. class:: MaxLengthValidator(max_length)
+
+.. class:: MaxLengthValidator(max_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
 
+    .. versionchanged:: 1.8
+
+       The ``message`` parameter was added.
+
 ``MinLengthValidator``
 ----------------------
-.. class:: MinLengthValidator(min_length)
+
+.. class:: MinLengthValidator(min_length, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_length'`` if the length of ``value`` is less than ``min_length``.
+
+    .. versionchanged:: 1.8
+
+       The ``message`` parameter was added.

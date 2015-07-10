@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# rodin <romihardiyanto@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# M Asep Indrayana <me@drayanaindra.com>, 2015
+# rodin <romihardiyanto@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-24 15:37+0000\n"
 "Last-Translator: rodin <romihardiyanto@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/projects/p/django/"
 "language/id/)\n"
@@ -18,22 +19,20 @@ msgstr ""
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:38
+msgid "Sessions"
+msgstr "Sesi"
+
 msgid "session key"
 msgstr "kunci sesi"
 
-#: models.py:40
 msgid "session data"
 msgstr "data sesi"
 
-#: models.py:41
 msgid "expire date"
 msgstr "tanggal kedaluwarsa"
 
-#: models.py:46
 msgid "session"
 msgstr "sesi"
 
-#: models.py:47
 msgid "sessions"
 msgstr "sesi"

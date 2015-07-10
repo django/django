@@ -111,6 +111,12 @@ CreateView
         creating objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_create_form.html'``.
 
+    .. attribute:: object
+
+        When using ``CreateView`` you have access to ``self.object``, which is
+        the object being created. If the object hasn't been created yet, the
+        value will be ``None``.
+
     **Example myapp/views.py**::
 
         from django.views.generic.edit import CreateView
@@ -161,6 +167,11 @@ UpdateView
         example, changing this attribute to ``'_update_form'`` for a view
         updating objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_update_form.html'``.
+
+    .. attribute:: object
+
+        When using ``UpdateView`` you have access to ``self.object``, which is
+        the object being updated.
 
     **Example myapp/views.py**::
 

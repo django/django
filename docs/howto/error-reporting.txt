@@ -44,9 +44,9 @@ To activate this behavior, put the email addresses of the recipients in the
 
 .. seealso::
 
-   Server error emails are sent using the logging framework, so you can
-   customize this behavior by :doc:`customizing your logging configuration
-   </topics/logging>`.
+    Server error emails are sent using the logging framework, so you can
+    customize this behavior by :doc:`customizing your logging configuration
+    </topics/logging>`.
 
 404 errors
 ~~~~~~~~~~
@@ -73,14 +73,14 @@ those are usually just people typing in broken URLs or broken Web 'bots).
     Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
-:setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
+:setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
 regular expression objects. For example::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'\.(php|cgi)$'),
         re.compile(r'^/phpmyadmin/'),
-    )
+    ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
@@ -89,11 +89,11 @@ The following example shows how to exclude some conventional URLs that browsers 
 crawlers often request::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'^/apple-touch-icon.*\.png$'),
         re.compile(r'^/favicon\.ico$'),
         re.compile(r'^/robots\.txt$'),
-    )
+    ]
 
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
@@ -105,9 +105,9 @@ and override its methods.
 
 .. seealso::
 
-   404 errors are logged using the logging framework. By default, these log
-   records are ignored, but you can use them for error reporting by writing a
-   handler and :doc:`configuring logging </topics/logging>` appropriately.
+    404 errors are logged using the logging framework. By default, these log
+    records are ignored, but you can use them for error reporting by writing a
+    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
 .. _filtering-error-reports:
 
@@ -163,13 +163,13 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
         def my_function():
             ...
 
-    .. admonition:: When using mutiple decorators
+    .. admonition:: When using multiple decorators
 
         If the variable you want to hide is also a function argument (e.g.
         '``user``’ in the following example), and if the decorated function has
-        mutiple decorators, then make sure to place ``@sensitive_variables`` at
-        the top of the decorator chain. This way it will also hide the function
-        argument as it gets passed through the other decorators::
+        multiple decorators, then make sure to place ``@sensitive_variables``
+        at the top of the decorator chain. This way it will also hide the
+        function argument as it gets passed through the other decorators::
 
             @sensitive_variables('user', 'pw', 'cc')
             @some_decorator
@@ -250,24 +250,24 @@ following methods:
 
 .. class:: SafeExceptionReporterFilter
 
-.. method:: SafeExceptionReporterFilter.is_active(self, request)
+.. method:: SafeExceptionReporterFilter.is_active(request)
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
 
-.. method:: SafeExceptionReporterFilter.get_request_repr(self, request)
+.. method:: SafeExceptionReporterFilter.get_request_repr(request)
 
     Returns the representation string of the request object, that is, the
     value that would be returned by ``repr(request)``, except it uses the
     filtered dictionary of POST parameters as determined by
     :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
-.. method:: SafeExceptionReporterFilter.get_post_parameters(self, request)
+.. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 
     Returns the filtered dictionary of POST parameters. By default it replaces
     the values of sensitive parameters with stars (`**********`).
 
-.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(self, request, tb_frame)
+.. method:: SafeExceptionReporterFilter.get_traceback_frame_variables(request, tb_frame)
 
     Returns the filtered dictionary of local variables for the given traceback
     frame. By default it replaces the values of sensitive variables with stars

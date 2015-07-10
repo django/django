@@ -1,6 +1,7 @@
 import unittest
 
-from django.utils import checksums
+from django.test import ignore_warnings
+from django.utils.deprecation import RemovedInDjango110Warning
 
 
 class TestUtilsChecksums(unittest.TestCase):
@@ -14,7 +15,9 @@ class TestUtilsChecksums(unittest.TestCase):
             output = value
         self.assertEqual(function(value), output)
 
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_luhn(self):
+        from django.utils import checksums
         f = checksums.luhn
         items = (
             (4111111111111111, True), ('4111111111111111', True),

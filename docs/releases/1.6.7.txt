@@ -1,0 +1,16 @@
+==========================
+Django 1.6.7 release notes
+==========================
+
+*September 2, 2014*
+
+Django 1.6.7 fixes several bugs in 1.6.6, including a regression related to
+a security fix in that release.
+
+Bugfixes
+========
+
+* Allowed inherited and m2m fields to be referenced in the admin
+  (:ticket:`23329`).
+* Fixed a crash when using ``QuerySet.defer()`` with ``select_related()``
+  (:ticket:`23370`).

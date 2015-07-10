@@ -1,13 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# abraham.martin <abraham.martin@gmail.com>, 2014
+# Antoni Aloy <aaloy@apsl.net>, 2013
+# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:49+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/django/language/"
 "es/)\n"
@@ -17,18 +20,20 @@ msgstr ""
 "Language: es\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:39
+msgid "Sites"
+msgstr "Sitios"
+
+msgid "The domain name cannot contain any spaces or tabs."
+msgstr "El nombre de dominio no puede contener espacios ni tabulaciones"
+
 msgid "domain name"
 msgstr "nombre de dominio"
 
-#: models.py:40
 msgid "display name"
-msgstr "nombre para mostrar"
+msgstr "nombre a mostrar"
 
-#: models.py:45
 msgid "site"
 msgstr "sitio"
 
-#: models.py:46
 msgid "sites"
 msgstr "sitios"

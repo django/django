@@ -29,7 +29,7 @@ possible, and raise issues for discussion on our mailing lists when there is
 confusion or disagreement.
 
 Django is a community project, and every contribution helps. We can't do this
-without YOU!
+without **you**!
 
 Triage workflow
 ---------------
@@ -57,10 +57,9 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* :doc:`Committers</internals/committers>` (also called core developers):
-  people with commit access who are responsible for making the big
-  decisions, writing large portions of the code and integrating the
-  contributions of the community.
+* Committers (also called core developers): people with commit access who are
+  responsible for making decisions and integrating the contributions of the
+  community.
 
 * Ticket triagers: anyone in the Django community who chooses to
   become involved in Django's development process. Our Trac installation
@@ -112,7 +111,7 @@ or ought to be closed for any of the various reasons.
 Accepted
 ~~~~~~~~
 
-The big grey area! The absolute meaning of "accepted" is that the issue
+The big gray area! The absolute meaning of "accepted" is that the issue
 described in the ticket is valid and is in some stage of being worked on.
 Beyond that there are several considerations:
 
@@ -147,7 +146,7 @@ Ready For Checkin
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
-commit-ready patch. A core committer now needs to give the patch a final
+commit-ready patch. A committer now needs to give the patch a final
 review prior to being committed. See the
 :ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
 RFC forever! What should I do?"
@@ -314,7 +313,7 @@ A ticket can be resolved in a number of ways:
       discussion in the |django-developers| mailing list. Feel free to
       start or join in discussions of "wontfix" tickets on the
       |django-developers| mailing list, but please do not reopen tickets
-      closed as "wontfix" by a :doc:`core developer</internals/committers>`.
+      closed as "wontfix" by a :doc:`core developer</internals/team>`.
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -357,7 +356,7 @@ Then, you can help out by:
 * Closing "Unreviewed" tickets as "invalid", "worksforme" or "duplicate."
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
-  sparse to be actionnable, or when they're feature requests requiring a
+  sparse to be actionable, or when they're feature requests requiring a
   discussion on |django-developers|.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"
@@ -372,16 +371,16 @@ Then, you can help out by:
   any activity in a long time, it's possible that the problem has been
   fixed but the ticket hasn't yet been closed.
 
-* Identifying trends and themes in the tickets. If there a lot of bug
+* Identifying trends and themes in the tickets. If there are a lot of bug
   reports about a particular part of Django, it may indicate we should
   consider refactoring that part of the code. If a trend is emerging,
   you should raise it for discussion (referencing the relevant tickets)
   on |django-developers|.
 
-* Verify if patches submitted by other users are correct. If they do and
-  also contain appropriate documentation and tests then move them to the
-  "Ready for Checkin" stage. If they don't then leave a comment to explain
-  why and set the corresponding flags ("Patch needs improvement",
+* Verify if patches submitted by other users are correct. If they are correct
+  and also contain appropriate documentation and tests then move them to the
+  "Ready for Checkin" stage. If they are not correct then leave a comment to
+  explain why and set the corresponding flags ("Patch needs improvement",
   "Needs tests" etc.).
 
 .. note::
@@ -407,7 +406,7 @@ the ticket database:
   review a patch that you submit.
 
 * Please **don't** reverse a decision that has been made by a :doc:`core
-  developer</internals/committers>`. If you disagree with a decision that
+  developer</internals/team>`. If you disagree with a decision that
   has been made, please post a message to |django-developers|.
 
 * If you're unsure if you should be making a change, don't make the
@@ -421,3 +420,52 @@ the ticket database:
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
+
+Bisecting a regression
+----------------------
+
+.. highlight:: console
+
+A regression is a bug that's present in some newer version of Django but not in
+an older one. An extremely helpful piece of information is the commit that
+introduced the regression. Knowing the commit that caused the change in
+behavior helps identify if the change was intentional or if it was an
+inadvertent side-effect. Here's how you can determine this.
+
+Begin by writing a regression test for Django's test suite for the issue. For
+example, we'll pretend we're debugging a regression in migrations. After you've
+written the test and confirmed that it fails on the latest master, put it in a
+separate file that you can run standalone. For our example, we'll pretend we
+created ``tests/migrations/test_regression.py``, which can be run with::
+
+    $ ./runtests.py migrations.test_regression
+
+Next, we mark the current point in history as being "bad" since the test fails::
+
+    $ git bisect bad
+    You need to start by "git bisect start"
+    Do you want me to do it for you [Y/n]? y
+
+Now, we need to find a point in git history before the regression was
+introduced (i.e. a point where the test passes). Use something like
+``git checkout HEAD~100`` to checkout an earlier revision (100 commits earlier,
+in this case). Check if the test fails. If so, mark that point as "bad"
+(``git bisect bad``), then checkout an earlier revision and recheck. Once you
+find a revision where your test passes, mark it as "good"::
+
+    $ git bisect good
+    Bisecting: X revisions left to test after this (roughly Y steps)
+    ...
+
+Now we're ready for the fun part: using ``git bisect run`` to automate the rest
+of the process::
+
+    $ git bisect run python runtests.py migrations.test_regression
+
+You should see ``git bisect`` use a binary search to automatically checkout
+revisions between the good and bad commits until it finds the first "bad"
+commit where the test fails.
+
+Now, report your results on the Trac ticket, and please include the regression
+test as an attachment. When someone writes a fix for the bug, they'll already
+have your test as a starting point.

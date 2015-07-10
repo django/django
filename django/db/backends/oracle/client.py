@@ -1,7 +1,6 @@
-import os
-import sys
+import subprocess
 
-from django.db.backends import BaseDatabaseClient
+from django.db.backends.base.client import BaseDatabaseClient
 
 
 class DatabaseClient(BaseDatabaseClient):
@@ -10,7 +9,4 @@ class DatabaseClient(BaseDatabaseClient):
     def runshell(self):
         conn_string = self.connection._connect_string()
         args = [self.executable_name, "-L", conn_string]
-        if os.name == 'nt':
-            sys.exit(os.system(" ".join(args)))
-        else:
-            os.execvp(self.executable_name, args)
+        subprocess.call(args)

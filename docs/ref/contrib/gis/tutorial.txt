@@ -10,10 +10,10 @@ world-class geographic Web framework.  GeoDjango strives to make it as simple
 as possible to create geographic Web applications, like location-based services.
 Its features include:
 
-* Django model fields for `OGC`_ geometries.
+* Django model fields for `OGC`_ geometries and raster data.
 * Extensions to Django's ORM for querying and manipulating spatial data.
-* Loosely-coupled, high-level Python interfaces for GIS geometry operations and
-  data formats.
+* Loosely-coupled, high-level Python interfaces for GIS geometry and raster
+  operations and data manipulation in different formats.
 * Editing geometry fields from the admin.
 
 This tutorial assumes familiarity with Django; thus, if you're brand new to
@@ -23,7 +23,7 @@ familiarize yourself with Django first.
 .. note::
 
     GeoDjango has additional requirements beyond what Django requires --
-    please consult the :ref:`installation documentation <ref-gis-install>`
+    please consult the :doc:`installation documentation <install/index>`
     for more details.
 
 This tutorial will guide you through the creation of a geographic web
@@ -56,7 +56,7 @@ First, create a spatial database for your project.
 If you are using PostGIS, create the database from the :ref:`spatial database
 template <spatialdb_template>`:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ createdb -T template_postgis geodjango
 
@@ -66,7 +66,7 @@ template <spatialdb_template>`:
     create a database.  To create a user with ``CREATE DATABASE`` privileges in
     PostgreSQL, use the following commands:
 
-    .. code-block:: bash
+    .. code-block:: console
 
         $ sudo su - postgres
         $ createuser --createdb geo
@@ -81,17 +81,17 @@ to create a :ref:`SpatiaLite database <create_spatialite_db>`.
 Create a New Project
 ------------------------
 
-Use the standard ``django-admin.py`` script to create a project called
+Use the standard ``django-admin`` script to create a project called
 ``geodjango``:
 
-.. code-block:: bash
+.. code-block:: console
 
-    $ django-admin.py startproject geodjango
+    $ django-admin startproject geodjango
 
 This will initialize a new project. Now, create a ``world`` Django application
 within the ``geodjango`` project:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ cd geodjango
     $ python manage.py startapp world
@@ -114,7 +114,7 @@ In addition, modify the :setting:`INSTALLED_APPS` setting to include
 :mod:`django.contrib.admin`, :mod:`django.contrib.gis`,
 and ``world`` (your newly created application)::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
@@ -123,7 +123,7 @@ and ``world`` (your newly created application)::
         'django.contrib.staticfiles',
         'django.contrib.gis',
         'world'
-    )
+    ]
 
 Geographic Data
 ===============
@@ -137,7 +137,7 @@ The world borders data is available in this `zip file`__.  Create a ``data``
 directory in the ``world`` application, download the world borders data, and
 unzip. On GNU/Linux platforms, use the following commands:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ mkdir world/data
     $ cd world/data
@@ -166,7 +166,7 @@ Use ``ogrinfo`` to examine spatial data
 The GDAL ``ogrinfo`` utility allows examining the metadata of shapefiles or
 other vector data sources:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ogrinfo world/data/TM_WORLD_BORDERS-0.3.shp
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -177,7 +177,7 @@ other vector data sources:
 layer contains polygon data.  To find out more, we'll specify the layer name
 and use the ``-so`` option to get only the important summary information:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ ogrinfo -so world/data/TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3
     INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp'
@@ -244,8 +244,7 @@ model to represent this data::
         objects = models.GeoManager()
 
         # Returns the string representation of the model.
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
 Please note two important things:
@@ -262,20 +261,34 @@ argument. Use an integer representing the coordinate system's EPSG code.
 
 __ http://en.wikipedia.org/wiki/SRID
 
-Run ``syncdb``
---------------
+Run ``migrate``
+---------------
 
 After defining your model, you need to sync it with the database. First,
-let's look at the SQL that will generate the table for the
-``WorldBorder`` model::
+create a database migration:
 
-    $ python manage.py sqlall world
+.. code-block:: console
+
+    $ python manage.py makemigrations
+    Migrations for 'world':
+      0001_initial.py:
+        - Create model WorldBorder
+
+Let's look at the SQL that will generate the table for the ``WorldBorder``
+model:
+
+.. code-block:: console
+
+    $ python manage.py sqlmigrate world 0001
 
 This command should produce the following output:
 
 .. code-block:: sql
 
     BEGIN;
+    --
+    -- Create model WorldBorder
+    --
     CREATE TABLE "world_worldborder" (
         "id" serial NOT NULL PRIMARY KEY,
         "name" varchar(50) NOT NULL,
@@ -289,28 +302,30 @@ This command should produce the following output:
         "subregion" integer NOT NULL,
         "lon" double precision NOT NULL,
         "lat" double precision NOT NULL
+        "mpoly" geometry(MULTIPOLYGON,4326) NOT NULL
     )
     ;
-    SELECT AddGeometryColumn('world_worldborder', 'mpoly', 4326, 'MULTIPOLYGON', 2);
-    ALTER TABLE "world_worldborder" ALTER "mpoly" SET NOT NULL;
-    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" GIST_GEOMETRY_OPS );
+    CREATE INDEX "world_worldborder_mpoly_id" ON "world_worldborder" USING GIST ( "mpoly" );
     COMMIT;
 
-If this looks correct, run ``syncdb`` to create this table in the database::
+If this looks correct, run :djadmin:`migrate` to create this table in the
+database:
 
-    $ python manage.py syncdb
-    Creating table world_worldborder
-    Installing custom SQL for world.WorldBorder model
+.. code-block:: console
 
-The ``syncdb`` command may also prompt you to create an admin user. Either
-do so now, or later by running ``django-admin.py createsuperuser``.
+    $ python manage.py migrate
+    Operations to perform:
+      Apply all migrations: admin, world, contenttypes, auth, sessions
+    Running migrations:
+      ...
+      Applying world.0001_initial... OK
 
 Importing Spatial Data
 ======================
 
-This section will show you how to import the world borders
-shapefile into the database via GeoDjango models using the
-:ref:`ref-layermapping`.
+This section will show you how to import the world borders shapefile into the
+database via GeoDjango models using the :doc:`layermapping`.
+
 There are many different ways to import data into a spatial database --
 besides the tools included within GeoDjango, you may also use the following:
 
@@ -320,7 +335,7 @@ besides the tools included within GeoDjango, you may also use the following:
   PostGIS.
 
 .. _ogr2ogr: http://www.gdal.org/ogr2ogr.html
-.. _shp2pgsql: http://postgis.refractions.net/documentation/manual-1.5/ch04.html#shp2pgsql_usage
+.. _shp2pgsql: http://postgis.net/docs/manual-1.5/ch04.html#shp2pgsql_usage
 
 .. _gdalinterface:
 
@@ -333,7 +348,7 @@ library that can work with all the vector data sources that OGR supports.
 
 First, invoke the Django shell:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py shell
 
@@ -497,7 +512,7 @@ A few notes about what's going on:
 
 Afterwards, invoke the Django shell from the ``geodjango`` project directory:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py shell
 
@@ -512,14 +527,14 @@ Next, import the ``load`` module, call the ``run`` routine, and watch
 Try ``ogrinspect``
 ------------------
 Now that you've seen how to define geographic models and import data with the
-:ref:`ref-layermapping`, it's possible to further automate this process with
+:doc:`layermapping`, it's possible to further automate this process with
 use of the :djadmin:`ogrinspect` management command.  The :djadmin:`ogrinspect`
 command  introspects a GDAL-supported vector data source (e.g., a shapefile)
 and generates a model definition and ``LayerMapping`` dictionary automatically.
 
 The general usage of the command goes as follows:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py ogrinspect [options] <data_source> <model_name> [options]
 
@@ -530,7 +545,7 @@ be used to further define how the model is generated.
 For example, the following command nearly reproduces the ``WorldBorder`` model
 and mapping dictionary created above, automatically:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py ogrinspect world/data/TM_WORLD_BORDERS-0.3.shp WorldBorder \
         --srid=4326 --mapping --multi
@@ -591,7 +606,7 @@ GeoDjango adds spatial lookups to the Django ORM.  For example, you
 can find the country in the ``WorldBorder`` table that contains
 a particular point.  First, fire up the management shell:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ python manage.py shell
 
@@ -610,10 +625,10 @@ a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
     >>> qs
     [<WorldBorder: United States>]
 
-Here, you retrieved a ``GeoQuerySet`` with only one model: the border of
-the United States (exactly what you would expect).
+Here, you retrieved a ``QuerySet`` with only one model: the border of the
+United States (exactly what you would expect).
 
-Similarly, you may also use a :ref:`GEOS geometry object <ref-geos>`.
+Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
 Here, you can combine the ``intersects`` spatial lookup with the ``get``
 method to retrieve only the ``WorldBorder`` instance for San Marino instead
 of a queryset::
@@ -625,7 +640,7 @@ of a queryset::
     <WorldBorder: San Marino>
 
 The ``contains`` and ``intersects`` lookups are just a subset of the
-available queries -- the :ref:`ref-gis-db-api` documentation has more.
+available queries -- the :doc:`db-api` documentation has more.
 
 Automatic Spatial Transformations
 ---------------------------------
@@ -697,8 +712,12 @@ the GEOS library::
     >>> pnt.contains(sm.mpoly)
     False
 
-``GeoQuerySet`` Methods
------------------------
+Geographic annotations
+----------------------
+
+GeoDjango also offers a set of geographic annotations to compute distances and
+several other operations (intersection, difference, etc.). See the
+:doc:`functions` documentation.
 
 
 Putting your data on the map
@@ -726,28 +745,32 @@ Let's dive right in.  Create a file called ``admin.py`` inside the
 
 Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
 
-    from django.conf.urls import patterns, url, include
+    from django.conf.urls import url, include
     from django.contrib.gis import admin
 
-    admin.autodiscover()
+    urlpatterns = [
+        url(r'^admin/', admin.site.urls),
+    ]
 
-    urlpatterns = patterns('',
-        url(r'^admin/', include(admin.site.urls)),
-    )
+Create an admin user:
 
-Start up the Django development server:
+.. code-block:: console
 
-.. code-block:: bash
+    $ python manage.py createsuperuser
+
+Next, start up the Django development server:
+
+.. code-block:: console
 
     $ python manage.py runserver
 
-Finally, browse to ``http://localhost:8000/admin/``, and log in with the admin
-user created after running ``syncdb``.  Browse to any of the ``WorldBorder``
-entries -- the borders may be edited by clicking on a polygon and dragging
-the vertexes to the desired position.
+Finally, browse to ``http://localhost:8000/admin/``, and log in with the user
+you just created. Browse to any of the ``WorldBorder`` entries -- the borders
+may be edited by clicking on a polygon and dragging the vertexes to the desired
+position.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Open Street Map: http://openstreetmap.org/
+.. _Open Street Map: http://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org
 
@@ -764,13 +787,15 @@ available with the :class:`~django.contrib.gis.admin.GeoModelAdmin`
 
 First, there are some important requirements:
 
-* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that the
-  :ref:`spherical mercator projection be added <addgoogleprojection>`
-  to the ``spatial_ref_sys`` table (PostGIS 1.3 and below, only).
+* :class:`~django.contrib.gis.admin.OSMGeoAdmin` requires that
+  :doc:`GDAL <gdal>` is installed. If you are running GDAL 1.6 (uncommon)
+  you will also need to add the :ref:`spherical mercator projection
+  <addgoogleprojection>`  to the ``spatial_ref_sys`` table.
+
 * The PROJ.4 datum shifting files must be installed (see the
   :ref:`PROJ.4 installation instructions <proj4>` for more details).
 
-If you meet these requirements, then just substitute the ``OSMGeoAdmin``
+If you meet this requirement, then just substitute the ``OSMGeoAdmin``
 option class in your ``admin.py`` file::
 
     admin.site.register(WorldBorder, admin.OSMGeoAdmin)

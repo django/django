@@ -202,6 +202,21 @@ a.active.selector-clearall {
     cursor: pointer;
 }
 
+.selector .help-icon {
+    background: url(../img/icon-unknown.gif) no-repeat;
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    vertical-align: middle;
+}
+
+.selector .search-label-icon {
+    background: url(../img/selector-search.gif) 0 2px no-repeat;
+    display: inline-block;
+    height: 18px;
+    width: 18px;
+}
+
 /* DATE AND TIME */
 
 p.datetime {
@@ -224,6 +239,22 @@ table p.datetime {
     font-size: 10px;
     margin-left: 0;
     padding-left: 0;
+}
+
+.datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
+    background: none no-repeat;
+    display: inline-block;
+    height: 16px;
+    width: 16px;
+    vertical-align: middle;
+}
+
+.datetimeshortcuts .clock-icon {
+    background-image: url(../img/icon_clock.gif);
+}
+
+.datetimeshortcuts .date-icon {
+    background-image: url(../img/icon_calendar.gif);
 }
 
 /* URL */
@@ -575,4 +606,18 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
     padding: 3px 4px;
     font-size: 11px;
     border-top: 1px solid #ddd;
+}
+
+/* RELATED WIDGET WRAPPER */
+.related-widget-wrapper {
+    float: left;       /* display properly in form rows with multiple fields */
+    overflow: hidden;  /* clear floated contents */
+}
+
+.related-widget-wrapper-link {
+    opacity: 0.3;
+}
+
+.related-widget-wrapper-link:link {
+    opacity: 1;
 }

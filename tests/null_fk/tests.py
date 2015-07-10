@@ -3,8 +3,9 @@ from __future__ import unicode_literals
 from django.db.models import Q
 from django.test import TestCase
 
-from .models import (SystemDetails, Item, PropertyValue, SystemInfo, Forum,
-    Post, Comment)
+from .models import (
+    Comment, Forum, Item, Post, PropertyValue, SystemDetails, SystemInfo,
+)
 
 
 class NullFkTests(TestCase):
@@ -35,7 +36,7 @@ class NullFkTests(TestCase):
         )
 
         # Regression test for #7530, #7716.
-        self.assertTrue(Comment.objects.select_related('post').filter(post__isnull=True)[0].post is None)
+        self.assertIsNone(Comment.objects.select_related('post').filter(post__isnull=True)[0].post)
 
         self.assertQuerysetEqual(
             Comment.objects.select_related('post__forum__system_info__system_details'),

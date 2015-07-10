@@ -1,0 +1,262 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Ḷḷumex03 <tornes@opmbx.org>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Asturian (http://www.transifex.com/projects/p/django/language/"
+"ast/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ast\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Humanize"
+msgstr ""
+
+msgid "th"
+msgstr "ᵘ"
+
+msgid "st"
+msgstr "ᵘ"
+
+msgid "nd"
+msgstr "ᵘ"
+
+msgid "rd"
+msgstr "ᵘ"
+
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f millón"
+msgstr[1] "%(value).1f millones"
+
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s millón"
+msgstr[1] "%(value)s millones"
+
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f billón"
+msgstr[1] "%(value).1f billones"
+
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s billón"
+msgstr[1] "%(value)s billones"
+
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f trillón"
+msgstr[1] "%(value).1f trillones"
+
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s trillón"
+msgstr[1] "%(value)s trillones"
+
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f cuatrillón"
+msgstr[1] "%(value).1f cuatrillones"
+
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s cuatrillón"
+msgstr[1] "%(value)s cuatrillones"
+
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f quintillón"
+msgstr[1] "%(value).1f quintillones"
+
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s quintillón"
+msgstr[1] "%(value)s quintillones"
+
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f sextillón"
+msgstr[1] "%(value).1f sextillones"
+
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s sextillón"
+msgstr[1] "%(value)s sextillones"
+
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f septillón"
+msgstr[1] "%(value).1f septillones"
+
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s septillón"
+msgstr[1] "%(value)s septillones"
+
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f octillón"
+msgstr[1] "%(value).1f octillones"
+
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s octillón"
+msgstr[1] "%(value)s octillones"
+
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f nonillón"
+msgstr[1] "%(value).1f nonillones"
+
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s nonillón"
+msgstr[1] "%(value)s nonillones"
+
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f decillón"
+msgstr[1] "%(value).1f decillones"
+
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s decillón"
+msgstr[1] "%(value)s decillones"
+
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f gúgol"
+msgstr[1] "%(value).1f gúgol"
+
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s gúgol"
+msgstr[1] "%(value)s gúgol"
+
+msgid "one"
+msgstr "un"
+
+msgid "two"
+msgstr "dos"
+
+msgid "three"
+msgstr "trés"
+
+msgid "four"
+msgstr "cuatro"
+
+msgid "five"
+msgstr "cinco"
+
+msgid "six"
+msgstr "seis"
+
+msgid "seven"
+msgstr "siete"
+
+msgid "eight"
+msgstr "ocho"
+
+msgid "nine"
+msgstr "nueve"
+
+msgid "today"
+msgstr "güei"
+
+msgid "tomorrow"
+msgstr "mañana"
+
+msgid "yesterday"
+msgstr "ayeri"
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "hai %(delta)s"
+
+msgid "now"
+msgstr "agora"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "%(delta)s dende agora"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] ""
+msgstr[1] ""

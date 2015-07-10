@@ -1,5 +1,5 @@
 """
-35. DB-API Shortcuts
+DB-API Shortcuts
 
 ``get_object_or_404()`` is a shortcut function to be used in view functions for
 performing a ``get()`` lookup and raising a ``Http404`` exception if a

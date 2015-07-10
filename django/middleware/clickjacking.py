@@ -28,7 +28,7 @@ class XFrameOptionsMiddleware(object):
     """
     def process_response(self, request, response):
         # Don't set it if it's already in the response
-        if response.get('X-Frame-Options', None) is not None:
+        if response.get('X-Frame-Options') is not None:
             return response
 
         # Don't set it if they used @xframe_options_exempt

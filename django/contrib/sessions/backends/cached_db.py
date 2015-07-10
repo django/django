@@ -6,7 +6,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.sessions.backends.db import SessionStore as DBStore
-from django.core.cache import get_cache
+from django.core.cache import caches
 from django.core.exceptions import SuspiciousOperation
 from django.utils import timezone
 from django.utils.encoding import force_text
@@ -20,7 +20,7 @@ class SessionStore(DBStore):
     """
 
     def __init__(self, session_key=None):
-        self._cache = get_cache(settings.SESSION_CACHE_ALIAS)
+        self._cache = caches[settings.SESSION_CACHE_ALIAS]
         super(SessionStore, self).__init__(session_key)
 
     @property
@@ -29,7 +29,7 @@ class SessionStore(DBStore):
 
     def load(self):
         try:
-            data = self._cache.get(self.cache_key, None)
+            data = self._cache.get(self.cache_key)
         except Exception:
             # Some backends (e.g. memcache) raise an exception on invalid
             # cache keys. If this happens, reset the session. See #17810.
@@ -51,12 +51,12 @@ class SessionStore(DBStore):
                     logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
                     logger.warning(force_text(e))
-                self.create()
+                self._session_key = None
                 data = {}
         return data
 
     def exists(self, session_key):
-        if (KEY_PREFIX + session_key) in self._cache:
+        if session_key and (KEY_PREFIX + session_key) in self._cache:
             return True
         return super(SessionStore, self).exists(session_key)
 
@@ -79,8 +79,8 @@ class SessionStore(DBStore):
         """
         self.clear()
         self.delete(self.session_key)
-        self.create()
+        self._session_key = None
 
 
 # At bottom to avoid circular import
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.models import Session  # isort:skip

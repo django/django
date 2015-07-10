@@ -85,8 +85,8 @@ table thead th.sorted .sortoptions {
 }
 
 thead th.sorted .text {
-	padding-right: 0;
-	padding-left: 42px;
+    padding-right: 0;
+    padding-left: 42px;
 }
 
 /* dashboard styles */

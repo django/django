@@ -1,3 +1,4 @@
+import django
 from django.core.handlers.wsgi import WSGIHandler
 
 
@@ -10,4 +11,5 @@ def get_wsgi_application():
     case the internal WSGI implementation changes or moves in the future.
 
     """
+    django.setup()
     return WSGIHandler()

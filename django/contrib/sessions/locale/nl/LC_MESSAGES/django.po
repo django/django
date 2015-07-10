@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Sander Steffann <sander@steffann.nl>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-20 22:40+0000\n"
+"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -17,22 +18,20 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:38
+msgid "Sessions"
+msgstr "Sessies"
+
 msgid "session key"
 msgstr "sessiesleutel"
 
-#: models.py:40
 msgid "session data"
 msgstr "sessiegegevens"
 
-#: models.py:41
 msgid "expire date"
 msgstr "verloopdatum"
 
-#: models.py:46
 msgid "session"
 msgstr "sessie"
 
-#: models.py:47
 msgid "sessions"
 msgstr "sessies"

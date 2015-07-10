@@ -1,5 +1,5 @@
 """
-23. Giving models a custom manager
+Giving models a custom manager
 
 You can use a custom ``Manager`` in a particular model by extending the base
 ``Manager`` class and instantiating your custom ``Manager`` in your model.
@@ -11,25 +11,21 @@ returns.
 
 from __future__ import unicode_literals
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-
-# An example of a custom manager called "objects".
 
 
 class PersonManager(models.Manager):
     def get_fun_people(self):
         return self.filter(fun=True)
 
-# An example of a custom manager that sets get_queryset().
-
 
 class PublishedBookManager(models.Manager):
     def get_queryset(self):
         return super(PublishedBookManager, self).get_queryset().filter(is_published=True)
-
-# An example of a custom queryset that copies its methods onto the manager.
 
 
 class CustomQuerySet(models.QuerySet):
@@ -66,7 +62,20 @@ class BaseCustomManager(models.Manager):
     def manager_only(self):
         return self.all()
 
+
 CustomManager = BaseCustomManager.from_queryset(CustomQuerySet)
+
+
+class CustomInitQuerySet(models.QuerySet):
+    # QuerySet with an __init__() method that takes an additional argument.
+    def __init__(self, custom_optional_arg=None, model=None, query=None, using=None, hints=None):
+        super(CustomInitQuerySet, self).__init__(model=model, query=query, using=using, hints=hints)
+
+
+class DeconstructibleCustomManager(BaseCustomManager.from_queryset(CustomQuerySet)):
+
+    def __init__(self, a, b, c=1, d=2):
+        super(DeconstructibleCustomManager, self).__init__(a)
 
 
 class FunPeopleManager(models.Manager):
@@ -88,7 +97,7 @@ class Person(models.Model):
     favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
     favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
     favorite_thing_id = models.IntegerField(null=True)
-    favorite_thing = generic.GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
     objects = PersonManager()
     fun_people = FunPeopleManager()
@@ -96,6 +105,24 @@ class Person(models.Model):
 
     custom_queryset_default_manager = CustomQuerySet.as_manager()
     custom_queryset_custom_manager = CustomManager('hello')
+    custom_init_queryset_manager = CustomInitQuerySet.as_manager()
+
+    def __str__(self):
+        return "%s %s" % (self.first_name, self.last_name)
+
+
+@python_2_unicode_compatible
+class FunPerson(models.Model):
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    fun = models.BooleanField(default=True)
+
+    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_thing_id = models.IntegerField(null=True)
+    favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
+
+    objects = FunPeopleManager()
 
     def __str__(self):
         return "%s %s" % (self.first_name, self.last_name)
@@ -108,14 +135,16 @@ class Book(models.Model):
     is_published = models.BooleanField(default=False)
     published_objects = PublishedBookManager()
     authors = models.ManyToManyField(Person, related_name='books')
+    fun_authors = models.ManyToManyField(FunPerson, related_name='books')
 
-    favorite_things = generic.GenericRelation(Person,
+    favorite_things = GenericRelation(Person,
+        content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
+
+    fun_people_favorite_things = GenericRelation(FunPerson,
         content_type_field='favorite_thing_type', object_id_field='favorite_thing_id')
 
     def __str__(self):
         return self.title
-
-# An example of providing multiple custom managers.
 
 
 class FastCarManager(models.Manager):
@@ -133,3 +162,54 @@ class Car(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class RestrictedManager(models.Manager):
+    def get_queryset(self):
+        return super(RestrictedManager, self).get_queryset().filter(is_public=True)
+
+
+@python_2_unicode_compatible
+class RelatedModel(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class RestrictedModel(models.Model):
+    name = models.CharField(max_length=50)
+    is_public = models.BooleanField(default=False)
+    related = models.ForeignKey(RelatedModel)
+
+    objects = RestrictedManager()
+    plain_manager = models.Manager()
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
+class OneToOneRestrictedModel(models.Model):
+    name = models.CharField(max_length=50)
+    is_public = models.BooleanField(default=False)
+    related = models.OneToOneField(RelatedModel)
+
+    objects = RestrictedManager()
+    plain_manager = models.Manager()
+
+    def __str__(self):
+        return self.name
+
+
+class AbstractPerson(models.Model):
+    abstract_persons = models.Manager()
+    objects = models.CharField(max_length=30)
+
+    class Meta:
+        abstract = True
+
+
+class PersonFromAbstract(AbstractPerson):
+    pass

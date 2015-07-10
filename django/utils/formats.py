@@ -1,17 +1,16 @@
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
-
-import decimal
 import datetime
-from importlib import import_module
+import decimal
 import unicodedata
+from importlib import import_module
 
 from django.conf import settings
-from django.utils import dateformat, numberformat, datetime_safe
+from django.utils import dateformat, datetime_safe, numberformat, six
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.translation import get_language, to_locale, check_for_language
+from django.utils.translation import (
+    check_for_language, get_language, to_locale,
+)
 
 # format_cache is a mapping from (format_type, lang) to the format string.
 # By using the cache, it is possible to avoid running get_format_modules
@@ -20,14 +19,14 @@ _format_cache = {}
 _format_modules_cache = {}
 
 ISO_INPUT_FORMATS = {
-    'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
-    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M:%S.%f', '%H:%M'),
-    'DATETIME_INPUT_FORMATS': (
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'TIME_INPUT_FORMATS': ['%H:%M:%S', '%H:%M:%S.%f', '%H:%M'],
+    'DATETIME_INPUT_FORMATS': [
         '%Y-%m-%d %H:%M:%S',
         '%Y-%m-%d %H:%M:%S.%f',
         '%Y-%m-%d %H:%M',
         '%Y-%m-%d'
-    ),
+    ],
 }
 
 
@@ -46,21 +45,29 @@ def iter_format_modules(lang, format_module_path=None):
     """
     Does the heavy lifting of finding format modules.
     """
-    if check_for_language(lang):
-        format_locations = ['django.conf.locale.%s']
-        if format_module_path:
-            format_locations.append(format_module_path + '.%s')
-            format_locations.reverse()
-        locale = to_locale(lang)
-        locales = [locale]
-        if '_' in locale:
-            locales.append(locale.split('_')[0])
-        for location in format_locations:
-            for loc in locales:
-                try:
-                    yield import_module('%s.formats' % (location % loc))
-                except ImportError:
-                    pass
+    if not check_for_language(lang):
+        return
+
+    if format_module_path is None:
+        format_module_path = settings.FORMAT_MODULE_PATH
+
+    format_locations = []
+    if format_module_path:
+        if isinstance(format_module_path, six.string_types):
+            format_module_path = [format_module_path]
+        for path in format_module_path:
+            format_locations.append(path + '.%s')
+    format_locations.append('django.conf.locale.%s')
+    locale = to_locale(lang)
+    locales = [locale]
+    if '_' in locale:
+        locales.append(locale.split('_')[0])
+    for location in format_locations:
+        for loc in locales:
+            try:
+                yield import_module('%s.formats' % (location % loc))
+            except ImportError:
+                pass
 
 
 def get_format_modules(lang=None, reverse=False):
@@ -213,9 +220,13 @@ def sanitize_separators(value):
             parts.append(decimals)
         if settings.USE_THOUSAND_SEPARATOR:
             thousand_sep = get_format('THOUSAND_SEPARATOR')
-            for replacement in set([
-                    thousand_sep, unicodedata.normalize('NFKD', thousand_sep)]):
-                value = value.replace(replacement, '')
+            if thousand_sep == '.' and value.count('.') == 1 and len(value.split('.')[-1]) != 3:
+                # Special case where we suspect a dot meant decimal separator (see #22171)
+                pass
+            else:
+                for replacement in {
+                        thousand_sep, unicodedata.normalize('NFKD', thousand_sep)}:
+                    value = value.replace(replacement, '')
         parts.append(value)
         value = '.'.join(reversed(parts))
     return value

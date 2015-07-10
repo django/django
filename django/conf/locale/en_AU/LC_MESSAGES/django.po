@@ -1,0 +1,1134 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Tom Fifield <tom@openstack.org>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: English (Australia) (http://www.transifex.com/projects/p/"
+"django/language/en_AU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_AU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Afrikaans"
+msgstr "Afrikaans"
+
+msgid "Arabic"
+msgstr "Arabic"
+
+msgid "Asturian"
+msgstr ""
+
+msgid "Azerbaijani"
+msgstr "Azerbaijani"
+
+msgid "Bulgarian"
+msgstr "Bulgarian"
+
+msgid "Belarusian"
+msgstr "Belarusian"
+
+msgid "Bengali"
+msgstr "Bengali"
+
+msgid "Breton"
+msgstr "Breton"
+
+msgid "Bosnian"
+msgstr "Bosnian"
+
+msgid "Catalan"
+msgstr "Catalan"
+
+msgid "Czech"
+msgstr "Czech"
+
+msgid "Welsh"
+msgstr "Welsh"
+
+msgid "Danish"
+msgstr "Danish"
+
+msgid "German"
+msgstr "German"
+
+msgid "Greek"
+msgstr "Greek"
+
+msgid "English"
+msgstr "English"
+
+msgid "Australian English"
+msgstr ""
+
+msgid "British English"
+msgstr "British English"
+
+msgid "Esperanto"
+msgstr "Esperanto"
+
+msgid "Spanish"
+msgstr "Spanish"
+
+msgid "Argentinian Spanish"
+msgstr "Argentinian Spanish"
+
+msgid "Mexican Spanish"
+msgstr "Mexican Spanish"
+
+msgid "Nicaraguan Spanish"
+msgstr "Nicaraguan Spanish"
+
+msgid "Venezuelan Spanish"
+msgstr "Venezuelan Spanish"
+
+msgid "Estonian"
+msgstr "Estonian"
+
+msgid "Basque"
+msgstr "Basque"
+
+msgid "Persian"
+msgstr "Persian"
+
+msgid "Finnish"
+msgstr "Finnish"
+
+msgid "French"
+msgstr "French"
+
+msgid "Frisian"
+msgstr "Frisian"
+
+msgid "Irish"
+msgstr "Irish"
+
+msgid "Galician"
+msgstr "Galician"
+
+msgid "Hebrew"
+msgstr "Hebrew"
+
+msgid "Hindi"
+msgstr "Hindi"
+
+msgid "Croatian"
+msgstr "Croatian"
+
+msgid "Hungarian"
+msgstr "Hungarian"
+
+msgid "Interlingua"
+msgstr "Interlingua"
+
+msgid "Indonesian"
+msgstr "Indonesian"
+
+msgid "Ido"
+msgstr ""
+
+msgid "Icelandic"
+msgstr "Icelandic"
+
+msgid "Italian"
+msgstr "Italian"
+
+msgid "Japanese"
+msgstr "Japanese"
+
+msgid "Georgian"
+msgstr "Georgian"
+
+msgid "Kazakh"
+msgstr "Kazakh"
+
+msgid "Khmer"
+msgstr "Khmer"
+
+msgid "Kannada"
+msgstr "Kannada"
+
+msgid "Korean"
+msgstr "Korean"
+
+msgid "Luxembourgish"
+msgstr "Luxembourgish"
+
+msgid "Lithuanian"
+msgstr "Lithuanian"
+
+msgid "Latvian"
+msgstr "Latvian"
+
+msgid "Macedonian"
+msgstr "Macedonian"
+
+msgid "Malayalam"
+msgstr "Malayalam"
+
+msgid "Mongolian"
+msgstr "Mongolian"
+
+msgid "Marathi"
+msgstr ""
+
+msgid "Burmese"
+msgstr "Burmese"
+
+msgid "Norwegian Bokmal"
+msgstr "Norwegian Bokmal"
+
+msgid "Nepali"
+msgstr "Nepali"
+
+msgid "Dutch"
+msgstr "Dutch"
+
+msgid "Norwegian Nynorsk"
+msgstr "Norwegian Nynorsk"
+
+msgid "Ossetic"
+msgstr "Ossetic"
+
+msgid "Punjabi"
+msgstr "Punjabi"
+
+msgid "Polish"
+msgstr "Polish"
+
+msgid "Portuguese"
+msgstr "Portuguese"
+
+msgid "Brazilian Portuguese"
+msgstr "Brazilian Portuguese"
+
+msgid "Romanian"
+msgstr "Romanian"
+
+msgid "Russian"
+msgstr "Russian"
+
+msgid "Slovak"
+msgstr "Slovak"
+
+msgid "Slovenian"
+msgstr "Slovenian"
+
+msgid "Albanian"
+msgstr "Albanian"
+
+msgid "Serbian"
+msgstr "Serbian"
+
+msgid "Serbian Latin"
+msgstr "Serbian Latin"
+
+msgid "Swedish"
+msgstr "Swedish"
+
+msgid "Swahili"
+msgstr "Swahili"
+
+msgid "Tamil"
+msgstr "Tamil"
+
+msgid "Telugu"
+msgstr "Telugu"
+
+msgid "Thai"
+msgstr "Thai"
+
+msgid "Turkish"
+msgstr "Turkish"
+
+msgid "Tatar"
+msgstr "Tatar"
+
+msgid "Udmurt"
+msgstr "Udmurt"
+
+msgid "Ukrainian"
+msgstr "Ukrainian"
+
+msgid "Urdu"
+msgstr "Urdu"
+
+msgid "Vietnamese"
+msgstr "Vietnamese"
+
+msgid "Simplified Chinese"
+msgstr "Simplified Chinese"
+
+msgid "Traditional Chinese"
+msgstr "Traditional Chinese"
+
+msgid "Messages"
+msgstr ""
+
+msgid "Site Maps"
+msgstr ""
+
+msgid "Static Files"
+msgstr ""
+
+msgid "Syndication"
+msgstr ""
+
+msgid "Web Design"
+msgstr ""
+
+msgid "Enter a valid value."
+msgstr "Enter a valid value."
+
+msgid "Enter a valid URL."
+msgstr "Enter a valid URL."
+
+msgid "Enter a valid integer."
+msgstr ""
+
+msgid "Enter a valid email address."
+msgstr "Enter a valid email address."
+
+msgid ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+msgstr ""
+"Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
+
+msgid "Enter a valid IPv4 address."
+msgstr "Enter a valid IPv4 address."
+
+msgid "Enter a valid IPv6 address."
+msgstr "Enter a valid IPv6 address."
+
+msgid "Enter a valid IPv4 or IPv6 address."
+msgstr "Enter a valid IPv4 or IPv6 address."
+
+msgid "Enter only digits separated by commas."
+msgstr "Enter only digits separated by commas."
+
+#, python-format
+msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+msgstr "Ensure this value is %(limit_value)s (it is %(show_value)s)."
+
+#, python-format
+msgid "Ensure this value is less than or equal to %(limit_value)s."
+msgstr "Ensure this value is less than or equal to %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is greater than or equal to %(limit_value)s."
+msgstr "Ensure this value is greater than or equal to %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Ensure this value has at least %(limit_value)d character (it has "
+"%(show_value)d)."
+msgstr[1] ""
+"Ensure this value has at least %(limit_value)d characters (it has "
+"%(show_value)d)."
+
+#, python-format
+msgid ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgid_plural ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+msgstr[0] ""
+"Ensure this value has at most %(limit_value)d character (it has "
+"%(show_value)d)."
+msgstr[1] ""
+"Ensure this value has at most %(limit_value)d characters (it has "
+"%(show_value)d)."
+
+msgid "and"
+msgstr "and"
+
+#, python-format
+msgid "%(model_name)s with this %(field_labels)s already exists."
+msgstr ""
+
+#, python-format
+msgid "Value %(value)r is not a valid choice."
+msgstr ""
+
+msgid "This field cannot be null."
+msgstr "This field cannot be null."
+
+msgid "This field cannot be blank."
+msgstr "This field cannot be blank."
+
+#, python-format
+msgid "%(model_name)s with this %(field_label)s already exists."
+msgstr "%(model_name)s with this %(field_label)s already exists."
+
+#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
+#. Eg: "Title must be unique for pub_date year"
+#, python-format
+msgid ""
+"%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
+msgstr ""
+
+#, python-format
+msgid "Field of type: %(field_type)s"
+msgstr "Field of type: %(field_type)s"
+
+msgid "Integer"
+msgstr "Integer"
+
+#, python-format
+msgid "'%(value)s' value must be an integer."
+msgstr ""
+
+#, python-format
+msgid "'%(value)s' value must be either True or False."
+msgstr ""
+
+msgid "Boolean (Either True or False)"
+msgstr "Boolean (Either True or False)"
+
+#, python-format
+msgid "String (up to %(max_length)s)"
+msgstr "String (up to %(max_length)s)"
+
+msgid "Comma-separated integers"
+msgstr "Comma-separated integers"
+
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
+"date."
+msgstr ""
+
+msgid "Date (without time)"
+msgstr "Date (without time)"
+
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
+"uuuuuu]][TZ] format."
+msgstr ""
+
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
+"[TZ]) but it is an invalid date/time."
+msgstr ""
+
+msgid "Date (with time)"
+msgstr "Date (with time)"
+
+#, python-format
+msgid "'%(value)s' value must be a decimal number."
+msgstr ""
+
+msgid "Decimal number"
+msgstr "Decimal number"
+
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Email address"
+msgstr "Email address"
+
+msgid "File path"
+msgstr "File path"
+
+#, python-format
+msgid "'%(value)s' value must be a float."
+msgstr ""
+
+msgid "Floating point number"
+msgstr "Floating point number"
+
+msgid "Big (8 byte) integer"
+msgstr "Big (8 byte) integer"
+
+msgid "IPv4 address"
+msgstr "IPv4 address"
+
+msgid "IP address"
+msgstr "IP address"
+
+#, python-format
+msgid "'%(value)s' value must be either None, True or False."
+msgstr ""
+
+msgid "Boolean (Either True, False or None)"
+msgstr "Boolean (Either True, False or None)"
+
+msgid "Positive integer"
+msgstr "Positive integer"
+
+msgid "Positive small integer"
+msgstr "Positive small integer"
+
+#, python-format
+msgid "Slug (up to %(max_length)s)"
+msgstr "Slug (up to %(max_length)s)"
+
+msgid "Small integer"
+msgstr "Small integer"
+
+msgid "Text"
+msgstr "Text"
+
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
+"format."
+msgstr ""
+
+#, python-format
+msgid ""
+"'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
+"invalid time."
+msgstr ""
+
+msgid "Time"
+msgstr "Time"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Raw binary data"
+msgstr "Raw binary data"
+
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr ""
+
+msgid "File"
+msgstr "File"
+
+msgid "Image"
+msgstr "Image"
+
+#, python-format
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
+msgstr ""
+
+msgid "Foreign Key (type determined by related field)"
+msgstr "Foreign Key (type determined by related field)"
+
+msgid "One-to-one relationship"
+msgstr "One-to-one relationship"
+
+msgid "Many-to-many relationship"
+msgstr "Many-to-many relationship"
+
+msgid "This field is required."
+msgstr "This field is required."
+
+msgid "Enter a whole number."
+msgstr "Enter a whole number."
+
+msgid "Enter a number."
+msgstr "Enter a number."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Ensure that there are no more than %(max)s digit in total."
+msgstr[1] "Ensure that there are no more than %(max)s digits in total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Ensure that there are no more than %(max)s decimal place."
+msgstr[1] "Ensure that there are no more than %(max)s decimal places."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgstr[1] ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+
+msgid "Enter a valid date."
+msgstr "Enter a valid date."
+
+msgid "Enter a valid time."
+msgstr "Enter a valid time."
+
+msgid "Enter a valid date/time."
+msgstr "Enter a valid date/time."
+
+msgid "Enter a valid duration."
+msgstr ""
+
+msgid "No file was submitted. Check the encoding type on the form."
+msgstr "No file was submitted. Check the encoding type on the form."
+
+msgid "No file was submitted."
+msgstr "No file was submitted."
+
+msgid "The submitted file is empty."
+msgstr "The submitted file is empty."
+
+#, python-format
+msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgid_plural ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+msgstr[0] ""
+"Ensure this filename has at most %(max)d character (it has %(length)d)."
+msgstr[1] ""
+"Ensure this filename has at most %(max)d characters (it has %(length)d)."
+
+msgid "Please either submit a file or check the clear checkbox, not both."
+msgstr "Please either submit a file or check the clear checkbox, not both."
+
+msgid ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+msgstr ""
+"Upload a valid image. The file you uploaded was either not an image or a "
+"corrupted image."
+
+#, python-format
+msgid "Select a valid choice. %(value)s is not one of the available choices."
+msgstr "Select a valid choice. %(value)s is not one of the available choices."
+
+msgid "Enter a list of values."
+msgstr "Enter a list of values."
+
+msgid "Enter a complete value."
+msgstr ""
+
+msgid "Enter a valid UUID."
+msgstr ""
+
+#. Translators: This is the default suffix added to form field labels
+msgid ":"
+msgstr ":"
+
+#, python-format
+msgid "(Hidden field %(name)s) %(error)s"
+msgstr "(Hidden field %(name)s) %(error)s"
+
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
+msgid "ManagementForm data is missing or has been tampered with"
+msgstr ""
+
+#, python-format
+msgid "Please submit %d or fewer forms."
+msgid_plural "Please submit %d or fewer forms."
+msgstr[0] "Please submit %d or fewer forms."
+msgstr[1] "Please submit %d or fewer forms."
+
+#, python-format
+msgid "Please submit %d or more forms."
+msgid_plural "Please submit %d or more forms."
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Order"
+msgstr "Order"
+
+msgid "Delete"
+msgstr "Delete"
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s."
+msgstr "Please correct the duplicate data for %(field)s."
+
+#, python-format
+msgid "Please correct the duplicate data for %(field)s, which must be unique."
+msgstr "Please correct the duplicate data for %(field)s, which must be unique."
+
+#, python-format
+msgid ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+msgstr ""
+"Please correct the duplicate data for %(field_name)s which must be unique "
+"for the %(lookup)s in %(date_field)s."
+
+msgid "Please correct the duplicate values below."
+msgstr "Please correct the duplicate values below."
+
+msgid "The inline foreign key did not match the parent instance primary key."
+msgstr "The inline foreign key did not match the parent instance primary key."
+
+msgid "Select a valid choice. That choice is not one of the available choices."
+msgstr ""
+"Select a valid choice. That choice is not one of the available choices."
+
+#, python-format
+msgid "\"%(pk)s\" is not a valid value for a primary key."
+msgstr "\"%(pk)s\" is not a valid value for a primary key."
+
+#, python-format
+msgid ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+msgstr ""
+"%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
+"may be ambiguous or it may not exist."
+
+msgid "Currently"
+msgstr "Currently"
+
+msgid "Change"
+msgstr "Change"
+
+msgid "Clear"
+msgstr "Clear"
+
+msgid "Unknown"
+msgstr "Unknown"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "yes,no,maybe"
+msgstr "yes,no,maybe"
+
+#, python-format
+msgid "%(size)d byte"
+msgid_plural "%(size)d bytes"
+msgstr[0] "%(size)d byte"
+msgstr[1] "%(size)d bytes"
+
+#, python-format
+msgid "%s KB"
+msgstr "%s KB"
+
+#, python-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#, python-format
+msgid "%s GB"
+msgstr "%s GB"
+
+#, python-format
+msgid "%s TB"
+msgstr "%s TB"
+
+#, python-format
+msgid "%s PB"
+msgstr "%s PB"
+
+msgid "p.m."
+msgstr "p.m."
+
+msgid "a.m."
+msgstr "a.m."
+
+msgid "PM"
+msgstr "PM"
+
+msgid "AM"
+msgstr "AM"
+
+msgid "midnight"
+msgstr "midnight"
+
+msgid "noon"
+msgstr "noon"
+
+msgid "Monday"
+msgstr "Monday"
+
+msgid "Tuesday"
+msgstr "Tuesday"
+
+msgid "Wednesday"
+msgstr "Wednesday"
+
+msgid "Thursday"
+msgstr "Thursday"
+
+msgid "Friday"
+msgstr "Friday"
+
+msgid "Saturday"
+msgstr "Saturday"
+
+msgid "Sunday"
+msgstr "Sunday"
+
+msgid "Mon"
+msgstr "Mon"
+
+msgid "Tue"
+msgstr "Tue"
+
+msgid "Wed"
+msgstr "Wed"
+
+msgid "Thu"
+msgstr "Thu"
+
+msgid "Fri"
+msgstr "Fri"
+
+msgid "Sat"
+msgstr "Sat"
+
+msgid "Sun"
+msgstr "Sun"
+
+msgid "January"
+msgstr "January"
+
+msgid "February"
+msgstr "February"
+
+msgid "March"
+msgstr "March"
+
+msgid "April"
+msgstr "April"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "June"
+
+msgid "July"
+msgstr "July"
+
+msgid "August"
+msgstr "August"
+
+msgid "September"
+msgstr "September"
+
+msgid "October"
+msgstr "October"
+
+msgid "November"
+msgstr "November"
+
+msgid "December"
+msgstr "December"
+
+msgid "jan"
+msgstr "jan"
+
+msgid "feb"
+msgstr "feb"
+
+msgid "mar"
+msgstr "mar"
+
+msgid "apr"
+msgstr "apr"
+
+msgid "may"
+msgstr "may"
+
+msgid "jun"
+msgstr "jun"
+
+msgid "jul"
+msgstr "jul"
+
+msgid "aug"
+msgstr "aug"
+
+msgid "sep"
+msgstr "sep"
+
+msgid "oct"
+msgstr "oct"
+
+msgid "nov"
+msgstr "nov"
+
+msgid "dec"
+msgstr "dec"
+
+msgctxt "abbrev. month"
+msgid "Jan."
+msgstr "Jan."
+
+msgctxt "abbrev. month"
+msgid "Feb."
+msgstr "Feb."
+
+msgctxt "abbrev. month"
+msgid "March"
+msgstr "March"
+
+msgctxt "abbrev. month"
+msgid "April"
+msgstr "April"
+
+msgctxt "abbrev. month"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month"
+msgid "June"
+msgstr "June"
+
+msgctxt "abbrev. month"
+msgid "July"
+msgstr "July"
+
+msgctxt "abbrev. month"
+msgid "Aug."
+msgstr "Aug."
+
+msgctxt "abbrev. month"
+msgid "Sept."
+msgstr "Sept."
+
+msgctxt "abbrev. month"
+msgid "Oct."
+msgstr "Oct."
+
+msgctxt "abbrev. month"
+msgid "Nov."
+msgstr "Nov."
+
+msgctxt "abbrev. month"
+msgid "Dec."
+msgstr "Dec."
+
+msgctxt "alt. month"
+msgid "January"
+msgstr "January"
+
+msgctxt "alt. month"
+msgid "February"
+msgstr "February"
+
+msgctxt "alt. month"
+msgid "March"
+msgstr "March"
+
+msgctxt "alt. month"
+msgid "April"
+msgstr "April"
+
+msgctxt "alt. month"
+msgid "May"
+msgstr "May"
+
+msgctxt "alt. month"
+msgid "June"
+msgstr "June"
+
+msgctxt "alt. month"
+msgid "July"
+msgstr "July"
+
+msgctxt "alt. month"
+msgid "August"
+msgstr "August"
+
+msgctxt "alt. month"
+msgid "September"
+msgstr "September"
+
+msgctxt "alt. month"
+msgid "October"
+msgstr "October"
+
+msgctxt "alt. month"
+msgid "November"
+msgstr "November"
+
+msgctxt "alt. month"
+msgid "December"
+msgstr "December"
+
+msgid "This is not a valid IPv6 address."
+msgstr ""
+
+#, python-format
+msgctxt "String to return when truncating text"
+msgid "%(truncated_text)s..."
+msgstr "%(truncated_text)s..."
+
+msgid "or"
+msgstr "or"
+
+#. Translators: This string is used as a separator between list elements
+msgid ", "
+msgstr ", "
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d year"
+msgstr[1] "%d years"
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d month"
+msgstr[1] "%d months"
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d week"
+msgstr[1] "%d weeks"
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d day"
+msgstr[1] "%d days"
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d hour"
+msgstr[1] "%d hours"
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minute"
+msgstr[1] "%d minutes"
+
+msgid "0 minutes"
+msgstr "0 minutes"
+
+msgid "Forbidden"
+msgstr ""
+
+msgid "CSRF verification failed. Request aborted."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this HTTPS site requires a 'Referer "
+"header' to be sent by your Web browser, but none was sent. This header is "
+"required for security reasons, to ensure that your browser is not being "
+"hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable 'Referer' headers, please re-"
+"enable them, at least for this site, or for HTTPS connections, or for 'same-"
+"origin' requests."
+msgstr ""
+
+msgid ""
+"You are seeing this message because this site requires a CSRF cookie when "
+"submitting forms. This cookie is required for security reasons, to ensure "
+"that your browser is not being hijacked by third parties."
+msgstr ""
+
+msgid ""
+"If you have configured your browser to disable cookies, please re-enable "
+"them, at least for this site, or for 'same-origin' requests."
+msgstr ""
+
+msgid "More information is available with DEBUG=True."
+msgstr ""
+
+msgid "Welcome to Django"
+msgstr ""
+
+msgid "It worked!"
+msgstr ""
+
+msgid "Congratulations on your first Django-powered page."
+msgstr ""
+
+msgid ""
+"Of course, you haven't actually done any work yet. Next, start your first "
+"app by running <code>python manage.py startapp [app_label]</code>."
+msgstr ""
+
+msgid ""
+"You're seeing this message because you have <code>DEBUG = True</code> in "
+"your Django settings file and you haven't configured any URLs. Get to work!"
+msgstr ""
+
+msgid "No year specified"
+msgstr "No year specified"
+
+msgid "No month specified"
+msgstr "No month specified"
+
+msgid "No day specified"
+msgstr "No day specified"
+
+msgid "No week specified"
+msgstr "No week specified"
+
+#, python-format
+msgid "No %(verbose_name_plural)s available"
+msgstr "No %(verbose_name_plural)s available"
+
+#, python-format
+msgid ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+msgstr ""
+"Future %(verbose_name_plural)s not available because %(class_name)s."
+"allow_future is False."
+
+#, python-format
+msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
+msgstr "Invalid date string '%(datestr)s' given format '%(format)s'"
+
+#, python-format
+msgid "No %(verbose_name)s found matching the query"
+msgstr "No %(verbose_name)s found matching the query"
+
+msgid "Page is not 'last', nor can it be converted to an int."
+msgstr "Page is not 'last', nor can it be converted to an int."
+
+#, python-format
+msgid "Invalid page (%(page_number)s): %(message)s"
+msgstr "Invalid page (%(page_number)s): %(message)s"
+
+#, python-format
+msgid "Empty list and '%(class_name)s.allow_empty' is False."
+msgstr "Empty list and '%(class_name)s.allow_empty' is False."
+
+msgid "Directory indexes are not allowed here."
+msgstr "Directory indexes are not allowed here."
+
+#, python-format
+msgid "\"%(path)s\" does not exist"
+msgstr "\"%(path)s\" does not exist"
+
+#, python-format
+msgid "Index of %(directory)s"
+msgstr "Index of %(directory)s"

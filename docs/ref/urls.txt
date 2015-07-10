@@ -9,11 +9,42 @@ patterns()
 
 .. function:: patterns(prefix, pattern_description, ...)
 
+.. deprecated:: 1.8
+
+    ``urlpatterns`` should be a plain list of :func:`django.conf.urls.url`
+    instances instead.
+
 A function that takes a prefix, and an arbitrary number of URL patterns, and
 returns a list of URL patterns in the format Django needs.
 
-The first argument to ``patterns()`` is a string ``prefix``. See
-:ref:`The view prefix <urlpatterns-view-prefix>`.
+The first argument to ``patterns()`` is a string ``prefix``. Here's the example
+URLconf from the :doc:`Django overview </intro/overview>`::
+
+    from django.conf.urls import patterns, url
+
+    urlpatterns = patterns('',
+        url(r'^articles/([0-9]{4})/$', 'news.views.year_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'news.views.month_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'news.views.article_detail'),
+    )
+
+In this example, each view has a common prefix -- ``'news.views'``.
+Instead of typing that out for each entry in ``urlpatterns``, you can use the
+first argument to the ``patterns()`` function to specify a prefix to apply to
+each view function.
+
+With this in mind, the above example can be written more concisely as::
+
+    from django.conf.urls import patterns, url
+
+    urlpatterns = patterns('news.views',
+        url(r'^articles/([0-9]{4})/$', 'year_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/$', 'month_archive'),
+        url(r'^articles/([0-9]{4})/([0-9]{2})/([0-9]+)/$', 'article_detail'),
+    )
+
+Note that you don't put a trailing dot (``"."``) in the prefix. Django puts
+that in automatically.
 
 The remaining arguments should be tuples in this format::
 
@@ -47,47 +78,59 @@ The ``optional_dictionary`` and ``optional_name`` parameters are described in
 static()
 --------
 
-.. function:: static.static(prefix, view='django.views.static.serve', **kwargs)
+.. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
 Helper function to return a URL pattern for serving files in debug mode::
 
     from django.conf import settings
     from django.conf.urls.static import static
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         # ... the rest of your URLconf goes here ...
-    ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+.. versionchanged:: 1.8
+
+    The ``view`` argument changed from a string
+    (``'django.views.static.serve'``) to the function.
 
 url()
 -----
 
 .. function:: url(regex, view, kwargs=None, name=None, prefix='')
 
-You can use the ``url()`` function, instead of a tuple, as an argument to
-``patterns()``. This is convenient if you want to specify a name without the
-optional extra arguments dictionary. For example::
+``urlpatterns`` should be a list of ``url()`` instances. For example::
 
-    urlpatterns = patterns('',
+    urlpatterns = [
         url(r'^index/$', index_view, name="main-view"),
         ...
-    )
+    ]
 
 This function takes five arguments, most of which are optional::
 
     url(regex, view, kwargs=None, name=None, prefix='')
 
+The ``kwargs`` parameter allows you to pass additional arguments to the view
+function or method. See :ref:`views-extra-options` for an example.
+
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
 
-The ``prefix`` parameter has the same meaning as the first argument to
-``patterns()`` and is only relevant when you're passing a string as the
-``view`` parameter.
+.. deprecated:: 1.8
+
+    Support for string ``view`` arguments is deprecated and will be removed in
+    Django 1.10. Pass the callable  instead.
+
+    The ``prefix`` parameter has the same meaning as the first argument to
+    ``patterns()`` and is only relevant when you're passing a string as the
+    ``view`` parameter.
 
 include()
 ---------
 
 .. function:: include(module[, namespace=None, app_name=None])
               include(pattern_list)
+              include((pattern_list, app_namespace)[, namespace=None])
               include((pattern_list, app_namespace, instance_namespace))
 
     A function that takes a full Python import path to another URLconf module
@@ -95,16 +138,21 @@ include()
     namespace` and :term:`instance namespace` where the entries will be included
     into can also be specified.
 
+    Usually, the application namespace should be specified by the included
+    module. If an application namespace is set, the ``namespace`` argument
+    can be used to set a different instance namespace.
+
     ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns or a 3-tuple containing such iterable plus the names of the
-    application and instance namespaces.
+    URL patterns, a 2-tuple containing such iterable plus the names of the
+    application namespaces, or a 3-tuple containing the iterable and the names
+    of both the application and instance namespace.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
     :type namespace: string
     :arg app_name: Application namespace for the URL entries being included
     :type app_name: string
-    :arg pattern_list: Iterable of URL entries as returned by :func:`patterns`
+    :arg pattern_list: Iterable of :func:`django.conf.urls.url` instances
     :arg app_namespace: Application namespace for the URL entries being included
     :type app_namespace: string
     :arg instance_namespace: Instance namespace for the URL entries being included
@@ -112,18 +160,30 @@ include()
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
 
+.. deprecated:: 1.9
+
+    Support for the ``app_name`` argument is deprecated and will be removed in
+    Django 2.0. Specify the ``app_name`` as explained in
+    :ref:`namespaces-and-include` instead.
+
+    Support for passing a 3-tuple is also deprecated and will be removed in
+    Django 2.0. Pass a 2-tuple containing the pattern list and application
+    namespace, and use the ``namespace`` argument instead.
+
+    Lastly, support for an instance namespace without an application namespace
+    has been deprecated and will be removed in Django 2.0. Specify the
+    application namespace or remove the instance namespace.
+
 handler400
 ----------
 
 .. data:: handler400
 
-.. versionadded:: 1.6
-
 A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.permission_denied'``. That default
+By default, this is ``'django.views.defaults.bad_request'``. That default
 value should suffice.
 
 See the documentation about :ref:`the 400 (bad request) view

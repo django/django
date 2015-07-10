@@ -1,18 +1,33 @@
-from django.utils.six.moves import html_parser as _html_parser
 import re
 import sys
 
+from django.utils import six
+from django.utils.six.moves import html_parser as _html_parser
+
 current_version = sys.version_info
 
-use_workaround = (
-    (current_version < (2, 7, 3)) or
-    (current_version >= (3, 0) and current_version < (3, 2, 3))
-)
+use_workaround = current_version < (2, 7, 3)
 
-HTMLParseError = _html_parser.HTMLParseError
+try:
+    HTMLParseError = _html_parser.HTMLParseError
+except AttributeError:
+    # create a dummy class for Python 3.5+ where it's been removed
+    class HTMLParseError(Exception):
+        pass
 
 if not use_workaround:
-    HTMLParser = _html_parser.HTMLParser
+    if six.PY3:
+        class HTMLParser(_html_parser.HTMLParser):
+            """Explicitly set convert_charrefs to be False.
+
+            This silences a deprecation warning on Python 3.4, but we can't do
+            it at call time because Python 2.7 does not have the keyword
+            argument.
+            """
+            def __init__(self, convert_charrefs=False, **kwargs):
+                _html_parser.HTMLParser.__init__(self, convert_charrefs=convert_charrefs, **kwargs)
+    else:
+        HTMLParser = _html_parser.HTMLParser
 else:
     tagfind = re.compile('([a-zA-Z][-.a-zA-Z0-9:_]*)(?:\s|/(?!>))*')
 

@@ -7,13 +7,12 @@ import re
 
 from docutils import nodes
 from docutils.parsers.rst import directives
-
-from sphinx import addnodes, __version__ as sphinx_ver
+from sphinx import __version__ as sphinx_ver, addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
-from sphinx.writers.html import SmartyPantsHTMLTranslator
-from sphinx.util.console import bold
 from sphinx.util.compat import Directive
+from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
+from sphinx.writers.html import SmartyPantsHTMLTranslator
 
 # RE for option descriptions without a '--' prefix
 simple_option_desc_re = re.compile(
@@ -99,11 +98,11 @@ def visit_snippet(self, node):
     linenos = node.rawsource.count('\n') >= self.highlightlinenothreshold - 1
     fname = node['filename']
     highlight_args = node.get('highlight_args', {})
-    if node.has_key('language'):
+    if 'language' in node:
         # code-block directives
         lang = node['language']
         highlight_args['force'] = True
-    if node.has_key('linenos'):
+    if 'linenos' in node:
         linenos = node['linenos']
 
     def warner(msg):
@@ -179,7 +178,7 @@ class SnippetWithFilename(Directive):
     option_spec = {'filename': directives.unchanged_required}
 
     def run(self):
-        code = u'\n'.join(self.content)
+        code = '\n'.join(self.content)
 
         literal = snippet_with_filename(code, code)
         if self.arguments:
@@ -236,11 +235,13 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         self.compact_p = self.context.pop()
         self.body.append('</table>\n')
 
-    # <big>? Really?
     def visit_desc_parameterlist(self, node):
-        self.body.append('(')
+        self.body.append('(')  # by default sphinx puts <big> around the "("
         self.first_param = 1
+        self.optional_param_level = 0
         self.param_separator = node.child_text_separator
+        self.required_params_left = sum([isinstance(c, addnodes.desc_parameter)
+                                         for c in node.children])
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
@@ -267,7 +268,6 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
     # that work.
     #
     version_text = {
-        'deprecated': 'Deprecated in Django %s',
         'versionchanged': 'Changed in Django %s',
         'versionadded': 'New in Django %s',
     }
@@ -276,11 +276,13 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
         self.body.append(
             self.starttag(node, 'div', CLASS=node['type'])
         )
-        title = "%s%s" % (
-            self.version_text[node['type']] % node['version'],
-            ":" if len(node) else "."
-        )
-        self.body.append('<span class="title">%s</span> ' % title)
+        version_text = self.version_text.get(node['type'])
+        if version_text:
+            title = "%s%s" % (
+                version_text % node['version'],
+                ":" if len(node) else "."
+            )
+            self.body.append('<span class="title">%s</span> ' % title)
 
     def depart_versionmodified(self, node):
         self.body.append("</div>\n")
@@ -297,7 +299,7 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 def parse_django_admin_node(env, sig, signode):
     command = sig.split(' ')[0]
     env._django_curr_admin_command = command
-    title = "django-admin.py %s" % sig
+    title = "django-admin %s" % sig
     signode += addnodes.desc_name(title, title)
     return sig
 
@@ -344,9 +346,9 @@ class DjangoStandaloneHTMLBuilder(StandaloneHTMLBuilder):
         xrefs = self.env.domaindata["std"]["objects"]
         templatebuiltins = {
             "ttags": [n for ((t, n), (l, a)) in xrefs.items()
-                        if t == "templatetag" and l == "ref/templates/builtins"],
+                      if t == "templatetag" and l == "ref/templates/builtins"],
             "tfilters": [n for ((t, n), (l, a)) in xrefs.items()
-                        if t == "templatefilter" and l == "ref/templates/builtins"],
+                         if t == "templatefilter" and l == "ref/templates/builtins"],
         }
         outfilename = os.path.join(self.outdir, "templatebuiltins.js")
         with open(outfilename, 'w') as fp:

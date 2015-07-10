@@ -1,0 +1,212 @@
+=========================================
+PostgreSQL specific aggregation functions
+=========================================
+
+.. module:: django.contrib.postgres.aggregates
+   :synopsis: PostgreSQL specific aggregation functions
+
+.. versionadded:: 1.9
+
+These functions are described in more detail in the `PostgreSQL docs
+<http://www.postgresql.org/docs/current/static/functions-aggregate.html>`_.
+
+.. note::
+
+    All functions come without default aliases, so you must explicitly provide
+    one. For example::
+
+        >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
+        {'arr': [0, 1, 2]}
+
+General-purpose aggregation functions
+-------------------------------------
+
+ArrayAgg
+~~~~~~~~
+
+.. class:: ArrayAgg(expression, **extra)
+
+    Returns a list of values, including nulls, concatenated into an array.
+
+BitAnd
+~~~~~~
+
+.. class:: BitAnd(expression, **extra)
+
+    Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
+    ``None`` if all values are null.
+
+BitOr
+~~~~~
+
+.. class:: BitOr(expression, **extra)
+
+    Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
+    ``None`` if all values are null.
+
+BoolAnd
+~~~~~~~~
+
+.. class:: BoolAnd(expression, **extra)
+
+    Returns ``True``, if all input values are true, ``None`` if all values are
+    null or if there are no values, otherwise ``False`` .
+
+BoolOr
+~~~~~~
+
+.. class:: BoolOr(expression, **extra)
+
+    Returns ``True`` if at least one input value is true, ``None`` if all
+    values are null or if there are no values, otherwise ``False``.
+
+StringAgg
+~~~~~~~~~
+
+.. class:: StringAgg(expression, delimiter)
+
+    Returns the input values concatenated into a string, separated by
+    the ``delimiter`` string.
+
+    .. attribute:: delimiter
+
+        Required argument. Needs to be a string.
+
+Aggregate functions for statistics
+----------------------------------
+
+``y`` and ``x``
+~~~~~~~~~~~~~~~
+
+The arguments ``y`` and ``x`` for all these functions can be the name of a
+field or an expression returning a numeric data. Both are required.
+
+Corr
+~~~~
+
+.. class:: Corr(y, x)
+
+    Returns the correlation coefficient as a ``float``, or ``None`` if there
+    aren't any matching rows.
+
+CovarPop
+~~~~~~~~
+
+.. class:: CovarPop(y, x, sample=False)
+
+    Returns the population covariance as a ``float``, or ``None`` if there
+    aren't any matching rows.
+
+    Has one optional argument:
+
+    .. attribute:: sample
+
+        By default ``CovarPop`` returns the general population covariance.
+        However, if ``sample=True``, the return value will be the sample
+        population covariance.
+
+RegrAvgX
+~~~~~~~~
+
+.. class:: RegrAvgX(y, x)
+
+    Returns the average of the independent variable (``sum(x)/N``) as a
+    ``float``, or ``None`` if there aren't any matching rows.
+
+RegrAvgY
+~~~~~~~~
+
+.. class:: RegrAvgY(y, x)
+
+    Returns the average of the independent variable (``sum(y)/N``) as a
+    ``float``, or ``None`` if there aren't any matching rows.
+
+RegrCount
+~~~~~~~~~
+
+.. class:: RegrCount(y, x)
+
+    Returns an ``int`` of the number of input rows in which both expressions
+    are not null.
+
+RegrIntercept
+~~~~~~~~~~~~~
+
+.. class:: RegrIntercept(y, x)
+
+    Returns the y-intercept of the least-squares-fit linear equation determined
+    by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
+    matching rows.
+
+RegrR2
+~~~~~~
+
+.. class:: RegrR2(y, x)
+
+    Returns the square of the correlation coefficient as a ``float``, or
+    ``None`` if there aren't any matching rows.
+
+RegrSlope
+~~~~~~~~~
+
+.. class:: RegrSlope(y, x)
+
+    Returns the slope of the least-squares-fit linear equation determined
+    by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
+    matching rows.
+
+RegrSXX
+~~~~~~~
+
+.. class:: RegrSXX(y, x)
+
+    Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent
+    variable) as a ``float``, or ``None`` if there aren't any matching rows.
+
+RegrSXY
+~~~~~~~
+
+.. class:: RegrSXY(y, x)
+
+    Returns ``sum(x*y) - sum(x) * sum(y)/N`` ("sum of products" of independent
+    times dependent variable) as a ``float``, or ``None`` if there aren't any
+    matching rows.
+
+RegrSYY
+~~~~~~~
+
+.. class:: RegrSYY(y, x)
+
+    Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent
+    variable)  as a ``float``, or ``None`` if there aren't any matching rows.
+
+Usage examples
+--------------
+
+We will use this example table::
+
+    | FIELD1 | FIELD2 | FIELD3 |
+    |--------|--------|--------|
+    |    foo |      1 |     13 |
+    |    bar |      2 | (null) |
+    |   test |      3 |     13 |
+
+
+Here's some examples of some of the general-purpose aggregation functions::
+
+    >>> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
+    {'result': 'foo;bar;test'}
+    >>> TestModel.objects.aggregate(result=ArrayAgg('field2'))
+    {'result': [1, 2, 3]}
+    >>> TestModel.objects.aggregate(result=ArrayAgg('field1'))
+    {'result': ['foo', 'bar', 'test']}
+
+The next example shows the usage of statistical aggregate functions. The
+underlying math will be not described (you can read about this, for example, at
+`wikipedia <http://en.wikipedia.org/wiki/Regression_analysis>`_)::
+
+    >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
+    {'count': 2}
+    >>> TestModel.objects.aggregate(avgx=RegrAvgX(y='field3', x='field2'),
+    ...                             avgy=RegrAvgY(y='field3', x='field2'))
+    {'avgx': 2, 'avgy': 13}

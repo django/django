@@ -1,5 +1,6 @@
-from django.db.backends.postgresql_psycopg2.introspection import DatabaseIntrospection
 from django.contrib.gis.gdal import OGRGeomType
+from django.db.backends.postgresql_psycopg2.introspection import \
+    DatabaseIntrospection
 
 
 class GeoIntrospectionError(Exception):
@@ -19,29 +20,52 @@ class PostGISIntrospection(DatabaseIntrospection):
         'raster_overviews',
     ]
 
+    # Overridden from parent to include raster indices in retrieval.
+    # Raster indices have pg_index.indkey value 0 because they are an
+    # expression over the raster column through the ST_ConvexHull function.
+    # So the default query has to be adapted to include raster indices.
+    _get_indexes_query = """
+        SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+        LEFT JOIN pg_catalog.pg_type t ON t.oid = attr.atttypid
+        WHERE
+            c.oid = idx.indrelid
+            AND idx.indexrelid = c2.oid
+            AND attr.attrelid = c.oid
+            AND (
+                attr.attnum = idx.indkey[0] OR
+                (t.typname LIKE 'raster' AND idx.indkey = '0')
+            )
+            AND attr.attnum > 0
+            AND c.relname = %s"""
+
     def get_postgis_types(self):
         """
         Returns a dictionary with keys that are the PostgreSQL object
         identification integers for the PostGIS geometry and/or
         geography types (if supported).
         """
-        cursor = self.connection.cursor()
+        field_types = [
+            ('geometry', 'GeometryField'),
+            # The value for the geography type is actually a tuple
+            # to pass in the `geography=True` keyword to the field
+            # definition.
+            ('geography', ('GeometryField', {'geography': True})),
+        ]
+        postgis_types = {}
+
         # The OID integers associated with the geometry type may
         # be different across versions; hence, this is why we have
         # to query the PostgreSQL pg_type table corresponding to the
         # PostGIS custom data types.
         oid_sql = 'SELECT "oid" FROM "pg_type" WHERE "typname" = %s'
+        cursor = self.connection.cursor()
         try:
-            cursor.execute(oid_sql, ('geometry',))
-            GEOM_TYPE = cursor.fetchone()[0]
-            postgis_types = {GEOM_TYPE: 'GeometryField'}
-            if self.connection.ops.geography:
-                cursor.execute(oid_sql, ('geography',))
-                GEOG_TYPE = cursor.fetchone()[0]
-                # The value for the geography type is actually a tuple
-                # to pass in the `geography=True` keyword to the field
-                # definition.
-                postgis_types[GEOG_TYPE] = ('GeometryField', {'geography': True})
+            for field_type in field_types:
+                cursor.execute(oid_sql, (field_type[0],))
+                for result in cursor.fetchall():
+                    postgis_types[result[0]] = field_type[1]
         finally:
             cursor.close()
 
@@ -51,7 +75,7 @@ class PostGISIntrospection(DatabaseIntrospection):
         if not self.postgis_types_reverse:
             # If the PostGIS types reverse dictionary is not populated, do so
             # now.  In order to prevent unnecessary requests upon connection
-            # intialization, the `data_types_reverse` dictionary is not updated
+            # initialization, the `data_types_reverse` dictionary is not updated
             # with the PostGIS custom types until introspection is actually
             # performed -- in other words, when this function is called.
             self.postgis_types_reverse = self.get_postgis_types()
@@ -77,12 +101,11 @@ class PostGISIntrospection(DatabaseIntrospection):
                 if not row:
                     raise GeoIntrospectionError
             except GeoIntrospectionError:
-                if self.connection.ops.geography:
-                    cursor.execute('SELECT "coord_dimension", "srid", "type" '
-                                   'FROM "geography_columns" '
-                                   'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
-                                   (table_name, geo_col))
-                    row = cursor.fetchone()
+                cursor.execute('SELECT "coord_dimension", "srid", "type" '
+                               'FROM "geography_columns" '
+                               'WHERE "f_table_name"=%s AND "f_geography_column"=%s',
+                               (table_name, geo_col))
+                row = cursor.fetchone()
 
             if not row:
                 raise Exception('Could not find a geometry or geography column for "%s"."%s"' %

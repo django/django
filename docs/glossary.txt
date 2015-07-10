@@ -6,6 +6,10 @@ Glossary
 
 .. glossary::
 
+    concrete model
+        A non-abstract (:attr:`abstract=False
+        <django.db.models.Options.abstract>`) model.
+
     field
         An attribute on a :term:`model`; a given field usually maps directly to
         a single database column.
@@ -46,7 +50,7 @@ Glossary
         version 2.2. This is a neat way to implement attributes whose usage
         resembles attribute access, but whose implementation uses method calls.
 
-        See :func:`property`.
+        See :class:`property`.
 
     queryset
         An object representing some set of rows to be fetched from the database.
@@ -72,4 +76,4 @@ Glossary
         See :doc:`/topics/templates`.
 
     view
-        A function responsible for rending a page.
+        A function responsible for rendering a page.

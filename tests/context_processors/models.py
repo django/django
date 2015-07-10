@@ -1,1 +1,5 @@
-# Models file for tests to run.
+from django.db import models
+
+
+class DebugObject(models.Model):
+    pass

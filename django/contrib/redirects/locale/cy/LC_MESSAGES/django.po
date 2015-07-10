@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2012,2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-08-03 14:11+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-01 19:17+0000\n"
 "Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
@@ -19,11 +19,12 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: models.py:9
+msgid "Redirects"
+msgstr "Ailgyfeiriadau"
+
 msgid "redirect from"
 msgstr "ailgyfeirio o"
 
-#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -31,11 +32,9 @@ msgstr ""
 "Dylai hon fod yn lwybr absoliwt, heb yr enw parth. Er enghraifft: '/"
 "digwyddiadau/chwilio/'."
 
-#: models.py:11
 msgid "redirect to"
 msgstr "ailgyfeirio i"
 
-#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -43,10 +42,8 @@ msgstr ""
 "Gellir fod naill ai yn lwybr absoliwt (fel uchod) neu URL llawn yn dechrau â "
 "'http://'."
 
-#: models.py:15
 msgid "redirect"
 msgstr "ailgyfeiriad"
 
-#: models.py:16
 msgid "redirects"
 msgstr "ailgyfeiriadau"

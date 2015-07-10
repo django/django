@@ -5,32 +5,39 @@ import io
 import os
 import re
 import shutil
-from unittest import SkipTest, skipUnless
+import time
 import warnings
+from unittest import SkipTest, skipUnless
 
+from django.conf import settings
 from django.core import management
+from django.core.management import execute_from_command_line
+from django.core.management.base import CommandError
+from django.core.management.commands.makemessages import \
+    Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase
-from django.utils.encoding import force_text
-from django.utils._os import upath
+from django.test import SimpleTestCase, mock, override_settings
+from django.test.utils import captured_stderr, captured_stdout
 from django.utils import six
+from django.utils._os import upath
+from django.utils.encoding import force_text
 from django.utils.six import StringIO
 from django.utils.translation import TranslatorCommentWarning
 
-
 LOCALE = 'de'
 has_xgettext = find_command('xgettext')
+this_directory = os.path.dirname(upath(__file__))
 
 
 @skipUnless(has_xgettext, 'xgettext is mandatory for extraction tests')
 class ExtractorTests(SimpleTestCase):
 
+    test_dir = os.path.abspath(os.path.join(this_directory, 'commands'))
+
     PO_FILE = 'locale/%s/LC_MESSAGES/django.po' % LOCALE
 
     def setUp(self):
         self._cwd = os.getcwd()
-        self.test_dir = os.path.abspath(
-            os.path.join(os.path.dirname(upath(__file__)), 'commands'))
 
     def _rmrf(self, dname):
         if os.path.commonprefix([self.test_dir, os.path.abspath(dname)]) != self.test_dir:
@@ -49,14 +56,32 @@ class ExtractorTests(SimpleTestCase):
             pass
         os.chdir(self._cwd)
 
-    def assertMsgId(self, msgid, s, use_quotes=True):
+    def _run_makemessages(self, **options):
+        os.chdir(self.test_dir)
+        out = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], verbosity=2,
+            stdout=out, **options)
+        output = out.getvalue()
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = fp.read()
+        return output, po_contents
+
+    def _assertPoKeyword(self, keyword, expected_value, haystack, use_quotes=True):
         q = '"'
         if use_quotes:
-            msgid = '"%s"' % msgid
+            expected_value = '"%s"' % expected_value
             q = "'"
-        needle = 'msgid %s' % msgid
-        msgid = re.escape(msgid)
-        return self.assertTrue(re.search('^msgid %s' % msgid, s, re.MULTILINE), 'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+        needle = '%s %s' % (keyword, expected_value)
+        expected_value = re.escape(expected_value)
+        return self.assertTrue(re.search('^%s %s' % (keyword, expected_value), haystack, re.MULTILINE),
+                               'Could not find %(q)s%(n)s%(q)s in generated PO file' % {'n': needle, 'q': q})
+
+    def assertMsgId(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
+
+    def assertMsgStr(self, msgstr, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgstr', msgstr, haystack, use_quotes=use_quotes)
 
     def assertNotMsgId(self, msgid, s, use_quotes=True):
         if use_quotes:
@@ -64,40 +89,91 @@ class ExtractorTests(SimpleTestCase):
         msgid = re.escape(msgid)
         return self.assertTrue(not re.search('^msgid %s' % msgid, s, re.MULTILINE))
 
+    def _assertPoLocComment(self, assert_presence, po_filename, line_number, *comment_parts):
+        with open(po_filename, 'r') as fp:
+            po_contents = force_text(fp.read())
+        if os.name == 'nt':
+            # #: .\path\to\file.html:123
+            cwd_prefix = '%s%s' % (os.curdir, os.sep)
+        else:
+            # #: path/to/file.html:123
+            cwd_prefix = ''
+        parts = ['#: ']
+        parts.append(os.path.join(cwd_prefix, *comment_parts))
+        if line_number is not None:
+            parts.append(':%d' % line_number)
+        needle = ''.join(parts)
+        if assert_presence:
+            return self.assertIn(needle, po_contents, '"%s" not found in final .po file.' % needle)
+        else:
+            return self.assertNotIn(needle, po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+
+    def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
+        """
+        self.assertLocationCommentPresent('django.po', 42, 'dirA', 'dirB', 'foo.py')
+
+        verifies that the django.po file has a gettext-style location comment of the form
+
+        `#: dirA/dirB/foo.py:42`
+
+        (or `#: .\dirA\dirB\foo.py:42` on Windows)
+
+        None can be passed for the line_number argument to skip checking of the :42 suffix part.
+        """
+        return self._assertPoLocComment(True, po_filename, line_number, *comment_parts)
+
+    def assertLocationCommentNotPresent(self, po_filename, line_number, *comment_parts):
+        """Check the opposite of assertLocationComment()"""
+        return self._assertPoLocComment(False, po_filename, line_number, *comment_parts)
+
+    def assertRecentlyModified(self, path):
+        """
+        Assert that file was recently modified (modification time was less than 10 seconds ago).
+        """
+        delta = time.time() - os.stat(path).st_mtime
+        self.assertLess(delta, 10, "%s was recently modified" % path)
+
+    def assertNotRecentlyModified(self, path):
+        """
+        Assert that file was not recently modified (modification time was more than 10 seconds ago).
+        """
+        delta = time.time() - os.stat(path).st_mtime
+        self.assertGreater(delta, 10, "%s wasn't recently modified" % path)
+
 
 class BasicExtractorTests(ExtractorTests):
 
     def test_comments_extractor(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
-            self.assertTrue('#. Translators: This comment should be extracted' in po_contents)
-            self.assertTrue('This comment should not be extracted' not in po_contents)
+            self.assertIn('#. Translators: This comment should be extracted', po_contents)
+            self.assertNotIn('This comment should not be extracted', po_contents)
             # Comments in templates
-            self.assertTrue('#. Translators: Django template comment for translators' in po_contents)
-            self.assertTrue("#. Translators: Django comment block for translators\n#. string's meaning unveiled" in po_contents)
+            self.assertIn('#. Translators: Django template comment for translators', po_contents)
+            self.assertIn("#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #1' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #1\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #1', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #1\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #2' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #2\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #2', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #2\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #3' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #3\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #3', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #3\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #4' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #4\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #4', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #4\n#. continued here.', po_contents)
 
-            self.assertTrue('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö' in po_contents)
-            self.assertTrue('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.' in po_contents)
+            self.assertIn('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö', po_contents)
+            self.assertIn('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.', po_contents)
 
     def test_templatize_trans_tag(self):
         # ticket #11240
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -113,7 +189,7 @@ class BasicExtractorTests(ExtractorTests):
     def test_templatize_blocktrans_tag(self):
         # ticket #11966
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -123,7 +199,7 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -131,17 +207,19 @@ class BasicExtractorTests(ExtractorTests):
             self.assertNotMsgId('Text with a few line breaks.', po_contents)
             # should be trimmed
             self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
+        # #21406 -- Should adjust for eaten line numbers
+        self.assertMsgId("I'm on line 97", po_contents)
+        self.assertLocationCommentPresent(self.PO_FILE, 97, 'templates', 'test.html')
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
-        from django.core.management.commands.makemessages import Command
-        self.assertTrue(Command.leave_locale_alone)
+        self.assertTrue(MakeMessagesCommand.leave_locale_alone)
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
-        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
+        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         with self.assertRaises(SyntaxError) as context_manager:
-            management.call_command('makemessages', locale=LOCALE, extensions=['tpl'], verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         six.assertRegex(
             self, str(context_manager.exception),
             r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
@@ -153,19 +231,19 @@ class BasicExtractorTests(ExtractorTests):
         os.chdir(self.test_dir)
         shutil.copyfile('./not_utf8.sample', './not_utf8.txt')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'not_utf8.txt'))
-        stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
+        out = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], stdout=out)
         self.assertIn("UnicodeDecodeError: skipped file not_utf8.txt in .",
-                      force_text(stdout.getvalue()))
+                      force_text(out.getvalue()))
 
     def test_extraction_warning(self):
         """test xgettext warning about multiple bare interpolation placeholders"""
         os.chdir(self.test_dir)
         shutil.copyfile('./code.sample', './code_sample.py')
         self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'code_sample.py'))
-        stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, stdout=stdout)
-        self.assertIn("code_sample.py:4", force_text(stdout.getvalue()))
+        out = StringIO()
+        management.call_command('makemessages', locale=[LOCALE], stdout=out)
+        self.assertIn("code_sample.py:4", force_text(out.getvalue()))
 
     def test_template_message_context_extractor(self):
         """
@@ -174,43 +252,43 @@ class BasicExtractorTests(ExtractorTests):
         Refs #14806.
         """
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             # {% trans %}
-            self.assertTrue('msgctxt "Special trans context #1"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #1"', po_contents)
             self.assertMsgId("Translatable literal #7a", po_contents)
-            self.assertTrue('msgctxt "Special trans context #2"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #2"', po_contents)
             self.assertMsgId("Translatable literal #7b", po_contents)
-            self.assertTrue('msgctxt "Special trans context #3"' in po_contents)
+            self.assertIn('msgctxt "Special trans context #3"', po_contents)
             self.assertMsgId("Translatable literal #7c", po_contents)
 
             # {% blocktrans %}
-            self.assertTrue('msgctxt "Special blocktrans context #1"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #1"', po_contents)
             self.assertMsgId("Translatable literal #8a", po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #2"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #2"', po_contents)
             self.assertMsgId("Translatable literal #8b-singular", po_contents)
-            self.assertTrue("Translatable literal #8b-plural" in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #3"' in po_contents)
+            self.assertIn("Translatable literal #8b-plural", po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #3"', po_contents)
             self.assertMsgId("Translatable literal #8c-singular", po_contents)
-            self.assertTrue("Translatable literal #8c-plural" in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context #4"' in po_contents)
+            self.assertIn("Translatable literal #8c-plural", po_contents)
+            self.assertIn('msgctxt "Special blocktrans context #4"', po_contents)
             self.assertMsgId("Translatable literal #8d %(a)s", po_contents)
 
     def test_context_in_single_quotes(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
             # {% trans %}
-            self.assertTrue('msgctxt "Context wrapped in double quotes"' in po_contents)
-            self.assertTrue('msgctxt "Context wrapped in single quotes"' in po_contents)
+            self.assertIn('msgctxt "Context wrapped in double quotes"', po_contents)
+            self.assertIn('msgctxt "Context wrapped in single quotes"', po_contents)
 
             # {% blocktrans %}
-            self.assertTrue('msgctxt "Special blocktrans context wrapped in double quotes"' in po_contents)
-            self.assertTrue('msgctxt "Special blocktrans context wrapped in single quotes"' in po_contents)
+            self.assertIn('msgctxt "Special blocktrans context wrapped in double quotes"', po_contents)
+            self.assertIn('msgctxt "Special blocktrans context wrapped in single quotes"', po_contents)
 
     def test_template_comments(self):
         """Template comment tags on the same line of other constructs (#19552)"""
@@ -219,7 +297,7 @@ class BasicExtractorTests(ExtractorTests):
         # translator comments syntax
         with warnings.catch_warnings(record=True) as ws:
             warnings.simplefilter('always')
-            management.call_command('makemessages', locale=LOCALE, extensions=['thtml'], verbosity=0)
+            management.call_command('makemessages', locale=[LOCALE], extensions=['thtml'], verbosity=0)
             self.assertEqual(len(ws), 3)
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
@@ -241,36 +319,96 @@ class BasicExtractorTests(ExtractorTests):
             po_contents = force_text(fp.read())
 
             self.assertMsgId('Translatable literal #9a', po_contents)
-            self.assertFalse('ignored comment #1' in po_contents)
+            self.assertNotIn('ignored comment #1', po_contents)
 
-            self.assertFalse('Translators: ignored i18n comment #1' in po_contents)
+            self.assertNotIn('Translators: ignored i18n comment #1', po_contents)
             self.assertMsgId("Translatable literal #9b", po_contents)
 
-            self.assertFalse('ignored i18n comment #2' in po_contents)
-            self.assertFalse('ignored comment #2' in po_contents)
+            self.assertNotIn('ignored i18n comment #2', po_contents)
+            self.assertNotIn('ignored comment #2', po_contents)
             self.assertMsgId('Translatable literal #9c', po_contents)
 
-            self.assertFalse('ignored comment #3' in po_contents)
-            self.assertFalse('ignored i18n comment #3' in po_contents)
+            self.assertNotIn('ignored comment #3', po_contents)
+            self.assertNotIn('ignored i18n comment #3', po_contents)
             self.assertMsgId('Translatable literal #9d', po_contents)
 
-            self.assertFalse('ignored comment #4' in po_contents)
+            self.assertNotIn('ignored comment #4', po_contents)
             self.assertMsgId('Translatable literal #9e', po_contents)
-            self.assertFalse('ignored comment #5' in po_contents)
+            self.assertNotIn('ignored comment #5', po_contents)
 
-            self.assertFalse('ignored i18n comment #4' in po_contents)
+            self.assertNotIn('ignored i18n comment #4', po_contents)
             self.assertMsgId('Translatable literal #9f', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #5' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #5', po_contents)
 
             self.assertMsgId('Translatable literal #9g', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #6' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #6', po_contents)
             self.assertMsgId('Translatable literal #9h', po_contents)
-            self.assertTrue('#. Translators: valid i18n comment #7' in po_contents)
+            self.assertIn('#. Translators: valid i18n comment #7', po_contents)
             self.assertMsgId('Translatable literal #9i', po_contents)
 
             six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #8')
             six.assertRegex(self, po_contents, r'#\..+Translators: valid i18n comment #9')
             self.assertMsgId("Translatable literal #9j", po_contents)
+
+    def test_makemessages_find_files(self):
+        """
+        Test that find_files only discover files having the proper extensions.
+        """
+        cmd = MakeMessagesCommand()
+        cmd.ignore_patterns = ['CVS', '.*', '*~', '*.pyc']
+        cmd.symlinks = False
+        cmd.domain = 'django'
+        cmd.extensions = ['html', 'txt', 'py']
+        cmd.verbosity = 0
+        cmd.locale_paths = []
+        cmd.default_locale_path = os.path.join(self.test_dir, 'locale')
+        found_files = cmd.find_files(self.test_dir)
+        found_exts = set([os.path.splitext(tfile.file)[1] for tfile in found_files])
+        self.assertEqual(found_exts.difference({'.py', '.html', '.txt'}), set())
+
+        cmd.extensions = ['js']
+        cmd.domain = 'djangojs'
+        found_files = cmd.find_files(self.test_dir)
+        found_exts = set([os.path.splitext(tfile.file)[1] for tfile in found_files])
+        self.assertEqual(found_exts.difference({'.js'}), set())
+
+    @mock.patch('django.core.management.commands.makemessages.popen_wrapper')
+    def test_makemessages_gettext_version(self, mocked_popen_wrapper):
+        # "Normal" output:
+        mocked_popen_wrapper.return_value = (
+            "xgettext (GNU gettext-tools) 0.18.1\n"
+            "Copyright (C) 1995-1998, 2000-2010 Free Software Foundation, Inc.\n"
+            "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+            "This is free software: you are free to change and redistribute it.\n"
+            "There is NO WARRANTY, to the extent permitted by law.\n"
+            "Written by Ulrich Drepper.\n", '', 0)
+        cmd = MakeMessagesCommand()
+        self.assertEqual(cmd.gettext_version, (0, 18, 1))
+
+        # Version number with only 2 parts (#23788)
+        mocked_popen_wrapper.return_value = (
+            "xgettext (GNU gettext-tools) 0.17\n", '', 0)
+        cmd = MakeMessagesCommand()
+        self.assertEqual(cmd.gettext_version, (0, 17))
+
+        # Bad version output
+        mocked_popen_wrapper.return_value = (
+            "any other return value\n", '', 0)
+        cmd = MakeMessagesCommand()
+        with six.assertRaisesRegex(self, CommandError, "Unable to get gettext version. Is it installed?"):
+            cmd.gettext_version
+
+    def test_po_file_encoding_when_updating(self):
+        """Update of PO file doesn't corrupt it with non-UTF-8 encoding on Python3+Windows (#23271)"""
+        BR_PO_BASE = 'locale/pt_BR/LC_MESSAGES/django'
+        os.chdir(self.test_dir)
+        shutil.copyfile(BR_PO_BASE + '.pristine', BR_PO_BASE + '.po')
+        self.addCleanup(self.rmfile, os.path.join(self.test_dir, 'locale', 'pt_BR', 'LC_MESSAGES', 'django.po'))
+        management.call_command('makemessages', locale=['pt_BR'], verbosity=0)
+        self.assertTrue(os.path.exists(BR_PO_BASE + '.po'))
+        with io.open(BR_PO_BASE + '.po', 'r', encoding='utf-8') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgStr("Größe", po_contents)
 
 
 class JavascriptExtractorTests(ExtractorTests):
@@ -279,45 +417,74 @@ class JavascriptExtractorTests(ExtractorTests):
 
     def test_javascript_literals(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', domain='djangojs', locale=LOCALE, verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
-            self.assertMsgId('This literal should be included.', po_contents)
-            self.assertMsgId('This one as well.', po_contents)
-            self.assertMsgId(r'He said, \"hello\".', po_contents)
-            self.assertMsgId("okkkk", po_contents)
-            self.assertMsgId("TEXT", po_contents)
-            self.assertMsgId("It's at http://example.com", po_contents)
-            self.assertMsgId("String", po_contents)
-            self.assertMsgId("/* but this one will be too */ 'cause there is no way of telling...", po_contents)
-            self.assertMsgId("foo", po_contents)
-            self.assertMsgId("bar", po_contents)
-            self.assertMsgId("baz", po_contents)
-            self.assertMsgId("quz", po_contents)
-            self.assertMsgId("foobar", po_contents)
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId('This literal should be included.', po_contents)
+        self.assertMsgId('gettext_noop should, too.', po_contents)
+        self.assertMsgId('This one as well.', po_contents)
+        self.assertMsgId(r'He said, \"hello\".', po_contents)
+        self.assertMsgId("okkkk", po_contents)
+        self.assertMsgId("TEXT", po_contents)
+        self.assertMsgId("It's at http://example.com", po_contents)
+        self.assertMsgId("String", po_contents)
+        self.assertMsgId("/* but this one will be too */ 'cause there is no way of telling...", po_contents)
+        self.assertMsgId("foo", po_contents)
+        self.assertMsgId("bar", po_contents)
+        self.assertMsgId("baz", po_contents)
+        self.assertMsgId("quz", po_contents)
+        self.assertMsgId("foobar", po_contents)
+
+    @override_settings(
+        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
+        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
+    def test_media_static_dirs_ignored(self):
+        """
+        Regression test for #23583.
+        """
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId("Static content inside app should be included.", po_contents)
+        self.assertNotMsgId("Content from STATIC_ROOT should not be included", po_contents)
+
+    @override_settings(STATIC_ROOT=None, MEDIA_ROOT='')
+    def test_default_root_settings(self):
+        """
+        Regression test for #23717.
+        """
+        _, po_contents = self._run_makemessages(domain='djangojs')
+        self.assertMsgId("Static content inside app should be included.", po_contents)
 
 
 class IgnoredExtractorTests(ExtractorTests):
 
-    def test_ignore_option(self):
-        os.chdir(self.test_dir)
-        ignore_patterns = [
+    def test_ignore_directory(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
             os.path.join('ignore_dir', '*'),
+        ])
+        self.assertIn("ignoring directory ignore_dir", out)
+        self.assertMsgId('This literal should be included.', po_contents)
+        self.assertNotMsgId('This should be ignored.', po_contents)
+
+    def test_ignore_subdirectory(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
+            'templates/*/ignore.html',
+            'templates/subdir/*',
+        ])
+        self.assertIn("ignoring directory subdir", out)
+        self.assertNotMsgId('This subdir should be ignored too.', po_contents)
+
+    def test_ignore_file_patterns(self):
+        out, po_contents = self._run_makemessages(ignore_patterns=[
             'xxx_*',
-        ]
-        stdout = StringIO()
-        management.call_command('makemessages', locale=LOCALE, verbosity=2,
-            ignore_patterns=ignore_patterns, stdout=stdout)
-        data = stdout.getvalue()
-        self.assertTrue("ignoring directory ignore_dir" in data)
-        self.assertTrue("ignoring file xxx_ignored.html" in data)
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = fp.read()
-            self.assertMsgId('This literal should be included.', po_contents)
-            self.assertNotMsgId('This should be ignored.', po_contents)
-            self.assertNotMsgId('This should be ignored too.', po_contents)
+        ])
+        self.assertIn("ignoring file xxx_ignored.html", out)
+        self.assertNotMsgId('This should be ignored too.', po_contents)
+
+    @override_settings(
+        STATIC_ROOT=os.path.join(this_directory, 'commands', 'static/'),
+        MEDIA_ROOT=os.path.join(this_directory, 'commands', 'media_root/'))
+    def test_media_static_dirs_ignored(self):
+        out, _ = self._run_makemessages()
+        self.assertIn("ignoring directory static", out)
+        self.assertIn("ignoring directory media_root", out)
 
 
 class SymlinkExtractorTests(ExtractorTests):
@@ -343,7 +510,7 @@ class SymlinkExtractorTests(ExtractorTests):
             else:
                 # On Python >= 3.2) os.symlink() exists always but then can
                 # fail at runtime when user hasn't the needed permissions on
-                # WIndows versions that support symbolink links (>= 6/Vista).
+                # Windows versions that support symbolink links (>= 6/Vista).
                 # See Python issue 9333 (http://bugs.python.org/issue9333).
                 # Skip the test in that case
                 try:
@@ -351,15 +518,16 @@ class SymlinkExtractorTests(ExtractorTests):
                 except (OSError, NotImplementedError):
                     raise SkipTest("os.symlink() is available on this OS but can't be used by this user.")
             os.chdir(self.test_dir)
-            management.call_command('makemessages', locale=LOCALE, verbosity=0, symlinks=True)
+            management.call_command('makemessages', locale=[LOCALE], verbosity=0, symlinks=True)
             self.assertTrue(os.path.exists(self.PO_FILE))
             with open(self.PO_FILE, 'r') as fp:
                 po_contents = force_text(fp.read())
                 self.assertMsgId('This literal should be included.', po_contents)
-                self.assertTrue('templates_symlinked/test.html' in po_contents)
+                self.assertIn('templates_symlinked/test.html', po_contents)
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
+
     PO_FILE_ES = 'locale/es/LC_MESSAGES/django.po'
 
     def tearDown(self):
@@ -373,16 +541,16 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
 
     def test_copy_plural_forms(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
-            self.assertTrue('Plural-Forms: nplurals=2; plural=(n != 1)' in po_contents)
+            self.assertIn('Plural-Forms: nplurals=2; plural=(n != 1)', po_contents)
 
     def test_override_plural_forms(self):
         """Ticket #20311."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale='es', extensions=['djtpl'], verbosity=0)
+        management.call_command('makemessages', locale=['es'], extensions=['djtpl'], verbosity=0)
         self.assertTrue(os.path.exists(self.PO_FILE_ES))
         with io.open(self.PO_FILE_ES, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
@@ -394,7 +562,7 @@ class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_enabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=True)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_wrap=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -402,7 +570,7 @@ class NoWrapExtractorTests(ExtractorTests):
 
     def test_no_wrap_disabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_wrap=False)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_wrap=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
@@ -414,34 +582,20 @@ class LocationCommentsTests(ExtractorTests):
     def test_no_location_enabled(self):
         """Behavior is correct if --no-location switch is specified. See #16903."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=True)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=True)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
-            needle = os.sep.join(['#: templates', 'test.html:55'])
-            self.assertFalse(needle in po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+        self.assertLocationCommentNotPresent(self.PO_FILE, 55, 'templates', 'test.html.py')
 
     def test_no_location_disabled(self):
         """Behavior is correct if --no-location switch isn't specified."""
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0, no_location=False)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            # Standard comment with source file relative path should be present -- #16903
-            po_contents = force_text(fp.read())
-            if os.name == 'nt':
-                # #: .\path\to\file.html:123
-                cwd_prefix = '%s%s' % (os.curdir, os.sep)
-            else:
-                # #: path/to/file.html:123
-                cwd_prefix = ''
-            needle = os.sep.join(['#: %stemplates' % cwd_prefix, 'test.html:55'])
-            self.assertTrue(needle in po_contents, '"%s" not found in final .po file.' % needle)
+        # #16903 -- Standard comment with source file relative path should be present
+        self.assertLocationCommentPresent(self.PO_FILE, 55, 'templates', 'test.html')
 
-            # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
-            bad_suffix = '.py'
-            bad_string = 'templates%stest.html%s' % (os.sep, bad_suffix)
-            self.assertFalse(bad_string in po_contents, '"%s" shouldn\'t be in final .po file.' % bad_string)
+        # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
+        self.assertLocationCommentNotPresent(self.PO_FILE, None, 'templates', 'test.html.py')
 
 
 class KeepPotFileExtractorTests(ExtractorTests):
@@ -462,18 +616,18 @@ class KeepPotFileExtractorTests(ExtractorTests):
 
     def test_keep_pot_disabled_by_default(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0)
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_explicitly_disabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
                                 keep_pot=False)
         self.assertFalse(os.path.exists(self.POT_FILE))
 
     def test_keep_pot_enabled(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=LOCALE, verbosity=0,
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0,
                                 keep_pot=True)
         self.assertTrue(os.path.exists(self.POT_FILE))
 
@@ -498,8 +652,101 @@ class MultipleLocaleExtractionTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE_PT))
         self.assertTrue(os.path.exists(self.PO_FILE_DE))
 
-    def test_comma_separated_locales(self):
+
+class ExcludedLocaleExtractionTests(ExtractorTests):
+
+    LOCALES = ['en', 'fr', 'it']
+    PO_FILE = 'locale/%s/LC_MESSAGES/django.po'
+
+    test_dir = os.path.abspath(os.path.join(this_directory, 'exclude'))
+
+    def _set_times_for_all_po_files(self):
+        """
+        Set access and modification times to the Unix epoch time for all the .po files.
+        """
+        for locale in self.LOCALES:
+            os.utime(self.PO_FILE % locale, (0, 0))
+
+    def setUp(self):
+        super(ExcludedLocaleExtractionTests, self).setUp()
+
+        os.chdir(self.test_dir)  # ExtractorTests.tearDown() takes care of restoring.
+        shutil.copytree('canned_locale', 'locale')
+        self._set_times_for_all_po_files()
+        self.addCleanup(self._rmrf, os.path.join(self.test_dir, 'locale'))
+
+    def test_command_help(self):
+        with captured_stdout(), captured_stderr():
+            # `call_command` bypasses the parser; by calling
+            # `execute_from_command_line` with the help subcommand we
+            # ensure that there are no issues with the parser itself.
+            execute_from_command_line(['django-admin', 'help', 'makemessages'])
+
+    def test_one_locale_excluded(self):
+        management.call_command('makemessages', exclude=['it'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_multiple_locales_excluded(self):
+        management.call_command('makemessages', exclude=['it', 'fr'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_one_locale_excluded_with_locale(self):
+        management.call_command('makemessages', locale=['en', 'fr'], exclude=['fr'], stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+    def test_multiple_locales_excluded_with_locale(self):
+        management.call_command('makemessages', locale=['en', 'fr', 'it'], exclude=['fr', 'it'],
+                                stdout=StringIO())
+        self.assertRecentlyModified(self.PO_FILE % 'en')
+        self.assertNotRecentlyModified(self.PO_FILE % 'fr')
+        self.assertNotRecentlyModified(self.PO_FILE % 'it')
+
+
+class CustomLayoutExtractionTests(ExtractorTests):
+
+    def setUp(self):
+        self._cwd = os.getcwd()
+        self.test_dir = os.path.join(this_directory, 'project_dir')
+
+    def test_no_locale_raises(self):
         os.chdir(self.test_dir)
-        management.call_command('makemessages', locale='pt,de,ch', verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE_PT))
-        self.assertTrue(os.path.exists(self.PO_FILE_DE))
+        with six.assertRaisesRegex(self, management.CommandError,
+                "Unable to find a locale path to store translations for file"):
+            management.call_command('makemessages', locale=LOCALE, verbosity=0)
+
+    @override_settings(
+        LOCALE_PATHS=[os.path.join(this_directory, 'project_dir', 'project_locale')],
+    )
+    def test_project_locale_paths(self):
+        """
+        Test that:
+          * translations for an app containing a locale folder are stored in that folder
+          * translations outside of that app are in LOCALE_PATHS[0]
+        """
+        os.chdir(self.test_dir)
+        self.addCleanup(shutil.rmtree,
+            os.path.join(settings.LOCALE_PATHS[0], LOCALE), True)
+        self.addCleanup(shutil.rmtree,
+            os.path.join(self.test_dir, 'app_with_locale', 'locale', LOCALE), True)
+
+        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
+        project_de_locale = os.path.join(
+            self.test_dir, 'project_locale', 'de', 'LC_MESSAGES', 'django.po')
+        app_de_locale = os.path.join(
+            self.test_dir, 'app_with_locale', 'locale', 'de', 'LC_MESSAGES', 'django.po')
+        self.assertTrue(os.path.exists(project_de_locale))
+        self.assertTrue(os.path.exists(app_de_locale))
+
+        with open(project_de_locale, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgId('This app has no locale directory', po_contents)
+            self.assertMsgId('This is a project-level string', po_contents)
+        with open(app_de_locale, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertMsgId('This app has a locale directory', po_contents)

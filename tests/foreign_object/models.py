@@ -1,7 +1,8 @@
 import datetime
 
 from django.db import models
-from django.db.models.fields.related import ReverseSingleRelatedObjectDescriptor
+from django.db.models.fields.related import \
+    ReverseSingleRelatedObjectDescriptor
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import get_language
 
@@ -108,16 +109,17 @@ class ArticleTranslationDescriptor(ReverseSingleRelatedObjectDescriptor):
         if instance is None:
             raise AttributeError("%s must be accessed via instance" % self.field.name)
         setattr(instance, self.cache_name, value)
-        if value is not None and not self.field.rel.multiple:
+        if value is not None and not self.field.remote_field.multiple:
             setattr(value, self.field.related.get_cache_name(), instance)
 
 
 class ColConstraint(object):
-    # Antyhing with as_sql() method works in get_extra_restriction().
+    # Anything with as_sql() method works in get_extra_restriction().
     def __init__(self, alias, col, value):
         self.alias, self.col, self.value = alias, col, value
 
-    def as_sql(self, qn, connection):
+    def as_sql(self, compiler, connection):
+        qn = compiler.quote_name_unless_alias
         return '%s.%s = %%s' % (qn(self.alias), qn(self.col)), [self.value]
 
 
@@ -162,7 +164,7 @@ class NewsArticle(Article):
 
 class ArticleTranslation(models.Model):
     article = models.ForeignKey(Article)
-    lang = models.CharField(max_length='2')
+    lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
     abstract = models.CharField(max_length=400, null=True)

@@ -1,9 +1,9 @@
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import BaseCommand
 
 
-class Command(NoArgsCommand):
+class Command(BaseCommand):
     help = "Test No-args commands"
-    requires_model_validation = False
+    requires_system_checks = False
 
-    def handle_noargs(self, **options):
-        print('EXECUTE:NoArgsCommand options=%s' % sorted(options.items()))
+    def handle(self, **options):
+        print('EXECUTE: noargs_command options=%s' % sorted(options.items()))

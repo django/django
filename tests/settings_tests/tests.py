@@ -1,22 +1,66 @@
+import os
+import sys
 import unittest
 import warnings
+from types import ModuleType
 
-from django.conf import settings
+from django.conf import LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
-from django.test import SimpleTestCase, TransactionTestCase, TestCase, signals
-from django.test.utils import override_settings
+from django.test import (
+    SimpleTestCase, TestCase, TransactionTestCase, modify_settings,
+    override_settings, signals,
+)
 from django.utils import six
+from django.utils.encoding import force_text
 
 
-@override_settings(TEST='override', TEST_OUTER='outer')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], ITEMS_OUTER=[1, 2, 3],
+                   TEST='override', TEST_OUTER='outer')
 class FullyDecoratedTranTestCase(TransactionTestCase):
 
     available_apps = []
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
         self.assertEqual(settings.TEST, 'override')
         self.assertEqual(settings.TEST_OUTER, 'outer')
+
+    @modify_settings(ITEMS={
+        'append': ['e', 'f'],
+        'prepend': ['a'],
+        'remove': ['d', 'c'],
+    })
+    def test_method_list_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'e', 'f'])
+        self.assertListEqual(settings.ITEMS_OUTER, [1, 2, 3])
+
+    @modify_settings(ITEMS={
+        'append': ['b'],
+        'prepend': ['d'],
+        'remove': ['a', 'c', 'e'],
+    })
+    def test_method_list_override_no_ops(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'd'])
+
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
+    def test_method_list_override_strings(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
+
+    @modify_settings(ITEMS={'remove': ['b', 'd']})
+    @modify_settings(ITEMS={'append': ['b'], 'prepend': ['d']})
+    def test_method_list_override_nested_order(self):
+        self.assertListEqual(settings.ITEMS, ['d', 'c', 'b'])
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -30,14 +74,26 @@ class FullyDecoratedTranTestCase(TransactionTestCase):
         self.assertEqual(FullyDecoratedTranTestCase.__module__, __name__)
 
 
-@override_settings(TEST='override')
+@modify_settings(ITEMS={
+    'prepend': ['b'],
+    'append': ['d'],
+    'remove': ['a', 'e']
+})
+@override_settings(ITEMS=['a', 'c', 'e'], TEST='override')
 class FullyDecoratedTestCase(TestCase):
 
     def test_override(self):
+        self.assertListEqual(settings.ITEMS, ['b', 'c', 'd'])
         self.assertEqual(settings.TEST, 'override')
 
+    @modify_settings(ITEMS={
+        'append': 'e',
+        'prepend': 'a',
+        'remove': 'c',
+    })
     @override_settings(TEST='override2')
     def test_method_override(self):
+        self.assertListEqual(settings.ITEMS, ['a', 'b', 'd', 'e'])
         self.assertEqual(settings.TEST, 'override2')
 
 
@@ -53,8 +109,18 @@ class ClassDecoratedTestCaseSuper(TestCase):
 
 @override_settings(TEST='override')
 class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
+
+    @classmethod
+    def setUpClass(cls):
+        super(ClassDecoratedTestCase, cls).setUpClass()
+        cls.foo = getattr(settings, 'TEST', 'BUG')
+
     def test_override(self):
         self.assertEqual(settings.TEST, 'override')
+
+    def test_setupclass_override(self):
+        """Test that settings are overridden within setUpClass -- refs #21281"""
+        self.assertEqual(self.foo, 'override')
 
     @override_settings(TEST='override2')
     def test_method_override(self):
@@ -72,18 +138,21 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
             self.fail()
 
 
-@override_settings(TEST='override-parent')
+@modify_settings(ITEMS={'append': 'mother'})
+@override_settings(ITEMS=['father'], TEST='override-parent')
 class ParentDecoratedTestCase(TestCase):
     pass
 
 
+@modify_settings(ITEMS={'append': ['child']})
 @override_settings(TEST='override-child')
 class ChildDecoratedTestCase(ParentDecoratedTestCase):
     def test_override_settings_inheritance(self):
+        self.assertEqual(settings.ITEMS, ['father', 'mother', 'child'])
         self.assertEqual(settings.TEST, 'override-child')
 
 
-class SettingsTests(TestCase):
+class SettingsTests(SimpleTestCase):
     def setUp(self):
         self.testvalue = None
         signals.setting_changed.connect(self.signal_callback)
@@ -176,10 +245,15 @@ class SettingsTests(TestCase):
         Allow deletion of a setting in an overridden settings set (#18824)
         """
         previous_i18n = settings.USE_I18N
+        previous_l10n = settings.USE_L10N
         with self.settings(USE_I18N=False):
             del settings.USE_I18N
             self.assertRaises(AttributeError, getattr, settings, 'USE_I18N')
+            # Should also work for a non-overridden setting
+            del settings.USE_L10N
+            self.assertRaises(AttributeError, getattr, settings, 'USE_L10N')
         self.assertEqual(settings.USE_I18N, previous_i18n)
+        self.assertEqual(settings.USE_L10N, previous_l10n)
 
     def test_override_settings_nested(self):
         """
@@ -204,60 +278,33 @@ class SettingsTests(TestCase):
         self.assertRaises(AttributeError, getattr, settings, 'TEST')
         self.assertRaises(AttributeError, getattr, settings, 'TEST2')
 
-    def test_allowed_include_roots_string(self):
-        """
-        ALLOWED_INCLUDE_ROOTS is not allowed to be incorrectly set to a string
-        rather than a tuple.
-        """
-        self.assertRaises(ValueError, setattr, settings,
-            'ALLOWED_INCLUDE_ROOTS', '/var/www/ssi/')
 
-
-class TestComplexSettingOverride(TestCase):
+class TestComplexSettingOverride(SimpleTestCase):
     def setUp(self):
         self.old_warn_override_settings = signals.COMPLEX_OVERRIDE_SETTINGS.copy()
         signals.COMPLEX_OVERRIDE_SETTINGS.add('TEST_WARN')
 
     def tearDown(self):
         signals.COMPLEX_OVERRIDE_SETTINGS = self.old_warn_override_settings
-        self.assertFalse('TEST_WARN' in signals.COMPLEX_OVERRIDE_SETTINGS)
+        self.assertNotIn('TEST_WARN', signals.COMPLEX_OVERRIDE_SETTINGS)
 
     def test_complex_override_warning(self):
         """Regression test for #19031"""
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
 
-            override = override_settings(TEST_WARN='override')
-            override.enable()
-            self.assertEqual('override', settings.TEST_WARN)
-            override.disable()
+            with override_settings(TEST_WARN='override'):
+                self.assertEqual(settings.TEST_WARN, 'override')
 
             self.assertEqual(len(w), 1)
-            self.assertEqual('Overriding setting TEST_WARN can lead to unexpected behaviour.', str(w[-1].message))
+            # File extension may by .py, .pyc, etc. Compare only basename.
+            self.assertEqual(os.path.splitext(w[0].filename)[0],
+                             os.path.splitext(__file__)[0])
+            self.assertEqual(str(w[0].message),
+                'Overriding setting TEST_WARN can lead to unexpected behavior.')
 
 
-class UniqueSettingsTests(TestCase):
-    """
-    Tests for the INSTALLED_APPS setting.
-    """
-    settings_module = settings
-
-    def setUp(self):
-        self._installed_apps = self.settings_module.INSTALLED_APPS
-
-    def tearDown(self):
-        self.settings_module.INSTALLED_APPS = self._installed_apps
-
-    def test_unique(self):
-        """
-        An ImproperlyConfigured exception is raised if the INSTALLED_APPS contains
-        any duplicate strings.
-        """
-        with self.assertRaises(ImproperlyConfigured):
-            self.settings_module.INSTALLED_APPS = ("myApp1", "myApp1", "myApp2", "myApp3")
-
-
-class TrailingSlashURLTests(TestCase):
+class TrailingSlashURLTests(SimpleTestCase):
     """
     Tests for the MEDIA_URL and STATIC_URL settings.
 
@@ -324,22 +371,22 @@ class TrailingSlashURLTests(TestCase):
         If the value ends in more than one slash, presume they know what
         they're doing.
         """
-        self.settings_module.MEDIA_URL = '/stupid//'
-        self.assertEqual('/stupid//', self.settings_module.MEDIA_URL)
+        self.settings_module.MEDIA_URL = '/wrong//'
+        self.assertEqual('/wrong//', self.settings_module.MEDIA_URL)
 
-        self.settings_module.MEDIA_URL = 'http://media.foo.com/stupid//'
-        self.assertEqual('http://media.foo.com/stupid//',
+        self.settings_module.MEDIA_URL = 'http://media.foo.com/wrong//'
+        self.assertEqual('http://media.foo.com/wrong//',
                          self.settings_module.MEDIA_URL)
 
-        self.settings_module.STATIC_URL = '/stupid//'
-        self.assertEqual('/stupid//', self.settings_module.STATIC_URL)
+        self.settings_module.STATIC_URL = '/wrong//'
+        self.assertEqual('/wrong//', self.settings_module.STATIC_URL)
 
-        self.settings_module.STATIC_URL = 'http://static.foo.com/stupid//'
-        self.assertEqual('http://static.foo.com/stupid//',
+        self.settings_module.STATIC_URL = 'http://static.foo.com/wrong//'
+        self.assertEqual('http://static.foo.com/wrong//',
                          self.settings_module.STATIC_URL)
 
 
-class SecureProxySslHeaderTest(TestCase):
+class SecureProxySslHeaderTest(SimpleTestCase):
     settings_module = settings
 
     def setUp(self):
@@ -369,3 +416,98 @@ class SecureProxySslHeaderTest(TestCase):
         req = HttpRequest()
         req.META['HTTP_X_FORWARDED_PROTOCOL'] = 'https'
         self.assertEqual(req.is_secure(), True)
+
+
+class IsOverriddenTest(SimpleTestCase):
+    def test_configure(self):
+        s = LazySettings()
+        s.configure(SECRET_KEY='foo')
+
+        self.assertTrue(s.is_overridden('SECRET_KEY'))
+
+    def test_module(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        sys.modules['fake_settings_module'] = settings_module
+        try:
+            s = Settings('fake_settings_module')
+
+            self.assertTrue(s.is_overridden('SECRET_KEY'))
+            self.assertFalse(s.is_overridden('ALLOWED_HOSTS'))
+        finally:
+            del sys.modules['fake_settings_module']
+
+    def test_override(self):
+        self.assertFalse(settings.is_overridden('ALLOWED_HOSTS'))
+        with override_settings(ALLOWED_HOSTS=[]):
+            self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
+
+
+class TestListSettings(unittest.TestCase):
+    """
+    Make sure settings that should be lists or tuples throw
+    ImproperlyConfigured if they are set to a string instead of a list or tuple.
+    """
+    list_or_tuple_settings = (
+        "ALLOWED_INCLUDE_ROOTS",
+        "INSTALLED_APPS",
+        "TEMPLATE_DIRS",
+        "LOCALE_PATHS",
+    )
+
+    def test_tuple_settings(self):
+        settings_module = ModuleType('fake_settings_module')
+        settings_module.SECRET_KEY = 'foo'
+        for setting in self.list_or_tuple_settings:
+            setattr(settings_module, setting, ('non_list_or_tuple_value'))
+            sys.modules['fake_settings_module'] = settings_module
+            try:
+                with self.assertRaises(ImproperlyConfigured):
+                    Settings('fake_settings_module')
+            finally:
+                del sys.modules['fake_settings_module']
+                delattr(settings_module, setting)
+
+
+class TestSessionVerification(unittest.TestCase):
+
+    def setUp(self):
+        self.settings_module = ModuleType('fake_settings_module')
+        self.settings_module.SECRET_KEY = 'foo'
+
+    def tearDown(self):
+        if 'fake_settings_module' in sys.modules:
+            del sys.modules['fake_settings_module']
+
+    def test_session_verification_deprecation_no_verification(self):
+        self.settings_module.MIDDLEWARE_CLASSES = ['django.contrib.auth.middleware.AuthenticationMiddleware']
+        sys.modules['fake_settings_module'] = self.settings_module
+        with warnings.catch_warnings(record=True) as warn:
+            warnings.filterwarnings('always')
+            Settings('fake_settings_module')
+        self.assertEqual(
+            force_text(warn[0].message),
+            "Session verification will become mandatory in Django 1.10. "
+            "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
+            "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
+            "reading the upgrade considerations in the 1.8 release notes.",
+        )
+
+    def test_session_verification_deprecation_both(self):
+        self.settings_module.MIDDLEWARE_CLASSES = [
+            'django.contrib.auth.middleware.AuthenticationMiddleware',
+            'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        ]
+        sys.modules['fake_settings_module'] = self.settings_module
+        with warnings.catch_warnings(record=True) as warn:
+            warnings.filterwarnings('always')
+            Settings('fake_settings_module')
+        self.assertEqual(len(warn), 0)
+
+    def test_session_verification_deprecation_neither(self):
+        self.settings_module.MIDDLEWARE_CLASSES = []
+        sys.modules['fake_settings_module'] = self.settings_module
+        with warnings.catch_warnings(record=True) as warn:
+            warnings.filterwarnings('always')
+            Settings('fake_settings_module')
+        self.assertEqual(len(warn), 0)

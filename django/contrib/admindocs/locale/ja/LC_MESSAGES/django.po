@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-#   <lemaire.adrien@gmail.com>, 2012.
+# Fandekasp <lemaire.adrien@gmail.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: Yoichi Fujimoto <wozozo@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -18,97 +19,21 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "タグ"
+msgid "Administrative Documentation"
+msgstr "管理用ドキュメント"
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "フィルター"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "ビュー"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "アプリケーション %r が見つかりません"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr ""
-"モデル %(model_name)r が %(app_label)r アプリケーションに見つかりません"
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "`%(app_label)s.%(data_type)s` (関連オブジェクト)"
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "モデル :"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "`%(app_label)s.%(object_name)s` (関連オブジェクト)"
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "全ての %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "%s の数"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr "%s のフィールド"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s はurlpatternオブジェクトでは無いようです"
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "ホーム"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "ブックマークレット"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "ドキュメントへのブックマークレット"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -128,70 +53,255 @@ msgstr ""
 "参照していなければならないことがあります。内部ネットワークにあるかどうか不明"
 "な場合は、システム管理者に確認してください。</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "このページのドキュメント"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "各ページから、ページを生成したビューのドキュメントにジャンプします。"
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "オブジェクト ID を表示"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "単一のオブジェクトを表示するページのコンテンツタイプと一意な IDを表示します。"
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "オブジェクトを (現在のウィンドウで) 編集"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "単一のオブジェクトを表示するページの管理ページへジャンプします。"
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "オブジェクトを (新しいウィンドウで) 編集"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "上と同じですが、新しいウィンドウで管理ページを開きます。"
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr "モデル"
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr "テンプレート"
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr "フィルター"
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "タグ"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr "すべてのテンプレートタグとその機能の一覧です。"
+
+msgid "Filters"
+msgstr "フィルター"
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"フィルタは、テンプレート内の変数に適用して出力を変更するためのアクションで"
+"す。"
+
+msgid "Models"
+msgstr "モデル"
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"モデルは、すべてのシステム内のオブジェクトとそれに関連するフィールドの説明で"
+"す。各モデルは、テンプレート変数としてアクセスできるフィールドのリストを持っ"
+"ています。"
+
 msgid "Views"
 msgstr "ビュー"
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"公開サイトの各ページは、ビューによって生成されます。ビューは、ページの生成に"
+"使用されるテンプレートとそのテンプレートで利用できるオブジェクトが定義されて"
+"います。"
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr "ブラウザから管理機能にすぐにアクセスするためのツールです。"
+
+msgid "Please install docutils"
+msgstr "docutilsをインストールして下さい"
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"管理ドキュメントシステムには、Pythonの <a href=\"%(link)s\">docutils</a> ライ"
+"ブラリが必要です。"
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"管理者に <a href=\"%(link)s\">docutils</a> のインストールについて問い合せて下"
+"さい。"
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr "モデル: %(name)s"
+
+msgid "Field"
+msgstr "フィールド"
+
+msgid "Type"
+msgstr "型"
+
+msgid "Description"
+msgstr "説明"
+
+msgid "Back to Model Documentation"
+msgstr "モデルドキュメントに戻る"
+
+msgid "Model documentation"
+msgstr "モデルドキュメント"
+
+msgid "Model groups"
+msgstr "モデルグループ"
+
+msgid "Templates"
+msgstr "テンプレート"
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr "テンプレート: %(name)s"
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "テンプレート: \"%(name)s\""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr "テンプレートの検索パス \"%(name)s\":"
+
+msgid "(does not exist)"
+msgstr "(存在しません)"
+
+msgid "Back to Documentation"
+msgstr "ドキュメントに戻る"
+
+msgid "Template filters"
+msgstr "テンプレートフィルタ"
+
+msgid "Template filter documentation"
+msgstr "テンプレートフィルタドキュメント"
+
+msgid "Built-in filters"
+msgstr "組み込みフィルタ"
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"これらのフィルタを使用するには、テンプレート内でのフィルタの使用箇所より前に "
+"<code>%(code)s</code> を記述してください。"
+
+msgid "Template tags"
+msgstr "テンプレートタグ"
+
+msgid "Template tag documentation"
+msgstr "テンプレートタグドキュメント"
+
+msgid "Built-in tags"
+msgstr "組み込みタグ"
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"これらのタグを使用するためには、タグの使用箇所より前に <code>%(code)s</code> "
+"をテンプレート内に記述します。"
+
+#, python-format
+msgid "View: %(name)s"
+msgstr "ビュー: %(name)s"
+
+msgid "Context:"
+msgstr "コンテキスト:"
+
+msgid "Templates:"
+msgstr "テンプレート:"
+
+msgid "Back to Views Documentation"
+msgstr "ビュードキュメントに戻る"
+
+msgid "View documentation"
+msgstr "ビュードキュメント"
+
+msgid "Jump to namespace"
+msgstr "ネームスペースへ移動"
+
+msgid "Empty namespace"
+msgstr "空のネームスペース"
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr "ネームスペース %(name)s のビュー"
+
+msgid "Views by empty namespace"
+msgstr "空のネームスペースのよるビュー"
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+"\n"
+"ビュー関数: <code>%(full_name)s</code>. 名前: <code>%(url_name)s</code>.\n"
+
 msgid "Boolean (Either True or False)"
 msgstr "ブール値 (真: True または偽: False)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
-msgstr "タイプが %(field_type)s のフィールド"
+msgstr "フィールドの型: %(field_type)s"
+
+msgid "tag:"
+msgstr "タグ"
+
+msgid "filter:"
+msgstr "フィルター"
+
+msgid "view:"
+msgstr "ビュー"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr "アプリケーション %(app_label)r が見つかりません"
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+"モデル %(model_name)r が %(app_label)r アプリケーションに見つかりません"
+
+msgid "model:"
+msgstr "モデル :"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "`%(app_label)s.%(data_type)s` (関連オブジェクト)"
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "`%(app_label)s.%(object_name)s` (関連オブジェクト)"
+
+#, python-format
+msgid "all %s"
+msgstr "全ての %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "%s の数"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s はurlpatternオブジェクトでは無いようです"

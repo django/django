@@ -1,5 +1,8 @@
 import threading
-from django.contrib.gis.geos.libgeos import lgeos, notice_h, error_h, CONTEXT_PTR
+
+from django.contrib.gis.geos.libgeos import (
+    CONTEXT_PTR, error_h, lgeos, notice_h,
+)
 
 
 class GEOSContextHandle(object):
@@ -12,7 +15,7 @@ class GEOSContextHandle(object):
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
 
     def __del__(self):
-        if self.ptr:
+        if self.ptr and lgeos:
             lgeos.finishGEOS_r(self.ptr)
 
 

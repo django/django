@@ -1,5 +1,3 @@
-.. _ref-geos:
-
 ========
 GEOS API
 ========
@@ -13,7 +11,7 @@ Background
 What is GEOS?
 -------------
 
-`GEOS`__ stands for **G**\ eometry **E**\ ngine - **O**\ pen **S**\ ource,
+`GEOS`__ stands for **Geometry Engine - Open Source**,
 and is a C++ library, ported from the  `Java Topology Suite`__.  GEOS
 implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
@@ -226,7 +224,7 @@ Returns a boolean indicating whether the geometry is a ``LinearRing``.
 Returns a boolean indicating whether the geometry is 'simple'. A geometry
 is simple if and only if it does not intersect itself (except at boundary
 points).  For example, a :class:`LineString` object is not simple if it
-intersects itself. Thus, :class:`LinearRing` and :class`Polygon` objects
+intersects itself. Thus, :class:`LinearRing` and :class:`Polygon` objects
 are always simple because they do cannot intersect themselves, by
 definition.
 
@@ -282,10 +280,6 @@ Returns the EWKB of this Geometry in hexadecimal form.  This is an
 extension of the WKB specification that includes the SRID value
 that are a part of this geometry.
 
-.. note::
-
-   GEOS 3.1 is *required* if you want valid 3D HEXEWKB.
-
 .. attribute:: GEOSGeometry.json
 
 Returns the GeoJSON representation of the geometry.
@@ -307,7 +301,7 @@ geometry.  This should only be used for geometries with an SRID of
 .. attribute:: GEOSGeometry.ogr
 
 Returns an :class:`~django.contrib.gis.gdal.OGRGeometry` object
-correspondg to the GEOS geometry.
+corresponding to the GEOS geometry.
 
 .. note::
 
@@ -328,10 +322,6 @@ as a Python buffer.  SRID value is not included, use the
 Return the EWKB representation of this Geometry as a Python buffer.
 This is an extension of the WKB specification that includes any SRID
 value that are a part of this geometry.
-
-.. note::
-
-   GEOS 3.1 is *required* if you want valid 3D EWKB.
 
 .. attribute:: GEOSGeometry.wkt
 
@@ -448,17 +438,16 @@ topological relationship between this geometry and the other.
 
 .. method:: GEOSGeometry.simplify(tolerance=0.0, preserve_topology=False)
 
-Returns a new :class:`GEOSGeometry`, simplified using the Douglas-Peucker
-algorithm to the specified tolerance.  A higher tolerance value implies
-less points in the output.  If no tolerance is tolerance provided,
-it defaults to 0.
+Returns a new :class:`GEOSGeometry`, simplified to the specified tolerance
+using the Douglas-Peucker algorithm. A higher tolerance value implies
+fewer points in the output. If no tolerance is provided, it defaults to 0.
 
-By default, this function does not preserve topology - e.g.,
-:class:`Polygon` objects can be split, collapsed into lines or disappear.
-:class:`Polygon` holes can be created or disappear, and lines can cross.
+By default, this function does not preserve topology. For example,
+:class:`Polygon` objects can be split, be collapsed into lines, or disappear.
+:class:`Polygon` holes can be created or disappear, and lines may cross.
 By specifying ``preserve_topology=True``, the result will have the same
-dimension and number of components as the input, however, this is
-significantly slower.
+dimension and number of components as the input; this is significantly
+slower, however.
 
 .. method:: GEOSGeometry.sym_difference(other)
 
@@ -491,7 +480,8 @@ the geometry.
 .. attribute:: GEOSGeometry.envelope
 
 Returns a :class:`Polygon` that represents the bounding envelope of
-this geometry.
+this geometry. Note that it can also return a :class:`Point` if the input
+geometry is a point.
 
 .. attribute:: GEOSGeometry.point_on_surface
 
@@ -508,7 +498,7 @@ This property returns the area of the Geometry.
 .. attribute:: GEOSGeometry.extent
 
 This property returns the extent of this geometry as a 4-tuple,
-consisting of (xmin, ymin, xmax, ymax).
+consisting of ``(xmin, ymin, xmax, ymax)``.
 
 .. method:: GEOSGeometry.clone()
 
@@ -533,14 +523,10 @@ a :class:`Polygon`).
 
 .. attribute:: GEOSGeometry.prepared
 
-.. note::
-
-    Support for prepared geometries requires GEOS 3.1.
-
 Returns a GEOS ``PreparedGeometry`` for the contents of this geometry.
 ``PreparedGeometry`` objects are optimized for the contains, intersects,
-and covers operations.  Refer to the :ref:`prepared-geometries` documentation
-for more information.
+covers, crosses, disjoint, overlaps, touches and within operations. Refer to
+the :ref:`prepared-geometries` documentation for more information.
 
 .. attribute:: GEOSGeometry.srs
 
@@ -553,7 +539,7 @@ corresponding to the SRID of the geometry or ``None``.
 
 .. method:: GEOSGeometry.transform(ct, clone=False)
 
-Transforms the geometry according to the given coordinate transformation paramter
+Transforms the geometry according to the given coordinate transformation parameter
 (``ct``), which may be an integer SRID, spatial reference WKT string,
 a PROJ.4 string, a :class:`~django.contrib.gis.gdal.SpatialReference` object, or a
 :class:`~django.contrib.gis.gdal.CoordTransform` object. By default, the geometry
@@ -563,16 +549,8 @@ is returned instead.
 
 .. note::
 
-    Requires GDAL.
-
-.. note::
-
-   Prior to 1.3, this method would silently no-op if GDAL was not available.
-   Now, a :class:`~django.contrib.gis.geos.GEOSException` is raised as
-   application code relying on this behavior is in error. In addition,
-   use of this method when the SRID is ``None`` or less than 0 now also generates
-   a :class:`~django.contrib.gis.geos.GEOSException`.
-
+    Requires GDAL. Raises :class:`~django.contrib.gis.geos.GEOSException` if
+    GDAL is not available or if the SRID is ``None`` or less than 0.
 
 ``Point``
 ---------
@@ -637,7 +615,7 @@ is returned instead.
    .. classmethod:: from_bbox(bbox)
 
    Returns a polygon object from the given bounding-box, a 4-tuple
-   comprising (xmin, ymin, xmax, ymax).
+   comprising ``(xmin, ymin, xmax, ymax)``.
 
    .. attribute:: num_interior_rings
 
@@ -710,10 +688,6 @@ Geometry Collections
    more efficient (faster) than trying to union the geometries together
    individually. [#fncascadedunion]_
 
-   .. note::
-
-       GEOS 3.1 is *required* to peform cascaded unions.
-
 ``GeometryCollection``
 ----------------------
 
@@ -740,10 +714,6 @@ geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
 please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
-.. note::
-
-   GEOS 3.1 is *required* in order to use prepared geometries.
-
 For example::
 
     >>> from django.contrib.gis.geos import Point, Polygon
@@ -766,7 +736,37 @@ For example::
 
   .. method:: covers(other)
 
+  .. method:: crosses(other)
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: disjoint(other)
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
   .. method:: intersects(other)
+
+  .. method:: overlaps(other)
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: touches(other)
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
+
+  .. method:: within(other)
+
+    .. note::
+
+       GEOS 3.3 is *required* to use this predicate.
 
 Geometry Factories
 ==================
@@ -860,7 +860,7 @@ Returns WKB of the geometry in hexadecimal.  Example::
 
 .. attribute:: WKBWriter.byteorder
 
-This property may be be set to change the byte-order of the geometry
+This property may be set to change the byte-order of the geometry
 representation.
 
 =============== =================================================
@@ -934,7 +934,7 @@ Returns the WKT of the given geometry. Example::
 
 
 .. rubric:: Footnotes
-.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
 
 Settings

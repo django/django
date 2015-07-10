@@ -1,5 +1,7 @@
-import cx_Oracle
 import sys
+
+import cx_Oracle
+
 from django.db.backends.oracle.introspection import DatabaseIntrospection
 from django.utils import six
 
@@ -16,8 +18,11 @@ class OracleIntrospection(DatabaseIntrospection):
         try:
             # Querying USER_SDO_GEOM_METADATA to get the SRID and dimension information.
             try:
-                cursor.execute('SELECT "DIMINFO", "SRID" FROM "USER_SDO_GEOM_METADATA" WHERE "TABLE_NAME"=%s AND "COLUMN_NAME"=%s',
-                               (table_name.upper(), geo_col.upper()))
+                cursor.execute(
+                    'SELECT "DIMINFO", "SRID" FROM "USER_SDO_GEOM_METADATA" '
+                    'WHERE "TABLE_NAME"=%s AND "COLUMN_NAME"=%s',
+                    (table_name.upper(), geo_col.upper())
+                )
                 row = cursor.fetchone()
             except Exception as msg:
                 new_msg = (

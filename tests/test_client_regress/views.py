@@ -1,15 +1,16 @@
 import json
-import warnings
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core.serializers.json import DjangoJSONEncoder
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
 from django.test.utils import setup_test_environment
+from django.utils.six.moves.urllib.parse import urlencode
 
 
 class CustomTestException(Exception):
@@ -37,20 +38,11 @@ get_view = login_required(get_view)
 
 def request_data(request, template='base.html', data='sausage'):
     "A simple view that returns the request data in the context"
-
-    # request.REQUEST is deprecated, but needs testing until removed.
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        request_foo = request.REQUEST.get('foo')
-        request_bar = request.REQUEST.get('bar')
-
     return render_to_response(template, {
         'get-foo': request.GET.get('foo'),
         'get-bar': request.GET.get('bar'),
         'post-foo': request.POST.get('foo'),
         'post-bar': request.POST.get('bar'),
-        'request-foo': request_foo,
-        'request-bar': request_bar,
         'data': data,
     })
 
@@ -74,14 +66,20 @@ def nested_view(request):
     """
     setup_test_environment()
     c = Client()
-    c.get("/test_client_regress/no_template_view")
+    c.get("/no_template_view")
     return render_to_response('base.html', {'nested': 'yes'})
 
 
 def login_protected_redirect_view(request):
     "A view that redirects all requests to the GET view"
-    return HttpResponseRedirect('/test_client_regress/get_view/')
+    return HttpResponseRedirect('/get_view/')
 login_protected_redirect_view = login_required(login_protected_redirect_view)
+
+
+def redirect_to_self_with_changing_query_view(request):
+    query = request.GET.copy()
+    query['counter'] += '0'
+    return HttpResponseRedirect('/redirect_to_self_with_changing_query_view/?%s' % urlencode(query))
 
 
 def set_session_view(request):
@@ -108,6 +106,10 @@ def return_undecodable_binary(request):
     return HttpResponse(
         b'%PDF-1.4\r\n%\x93\x8c\x8b\x9e ReportLab Generated PDF document http://www.reportlab.com'
     )
+
+
+def return_json_response(request):
+    return JsonResponse({'key': 'value'})
 
 
 def return_json_file(request):
@@ -151,3 +153,9 @@ def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path
     return render_to_response('request_context.html', context_instance=RequestContext(request, {}))
+
+
+def render_template_multiple_times(request):
+    """A view that renders a template multiple times."""
+    return HttpResponse(
+        render_to_string('base.html') + render_to_string('base.html'))

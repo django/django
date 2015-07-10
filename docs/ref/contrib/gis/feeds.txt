@@ -13,7 +13,7 @@ Django's, please consult :doc:`Django's syndication documentation
 
 .. _W3C Geo: http://www.w3.org/2003/01/geo/
 
-__ http://georss.org/1.0#simple
+__ http://georss.org/simple.html
 
 Example
 =======

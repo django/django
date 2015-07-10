@@ -1,15 +1,19 @@
 from django import template
-from django.templatetags.static import StaticNode
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.templatetags.static import StaticNode
 
 register = template.Library()
+
+
+def static(path):
+    return staticfiles_storage.url(path)
 
 
 class StaticFilesNode(StaticNode):
 
     def url(self, context):
         path = self.path.resolve(context)
-        return staticfiles_storage.url(path)
+        return static(path)
 
 
 @register.tag('static')
@@ -31,7 +35,3 @@ def do_static(parser, token):
 
     """
     return StaticFilesNode.handle_token(parser, token)
-
-
-def static(path):
-    return staticfiles_storage.url(path)

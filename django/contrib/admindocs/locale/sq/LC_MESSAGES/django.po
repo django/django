@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Besnik <besnik@programeshqip.org>, 2011.
+# Besnik <besnik@programeshqip.org>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-11-25 11:03+0000\n"
-"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -17,96 +17,21 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "etiketë:"
+msgid "Administrative Documentation"
+msgstr "Dokumentim Administrimi"
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "filtër:"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "parje:"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "Nuk u gjet zbatimi %r"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "Nuk u gjet modeli %(model_name)r në zbatimin %(app_label)r"
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "objekti i afërt `%(app_label)s.%(data_type)s`"
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "model:"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "objektet e afërta `%(app_label)s.%(object_name)s`"
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "krejt %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "numër i %s"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Fusha te objektet %s"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s nuk duket të jetë një objekt urlpattern"
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Hyrje"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Dokumentim"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "\"Bookmarklet\"-e"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "\"Bookmarklet\"-e Dokumentimi"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -121,80 +46,266 @@ msgstr ""
 "paneli juaj\n"
 "i faqerojtësve, ose djathtas-klikoni dhe shtojeni te faqerojtësit tuaj. Tani "
 "mundeni\n"
-"të përzgjidhni \"bookmarklet\" nga cilado faqe e \"site\"-it.  Kini parasysh "
-"që disa prej\n"
-"\"bookmarklet\"-eve kërkojnë që ju ta shihni \"site\"-in prej një kompjuteri "
-"të specifikuar\n"
-"si \"i brendshëm\" (sqarojeni me përgjegjësin e sistemit nëse nuk jeni i "
+"të përzgjidhni \"bookmarklet\" nga cilado faqe e sajtit.  Kini parasysh që "
+"disa prej\n"
+"\"bookmarklet\"-eve kërkojnë që ju ta shihni sajtin prej një kompjuteri të "
+"specifikuar\n"
+"si \"i brendshëm\" (sqarojeni me përgjegjësin e sistemit, nëse nuk jeni i "
 "sigurt\n"
-"në është a jo \"i brendshëm\" kompjuteri juaj).</p>\n"
+"nëse është a jo \"i brendshëm\" kompjuteri juaj).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Dokumentim për këtë faqe"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "Ju kalon nga cilado faqe te dokumenti që prodhon atë faqe, për ta parë."
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Shfaq ID objekti"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "Shfaq lloj lënde dhe ID unike për faqet që përfaqësojnë një objekt të vetëm."
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Përpunojeni këtë objekt (dritarja e tanishme)"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "Kalon te faqja e përgjegjësit për faqet që përfaqësojnë një objekt të vetëm."
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Përpunojeni këtë objekt (dritare e re)"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Si më sipër, por hap faqen e përgjegjësit në një dritare të re."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr "Modele"
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr "Gjedhe"
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr "Filtra"
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Etiketa"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr "Radhitni krejt etiketat e gjedheve dhe funksionet e tyre."
+
+msgid "Filters"
+msgstr "Filtra"
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"Filtrat janë veprime që mund të zbatohen mbi ndryshore në një gjedhe për të "
+"ndryshuar përfundimet e saj."
+
+msgid "Models"
+msgstr "Modele"
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"Modelet janë përshkrime të krejt objekteve në sistem dhe fushave "
+"përshoqëruar me to. Çdo model ka një listë fushash të cilat mund të përdoren "
+"si ndryshore gjedheje"
+
 msgid "Views"
 msgstr "Parje"
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"Çdo faqe në sajtin publik prodhohet nga ajo që quhet skenë. Skena përcakton "
+"cila gjedhe përdoret për të prodhuar faqen dhe cilët objekte mund të kihen "
+"për atë gjedhe."
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+"Mjete që shfletuesi juaj të përdorë me shpejtësi funksione administrimi."
+
+msgid "Please install docutils"
+msgstr "Ju lutemi, instaloni docutils"
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"Sistemi i dokumentimit të administrimeve lyp librarinë <a href=\"%(link)s"
+"\">docutils</a> të Pitonit."
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Ju lutemi, kërkojuni përgjegjësve të sistemit të instalojnë <a href="
+"\"%(link)s\">docutils</a>."
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Model: %(name)s"
+
+msgid "Field"
+msgstr "Fushë"
+
+msgid "Type"
+msgstr "Lloj"
+
+msgid "Description"
+msgstr "Përshkrim"
+
+msgid "Back to Model Documentation"
+msgstr "Mbrapsht te Dokumentimi i Modelit"
+
+msgid "Model documentation"
+msgstr "Dokumentim modeli"
+
+msgid "Model groups"
+msgstr "Grupe modeli"
+
+msgid "Templates"
+msgstr "Gjedhe"
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Gjedhe: %(name)s"
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Gjedhe: \"%(name)s\""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr "Shteg kërkimesh për gjedhen \"%(name)s\":"
+
+msgid "(does not exist)"
+msgstr "(nuk ekziston)"
+
+msgid "Back to Documentation"
+msgstr "Mbrapsht te Dokumentimi"
+
+msgid "Template filters"
+msgstr "Filtra gjedhesh"
+
+msgid "Template filter documentation"
+msgstr "Dokumentim filtrash gjedheje"
+
+msgid "Built-in filters"
+msgstr "Filtra të brendshëm"
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"Për të përdorur këta filtra, vendosni te gjedhja juaj <code>%(code)s</code> "
+"përpara se të përdorni filtrin."
+
+msgid "Template tags"
+msgstr "Etiketa gjedhesh"
+
+msgid "Template tag documentation"
+msgstr "Dokumentim etikatash gjedheje"
+
+msgid "Built-in tags"
+msgstr "Etiketa të brendshme"
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"Për të përdorur këto etiketa, vendosni te gjedhja juaj <code>%(code)s</code> "
+"përpara se të përdorni etiketën."
+
+#, python-format
+msgid "View: %(name)s"
+msgstr "Shiheni: %(name)s"
+
+msgid "Context:"
+msgstr "Kontekst:"
+
+msgid "Templates:"
+msgstr "Gjedhe:"
+
+msgid "Back to Views Documentation"
+msgstr "Mbrapsht te Dokumentimi i Skenave"
+
+msgid "View documentation"
+msgstr "Dokumentim Skenash"
+
+msgid "Jump to namespace"
+msgstr "Kalo te emërhapësira"
+
+msgid "Empty namespace"
+msgstr "Emërhapësirë e zbrazët"
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr "Skena me emërhapësirë %(name)s"
+
+msgid "Views by empty namespace"
+msgstr "Skena me emërhapësirë të zbrazët"
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+"\n"
+"    Funksion skene: <code>%(full_name)s</code>. Emër: <code>%(url_name)s</"
+"code>.\n"
+
 msgid "Boolean (Either True or False)"
 msgstr "Buleane (Ose True, ose False)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Fushë e llojit: %(field_type)s"
+
+msgid "tag:"
+msgstr "etiketë:"
+
+msgid "filter:"
+msgstr "filtër:"
+
+msgid "view:"
+msgstr "parje:"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr "Nuk u gjet dot zbatimi %(app_label)r"
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "Nuk u gjet modeli %(model_name)r në zbatimin %(app_label)r"
+
+msgid "model:"
+msgstr "model:"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "objekti i afërt `%(app_label)s.%(data_type)s`"
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "objektet e afërta `%(app_label)s.%(object_name)s`"
+
+#, python-format
+msgid "all %s"
+msgstr "krejt %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "numër i %s"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s nuk duket të jetë një objekt urlpattern"

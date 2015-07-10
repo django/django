@@ -14,24 +14,22 @@ those packages have.
 
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,
-    ``'django.contrib.admin'``) to your :setting:`INSTALLED_APPS` setting and
-    re-run ``manage.py migrate``.
+    ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
+    and re-run ``manage.py migrate``.
 
-.. _"batteries included" philosophy: http://docs.python.org/tutorial/stdlib.html#batteries-included
+.. _"batteries included" philosophy: https://docs.python.org/tutorial/stdlib.html#batteries-included
 
 .. toctree::
    :maxdepth: 1
 
    admin/index
    auth
-   comments/index
    contenttypes
-   csrf
    flatpages
-   formtools/index
    gis/index
    humanize
    messages
+   postgres/index
    redirects
    sitemaps
    sites
@@ -55,11 +53,6 @@ Django's authentication framework.
 
 See :doc:`/topics/auth/index`.
 
-comments
-========
-
-A simple yet flexible comments system. See :doc:`/ref/contrib/comments/index`.
-
 contenttypes
 ============
 
@@ -67,13 +60,6 @@ A light framework for hooking into "types" of content, where each installed
 Django model is a separate content type.
 
 See the :doc:`contenttypes documentation </ref/contrib/contenttypes>`.
-
-csrf
-====
-
-A middleware for preventing Cross Site Request Forgeries
-
-See the :doc:`csrf documentation </ref/contrib/csrf>`.
 
 flatpages
 =========
@@ -83,27 +69,6 @@ A framework for managing simple "flat" HTML content in a database.
 See the :doc:`flatpages documentation </ref/contrib/flatpages>`.
 
 Requires the sites_ contrib package to be installed as well.
-
-formtools
-=========
-
-A set of high-level abstractions for Django forms (django.forms).
-
-django.contrib.formtools.preview
---------------------------------
-
-An abstraction of the following workflow:
-
-"Display an HTML form, force a preview, then do something with the submission."
-
-See the :doc:`form preview documentation </ref/contrib/formtools/form-preview>`.
-
-django.contrib.formtools.wizard
--------------------------------
-
-Splits forms across multiple Web pages.
-
-See the :doc:`form wizard documentation </ref/contrib/formtools/form-wizard>`.
 
 gis
 ====
@@ -127,6 +92,13 @@ A framework for storing and retrieving temporary cookie- or session-based
 messages
 
 See the :doc:`messages documentation </ref/contrib/messages>`.
+
+postgres
+========
+
+A collection of PostgreSQL specific features.
+
+See the :doc:`contrib.postgres documentation </ref/contrib/postgres/index>`.
 
 redirects
 =========

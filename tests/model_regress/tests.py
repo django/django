@@ -2,18 +2,18 @@ from __future__ import unicode_literals
 
 import datetime
 from operator import attrgetter
-import sys
-import unittest
 
 from django.core.exceptions import ValidationError
+from django.db import router
+from django.db.models.sql import InsertQuery
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.timezone import get_fixed_timezone
-from django.db import connection, router
-from django.db.models.sql import InsertQuery
 
-from .models import (Worker, Article, Party, Event, Department,
-    BrokenUnicodeMethod, NonAutoPK, Model1, Model2, Model3)
+from .models import (
+    Article, BrokenUnicodeMethod, Department, Event, Model1, Model2, Model3,
+    NonAutoPK, Party, Worker,
+)
 
 
 class ModelTests(TestCase):
@@ -65,6 +65,17 @@ class ModelTests(TestCase):
         )
         a = Article.objects.get(pk=a.pk)
         self.assertEqual(len(a.article_text), 5000)
+
+    def test_long_unicode_textfield(self):
+        # TextFields can hold more than 4000 bytes also when they are
+        # less than 4000 characters
+        a = Article.objects.create(
+            headline="Really, really big",
+            pub_date=datetime.datetime.now(),
+            article_text='\u05d0\u05d1\u05d2' * 1000
+        )
+        a = Article.objects.get(pk=a.pk)
+        self.assertEqual(len(a.article_text), 3000)
 
     def test_date_lookup(self):
         # Regression test for #659
@@ -133,14 +144,9 @@ class ModelTests(TestCase):
             attrgetter("when")
         )
 
-    if (3,) <= sys.version_info < (3, 3) and connection.vendor == 'mysql':
-        # In Python < 3.3, datetime.strftime raises an exception for years
-        # below 1000, and existing MySQL DB-API drivers hit this problem.
-        test_date_lookup = unittest.expectedFailure(test_date_lookup)
-
     def test_date_filter_null(self):
         # Date filtering was failing with NULL date values in SQLite
-        # (regression test for #3501, amongst other things).
+        # (regression test for #3501, among other things).
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]

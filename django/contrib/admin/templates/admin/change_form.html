@@ -10,13 +10,13 @@
 
 {% block coltype %}colM{% endblock %}
 
-{% block bodyclass %}app-{{ opts.app_label }} model-{{ opts.object_name.lower }} change-form{% endblock %}
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
 
 {% if not is_popup %}
 {% block breadcrumbs %}
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
-&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ app_label|capfirst|escape }}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
 &rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
 &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
@@ -32,12 +32,12 @@
         {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
         <a href="{% add_preserved_filters history_url %}" class="historylink">{% trans "History" %}</a>
     </li>
-    {% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif%}
+    {% if has_absolute_url %}<li><a href="{{ absolute_url }}" class="viewsitelink">{% trans "View on site" %}</a></li>{% endif %}
     {% endblock %}
   </ul>
 {% endif %}{% endif %}
 {% endblock %}
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form">{% csrf_token %}{% block form_top %}{% endblock %}
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" novalidate>{% csrf_token %}{% block form_top %}{% endblock %}
 <div>
 {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
 {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />{% endif %}
@@ -67,15 +67,52 @@
 
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
-{% if adminform and add %}
+{% block admin_change_form_document_ready %}
     <script type="text/javascript">
         (function($) {
             $(document).ready(function() {
+                $('.add-another').click(function(e) {
+                    e.preventDefault();
+                    var event = $.Event('django:add-another-related');
+                    $(this).trigger(event);
+                    if (!event.isDefaultPrevented()) {
+                        showAddAnotherPopup(this);
+                    }
+                });
+                $('.related-lookup').click(function(e) {
+                    e.preventDefault();
+                    var event = $.Event('django:lookup-related');
+                    $(this).trigger(event);
+                    if (!event.isDefaultPrevented()) {
+                        showRelatedObjectLookupPopup(this);
+                    }
+                });
+                $('body').on('click', '.related-widget-wrapper-link', function(e) {
+                    e.preventDefault();
+                    if (this.href) {
+                        var event = $.Event('django:show-related', {href: this.href});
+                        $(this).trigger(event);
+                        if (!event.isDefaultPrevented()) {
+                            showRelatedObjectPopup(this);
+                        }
+                    }
+                });
+                $('body').on('change', '.related-widget-wrapper select', function(e) {
+                    var event = $.Event('django:update-related');
+                    $(this).trigger(event);
+                    if (!event.isDefaultPrevented()) {
+                        updateRelatedObjectLinks(this);
+                    }
+                });
+                $('.related-widget-wrapper select').trigger('change');
+
+            {% if adminform and add %}
                 $('form#{{ opts.model_name }}_form :input:visible:enabled:first').focus()
+            {% endif %}
             });
         })(django.jQuery);
     </script>
-{% endif %}
+{% endblock %}
 
 {# JavaScript for prepopulated fields #}
 {% prepopulated_fields_js %}

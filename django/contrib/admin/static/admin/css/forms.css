@@ -93,6 +93,7 @@ form .aligned table p {
 }
 
 form .aligned p.help {
+    clear: left;
     padding-left: 38px;
 }
 
@@ -373,4 +374,23 @@ body.popup .submit-row {
 
 .empty-form {
     display: none;
+}
+
+/* RELATED FIELD ADD ONE / LOOKUP */
+
+.add-another, .related-lookup {
+    margin-left: 5px;
+    display: inline-block;
+}
+
+.add-another {
+    width: 10px;
+    height: 10px;
+    background-image: url(../img/icon_addlink.gif);
+}
+
+.related-lookup {
+    width: 16px;
+    height: 16px;
+    background-image: url(../img/selector-search.gif);
 }

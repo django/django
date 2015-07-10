@@ -1,23 +1,15 @@
 "Memcached cache backend"
 
-import time
 import pickle
-from threading import local
+import time
 
-from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
-
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
 from django.utils.encoding import force_str
+from django.utils.functional import cached_property
 
 
-class BaseMemcachedCacheMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('_get_memcache_timeout', 'get_backend_timeout', PendingDeprecationWarning),
-    )
-
-
-class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache)):
+class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super(BaseMemcachedCache, self).__init__(params)
         if isinstance(server, six.string_types):
@@ -32,7 +24,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
-        self._options = params.get('OPTIONS', None)
+        self._options = params.get('OPTIONS')
 
     @property
     def _cache(self):
@@ -50,7 +42,7 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
         way. Call this function to obtain a safe value for your timeout.
         """
         if timeout == DEFAULT_TIMEOUT:
-            return self.default_timeout
+            timeout = self.default_timeout
 
         if timeout is None:
             # Using 0 in memcache sets a non-expiring timeout.
@@ -61,10 +53,11 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
             timeout = -1
 
         if timeout > 2592000:  # 60*60*24*30, 30 days
-            # See http://code.google.com/p/memcached/wiki/FAQ
-            # "You can set expire times up to 30 days in the future. After that
-            # memcached interprets it as a date, and will expire the item after
-            # said date. This is a simple (but obscure) mechanic."
+            # See http://code.google.com/p/memcached/wiki/NewProgramming#Expiration
+            # "Expiration times can be set from 0, meaning "never expire", to
+            # 30 days. Any time higher than 30 days is interpreted as a Unix
+            # timestamp date. If you want to expire an object on January 1st of
+            # next year, this is how you do that."
             #
             # This means that we have to switch to absolute timestamps.
             timeout += int(time.time())
@@ -87,7 +80,9 @@ class BaseMemcachedCache(six.with_metaclass(BaseMemcachedCacheMethods, BaseCache
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
-        self._cache.set(key, value, self.get_backend_timeout(timeout))
+        if not self._cache.set(key, value, self.get_backend_timeout(timeout)):
+            # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
+            self._cache.delete(key)
 
     def delete(self, key, version=None):
         key = self.make_key(key, version=version)
@@ -177,24 +172,14 @@ class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
     def __init__(self, server, params):
         import pylibmc
-        self._local = local()
         super(PyLibMCCache, self).__init__(server, params,
                                            library=pylibmc,
                                            value_not_found_exception=pylibmc.NotFound)
 
-    @property
+    @cached_property
     def _cache(self):
-        # PylibMC uses cache options as the 'behaviors' attribute.
-        # It also needs to use threadlocals, because some versions of
-        # PylibMC don't play well with the GIL.
-        client = getattr(self._local, 'client', None)
-        if client:
-            return client
-
         client = self._lib.Client(self._servers)
         if self._options:
             client.behaviors = self._options
-
-        self._local.client = client
 
         return client

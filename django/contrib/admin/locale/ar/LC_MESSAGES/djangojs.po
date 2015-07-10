@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Ossama Khayat <okhayat@gmail.com>, 2011-2012.
+# Bashar Al-Abdulhadi, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-11-27 17:05+0000\n"
-"Last-Translator: Ossama Khayat <okhayat@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "%s المتوفرة"
 
-#: static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -33,39 +31,31 @@ msgstr ""
 "هذه قائمة %s المتوفرة. يمكنك اختيار بعضها بانتقائها في الصندوق أدناه ثم "
 "الضغط على سهم الـ\"اختيار\" بين الصندوقين."
 
-#: static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "اكتب في هذا الصندوق لتصفية قائمة %s المتوفرة."
 
-#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "انتقاء"
 
-#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "اختر الكل"
 
-#: static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "اضغط لاختيار جميع %s جملة واحدة."
 
-#: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "اختيار"
 
-#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "احذف"
 
-#: static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "%s المُختارة"
 
-#: static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -73,16 +63,13 @@ msgstr ""
 "هذه قائمة %s المحددة. يمكنك إزالة بعضها باختيارها في الصندوق أدناه ثم اضغط "
 "على سهم الـ\"إزالة\" بين الصندوقين."
 
-#: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "إزالة الكل"
 
-#: static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "اضغط لإزالة جميع %s المحددة جملة واحدة."
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "لا شي محدد"
@@ -92,7 +79,6 @@ msgstr[3] "%(sel)s من %(cnt)s محددة"
 msgstr[4] "%(sel)s من %(cnt)s محدد"
 msgstr[5] "%(sel)s من %(cnt)s محدد"
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -100,7 +86,6 @@ msgstr ""
 "لديك تعديلات غير محفوظة على بعض الحقول القابلة للتعديل. إن نفذت أي إجراء "
 "فسوف تخسر تعديلاتك."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -109,76 +94,76 @@ msgstr ""
 "اخترت إجراءً لكن دون أن تحفظ تغييرات التي قمت بها. رجاء اضغط زر الموافقة "
 "لتحفظ تعديلاتك. ستحتاج إلى إعادة تنفيذ الإجراء."
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
 "button."
 msgstr "اخترت إجراءً دون تغيير أي حقل. لعلك تريد زر التنفيذ بدلاً من زر الحفظ."
 
-#: static/admin/js/calendar.js:26
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+msgstr[1] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+msgstr[2] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+msgstr[3] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+msgstr[4] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+msgstr[5] "ملاحظة: أنت متقدم بـ %s ساعة من وقت الخادم."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+msgstr[1] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+msgstr[2] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+msgstr[3] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+msgstr[4] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+msgstr[5] "ملاحظة: أنت متأخر بـ %s ساعة من وقت الخادم."
+
+msgid "Now"
+msgstr "الآن"
+
+msgid "Clock"
+msgstr "الساعة"
+
+msgid "Choose a time"
+msgstr "اختر وقتاً"
+
+msgid "Midnight"
+msgstr "منتصف الليل"
+
+msgid "6 a.m."
+msgstr "6 ص."
+
+msgid "Noon"
+msgstr "الظهر"
+
+msgid "Cancel"
+msgstr "ألغ"
+
+msgid "Today"
+msgstr "اليوم"
+
+msgid "Calendar"
+msgstr "التقويم"
+
+msgid "Yesterday"
+msgstr "أمس"
+
+msgid "Tomorrow"
+msgstr "غداً"
+
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 "يناير فبراير مارس إبريل مايو يونيو يوليو أغسطس سبتمبر أكتوبر نوفمبر ديسمبر"
 
-#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "أ إ ث أ خ ج س"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "أظهر"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "اخف"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "الآن"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "الساعة"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "اختر وقتاً"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "منتصف الليل"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "6 ص."
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "الظهر"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "ألغ"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "اليوم"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "التقويم"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "أمس"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "غداً"

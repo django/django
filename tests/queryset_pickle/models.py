@@ -1,6 +1,6 @@
 import datetime
 
-from django.db import models
+from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -23,11 +23,29 @@ class Numbers(object):
 nn = Numbers()
 
 
+class PreviousDjangoVersionQuerySet(models.QuerySet):
+    def __getstate__(self):
+        state = super(PreviousDjangoVersionQuerySet, self).__getstate__()
+        state[DJANGO_VERSION_PICKLE_KEY] = '1.0'
+        return state
+
+
+class MissingDjangoVersionQuerySet(models.QuerySet):
+    def __getstate__(self):
+        state = super(MissingDjangoVersionQuerySet, self).__getstate__()
+        del state[DJANGO_VERSION_PICKLE_KEY]
+        return state
+
+
 class Group(models.Model):
     name = models.CharField(_('name'), max_length=100)
+    objects = models.Manager()
+    previous_django_version_objects = PreviousDjangoVersionQuerySet.as_manager()
+    missing_django_version_objects = MissingDjangoVersionQuerySet.as_manager()
 
 
 class Event(models.Model):
+    title = models.CharField(max_length=100)
     group = models.ForeignKey(Group)
 
 

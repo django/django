@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from .models import PersonWithDefaultMaxLengths, PersonWithCustomMaxLengths
+from .models import PersonWithCustomMaxLengths, PersonWithDefaultMaxLengths
 
 
 class MaxLengthArgumentsTests(unittest.TestCase):
@@ -11,7 +11,7 @@ class MaxLengthArgumentsTests(unittest.TestCase):
         self.assertEqual(model._meta.get_field(field).max_length, length)
 
     def test_default_max_lengths(self):
-        self.verify_max_length(PersonWithDefaultMaxLengths, 'email', 75)
+        self.verify_max_length(PersonWithDefaultMaxLengths, 'email', 254)
         self.verify_max_length(PersonWithDefaultMaxLengths, 'vcard', 100)
         self.verify_max_length(PersonWithDefaultMaxLengths, 'homepage', 200)
         self.verify_max_length(PersonWithDefaultMaxLengths, 'avatar', 100)

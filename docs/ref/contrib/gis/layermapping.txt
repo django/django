@@ -1,5 +1,3 @@
-.. _ref-layermapping:
-
 ====================================
 ``LayerMapping`` data import utility
 ====================================
@@ -52,7 +50,7 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-2. Now we define our corresponding Django model (make sure to use ``syncdb``)::
+2. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
 
     from django.contrib.gis.db import models
 
@@ -61,8 +59,7 @@ Example
         poly = models.PolygonField(srid=4269) # we want our model in a different SRID
         objects = models.GeoManager()
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return 'Name: %s' % self.name
 
 3. Use :class:`LayerMapping` to extract all the features and place them in the
@@ -117,7 +114,7 @@ Keyword Arguments
                        (defaults to 0)
 
 ``source_srs``         Use this to specify the source SRS manually (for
-                       example, some shapefiles don't come with a '.prj'
+                       example, some shapefiles don't come with a ``'.prj'``
                        file).  An integer SRID, WKT or PROJ.4 strings, and
                        :class:`django.contrib.gis.gdal.SpatialReference`
                        objects are accepted.
@@ -142,8 +139,8 @@ Keyword Arguments
                        associated with the unique model.  Forces
                        the transaction mode to be ``'autocommit'``.
 
-``using``              New in version 1.2.  Sets the database to use when
-                       importing spatial data.  Default is ``'default'``
+``using``              Sets the database to use when importing spatial data.
+                       Default is ``'default'``.
 =====================  =====================================================
 
 ``save()`` Keyword Arguments

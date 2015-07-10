@@ -1,0 +1,36 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Yhal Htet Aung <jumoun@gmail.com>, 2013
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Burmese (http://www.transifex.com/projects/p/django/language/"
+"my/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: my\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Sessions"
+msgstr ""
+
+msgid "session key"
+msgstr "ကြားကာလသော့"
+
+msgid "session data"
+msgstr "ကြားကာလအချက်အလက်"
+
+msgid "expire date"
+msgstr "သက်တမ်းကုန်နေ့စွဲ"
+
+msgid "session"
+msgstr "ကြားကာလ"
+
+msgid "sessions"
+msgstr "ကြားကာလများ"

@@ -1,5 +1,5 @@
 """
-7. The lookup API
+The lookup API
 
 This demonstrates features of the database API.
 """
@@ -9,6 +9,14 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+
+
+class Alarm(models.Model):
+    desc = models.CharField(max_length=100)
+    time = models.TimeField()
+
+    def __str__(self):
+        return '%s (%s)' % (self.time, self.desc)
 
 
 class Author(models.Model):
@@ -65,3 +73,15 @@ class Player(models.Model):
 
     def __str__(self):
         return self.name
+
+
+# To test __search lookup a fulltext index is needed. This
+# is only available when using MySQL 5.6, or when using MyISAM
+# tables. As 5.6 isn't common yet, lets use MyISAM table for
+# testing. The table is manually created by the test method.
+class MyISAMArticle(models.Model):
+    headline = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'myisam_article'
+        managed = False

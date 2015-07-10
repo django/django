@@ -15,15 +15,12 @@
 {% block content %}
 <h1>{% blocktrans %}Template: "{{ name }}"{% endblocktrans %}</h1>
 
-{% regroup templates|dictsort:"site_id" by site as templates_by_site %}
-{% for group in templates_by_site %}
-    <h2>{% blocktrans with group.grouper as grouper %}Search path for template "{{ name }}" on {{ grouper }}:{% endblocktrans %}</h2>
-    <ol>
-    {% for template in group.list|dictsort:"order" %}
-        <li><code>{{ template.file }}</code>{% if not template.exists %} <em>{% trans '(does not exist)' %}</em>{% endif %}</li>
-    {% endfor %}
-    </ol>
+<h2>{% blocktrans %}Search path for template "{{ name }}":{% endblocktrans %}</h2>
+<ol>
+{% for template in templates|dictsort:"order" %}
+    <li><code>{{ template.file }}</code>{% if not template.exists %} <em>{% trans '(does not exist)' %}</em>{% endif %}</li>
 {% endfor %}
+</ol>
 
 <p class="small"><a href="{% url 'django-admindocs-docroot' %}">&lsaquo; {% trans 'Back to Documentation' %}</a></p>
 {% endblock %}

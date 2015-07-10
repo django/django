@@ -101,7 +101,7 @@ class Item(models.Model):
     name = models.CharField(max_length=10)
     created = models.DateTimeField()
     modified = models.DateTimeField(blank=True, null=True)
-    tags = models.ManyToManyField(Tag, blank=True, null=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     creator = models.ForeignKey(Author)
     note = models.ForeignKey(Note)
 
@@ -153,7 +153,7 @@ class Number(models.Model):
     def __str__(self):
         return six.text_type(self.num)
 
-# Symmetrical m2m field with a normal field using the reverse accesor name
+# Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
 
 
@@ -258,6 +258,12 @@ class CustomPk(models.Model):
 class Related(models.Model):
     custom = models.ForeignKey(CustomPk)
 
+
+class CustomPkTag(models.Model):
+    id = models.CharField(max_length=20, primary_key=True)
+    custom_pk = models.ManyToManyField(CustomPk)
+    tag = models.CharField(max_length=20)
+
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.
 
@@ -358,9 +364,13 @@ class Plaything(models.Model):
         return self.name
 
 
+@python_2_unicode_compatible
 class Article(models.Model):
     name = models.CharField(max_length=20)
     created = models.DateTimeField()
+
+    def __str__(self):
+        return self.name
 
 
 @python_2_unicode_compatible
@@ -398,6 +408,19 @@ class ObjectA(models.Model):
     def __str__(self):
         return self.name
 
+    def __iter__(self):
+        # Ticket #23721
+        assert False, 'type checking should happen without calling model __iter__'
+
+
+class ProxyObjectA(ObjectA):
+    class Meta:
+        proxy = True
+
+
+class ChildObjectA(ObjectA):
+    pass
+
 
 @python_2_unicode_compatible
 class ObjectB(models.Model):
@@ -409,11 +432,17 @@ class ObjectB(models.Model):
         return self.name
 
 
+class ProxyObjectB(ObjectB):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class ObjectC(models.Model):
     name = models.CharField(max_length=50)
     objecta = models.ForeignKey(ObjectA, null=True)
     objectb = models.ForeignKey(ObjectB, null=True)
+    childobjecta = models.ForeignKey(ChildObjectA, null=True, related_name='ca_pk')
 
     def __str__(self):
         return self.name
@@ -654,3 +683,48 @@ class Employment(models.Model):
     employer = models.ForeignKey(Company)
     employee = models.ForeignKey(Person)
     title = models.CharField(max_length=128)
+
+
+# Bug #22429
+
+class School(models.Model):
+    pass
+
+
+class Student(models.Model):
+    school = models.ForeignKey(School)
+
+
+class Classroom(models.Model):
+    school = models.ForeignKey(School)
+    students = models.ManyToManyField(Student, related_name='classroom')
+
+
+class Ticket23605A(models.Model):
+    pass
+
+
+class Ticket23605B(models.Model):
+    modela_fk = models.ForeignKey(Ticket23605A)
+    modelc_fk = models.ForeignKey("Ticket23605C")
+    field_b0 = models.IntegerField(null=True)
+    field_b1 = models.BooleanField(default=False)
+
+
+class Ticket23605C(models.Model):
+    field_c0 = models.FloatField()
+
+
+# db_table names have capital letters to ensure they are quoted in queries.
+class Individual(models.Model):
+    alive = models.BooleanField()
+
+    class Meta:
+        db_table = 'Individual'
+
+
+class RelatedIndividual(models.Model):
+    related = models.ForeignKey(Individual, related_name='related_individual')
+
+    class Meta:
+        db_table = 'RelatedIndividual'

@@ -1,5 +1,8 @@
 from django.forms import *  # NOQA
-from .fields import (GeometryField, GeometryCollectionField, PointField,  # NOQA
-    MultiPointField, LineStringField, MultiLineStringField, PolygonField,
-    MultiPolygonField)
+
+from .fields import (  # NOQA
+    GeometryCollectionField, GeometryField, LineStringField,
+    MultiLineStringField, MultiPointField, MultiPolygonField, PointField,
+    PolygonField,
+)
 from .widgets import BaseGeometryWidget, OpenLayersWidget, OSMWidget  # NOQA

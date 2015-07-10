@@ -17,9 +17,9 @@ Python and Django projects share common problems. Wouldn't it be great if we
 could save some of this repeated work?
 
 Reusability is the way of life in Python. `The Python Package Index (PyPI)
-<http://guide.python-distribute.org/contributing.html#pypi-info>`_ has a vast
-range of packages you can use in your own Python programs. Check out `Django
-Packages <http://www.djangopackages.com>`_ for existing reusable apps you could
+<https://pypi.python.org/pypi>`_ has a vast range of packages you can use in
+your own Python programs. Check out `Django Packages
+<https://www.djangopackages.com>`_ for existing reusable apps you could
 incorporate in your project. Django itself is also just a Python package. This
 means that you can take existing Python packages or Django apps and compose
 them into your own web project. You only need to write the parts that make
@@ -34,7 +34,7 @@ projects and ready to publish for others to install and use.
 
 .. admonition:: Package? App?
 
-    A Python `package <http://docs.python.org/tutorial/modules.html#packages>`_
+    A Python `package <https://docs.python.org/tutorial/modules.html#packages>`_
     provides a way of grouping related Python code for easy reuse. A package
     contains one or more files of Python code (also known as "modules").
 
@@ -42,9 +42,10 @@ projects and ready to publish for others to install and use.
     bar``. For a directory (like ``polls``) to form a package, it must contain
     a special file ``__init__.py``, even if this file is empty.
 
-    A Django *app* is just a Python package that is specifically intended for
-    use in a Django project. An app may also use common Django conventions,
-    such as having a ``models.py`` file.
+    A Django *application* is just a Python package that is specifically
+    intended for use in a Django project. An application may use common Django
+    conventions, such as having ``models``, ``tests``, ``urls``, and ``views``
+    submodules.
 
     Later on we use the term *packaging* to describe the process of making a
     Python package easy for others to install. It can be a little confusing, we
@@ -65,6 +66,9 @@ After the previous tutorials, our project should look like this::
         polls/
             __init__.py
             admin.py
+            migrations/
+                __init__.py
+                0001_initial.py
             models.py
             static/
                 polls/
@@ -100,15 +104,15 @@ Installing some prerequisites
 =============================
 
 The current state of Python packaging is a bit muddled with various tools. For
-this tutorial, we're going to use distribute_ to build our package. It's a
-community-maintained fork of the older ``setuptools`` project. We'll also be
+this tutorial, we're going to use setuptools_ to build our package. It's the
+recommended packaging tool (merged with the ``distribute`` fork). We'll also be
 using `pip`_ to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
-Django with pip<installing-official-release>`. You can install ``distribute``
+Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
 
-.. _distribute: http://pypi.python.org/pypi/distribute
-.. _pip: http://pypi.python.org/pypi/pip
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. _pip: https://pypi.python.org/pypi/pip
 
 Packaging your app
 ==================
@@ -127,6 +131,12 @@ this. For a small app like polls, this process isn't too difficult.
        ``django-`` to your module name when creating a package to distribute.
        This helps others looking for Django apps identify your app as Django
        specific.
+
+       Application labels (that is, the final part of the dotted path to
+       application packages) *must* be unique in :setting:`INSTALLED_APPS`.
+       Avoid using the same label as any of the Django :doc:`contrib packages
+       </ref/contrib/index>`, for example ``auth``, ``admin``, or
+       ``messages``.
 
 2. Move the ``polls`` directory into the ``django-polls`` directory.
 
@@ -149,10 +159,10 @@ this. For a small app like polls, this process isn't too difficult.
 
        1. Add "polls" to your INSTALLED_APPS setting like this::
 
-           INSTALLED_APPS = (
+           INSTALLED_APPS = [
                ...
                'polls',
-           )
+           ]
 
        2. Include the polls URLconf in your project urls.py like this::
 
@@ -174,8 +184,8 @@ this. For a small app like polls, this process isn't too difficult.
 
 5. Next we'll create a ``setup.py`` file which provides details about how to
    build and install the app.  A full explanation of this file is beyond the
-   scope of this tutorial, but the `distribute docs
-   <http://packages.python.org/distribute/setuptools.html>`_ have a good
+   scope of this tutorial, but the `setuptools docs
+   <http://pythonhosted.org/setuptools/setuptools.html>`_ have a good
    explanation. Create a file ``django-polls/setup.py`` with the following
    contents:
 
@@ -185,7 +195,8 @@ this. For a small app like polls, this process isn't too difficult.
        import os
        from setuptools import setup
 
-       README = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
+       with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
+           README = readme.read()
 
        # allow setup.py to be run from any path
        os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
@@ -208,23 +219,18 @@ this. For a small app like polls, this process isn't too difficult.
                'License :: OSI Approved :: BSD License', # example license
                'Operating System :: OS Independent',
                'Programming Language :: Python',
-               # replace these appropriately if you are using Python 3
-               'Programming Language :: Python :: 2',
-               'Programming Language :: Python :: 2.7',
+               # Replace these appropriately if you are stuck on Python 2.
+               'Programming Language :: Python :: 3',
+               'Programming Language :: Python :: 3.2',
+               'Programming Language :: Python :: 3.3',
                'Topic :: Internet :: WWW/HTTP',
                'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
            ],
        )
 
-   .. admonition:: I thought you said we were going to use ``distribute``?
-
-       Distribute is a drop-in replacement for ``setuptools``. Even though we
-       appear to import from ``setuptools``, since we have ``distribute``
-       installed, it will override the import.
-
 6. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
-   distribute docs referred to in the previous step discuss this file in more
+   setuptools docs referred to in the previous step discuss this file in more
    details. To include the templates, the ``README.rst`` and our ``LICENSE``
    file, create a file ``django-polls/MANIFEST.in`` with the following
    contents:
@@ -245,14 +251,14 @@ this. For a small app like polls, this process isn't too difficult.
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
-   online through sites like `readthedocs.org <http://readthedocs.org>`_.
+   online through sites like `readthedocs.org <https://readthedocs.org>`_.
 
 8. Try building your package with ``python setup.py sdist`` (run from inside
    ``django-polls``). This creates a directory called ``dist`` and builds your
    new package, ``django-polls-0.1.tar.gz``.
 
-For more information on packaging, see `The Hitchhiker's Guide to Packaging
-<http://guide.python-distribute.org/quickstart.html>`_.
+For more information on packaging, see Python's `Tutorial on Packaging and
+Distributing Projects <https://packaging.python.org/en/latest/distributing.html>`_.
 
 Using your own package
 ======================
@@ -284,7 +290,7 @@ working. We'll now fix this by installing our new ``django-polls`` package.
 
     pip uninstall django-polls
 
-.. _pip: http://pypi.python.org/pypi/pip
+.. _pip: https://pypi.python.org/pypi/pip
 
 Publishing your app
 ===================
@@ -296,13 +302,10 @@ the world! If this wasn't just an example, you could now:
 
 * Upload the package on your Web site.
 
-* Post the package on a public repository, such as `The Python Package Index
-  (PyPI) <http://guide.python-distribute.org/contributing.html#pypi-info>`_.
-
-For more information on PyPI, see the `Quickstart
-<http://guide.python-distribute.org/quickstart.html#register-your-package-with-the-python-package-index-pypi>`_
-section of The Hitchhiker's Guide to Packaging. One detail this guide mentions
-is choosing the license under which your code is distributed.
+* Post the package on a public repository, such as `the Python Package Index
+  (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good
+  tutorial <https://packaging.python.org/en/latest/distributing.html#uploading-your-project-to-pypi>`_
+  for doing this.
 
 Installing Python packages with virtualenv
 ==========================================

@@ -1,44 +1,48 @@
 from __future__ import unicode_literals
 
-import warnings
-
-from django.conf import settings
-from django.utils.html import format_html, format_html_join
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-from django.utils import six
+import json
 import sys
 
-# Import ValidationError so that it can be imported from this
-# module to maintain backwards compatibility.
-from django.core.exceptions import ValidationError
+from django.conf import settings
+from django.core.exceptions import ValidationError  # backwards compatibility
+from django.utils import six, timezone
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html import escape, format_html, format_html_join, html_safe
+from django.utils.translation import ugettext_lazy as _
+
+try:
+    from collections import UserList
+except ImportError:  # Python 2
+    from UserList import UserList
 
 
 def flatatt(attrs):
     """
     Convert a dictionary of attributes to a single string.
     The returned string will contain a leading space followed by key="value",
-    XML-style pairs.  It is assumed that the keys do not need to be XML-escaped.
-    If the passed dictionary is empty, then return an empty string.
+    XML-style pairs. In the case of a boolean value, the key will appear
+    without a value. It is assumed that the keys do not need to be
+    XML-escaped. If the passed dictionary is empty, then return an empty
+    string.
 
-    The result is passed through 'mark_safe'.
+    The result is passed through 'mark_safe' (by way of 'format_html_join').
     """
-    for attr_name, value in attrs.items():
-        if type(value) is bool:
-            warnings.warn(
-                "In Django 1.8, widget attribute %(attr_name)s=%(bool_value)s "
-                "will %(action)s. To preserve current behavior, use the "
-                "string '%(bool_value)s' instead of the boolean value." % {
-                    'attr_name': attr_name,
-                    'action': "be rendered as '%s'" % attr_name if value else "not be rendered",
-                    'bool_value': value,
-                },
-                DeprecationWarning
-            )
-    return format_html_join('', ' {0}="{1}"', sorted(attrs.items()))
+    key_value_attrs = []
+    boolean_attrs = []
+    for attr, value in attrs.items():
+        if isinstance(value, bool):
+            if value:
+                boolean_attrs.append((attr,))
+        else:
+            key_value_attrs.append((attr, value))
+
+    return (
+        format_html_join('', ' {}="{}"', sorted(key_value_attrs)) +
+        format_html_join('', ' {}', sorted(boolean_attrs))
+    )
 
 
+@html_safe
 @python_2_unicode_compatible
 class ErrorDict(dict):
     """
@@ -46,46 +50,103 @@ class ErrorDict(dict):
 
     The dictionary keys are the field names, and the values are the errors.
     """
-    def __str__(self):
-        return self.as_ul()
+    def as_data(self):
+        return {f: e.as_data() for f, e in self.items()}
+
+    def as_json(self, escape_html=False):
+        return json.dumps({f: e.get_json_data(escape_html) for f, e in self.items()})
 
     def as_ul(self):
         if not self:
             return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}{1}</li>',
-                                            ((k, force_text(v))
-                                             for k, v in self.items())
-                           ))
+        return format_html(
+            '<ul class="errorlist">{}</ul>',
+            format_html_join('', '<li>{}{}</li>', ((k, force_text(v)) for k, v in self.items()))
+        )
 
     def as_text(self):
-        return '\n'.join('* %s\n%s' % (k, '\n'.join('  * %s' % force_text(i) for i in v)) for k, v in self.items())
+        output = []
+        for field, errors in self.items():
+            output.append('* %s' % field)
+            output.append('\n'.join('  * %s' % e for e in errors))
+        return '\n'.join(output)
+
+    def __str__(self):
+        return self.as_ul()
 
 
+@html_safe
 @python_2_unicode_compatible
-class ErrorList(list):
+class ErrorList(UserList, list):
     """
     A collection of errors that knows how to display itself in various formats.
     """
+    def __init__(self, initlist=None, error_class=None):
+        super(ErrorList, self).__init__(initlist)
+
+        if error_class is None:
+            self.error_class = 'errorlist'
+        else:
+            self.error_class = 'errorlist {}'.format(error_class)
+
+    def as_data(self):
+        return ValidationError(self.data).error_list
+
+    def get_json_data(self, escape_html=False):
+        errors = []
+        for error in self.as_data():
+            message = list(error)[0]
+            errors.append({
+                'message': escape(message) if escape_html else message,
+                'code': error.code or '',
+            })
+        return errors
+
+    def as_json(self, escape_html=False):
+        return json.dumps(self.get_json_data(escape_html))
+
+    def as_ul(self):
+        if not self.data:
+            return ''
+
+        return format_html(
+            '<ul class="{}">{}</ul>',
+            self.error_class,
+            format_html_join('', '<li>{}</li>', ((force_text(e),) for e in self))
+        )
+
+    def as_text(self):
+        return '\n'.join('* %s' % e for e in self)
+
     def __str__(self):
         return self.as_ul()
 
-    def as_ul(self):
-        if not self:
-            return ''
-        return format_html('<ul class="errorlist">{0}</ul>',
-                           format_html_join('', '<li>{0}</li>',
-                                            ((force_text(e),) for e in self)
-                                            )
-                           )
-
-    def as_text(self):
-        if not self:
-            return ''
-        return '\n'.join('* %s' % force_text(e) for e in self)
-
     def __repr__(self):
-        return repr([force_text(e) for e in self])
+        return repr(list(self))
+
+    def __contains__(self, item):
+        return item in list(self)
+
+    def __eq__(self, other):
+        return list(self) == other
+
+    def __ne__(self, other):
+        return list(self) != other
+
+    def __getitem__(self, i):
+        error = self.data[i]
+        if isinstance(error, ValidationError):
+            return list(error)[0]
+        return force_text(error)
+
+    def __reduce_ex__(self, *args, **kwargs):
+        # The `list` reduce function returns an iterator as the fourth element
+        # that is normally used for repopulating. Since we only inherit from
+        # `list` for `isinstance` backward compatibility (Refs #17413) we
+        # nullify this iterator as it would otherwise result in duplicate
+        # entries. (Refs #23594)
+        info = super(UserList, self).__reduce_ex__(*args, **kwargs)
+        return info[:3] + (None, None)
 
 
 # Utilities for time zone support in DateTimeField et al.

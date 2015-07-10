@@ -1,7 +1,9 @@
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.template import Context, Template
+from django.template import Context, Engine
 from django.utils.translation import ugettext as _
+from django.utils.version import get_docs_version
+
 
 # We include the template inline since we need to be able to reliably display
 # this error message, especially for the sake of developers, and there isn't any
@@ -58,16 +60,16 @@ CSRF_FAILURE_TEMPLATE = """
 
   <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
   <a
-  href='http://docs.djangoproject.com/en/dev/ref/contrib/csrf/#ref-contrib-csrf'>Django's
+  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django's
   CSRF mechanism</a> has not been used correctly.  For POST forms, you need to
   ensure:</p>
 
   <ul>
     <li>Your browser is accepting cookies.</li>
 
-    <li>The view function uses <a
-    href='http://docs.djangoproject.com/en/dev/ref/templates/api/#subclassing-context-requestcontext'><code>RequestContext</code></a>
-    for the template, instead of <code>Context</code>.</li>
+    <li>The view function passes a <code>request</code> to the template's <a
+    href="https://docs.djangoproject.com/en/dev/topics/templates/#django.template.backends.base.Template.render"><code>render</code></a>
+    method.</li>
 
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
     {% templatetag closeblock %}</code> template tag inside each POST form that
@@ -100,7 +102,7 @@ def csrf_failure(request, reason=""):
     Default view used when request fails CSRF protection
     """
     from django.middleware.csrf import REASON_NO_REFERER, REASON_NO_CSRF_COOKIE
-    t = Template(CSRF_FAILURE_TEMPLATE)
+    t = Engine().from_string(CSRF_FAILURE_TEMPLATE)
     c = Context({
         'title': _("Forbidden"),
         'main': _("CSRF verification failed. Request aborted."),
@@ -126,6 +128,7 @@ def csrf_failure(request, reason=""):
             "re-enable them, at least for this site, or for 'same-origin' "
             "requests."),
         'DEBUG': settings.DEBUG,
+        'docs_version': get_docs_version(),
         'more': _("More information is available with DEBUG=True."),
     })
     return HttpResponseForbidden(t.render(c), content_type='text/html')

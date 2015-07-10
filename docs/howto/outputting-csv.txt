@@ -54,26 +54,65 @@ mention:
   about escaping strings with quotes or commas in them. Just pass
   ``writerow()`` your raw strings, and it'll do the right thing.
 
-Handling Unicode
-~~~~~~~~~~~~~~~~
+.. admonition:: Handling Unicode on Python 2
 
-Python's :mod:`csv` module does not support Unicode input. Since Django uses
-Unicode internally this means strings read from sources such as
-:class:`~django.http.HttpRequest` are potentially problematic. There are a few
-options for handling this:
+    Python 2's :mod:`csv` module does not support Unicode input. Since Django
+    uses Unicode internally this means strings read from sources such as
+    :class:`~django.http.HttpRequest` are potentially problematic. There are a
+    few options for handling this:
 
-* Manually encode all Unicode objects to a compatible encoding.
+    * Manually encode all Unicode objects to a compatible encoding.
 
-* Use the ``UnicodeWriter`` class provided in the `csv module's examples
-  section`_.
+    * Use the ``UnicodeWriter`` class provided in the `csv module's examples
+      section`_.
 
-* Use the `python-unicodecsv module`_, which aims to be a drop-in
-  replacement for :mod:`csv` that gracefully handles Unicode.
+    * Use the `python-unicodecsv module`_, which aims to be a drop-in
+      replacement for :mod:`csv` that gracefully handles Unicode.
 
-For more information, see the Python documentation of the :mod:`csv` module.
+    For more information, see the Python documentation of the :mod:`csv` module.
 
-.. _`csv module's examples section`: http://docs.python.org/library/csv.html#examples
-.. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
+    .. _`csv module's examples section`: https://docs.python.org/library/csv.html#examples
+    .. _`python-unicodecsv module`: https://github.com/jdunck/python-unicodecsv
+
+.. _streaming-csv-files:
+
+Streaming large CSV files
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When dealing with views that generate very large responses, you might want to
+consider using Django's :class:`~django.http.StreamingHttpResponse` instead.
+For example, by streaming a file that takes a long time to generate you can
+avoid a load balancer dropping a connection that might have otherwise timed out
+while the server was generating the response.
+
+In this example, we make full use of Python generators to efficiently handle
+the assembly and transmission of a large CSV file::
+
+    import csv
+
+    from django.utils.six.moves import range
+    from django.http import StreamingHttpResponse
+
+    class Echo(object):
+        """An object that implements just the write method of the file-like
+        interface.
+        """
+        def write(self, value):
+            """Write the value by returning it, instead of storing in a buffer."""
+            return value
+
+    def some_streaming_csv_view(request):
+        """A view that streams a large CSV file."""
+        # Generate a sequence of rows. The range is based on the maximum number of
+        # rows that can be handled by a single sheet in most spreadsheet
+        # applications.
+        rows = (["Row {}".format(idx), str(idx)] for idx in range(65536))
+        pseudo_buffer = Echo()
+        writer = csv.writer(pseudo_buffer)
+        response = StreamingHttpResponse((writer.writerow(row) for row in rows),
+                                         content_type="text/csv")
+        response['Content-Disposition'] = 'attachment; filename="somefilename.csv"'
+        return response
 
 Using the template system
 =========================

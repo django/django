@@ -1,5 +1,3 @@
-.. _ref-geoquerysets:
-
 =========================
 GeoQuerySet API Reference
 =========================
@@ -7,7 +5,6 @@ GeoQuerySet API Reference
 .. currentmodule:: django.contrib.gis.db.models
 
 .. class:: GeoQuerySet([model=None])
-
 
 .. _spatial-lookups:
 
@@ -121,10 +118,6 @@ contains_properly
 
 Returns true if the lookup geometry intersects the interior of the
 geometry field, but not the boundary (or exterior). [#fncontainsproperly]_
-
-.. note::
-
-    Requires PostGIS 1.4 and above.
 
 Example::
 
@@ -286,7 +279,7 @@ Example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
 
 PostGIS SQL equivalent::
 
@@ -308,7 +301,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
 
 Oracle SQL equivalent::
 
@@ -492,16 +485,16 @@ strictly_below
 
 *Availability*: PostGIS
 
-Tests if the geometry field's bounding box is strictly above the lookup
+Tests if the geometry field's bounding box is strictly below the lookup
 geometry's bounding box.
 
 Example::
 
-    Zipcode.objects.filter(poly__strictly_above=geom)
+    Zipcode.objects.filter(poly__strictly_below=geom)
 
 PostGIS equivalent::
 
-    SELECT ... WHERE poly |>> geom
+    SELECT ... WHERE poly <<| geom
 
 
 .. _distance-lookups:
@@ -613,8 +606,11 @@ SpatiaLite  ``Distance(poly, geom) <= 5``
 dwithin
 -------
 
-Returns models where the distance to the geometry field from the
-lookup geometry are within the given distance from one another.
+Returns models where the distance to the geometry field from the lookup
+geometry are within the given distance from one another. Note that you can only
+provide :class:`~django.contrib.gis.measure.Distance` objects if the targeted
+geometries are in a projected system. For geographic geometries, you should use
+units of the geometry field (e.g. degrees for ``WGS84``) .
 
 Example::
 
@@ -637,8 +633,14 @@ Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 ``GeoQuerySet`` Methods
 =======================
 
+.. deprecated:: 1.9
+
+    Using ``GeoQuerySet`` methods is now deprecated in favor of the new
+    :doc:`functions`. Albeit a little more verbose, they are much more powerful
+    in how it is possible to combine them to build more complex queries.
+
 ``GeoQuerySet`` methods specify that a spatial operation be performed
-on each patial operation on each geographic
+on each spatial operation on each geographic
 field in the queryset and store its output in a new attribute on the model
 (which is generally the name of the ``GeoQuerySet`` method).
 
@@ -649,7 +651,7 @@ of every ``GeoQuerySet`` method available in GeoDjango.
 .. note::
 
     What methods are available depend on your spatial backend.  See
-    the :ref:`compatibility table <geoqueryset-method-compatibility>`
+    the :ref:`compatibility table <database-functions-compatibility>`
     for more details.
 
 With a few exceptions, the following keyword arguments may be used with all
@@ -695,6 +697,11 @@ Measurement
 
 .. method:: GeoQuerySet.area(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Area` function
+    instead.
+
 Returns the area of the geographic field in an ``area`` attribute on
 each element of this GeoQuerySet.
 
@@ -702,6 +709,11 @@ each element of this GeoQuerySet.
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.distance(geom, **kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Distance` function
+    instead.
 
 This method takes a geometry as a parameter, and attaches a ``distance``
 attribute to every model in the returned queryset that contains the
@@ -731,16 +743,21 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     :class:`~django.contrib.gis.measure.Distance` object, you can easily express
     the value in the units of your choice.  For example, ``city.distance.mi`` is
     the distance value in miles and ``city.distance.km`` is the distance value
-    in kilometers.  See the :ref:`ref-measure` for usage details and the list of
+    in kilometers.  See :doc:`measure` for usage details and the list of
     :ref:`supported_units`.
 
-__ https://github.com/django/django/blob/master/django/contrib/gis/tests/distapp/models.py
+__ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
 __ http://en.wikipedia.org/wiki/Tasmania
 
 ``length``
 ~~~~~~~~~~
 
 .. method:: GeoQuerySet.length(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Length` function
+    instead.
 
 Returns the length of the geometry field in a ``length`` attribute
 (a :class:`~django.contrib.gis.measure.Distance` object) on each model in
@@ -750,6 +767,11 @@ the queryset.
 ~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.perimeter(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Perimeter` function
+    instead.
 
 Returns the perimeter of the geometry field in a ``perimeter`` attribute
 (a :class:`~django.contrib.gis.measure.Distance` object) on each model in
@@ -767,6 +789,11 @@ function evaluated on the geometry field.
 
 .. method:: GeoQuerySet.centroid(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Centroid` function
+    instead.
+
 *Availability*: PostGIS, Oracle, SpatiaLite
 
 Returns the ``centroid`` value for the geographic field in a ``centroid``
@@ -777,6 +804,11 @@ attribute on each element of the ``GeoQuerySet``.
 
 .. method:: GeoQuerySet.envelope(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Envelope` function
+    instead.
+
 *Availability*: PostGIS, SpatiaLite
 
 Returns a geometry representing the bounding box of the geometry field in
@@ -786,6 +818,11 @@ an ``envelope`` attribute on each element of the ``GeoQuerySet``.
 ~~~~~~~~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.point_on_surface(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.PointOnSurface`
+    function instead.
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
@@ -801,6 +838,11 @@ Geometry Editors
 
 .. method:: GeoQuerySet.force_rhr(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.ForceRHR` function
+    instead.
+
 *Availability*: PostGIS
 
 Returns a modified version of the polygon/multipolygon in which all
@@ -812,6 +854,11 @@ of the vertices follow the Right-Hand-Rule, and attaches as a
 
 .. method:: GeoQuerySet.reverse_geom(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Reverse` function
+    instead.
+
 *Availability*: PostGIS, Oracle
 
 Reverse the coordinate order of the geometry field, and attaches as a
@@ -822,12 +869,22 @@ Reverse the coordinate order of the geometry field, and attaches as a
 
 .. method:: GeoQuerySet.scale(x, y, z=0.0, **kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Scale` function
+    instead.
+
 *Availability*: PostGIS, SpatiaLite
 
 ``snap_to_grid``
 ~~~~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.snap_to_grid(*args, **kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.SnapToGrid` function
+    instead.
 
 Snap all points of the input geometry to the grid.  How the
 geometry is snapped to the grid depends on how many numeric
@@ -845,6 +902,11 @@ Number of Arguments  Description
 ~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.transform(srid=4326, **kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Transform` function
+    instead.
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
@@ -877,6 +939,11 @@ Example::
 ~~~~~~~~~~~~~
 .. method:: GeoQuerySet.translate(x, y, z=0.0, **kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Translate` function
+    instead.
+
 *Availability*: PostGIS, SpatiaLite
 
 Translates the geometry field to a new location using the given numeric
@@ -894,6 +961,11 @@ to each element of the ``GeoQuerySet`` that is the result of the operation.
 
 .. method:: GeoQuerySet.difference(geom)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Difference` function
+    instead.
+
 Returns the spatial difference of the geographic field with the given
 geometry in a ``difference`` attribute on each element of the
 ``GeoQuerySet``.
@@ -904,6 +976,11 @@ geometry in a ``difference`` attribute on each element of the
 
 .. method:: GeoQuerySet.intersection(geom)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Intersection`
+    function instead.
+
 Returns the spatial intersection of the geographic field with the
 given geometry in an ``intersection`` attribute on each element of the
 ``GeoQuerySet``.
@@ -913,6 +990,11 @@ given geometry in an ``intersection`` attribute on each element of the
 
 .. method:: GeoQuerySet.sym_difference(geom)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.SymDifference`
+    function instead.
+
 Returns the symmetric difference of the geographic field with the
 given geometry in a ``sym_difference`` attribute on each element of the
 ``GeoQuerySet``.
@@ -921,6 +1003,11 @@ given geometry in a ``sym_difference`` attribute on each element of the
 ~~~~~~~~~
 
 .. method:: GeoQuerySet.union(geom)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.Union` function
+    instead.
 
 Returns the union of the geographic field with the given
 geometry in an ``union`` attribute on each element of the
@@ -937,6 +1024,11 @@ of the geometry field in each model converted to the requested output format.
 
 .. method:: GeoQuerySet.geohash(precision=20, **kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.GeoHash` function
+    instead.
+
 Attaches a ``geohash`` attribute to every model the queryset
 containing the `GeoHash`__ representation of the geometry.
 
@@ -946,6 +1038,11 @@ __ http://geohash.org/
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.geojson(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.AsGeoJSON` function
+    instead.
 
 *Availability*: PostGIS, SpatiaLite
 
@@ -973,6 +1070,11 @@ __ http://geojson.org/
 ~~~~~~~
 
 .. method:: GeoQuerySet.gml(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.AsGML` function
+    instead.
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
@@ -1005,6 +1107,11 @@ __ http://en.wikipedia.org/wiki/Geography_Markup_Language
 
 .. method:: GeoQuerySet.kml(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.AsKML` function
+    instead.
+
 *Availability*: PostGIS, SpatiaLite
 
 Attaches a ``kml`` attribute to every model in the queryset that contains the
@@ -1033,6 +1140,11 @@ __ https://developers.google.com/kml/documentation/
 
 .. method:: GeoQuerySet.svg(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.AsSVG` function
+    instead.
+
 *Availability*: PostGIS, SpatiaLite
 
 Attaches a ``svg`` attribute to every model in the queryset that contains
@@ -1060,6 +1172,11 @@ Miscellaneous
 
 .. method:: GeoQuerySet.mem_size(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.MemSize` function
+    instead.
+
 *Availability*: PostGIS
 
 Returns the memory size (number of bytes) that the geometry field takes
@@ -1069,6 +1186,11 @@ in a ``mem_size`` attribute  on each element of the ``GeoQuerySet``.
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.num_geom(**kwargs)
+
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.NumGeometries`
+    function instead.
 
 *Availability*: PostGIS, Oracle, SpatiaLite
 
@@ -1082,6 +1204,11 @@ otherwise sets with ``None``.
 
 .. method:: GeoQuerySet.num_points(**kwargs)
 
+.. deprecated:: 1.9
+
+    Use the :class:`~django.contrib.gis.db.models.functions.NumPoints` function
+    instead.
+
 *Availability*: PostGIS, Oracle, SpatiaLite
 
 Returns the number of points in the first linestring in the
@@ -1094,87 +1221,72 @@ Spatial Aggregates
 Aggregate Methods
 -----------------
 
+.. deprecated:: 1.8
+
+    Aggregate methods are now deprecated. Prefer using their function-based
+    equivalents.
+
 ``collect``
 ~~~~~~~~~~~
 
 .. method:: GeoQuerySet.collect(**kwargs)
 
-*Availability*: PostGIS
+.. deprecated:: 1.8
 
-Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
-column.  This is analagous to a simplified version of the :meth:`GeoQuerySet.unionagg` method,
-except it can be several orders of magnitude faster than peforming a union because
-it simply rolls up geometries into a collection or multi object, not caring about
-dissolving boundaries.
+    Use the :class:`Collect` aggregate instead.
+
+Shortcut for ``aggregate(Collect(<field>))``.
 
 ``extent``
 ~~~~~~~~~~
 
 .. method:: GeoQuerySet.extent(**kwargs)
 
-*Availability*: PostGIS, Oracle
+.. deprecated:: 1.8
 
-Returns the extent of the ``GeoQuerySet`` as a four-tuple, comprising the
-lower left coordinate and the upper right coordinate.
+    Use the :class:`Extent` aggregate instead.
 
-Example::
-
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print(qs.extent())
-    (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
+Shortcut for ``aggregate(Extent(<field>))``.
 
 ``extent3d``
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.extent3d(**kwargs)
 
-*Availability*: PostGIS
+.. deprecated:: 1.8
 
-Returns the 3D extent of the ``GeoQuerySet`` as a six-tuple, comprising
-the lower left coordinate and upper right coordinate.
+    Use the :class:`Extent` aggregate instead.
 
-Example::
-
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-    >>> print(qs.extent3d())
-    (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
+Shortcut for ``aggregate(Extent3D(<field>))``.
 
 ``make_line``
 ~~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.make_line(**kwargs)
 
-*Availability*: PostGIS
+.. deprecated:: 1.8
 
-Returns a ``LineString`` constructed from the point field geometries in the
-``GeoQuerySet``.  Currently, ordering the queryset has no effect.
+    Use the :class:`MakeLine` aggregate instead.
 
-Example::
-
-     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')).make_line())
-     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
+Shortcut for ``aggregate(MakeLine(<field>))``.
 
 ``unionagg``
 ~~~~~~~~~~~~
 
 .. method:: GeoQuerySet.unionagg(**kwargs)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+.. deprecated:: 1.8
 
-This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
-comprising the union of every geometry in the queryset.  Please note that
-use of ``unionagg`` is processor intensive and may take a significant amount
-of time on large querysets.
+    Use the :class:`Union` aggregate instead.
 
-.. note::
+Shortcut for ``aggregate(Union(<field>))``.
 
-    If the computation time for using this method is too expensive,
-    consider using :meth:`GeoQuerySet.collect` instead.
+Aggregate Functions
+-------------------
 
-Example::
-
-    >>> u = Zipcode.objects.unionagg() # This may take a long time.
-    >>> u = Zipcode.objects.filter(poly__within=bbox).unionagg() # A more sensible approach.
+Django provides some GIS-specific aggregate functions. For details on how to
+use these aggregate functions, see :doc:`the topic guide on aggregation
+</topics/db/aggregation>`.
 
 =====================  =====================================================
 Keyword Argument       Description
@@ -1187,9 +1299,6 @@ Keyword Argument       Description
 
 __ http://docs.oracle.com/html/B14255_01/sdo_intro.htm#sthref150
 
-Aggregate Functions
--------------------
-
 Example::
 
     >>> from django.contrib.gis.db.models import Extent, Union
@@ -1200,38 +1309,87 @@ Example::
 
 .. class:: Collect(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.collect` aggregate method.
+*Availability*: PostGIS, Spatialite (≥3.0)
+
+Returns a ``GEOMETRYCOLLECTION`` or a ``MULTI`` geometry object from the geometry
+column. This is analogous to a simplified version of the :class:`Union`
+aggregate, except it can be several orders of magnitude faster than performing
+a union because it simply rolls up geometries into a collection or multi object,
+not caring about dissolving boundaries.
 
 ``Extent``
 ~~~~~~~~~~
+
 .. class:: Extent(geo_field)
 
+*Availability*: PostGIS, Oracle, Spatialite (≥3.0)
 
-Returns the same as the :meth:`GeoQuerySet.extent` aggregate method.
+Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
+comprising the lower left coordinate and the upper right coordinate.
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
+    >>> print(qs[poly__extent])
+    (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
 ~~~~~~~~~~~~
 
 .. class:: Extent3D(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.extent3d` aggregate method.
+*Availability*: PostGIS
+
+Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
+comprising the lower left coordinate and upper right coordinate (each with x, y,
+and z coordinates).
+
+Example::
+
+    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
+    >>> print(qs[poly__extent3d])
+    (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
 ~~~~~~~~~~~~
 
 .. class:: MakeLine(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.make_line` aggregate method.
+*Availability*: PostGIS
+
+Returns a ``LineString`` constructed from the point field geometries in the
+``QuerySet``. Currently, ordering the queryset has no effect.
+
+Example::
+
+     >>> print(City.objects.filter(name__in=('Houston', 'Dallas')
+     ...      ).aggregate(MakeLine('poly'))[poly__makeline]
+     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
 ~~~~~~~~~
 
 .. class:: Union(geo_field)
 
-Returns the same as the :meth:`GeoQuerySet.union` aggregate method.
+*Availability*: PostGIS, Oracle, SpatiaLite
+
+This method returns a :class:`~django.contrib.gis.geos.GEOSGeometry` object
+comprising the union of every geometry in the queryset. Please note that use of
+``Union`` is processor intensive and may take a significant amount of time on
+large querysets.
+
+.. note::
+
+    If the computation time for using this method is too expensive, consider
+    using :class:`Collect` instead.
+
+Example::
+
+    >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <http://docs.oracle.com/cd/B19306_01/appdev.102/b14255/sdo_operat.htm#sthref845>`_, from Ch. 11 of the Oracle Spatial User's Guide and Manual.
 .. [#fncovers] For an explanation of this routine, read `Quirks of the "Contains" Spatial Predicate <http://lin-ear-th-inking.blogspot.com/2007/06/subtleties-of-ogc-covers-spatial.html>`_ by Martin Davis (a PostGIS developer).
-.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.refractions.net/documentation/manual-1.4/ST_ContainsProperly.html>`_ for more details.
+.. [#fncontainsproperly] Refer to the PostGIS ``ST_ContainsProperly`` `documentation <http://postgis.net/docs/manual-1.5/ST_ContainsProperly.html>`_ for more details.

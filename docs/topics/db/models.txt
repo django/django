@@ -70,11 +70,11 @@ For example, if the models for your application live in the module
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         #...
         'myapp',
         #...
-    )
+    ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
 :djadmin:`manage.py migrate <migrate>`, optionally making migrations
@@ -190,9 +190,9 @@ ones:
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
         >>> p.shirt_size
-        u'L'
+        'L'
         >>> p.get_shirt_size_display()
-        u'Large'
+        'Large'
 
 :attr:`~Field.default`
     The default value for the field. This can be a value or a callable
@@ -212,6 +212,23 @@ ones:
     :attr:`primary_key=True <Field.primary_key>` on any of your fields
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.
+
+    The primary key field is read-only. If you change the value of the primary
+    key on an existing object and then save it, a new object will be created
+    alongside the old one. For example::
+
+        from django.db import models
+
+        class Fruit(models.Model):
+            name = models.CharField(max_length=100, primary_key=True)
+
+    .. code-block:: pycon
+
+        >>> fruit = Fruit.objects.create(name='Apple')
+        >>> fruit.name = 'Pear'
+        >>> fruit.save()
+        >>> Fruit.objects.values_list('name', flat=True)
+        ['Apple', 'Pear']
 
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
@@ -417,16 +434,14 @@ something like this::
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Group(models.Model):
         name = models.CharField(max_length=128)
         members = models.ManyToManyField(Person, through='Membership')
 
-        # On Python 3: def __str__(self):
-        def __unicode__(self):
+        def __str__(self):              # __unicode__ on Python 2
             return self.name
 
     class Membership(models.Model):
@@ -436,24 +451,26 @@ something like this::
         invite_reason = models.CharField(max_length=64)
 
 When you set up the intermediary model, you explicitly specify foreign
-keys to the models that are involved in the ManyToMany relation. This
+keys to the models that are involved in the many-to-many relationship. This
 explicit declaration defines how the two models are related.
 
 There are a few restrictions on the intermediate model:
 
 * Your intermediate model must contain one - and *only* one - foreign key
-  to the target model (this would be ``Person`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
+  to the source model (this would be ``Group`` in our example), or you must
+  explicitly specify the foreign keys Django should use for the relationship
+  using :attr:`ManyToManyField.through_fields <ManyToManyField.through_fields>`.
+  If you have more than one foreign key and ``through_fields`` is not
+  specified, a validation error will be raised. A similar restriction applies
+  to the foreign key to the target model (this would be ``Person`` in our
+  example).
 
-* Your intermediate model must contain one - and *only* one - foreign key
-  to the source model (this would be ``Group`` in our example). If you
-  have more than one foreign key, a validation error will be raised.
-
-* The only exception to this is a model which has a many-to-many
-  relationship to itself, through an intermediary model. In this
-  case, two foreign keys to the same model are permitted, but they
-  will be treated as the two (different) sides of the many-to-many
-  relation.
+* For a model which has a many-to-many relationship to itself through an
+  intermediary model, two foreign keys to the same model are permitted, but
+  they will be treated as the two (different) sides of the many-to-many
+  relationship. If there are *more* than two foreign keys though, you
+  must also specify ``through_fields`` as above, or a validation error
+  will be raised.
 
 * When defining a many-to-many relationship from a model to
   itself, using an intermediary model, you *must* use
@@ -535,7 +552,7 @@ querying the ``Membership`` model::
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
@@ -545,7 +562,7 @@ Another way to access the same information is by querying the
     >>> ringos_membership.date_joined
     datetime.date(1962, 8, 16)
     >>> ringos_membership.invite_reason
-    u'Needed a new drummer.'
+    'Needed a new drummer.'
 
 
 One-to-one relationships
@@ -665,6 +682,20 @@ Meta`` to a model is completely optional.
 A complete list of all possible ``Meta`` options can be found in the :doc:`model
 option reference </ref/models/options>`.
 
+.. _model-attributes:
+
+Model attributes
+================
+
+``objects``
+    The most important attribute of a model is the
+    :class:`~django.db.models.Manager`. It's the interface through which
+    database query operations are provided to Django models and is used to
+    :ref:`retrieve the instances <retrieving-objects>` from the database. If no
+    custom ``Manager`` is defined, the default name is
+    :attr:`~django.db.models.Model.objects`. Managers are only accessible via
+    model classes, not the model instances.
+
 .. _model-methods:
 
 Model methods
@@ -685,9 +716,6 @@ For example, this model has a few custom methods::
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         birth_date = models.DateField()
-        address = models.CharField(max_length=100)
-        city = models.CharField(max_length=50)
-        state = models.CharField(max_length=2)      # yes, this is America-centric
 
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
@@ -698,10 +726,6 @@ For example, this model has a few custom methods::
                 return "Baby boomer"
             else:
                 return "Post-boomer"
-
-        def is_midwestern(self):
-            "Returns True if this person is from the Midwest."
-            return self.state in ('IL', 'WI', 'MI', 'IN', 'OH', 'IA', 'MO')
 
         def _get_full_name(self):
             "Returns the person's full name."
@@ -819,11 +843,14 @@ Model inheritance
 =================
 
 Model inheritance in Django works almost identically to the way normal
-class inheritance works in Python. The only decision you have to make
-is whether you want the parent models to be models in their own right
-(with their own database tables), or if the parents are just holders
-of common information that will only be visible through the child
-models.
+class inheritance works in Python, but the basics at the beginning of the page
+should still be followed. That means the base class should subclass
+:class:`django.db.models.Model`.
+
+The only decision you have to make is whether you want the parent models to be
+models in their own right (with their own database tables), or if the parents
+are just holders of common information that will only be visible through the
+child models.
 
 There are three styles of inheritance that are possible in Django.
 
@@ -960,7 +987,7 @@ The reverse name of the ``common.ChildA.m2m`` field will be
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
 to construct your related name, but if you forget to use it, Django will raise
-errors when you validate your models (or run :djadmin:`migrate`).
+errors when you perform system checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -990,8 +1017,8 @@ For example::
         address = models.CharField(max_length=80)
 
     class Restaurant(Place):
-        serves_hot_dogs = models.BooleanField()
-        serves_pizza = models.BooleanField()
+        serves_hot_dogs = models.BooleanField(default=False)
+        serves_pizza = models.BooleanField(default=False)
 
 All of the fields of ``Place`` will also be available in ``Restaurant``,
 although the data will reside in a different database table. So these are both
@@ -1011,7 +1038,8 @@ of the model name::
 
 However, if ``p`` in the above example was *not* a ``Restaurant`` (it had been
 created directly as a ``Place`` object or was the parent of some other class),
-referring to ``p.restaurant`` would raise a Restaurant.DoesNotExist exception.
+referring to ``p.restaurant`` would raise a ``Restaurant.DoesNotExist``
+exception.
 
 ``Meta`` and multi-table inheritance
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1049,19 +1077,27 @@ as in the above example. However, this uses up the name that is the
 default :attr:`~django.db.models.ForeignKey.related_name` value for
 :class:`~django.db.models.ForeignKey` and
 :class:`~django.db.models.ManyToManyField` relations.  If you
-are putting those types of relations on a subclass of another model,
-you **must** specify the
-:attr:`~django.db.models.ForeignKey.related_name` attribute on each
-such field. If you forget, Django will raise an error when you run
-:djadmin:`validate` or :djadmin:`migrate`.
+are putting those types of relations on a subclass of the parent model, you
+**must** specify the :attr:`~django.db.models.ForeignKey.related_name`
+attribute on each such field. If you forget, Django will raise a validation
+error.
 
 For example, using the above ``Place`` class again, let's create another
 subclass with a :class:`~django.db.models.ManyToManyField`::
 
     class Supplier(Place):
-        # Must specify related_name on all relations.
-        customers = models.ManyToManyField(Restaurant, related_name='provider')
+        customers = models.ManyToManyField(Place)
 
+This results in the error::
+
+    Reverse query name for 'Supplier.customers' clashes with reverse query
+    name for 'Supplier.place_ptr'.
+
+    HINT: Add or change a related_name argument to the definition for
+    'Supplier.customers' or 'Supplier.place_ptr'.
+
+Adding ``related_name`` to the ``customers`` field as follows would resolve the
+error: ``models.ManyToManyField(Place, related_name='provider')``.
 
 Specifying the parent link field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1153,9 +1189,6 @@ provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields.
 
-Proxy models inherit any ``Meta`` options that they don't define from their
-non-abstract model parent (the model they are proxying for).
-
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1242,6 +1275,8 @@ So, the general rules are:
    This sets things up so that the proxy model is an exact copy of the
    storage structure of the original model when data is saved.
 
+.. _model-multiple-inheritance-topic:
+
 Multiple inheritance
 --------------------
 
@@ -1258,6 +1293,35 @@ field or method to every class that inherits the mix-in. Try to keep your
 inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
+
+Note that inheriting from multiple models that have a common ``id`` primary
+key field will raise an error. To properly use multiple inheritance, you can
+use an explicit :class:`~django.db.models.AutoField` in the base models::
+
+    class Article(models.Model):
+        article_id = models.AutoField(primary_key=True)
+        ...
+
+    class Book(models.Model):
+        book_id = models.AutoField(primary_key=True)
+        ...
+
+    class BookReview(Book, Article):
+        pass
+
+Or use a common ancestor to hold the :class:`~django.db.models.AutoField`::
+
+    class Piece(models.Model):
+        pass
+
+    class Article(Piece):
+        ...
+
+    class Book(Piece):
+        ...
+
+    class BookReview(Book, Article):
+        pass
 
 Field name "hiding" is not permitted
 -------------------------------------
@@ -1286,3 +1350,9 @@ different database tables).
 
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
+
+.. seealso::
+
+    :doc:`The Models Reference </ref/models/index>`
+        Covers all the model related APIs including model fields, related
+        objects, and ``QuerySet``.

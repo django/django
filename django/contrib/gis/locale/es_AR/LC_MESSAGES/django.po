@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Ramiro Morales <cramm0@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Ramiro Morales, 2012,2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-16 01:45+0000\n"
-"Last-Translator: Ramiro Morales <cramm0@gmail.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-24 00:38+0000\n"
+"Last-Translator: Ramiro Morales\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
 "django/language/es_AR/)\n"
 "MIME-Version: 1.0\n"
@@ -18,62 +18,47 @@ msgstr ""
 "Language: es_AR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "No se han registrado feeds"
+msgid "GIS"
+msgstr "SIG"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "El slug %r no ha sido registrado"
-
-#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "El campo GIS base -- corresponde al tipo Geometry de la especificación "
 "OpenGIS."
 
-#: db/models/fields.py:271
 msgid "Point"
 msgstr "Punto"
 
-#: db/models/fields.py:275
 msgid "Line string"
 msgstr "Secuencia de líneas"
 
-#: db/models/fields.py:279
 msgid "Polygon"
 msgstr "Polígono"
 
-#: db/models/fields.py:283
 msgid "Multi-point"
 msgstr "Multi-punto"
 
-#: db/models/fields.py:287
 msgid "Multi-line string"
 msgstr "Cadena multi-línea"
 
-#: db/models/fields.py:291
 msgid "Multi polygon"
 msgstr "Multi polígono"
 
-#: db/models/fields.py:295
 msgid "Geometry collection"
 msgstr "Colección de Geometry's"
 
-#: forms/fields.py:19
+msgid "Extent Aggregate Field"
+msgstr "Campo Extent Aggregate"
+
 msgid "No geometry value provided."
 msgstr "No se ha proporcionado un valor de geometría."
 
-#: forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr "Valor de geometría no válido."
 
-#: forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr "Tipo de geometría no válido."
 
-#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -81,17 +66,21 @@ msgstr ""
 "Ha ocurrido un error mientras se transformaba la geometría al SRID del campo "
 "de formulario de la misma."
 
-#: sitemaps/views.py:46
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "No hay un sitemap disponible para la sección: %r"
+msgid "Delete all Features"
+msgstr "Eliminar todas las Features"
 
-#: sitemaps/views.py:60
-#, python-format
-msgid "Page %s empty"
-msgstr "La página %s está vacía"
+msgid "WKT debugging window:"
+msgstr "Ventana de depuración WTK:"
 
-#: sitemaps/views.py:62
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps vía GeoDjango"
+
+msgid "Debugging window (serialized value)"
+msgstr "Ventana de depuración (valor serializado)"
+
+msgid "No feeds are registered."
+msgstr "No se han registrado feeds"
+
 #, python-format
-msgid "No page '%s'"
-msgstr "No existe la página '%s'"
+msgid "Slug %r isn't registered."
+msgstr "El slug %r no ha sido registrado"

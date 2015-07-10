@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Meir Kriheli <mkriheli@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Meir Kriheli <mkriheli@gmail.com>, 2012,2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-10-23 09:00+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-21 19:48+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
@@ -18,76 +18,65 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "לא נרשמו פידים."
+msgid "GIS"
+msgstr "מערכת מידע גאוגרפית"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slug %r אינו רשום."
-
-#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "שדה ה־GIS הבסיסי -- ממופה לטיפוס OpenGIS Specification Geometry."
 
-#: db/models/fields.py:271
 msgid "Point"
 msgstr "נקודה"
 
-#: db/models/fields.py:275
 msgid "Line string"
 msgstr "מחרוזת קו"
 
-#: db/models/fields.py:279
 msgid "Polygon"
 msgstr "פוליגון"
 
-#: db/models/fields.py:283
 msgid "Multi-point"
 msgstr "מרובה־נקודות"
 
-#: db/models/fields.py:287
 msgid "Multi-line string"
 msgstr "מחרוזת קו מרובת שורות"
 
-#: db/models/fields.py:291
 msgid "Multi polygon"
 msgstr "פוליגון מרובה"
 
-#: db/models/fields.py:295
 msgid "Geometry collection"
 msgstr "אוסף גיאומטרי"
 
-#: forms/fields.py:19
+msgid "Extent Aggregate Field"
+msgstr "שדה Extent Aggregate"
+
 msgid "No geometry value provided."
 msgstr "לא סופק ערך גיאומטרי."
 
-#: forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr "ערך גאומטרי שגוי."
 
-#: forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr "סוג גיאומטרי שגוי."
 
-#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "הייתה בעיה עם השינוי של הצורה לסוג של השדה."
 
-#: sitemaps/views.py:46
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "אין sitemap זמין עבור מדור: %r"
+msgid "Delete all Features"
+msgstr "מחיקת כל התכונות"
 
-#: sitemaps/views.py:60
-#, python-format
-msgid "Page %s empty"
-msgstr "עמוד %s ריק"
+msgid "WKT debugging window:"
+msgstr "חלון ניפוי שגיאות WKT:"
 
-#: sitemaps/views.py:62
+msgid "Google Maps via GeoDjango"
+msgstr "מפות גוגל דרך GeoDjango"
+
+msgid "Debugging window (serialized value)"
+msgstr "חלון ניפוי שגיאות (serialized value)"
+
+msgid "No feeds are registered."
+msgstr "לא נרשמו פידים."
+
 #, python-format
-msgid "No page '%s'"
-msgstr "עמוד '%s' אינו קיים"
+msgid "Slug %r isn't registered."
+msgstr "Slug %r אינו רשום."

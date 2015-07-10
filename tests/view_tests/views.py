@@ -1,22 +1,24 @@
 from __future__ import unicode_literals
 
-import os
+import datetime
+import decimal
+import logging
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import get_resolver
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render_to_response, render
-from django.template import Context, RequestContext, TemplateDoesNotExist
-from django.views.debug import technical_500_response, SafeExceptionReporterFilter
-from django.views.decorators.debug import (sensitive_post_parameters,
-                                           sensitive_variables)
-from django.utils._os import upath
-from django.utils.log import getLogger
+from django.http import Http404, HttpResponse, JsonResponse
+from django.shortcuts import render, render_to_response
+from django.template import TemplateDoesNotExist
+from django.views.debug import (
+    SafeExceptionReporterFilter, technical_500_response,
+)
+from django.views.decorators.debug import (
+    sensitive_post_parameters, sensitive_variables,
+)
+from django.views.generic import View
 
 from . import BrokenException, except_args
-
-dirs = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
 
 
 def index_page(request):
@@ -50,19 +52,21 @@ def raises400(request):
 
 
 def raises403(request):
-    raise PermissionDenied
+    raise PermissionDenied("Insufficient Permissions")
 
 
 def raises404(request):
     resolver = get_resolver(None)
-    resolver.resolve('')
+    resolver.resolve('/not-in-urls')
 
 
-def redirect(request):
-    """
-    Forces an HTTP redirect.
-    """
-    return HttpResponseRedirect("target/")
+def technical404(request):
+    raise Http404("Testing technical 404.")
+
+
+class Http404View(View):
+    def get(self, request):
+        raise Http404("Testing class-based technical 404.")
 
 
 def view_exception(request, n):
@@ -77,80 +81,9 @@ def template_exception(request, n):
 def jsi18n(request):
     return render_to_response('jsi18n.html')
 
-# Some views to exercise the shortcuts
 
-
-def render_to_response_view(request):
-    return render_to_response('debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    })
-
-
-def render_to_response_view_with_request_context(request):
-    return render_to_response('debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, context_instance=RequestContext(request))
-
-
-def render_to_response_view_with_content_type(request):
-    return render_to_response('debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, content_type='application/x-rendertest')
-
-
-def render_to_response_view_with_dirs(request):
-    return render_to_response('render_dirs_test.html', dirs=dirs)
-
-
-def render_view(request):
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    })
-
-
-def render_view_with_base_context(request):
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, context_instance=Context())
-
-
-def render_view_with_content_type(request):
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, content_type='application/x-rendertest')
-
-
-def render_view_with_status(request):
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, status=403)
-
-
-def render_view_with_current_app(request):
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, current_app="foobar_app")
-
-
-def render_view_with_current_app_conflict(request):
-    # This should fail because we don't passing both a current_app and
-    # context_instance:
-    return render(request, 'debug/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, current_app="foobar_app", context_instance=RequestContext(request))
-
-
-def render_with_dirs(request):
-    return render(request, 'render_dirs_test.html', dirs=dirs)
+def jsi18n_multi_catalogs(request):
+    return render_to_response('jsi18n-multi-catalogs.html')
 
 
 def raises_template_does_not_exist(request, path='i_dont_exist.html'):
@@ -169,7 +102,7 @@ def render_no_template(request):
 
 
 def send_log(request, exc_info):
-    logger = getLogger('django.request')
+    logger = logging.getLogger('django')
     # The default logging config has a logging filter to ensure admin emails are
     # only sent with DEBUG=False, but since someone might choose to remove that
     # filter, we still want to be able to test the behavior of error emails
@@ -334,3 +267,13 @@ def multivalue_dict_key_error(request):
         exc_info = sys.exc_info()
         send_log(request, exc_info)
         return technical_500_response(request, *exc_info)
+
+
+def json_response_view(request):
+    return JsonResponse({
+        'a': [1, 2, 3],
+        'foo': {'bar': 'baz'},
+        # Make sure datetime and Decimal objects would be serialized properly
+        'timestamp': datetime.datetime(2013, 5, 19, 20),
+        'value': decimal.Decimal('3.14'),
+    })

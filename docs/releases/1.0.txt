@@ -194,10 +194,7 @@ Refactored ``django.contrib.comments``
 
 As part of a Google Summer of Code project, Thejaswi Puthraya carried out a
 major rewrite and refactoring of Django's bundled comment system, greatly
-increasing its flexibility and customizability. :doc:`Full documentation
-</ref/contrib/comments/index>` is available, as well as an upgrade guide
-if you were using the previous incarnation of
-the comments application.
+increasing its flexibility and customizability.
 
 Removal of deprecated features
 ------------------------------
@@ -244,4 +241,3 @@ backends. However, not all database backends are alike, and in particular many o
 - :ref:`mysql-notes`
 - :ref:`sqlite-notes`
 - :ref:`oracle-notes`
-

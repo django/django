@@ -1,5 +1,5 @@
 """
-13. Adding hooks before/after saving and deleting
+Adding hooks before/after saving and deleting
 
 To execute arbitrary code around ``save()`` and ``delete()``, just subclass
 the methods.
@@ -24,7 +24,7 @@ class Person(models.Model):
 
     def save(self, *args, **kwargs):
         self.data.append("Before save")
-         # Call the "real" save() method
+        # Call the "real" save() method
         super(Person, self).save(*args, **kwargs)
         self.data.append("After save")
 

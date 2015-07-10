@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-01 19:17+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -18,22 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: models.py:38
-msgid "session key"
-msgstr "goriad sesiwn"
+msgid "Sessions"
+msgstr "Sesiynau"
 
-#: models.py:40
+msgid "session key"
+msgstr "allwedd sesiwn"
+
 msgid "session data"
 msgstr "data sesiwn"
 
-#: models.py:41
 msgid "expire date"
-msgstr "dyddiad darfod"
+msgstr "dyddiad terfyn"
 
-#: models.py:46
 msgid "session"
 msgstr "sesiwn"
 
-#: models.py:47
 msgid "sessions"
 msgstr "sesiynau"

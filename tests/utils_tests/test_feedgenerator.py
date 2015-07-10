@@ -89,7 +89,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         atom_feed = feedgenerator.Atom1Feed("title", "link", "description")
         self.assertEqual(
-            atom_feed.mime_type, "application/atom+xml; charset=utf-8"
+            atom_feed.content_type, "application/atom+xml; charset=utf-8"
         )
 
     def test_rss_mime_type(self):
@@ -98,7 +98,7 @@ class FeedgeneratorTest(unittest.TestCase):
         """
         rss_feed = feedgenerator.Rss201rev2Feed("title", "link", "description")
         self.assertEqual(
-            rss_feed.mime_type, "application/rss+xml; charset=utf-8"
+            rss_feed.content_type, "application/rss+xml; charset=utf-8"
         )
 
     # Two regression tests for #14202

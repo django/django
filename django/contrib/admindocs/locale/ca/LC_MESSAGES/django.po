@@ -1,15 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Carles Barrobés <carles@barrobes.com>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# abraham.martin <abraham.martin@gmail.com>, 2014
+# Antoni Aloy <aaloy@apsl.net>, 2014
+# Carles Barrobés <carles@barrobes.com>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: Carles Barrobés <carles@barrobes.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -18,96 +20,21 @@ msgstr ""
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "etiqueta:"
+msgid "Administrative Documentation"
+msgstr "Documentació Administrativa"
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "filtre:"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "vista:"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "No s'ha pogut trobar l'aplicació %r"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "El model %(model_name)r no s'ha trobat a l'aplicació %(app_label)r"
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "model:"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "tots %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "nombre de %s"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr "Camps en objectes %s"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s no sembla ser un objecte 'urlpattern'"
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Inici"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Documentació"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "'Bookmarklets'"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "'Bookmarklets' de documentació"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -127,22 +54,18 @@ msgstr ""
 "amb el vostre administrador de sistemes si no esteu segurs si el vostre "
 "ordinador és \"intern\").</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Documentació d'aquesta pàgina"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "Us porta des de qualsevol pàgina a la documentació de la vista que la genera."
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Mostra l'ID de l'objecte"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -150,51 +73,241 @@ msgstr ""
 "Mostra el 'content-type' (tipus de contingut) i l'ID inequívoc de les "
 "pàgines que representen un únic objecte."
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Editar aquest objecte (finestra actual)"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr ""
 "El porta a la pàgina d'administració de pàgines que representen un únic "
 "objecte."
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Editar aquest objecte (nova finestra)"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Com abans, però obre la pàgina d'administració en una nova finestra."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr "Models"
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr "Plantilles"
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr "Filtres"
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Etiquetes"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr "Llista d'etiquetes de plantilles i les seves funcions."
+
+msgid "Filters"
+msgstr "Filtres"
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+"Els filtres són accions que poden ser aplicades a variables a una plantilla "
+"per alterar la seva sortida."
+
+msgid "Models"
+msgstr "Models"
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+"Els models són descripcions de tots els objectes del sistema i els seus "
+"camps associats. Cada model té una llista de camps que són accessibles com "
+"variables de la plantilla."
+
 msgid "Views"
 msgstr "Vistes"
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+"Cada plana del lloc públic és generat per una vista (view). La vista "
+"defineix quina plantilla es fa servir per generar la plana i quins objectes "
+"estan disponibles a aquella plantilla."
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+"Eines pel seu navegador per accedir ràpidament a la funcionalitat de l'admin."
+
+msgid "Please install docutils"
+msgstr "Si us plau instal·leu docutils"
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"El sistema d'administració de documentació requereix de la biblioteca de "
+"Python <a href=\"%(link)s\">docutils</a>."
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Si us plau, demani als seus administradors la instal·lació de <a href="
+"\"%(link)s\">docutils</a> ."
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Model: %(name)s"
+
+msgid "Field"
+msgstr "Camp"
+
+msgid "Type"
+msgstr "Tipus"
+
+msgid "Description"
+msgstr "Descripció"
+
+msgid "Back to Model Documentation"
+msgstr "Tornar a la documentació del Model"
+
+msgid "Model documentation"
+msgstr "Documentació del model"
+
+msgid "Model groups"
+msgstr "Grups de model"
+
+msgid "Templates"
+msgstr "Plantilles"
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Plantilla: %(name)s"
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Plantilla: \"%(name)s\""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr "Camí de cerca per la plantilla \"%(name)s\":"
+
+msgid "(does not exist)"
+msgstr "(no existeix)"
+
+msgid "Back to Documentation"
+msgstr "Tornar a la documentació"
+
+msgid "Template filters"
+msgstr "Filtres de plantilla"
+
+msgid "Template filter documentation"
+msgstr "Documentació dels filtres de plantilla"
+
+msgid "Built-in filters"
+msgstr "Filtres integrats"
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"Per utilitzar aquests filtres, introdueixi <code>%(code)s</code> a la seva "
+"plantilla abans d'utilitzar el filtre."
+
+msgid "Template tags"
+msgstr "Etiquetes de plantilles"
+
+msgid "Template tag documentation"
+msgstr "Documentació de les etiquetes de plantilla"
+
+msgid "Built-in tags"
+msgstr "Etiquetes integrades"
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"Per utilitzar aquestes etiquetes, introdueix <code>%(code)s</code> a la teva "
+"plantilla abans d'utilitzar l'etiqueta"
+
+#, python-format
+msgid "View: %(name)s"
+msgstr "Vista: %(name)s"
+
+msgid "Context:"
+msgstr "Contexte:"
+
+msgid "Templates:"
+msgstr "Plantilles:"
+
+msgid "Back to Views Documentation"
+msgstr "Tornar a la documentació de les Vistes"
+
+msgid "View documentation"
+msgstr "Veure documentació"
+
+msgid "Jump to namespace"
+msgstr "Anar a l'espai de noms"
+
+msgid "Empty namespace"
+msgstr "Espai de noms buit"
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr "Vistes de l'espai de noms %(name)s"
+
+msgid "Views by empty namespace"
+msgstr "Vistes per l'espai de noms buit"
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+"\n"
+"Funció de la vista: <code>%(full_name)s</code> . Nom: <code>%(url_name)s</"
+"code> .\n"
+
 msgid "Boolean (Either True or False)"
 msgstr "Booleà (Cert o Fals)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Camp del tipus: %(field_type)s"
+
+msgid "tag:"
+msgstr "etiqueta:"
+
+msgid "filter:"
+msgstr "filtre:"
+
+msgid "view:"
+msgstr "vista:"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr "Aplicació %(app_label)r no trobada"
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "El model %(model_name)r no s'ha trobat a l'aplicació %(app_label)r"
+
+msgid "model:"
+msgstr "model:"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "l'objecte relacionat `%(app_label)s.%(data_type)s`"
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "objectes relacionats `%(app_label)s.%(object_name)s`"
+
+#, python-format
+msgid "all %s"
+msgstr "tots %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "nombre de %s"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s no sembla ser un objecte 'urlpattern'"

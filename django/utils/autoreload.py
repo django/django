@@ -31,19 +31,13 @@
 import os
 import signal
 import sys
-import tempfile
 import time
 import traceback
 
+from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-from django.utils._os import upath
-from django.utils.importlib import import_module
-from django.utils import six
-try:
-    from django.utils.six.moves import _thread as thread
-except ImportError:
-    from django.utils.six.moves import _dummy_thread as thread
+from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -69,46 +63,50 @@ try:
 except ImportError:
     pass
 
-try:
-    import select
-    select.kevent, select.kqueue
-    USE_KQUEUE = True
-
-    import resource
-    NOFILES_SOFT, NOFILES_HARD = resource.getrlimit(resource.RLIMIT_NOFILE)
-
-    import subprocess
-    command = ["sysctl", "-n", "kern.maxfilesperproc"]
-    NOFILES_KERN = int(subprocess.check_output(command).strip())
-except (AttributeError, OSError):
-    USE_KQUEUE = False
-
 RUN_RELOADER = True
+
+FILE_MODIFIED = 1
+I18N_MODIFIED = 2
 
 _mtimes = {}
 _win = (sys.platform == "win32")
 
 _error_files = []
+_cached_modules = set()
+_cached_filenames = []
 
 
-def gen_filenames():
+def gen_filenames(only_new=False):
     """
-    Yields a generator over filenames referenced in sys.modules and translation
+    Returns a list of filenames referenced in sys.modules and translation
     files.
     """
-    filenames = [filename.__file__ for filename in sys.modules.values()
-                if hasattr(filename, '__file__')]
+    # N.B. ``list(...)`` is needed, because this runs in parallel with
+    # application code which might be mutating ``sys.modules``, and this will
+    # fail with RuntimeError: cannot mutate dictionary while iterating
+    global _cached_modules, _cached_filenames
+    module_values = set(sys.modules.values())
+    _cached_filenames = clean_files(_cached_filenames)
+    if _cached_modules == module_values:
+        # No changes in module list, short-circuit the function
+        if only_new:
+            return []
+        else:
+            return _cached_filenames
 
-    if settings.USE_I18N:
+    new_modules = module_values - _cached_modules
+    new_filenames = clean_files(
+        [filename.__file__ for filename in new_modules
+         if hasattr(filename, '__file__')])
+
+    if not _cached_filenames and settings.USE_I18N:
         # Add the names of the .mo files that can be generated
         # by compilemessages management command to the list of files watched.
         basedirs = [os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                  'conf', 'locale'),
                     'locale']
-        for appname in reversed(settings.INSTALLED_APPS):
-            app = import_module(appname)
-            basedirs.append(os.path.join(os.path.dirname(upath(app.__file__)),
-                                         'locale'))
+        for app_config in reversed(list(apps.get_app_configs())):
+            basedirs.append(os.path.join(app_config.path, 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]
@@ -116,9 +114,19 @@ def gen_filenames():
             for dirpath, dirnames, locale_filenames in os.walk(basedir):
                 for filename in locale_filenames:
                     if filename.endswith('.mo'):
-                        filenames.append(os.path.join(dirpath, filename))
+                        new_filenames.append(os.path.join(dirpath, filename))
 
-    for filename in filenames + _error_files:
+    _cached_modules = _cached_modules.union(new_modules)
+    _cached_filenames += new_filenames
+    if only_new:
+        return new_filenames
+    else:
+        return _cached_filenames + clean_files(_error_files)
+
+
+def clean_files(filelist):
+    filenames = []
+    for filename in filelist:
         if not filename:
             continue
         if filename.endswith(".pyc") or filename.endswith(".pyo"):
@@ -126,7 +134,17 @@ def gen_filenames():
         if filename.endswith("$py.class"):
             filename = filename[:-9] + ".py"
         if os.path.exists(filename):
-            yield filename
+            filenames.append(filename)
+    return filenames
+
+
+def reset_translations():
+    import gettext
+    from django.utils.translation import trans_real
+    gettext._translations = {}
+    trans_real._translations = {}
+    trans_real._default = None
+    trans_real._active = threading.local()
 
 
 def inotify_code_changed():
@@ -134,19 +152,34 @@ def inotify_code_changed():
     Checks for changed code using inotify. After being called
     it blocks until a change event has been fired.
     """
+    class EventHandler(pyinotify.ProcessEvent):
+        modified_code = None
+
+        def process_default(self, event):
+            if event.path.endswith('.mo'):
+                EventHandler.modified_code = I18N_MODIFIED
+            else:
+                EventHandler.modified_code = FILE_MODIFIED
+
     wm = pyinotify.WatchManager()
-    notifier = pyinotify.Notifier(wm)
+    notifier = pyinotify.Notifier(wm, EventHandler())
 
     def update_watch(sender=None, **kwargs):
+        if sender and getattr(sender, 'handles_files', False):
+            # No need to update watches when request serves files.
+            # (sender is supposed to be a django.core.handlers.BaseHandler subclass)
+            return
         mask = (
             pyinotify.IN_MODIFY |
             pyinotify.IN_DELETE |
             pyinotify.IN_ATTRIB |
             pyinotify.IN_MOVED_FROM |
             pyinotify.IN_MOVED_TO |
-            pyinotify.IN_CREATE
+            pyinotify.IN_CREATE |
+            pyinotify.IN_DELETE_SELF |
+            pyinotify.IN_MOVE_SELF
         )
-        for path in gen_filenames():
+        for path in gen_filenames(only_new=True):
             wm.add_watch(path, mask)
 
     # New modules may get imported when a request is processed.
@@ -155,92 +188,12 @@ def inotify_code_changed():
     # Block until an event happens.
     update_watch()
     notifier.check_events(timeout=None)
+    notifier.read_events()
+    notifier.process_events()
     notifier.stop()
 
     # If we are here the code must have changed.
-    return True
-
-
-def kqueue_code_changed():
-    """
-    Checks for changed code using kqueue. After being called
-    it blocks until a change event has been fired.
-    """
-    kqueue = select.kqueue()
-
-    # Utility function to create kevents.
-    _filter = select.KQ_FILTER_VNODE
-    flags = select.KQ_EV_ADD
-    fflags = select.KQ_NOTE_DELETE | select.KQ_NOTE_WRITE | select.KQ_NOTE_RENAME
-
-    def make_kevent(descriptor):
-        return select.kevent(descriptor, _filter, flags, fflags)
-
-    # New modules may get imported when a request is processed. We add a file
-    # descriptor to the kqueue to exit the kqueue.control after each request.
-    buf_kwargs = {'buffering' if six.PY3 else 'bufsize': 0}
-    watcher = tempfile.TemporaryFile(**buf_kwargs)
-    kqueue.control([make_kevent(watcher)], 0)
-
-    def update_watch(sender=None, **kwargs):
-        watcher.write(b'.')
-
-    request_finished.connect(update_watch)
-
-    # We have to manage a set of descriptors to avoid the overhead of opening
-    # and closing every files whenever we reload the set of files to watch.
-    filenames = set()
-    descriptors = set()
-
-    while True:
-        old_filenames = filenames
-        filenames = set(gen_filenames())
-        new_filenames = filenames - old_filenames
-
-        # If new files were added since the last time we went through the loop,
-        # add them to the kqueue.
-        if new_filenames:
-
-            # We must increase the maximum number of open file descriptors
-            # because each kevent uses one file descriptor and resource limits
-            # are too low by default.
-            #
-            # In fact there are two limits:
-            # - kernel limit: `sysctl kern.maxfilesperproc` -> 10240 on OS X.9
-            # - resource limit: `launchctl limit maxfiles` -> 256 on OS X.9
-            #
-            # The latter can be changed with Python's resource module, but it
-            # can never exceed the former. Unfortunately, getrlimit(3) -- used
-            # by both launchctl and the resource module -- reports no "hard
-            # limit", even though the kernel sets one.
-
-            # If project is too large or kernel limits are too tight, use polling.
-            if len(filenames) >= NOFILES_KERN:
-                return code_changed()
-
-            # Add the number of file descriptors we're going to use to the current
-            # resource limit, while staying within the kernel limit.
-            nofiles_target = min(len(filenames) + NOFILES_SOFT, NOFILES_KERN)
-            resource.setrlimit(resource.RLIMIT_NOFILE, (nofiles_target, NOFILES_HARD))
-
-            new_descriptors = set(open(filename) for filename in new_filenames)
-            descriptors |= new_descriptors
-
-            kqueue.control([make_kevent(descriptor) for descriptor in new_descriptors], 0)
-
-        events = kqueue.control([], 1)
-
-        # After a request, reload the set of watched files.
-        if len(events) == 1 and events[0].ident == watcher.fileno():
-            continue
-
-        # If the change affected another file, clean up and exit.
-        for descriptor in descriptors:
-            descriptor.close()
-        watcher.close()
-        kqueue.close()
-
-        return True
+    return EventHandler.modified_code
 
 
 def code_changed():
@@ -259,7 +212,7 @@ def code_changed():
                 del _error_files[_error_files.index(filename)]
             except ValueError:
                 pass
-            return True
+            return I18N_MODIFIED if filename.endswith('.mo') else FILE_MODIFIED
     return False
 
 
@@ -305,13 +258,14 @@ def reloader_thread():
     ensure_echo_on()
     if USE_INOTIFY:
         fn = inotify_code_changed
-    elif USE_KQUEUE:
-        fn = kqueue_code_changed
     else:
         fn = code_changed
     while RUN_RELOADER:
-        if fn():
+        change = fn()
+        if change == FILE_MODIFIED:
             sys.exit(3)  # force reload
+        elif change == I18N_MODIFIED:
+            reset_translations()
         time.sleep(1)
 
 

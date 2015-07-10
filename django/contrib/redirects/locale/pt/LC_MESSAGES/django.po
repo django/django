@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Nuno Mariz <nmariz@gmail.com>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Nuno Mariz <nmariz@gmail.com>, 2011
+# Raúl Pedro Fernandes Santos, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Nuno Mariz <nmariz@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (http://www.transifex.com/projects/p/django/"
 "language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +19,12 @@ msgstr ""
 "Language: pt\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9
+msgid "Redirects"
+msgstr "Redireccionamentos"
+
 msgid "redirect from"
 msgstr "redirecionar de"
 
-#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -30,11 +32,9 @@ msgstr ""
 "Isto deverá ser um caminho absoluto, excluindo o domínio. Exemplo: '/events/"
 "search/'."
 
-#: models.py:11
 msgid "redirect to"
 msgstr "redirecionar para"
 
-#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -42,10 +42,8 @@ msgstr ""
 "Isto poderá ser um caminho absoluto (como acima) ou um URL completo começado "
 "por 'http://'."
 
-#: models.py:15
 msgid "redirect"
 msgstr "redirecionar"
 
-#: models.py:16
 msgid "redirects"
 msgstr "redireciona"

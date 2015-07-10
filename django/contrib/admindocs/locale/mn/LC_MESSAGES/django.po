@@ -1,15 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2011-2012.
+# Bayarkhuu Bataa, 2014
+# Claude Paroz <claude@2xlibre.net>, 2014
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Zorig <zorig_ezd@yahoo.com>, 2013-2014
+# Анхбаяр Анхаа <l.ankhbayar@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
-"Last-Translator: Анхбаяр Анхаа <l.ankhbayar@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Mongolian (http://www.transifex.com/projects/p/django/"
 "language/mn/)\n"
 "MIME-Version: 1.0\n"
@@ -18,96 +21,21 @@ msgstr ""
 "Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "шошго:"
+msgid "Administrative Documentation"
+msgstr ""
 
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "шүүлтүүр:"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "харах:"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "%r програм олдсонгүй"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
-msgstr "  %(app_label)r програмд %(model_name)r модел олдсонгүй"
-
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr "холбогдох `%(app_label)s.%(data_type)s`объект"
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "модел:"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr "холбогдох `%(app_label)s.%(object_name)s` объектууд"
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "бүх %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "%s-ийн тоо"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr " %s объектийн нөхөх хэсгүүд"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s нь url хэлбэрийн объект биш байна"
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Админ эхлэл"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Баримтжуулалт"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "Bookmarklet-ууд"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Мookmarklet-уудын баримтжуулалт"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -126,11 +54,9 @@ msgstr ""
 " сайт руу орох шаардлагатай болдог (компьютер тань \"дотоод\" мөн\n"
 " эсэхийг мэдэхгүй байгаа бол системийн удирдлагаасаа асууна уу).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Энэ хуудасны баримтжуулалт"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
@@ -138,11 +64,9 @@ msgstr ""
 "Таныг ямар ч хамаагүй хуудаснаас тухайн хуудсыг гаргаж байгаа "
 "баримтжуулалтанд аваачна."
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Объектийн ID-ийг харуулах"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
@@ -150,49 +74,227 @@ msgstr ""
 "Нэг объект харуулж буй хуудаснуудын агуулгын төрөл болоод давтагдахгүй ID-"
 "ийг харуулна."
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Энэ объектийг засварлах (одоо хэрэглэж буй цонх)"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "Нэг объект харуулж буй хуудаснуудын удирдлагын хуудсанд аваачна."
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Энэ объектийг засварлах (шинэ цонх)"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Дээрхийн нэгэн адил ч удирдлагын хуудсыг шинэ цонхонд нээнэ."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr "Моделууд"
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr "Загварууд"
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr "Шүүлтүүрүүд"
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Таг-ууд"
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr "Бүх загваруудын шошго мөн тэдний функц"
+
+msgid "Filters"
+msgstr "Шүүлтүүрүүд"
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+
+msgid "Models"
+msgstr "Моделууд"
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+
 msgid "Views"
 msgstr "View-үүд"
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+
+msgid "Please install docutils"
+msgstr "docutils ийг суулгана уу"
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+"Админ хэсгийн баримтжуулалтын ажиллуулхад  Python ийн <a href=\"%(link)s"
+"\">docutils</a> санг суулгах шаардлагатай."
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"Админуудаас <a href=\"%(link)s\">docutils</a> санг суулгасан эсхийг асууна "
+"уу."
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr "Модель: %(name)s"
+
+msgid "Field"
+msgstr "Талбар"
+
+msgid "Type"
+msgstr "Төрөл"
+
+msgid "Description"
+msgstr "Товчхон"
+
+msgid "Back to Model Documentation"
+msgstr "Моделийн баримтруу буцах"
+
+msgid "Model documentation"
+msgstr "Моделийн баримт"
+
+msgid "Model groups"
+msgstr "Модел бүлэгүүд"
+
+msgid "Templates"
+msgstr "Загварууд"
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr "Загвар: %(name)s"
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr "Загвар: \"%(name)s\""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr "\"%(name)s\" тэмплэйтын зам хайх"
+
+msgid "(does not exist)"
+msgstr "(Оршдоггүй)"
+
+msgid "Back to Documentation"
+msgstr "Баримтруу буцах"
+
+msgid "Template filters"
+msgstr "Загвар шүүлт"
+
+msgid "Template filter documentation"
+msgstr "Загвар шүүлтийн баримт"
+
+msgid "Built-in filters"
+msgstr "Өгөгдмөл шүүлтүүрүүд"
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+"Энэ шошгыг ашиглахын тулд үүнийг <code>%(code)s</code> шошгоны өмнө загвар "
+"дотроо бич"
+
+msgid "Template tags"
+msgstr "Загвар шошго"
+
+msgid "Template tag documentation"
+msgstr "Template tag баримтжуулалт"
+
+msgid "Built-in tags"
+msgstr "Өгөгдмөл шошгууд"
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+"Энэ шошгыг ашиглахын тулд үүнийг <code>%(code)s</code> шошгоны өмнө загвар "
+"дотроо бич"
+
+#, python-format
+msgid "View: %(name)s"
+msgstr "Харагдац: %(name)s"
+
+msgid "Context:"
+msgstr "Уул үг: "
+
+msgid "Templates:"
+msgstr "Загварууд:"
+
+msgid "Back to Views Documentation"
+msgstr "Харагдац баримтруу буцах"
+
+msgid "View documentation"
+msgstr "Харагдац баримт"
+
+msgid "Jump to namespace"
+msgstr "Хоосон зай үүсгэх"
+
+msgid "Empty namespace"
+msgstr "Хоосон нэрний зай"
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr "%(name)s нэрсээр харах"
+
+msgid "Views by empty namespace"
+msgstr "Хоосон зайгаар харах"
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (Үнэн худлын аль нэг нь)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Талбарийн төрөл нь : %(field_type)s"
+
+msgid "tag:"
+msgstr "шошго:"
+
+msgid "filter:"
+msgstr "шүүлтүүр:"
+
+msgid "view:"
+msgstr "харах:"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr "%(app_label)r аппликэйшн олдсонгүй"
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr "  %(app_label)r програмд %(model_name)r модел олдсонгүй"
+
+msgid "model:"
+msgstr "модел:"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr "холбогдох `%(app_label)s.%(data_type)s`объект"
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr "холбогдох `%(app_label)s.%(object_name)s` объектууд"
+
+#, python-format
+msgid "all %s"
+msgstr "бүх %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "%s-ийн тоо"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s нь url хэлбэрийн объект биш байна"

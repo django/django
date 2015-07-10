@@ -1,16 +1,14 @@
 import logging
 
+from django.contrib.gis.gdal import GDALException
+from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Textarea
-from django.template import loader, Context
-from django.utils import six
-from django.utils import translation
-
-from django.contrib.gis.gdal import OGRException
-from django.contrib.gis.geos import GEOSGeometry, GEOSException
+from django.template import loader
+from django.utils import six, translation
 
 # Creating a template context that contains Django settings
 # values needed by admin map templates.
-geo_context = Context({'LANGUAGE_BIDI': translation.get_language_bidi()})
+geo_context = {'LANGUAGE_BIDI': translation.get_language_bidi()}
 logger = logging.getLogger('django.contrib.gis')
 
 
@@ -22,6 +20,9 @@ class OpenLayersWidget(Textarea):
         # Update the template parameters with any attributes passed in.
         if attrs:
             self.params.update(attrs)
+            self.params['editable'] = self.params['modifiable']
+        else:
+            self.params['editable'] = True
 
         # Defaulting the WKT value to a blank string -- this
         # will be tested in the JavaScript and the appropriate
@@ -65,7 +66,7 @@ class OpenLayersWidget(Textarea):
                     ogr = value.ogr
                     ogr.transform(srid)
                     wkt = ogr.wkt
-                except OGRException as err:
+                except GDALException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)" % (
                             value.srid, srid, err)
@@ -78,8 +79,8 @@ class OpenLayersWidget(Textarea):
             # geometry.
             self.params['wkt'] = wkt
 
-        return loader.render_to_string(self.template, self.params,
-                                       context_instance=geo_context)
+        self.params.update(geo_context)
+        return loader.render_to_string(self.template, self.params)
 
     def map_options(self):
         "Builds the map options hash for the OpenLayers template."

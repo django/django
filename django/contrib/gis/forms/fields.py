@@ -1,11 +1,9 @@
 from __future__ import unicode_literals
 
 from django import forms
+from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.utils.translation import ugettext_lazy as _
 
-# While this couples the geographic forms to the GEOS library,
-# it decouples from database (by not importing SpatialBackend).
-from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from .widgets import OpenLayersWidget
 
 
@@ -23,7 +21,7 @@ class GeometryField(forms.Field):
         'invalid_geom': _('Invalid geometry value.'),
         'invalid_geom_type': _('Invalid geometry type.'),
         'transform_error': _('An error occurred when transforming the geometry '
-                              'to the SRID of the geometry form field.'),
+                             'to the SRID of the geometry form field.'),
     }
 
     def __init__(self, **kwargs):
@@ -44,10 +42,16 @@ class GeometryField(forms.Field):
         if not isinstance(value, GEOSGeometry):
             try:
                 value = GEOSGeometry(value)
-                if not value.srid:
-                    value.srid = self.widget.map_srid
             except (GEOSException, ValueError, TypeError):
                 raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
+
+        # Try to set the srid
+        if not value.srid:
+            try:
+                value.srid = self.widget.map_srid
+            except AttributeError:
+                if self.srid:
+                    value.srid = self.srid
         return value
 
     def clean(self, value):
@@ -66,19 +70,16 @@ class GeometryField(forms.Field):
             raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
 
         # Transforming the geometry if the SRID was set.
-        if self.srid:
-            if not geom.srid:
-                # Should match that of the field if not given.
-                geom.srid = self.srid
-            elif self.srid != -1 and self.srid != geom.srid:
-                try:
-                    geom.transform(self.srid)
-                except GEOSException:
-                    raise forms.ValidationError(self.error_messages['transform_error'], code='transform_error')
+        if self.srid and self.srid != -1 and self.srid != geom.srid:
+            try:
+                geom.transform(self.srid)
+            except GEOSException:
+                raise forms.ValidationError(
+                    self.error_messages['transform_error'], code='transform_error')
 
         return geom
 
-    def _has_changed(self, initial, data):
+    def has_changed(self, initial, data):
         """ Compare geographic value of data with its initial value. """
 
         try:

@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Emil <bmachaku@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-03-16 18:53+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -16,33 +17,30 @@ msgstr ""
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:9
-msgid "redirect from"
-msgstr "elekeza upya kutoka"
+msgid "Redirects"
+msgstr "Maelekezo upya"
 
-#: models.py:10
+msgid "redirect from"
+msgstr "Imeelekezwa kutoka"
+
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr ""
-"Hii inatakiwa kuwa njia kamili, ukiondo jina la domeini. Mfano:'/matukio/"
+"Hii inatakiwa kuwa kiungo kamili pasipo na jina la kikoa. Mfano:'/matukio/"
 "tafuta/'."
 
-#: models.py:11
 msgid "redirect to"
-msgstr "elekeza upya kwenda"
+msgstr "elekeza kwenda"
 
-#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Hii inaweza kuwa njia kamili (kama hapo juu) or URL kamili yenye 'http://'."
+"Hii inaweza kuwa kiungo kamili (kama hapo juu) or URL kamili yenye 'http://'."
 
-#: models.py:15
 msgid "redirect"
 msgstr "maelekezo upya"
 
-#: models.py:16
 msgid "redirects"
 msgstr "maelekezo upya"

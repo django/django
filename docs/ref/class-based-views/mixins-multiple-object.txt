@@ -15,7 +15,7 @@ MultipleObjectMixin
     * Use the ``page`` parameter in the URLconf. For example, this is what
       your URLconf might look like::
 
-        (r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view())
+        url(r'^objects/page(?P<page>[0-9]+)/$', PaginatedView.as_view()),
 
     * Pass the page number via the ``page`` query-string parameter. For
       example, a URL would look like this::
@@ -56,7 +56,8 @@ MultipleObjectMixin
 
         The model that this view will display data for. Specifying ``model
         = Foo`` is effectively the same as specifying ``queryset =
-        Foo.objects.all()``.
+        Foo.objects.all()``, where ``objects`` stands for ``Foo``’s
+        :ref:`default manager <default-managers>`.
 
     .. attribute:: queryset
 
@@ -71,6 +72,13 @@ MultipleObjectMixin
             retrieve it with :meth:`get_queryset` which takes care of the
             cloning behind the scenes.
 
+    .. attribute:: ordering
+
+        .. versionadded:: 1.8
+
+        A string or list of strings specifying the ordering to apply to the ``queryset``.
+        Valid values are the same as those for :meth:`~django.db.models.query.QuerySet.order_by`.
+
     .. attribute:: paginate_by
 
         An integer specifying how many objects should be displayed per page. If
@@ -81,8 +89,6 @@ MultipleObjectMixin
 
     .. attribute:: paginate_orphans
 
-        .. versionadded:: 1.6
-
         An integer specifying the number of "overflow" objects the last page
         can contain. This extends the :attr:`paginate_by` limit on the last
         page by up to ``paginate_orphans``, in order to keep the last page from
@@ -91,7 +97,7 @@ MultipleObjectMixin
     .. attribute:: page_kwarg
 
         A string specifying the name to use for the page parameter.
-        The view will expect this prameter to be available either as a query
+        The view will expect this parameter to be available either as a query
         string parameter (via ``request.GET``) or as a kwarg variable specified
         in the URLconf. Defaults to ``page``.
 
@@ -111,6 +117,15 @@ MultipleObjectMixin
 
         Get the list of items for this view. This must be an iterable and may
         be a queryset (in which queryset-specific behavior will be enabled).
+
+    .. method:: get_ordering()
+
+        .. versionadded:: 1.8
+
+        Returns a string (or iterable of strings) that defines the ordering that
+        will be applied to the ``queryset``.
+
+        Returns :attr:`ordering` by default.
 
     .. method:: paginate_queryset(queryset, page_size)
 
@@ -135,8 +150,6 @@ MultipleObjectMixin
 
     .. method:: get_paginate_orphans()
 
-        .. versionadded:: 1.6
-
         An integer specifying the number of "overflow" objects the last page
         can contain. By default this simply returns the value of
         :attr:`paginate_orphans`.
@@ -154,7 +167,7 @@ MultipleObjectMixin
         the list of data that this view is manipulating. If
         ``object_list`` is a queryset of Django objects and
         :attr:`context_object_name` is not set,
-        the context name will be the ``object_name`` of the model that
+        the context name will be the ``model_name`` of the model that
         the queryset is composed from, with postfix ``'_list'``
         appended. For example, the model ``Article`` would have a
         context object named ``article_list``.
@@ -210,4 +223,4 @@ MultipleObjectTemplateResponseMixin
         Returns a list of candidate template names. Returns the following list:
 
         * the value of ``template_name`` on the view (if provided)
-        * ``<app_label>/<object_name><template_name_suffix>.html``
+        * ``<app_label>/<model_name><template_name_suffix>.html``

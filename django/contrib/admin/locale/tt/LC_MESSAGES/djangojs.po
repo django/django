@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Azat Khasanshin <lordofbazuks@gmail.com>, 2011.
+# Azat Khasanshin <lordofbazuks@gmail.com>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-03-23 02:35+0100\n"
-"PO-Revision-Date: 2012-03-08 10:42+0000\n"
-"Last-Translator: Azat Khasanshin <lordofbazuks@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Tatar (http://www.transifex.com/projects/p/django/language/"
 "tt/)\n"
 "MIME-Version: 1.0\n"
@@ -17,71 +17,57 @@ msgstr ""
 "Language: tt\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "Рөхсәт ителгән %s"
 
-#: static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Фильтр"
 
-#: static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Барысын сайларга"
 
-#: static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Бетерергә"
 
-#: static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Сайланган %s"
 
-#: static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr ""
 
-#: static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr ""
 
-#: static/admin/js/actions.js:18 static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(cnt)s арасыннан %(sel)s сайланган"
 
-#: static/admin/js/actions.js:109 static/admin/js/actions.min.js:5
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -89,7 +75,6 @@ msgstr ""
 "Кайбер кырларда сакланмаган төзәтүләр кала. Сез гамәлне башкарсагыз, сезнең "
 "сакланмаган үзгәртүләр югалачаклар."
 
-#: static/admin/js/actions.js:121 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -99,7 +84,6 @@ msgstr ""
 "Аларны саклау өчен OK төймәсенә басыгыз. Аннан соң гамәлне тагын бер тапкыр "
 "башкарырга туры килер."
 
-#: static/admin/js/actions.js:123 static/admin/js/actions.min.js:6
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -108,7 +92,49 @@ msgstr ""
 "Сез гамәлне сайладыгыз һәм төзәтүләрне башкармадыгыз. Бәлки сез \"Сакларга\" "
 "төймәсе урынына \"Башкарырга\" төймәсен кулланырга теләдегез."
 
-#: static/admin/js/calendar.js:26
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+
+msgid "Now"
+msgstr "Хәзер"
+
+msgid "Clock"
+msgstr "Сәгатьләр"
+
+msgid "Choose a time"
+msgstr "Вакыт сайлагыз"
+
+msgid "Midnight"
+msgstr "Төн уртасы"
+
+msgid "6 a.m."
+msgstr "Иртәнге 6"
+
+msgid "Noon"
+msgstr "Төш"
+
+msgid "Cancel"
+msgstr "Юкка чыгарырга"
+
+msgid "Today"
+msgstr "Бүген"
+
+msgid "Calendar"
+msgstr "Календарь"
+
+msgid "Yesterday"
+msgstr "Кичә"
+
+msgid "Tomorrow"
+msgstr "Иртәгә"
+
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -116,62 +142,11 @@ msgstr ""
 "Гыйнвар Февраль Март Апрель Май Июнь Июль Август Сентябрь Октябрь Ноябрь "
 "Декабрь"
 
-#: static/admin/js/calendar.js:27
 msgid "S M T W T F S"
 msgstr "Я Д С Ч П Җ Ш"
 
-#: static/admin/js/collapse.js:8 static/admin/js/collapse.js.c:19
-#: static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Күрсәтергә"
 
-#: static/admin/js/collapse.js:15 static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Яшерергә"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:49
-#: static/admin/js/admin/DateTimeShortcuts.js:85
-msgid "Now"
-msgstr "Хәзер"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:53
-msgid "Clock"
-msgstr "Сәгатьләр"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:81
-msgid "Choose a time"
-msgstr "Вакыт сайлагыз"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:86
-msgid "Midnight"
-msgstr "Төн уртасы"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:87
-msgid "6 a.m."
-msgstr "Иртәнге 6"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:88
-msgid "Noon"
-msgstr "Төш"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:92
-#: static/admin/js/admin/DateTimeShortcuts.js:204
-msgid "Cancel"
-msgstr "Юкка чыгарырга"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:144
-#: static/admin/js/admin/DateTimeShortcuts.js:197
-msgid "Today"
-msgstr "Бүген"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:148
-msgid "Calendar"
-msgstr "Календарь"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:195
-msgid "Yesterday"
-msgstr "Кичә"
-
-#: static/admin/js/admin/DateTimeShortcuts.js:199
-msgid "Tomorrow"
-msgstr "Иртәгә"

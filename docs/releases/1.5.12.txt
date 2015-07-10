@@ -1,0 +1,14 @@
+===========================
+Django 1.5.12 release notes
+===========================
+
+*January 2, 2015*
+
+Django 1.5.12 fixes a regression in the 1.5.9 security release.
+
+Bugfixes
+========
+
+* Fixed a regression with dynamically generated inlines and allowed field
+  references in the admin
+  (:ticket:`23754`).

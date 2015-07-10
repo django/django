@@ -1,18 +1,26 @@
 from __future__ import unicode_literals
 
-from django.template import Template, Context
-from django.test import TestCase
-from django.utils.encoding import force_text, force_bytes
-from django.utils.functional import lazy, Promise
-from django.utils.safestring import mark_safe, mark_for_escaping
-from django.utils import six
-from django.utils import translation
+from django.template import Context, Template
+from django.test import SimpleTestCase
+from django.utils import html, six, text
+from django.utils.encoding import force_bytes, force_text
+from django.utils.functional import lazy
+from django.utils.safestring import (
+    EscapeData, SafeData, mark_for_escaping, mark_safe,
+)
 
 lazystr = lazy(force_text, six.text_type)
 lazybytes = lazy(force_bytes, bytes)
 
 
-class SafeStringTest(TestCase):
+class customescape(six.text_type):
+    def __html__(self):
+        # implement specific and obviously wrong escaping
+        # in order to be able to tell for sure when it runs
+        return self.replace('<', '<<').replace('>', '>>')
+
+
+class SafeStringTest(SimpleTestCase):
     def assertRenderEqual(self, tpl, expected, **context):
         context = Context(context)
         tpl = Template(tpl)
@@ -24,32 +32,76 @@ class SafeStringTest(TestCase):
         self.assertRenderEqual('{{ s }}', 'a&b', s=s)
         self.assertRenderEqual('{{ s|force_escape }}', 'a&amp;b', s=s)
 
+    def test_mark_safe_object_implementing_dunder_html(self):
+        e = customescape('<a&b>')
+        s = mark_safe(e)
+        self.assertIs(s, e)
+
+        self.assertRenderEqual('{{ s }}', '<<a&b>>', s=s)
+        self.assertRenderEqual('{{ s|force_escape }}', '&lt;a&amp;b&gt;', s=s)
+
     def test_mark_safe_lazy(self):
         s = lazystr('a&b')
         b = lazybytes(b'a&b')
 
-        self.assertIsInstance(mark_safe(s), Promise)
-        self.assertIsInstance(mark_safe(b), Promise)
+        self.assertIsInstance(mark_safe(s), SafeData)
+        self.assertIsInstance(mark_safe(b), SafeData)
         self.assertRenderEqual('{{ s }}', 'a&b', s=mark_safe(s))
+
+    def test_mark_safe_object_implementing_dunder_str(self):
+        class Obj(object):
+            def __str__(self):
+                return '<obj>'
+
+        s = mark_safe(Obj())
+
+        self.assertRenderEqual('{{ s }}', '<obj>', s=s)
+
+    def test_mark_safe_result_implements_dunder_html(self):
+        self.assertEqual(mark_safe('a&b').__html__(), 'a&b')
+
+    def test_mark_safe_lazy_result_implements_dunder_html(self):
+        self.assertEqual(mark_safe(lazystr('a&b')).__html__(), 'a&b')
 
     def test_mark_for_escaping(self):
         s = mark_for_escaping('a&b')
         self.assertRenderEqual('{{ s }}', 'a&amp;b', s=s)
         self.assertRenderEqual('{{ s }}', 'a&amp;b', s=mark_for_escaping(s))
 
+    def test_mark_for_escaping_object_implementing_dunder_html(self):
+        e = customescape('<a&b>')
+        s = mark_for_escaping(e)
+        self.assertIs(s, e)
+
+        self.assertRenderEqual('{{ s }}', '<<a&b>>', s=s)
+        self.assertRenderEqual('{{ s|force_escape }}', '&lt;a&amp;b&gt;', s=s)
+
     def test_mark_for_escaping_lazy(self):
         s = lazystr('a&b')
         b = lazybytes(b'a&b')
 
-        self.assertIsInstance(mark_for_escaping(s), Promise)
-        self.assertIsInstance(mark_for_escaping(b), Promise)
+        self.assertIsInstance(mark_for_escaping(s), EscapeData)
+        self.assertIsInstance(mark_for_escaping(b), EscapeData)
         self.assertRenderEqual('{% autoescape off %}{{ s }}{% endautoescape %}', 'a&amp;b', s=mark_for_escaping(s))
 
-    def test_regression_20296(self):
-        s = mark_safe(translation.ugettext_lazy("username"))
-        with translation.override('fr'):
-            self.assertRenderEqual('{{ s }}', "nom d'utilisateur", s=s)
+    def test_mark_for_escaping_object_implementing_dunder_str(self):
+        class Obj(object):
+            def __str__(self):
+                return '<obj>'
 
-    def test_html(self):
-        s = '<h1>interop</h1>'
-        self.assertEqual(s, mark_safe(s).__html__())
+        s = mark_for_escaping(Obj())
+
+        self.assertRenderEqual('{{ s }}', '&lt;obj&gt;', s=s)
+
+    def test_add_lazy_safe_text_and_safe_text(self):
+        s = html.escape(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+        s = html.escapejs(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)
+
+        s = text.slugify(lazystr('a'))
+        s += mark_safe('&b')
+        self.assertRenderEqual('{{ s }}', 'a&b', s=s)

@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.apps.registry import Apps
 from django.db import models
-from django.db.models.loading import BaseAppCache
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+
+
+class CustomModelBase(models.base.ModelBase):
+    pass
+
+
+class ModelWithCustomBase(six.with_metaclass(CustomModelBase, models.Model)):
+    pass
 
 
 @python_2_unicode_compatible
@@ -12,7 +21,7 @@ class UnicodeModel(models.Model):
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
-        app_cache = BaseAppCache()
+        apps = Apps()
         verbose_name = 'úñí©óðé µóðéø'
         verbose_name_plural = 'úñí©óðé µóðéøß'
 
@@ -32,4 +41,34 @@ class UnserializableModel(models.Model):
 
     class Meta:
         # Disable auto loading of this model as we load it on our own
-        app_cache = BaseAppCache()
+        apps = Apps()
+
+
+class UnmigratedModel(models.Model):
+    """
+    A model that is in a migration-less app (which this app is
+    if its migrations directory has not been repointed)
+    """
+    pass
+
+
+class EmptyManager(models.Manager):
+    use_in_migrations = True
+
+
+class FoodQuerySet(models.query.QuerySet):
+    pass
+
+
+class BaseFoodManager(models.Manager):
+    def __init__(self, a, b, c=1, d=2):
+        super(BaseFoodManager, self).__init__()
+        self.args = (a, b, c, d)
+
+
+class FoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
+    use_in_migrations = True
+
+
+class NoMigrationFoodManager(BaseFoodManager.from_queryset(FoodQuerySet)):
+    pass

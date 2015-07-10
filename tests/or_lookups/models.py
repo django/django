@@ -1,5 +1,5 @@
 """
-19. OR lookups
+OR lookups
 
 To perform an OR lookup, or a lookup that combines ANDs and ORs, combine
 ``QuerySet`` objects using ``&`` and ``|`` operators.

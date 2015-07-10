@@ -1,13 +1,13 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-22 09:28+0200\n"
-"PO-Revision-Date: 2012-10-22 08:46+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kannada (http://www.transifex.com/projects/p/django/language/"
 "kn/)\n"
@@ -17,96 +17,21 @@ msgstr ""
 "Language: kn\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:58 views.py:60 views.py:62
-msgid "tag:"
-msgstr "ಟ್ಯಾಗ್:"
-
-#: views.py:93 views.py:95 views.py:97
-msgid "filter:"
-msgstr "ಸೋಸಕ:"
-
-#: views.py:156 views.py:158 views.py:160
-msgid "view:"
-msgstr "ನೋಟ:"
-
-#: views.py:188
-#, python-format
-msgid "App %r not found"
-msgstr "%r ಅನ್ವಯಾಂಶ ಸಿಗಲಿಲ್ಲ"
-
-#: views.py:195
-#, python-format
-msgid "Model %(model_name)r not found in app %(app_label)r"
+msgid "Administrative Documentation"
 msgstr ""
 
-#: views.py:207
-#, python-format
-msgid "the related `%(app_label)s.%(data_type)s` object"
-msgstr ""
-
-#: views.py:207 views.py:226 views.py:231 views.py:245 views.py:259
-#: views.py:264
-msgid "model:"
-msgstr "ಮಾಡೆಲ್:"
-
-#: views.py:222 views.py:254
-#, python-format
-msgid "related `%(app_label)s.%(object_name)s` objects"
-msgstr ""
-
-#: views.py:226 views.py:259
-#, python-format
-msgid "all %s"
-msgstr "ಎಲ್ಲಾ %s"
-
-#: views.py:231 views.py:264
-#, python-format
-msgid "number of %s"
-msgstr "%s ಗಳ ಸಂಖ್ಯೆ"
-
-#: views.py:269
-#, python-format
-msgid "Fields on %s objects"
-msgstr "%s ವಸ್ತುಗಳ ಅಂಶಗಳು"
-
-#: views.py:361
-#, python-format
-msgid "%s does not appear to be a urlpattern object"
-msgstr "%s  URL ಸ್ವರೂಪದ್ದಾಗಿ ತೋರುವದಿಲ್ಲ."
-
-#: templates/admin_doc/bookmarklets.html:6 templates/admin_doc/index.html:6
-#: templates/admin_doc/missing_docutils.html:6
-#: templates/admin_doc/model_detail.html:14
-#: templates/admin_doc/model_index.html:8
-#: templates/admin_doc/template_detail.html:6
-#: templates/admin_doc/template_filter_index.html:7
-#: templates/admin_doc/template_tag_index.html:7
-#: templates/admin_doc/view_detail.html:6
-#: templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "ಪ್ರಾರಂಭಸ್ಥಳ(ಮನೆ)"
 
-#: templates/admin_doc/bookmarklets.html:7 templates/admin_doc/index.html:7
-#: templates/admin_doc/missing_docutils.html:7
-#: templates/admin_doc/model_detail.html:15
-#: templates/admin_doc/model_index.html:9
-#: templates/admin_doc/template_detail.html:7
-#: templates/admin_doc/template_filter_index.html:8
-#: templates/admin_doc/template_tag_index.html:8
-#: templates/admin_doc/view_detail.html:7
-#: templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "ವಿವರಮಾಹಿತಿ"
 
-#: templates/admin_doc/bookmarklets.html:8
 msgid "Bookmarklets"
 msgstr "ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
 
-#: templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "ಮಾಹಿತಿಯ ಚಿಕ್ಕ ಪುಟಗುರುತುಗಳು"
 
-#: templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -117,8 +42,8 @@ msgid ""
 "your computer is \"internal\").</p>\n"
 msgstr ""
 "\n"
-"<p class=\"help\">ಸಣ್ಣ್ಪುಟಗುರುತುಗಳನ್ನು ಅನುಸ್ಥಾಪಿಸಲು ಕೊಂಡಿಯನ್ನು ಪುಟಗುರುತು ಉಪಕರಣಪಟ್ಟಿ"
-"(ಟೂಲ್ ಬಾರ್)ಕಡೆಗೆ ಎಳೆದೊಯ್ಯಿರಿ,\n"
+"<p class=\"help\">ಸಣ್ಣ್ಪುಟಗುರುತುಗಳನ್ನು ಅನುಸ್ಥಾಪಿಸಲು ಕೊಂಡಿಯನ್ನು ಪುಟಗುರುತು "
+"ಉಪಕರಣಪಟ್ಟಿ(ಟೂಲ್ ಬಾರ್)ಕಡೆಗೆ ಎಳೆದೊಯ್ಯಿರಿ,\n"
 " ಅಥವಾ ಕೊಂಡಿಯ ಮೇಲೆ ಮೂಷಿಕ(ಮೌಸ್)ದ ಬಲಬಟನ್ನನ್ನು ಒತ್ತಿ ಪುಟಗುರುತುಗಳಿಗೆ ಸೇರಿಸಿಕೊಳ್ಳಿ. ಈಗ \n"
 " ನೀವು ಸಣ್ಣಪುಟಗುರುತುಗಳನ್ನು ತಾಣದ ಯಾವ ಪುಟದಿಂದ ಬೇಕಾದರೂ ಆಯ್ಕೆಮಾಡಿಕೊಳ್ಳಬಹುದು.\n"
 "ನೆನಪಿರಲಿ, ಕೆಲವು ಸಣ್ಣಪುಟಗುರುತುಗಳಿಗೆ ನೀವು ಈ ತಾಣವನ್ನು ಆಂತರಿಕ (\"internal\") ಎಂದು "
@@ -126,71 +51,237 @@ msgstr ""
 "(  ನಿಮ್ಮ ಗಣಕವು \"internal\" ಹೌದೇ ಅಲ್ಲವೇ ಎಂದು ಗೊತ್ತಿಲ್ಲದಿದ್ದರೆ , ಗಣಕದ ಆಡಳಿತಗಾರರನ್ನು "
 "ಕೇಳಿರಿ).</p>\n"
 
-#: templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "ಈ ಪುಟದ ಬಗೆಗಿನ ಮಾಹಿತಿ"
 
-#: templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "ನಿಮ್ಮನ್ನು ಯಾವುದೇ ಪುಟದಿಂದ ಆ ಪುಟವನ್ನು ಸೃಷ್ಟಿಸುವ ನೋಟದ ಮಾಹಿತಿಪುಟಕ್ಕೆ ಕೊಂಡೊಯ್ಯುವದು"
 
-#: templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "ವಸ್ತುವಿನ ಐಡಿ ತೋರಿಸಿ"
 
-#: templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳ ವಿಶಿಷ್ಠ ಐಡಿ ಮತ್ತು ಒಳವಿಷಯಬಗೆಯನ್ನು ತೋರಿಸುತ್ತದೆ."
 
-#: templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಈಗಿನ ಕಿಟಕಿಯಲ್ಲಿ)"
 
-#: templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "ಏಕೈಕ ವಸ್ತುವನ್ನು ಪ್ರತಿನಿಧಿಸುವ ಪುಟಗಳಿಗಾಗಿ ಆಡಳಿತಪುಟಕ್ಕೆ ಒಯ್ಯುತ್ತದೆ"
 
-#: templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "ಈ ವಸ್ತುವನ್ನು ಬದಲಿಸಿ(ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ)"
 
-#: templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "ಮೇಲಿನಂತೆ, ಆದರೆ ಆಡಳಿತಪುಟವನ್ನು ಹೊಸ ಕಿಟಕಿಯಲ್ಲಿ ತೆರೆಯುವದು."
 
-#: templates/admin_doc/model_detail.html:16
-#: templates/admin_doc/model_index.html:10
-msgid "Models"
-msgstr ""
-
-#: templates/admin_doc/template_detail.html:8
-msgid "Templates"
-msgstr ""
-
-#: templates/admin_doc/template_filter_index.html:9
-msgid "Filters"
-msgstr ""
-
-#: templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr ""
 
-#: templates/admin_doc/view_detail.html:8
-#: templates/admin_doc/view_index.html:9
+msgid "List of all the template tags and their functions."
+msgstr ""
+
+msgid "Filters"
+msgstr ""
+
+msgid ""
+"Filters are actions which can be applied to variables in a template to alter "
+"the output."
+msgstr ""
+
+msgid "Models"
+msgstr ""
+
+msgid ""
+"Models are descriptions of all the objects in the system and their "
+"associated fields. Each model has a list of fields which can be accessed as "
+"template variables"
+msgstr ""
+
 msgid "Views"
 msgstr ""
 
-#: tests/__init__.py:23
+msgid ""
+"Each page on the public site is generated by a view. The view defines which "
+"template is used to generate the page and which objects are available to "
+"that template."
+msgstr ""
+
+msgid "Tools for your browser to quickly access admin functionality."
+msgstr ""
+
+msgid "Please install docutils"
+msgstr ""
+
+#, python-format
+msgid ""
+"The admin documentation system requires Python's <a href=\"%(link)s"
+"\">docutils</a> library."
+msgstr ""
+
+#, python-format
+msgid ""
+"Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+
+#, python-format
+msgid "Model: %(name)s"
+msgstr ""
+
+msgid "Field"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Back to Model Documentation"
+msgstr ""
+
+msgid "Model documentation"
+msgstr ""
+
+msgid "Model groups"
+msgstr ""
+
+msgid "Templates"
+msgstr ""
+
+#, python-format
+msgid "Template: %(name)s"
+msgstr ""
+
+#, python-format
+msgid "Template: \"%(name)s\""
+msgstr ""
+
+#, python-format
+msgid "Search path for template \"%(name)s\":"
+msgstr ""
+
+msgid "(does not exist)"
+msgstr ""
+
+msgid "Back to Documentation"
+msgstr ""
+
+msgid "Template filters"
+msgstr ""
+
+msgid "Template filter documentation"
+msgstr ""
+
+msgid "Built-in filters"
+msgstr ""
+
+#, python-format
+msgid ""
+"To use these filters, put <code>%(code)s</code> in your template before "
+"using the filter."
+msgstr ""
+
+msgid "Template tags"
+msgstr ""
+
+msgid "Template tag documentation"
+msgstr ""
+
+msgid "Built-in tags"
+msgstr ""
+
+#, python-format
+msgid ""
+"To use these tags, put <code>%(code)s</code> in your template before using "
+"the tag."
+msgstr ""
+
+#, python-format
+msgid "View: %(name)s"
+msgstr ""
+
+msgid "Context:"
+msgstr ""
+
+msgid "Templates:"
+msgstr ""
+
+msgid "Back to Views Documentation"
+msgstr ""
+
+msgid "View documentation"
+msgstr ""
+
+msgid "Jump to namespace"
+msgstr ""
+
+msgid "Empty namespace"
+msgstr ""
+
+#, python-format
+msgid "Views by namespace %(name)s"
+msgstr ""
+
+msgid "Views by empty namespace"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"    View function: <code>%(full_name)s</code>. Name: <code>%(url_name)s</"
+"code>.\n"
+msgstr ""
+
 msgid "Boolean (Either True or False)"
 msgstr "ಬೂಲಿಯನ್ (ಹೌದು ಅಥವ ಅಲ್ಲ)"
 
-#: tests/__init__.py:33
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "ಕ್ಷೇತ್ರದ ಬಗೆ: %(field_type)s"
+
+msgid "tag:"
+msgstr "ಟ್ಯಾಗ್:"
+
+msgid "filter:"
+msgstr "ಸೋಸಕ:"
+
+msgid "view:"
+msgstr "ನೋಟ:"
+
+#, python-format
+msgid "App %(app_label)r not found"
+msgstr ""
+
+#, python-format
+msgid "Model %(model_name)r not found in app %(app_label)r"
+msgstr ""
+
+msgid "model:"
+msgstr "ಮಾಡೆಲ್:"
+
+#, python-format
+msgid "the related `%(app_label)s.%(data_type)s` object"
+msgstr ""
+
+#, python-format
+msgid "related `%(app_label)s.%(object_name)s` objects"
+msgstr ""
+
+#, python-format
+msgid "all %s"
+msgstr "ಎಲ್ಲಾ %s"
+
+#, python-format
+msgid "number of %s"
+msgstr "%s ಗಳ ಸಂಖ್ಯೆ"
+
+#, python-format
+msgid "%s does not appear to be a urlpattern object"
+msgstr "%s  URL ಸ್ವರೂಪದ್ದಾಗಿ ತೋರುವದಿಲ್ಲ."

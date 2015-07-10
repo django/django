@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Reporter, Article
+from .models import Article, Car, Driver, Reporter
 
 
 class ManyToOneNullTests(TestCase):
@@ -74,9 +74,26 @@ class ManyToOneNullTests(TestCase):
         self.assertRaises(Reporter.DoesNotExist, self.r.article_set.remove, self.a4)
         self.assertQuerysetEqual(self.r2.article_set.all(), ['<Article: Fourth>'])
 
+    def test_set(self):
+        # Use manager.set() to allocate ForeignKey. Null is legal, so existing
+        # members of the set that are not in the assignment set are set to null.
+        self.r2.article_set.set([self.a2, self.a3])
+        self.assertQuerysetEqual(self.r2.article_set.all(),
+                                 ['<Article: Second>', '<Article: Third>'])
+        # Use manager.set(clear=True)
+        self.r2.article_set.set([self.a3, self.a4], clear=True)
+        self.assertQuerysetEqual(self.r2.article_set.all(),
+                                 ['<Article: Fourth>', '<Article: Third>'])
+        # Clear the rest of the set
+        self.r2.article_set.set([])
+        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+        self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
+                                 ['<Article: Fourth>', '<Article: Second>', '<Article: Third>'])
+
     def test_assign_clear_related_set(self):
         # Use descriptor assignment to allocate ForeignKey. Null is legal, so
-        # existing members of set that are not in the assignment set are set null
+        # existing members of the set that are not in the assignment set are
+        # set to null.
         self.r2.article_set = [self.a2, self.a3]
         self.assertQuerysetEqual(self.r2.article_set.all(),
                                  ['<Article: Second>', '<Article: Third>'])
@@ -86,6 +103,18 @@ class ManyToOneNullTests(TestCase):
         self.assertQuerysetEqual(Article.objects.filter(reporter__isnull=True),
                                  ['<Article: First>', '<Article: Fourth>'])
 
+    def test_assign_with_queryset(self):
+        # Ensure that querysets used in reverse FK assignments are pre-evaluated
+        # so their value isn't affected by the clearing operation in
+        # ForeignRelatedObjectsDescriptor.__set__. Refs #19816.
+        self.r2.article_set = [self.a2, self.a3]
+
+        qs = self.r2.article_set.filter(headline="Second")
+        self.r2.article_set = qs
+
+        self.assertEqual(1, self.r2.article_set.count())
+        self.assertEqual(1, qs.count())
+
     def test_clear_efficiency(self):
         r = Reporter.objects.create()
         for _ in range(3):
@@ -93,3 +122,10 @@ class ManyToOneNullTests(TestCase):
         with self.assertNumQueries(1):
             r.article_set.clear()
         self.assertEqual(r.article_set.count(), 0)
+
+    def test_related_null_to_field(self):
+        c1 = Car.objects.create()
+        d1 = Driver.objects.create()
+        self.assertIs(d1.car, None)
+        with self.assertNumQueries(0):
+            self.assertEqual(list(c1.drivers.all()), [])

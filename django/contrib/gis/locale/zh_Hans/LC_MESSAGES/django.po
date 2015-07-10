@@ -1,0 +1,86 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Daniel Duan <DaNmarner@gmail.com>, 2011
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Lei Yang <yanglei.go@gmail.com>, 2011
+# Lele Long <schemacs@gmail.com>, 2011,2015
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2014
+# Kevin Sze <leiarix@gmail.com>, 2012
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 12:34+0000\n"
+"Last-Translator: Lele Long <schemacs@gmail.com>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"language/zh_CN/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
+msgstr "基本地理信息系统域 - 映射于 OpenGIS 规范几何类型。"
+
+msgid "Point"
+msgstr "点"
+
+msgid "Line string"
+msgstr "行字串"
+
+msgid "Polygon"
+msgstr "多边形"
+
+msgid "Multi-point"
+msgstr "多点"
+
+msgid "Multi-line string"
+msgstr "多行字符串"
+
+msgid "Multi polygon"
+msgstr "多个多边形"
+
+msgid "Geometry collection"
+msgstr "几何集合"
+
+msgid "Extent Aggregate Field"
+msgstr "扩展聚集字段"
+
+msgid "No geometry value provided."
+msgstr "未提供几何信息。"
+
+msgid "Invalid geometry value."
+msgstr "无效几何信息。"
+
+msgid "Invalid geometry type."
+msgstr "无效几何类型。"
+
+msgid ""
+"An error occurred when transforming the geometry to the SRID of the geometry "
+"form field."
+msgstr "几何形状的SRID字段发生试图转换错误ました。"
+
+msgid "Delete all Features"
+msgstr "删除所有功能"
+
+msgid "WKT debugging window:"
+msgstr "WKT 调试窗口："
+
+msgid "Google Maps via GeoDjango"
+msgstr "使用GeoDjango的谷歌地图"
+
+msgid "Debugging window (serialized value)"
+msgstr "调试窗口(已序列化的值)"
+
+msgid "No feeds are registered."
+msgstr "没有已注册的源。"
+
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Slug %r 没有注册."

@@ -113,8 +113,9 @@ Formatters
 
 Ultimately, a log record needs to be rendered as text. Formatters
 describe the exact format of that text. A formatter usually consists
-of a Python formatting string; however, you can also write custom
-formatters to implement specific formatting behavior.
+of a Python formatting string containing
+:ref:`LogRecord attributes <python:logrecord-attributes>`; however,
+you can also write custom formatters to implement specific formatting behavior.
 
 Using logging
 =============
@@ -178,11 +179,11 @@ Making logging calls
 The logger instance contains an entry method for each of the default
 log levels:
 
-* ``logger.critical()``
-* ``logger.error()``
-* ``logger.warning()``
-* ``logger.info()``
 * ``logger.debug()``
+* ``logger.info()``
+* ``logger.warning()``
+* ``logger.error()``
+* ``logger.critical()``
 
 There are two other logging calls available:
 
@@ -211,36 +212,97 @@ handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
 
-Prior to Django 1.5, the :setting:`LOGGING` setting always overwrote the
-:ref:`default Django logging configuration <default-logging-configuration>`.
-From Django 1.5 forward, it is possible to get the project's logging
-configuration merged with Django's defaults, hence you can decide if you want to
-add to, or replace the existing configuration.
+By default, the :setting:`LOGGING` setting is merged with :ref:`Django's
+default logging configuration <default-logging-configuration>` using the
+following scheme.
 
 If the ``disable_existing_loggers`` key in the :setting:`LOGGING` dictConfig is
-set to ``True`` (which is the default) the default configuration is completely
-overridden. Alternatively you can redefine some or all of the loggers by
-setting ``disable_existing_loggers`` to ``False``.
+set to ``True`` (which is the default) then all loggers from the default
+configuration will be disabled. Disabled loggers are not the same as removed;
+the logger will still exist, but will silently discard anything logged to it,
+not even propagating entries to a parent logger. Thus you should be very
+careful using ``'disable_existing_loggers': True``; it's probably not what you
+want. Instead, you can set ``disable_existing_loggers`` to ``False`` and
+redefine some or all of the default loggers; or you can set
+:setting:`LOGGING_CONFIG` to ``None`` and :ref:`handle logging config yourself
+<disabling-logging-configuration>`.
 
-Logging is configured as soon as settings have been loaded
-(either manually using :func:`~django.conf.settings.configure` or when at least
-one setting is accessed). Since the loading of settings is one of the first
-things that Django does, you can be certain that loggers are always ready for
-use in your project code.
+Logging is configured as part of the general Django ``setup()`` function.
+Therefore, you can be certain that loggers are always ready for use in your
+project code.
 
-.. _dictConfig format: http://docs.python.org/library/logging.config.html#configuration-dictionary-schema
+.. _dictConfig format: https://docs.python.org/library/logging.config.html#configuration-dictionary-schema
 
-An example
-----------
+Examples
+--------
 
 The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
-you a taste of what is possible, here is an example of a fairly
-complex logging setup, configured using :func:`logging.config.dictConfig`::
+you a taste of what is possible, here are several examples.
+
+First, here's a simple configuration which writes all request logging from the
+:ref:`django-request-logger` logger to a local file::
 
     LOGGING = {
         'version': 1,
-        'disable_existing_loggers': True,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/path/to/django/debug.log',
+            },
+        },
+        'loggers': {
+            'django.request': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
+        },
+    }
+
+If you use this example, be sure to change the ``'filename'`` path to a
+location that's writable by the user that's running the Django application.
+
+Second, here's an example of how to make the logging system print Django's
+logging to the console. It may be useful during local development.
+
+By default, this config only sends messages of level ``INFO`` or higher to the
+console (same as Django's default logging config, except that the default only
+displays log records when ``DEBUG=True``). Django does not log many such
+messages. With this config, however, you can also set the environment variable
+``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
+verbose as it includes all database queries::
+
+    import os
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            },
+        },
+    }
+
+.. versionchanged:: 1.9
+
+    Django's default logging configuration changed. See :ref:`the release notes
+    <default-logging-changes-19>` for a description of the changes.
+
+Finally, here's an example of a fairly complex logging setup::
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
         'formatters': {
             'verbose': {
                 'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
@@ -260,7 +322,7 @@ complex logging setup, configured using :func:`logging.config.dictConfig`::
                 'level': 'DEBUG',
                 'class': 'logging.NullHandler',
             },
-            'console':{
+            'console': {
                 'level': 'DEBUG',
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple'
@@ -294,8 +356,6 @@ This logging configuration does the following things:
 
 * Identifies the configuration as being in 'dictConfig version 1'
   format. At present, this is the only dictConfig format version.
-
-* Disables all existing logging configurations.
 
 * Defines two formatters:
 
@@ -349,7 +409,7 @@ This logging configuration does the following things:
     printed to the console; ``ERROR`` and ``CRITICAL``
     messages will also be output via email.
 
-.. _formatter documentation: http://docs.python.org/library/logging.html#formatter-objects
+.. _formatter documentation: https://docs.python.org/library/logging.html#formatter-objects
 
 Custom logging configuration
 ----------------------------
@@ -364,20 +424,30 @@ use a different configuration process, you can use any other callable
 that takes a single argument. The contents of :setting:`LOGGING` will
 be provided as the value of that argument when logging is configured.
 
+.. _disabling-logging-configuration:
+
 Disabling logging configuration
 -------------------------------
 
 If you don't want to configure logging at all (or you want to manually
 configure logging using your own approach), you can set
 :setting:`LOGGING_CONFIG` to ``None``. This will disable the
-configuration process.
+configuration process for :ref:`Django's default logging
+<default-logging-configuration>`. Here's an example that disables Django's
+logging configuration and then manually configures logging:
 
-.. note::
-    Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the
-    configuration process is disabled, not logging itself. If you
-    disable the configuration process, Django will still make logging
-    calls, falling back to whatever default logging behavior is
-    defined.
+.. snippet::
+    :filename: settings.py
+
+    LOGGING_CONFIG = None
+
+    import logging.config
+    logging.config.dictConfig(...)
+
+Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
+configuration process is disabled, not logging itself. If you disable the
+configuration process, Django will still make logging calls, falling back to
+whatever default logging behavior is defined.
 
 Django's logging extensions
 ===========================
@@ -388,13 +458,15 @@ requirements of logging in Web server environment.
 Loggers
 -------
 
-Django provides four built-in loggers.
+Django provides several built-in loggers.
 
 ``django``
 ~~~~~~~~~~
 
 ``django`` is the catch-all logger. No messages are posted directly to
 this logger.
+
+.. _django-request-logger:
 
 ``django.request``
 ~~~~~~~~~~~~~~~~~~
@@ -411,12 +483,24 @@ Messages to this logger have the following extra context:
 * ``request``: The request object that generated the logging
   message.
 
+.. _django-template-logger:
+
+``django.template``
+~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Log messages related to the rendering of templates. Missing context variables
+are logged as ``DEBUG`` messages if :setting:`DEBUG` is `True`.
+
+.. _django-db-logger:
+
 ``django.db.backends``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Messages relating to the interaction of code with the database.
-For example, every SQL statement executed by a request is logged
-at the ``DEBUG`` level to this logger.
+Messages relating to the interaction of code with the database. For example,
+every application-level SQL statement executed by a request is logged at the
+``DEBUG`` level to this logger.
 
 Messages to this logger have the following extra context:
 
@@ -427,6 +511,11 @@ Messages to this logger have the following extra context:
 For performance reasons, SQL logging is only enabled when
 ``settings.DEBUG`` is set to ``True``, regardless of the logging
 level or handlers that are installed.
+
+This logging does not include framework-level initialization (e.g.
+``SET TIMEZONE``) or transaction management queries (e.g. ``BEGIN``,
+``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
+wish to view all database queries.
 
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -441,21 +530,29 @@ a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
 response, and an error message will be logged to the
 ``django.security.DisallowedHost`` logger.
 
-Only the parent ``django.security`` logger is configured by default, and all
-child loggers will propagate to the parent logger. The ``django.security``
-logger is configured the same as the ``django.request`` logger, and any error
-events will be mailed to admins. Requests resulting in a 400 response due to
-a ``SuspiciousOperation`` will not be logged to the ``django.request`` logger,
-but only to the ``django.security`` logger.
+These log events will reach the 'django' logger by default, which mails error
+events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
+to a ``SuspiciousOperation`` will not be logged to the ``django.request``
+logger, but only to the ``django.security`` logger.
 
-To silence a particular type of SuspiciousOperation, you can override that
-specific logger following this example::
+To silence a particular type of ``SuspiciousOperation``, you can override that
+specific logger following this example:
 
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
+.. code-block:: python
+
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    },
+
+``django.db.backends.schema``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Logs the SQL queries that are executed during schema changes to the database by
+the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
+queries executed by :class:`~django.db.migrations.operations.RunPython`.
 
 Handlers
 --------
@@ -479,7 +576,9 @@ Python logging module.
     containing the full content of the debug Web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``django.utils.log.AdminEmailHandler``, like this:
+
+    .. code-block:: python
 
         'handlers': {
             'mail_admins': {
@@ -499,11 +598,11 @@ Python logging module.
     sensitive information to be filtered out of error reports -- learn more on
     :ref:`Filtering error reports<filtering-error-reports>`.
 
-    .. versionadded:: 1.6
-
     By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this::
+    handler can be overridden, like this:
+
+    .. code-block:: python
 
         'handlers': {
             'mail_admins': {
@@ -516,8 +615,15 @@ Python logging module.
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
 
-.. _Sentry: http://pypi.python.org/pypi/sentry
+    .. method:: send_mail(subject, message, *args, **kwargs)
 
+        .. versionadded:: 1.8
+
+        Sends emails to admin users. To customize this behavior, you can
+        subclass the :class:`~django.utils.log.AdminEmailHandler` class and
+        override this method.
+
+.. _Sentry: https://pypi.python.org/pypi/sentry
 
 Filters
 -------
@@ -527,25 +633,27 @@ logging module.
 
 .. class:: CallbackFilter(callback)
 
-   This filter accepts a callback function (which should accept a single
-   argument, the record to be logged), and calls it for each record that passes
-   through the filter. Handling of that record will not proceed if the callback
-   returns False.
+    This filter accepts a callback function (which should accept a single
+    argument, the record to be logged), and calls it for each record that
+    passes through the filter. Handling of that record will not proceed if the
+    callback returns False.
 
-   For instance, to filter out :exc:`~django.http.UnreadablePostError`
-   (raised when a user cancels an upload) from the admin emails, you would
-   create a filter function::
+    For instance, to filter out :exc:`~django.http.UnreadablePostError`
+    (raised when a user cancels an upload) from the admin emails, you would
+    create a filter function::
 
-    from django.http import UnreadablePostError
+        from django.http import UnreadablePostError
 
-    def skip_unreadable_post(record):
-        if record.exc_info:
-            exc_type, exc_value = record.exc_info[:2]
-            if isinstance(exc_value, UnreadablePostError):
-                return False
-        return True
+        def skip_unreadable_post(record):
+            if record.exc_info:
+                exc_type, exc_value = record.exc_info[:2]
+                if isinstance(exc_value, UnreadablePostError):
+                    return False
+            return True
 
-   and then add it to your logging config::
+    and then add it to your logging config:
+
+    .. code-block:: python
 
         'filters': {
             'skip_unreadable_posts': {
@@ -563,13 +671,15 @@ logging module.
 
 .. class:: RequireDebugFalse()
 
-   This filter will only pass on records when settings.DEBUG is False.
+    This filter will only pass on records when settings.DEBUG is False.
 
-   This filter is used as follows in the default :setting:`LOGGING`
-   configuration to ensure that the :class:`AdminEmailHandler` only sends error
-   emails to admins when :setting:`DEBUG` is ``False``::
+    This filter is used as follows in the default :setting:`LOGGING`
+    configuration to ensure that the :class:`AdminEmailHandler` only sends
+    error emails to admins when :setting:`DEBUG` is ``False``:
 
-       'filters': {
+    .. code-block:: python
+
+        'filters': {
             'require_debug_false': {
                 '()': 'django.utils.log.RequireDebugFalse',
             }
@@ -584,21 +694,33 @@ logging module.
 
 .. class:: RequireDebugTrue()
 
-   This filter is similar to :class:`RequireDebugFalse`, except that records are
-   passed only when :setting:`DEBUG` is ``True``.
+    This filter is similar to :class:`RequireDebugFalse`, except that records are
+    passed only when :setting:`DEBUG` is ``True``.
 
 .. _default-logging-configuration:
 
 Django's default logging configuration
 ======================================
 
-By default, Django configures the ``django.request`` logger so that all messages
-with ``ERROR`` or ``CRITICAL`` level are sent to :class:`AdminEmailHandler`, as
-long as the :setting:`DEBUG` setting is set to ``False``.
+By default, Django configures the following logging:
 
-All messages reaching the ``django`` catch-all logger when :setting:`DEBUG` is
-``True`` are sent to the console. They are simply discarded (sent to
-``NullHandler``) when :setting:`DEBUG` is ``False``.
+When :setting:`DEBUG` is ``True``:
+
+* The ``django`` catch-all logger sends all messages at the ``INFO`` level or
+  higher to the console.
+
+* The ``py.warnings`` logger, which handles messages from ``warnings.warn()``,
+  sends messages to the console.
+
+When :setting:`DEBUG` is ``False``:
+
+* The ``django`` logger send messages with ``ERROR`` or ``CRITICAL`` level to
+  :class:`AdminEmailHandler`.
+
+.. versionchanged:: 1.9
+
+    Django's default logging configuration changed. See :ref:`the release notes
+    <default-logging-changes-19>` for a description of the changes.
 
 See also :ref:`Configuring logging <configuring-logging>` to learn how you can
 complement or replace this default logging configuration.

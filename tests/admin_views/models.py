@@ -2,12 +2,15 @@
 from __future__ import unicode_literals
 
 import datetime
-import tempfile
 import os
+import tempfile
 
 from django.contrib.auth.models import User
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
@@ -20,6 +23,13 @@ class Section(models.Model):
     """
     name = models.CharField(max_length=100)
 
+    @property
+    def name_property(self):
+        """
+        A property that simply returns the name. Used to test #24461
+        """
+        return self.name
+
 
 @python_2_unicode_compatible
 class Article(models.Model):
@@ -30,6 +40,7 @@ class Article(models.Model):
     content = models.TextField()
     date = models.DateTimeField()
     section = models.ForeignKey(Section, null=True, blank=True)
+    sub_section = models.ForeignKey(Section, null=True, blank=True, on_delete=models.SET_NULL, related_name='+')
 
     def __str__(self):
         return self.title
@@ -38,6 +49,11 @@ class Article(models.Model):
         return self.date.year
     model_year.admin_order_field = 'date'
     model_year.short_description = ''
+
+    def model_year_reversed(self):
+        return self.date.year
+    model_year_reversed.admin_order_field = '-date'
+    model_year_reversed.short_description = ''
 
 
 @python_2_unicode_compatible
@@ -171,6 +187,33 @@ class Sketch(models.Model):
         return self.title
 
 
+def today_callable_dict():
+    return {"last_action__gte": datetime.datetime.today()}
+
+
+def today_callable_q():
+    return models.Q(last_action__gte=datetime.datetime.today())
+
+
+@python_2_unicode_compatible
+class Character(models.Model):
+    username = models.CharField(max_length=100)
+    last_action = models.DateTimeField()
+
+    def __str__(self):
+        return self.username
+
+
+@python_2_unicode_compatible
+class StumpJoke(models.Model):
+    variation = models.CharField(max_length=100)
+    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+    def __str__(self):
+        return self.variation
+
+
 class Fabric(models.Model):
     NG_CHOICES = (
         ('Textured', (
@@ -269,10 +312,18 @@ class Vodcast(Media):
 class Parent(models.Model):
     name = models.CharField(max_length=128)
 
+    def clean(self):
+        if self.name == '_invalid':
+            raise ValidationError('invalid')
+
 
 class Child(models.Model):
     parent = models.ForeignKey(Parent, editable=False)
     name = models.CharField(max_length=30, blank=True)
+
+    def clean(self):
+        if self.name == '_invalid':
+            raise ValidationError('invalid')
 
 
 @python_2_unicode_compatible
@@ -281,7 +332,7 @@ class EmptyModel(models.Model):
         return "Primary key = %s" % self.id
 
 
-temp_storage = FileSystemStorage(tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR']))
+temp_storage = FileSystemStorage(tempfile.mkdtemp())
 UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 
@@ -404,6 +455,13 @@ class Post(models.Model):
         return "Very awesome."
 
 
+# Proxy model to test overridden fields attrs on Post model so as not to
+# interfere with other tests.
+class FieldOverridePost(Post):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Gadget(models.Model):
     name = models.CharField(max_length=100)
@@ -430,7 +488,7 @@ class FunkyTag(models.Model):
     name = models.CharField(max_length=25)
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return self.name
@@ -441,7 +499,7 @@ class Plot(models.Model):
     name = models.CharField(max_length=100)
     team_leader = models.ForeignKey(Villain, related_name='lead_plots')
     contact = models.ForeignKey(Villain, related_name='contact_plots')
-    tags = generic.GenericRelation(FunkyTag)
+    tags = GenericRelation(FunkyTag)
 
     def __str__(self):
         return self.name
@@ -504,7 +562,7 @@ class Pizza(models.Model):
 
 
 class Album(models.Model):
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=30)
 
 
@@ -613,7 +671,8 @@ class PrePopulatedPostLargeSlug(models.Model):
     """
     title = models.CharField(max_length=100)
     published = models.BooleanField(default=False)
-    slug = models.SlugField(max_length=1000)
+    # `db_index=False` because MySQL cannot index large CharField (#21196).
+    slug = models.SlugField(max_length=1000, db_index=False)
 
 
 class AdminOrderedField(models.Model):
@@ -712,6 +771,26 @@ class Choice(models.Model):
         choices=((1, 'Yes'), (0, 'No'), (None, 'No opinion')))
 
 
+class ParentWithDependentChildren(models.Model):
+    """
+    Issue #20522
+    Model where the validation of child foreign-key relationships depends
+    on validation of the parent
+    """
+    some_required_info = models.PositiveIntegerField()
+    family_name = models.CharField(max_length=255, blank=False)
+
+
+class DependentChild(models.Model):
+    """
+    Issue #20522
+    Model that depends on validation of the parent class for one of its
+    fields to validate during clean
+    """
+    parent = models.ForeignKey(ParentWithDependentChildren)
+    family_name = models.CharField(max_length=255)
+
+
 class _Manager(models.Manager):
     def get_queryset(self):
         return super(_Manager, self).get_queryset().filter(pk__gt=1)
@@ -745,13 +824,79 @@ class City(models.Model):
     state = models.ForeignKey(State)
     name = models.CharField(max_length=100)
 
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
+
 
 class Restaurant(models.Model):
     city = models.ForeignKey(City)
     name = models.CharField(max_length=100)
+
+    def get_absolute_url(self):
+        return '/dummy/%s/' % self.pk
 
 
 class Worker(models.Model):
     work_at = models.ForeignKey(Restaurant)
     name = models.CharField(max_length=50)
     surname = models.CharField(max_length=50)
+
+
+# Models for #23329
+class ReferencedByParent(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+
+class ParentWithFK(models.Model):
+    fk = models.ForeignKey(
+        ReferencedByParent, to_field='name', related_name='hidden+',
+    )
+
+
+class ChildOfReferer(ParentWithFK):
+    pass
+
+
+# Models for #23431
+class ReferencedByInline(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+
+class InlineReference(models.Model):
+    fk = models.ForeignKey(
+        ReferencedByInline, to_field='name', related_name='hidden+',
+    )
+
+
+class InlineReferer(models.Model):
+    refs = models.ManyToManyField(InlineReference)
+
+
+# Models for #23604 and #23915
+class Recipe(models.Model):
+    rname = models.CharField(max_length=20, unique=True)
+
+
+class Ingredient(models.Model):
+    iname = models.CharField(max_length=20, unique=True)
+    recipes = models.ManyToManyField(Recipe, through='RecipeIngredient')
+
+
+class RecipeIngredient(models.Model):
+    ingredient = models.ForeignKey(Ingredient, to_field='iname')
+    recipe = models.ForeignKey(Recipe, to_field='rname')
+
+
+# Model for #23839
+class NotReferenced(models.Model):
+    # Don't point any FK at this model.
+    pass
+
+
+# Models for #23934
+class ExplicitlyProvidedPK(models.Model):
+    name = models.IntegerField(primary_key=True)
+
+
+class ImplicitlyGeneratedPK(models.Model):
+    name = models.IntegerField(unique=True)

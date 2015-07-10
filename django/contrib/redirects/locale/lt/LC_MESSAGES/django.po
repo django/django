@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:57+0200\n"
-"PO-Revision-Date: 2012-02-14 13:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-12 12:48+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +19,12 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: models.py:9
+msgid "Redirects"
+msgstr "Nukreipimai"
+
 msgid "redirect from"
 msgstr "nukreiptas (redirect) iš"
 
-#: models.py:10
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -30,11 +32,9 @@ msgstr ""
 "Turi būti absoliutus adresas neįtraukiant domaino. Pavyzdžiui: '/events/"
 "search/'."
 
-#: models.py:11
 msgid "redirect to"
 msgstr "nukreipti(redirect) į"
 
-#: models.py:12
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -42,10 +42,8 @@ msgstr ""
 "Gali būti absoliutus adresas (kaip viršuj) arba pilnas URL pradedant "
 "'http://'."
 
-#: models.py:15
 msgid "redirect"
 msgstr "nukreipti"
 
-#: models.py:16
 msgid "redirects"
 msgstr "nukreipia"

@@ -1,13 +1,15 @@
 "Thread-safe in-memory cache backend."
 
 import time
+from contextlib import contextmanager
+
+from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.utils.synch import RWLock
+
 try:
     from django.utils.six.moves import cPickle as pickle
 except ImportError:
     import pickle
-
-from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
-from django.utils.synch import RWLock
 
 
 # Global in-memory store of cache data. Keyed by name, to provide
@@ -15,6 +17,12 @@ from django.utils.synch import RWLock
 _caches = {}
 _expire_info = {}
 _locks = {}
+
+
+@contextmanager
+def dummy():
+    """A context manager that does nothing special."""
+    yield
 
 
 class LocMemCache(BaseCache):
@@ -27,24 +35,19 @@ class LocMemCache(BaseCache):
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        try:
-            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            return False
+        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         with self._lock.writer():
-            exp = self._expire_info.get(key)
-            if exp is None or exp <= time.time():
+            if self._has_expired(key):
                 self._set(key, pickled, timeout)
                 return True
             return False
 
-    def get(self, key, default=None, version=None):
+    def get(self, key, default=None, version=None, acquire_lock=True):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         pickled = None
-        with self._lock.reader():
-            exp = self._expire_info.get(key, 0)
-            if exp is None or exp > time.time():
+        with (self._lock.reader() if acquire_lock else dummy()):
+            if not self._has_expired(key):
                 pickled = self._cache[key]
         if pickled is not None:
             try:
@@ -52,7 +55,7 @@ class LocMemCache(BaseCache):
             except pickle.PickleError:
                 return default
 
-        with self._lock.writer():
+        with (self._lock.writer() if acquire_lock else dummy()):
             try:
                 del self._cache[key]
                 del self._expire_info[key]
@@ -69,37 +72,26 @@ class LocMemCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
-        try:
-            pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            pass
-        else:
-            with self._lock.writer():
-                self._set(key, pickled, timeout)
+        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
+        with self._lock.writer():
+            self._set(key, pickled, timeout)
 
     def incr(self, key, delta=1, version=None):
-        value = self.get(key, version=version)
-        if value is None:
-            raise ValueError("Key '%s' not found" % key)
-        new_value = value + delta
-        key = self.make_key(key, version=version)
-        try:
+        with self._lock.writer():
+            value = self.get(key, version=version, acquire_lock=False)
+            if value is None:
+                raise ValueError("Key '%s' not found" % key)
+            new_value = value + delta
+            key = self.make_key(key, version=version)
             pickled = pickle.dumps(new_value, pickle.HIGHEST_PROTOCOL)
-        except pickle.PickleError:
-            pass
-        else:
-            with self._lock.writer():
-                self._cache[key] = pickled
+            self._cache[key] = pickled
         return new_value
 
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
         with self._lock.reader():
-            exp = self._expire_info.get(key)
-            if exp is None:
-                return False
-            elif exp > time.time():
+            if not self._has_expired(key):
                 return True
 
         with self._lock.writer():
@@ -109,6 +101,12 @@ class LocMemCache(BaseCache):
             except KeyError:
                 pass
             return False
+
+    def _has_expired(self, key):
+        exp = self._expire_info.get(key, -1)
+        if exp is None or exp > time.time():
+            return False
+        return True
 
     def _cull(self):
         if self._cull_frequency == 0:
@@ -137,8 +135,3 @@ class LocMemCache(BaseCache):
     def clear(self):
         self._cache.clear()
         self._expire_info.clear()
-
-
-# For backwards compatibility
-class CacheClass(LocMemCache):
-    pass

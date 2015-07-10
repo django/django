@@ -1,0 +1,236 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Tom Fifield <tom@openstack.org>, 2014
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: English (Australia) (http://www.transifex.com/projects/p/"
+"django/language/en_AU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_AU\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Personal info"
+msgstr "Personal info"
+
+msgid "Permissions"
+msgstr "Permissions"
+
+msgid "Important dates"
+msgstr "Important dates"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
+msgid "Password changed successfully."
+msgstr "Password changed successfully."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Change password: %s"
+
+msgid "Authentication and Authorization"
+msgstr ""
+
+msgid "No password set."
+msgstr "No password set."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr "Invalid password format or unknown hashing algorithm."
+
+msgid "The two password fields didn't match."
+msgstr "The two password fields didn't match."
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Password confirmation"
+msgstr "Password confirmation"
+
+msgid "Enter the same password as above, for verification."
+msgstr "Enter the same password as above, for verification."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+msgstr ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a href=\"password/\">this "
+"form</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+
+msgid "This account is inactive."
+msgstr "This account is inactive."
+
+msgid "Email"
+msgstr "Email"
+
+msgid "New password"
+msgstr "New password"
+
+msgid "New password confirmation"
+msgstr "New password confirmation"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr "Your old password was entered incorrectly. Please enter it again."
+
+msgid "Old password"
+msgstr "Old password"
+
+msgid "Password (again)"
+msgstr "Password (again)"
+
+msgid "algorithm"
+msgstr "algorithm"
+
+msgid "iterations"
+msgstr "iterations"
+
+msgid "salt"
+msgstr "salt"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "work factor"
+msgstr "work factor"
+
+msgid "checksum"
+msgstr "checksum"
+
+msgid "name"
+msgstr "name"
+
+msgid "codename"
+msgstr "codename"
+
+msgid "permission"
+msgstr "permission"
+
+msgid "permissions"
+msgstr "permissions"
+
+msgid "group"
+msgstr "group"
+
+msgid "groups"
+msgstr "groups"
+
+msgid "password"
+msgstr "password"
+
+msgid "last login"
+msgstr "last login"
+
+msgid "superuser status"
+msgstr "superuser status"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+
+msgid "user permissions"
+msgstr "user permissions"
+
+msgid "Specific permissions for this user."
+msgstr ""
+
+msgid "username"
+msgstr "username"
+
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "A user with that username already exists."
+
+msgid "first name"
+msgstr "first name"
+
+msgid "last name"
+msgstr "last name"
+
+msgid "email address"
+msgstr "email address"
+
+msgid "staff status"
+msgstr "staff status"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Designates whether the user can log into this admin site."
+
+msgid "active"
+msgstr "active"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+
+msgid "date joined"
+msgstr "date joined"
+
+msgid "user"
+msgstr "user"
+
+msgid "users"
+msgstr "users"
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Password reset on %(site_name)s"
+
+msgid "Logged out"
+msgstr "Logged out"
+
+msgid "Password reset"
+msgstr ""
+
+msgid "Password reset sent"
+msgstr ""
+
+msgid "Enter new password"
+msgstr ""
+
+msgid "Password reset unsuccessful"
+msgstr ""
+
+msgid "Password reset complete"
+msgstr ""
+
+msgid "Password change"
+msgstr ""
+
+msgid "Password change successful"
+msgstr ""

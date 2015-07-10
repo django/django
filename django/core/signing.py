@@ -10,7 +10,7 @@ There are two components here, separated by a ':'. The first component is a
 URLsafe base64 encoded JSON of the object passed to dumps(). The second
 component is a base64 encoded hmac/SHA1 hash of "$first_component:$secret"
 
-signing.loads(s) checks the signature and returns the deserialised object.
+signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
 >>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
@@ -36,15 +36,21 @@ These functions make use of all of them.
 from __future__ import unicode_literals
 
 import base64
+import datetime
 import json
+import re
 import time
+import warnings
 import zlib
 
 from django.conf import settings
 from django.utils import baseconv
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_bytes, force_str, force_text
-from django.utils.module_loading import import_by_path
+from django.utils.module_loading import import_string
+
+_SEP_UNSAFE = re.compile(r'^[A-z0-9-_=]*$')
 
 
 class BadSignature(Exception):
@@ -75,8 +81,9 @@ def base64_hmac(salt, value, key):
 
 
 def get_cookie_signer(salt='django.core.signing.get_cookie_signer'):
-    Signer = import_by_path(settings.SIGNING_BACKEND)
-    return Signer('django.http.cookies' + settings.SECRET_KEY, salt=salt)
+    Signer = import_string(settings.SIGNING_BACKEND)
+    key = force_bytes(settings.SECRET_KEY)
+    return Signer(b'django.http.cookies' + key, salt=salt)
 
 
 class JSONSerializer(object):
@@ -148,9 +155,12 @@ class Signer(object):
 
     def __init__(self, key=None, sep=':', salt=None):
         # Use of native strings in all versions of Python
-        self.sep = str(sep)
-        self.key = str(key or settings.SECRET_KEY)
-        self.salt = str(salt or
+        self.key = key or settings.SECRET_KEY
+        self.sep = force_str(sep)
+        if _SEP_UNSAFE.match(self.sep):
+            warnings.warn('Unsafe Signer separator: %r (cannot be empty or consist of only A-z0-9-_=)' % sep,
+                          RemovedInDjango110Warning)
+        self.salt = force_str(salt or
             '%s.%s' % (self.__class__.__module__, self.__class__.__name__))
 
     def signature(self, value):
@@ -164,7 +174,7 @@ class Signer(object):
 
     def unsign(self, signed_value):
         signed_value = force_str(signed_value)
-        if not self.sep in signed_value:
+        if self.sep not in signed_value:
             raise BadSignature('No "%s" found in value' % self.sep)
         value, sig = signed_value.rsplit(self.sep, 1)
         if constant_time_compare(sig, self.signature(value)):
@@ -191,6 +201,8 @@ class TimestampSigner(Signer):
         value, timestamp = result.rsplit(self.sep, 1)
         timestamp = baseconv.base62.decode(timestamp)
         if max_age is not None:
+            if isinstance(max_age, datetime.timedelta):
+                max_age = max_age.total_seconds()
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:

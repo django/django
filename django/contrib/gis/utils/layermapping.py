@@ -4,18 +4,21 @@
  vector files (e.g. SHP files) to Geographic-enabled Django models.
 
  For more information, please consult the GeoDjango documentation:
-   http://geodjango.org/docs/layermapping.html
+   https://docs.djangoproject.com/en/dev/ref/contrib/gis/layermapping/
 """
 import sys
 from decimal import Decimal, InvalidOperation as DecimalInvalidOperation
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import connections, router
+
 from django.contrib.gis.db.models import GeometryField
-from django.contrib.gis.gdal import (CoordTransform, DataSource,
-    OGRException, OGRGeometry, OGRGeomType, SpatialReference)
+from django.contrib.gis.gdal import (
+    CoordTransform, DataSource, GDALException, OGRGeometry, OGRGeomType,
+    SpatialReference,
+)
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime)
-from django.db import models, transaction
+    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+)
+from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
+from django.db import connections, models, router, transaction
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -97,16 +100,16 @@ class LayerMapping(object):
         self.mapping = mapping
         self.model = model
 
-        # Checking the layer -- intitialization of the object will fail if
+        # Checking the layer -- initialization of the object will fail if
         # things don't check out before hand.
         self.check_layer()
 
         # Getting the geometry column associated with the model (an
         # exception will be raised if there is no geometry column).
-        if self.spatial_backend.mysql:
-            transform = False
-        else:
+        if connections[self.using].features.supports_transform:
             self.geo_field = self.geometry_field()
+        else:
+            transform = False
 
         # Checking the source spatial reference system, and getting
         # the coordinate transformation object (unless the `transform`
@@ -144,7 +147,7 @@ class LayerMapping(object):
         else:
             raise LayerMapError('Unrecognized transaction mode: %s' % transaction_mode)
 
-    #### Checking routines used during initialization ####
+    # #### Checking routines used during initialization ####
     def check_fid_range(self, fid_range):
         "This checks the `fid_range` keyword."
         if fid_range:
@@ -189,7 +192,7 @@ class LayerMapping(object):
             # for the given field name in the mapping.
             try:
                 model_field = self.model._meta.get_field(field_name)
-            except models.fields.FieldDoesNotExist:
+            except FieldDoesNotExist:
                 raise LayerMapError('Given mapping field "%s" not in given Model fields.' % field_name)
 
             # Getting the string name for the Django field class (e.g., 'PointField').
@@ -207,7 +210,7 @@ class LayerMapping(object):
                         gtype = OGRGeomType(ogr_name + '25D')
                     else:
                         gtype = OGRGeomType(ogr_name)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Invalid mapping for GeometryField "%s".' % field_name)
 
                 # Making sure that the OGR Layer's Geometry is compatible.
@@ -226,12 +229,12 @@ class LayerMapping(object):
             elif isinstance(model_field, models.ForeignKey):
                 if isinstance(ogr_name, dict):
                     # Is every given related model mapping field in the Layer?
-                    rel_model = model_field.rel.to
+                    rel_model = model_field.remote_field.model
                     for rel_name, ogr_field in ogr_name.items():
                         idx = check_ogr_fld(ogr_field)
                         try:
                             rel_model._meta.get_field(rel_name)
-                        except models.fields.FieldDoesNotExist:
+                        except FieldDoesNotExist:
                             raise LayerMapError('ForeignKey mapping field "%s" not in %s fields.' %
                                                 (rel_name, rel_model.__class__.__name__))
                     fields_val = rel_model
@@ -239,7 +242,7 @@ class LayerMapping(object):
                     raise TypeError('ForeignKey mapping must be of dictionary type.')
             else:
                 # Is the model field type supported by LayerMapping?
-                if not model_field.__class__ in self.FIELD_TYPES:
+                if model_field.__class__ not in self.FIELD_TYPES:
                     raise LayerMapError('Django field type "%s" has no OGR mapping (yet).' % fld_name)
 
                 # Is the OGR field in the Layer?
@@ -277,7 +280,7 @@ class LayerMapping(object):
         if isinstance(unique, (list, tuple)):
             # List of fields to determine uniqueness with
             for attr in unique:
-                if not attr in self.mapping:
+                if attr not in self.mapping:
                     raise ValueError
         elif isinstance(unique, six.string_types):
             # Only a single field passed in.
@@ -304,7 +307,7 @@ class LayerMapping(object):
                 # Verify OGR geometry.
                 try:
                     val = self.verify_geom(feat.geom, model_field)
-                except OGRException:
+                except GDALException:
                     raise LayerMapError('Could not retrieve geometry from feature.')
             elif isinstance(model_field, models.base.ModelBase):
                 # The related _model_, not a field was passed in -- indicating
@@ -329,9 +332,9 @@ class LayerMapping(object):
         if isinstance(self.unique, six.string_types):
             return {self.unique: kwargs[self.unique]}
         else:
-            return dict((fld, kwargs[fld]) for fld in self.unique)
+            return {fld: kwargs[fld] for fld in self.unique}
 
-    #### Verification routines used in constructing model keyword arguments. ####
+    # #### Verification routines used in constructing model keyword arguments. ####
     def verify_ogr_field(self, ogr_field, model_field):
         """
         Verifies if the OGR Field contents are acceptable to the Django
@@ -339,16 +342,16 @@ class LayerMapping(object):
         otherwise the proper exception is raised.
         """
         if (isinstance(ogr_field, OFTString) and
-            isinstance(model_field, (models.CharField, models.TextField))):
+                isinstance(model_field, (models.CharField, models.TextField))):
             if self.encoding:
                 # The encoding for OGR data sources may be specified here
                 # (e.g., 'cp437' for Census Bureau boundary files).
                 val = force_text(ogr_field.value, self.encoding)
             else:
                 val = ogr_field.value
-                if model_field.max_length and len(val) > model_field.max_length:
-                    raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
-                                        (model_field.name, model_field.max_length, len(val)))
+            if model_field.max_length and len(val) > model_field.max_length:
+                raise InvalidString('%s model field maximum string length is %s, given %s characters.' %
+                                    (model_field.name, model_field.max_length, len(val)))
         elif isinstance(ogr_field, OFTReal) and isinstance(model_field, models.DecimalField):
             try:
                 # Creating an instance of the Decimal value to use.
@@ -374,8 +377,11 @@ class LayerMapping(object):
             # If we have more than the maximum digits allowed, then throw an
             # InvalidDecimal exception.
             if n_prec > max_prec:
-                raise InvalidDecimal('A DecimalField with max_digits %d, decimal_places %d must round to an absolute value less than 10^%d.' %
-                                     (model_field.max_digits, model_field.decimal_places, max_prec))
+                raise InvalidDecimal(
+                    'A DecimalField with max_digits %d, decimal_places %d must '
+                    'round to an absolute value less than 10^%d.' %
+                    (model_field.max_digits, model_field.decimal_places, max_prec)
+                )
             val = d
         elif isinstance(ogr_field, (OFTReal, OFTString)) and isinstance(model_field, models.IntegerField):
             # Attempt to convert any OFTReal and OFTString value to an OFTInteger.
@@ -406,7 +412,10 @@ class LayerMapping(object):
         try:
             return rel_model.objects.using(self.using).get(**fk_kwargs)
         except ObjectDoesNotExist:
-            raise MissingForeignKey('No ForeignKey %s model found with keyword arguments: %s' % (rel_model.__name__, fk_kwargs))
+            raise MissingForeignKey(
+                'No ForeignKey %s model found with keyword arguments: %s' %
+                (rel_model.__name__, fk_kwargs)
+            )
 
     def verify_geom(self, geom, model_field):
         """
@@ -435,7 +444,7 @@ class LayerMapping(object):
         # Returning the WKT of the geometry.
         return g.wkt
 
-    #### Other model methods ####
+    # #### Other model methods ####
     def coord_transform(self):
         "Returns the coordinate transformation object."
         SpatialRefSys = self.spatial_backend.spatial_ref_sys()
@@ -451,11 +460,10 @@ class LayerMapping(object):
 
     def geometry_field(self):
         "Returns the GeometryField instance associated with the geographic column."
-        # Use the `get_field_by_name` on the model's options so that we
+        # Use `get_field()` on the model's options so that we
         # get the correct field instance if there's model inheritance.
         opts = self.model._meta
-        fld, model, direct, m2m = opts.get_field_by_name(self.geom_field)
-        return fld
+        return opts.get_field(self.geom_field)
 
     def make_multi(self, geom_type, model_field):
         """
@@ -489,7 +497,7 @@ class LayerMapping(object):
 
          progress:
            When this keyword is set, status information will be printed giving
-           the number of features processed and sucessfully saved.  By default,
+           the number of features processed and successfully saved.  By default,
            progress information will pe printed every 1000 features processed,
            however, this default may be overridden by setting this keyword with an
            integer for the desired interval.
@@ -571,7 +579,10 @@ class LayerMapping(object):
                         if strict:
                             # Bailing out if the `strict` keyword is set.
                             if not silent:
-                                stream.write('Failed to save the feature (id: %s) into the model with the keyword arguments:\n' % feat.fid)
+                                stream.write(
+                                    'Failed to save the feature (id: %s) into the '
+                                    'model with the keyword arguments:\n' % feat.fid
+                                )
                                 stream.write('%s\n' % kwargs)
                             raise
                         elif not silent:

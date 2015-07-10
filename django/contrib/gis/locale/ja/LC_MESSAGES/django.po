@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Shinya Okano <tokibito@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-07-31 16:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-29 02:56+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
@@ -18,60 +18,45 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr "フィードが登録されていません。"
+msgid "GIS"
+msgstr "地理情報システム"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr "スラグ %r は登録されていません。"
-
-#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "GIS基底フィールドです -- OpenGIS で決められた地形タイプに対応"
 
-#: db/models/fields.py:271
 msgid "Point"
 msgstr "点"
 
-#: db/models/fields.py:275
 msgid "Line string"
 msgstr "線"
 
-#: db/models/fields.py:279
 msgid "Polygon"
 msgstr "ポリゴン"
 
-#: db/models/fields.py:283
 msgid "Multi-point"
 msgstr "複数の点"
 
-#: db/models/fields.py:287
 msgid "Multi-line string"
 msgstr "複数の線"
 
-#: db/models/fields.py:291
 msgid "Multi polygon"
 msgstr "複数のポリゴン"
 
-#: db/models/fields.py:295
 msgid "Geometry collection"
 msgstr "地形の集合"
 
-#: forms/fields.py:19
+msgid "Extent Aggregate Field"
+msgstr "広さ集計フィールド"
+
 msgid "No geometry value provided."
 msgstr "geometry値がありません。"
 
-#: forms/fields.py:20
 msgid "Invalid geometry value."
 msgstr "geometry値が不正です"
 
-#: forms/fields.py:21
 msgid "Invalid geometry type."
 msgstr "geometryタイプが不正です。"
 
-#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -79,17 +64,21 @@ msgstr ""
 "geometry を geometry フォームフィールドの SRID に変換しようとしてエラーが起き"
 "ました。"
 
-#: sitemaps/views.py:46
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "このセクションで利用可能なサイトマップはありません: %r"
+msgid "Delete all Features"
+msgstr "すべての機能を削除"
 
-#: sitemaps/views.py:60
-#, python-format
-msgid "Page %s empty"
-msgstr "ページ %s は空です"
+msgid "WKT debugging window:"
+msgstr "WKTデバッグウィンドウ:"
 
-#: sitemaps/views.py:62
+msgid "Google Maps via GeoDjango"
+msgstr "GeoDjangoによるGoogleマップ"
+
+msgid "Debugging window (serialized value)"
+msgstr "デバッグウィンドウ(シリアライズされた値)"
+
+msgid "No feeds are registered."
+msgstr "フィードが登録されていません。"
+
 #, python-format
-msgid "No page '%s'"
-msgstr "ページ '%s' は存在しません"
+msgid "Slug %r isn't registered."
+msgstr "スラグ %r は登録されていません。"

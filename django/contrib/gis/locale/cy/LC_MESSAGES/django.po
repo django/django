@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2011-01-19 16:52+0000\n"
-"Last-Translator: Django team\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -17,76 +18,66 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: views.py:9
-msgid "No feeds are registered."
-msgstr ""
+msgid "GIS"
+msgstr "GIS"
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr ""
-
-#: db/models/fields.py:51
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
+msgstr "Y maes GIS sail - mapia i'r math OpenGIS Specification Geometry"
 
-#: db/models/fields.py:271
 msgid "Point"
-msgstr ""
+msgstr "Pwynt"
 
-#: db/models/fields.py:275
 msgid "Line string"
-msgstr ""
+msgstr "Llinyn llinell"
 
-#: db/models/fields.py:279
 msgid "Polygon"
-msgstr ""
+msgstr "Polygon"
 
-#: db/models/fields.py:283
 msgid "Multi-point"
-msgstr ""
+msgstr "Aml-bwynt"
 
-#: db/models/fields.py:287
 msgid "Multi-line string"
-msgstr ""
+msgstr "Llinyn aml-linell"
 
-#: db/models/fields.py:291
 msgid "Multi polygon"
-msgstr ""
+msgstr "Aml-bolygon"
 
-#: db/models/fields.py:295
 msgid "Geometry collection"
+msgstr "Casgliad geometreg"
+
+msgid "Extent Aggregate Field"
 msgstr ""
 
-#: forms/fields.py:19
 msgid "No geometry value provided."
-msgstr ""
+msgstr "Ni ddarparwyd gwerth geometreg"
 
-#: forms/fields.py:20
 msgid "Invalid geometry value."
-msgstr ""
+msgstr "Gwerth geometreg annilys"
 
-#: forms/fields.py:21
 msgid "Invalid geometry type."
-msgstr ""
+msgstr "Math geometreg annilys"
 
-#: forms/fields.py:22
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
+"Roedd gwall tra'n trawsnewid y geometreg i SRID y maes ffurflen geometreg."
 
-#: sitemaps/views.py:46
-#, python-format
-msgid "No sitemap available for section: %r"
+msgid "Delete all Features"
 msgstr ""
 
-#: sitemaps/views.py:60
-#, python-format
-msgid "Page %s empty"
+msgid "WKT debugging window:"
 msgstr ""
 
-#: sitemaps/views.py:62
-#, python-format
-msgid "No page '%s'"
+msgid "Google Maps via GeoDjango"
 msgstr ""
+
+msgid "Debugging window (serialized value)"
+msgstr ""
+
+msgid "No feeds are registered."
+msgstr "Does dim un llif wedi ei gofrestru."
+
+#, python-format
+msgid "Slug %r isn't registered."
+msgstr "Malwen %r heb ei gofrestru."

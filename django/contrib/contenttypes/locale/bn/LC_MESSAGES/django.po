@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Tahmid Rafi <rafi.tahmid@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-15 10:56+0200\n"
-"PO-Revision-Date: 2012-03-08 11:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-25 18:55+0000\n"
+"Last-Translator: Tahmid Rafi <rafi.tahmid@gmail.com>\n"
 "Language-Team: Bengali (http://www.transifex.com/projects/p/django/language/"
 "bn/)\n"
 "MIME-Version: 1.0\n"
@@ -17,29 +18,26 @@ msgstr ""
 "Language: bn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: models.py:130
+msgid "Content Types"
+msgstr "কনটেন্ট টাইপসমূহ"
+
 msgid "python model class name"
 msgstr "পাইথন মডেল ক্লাসের নাম"
 
-#: models.py:134
 msgid "content type"
 msgstr "কনটেন্ট টাইপ"
 
-#: models.py:135
 msgid "content types"
 msgstr "কনটেন্ট টাইপ সমূহ"
 
-#: views.py:17
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
-msgstr ""
+msgstr "কনটেন্ট টাইপ %(ct_id)s অবজেক্টের সাথে সংযুক্ত কোনো মডেল নেই"
 
-#: views.py:21
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr ""
 
-#: views.py:27
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr ""
+msgstr "%(ct_name)s অবজেক্টের কোনো get_absolute_url() মেথড নেই"

@@ -7,8 +7,8 @@ import os
 from io import BytesIO
 
 from django.conf import settings
-from django.core.files.base import File
 from django.core.files import temp as tempfile
+from django.core.files.base import File
 from django.utils.encoding import force_str
 
 __all__ = ('UploadedFile', 'TemporaryUploadedFile', 'InMemoryUploadedFile',
@@ -60,7 +60,7 @@ class TemporaryUploadedFile(UploadedFile):
     """
     A file uploaded to a temporary location (i.e. stream-to-disk).
     """
-    def __init__(self, name, content_type, size, charset, content_type_extra):
+    def __init__(self, name, content_type, size, charset, content_type_extra=None):
         if settings.FILE_UPLOAD_TEMP_DIR:
             file = tempfile.NamedTemporaryFile(suffix='.upload',
                 dir=settings.FILE_UPLOAD_TEMP_DIR)
@@ -89,15 +89,12 @@ class InMemoryUploadedFile(UploadedFile):
     """
     A file uploaded into memory (i.e. stream-to-memory).
     """
-    def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra):
+    def __init__(self, file, field_name, name, content_type, size, charset, content_type_extra=None):
         super(InMemoryUploadedFile, self).__init__(file, name, content_type, size, charset, content_type_extra)
         self.field_name = field_name
 
     def open(self, mode=None):
         self.file.seek(0)
-
-    def close(self):
-        pass
 
     def chunks(self, chunk_size=None):
         self.file.seek(0)
@@ -117,6 +114,7 @@ class SimpleUploadedFile(InMemoryUploadedFile):
         super(SimpleUploadedFile, self).__init__(BytesIO(content), None, name,
                                                  content_type, len(content), None, None)
 
+    @classmethod
     def from_dict(cls, file_dict):
         """
         Creates a SimpleUploadedFile object from
@@ -128,4 +126,3 @@ class SimpleUploadedFile(InMemoryUploadedFile):
         return cls(file_dict['filename'],
                    file_dict['content'],
                    file_dict.get('content-type', 'text/plain'))
-    from_dict = classmethod(from_dict)

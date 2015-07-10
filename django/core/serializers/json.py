@@ -3,17 +3,18 @@ Serialize data to/from JSON
 """
 
 # Avoid shadowing the standard library json module
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import decimal
 import json
 import sys
+import uuid
 
 from django.core.serializers.base import DeserializationError
-from django.core.serializers.python import Serializer as PythonSerializer
-from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.core.serializers.python import (
+    Deserializer as PythonDeserializer, Serializer as PythonSerializer,
+)
 from django.utils import six
 from django.utils.timezone import is_aware
 
@@ -24,7 +25,7 @@ class Serializer(PythonSerializer):
     """
     internal_use_only = False
 
-    def start_serialization(self):
+    def _init_options(self):
         if json.__version__.split('.') >= ['2', '1', '3']:
             # Use JS strings to represent Python Decimal instances (ticket #16850)
             self.options.update({'use_decimal': False})
@@ -35,6 +36,9 @@ class Serializer(PythonSerializer):
         if self.options.get('indent'):
             # Prevent trailing spaces
             self.json_kwargs['separators'] = (',', ': ')
+
+    def start_serialization(self):
+        self._init_options()
         self.stream.write("[")
 
     def end_serialization(self):
@@ -83,7 +87,7 @@ def Deserializer(stream_or_string, **options):
 
 class DjangoJSONEncoder(json.JSONEncoder):
     """
-    JSONEncoder subclass that knows how to encode date/time and decimal types.
+    JSONEncoder subclass that knows how to encode date/time, decimal types and UUIDs.
     """
     def default(self, o):
         # See "Date Time String Format" in the ECMA-262 specification.
@@ -104,6 +108,8 @@ class DjangoJSONEncoder(json.JSONEncoder):
                 r = r[:12]
             return r
         elif isinstance(o, decimal.Decimal):
+            return str(o)
+        elif isinstance(o, uuid.UUID):
             return str(o)
         else:
             return super(DjangoJSONEncoder, self).default(o)

@@ -1,5 +1,5 @@
 """
-21. Specifying 'choices' for a field
+Specifying 'choices' for a field
 
 Most fields take a ``choices`` parameter, which should be a tuple of tuples
 specifying which are the valid values for that field.
@@ -11,7 +11,6 @@ field. This method returns the "human-readable" value of the field.
 
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
-
 
 GENDER_CHOICES = (
     ('M', 'Male'),

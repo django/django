@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-05-02 16:18+0200\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -13,76 +13,86 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views.py:9
-msgid "No feeds are registered."
+#: contrib/gis/apps.py:8
+msgid "GIS"
 msgstr ""
 
-#: views.py:19
-#, python-format
-msgid "Slug %r isn't registered."
-msgstr ""
-
-#: db/models/fields.py:51
+#: contrib/gis/db/models/fields.py:78
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr ""
 
-#: db/models/fields.py:270
+#: contrib/gis/db/models/fields.py:325
 msgid "Point"
 msgstr ""
 
-#: db/models/fields.py:274
+#: contrib/gis/db/models/fields.py:331
 msgid "Line string"
 msgstr ""
 
-#: db/models/fields.py:278
+#: contrib/gis/db/models/fields.py:337
 msgid "Polygon"
 msgstr ""
 
-#: db/models/fields.py:282
+#: contrib/gis/db/models/fields.py:343
 msgid "Multi-point"
 msgstr ""
 
-#: db/models/fields.py:286
+#: contrib/gis/db/models/fields.py:349
 msgid "Multi-line string"
 msgstr ""
 
-#: db/models/fields.py:290
+#: contrib/gis/db/models/fields.py:355
 msgid "Multi polygon"
 msgstr ""
 
-#: db/models/fields.py:294
+#: contrib/gis/db/models/fields.py:361
 msgid "Geometry collection"
 msgstr ""
 
-#: forms/fields.py:23
+#: contrib/gis/db/models/fields.py:367
+msgid "Extent Aggregate Field"
+msgstr ""
+
+#: contrib/gis/forms/fields.py:22
 msgid "No geometry value provided."
 msgstr ""
 
-#: forms/fields.py:24
+#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr ""
 
-#: forms/fields.py:25
+#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr ""
 
-#: forms/fields.py:26
+#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr ""
 
-#: sitemaps/views.py:46
-#, python-format
-msgid "No sitemap available for section: %r"
+#: contrib/gis/templates/gis/admin/openlayers.html:35
+#: contrib/gis/templates/gis/openlayers.html:18
+msgid "Delete all Features"
 msgstr ""
 
-#: sitemaps/views.py:60
-#, python-format
-msgid "Page %s empty"
+#: contrib/gis/templates/gis/admin/openlayers.html:37
+msgid "WKT debugging window:"
 msgstr ""
 
-#: sitemaps/views.py:62
+#: contrib/gis/templates/gis/google/google-map.html:4
+msgid "Google Maps via GeoDjango"
+msgstr ""
+
+#: contrib/gis/templates/gis/openlayers.html:19
+msgid "Debugging window (serialized value)"
+msgstr ""
+
+#: contrib/gis/views.py:10
+msgid "No feeds are registered."
+msgstr ""
+
+#: contrib/gis/views.py:16
 #, python-format
-msgid "No page '%s'"
+msgid "Slug %r isn't registered."
 msgstr ""

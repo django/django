@@ -1,7 +1,7 @@
 import re
 
-from django.utils.text import compress_sequence, compress_string
 from django.utils.cache import patch_vary_headers
+from django.utils.text import compress_sequence, compress_string
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
@@ -17,17 +17,11 @@ class GZipMiddleware(object):
         if not response.streaming and len(response.content) < 200:
             return response
 
-        patch_vary_headers(response, ('Accept-Encoding',))
-
         # Avoid gzipping if we've already got a content-encoding.
         if response.has_header('Content-Encoding'):
             return response
 
-        # MSIE have issues with gzipped response of various content types.
-        if "msie" in request.META.get('HTTP_USER_AGENT', '').lower():
-            ctype = response.get('Content-Type', '').lower()
-            if not ctype.startswith("text/") or "javascript" in ctype:
-                return response
+        patch_vary_headers(response, ('Accept-Encoding',))
 
         ae = request.META.get('HTTP_ACCEPT_ENCODING', '')
         if not re_accepts_gzip.search(ae):
