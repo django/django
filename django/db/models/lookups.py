@@ -266,6 +266,7 @@ default_lookups['lte'] = LessThanOrEqual
 
 class In(BuiltinLookup):
     lookup_name = 'in'
+    operator = 'IN'
 
     def process_rhs(self, compiler, connection):
         if self.rhs_is_direct_value():
@@ -282,7 +283,7 @@ class In(BuiltinLookup):
             return super(In, self).process_rhs(compiler, connection)
 
     def get_rhs_op(self, connection, rhs):
-        return 'IN %s' % rhs
+        return '%s %s' % (self.operator, rhs)
 
     def as_sql(self, compiler, connection):
         max_in_list_size = connection.ops.max_in_list_size()
@@ -297,7 +298,7 @@ class In(BuiltinLookup):
             for offset in range(0, len(rhs_params), max_in_list_size):
                 if offset > 0:
                     in_clause_elements.append(' OR ')
-                in_clause_elements.append('%s IN (' % lhs)
+                in_clause_elements.append('%s %s (' % (lhs, self.operator))
                 params.extend(lhs_params)
                 sqls = rhs[offset: offset + max_in_list_size]
                 sqls_params = rhs_params[offset: offset + max_in_list_size]
@@ -312,6 +313,14 @@ class In(BuiltinLookup):
 
 
 default_lookups['in'] = In
+
+
+class NotIn(In):
+    lookup_name = 'not_in'
+    operator = 'NOT IN'
+
+
+default_lookups['not_in'] = NotIn
 
 
 class PatternLookup(BuiltinLookup):
