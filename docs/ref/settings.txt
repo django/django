@@ -697,8 +697,8 @@ MIGRATE
 
 Default: ``True``
 
-If the test database should be created using apps' existing migrations (the
-default). If this is set to ``False``, Django will attempt to create the
+Whether or not the test database should be created using apps' existing migrations
+(the default). If this is set to ``False``, Django will attempt to create the
 database schema directly from the apps' models.
 
 Creating directly from the models is likely faster for apps with larger numbers
