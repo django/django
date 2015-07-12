@@ -151,6 +151,8 @@ Minor features
 * The time picker widget includes a '6 p.m' option for consistency of having
   predefined options every 6 hours.
 
+* JavaScript slug generation now supports Romanian characters.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
