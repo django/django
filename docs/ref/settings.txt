@@ -690,6 +690,8 @@ on :ref:`controlling the creation order of test databases
 
 .. setting:: TEST_MIGRATE
 
+.. versionadded:: 1.9
+
 MIGRATE
 ^^^^^^^
 
