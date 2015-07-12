@@ -102,7 +102,9 @@ The view function looks like this::
         return render_to_response('list.html', {"contacts": contacts})
 
 In the template :file:`list.html`, you'll want to include navigation between
-pages along with any interesting information from the objects themselves::
+pages along with any interesting information from the objects themselves:
+
+.. code-block:: html+django
 
     {% for contact in contacts %}
         {# Each "contact" is a Contact model object. #}
