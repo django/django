@@ -2318,6 +2318,21 @@ extract two field values, where only one is expected::
     the first query. Without it, a nested query would be executed, because
     :ref:`querysets-are-lazy`.
 
+.. fieldlookup:: in
+
+not_in
+~~~~~~
+
+Not in a given list.
+
+Example::
+
+    Entry.objects.filter(id__not_in=[1, 3, 4])
+
+SQL equivalent::
+
+    SELECT ... WHERE id NOT IN (1, 3, 4);
+
 .. fieldlookup:: gt
 
 gt
