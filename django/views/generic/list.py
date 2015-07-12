@@ -68,7 +68,7 @@ class MultipleObjectMixin(ContextMixin):
             orphans=self.get_paginate_orphans(),
             allow_empty_first_page=self.get_allow_empty(),
             request=self.request,
-            page_kwarg=self.page_kwarg
+            page_kwarg=self.page_kwarg,
         )
         page_kwarg = self.page_kwarg
         page = self.kwargs.get(page_kwarg) or self.request.GET.get(page_kwarg) or 1

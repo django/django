@@ -161,10 +161,14 @@ Optional arguments
     Whether or not the first page is allowed to be empty.  If ``False`` and
     ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
 
+.. versionadded:: 1.9
+
 ``request``
     An ``HttpRequest`` object, used for creating pagination query strings.
 
     See :meth:`~Page.next_page_querystring`.
+
+.. versionadded:: 1.9
 
 ``page_kwarg``
     A string specifying the name to use for the page parameter in the
@@ -267,19 +271,23 @@ Methods
     Returns the previous page number. Raises :exc:`InvalidPage` if previous
     page doesn't exist.
 
+.. versionadded:: 1.9
+
 .. method:: Page.next_page_querystring()
 
-    Returns the query string for the next page.
-    Raises :exc:`InvalidPage` if next page doesn't exist.
+    Returns the query string for the next page.  Raises :exc:`InvalidPage` if
+    next page doesn't exist.
 
-    Use this instead of :meth:`~Page.next_page_number` in your templates::
+    Use this instead of :meth:`~Page.next_page_number` in your templates:
+
+    .. code-block:: html+django
 
         {% if contacts.has_next %}
             <a href="?{{ contacts.next_page_querystring }}">next</a>
         {% endif %}
 
     This is useful when there are other parameters in the query string that
-    need to remain intact on the the next page e.g, paginated search results.
+    need to remain intact on the the next page, e.g. paginated search results.
 
     .. admonition:: Where's my query string?
 
@@ -288,6 +296,8 @@ Methods
         only return the ``page`` parameter. In order to return the whole
         query string the :class:`Paginator` must have been constructed with a
         valid ``request`` argument.
+
+.. versionadded:: 1.9
 
 .. method:: Page.previous_page_querystring()
 
