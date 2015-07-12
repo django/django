@@ -28,6 +28,10 @@ var TURKISH_MAP = {
     'ş':'s', 'Ş':'S', 'ı':'i', 'İ':'I', 'ç':'c', 'Ç':'C', 'ü':'u', 'Ü':'U',
     'ö':'o', 'Ö':'O', 'ğ':'g', 'Ğ':'G'
 };
+var ROMANIAN_MAP = {
+    'ă':'a', 'î':'i', 'ș':'s', 'ț':'t', 'â':'a',
+    'Ă':'A', 'Î':'I', 'Ș':'S', 'Ț':'T', 'Â':'A'
+};
 var RUSSIAN_MAP = {
     'а':'a', 'б':'b', 'в':'v', 'г':'g', 'д':'d', 'е':'e', 'ё':'yo', 'ж':'zh',
     'з':'z', 'и':'i', 'й':'j', 'к':'k', 'л':'l', 'м':'m', 'н':'n', 'о':'o',
@@ -84,6 +88,7 @@ var ALL_DOWNCODE_MAPS = [
     LATIN_SYMBOLS_MAP,
     GREEK_MAP,
     TURKISH_MAP,
+    ROMANIAN_MAP,
     RUSSIAN_MAP,
     UKRAINIAN_MAP,
     CZECH_MAP,

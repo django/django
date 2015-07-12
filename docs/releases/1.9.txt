@@ -151,6 +151,9 @@ Minor features
 * The time picker widget includes a '6 p.m' option for consistency of having
   predefined options every 6 hours.
 
+* Fixed #25117 -- Added Romanian char map for Javascript slug generation in 
+  django/contrib/admin/static/admin/js/urlify.js
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
