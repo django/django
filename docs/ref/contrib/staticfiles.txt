@@ -360,8 +360,8 @@ slightly different call:
 
 .. admonition:: Using Jinja2 templates?
 
-    See :class:`django.template.backends.jinja2.Jinja2` for information on using the
-    ``static`` tag with Jinja2.
+    See :class:`django.template.backends.jinja2.Jinja2` for information on
+    using the ``static`` tag with Jinja2.
 
 Finders Module
 ==============
