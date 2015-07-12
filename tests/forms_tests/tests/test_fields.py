@@ -842,23 +842,23 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual('image/png', uploaded_file.content_type)
 
     @skipIf(Image is None, "Pillow is required to test ImageField")
-    def test_imagefield_annotate_with_bitmap_image_after_clean(self):
+    def test_imagefield_annotate_with_tga_image_after_clean(self):
         """
         This also tests the situation when Pillow doesn't detect the MIME type
         of the image (#24948).
         """
         f = ImageField()
 
-        img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.bmp'
+        img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.tga'
         with open(img_path, 'rb') as img_file:
             img_data = img_file.read()
 
-        img_file = SimpleUploadedFile('1x1.bmp', img_data)
+        img_file = SimpleUploadedFile('1x1.tga', img_data)
         img_file.content_type = 'text/plain'
 
         uploaded_file = f.clean(img_file)
 
-        self.assertEqual('BMP', uploaded_file.image.format)
+        self.assertEqual('TGA', uploaded_file.image.format)
         self.assertIsNone(uploaded_file.content_type)
 
     # URLField ##################################################################
@@ -1404,8 +1404,8 @@ class FieldsTests(SimpleTestCase):
         f.choices.sort()
         expected = [
             ('/tests/forms_tests/tests/filepath_test_files/.dot-file', '.dot-file'),
-            ('/tests/forms_tests/tests/filepath_test_files/1x1.bmp', '1x1.bmp'),
             ('/tests/forms_tests/tests/filepath_test_files/1x1.png', '1x1.png'),
+            ('/tests/forms_tests/tests/filepath_test_files/1x1.tga', '1x1.tga'),
             ('/tests/forms_tests/tests/filepath_test_files/directory', 'directory'),
             ('/tests/forms_tests/tests/filepath_test_files/fake-image.jpg', 'fake-image.jpg'),
             ('/tests/forms_tests/tests/filepath_test_files/real-text-file.txt', 'real-text-file.txt'),
