@@ -141,22 +141,13 @@ template is stored.
 Included Bookmarklets
 =====================
 
-Several useful bookmarklets are available from the ``admindocs`` page:
+One bookmarklet is available from the ``admindocs`` page:
 
 Documentation for this page
     Jumps you from any page to the documentation for the view that generates
     that page.
 
-Show object ID
-    Shows the content-type and unique ID for pages that represent a single
-    object.
-
-Edit this object
-    Jumps to the admin page for pages that represent a single object.
-
-Using these bookmarklets requires that you are either logged into the
-:mod:`Django admin <django.contrib.admin>` as a
+Using this bookmarklet requires that ``XViewMiddleware`` is installed and that
+you are logged into the :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``, or that the
-``XViewMiddleware`` is installed and you are accessing the site from an IP
-address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``.
