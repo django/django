@@ -369,7 +369,7 @@ template you'd want to use:
                 </span>
 
                 {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">next</a>
+                    <a href="?{{ page_obj.next_page_querystring }}">next</a>
                 {% endif %}
             </span>
         </div>

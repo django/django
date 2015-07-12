@@ -115,7 +115,7 @@ pages along with any interesting information from the objects themselves:
     <div class="pagination">
         <span class="step-links">
             {% if contacts.has_previous %}
-                <a href="?page={{ contacts.previous_page_number }}">previous</a>
+                <a href="?{{ contacts.previous_page_querystring }}">previous</a>
             {% endif %}
 
             <span class="current">
@@ -123,10 +123,19 @@ pages along with any interesting information from the objects themselves:
             </span>
 
             {% if contacts.has_next %}
-                <a href="?page={{ contacts.next_page_number }}">next</a>
+                <a href="?{{ contacts.next_page_querystring }}">next</a>
             {% endif %}
         </span>
     </div>
+
+.. admonition:: What about Page.previous_page_number() and Page.next_page_number()?
+
+    Prior to Django 1.9 the documentation encouraged users to create links to
+    adjacent pages using :meth:`Page.previous_page_number` and
+    :meth:`Page.next_page_number` to manually build the querystring, e.g.
+    ``<a href="?page={{ contacts.next_page_number }}">next</a>``. This is still
+    a viable method, but the new querystring methods referenced above may be
+    simpler to use.
 
 ``Paginator`` objects
 =====================
