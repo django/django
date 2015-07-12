@@ -22,7 +22,7 @@ class FlatPage(models.Model):
     registration_required = models.BooleanField(_('registration required'),
         help_text=_("If this is checked, only logged-in users will be able to view the page."),
         default=False)
-    sites = models.ManyToManyField(Site)
+    sites = models.ManyToManyField(Site, verbose_name=_('sites'))
 
     class Meta:
         db_table = 'django_flatpage'
