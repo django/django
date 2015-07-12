@@ -358,6 +358,11 @@ slightly different call:
     {% static "images/hi.jpg" as myphoto %}
     <img src="{{ myphoto }}" alt="Hi!" />
 
+.. admonition:: Using Jinja2 templates?
+
+    See :class:`django.template.backends.jinja2.Jinja2` for information on
+    using the ``static`` tag with Jinja2.
+
 Finders Module
 ==============
 
