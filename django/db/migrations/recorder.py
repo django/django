@@ -84,3 +84,31 @@ class MigrationRecorder(object):
         Deletes all migration records. Useful if you're testing migrations.
         """
         self.migration_qs.all().delete()
+
+
+class NullMigrationRecorder(object):
+    """
+    Null version of MigrationRecorder which never records anything and always
+    says no migrations are applied.
+
+    Designed for use with migrations-direct-from-memory-models, during e.g.
+    test database creation.
+    """
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def ensure_schema(self):
+        pass
+
+    def applied_migrations(self):
+        return set()
+
+    def record_applied(self, app, name):
+        pass
+
+    def record_unapplied(self, app, name):
+        pass
+
+    def flush(self):
+        pass
