@@ -688,6 +688,22 @@ The creation-order dependencies of the database. See the documentation
 on :ref:`controlling the creation order of test databases
 <topics-testing-creation-dependencies>` for details.
 
+.. setting:: TEST_MIGRATE
+
+MIGRATE
+^^^^^^^
+
+Default: ``True``
+
+If the test database should be created using apps' existing migrations (the
+default). If this is set to ``False``, Django will attempt to create the
+database schema directly from the apps' models.
+
+Creating directly from the models is likely faster for apps with larger numbers
+of migrations, but note that turning this on will ignore all existing migration
+code, including custom ``RunSQL`` and ``RunPython`` operations for things like
+populating data and creating custom indexes.
+
 .. setting:: TEST_MIRROR
 
 MIRROR
