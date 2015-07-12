@@ -257,9 +257,14 @@ The CSRF protection is based on the following things:
    due to the fact that HTTP 'Set-Cookie' headers are (unfortunately) accepted
    by clients that are talking to a site under HTTPS.  (Referer checking is not
    done for HTTP requests because the presence of the Referer header is not
-   reliable enough under HTTP.)
+   reliable enough under HTTP.)  The referer is compared against the
+   :setting:`CSRF_COOKIE_DOMAIN` setting.  The :setting:`CSRF_COOKIE_DOMAIN`
+   setting supports subdomains.  For example, ".example.com" will allow
+   post requests from "www.example.com" and "api.example.com." If
+   :setting:`CSRF_COOKIE_DOMAIN` is not set, the referer must match the
+   ``Host`` header.
 
-This ensures that only forms that have originated from your Web site can be used
+This ensures that only forms that have originated from trusted domains can be used
 to POST data back.
 
 It deliberately ignores GET requests (and other requests that are defined as
