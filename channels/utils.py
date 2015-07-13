@@ -1,6 +1,7 @@
 import types
 from django.apps import apps
 
+from six import PY3
 
 def auto_import_consumers():
     """
@@ -12,8 +13,13 @@ def auto_import_consumers():
             try:
                 __import__(module_name)
             except ImportError as e:
-                if "no module named %s" % submodule not in str(e).lower():
-                    raise
+                err = str(e).lower()
+                if PY3:
+                    if "no module named '%s'" % (module_name,) not in err:
+                        raise
+                else:
+                    if "no module named %s" % (submodule,) not in err:
+                        raise
 
 
 def name_that_thing(thing):

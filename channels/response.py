@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from six import PY3
 
 
 def encode_response(response):
@@ -10,8 +11,10 @@ def encode_response(response):
         "content_type": getattr(response, "content_type", None),
         "content": response.content,
         "status_code": response.status_code,
-        "headers": response._headers.values(),
+        "headers": list(response._headers.values()),
     }
+    if PY3:
+        value["content"] = value["content"].decode('utf8')
     response.close()
     return value
 

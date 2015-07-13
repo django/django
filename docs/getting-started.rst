@@ -27,7 +27,7 @@ app, and put this in a ``consumers.py`` file in the app::
     @consumer("django.wsgi.request")
     def http_consumer(response_channel, path, **kwargs):
         response = HttpResponse("Hello world! You asked for %s" % path)
-        Channel(response_channel).send(response.channel_encode())
+        Channel(response_channel).send(**response.channel_encode())
 
 The most important thing to note here is that, because things we send in
 messages must be JSON-serialisable, the request and response messages
