@@ -95,7 +95,7 @@ Now, that's taken care of adding and removing WebSocket send channels for the
 we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
 
-    from channels import Channel
+    from channels import Channel, Group
     from channels.decorators import consumer
 
     @consumer("django.websocket.connect", "django.websocket.keepalive")
@@ -344,7 +344,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
     from .models import ChatMessage
 
     @consumer("chat-messages")
-    def msg_consumer(room, message):
+    def msg_consumer(channel, room, message):
         # Save to model
         ChatMessage.objects.create(room=room, message=message)
         # Broadcast to listening sockets
