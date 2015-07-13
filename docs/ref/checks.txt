@@ -19,6 +19,7 @@ Django's system checks are organized using the following tags:
 * ``admin``: Checks of any admin site declarations.
 * ``compatibility``: Flagging potential problems with version upgrades.
 * ``security``: Checks security related configuration.
+* ``templates``: Checks template related configuration.
 
 Some checks may be registered with multiple tags.
 
