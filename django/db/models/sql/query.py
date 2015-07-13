@@ -1643,6 +1643,8 @@ class Query(object):
         for item in ordering:
             if not hasattr(item, 'resolve_expression') and not ORDER_PATTERN.match(item):
                 errors.append(item)
+            if getattr(item, 'contains_aggregate', False):
+                raise FieldError('Direct usage of aggregates in order_by is not allowed: %s' % item)
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
