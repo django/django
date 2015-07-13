@@ -58,7 +58,7 @@ class Group(object):
     of the group after an expiry time (keep re-adding to keep them in).
     """
 
-    def __init__(self, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
+    def __init__(self, name, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
         self.name = name
         if channel_backend:
             self.channel_backend = channel_backend
@@ -66,13 +66,13 @@ class Group(object):
             self.channel_backend = channel_backends[alias]
 
     def add(self, channel):
-        self.channel_backend.add(self.name, channel)
+        self.channel_backend.group_add(self.name, channel)
 
     def discard(self, channel):
-        self.channel_backend.discard(self.name, channel)
+        self.channel_backend.group_discard(self.name, channel)
 
     def channels(self):
-        self.channel_backend.channels(self.name)
+        self.channel_backend.group_channels(self.name)
 
     def send(self, **kwargs):
-        self.channel_backend.send_group(self, self.name, kwargs)
+        self.channel_backend.send_group(self.name, kwargs)

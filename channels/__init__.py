@@ -17,4 +17,4 @@ from .hacks import monkeypatch_django
 monkeypatch_django()
 
 # Promote channel to top-level (down here to avoid circular import errs)
-from .channel import Channel
+from .channel import Channel, Group
