@@ -11,7 +11,7 @@ def encode_request(request):
         "GET": list(request.GET.items()),
         "POST": list(request.POST.items()),
         "COOKIES": request.COOKIES,
-        "META": dict({k: v for k, v in request.META.items() if not k.startswith("wsgi")}),
+        "META": {k: v for k, v in request.META.items() if not k.startswith("wsgi")},
         "path": request.path,
         "path_info": request.path_info,
         "method": request.method,
