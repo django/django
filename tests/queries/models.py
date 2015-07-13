@@ -700,7 +700,11 @@ class Classroom(models.Model):
     students = models.ManyToManyField(Student, related_name='classroom')
 
 
-class Ticket23605A(models.Model):
+class Ticket23605AParent(models.Model):
+    pass
+
+
+class Ticket23605A(Ticket23605AParent):
     pass
 
 
