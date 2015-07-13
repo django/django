@@ -19,6 +19,7 @@ Final releases
 .. toctree::
    :maxdepth: 1
 
+   1.4.22
    1.4.21
    1.4.20
    1.4.19

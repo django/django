@@ -65,6 +65,9 @@ if len(sys.argv) > 1 and sys.argv[1] == 'bdist_wininst':
     for file_info in data_files:
         file_info[0] = '\\PURELIB\\%s' % file_info[0]
 
+if 'bdist_wheel' in sys.argv:
+    raise RuntimeError('Django 1.4 does not support wheel. This error is safe to ignore.')
+
 # Dynamically calculate the version based on django.VERSION.
 version = __import__('django').get_version()
 
