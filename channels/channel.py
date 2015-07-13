@@ -54,7 +54,7 @@ class Channel(object):
         return view_producer(self.name)
 
     @classmethod
-    def consumer(self, channels, alias=DEFAULT_CHANNEL_BACKEND):
+    def consumer(self, *channels, alias=DEFAULT_CHANNEL_BACKEND):
         """
         Decorator that registers a function as a consumer.
         """
@@ -68,3 +68,29 @@ class Channel(object):
             channel_backend.registry.add_consumer(func, channels)
             return func
         return inner
+
+
+class Group(object):
+    """
+    A group of channels that can be messaged at once, and that expire out
+    of the group after an expiry time (keep re-adding to keep them in).
+    """
+
+    def __init__(self, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
+        self.name = name
+        if channel_backend:
+            self.channel_backend = channel_backend
+        else:
+            self.channel_backend = channel_backends[alias]
+
+    def add(self, channel):
+        self.channel_backend.add(self.name, channel)
+
+    def discard(self, channel):
+        self.channel_backend.discard(self.name, channel)
+
+    def channels(self):
+        self.channel_backend.channels(self.name)
+
+    def send(self, **kwargs):
+        self.channel_backend.send_group(self, self.name, kwargs)

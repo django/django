@@ -28,7 +28,7 @@ class RedisChannelBackend(BaseChannelBackend):
 
     def send(self, channel, message):
         # Write out message into expiring key (avoids big items in list)
-        key = uuid.uuid4()
+        key = self.prefix + uuid.uuid4().get_hex()
         self.connection.set(
             key,
             json.dumps(message),
@@ -62,6 +62,42 @@ class RedisChannelBackend(BaseChannelBackend):
                 return result[0][len(self.prefix):], json.loads(content)
             else:
                 return None, None
+
+    def group_add(self, group, channel, expiry=None):
+        """
+        Adds the channel to the named group for at least 'expiry'
+        seconds (expiry defaults to message expiry if not provided).
+        """
+        key = "%s:group:%s" % (self.prefix, group)
+        self.connection.zadd(
+            key,
+            **{channel: time.time() + (expiry or self.expiry)}
+        )
+
+    def group_discard(self, group, channel):
+        """
+        Removes the channel from the named group if it is in the group;
+        does nothing otherwise (does not error)
+        """
+        key = "%s:group:%s" % (self.prefix, group)
+        self.connection.zrem(
+            key,
+            channel,
+        )
+
+    def group_channels(self, group):
+        """
+        Returns an iterable of all channels in the group.
+        """
+        key = "%s:group:%s" % (self.prefix, group)
+        # Discard old channels
+        self.connection.zremrangebyscore(key, 0, int(time.time()) - 10)
+        # Return current lot
+        return self.connection.zrange(
+            key,
+            0,
+            -1,
+        )
 
     def __str__(self):
         return "%s(host=%s, port=%s)" % (self.__class__.__name__, self.host, self.port)

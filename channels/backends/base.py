@@ -88,7 +88,7 @@ class BaseChannelBackend(object):
         This base class provides a default implementation; can be overridden
         to be more efficient by subclasses.
         """
-        for channel in self.group_channels():
+        for channel in self.group_channels(group):
             self.send(channel, message)
 
     def __str__(self):
