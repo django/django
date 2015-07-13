@@ -30,6 +30,10 @@ class Command(RunserverCommand):
         worker = WorkerThread(self.channel_backend)
         worker.daemon = True
         worker.start()
+        # Note that this is the right one on the console
+        self.stdout.write("Worker thread running, channels enabled")
+        if self.channel_backend.local_only:
+            self.stdout.write("Local channel backend detected, no remote channels support")
         # Run the rest
         return super(Command, self).run(*args, **options)
 

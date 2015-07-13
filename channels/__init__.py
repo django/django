@@ -12,9 +12,7 @@ channel_backends = BackendManager(
     })
 )
 
-# Ensure monkeypatching
-from .hacks import monkeypatch_django
-monkeypatch_django()
+default_app_config = 'channels.apps.ChannelsConfig'
 
 # Promote channel to top-level (down here to avoid circular import errs)
 from .channel import Channel, Group

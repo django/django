@@ -19,6 +19,11 @@ def monkeypatch_django():
     # Allow ResponseLater to propagate above handler
     BaseHandler.old_handle_uncaught_exception = BaseHandler.handle_uncaught_exception
     BaseHandler.handle_uncaught_exception = new_handle_uncaught_exception
+    # Ensure that the staticfiles version of runserver bows down to us
+    # This one is particularly horrible
+    from django.contrib.staticfiles.management.commands.runserver import Command as StaticRunserverCommand
+    from .management.commands.runserver import Command as RunserverCommand
+    StaticRunserverCommand.__bases__ = (RunserverCommand, )
 
 
 def new_handle_uncaught_exception(self, request, resolver, exc_info):
