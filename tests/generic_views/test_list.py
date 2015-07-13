@@ -97,7 +97,7 @@ class ListViewTests(TestCase):
         self.assertIn('parameter=preserved', res.context['page_obj'].next_page_querystring())
         self.assertIn('parameter=preserved', res.context['page_obj'].previous_page_querystring())
 
-    def test_unpaginated_with_querystring(self):
+    def test_paginated_first_page(self):
         self._make_authors(100)
         res = self.client.get('/list/authors/paginated/')
         self.assertEqual(res.status_code, 200)
