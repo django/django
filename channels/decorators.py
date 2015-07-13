@@ -5,7 +5,7 @@ from django.utils import six
 from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 
 
-def consumer(self, *channels, alias=DEFAULT_CHANNEL_BACKEND):
+def consumer(self, alias=DEFAULT_CHANNEL_BACKEND, *channels):
     """
     Decorator that registers a function as a consumer.
     """
