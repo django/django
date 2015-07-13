@@ -175,7 +175,9 @@ to test your new code::
     socket.onmessage = function(e) {
         alert(e.data);
     }
-    socket.send("hello world");
+    socket.onopen = function() {
+        socket.send("hello world");
+    }
 
 You should see an alert come back immediately saying "hello world" - your
 message has round-tripped through the server and come back to trigger the alert.
