@@ -285,6 +285,13 @@ class HttpResponse(HttpResponseBase):
         # Content is a bytestring. See the `content` property methods.
         self.content = content
 
+    def __repr__(self):
+        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+        }
+
     def serialize(self):
         """Full HTTP message, including headers, as a bytestring."""
         return self.serialize_headers() + b'\r\n\r\n' + self.content
@@ -403,6 +410,14 @@ class HttpResponseRedirectBase(HttpResponse):
 
     url = property(lambda self: self['Location'])
 
+    def __repr__(self):
+        return '<%(cls)s status_code=%(status_code)d, "%(content_type)s", url="%(url)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+            'url': self.url,
+        }
+
 
 class HttpResponseRedirect(HttpResponseRedirectBase):
     status_code = 302
@@ -444,6 +459,14 @@ class HttpResponseNotAllowed(HttpResponse):
     def __init__(self, permitted_methods, *args, **kwargs):
         super(HttpResponseNotAllowed, self).__init__(*args, **kwargs)
         self['Allow'] = ', '.join(permitted_methods)
+
+    def __repr__(self):
+        return '<%(cls)s [%(methods)s] status_code=%(status_code)d, "%(content_type)s">' % {
+            'cls': self.__class__.__name__,
+            'status_code': self.status_code,
+            'content_type': self['Content-Type'],
+            'methods': self['Allow'],
+        }
 
 
 class HttpResponseGone(HttpResponse):

@@ -443,6 +443,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
         r = HttpResponseRedirect(lazystr('/redirected/'))
         self.assertEqual(r.url, '/redirected/')
 
+    def test_redirect_repr(self):
+        response = HttpResponseRedirect('/redirected/')
+        expected = '<HttpResponseRedirect status_code=302, "text/html; charset=utf-8", url="/redirected/">'
+        self.assertEqual(repr(response), expected)
+
     def test_not_modified(self):
         response = HttpResponseNotModified()
         self.assertEqual(response.status_code, 304)
@@ -459,6 +464,11 @@ class HttpResponseSubclassesTests(SimpleTestCase):
             content='Only the GET method is allowed',
             content_type='text/html')
         self.assertContains(response, 'Only the GET method is allowed', status_code=405)
+
+    def test_not_allowed_repr(self):
+        response = HttpResponseNotAllowed(['GET', 'OPTIONS'], content_type='text/plain')
+        expected = '<HttpResponseNotAllowed [GET, OPTIONS] status_code=405, "text/plain">'
+        self.assertEqual(repr(response), expected)
 
 
 class JsonResponseTests(SimpleTestCase):
