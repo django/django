@@ -62,7 +62,8 @@ class Paginator(object):
         Returns a query string for the given page number, preserving any
         GET parameters present.
         """
-        params = self.request.GET.copy() if self.request else QueryDict('')
+        params = self.request.GET.copy() \
+            if self.request else QueryDict(mutable=True)
         params[self.page_kwarg] = page_number
         return params.urlencode()
 
