@@ -114,6 +114,7 @@ class WebsocketTwistedInterface(object):
         """
         while True:
             channels = self.factory.send_channels()
+            # TODO: Send keepalives
             # Quit if reactor is stopping
             if not reactor.running:
                 return

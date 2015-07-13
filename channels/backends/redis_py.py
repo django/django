@@ -99,5 +99,7 @@ class RedisChannelBackend(BaseChannelBackend):
             -1,
         )
 
+    # TODO: send_group efficient implementation using Lua
+
     def __str__(self):
         return "%s(host=%s, port=%s)" % (self.__class__.__name__, self.host, self.port)

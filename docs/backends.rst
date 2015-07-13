@@ -1,5 +1,24 @@
-Channel Backend Requirements
-============================
+Backends
+========
+
+Multiple choices of backend are available, to fill different tradeoffs of
+complexity, throughput and scalability. You can also write your own backend if
+you wish; the API is very simple and documented below.
+
+In-memory
+---------
+
+Database
+--------
+
+Redis
+-----
+
+Writing Custom Backends
+-----------------------
+
+Backend Requirements
+^^^^^^^^^^^^^^^^^^^^
 
 While the channel backends are pluggable, there's a minimum standard they
 must meet in terms of the way they perform.
@@ -23,11 +42,13 @@ In particular, a channel backend MUST:
 
 * Preserve the ordering of messages inside a channel
 
-* Never deliver a message more than once
+* Never deliver a message more than once (design for at-most-once delivery)
 
 * Never block on sending of a message (dropping the message/erroring is preferable to blocking)
 
 * Be able to store messages of at least 5MB in size
+
+* Allow for channel and group names of up to 200 printable ASCII characters
 
 * Expire messages only after the expiry period provided is up (a backend may
   keep them longer if it wishes, but should expire them at some reasonable
@@ -40,6 +61,10 @@ In addition, it SHOULD:
 
 * Provide a ``send_group()`` method which sends a message to every channel
   in a group.
+
+* Make ``send_group()`` perform better than ``O(n)``, where ``n`` is the
+  number of members in the group; preferably send the messages to all
+  members in a single call to your backing datastore or protocol.
 
 * Try and preserve a rough global ordering, so that one busy channel does not
   drown out an old message in another channel if a worker is listening on both.
