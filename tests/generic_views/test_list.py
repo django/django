@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.paginator import EmptyPage
 from django.test import TestCase, override_settings
 from django.utils.encoding import force_str
 from django.views.generic.base import View
@@ -95,6 +96,15 @@ class ListViewTests(TestCase):
         self.assertEqual(res.context['page_obj'].number, 2)
         self.assertEqual(res.context['page_obj'].next_page_querystring(), 'parameter=preserved&page=3')
         self.assertEqual(res.context['page_obj'].previous_page_querystring(), 'parameter=preserved&page=1')
+
+    def test_unpaginated_with_querystring(self):
+        self._make_authors(100)
+        res = self.client.get('/list/authors/paginated/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['page_obj'].number, 1)
+        self.assertEqual(res.context['page_obj'].next_page_querystring(), 'page=2')
+        with self.assertRaises(EmptyPage):
+            res.context['page_obj'].previous_page_querystring()
 
     def test_paginated_get_page_by_urlvar(self):
         self._make_authors(100)
