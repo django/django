@@ -50,6 +50,30 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_initial_false"})
+    def test_migrate_initial_false(self):
+        """
+        Tests that explicitly set `initial = False` skips fake-initial detection.
+        """
+        # Make sure no tables are created
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        # Run the migrations to 0001 only
+        call_command("migrate", "migrations", "0001", verbosity=0)
+        # Fake roll-back
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        # Make sure fake-initial detection does not run
+        with self.assertRaises(DatabaseError):
+            call_command("migrate", "migrations", "0001", fake_initial=True, verbosity=0)
+
+        call_command("migrate", "migrations", "0001", fake=True, verbosity=0)
+        # real roll-back
+        call_command("migrate", "migrations", "zero", verbosity=0)
+        # Make sure it's all gone
+        self.assertTableNotExists("migrations_author")
+        self.assertTableNotExists("migrations_tribble")
+        self.assertTableNotExists("migrations_book")
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_migrate_fake_initial(self):
         """
@@ -80,6 +104,7 @@ class MigrateTests(MigrationTestBase):
             "migrations.0001_initial... faked",
             out.getvalue().lower()
         )
+
         # Run migrations all the way
         call_command("migrate", verbosity=0)
         # Make sure the right tables exist
@@ -108,6 +133,24 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_fake_split_initial"})
+    def test_migrate_fake_split_initial(self):
+        """
+        Make sure split initial migrations can all be faked with --fake-initial.
+        """
+        call_command("migrate", "migrations", "0002", verbosity=0)
+        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
+        out = six.StringIO()
+        with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+            call_command("migrate", "migrations", "0002", fake_initial=True, stdout=out, verbosity=1)
+        value = out.getvalue().lower()
+        self.assertIn("migrations.0001_initial... faked", value)
+        self.assertIn("migrations.0002_second... faked", value)
+        # Fake an apply
+        call_command("migrate", "migrations", fake=True, verbosity=0)
+        # Unmigrate everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_conflict"})
     def test_migrate_conflict_exit(self):
@@ -409,6 +452,7 @@ class MakeMigrationsTests(MigrationTestBase):
                 content = fp.read()
                 self.assertIn('# -*- coding: utf-8 -*-', content)
                 self.assertIn('migrations.CreateModel', content)
+                self.assertIn('initial = True', content)
 
                 if six.PY3:
                     self.assertIn('úñí©óðé µóðéø', content)  # Meta.verbose_name
@@ -881,6 +925,16 @@ class SquashMigrationsTests(MigrationTestBase):
 
             squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
             self.assertTrue(os.path.exists(squashed_migration_file))
+
+    def test_squashmigrations_initial_attribute(self):
+        with self.temporary_migration_module(module="migrations.test_migrations") as migration_dir:
+            call_command("squashmigrations", "migrations", "0002", interactive=False, verbosity=0)
+
+            squashed_migration_file = os.path.join(migration_dir, "0001_squashed_0002_second.py")
+
+            with codecs.open(squashed_migration_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+                self.assertIn("initial = True", content)
 
     def test_squashmigrations_optimizes(self):
         """
