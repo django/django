@@ -99,7 +99,7 @@ A view takes a request and returns a response; a consumer takes a channel
 message and can write out zero to many other channel messages.
 
 Now, let's make a channel for requests (called ``django.wsgi.request``), 
-and a channel per client for responses (e.g. ``django.wsgi.respsonse.o4F2h2Fd``),
+and a channel per client for responses (e.g. ``django.wsgi.response.o4F2h2Fd``),
 with the response channel a property (``send_channel``) of the request message.
 Suddenly, a view is merely another example of a consumer::
 
