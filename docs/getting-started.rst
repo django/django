@@ -275,7 +275,7 @@ However, that session is based on cookies, and so follows the user round the
 site - it's great for information that should persist across all WebSocket and
 HTTP connections, but not great for information that is specific to a single
 WebSocket (such as "which chatroom should this socket be connected to"). For
-this reason, Channels also provides a ``websocker_channel_session`` decorator,
+this reason, Channels also provides a ``send_channel_session`` decorator,
 which adds a ``channel_session`` attribute to the message; this works just like
 the normal ``session`` attribute, and persists to the same storage, but varies
 per-channel rather than per-cookie.
@@ -284,10 +284,10 @@ Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request (we'll ignore auth for now)::
 
     from channels import Channel
-    from channels.decorators import consumer, websocket_channel_session
+    from channels.decorators import consumer, send_channel_session
 
     @consumer("django.websocket.connect")
-    @websocket_channel_session
+    @send_channel_session
     def ws_connect(channel, send_channel, path, channel_session, **kwargs):
         # Work out room name from path (ignore slashes)
         room = path.strip("/")
@@ -296,17 +296,17 @@ name in the path of your WebSocket request (we'll ignore auth for now)::
         Group("chat-%s" % room).add(send_channel)
 
     @consumer("django.websocket.keepalive")
-    @websocket_channel_session
+    @send_channel_session
     def ws_add(channel, send_channel, channel_session, **kwargs):
         Group("chat-%s" % channel_session['room']).add(send_channel)
 
     @consumer("django.websocket.receive")
-    @websocket_channel_session
+    @send_channel_session
     def ws_message(channel, send_channel, content, channel_session, **kwargs):
         Group("chat-%s" % channel_session['room']).send(content=content)
 
     @consumer("django.websocket.disconnect")
-    @websocket_channel_session
+    @send_channel_session
     def ws_disconnect(channel, send_channel, channel_session, **kwargs):
         Group("chat-%s" % channel_session['room']).discard(send_channel)
 
@@ -340,7 +340,7 @@ Let's see what that looks like, assuming we
 have a ChatMessage model with ``message`` and ``room`` fields::
 
     from channels import Channel
-    from channels.decorators import consumer, websocket_channel_session
+    from channels.decorators import consumer, send_channel_session
     from .models import ChatMessage
 
     @consumer("chat-messages")
@@ -351,7 +351,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         Group("chat-%s" % room).send(message)
 
     @consumer("django.websocket.connect")
-    @websocket_channel_session
+    @send_channel_session
     def ws_connect(channel, send_channel, path, channel_session, **kwargs):
         # Work out room name from path (ignore slashes)
         room = path.strip("/")
@@ -360,18 +360,18 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         Group("chat-%s" % room).add(send_channel)
 
     @consumer("django.websocket.keepalive")
-    @websocket_channel_session
+    @send_channel_session
     def ws_add(channel, send_channel, channel_session, **kwargs):
         Group("chat-%s" % channel_session['room']).add(send_channel)
 
     @consumer("django.websocket.receive")
-    @websocket_channel_session
+    @send_channel_session
     def ws_message(channel, send_channel, content, channel_session, **kwargs):
         # Stick the message onto the processing queue
         Channel("chat-messages").send(room=channel_session['room'], message=content)
 
     @consumer("django.websocket.disconnect")
-    @websocket_channel_session
+    @send_channel_session
     def ws_disconnect(channel, send_channel, channel_session, **kwargs):
         Group("chat-%s" % channel_session['room']).discard(send_channel)
 
