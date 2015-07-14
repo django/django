@@ -1,9 +1,11 @@
 import django
 import time
+
+from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
 from collections import deque
 from twisted.internet import reactor
+
 from channels import Channel, channel_backends, DEFAULT_CHANNEL_BACKEND
-from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
 
 
 class InterfaceProtocol(WebSocketServerProtocol):
@@ -20,7 +22,8 @@ class InterfaceProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
         # Make sending channel
-        self.send_channel = Channel.new_name("django.websocket.send")
+        self.send_channel = Channel.new_name("!django.websocket.send")
+        self.last_keepalive = time.time()
         self.factory.protocols[self.send_channel] = self
         # Send news that this channel is open
         Channel("django.websocket.connect").send(
@@ -67,6 +70,16 @@ class InterfaceProtocol(WebSocketServerProtocol):
                 **self.request_info
             )
 
+    def sendKeepalive(self):
+        """
+        Sends a keepalive packet on the keepalive channel.
+        """
+        Channel("django.websocket.keepalive").send(
+            send_channel = self.send_channel,
+            **self.request_info
+        )
+        self.last_keepalive = time.time()
+
 
 class InterfaceFactory(WebSocketServerFactory):
     """
@@ -106,6 +119,7 @@ class WebsocketTwistedInterface(object):
         self.factory.protocol = InterfaceProtocol
         reactor.listenTCP(self.port, self.factory)
         reactor.callInThread(self.backend_reader)
+        reactor.callLater(1, self.keepalive_sender)
         reactor.run()
 
     def backend_reader(self):
@@ -130,3 +144,14 @@ class WebsocketTwistedInterface(object):
                 continue
             # Deal with the message
             self.factory.dispatch_send(channel, message)
+
+    def keepalive_sender(self):
+        """
+        Sends keepalive messages for open WebSockets every
+        (channel_backend expiry / 2) seconds.
+        """
+        expiry_window = int(self.channel_backend.expiry / 2)
+        for protocol in self.factory.protocols.values():
+            if time.time() - protocol.last_keepalive > expiry_window:
+                protocol.sendKeepalive()
+        reactor.callLater(1, self.keepalive_sender)
