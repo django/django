@@ -632,6 +632,11 @@ class BaseModelFormSet(BaseFormSet):
         """Saves and returns an existing model instance for the given form."""
         return form.save(commit=commit)
 
+    def delete_existing(self, obj, commit=True):
+        """Deletes an existing model instance"""
+        if commit:
+            obj.delete()
+
     def save(self, commit=True):
         """Saves model instances for every form, adding and changing instances
         as necessary, and returns the list of instances.
@@ -756,8 +761,7 @@ class BaseModelFormSet(BaseFormSet):
                 if obj.pk is None:
                     continue
                 self.deleted_objects.append(obj)
-                if commit:
-                    obj.delete()
+                self.delete_existing(obj, commit=commit)
             elif form.has_changed():
                 self.changed_objects.append((obj, form.changed_data))
                 saved_instances.append(self.save_existing(form, obj, commit=commit))
