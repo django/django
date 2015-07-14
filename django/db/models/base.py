@@ -1608,6 +1608,16 @@ class Model(six.with_metaclass(ModelBase)):
 
         return errors
 
+    def assign_attributes(self, values_dict):
+        """
+        Helper method to mass update fields in an unpersisted model object.
+        """
+        keys = values_dict.keys()
+        fields = [f.name for f in self._meta.get_fields()]
+        for k in keys:
+            if k in fields:
+                setattr(self, k, values_dict[k])
+
 
 ############################################
 # HELPER FUNCTIONS (CURRIED MODEL METHODS) #
