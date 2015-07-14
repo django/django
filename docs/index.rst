@@ -23,6 +23,7 @@ Contents:
    concepts
    installation
    getting-started
+   deploying
    integration-changes
    message-standards
    scaling

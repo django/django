@@ -391,5 +391,5 @@ systems easily integrate with WebSockets.
 
 We recommend you read through the rest of the reference documentation to see
 all of what Channels has to offer; in particular, you may want to look at
-our :doc:`deployment` and :doc:`scaling` resources to get an idea of how to
+our :doc:`deploying` and :doc:`scaling` resources to get an idea of how to
 design and run apps in production environments.
