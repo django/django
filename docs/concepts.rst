@@ -62,7 +62,9 @@ How do we use channels?
 That's what a channel is, but how is Django using them? Well, inside Django
 you can connect a function to consume a channel, like so::
 
-    @Channel.consumer("channel-name")
+    from channels.decorators import consumer
+
+    @consumer("channel-name")
     def my_consumer(something, **kwargs):
         pass
 
@@ -101,7 +103,7 @@ and a channel per client for responses (e.g. ``django.wsgi.respsonse.o4F2h2Fd``)
 with the response channel a property (``send_channel``) of the request message.
 Suddenly, a view is merely another example of a consumer::
 
-    @Channel.consumer("django.wsgi.request")
+    @consumer("django.wsgi.request")
     def my_consumer(send_channel, **request_data):
         # Decode the request from JSON-compat to a full object
         django_request = Request.decode(request_data)
@@ -181,7 +183,7 @@ set of channels (here, using Redis) to send updates to::
                 content=instance.content,
             )
 
-    @Channel.consumer("django.websocket.connect")
+    @consumer("django.websocket.connect")
     def ws_connect(path, send_channel, **kwargs):
         # Add to reader set
         redis_conn.sadd("readers", send_channel)
@@ -217,8 +219,8 @@ we don't need to; Channels has it built in, as a feature called Groups::
             content=instance.content,
         )
 
-    @Channel.consumer("django.websocket.connect")
-    @Channel.consumer("django.websocket.keepalive")
+    @consumer("django.websocket.connect")
+    @consumer("django.websocket.keepalive")
     def ws_connect(path, send_channel, **kwargs):
         # Add to reader group
         Group("liveblog").add(send_channel)
