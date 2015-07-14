@@ -207,7 +207,7 @@ class Command(BaseCommand):
         parser.add_argument('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.')
         parser.add_argument('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: "html,txt", or "js" '
+            help='The file extension(s) to examine (default: "html,txt,py", or "js" '
                  'if the domain is "djangojs"). Separate multiple extensions with '
                  'commas, or use -e multiple times.',
             action='append')
