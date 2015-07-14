@@ -219,7 +219,7 @@ class DeletionTests(TestCase):
         models.signals.post_delete.connect(log_post_delete)
         models.signals.pre_delete.connect(log_pre_delete)
 
-        r = R.objects.create(pk=1)
+        r = R.objects.get_or_create(pk=1)[0]
         s1 = S.objects.create(pk=1, r=r)
         s2 = S.objects.create(pk=2, r=r)
         T.objects.create(pk=1, s=s1)
@@ -243,7 +243,7 @@ class DeletionTests(TestCase):
             self.assertIs(type(instance), S)
             deletions.append(instance.id)
 
-        r = R.objects.create(pk=1)
+        r = R.objects.create()
         S.objects.create(pk=1, r=r)
 
         models.signals.post_delete.connect(log_post_delete, sender=S)
@@ -401,7 +401,7 @@ class DeletionTests(TestCase):
         r.m_set.add(m2)
         r.save()
         existed_objs = {
-            R._meta.label: R.objects.count(),
+            R._meta.label: 1,
             HiddenUser._meta.label: HiddenUser.objects.count(),
             A._meta.label: A.objects.count(),
             MR._meta.label: MR.objects.count(),

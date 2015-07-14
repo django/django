@@ -90,7 +90,7 @@ class TestTicket14567(TestCase):
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
         "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
-        option = ChoiceOptionModel.objects.create(name='default')
+        option = ChoiceOptionModel.objects.get(name='default')
 
         choices = list(ChoiceFieldForm().fields['choice'].choices)
         self.assertEqual(len(choices), 1)
@@ -98,7 +98,6 @@ class ModelFormCallableModelDefault(TestCase):
 
     def test_callable_initial_value(self):
         "The initial value for a callable default returning a queryset is the pk (refs #13769)"
-        ChoiceOptionModel.objects.create(id=1, name='default')
         ChoiceOptionModel.objects.create(id=2, name='option 2')
         ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm().as_p(), """<p><label for="id_choice">Choice:</label> <select name="choice" id="id_choice">
@@ -124,7 +123,6 @@ class ModelFormCallableModelDefault(TestCase):
 
     def test_initial_instance_value(self):
         "Initial instances for model fields may also be instances (refs #7287)"
-        ChoiceOptionModel.objects.create(id=1, name='default')
         obj2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         obj3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
         self.assertHTMLEqual(ChoiceFieldForm(initial={
@@ -259,7 +257,7 @@ class RelatedModelFormTests(SimpleTestCase):
 class ManyToManyExclusionTestCase(TestCase):
     def test_m2m_field_exclusion(self):
         # Issue 12337. save_instance should honor the passed-in exclude keyword.
-        opt1 = ChoiceOptionModel.objects.create(id=1, name='default')
+        opt1 = ChoiceOptionModel.objects.get(name='default')
         opt2 = ChoiceOptionModel.objects.create(id=2, name='option 2')
         opt3 = ChoiceOptionModel.objects.create(id=3, name='option 3')
         initial = {
