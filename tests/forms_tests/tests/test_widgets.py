@@ -2007,8 +2007,8 @@ class SelectWidgetTests(SimpleTestCase):
         """
         widget = Select()
         obj = copy.deepcopy(widget)
-        self.assertTrue(widget is not obj)
+        self.assertIsNot(widget, obj)
         self.assertEqual(widget.choices, obj.choices)
-        self.assertTrue(widget.choices is not obj.choices)
+        self.assertIsNot(widget.choices, obj.choices)
         self.assertEqual(widget.attrs, obj.attrs)
-        self.assertTrue(widget.attrs is not obj.attrs)
+        self.assertIsNot(widget.attrs, obj.attrs)
