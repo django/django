@@ -4,6 +4,9 @@ import time
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
+from django.core.management.sql import (
+    emit_post_migrate_signal, emit_pre_migrate_signal,
+)
 from django.db import router
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.executor import MigrationExecutor
@@ -79,7 +82,7 @@ class BaseDatabaseCreation(object):
                 run_syncdb=True,
             )
         else:
-            self.populate_schema_directly()
+            self.populate_schema_directly(verbosity=max(verbosity - 1, 0))
 
         # We then serialize the current state of the database into a string
         # and store it on the connection. This slightly horrific process is so people
@@ -95,7 +98,7 @@ class BaseDatabaseCreation(object):
 
         return test_database_name
 
-    def populate_schema_directly(self):
+    def populate_schema_directly(self, verbosity):
         """
         Populates the schema of the database in question directly, without
         using migrations at all.
@@ -103,6 +106,7 @@ class BaseDatabaseCreation(object):
         This is done by running the migration autodetector over the current
         loaded model set and directly executing the migrations it produces.
         """
+        emit_pre_migrate_signal(verbosity, False, self.connection.alias)
 
         # Set up the migration autodetector to make a from-scratch set of migrations to apply
         all_app_labels = {config.label for config in apps.get_app_configs()}
@@ -129,7 +133,9 @@ class BaseDatabaseCreation(object):
         executor.loader = loader
         executor.recorder = NullMigrationRecorder(self.connection)
         targets = [key for key in loader.graph.leaf_nodes() if key[0] in all_app_labels]
-        sql_statements = executor.migrate(targets)
+        executor.migrate(targets)
+
+        emit_post_migrate_signal(verbosity, False, self.connection.alias)
 
     def set_as_test_mirror(self, primary_settings_dict):
         """
