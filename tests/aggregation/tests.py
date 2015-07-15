@@ -395,6 +395,29 @@ class AggregateTestCase(TestCase):
         vals = Book.objects.aggregate(Count("rating", distinct=True))
         self.assertEqual(vals, {"rating__count": 4})
 
+    def test_nonselected_annotations_not_in_groupby(self):
+        vals = list(Book.objects.annotate(xprice=F('price')).filter(xprice__lte=30).values('publisher')
+                        .annotate(count=Count('pk')).order_by('publisher'))
+        self.assertEqual(
+            vals, [
+                {'publisher': 1, 'count': 2},
+                {'publisher': 2, 'count': 1},
+                {'publisher': 3, 'count': 1},
+            ]
+        )
+
+    def test_nonselected_annotations_not_in_groupby2(self):
+        vals = list(Book.objects.annotate(xprice=F('price')).filter(xprice__lte=30).values('publisher', 'xprice')
+                        .annotate(count=Count('pk')).values('publisher', 'count').order_by('publisher'))
+        self.assertEqual(
+            vals, [
+                {'publisher': 1, 'count': 1},
+                {'publisher': 1, 'count': 1},
+                {'publisher': 2, 'count': 1},
+                {'publisher': 3, 'count': 1},
+            ]
+        )
+
     def test_fkey_aggregate(self):
         explicit = list(Author.objects.annotate(Count('book__id')))
         implicit = list(Author.objects.annotate(Count('book')))
