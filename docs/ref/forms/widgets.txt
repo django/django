@@ -768,7 +768,7 @@ Composite widgets
     month, day, and year. Note that this widget lives in a separate file from
     the standard widgets.
 
-    Takes one optional argument:
+    Takes several optional arguments:
 
     .. attribute:: SelectDateWidget.years
 
