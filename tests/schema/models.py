@@ -89,6 +89,14 @@ class BookWithoutAuthor(models.Model):
         db_table = "schema_book"
 
 
+class BookForeignObj(models.Model):
+    title = models.CharField(max_length=100, db_index=True)
+    author_id = models.IntegerField()
+
+    class Meta:
+        apps = new_apps
+
+
 class IntegerPK(models.Model):
     i = models.IntegerField(primary_key=True)
     j = models.IntegerField(unique=True)

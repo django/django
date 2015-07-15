@@ -77,10 +77,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           4. delete the "app_model__old" table
         """
         # Work out the new fields dict / mapping
-        body = {f.name: f for f in model._meta.local_fields}
+        body = {f.name: f for f in model._meta.local_concrete_fields}
         # Since mapping might mix column names and default values,
         # its values must be already quoted.
-        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_fields}
+        mapping = {f.column: self.quote_name(f.column) for f in model._meta.local_concrete_fields}
         # This maps field names (not columns) for things like unique_together
         rename_mapping = {}
         # If any of the new or altered fields is introducing a new PK,
@@ -98,7 +98,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         for field in create_fields:
             body[field.name] = field
             # Choose a default and insert it into the copy map
-            if not field.many_to_many:
+            if not field.many_to_many and field.concrete:
                 mapping[field.column] = self.quote_value(
                     self.effective_default(field)
                 )
