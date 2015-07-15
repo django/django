@@ -95,6 +95,9 @@ When :setting:`DEBUG` is ``True`` or when running tests, host validation is
 disabled; any host will be accepted. Thus it's usually only necessary to set it
 in production.
 
+When :setting:`DEBUG` is ``False`` and :setting:`ALLOWED_HOSTS` is not set, 
+Django will log a security warning.
+
 This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
