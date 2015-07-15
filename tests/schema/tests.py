@@ -13,7 +13,7 @@ from django.db.models.fields import (
     TextField, TimeField,
 )
 from django.db.models.fields.related import (
-    ForeignKey, ManyToManyField, OneToOneField,
+    ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.transaction import atomic
 from django.test import TransactionTestCase, skipIfDBFeature
@@ -22,10 +22,10 @@ from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
 )
 from .models import (
-    Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book, BookWeak,
-    BookWithLongName, BookWithO2O, BookWithoutAuthor, BookWithSlug, IntegerPK,
-    Note, NoteRename, Tag, TagIndexed, TagM2MTest, TagUniqueRename, Thing,
-    UniqueTest, new_apps,
+    Author, AuthorWithDefaultHeight, AuthorWithEvenLongerName, Book,
+    BookForeignObj, BookWeak, BookWithLongName, BookWithO2O, BookWithoutAuthor,
+    BookWithSlug, IntegerPK, Note, NoteRename, Tag, TagIndexed, TagM2MTest,
+    TagUniqueRename, Thing, UniqueTest, new_apps,
 )
 
 
@@ -1506,6 +1506,15 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("author_other_really_long_named_i_mean_so_long_fk")
         with connection.schema_editor() as editor:
             editor.add_field(BookWithLongName, new_field)
+
+    def test_add_foreign_object(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(BookForeignObj)
+
+        new_field = ForeignObject(Author, from_fields=['author_id'], to_fields=['id'])
+        new_field.set_attributes_from_name('author')
+        with connection.schema_editor() as editor:
+            editor.add_field(BookForeignObj, new_field)
 
     def test_creation_deletion_reserved_names(self):
         """
