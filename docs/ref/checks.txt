@@ -469,6 +469,8 @@ of the :djadmin:`check` command:
   ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
+* **security.W020**: You should not have :setting:`ALLOWED_HOSTS` set to
+  ``empty`` in deployment.
 
 Sites
 -----
