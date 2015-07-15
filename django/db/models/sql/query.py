@@ -1679,8 +1679,8 @@ class Query(object):
         for col in self.select:
             self.group_by.append(col)
 
-        if self._annotations:
-            for alias, annotation in six.iteritems(self.annotations):
+        if self.annotation_select:
+            for alias, annotation in six.iteritems(self.annotation_select):
                 for col in annotation.get_group_by_cols():
                     self.group_by.append(col)
 
