@@ -191,5 +191,4 @@ def check_xframe_deny(app_configs, **kwargs):
 
 @register(Tags.security, deploy=True)
 def check_allowed_hosts(app_configs, **kwargs):
-    passed_check = not settings.ALLOWED_HOSTS
-    return [] if passed_check else [W020]
+    return [] if settings.ALLOWED_HOSTS else [W020]
