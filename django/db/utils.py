@@ -114,7 +114,7 @@ def load_backend(backend_name):
         try:
             builtin_backends = [
                 name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-                if ispkg and name != 'dummy']
+                if ispkg and name not in {'base', 'dummy'}]
         except EnvironmentError:
             builtin_backends = []
         if backend_name not in ['django.db.backends.%s' % b for b in
