@@ -935,6 +935,7 @@ class SelectDateWidget(Widget):
     month_field = '%s_month'
     day_field = '%s_day'
     year_field = '%s_year'
+    select_widget = Select
 
     date_re = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
@@ -1050,6 +1051,6 @@ class SelectDateWidget(Widget):
         if not self.is_required:
             choices.insert(0, none_value)
         local_attrs = self.build_attrs(id=field % id_)
-        s = Select(choices=choices)
+        s = self.select_widget(choices=choices)
         select_html = s.render(field % name, val, local_attrs)
         return select_html
