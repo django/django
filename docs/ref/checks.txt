@@ -509,3 +509,11 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+
+Sessions
+--------
+
+The following checks verify sessions related configuration:
+
+* **sessions.E001**: The ``<cookie name>`` and ``<cookie name>`` settings must
+  be different.
