@@ -1563,6 +1563,36 @@ The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
     except ObjectDoesNotExist:
         print("Either the entry or blog doesn't exist.")
 
+get_value
+~~~~~~~~~
+
+.. method:: get_value(field, **kwargs)
+
+Returns the specified field's value of the object matching the given lookup parameters, which should be in
+the format described in `Field lookups`_.
+
+``get_value()`` raises :exc:`~django.core.exceptions.MultipleObjectsReturned` if more
+than one object was found. The
+:exc:`~django.core.exceptions.MultipleObjectsReturned` exception is an
+attribute of the model class.
+
+``get_value()`` raises a :exc:`~django.db.models.Model.DoesNotExist` exception if an
+object wasn't found for the given parameters. This exception is an attribute
+of the model class. Example::
+
+    Entry.objects.get_value('description', id='foo') # raises Entry.DoesNotExist
+
+The :exc:`~django.db.models.Model.DoesNotExist` exception inherits from
+:exc:`django.core.exceptions.ObjectDoesNotExist`, so you can target multiple
+:exc:`~django.db.models.Model.DoesNotExist` exceptions. Example::
+
+    from django.core.exceptions import ObjectDoesNotExist
+    try:
+        e = Entry.objects.get_value('description', id=3)
+        b = Blog.objects.get('title', id=1)
+    except ObjectDoesNotExist:
+        print("Either the entry or blog doesn't exist.")
+
 create
 ~~~~~~
 
