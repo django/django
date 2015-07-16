@@ -893,6 +893,10 @@ loaders that come with Django:
 
 .. class:: eggs.Loader
 
+    .. deprecated:: 1.9
+
+        Distributing applications as eggs is not recommended.
+
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.
 
