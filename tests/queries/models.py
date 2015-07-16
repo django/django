@@ -87,7 +87,7 @@ class ExtraInfo(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=10)
     num = models.IntegerField(unique=True)
-    extra = models.ForeignKey(ExtraInfo)
+    extra = models.ForeignKey(ExtraInfo, related_name='author')
 
     class Meta:
         ordering = ['name']

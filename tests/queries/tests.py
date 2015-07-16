@@ -312,6 +312,12 @@ class Queries1Tests(BaseQuerysetTest):
             Author.objects.order_by('name').get_value('pk', pk=self.a1.pk)
         self.assertNotIn('order by', captured_queries[0]['sql'].lower())
 
+    def test_get_value_of_annotation(self):
+        annotate = ExtraInfo.objects.annotate(authors_count=Count('author'))
+        value = annotate.get_value('authors_count', pk=self.e1.pk)
+
+        self.assertEqual(value, annotate.get(pk=self.e1.pk).authors_count)
+
     def test_get_value(self):
         value = Author.objects.get_value('pk', pk=self.a1.pk)
         self.assertEqual(value, self.a1.pk)
