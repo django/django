@@ -5,6 +5,7 @@ import warnings
 
 from django.db import models
 from django.utils import six
+from django.utils.deconstruct import deconstructible
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, python_2_unicode_compatible
 
@@ -16,6 +17,7 @@ warnings.filterwarnings(
 )
 
 
+@deconstructible
 @python_2_unicode_compatible
 class Small(object):
     """
