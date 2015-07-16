@@ -12,7 +12,8 @@ class R(models.Model):
         return "%s" % self.pk
 
 
-get_default_r = lambda: R.objects.get_or_create(is_default=True)[0]
+def get_default_r():
+    return R.objects.get_or_create(is_default=True)[0].pk
 
 
 class S(models.Model):

@@ -26,7 +26,7 @@ class Foo(models.Model):
 
 
 def get_foo():
-    return Foo.objects.get(id=1)
+    return Foo.objects.get_or_create(id=1, defaults={'a': 'abc', 'd': '12.34'})[0].pk
 
 
 class Bar(models.Model):

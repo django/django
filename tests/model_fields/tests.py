@@ -143,7 +143,6 @@ class DecimalFieldTests(test.TestCase):
         """
         We should be able to filter decimal fields using strings (#8023)
         """
-        Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
         self.assertEqual(list(Foo.objects.filter(d='1.23')), [])
 
     def test_save_without_float_conversion(self):
@@ -168,7 +167,7 @@ class DecimalFieldTests(test.TestCase):
 class ForeignKeyTests(test.TestCase):
     def test_callable_default(self):
         """Test the use of a lazy callable for ForeignKey.default"""
-        a = Foo.objects.create(id=1, a='abc', d=Decimal("12.34"))
+        a = Foo.objects.get_or_create(id=1, defaults={'a': 'abc', 'd': '12.34'})[0]
         b = Bar.objects.create(b="bcd")
         self.assertEqual(b.a, a)
 

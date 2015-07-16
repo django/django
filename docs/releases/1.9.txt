@@ -517,6 +517,9 @@ Tests
   site while skipping the authentication and verification steps of
   :meth:`~django.test.Client.login()`.
 
+* Added the :setting:`DATABASES['TEST']['MIGRATE'] <TEST_MIGRATE>` option to
+  allow disabling of migration running during test database creation.
+
 URLs
 ^^^^
 

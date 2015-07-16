@@ -4,7 +4,17 @@ import time
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
+from django.core.management.sql import (
+    emit_post_migrate_signal, emit_pre_migrate_signal,
+)
 from django.db import router
+from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.executor import MigrationExecutor
+from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.questioner import NonInteractiveMigrationQuestioner
+from django.db.migrations.recorder import NullMigrationRecorder
+from django.db.migrations.state import ProjectState
 from django.utils.six import StringIO
 from django.utils.six.moves import input
 
@@ -63,13 +73,16 @@ class BaseDatabaseCreation(object):
         # We report migrate messages at one level lower than that requested.
         # This ensures we don't get flooded with messages during testing
         # (unless you really ask to be flooded).
-        call_command(
-            'migrate',
-            verbosity=max(verbosity - 1, 0),
-            interactive=False,
-            database=self.connection.alias,
-            run_syncdb=True,
-        )
+        if self.connection.settings_dict.get("TEST", {}).get("MIGRATE", True):
+            call_command(
+                'migrate',
+                verbosity=max(verbosity - 1, 0),
+                interactive=False,
+                database=self.connection.alias,
+                run_syncdb=True,
+            )
+        else:
+            self.populate_schema_directly(verbosity=max(verbosity - 1, 0))
 
         # We then serialize the current state of the database into a string
         # and store it on the connection. This slightly horrific process is so people
@@ -84,6 +97,45 @@ class BaseDatabaseCreation(object):
         self.connection.ensure_connection()
 
         return test_database_name
+
+    def populate_schema_directly(self, verbosity):
+        """
+        Populates the schema of the database in question directly, without
+        using migrations at all.
+
+        This is done by running the migration autodetector over the current
+        loaded model set and directly executing the migrations it produces.
+        """
+        emit_pre_migrate_signal(verbosity, False, self.connection.alias)
+
+        # Set up the migration autodetector to make a from-scratch set of migrations to apply
+        all_app_labels = {config.label for config in apps.get_app_configs()}
+        initial_state = ProjectState()
+        questioner = NonInteractiveMigrationQuestioner(specified_apps=all_app_labels, dry_run=True)
+        autodetector = MigrationAutodetector(
+            initial_state,
+            ProjectState.from_apps(apps),
+            questioner,
+        )
+
+        # Run the autodetector
+        changes = autodetector.changes(
+            graph=MigrationGraph(),
+            trim_to_apps=all_app_labels,
+            convert_apps=all_app_labels,
+        )
+
+        # Loop the changes back into a graph we can apply from
+        loader = MigrationLoader.from_changes(changes)
+
+        # Fake-apply them to get SQL
+        executor = MigrationExecutor(self.connection)
+        executor.loader = loader
+        executor.recorder = NullMigrationRecorder(self.connection)
+        targets = [key for key in loader.graph.leaf_nodes() if key[0] in all_app_labels]
+        executor.migrate(targets)
+
+        emit_post_migrate_signal(verbosity, False, self.connection.alias)
 
     def set_as_test_mirror(self, primary_settings_dict):
         """

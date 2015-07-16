@@ -422,10 +422,12 @@ class Category(models.Model):
         return '%s:o%s' % (self.id, self.order)
 
 
+def link_posted_default():
+    return datetime.date.today() - datetime.timedelta(days=7)
+
+
 class Link(models.Model):
-    posted = models.DateField(
-        default=lambda: datetime.date.today() - datetime.timedelta(days=7)
-    )
+    posted = models.DateField(default=link_posted_default)
     url = models.URLField()
     post = models.ForeignKey("Post")
 

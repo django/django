@@ -15,9 +15,15 @@
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'TEST': {
+            'MIGRATE': False,
+        },
     },
     'other': {
         'ENGINE': 'django.db.backends.sqlite3',
+        'TEST': {
+            'MIGRATE': False,
+        },
     }
 }
 
