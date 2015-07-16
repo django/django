@@ -15,6 +15,8 @@ try:
 except ImportError:
     resource_string = None
 
+warnings.warn('The egg template loader is deprecated.', RemovedInDjango20Warning)
+
 
 class EggOrigin(Origin):
 

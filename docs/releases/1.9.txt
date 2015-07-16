@@ -1004,6 +1004,9 @@ Miscellaneous
 * ``django.db.models.Field._get_val_from_obj()`` is deprecated in favor of
   ``Field.value_from_object()``.
 
+* ``django.template.loaders.eggs.Loader`` is deprecated as distributing
+  applications as eggs is not recommended.
+
 .. removed-features-1.9:
 
 Features removed in 1.9

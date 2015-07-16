@@ -153,6 +153,7 @@ class EggLoaderTests(SimpleTestCase):
             del pkg_resources._provider_factories[MockLoader]
 
     @classmethod
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def setUpClass(cls):
         cls.engine = Engine(loaders=[
             'django.template.loaders.eggs.Loader',
