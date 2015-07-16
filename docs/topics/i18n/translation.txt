@@ -832,8 +832,8 @@ language name (translated into the currently active locale).
 
 .. templatetag:: get_current_language
 
-``get_current_languages``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+``get_current_language``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
 preferred language as a string. Example: ``en-us``. See
