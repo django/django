@@ -31,7 +31,7 @@ from .models import (
     School, SharedConnection, SimpleCategory, SingleObject, SpecialCategory,
     Staff, StaffUser, Student, Tag, Task, Ticket21203Child, Ticket21203Parent,
     Ticket23605A, Ticket23605B, Ticket23605C, TvChef, Valid,
-)
+    UnusedModel)
 
 
 class BaseQuerysetTest(TestCase):
@@ -61,10 +61,10 @@ class Queries1Tests(BaseQuerysetTest):
         # Create these out of order so that sorting by 'id' will be different to sorting
         # by 'info'. Helps detect some problems later.
         cls.e2 = ExtraInfo.objects.create(info='e2', note=n2, value=41)
-        e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
+        cls.e1 = ExtraInfo.objects.create(info='e1', note=cls.n1, value=42)
 
-        cls.a1 = Author.objects.create(name='a1', num=1001, extra=e1)
-        cls.a2 = Author.objects.create(name='a2', num=2002, extra=e1)
+        cls.a1 = Author.objects.create(name='a1', num=1001, extra=cls.e1)
+        cls.a2 = Author.objects.create(name='a2', num=2002, extra=cls.e1)
         a3 = Author.objects.create(name='a3', num=3003, extra=cls.e2)
         cls.a4 = Author.objects.create(name='a4', num=4004, extra=cls.e2)
 
@@ -280,13 +280,41 @@ class Queries1Tests(BaseQuerysetTest):
         qs = qs.order_by('id')
         self.assertNotIn('OUTER JOIN', str(qs.query))
 
-    def test_get_clears_ordering(self):
+    def test_get(self):
+        value = Author.objects.get(pk=self.a1.pk)
+        self.assertEqual(value, self.a1)
+
+    def test_get_multiple_objects_returned_is_raised(self):
+        with self.assertRaisesRegexp(Author.MultipleObjectsReturned,
+                                     r"get\(\) returned more than one %s -- it returned [0-9]+!" % Author._meta.object_name):
+            Author.objects.get(extra=self.e1)
+
+    def test_get_does_not_exist_is_raised(self):
+        with self.assertRaisesMessage(UnusedModel.DoesNotExist,
+                                      "%s matching query does not exist." % UnusedModel._meta.object_name):
+            UnusedModel.objects.get(pk=1)
+
+    def test_get_value_multiple_objects_returned_is_raised(self):
+        with self.assertRaisesRegexp(Author.MultipleObjectsReturned,
+                                     r"get_value\(\) returned more than one %s -- it returned [0-9]+!" % Author._meta.object_name):
+            Author.objects.get_value('pk', extra=self.e1)
+
+    def test_get_value_does_not_exist_is_raised(self):
+        with self.assertRaisesMessage(UnusedModel.DoesNotExist,
+                                      "%s matching query does not exist." % UnusedModel._meta.object_name):
+            UnusedModel.objects.get_value('pk', pk=1)
+
+    def test_get_value_clears_ordering(self):
         """
-        get() should clear ordering for optimization purposes.
+        get_value() should clear ordering for optimization purposes.
         """
         with CaptureQueriesContext(connection) as captured_queries:
-            Author.objects.order_by('name').get(pk=self.a1.pk)
+            Author.objects.order_by('name').get_value('pk', pk=self.a1.pk)
         self.assertNotIn('order by', captured_queries[0]['sql'].lower())
+
+    def test_get_value(self):
+        value = Author.objects.get_value('pk', pk=self.a1.pk)
+        self.assertEqual(value, self.a1.pk)
 
     def test_tickets_4088_4306(self):
         self.assertQuerysetEqual(

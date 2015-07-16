@@ -31,7 +31,7 @@ class NamedCategory(DumbCategory):
 class Tag(models.Model):
     name = models.CharField(max_length=10)
     parent = models.ForeignKey('self', blank=True, null=True,
-            related_name='children')
+                               related_name='children')
     category = models.ForeignKey(NamedCategory, null=True, default=None)
 
     class Meta:
@@ -153,6 +153,7 @@ class Number(models.Model):
     def __str__(self):
         return six.text_type(self.num)
 
+
 # Symmetrical m2m field with a normal field using the reverse accessor name
 # ("valid").
 
@@ -164,6 +165,7 @@ class Valid(models.Model):
     class Meta:
         ordering = ['valid']
 
+
 # Some funky cross-linked models for testing a couple of infinite recursion
 # cases.
 
@@ -174,6 +176,7 @@ class X(models.Model):
 
 class Y(models.Model):
     x1 = models.ForeignKey(X, related_name='y1')
+
 
 # Some models with a cycle in the default ordering. This would be bad if we
 # didn't catch the infinite loop.
@@ -221,6 +224,7 @@ class ManagedModel(models.Model):
     def __str__(self):
         return self.data
 
+
 # An inter-related setup with multiple paths from Child to Detail.
 
 
@@ -244,6 +248,7 @@ class Child(models.Model):
     person = models.OneToOneField(Member, primary_key=True)
     parent = models.ForeignKey(Member, related_name="children")
 
+
 # Custom primary keys interfered with ordering in the past.
 
 
@@ -264,6 +269,7 @@ class CustomPkTag(models.Model):
     custom_pk = models.ManyToManyField(CustomPk)
     tag = models.CharField(max_length=20)
 
+
 # An inter-related setup with a model subclass that has a nullable
 # path to another model, and a return path from that model.
 
@@ -283,6 +289,7 @@ class TvChef(Celebrity):
 
 class Fan(models.Model):
     fan_of = models.ForeignKey(Celebrity)
+
 
 # Multiple foreign keys
 
@@ -312,6 +319,7 @@ class ReservedName(models.Model):
     def __str__(self):
         return self.name
 
+
 # A simpler shared-foreign-key setup that can expose some problems.
 
 
@@ -329,6 +337,7 @@ class PointerA(models.Model):
 
 class PointerB(models.Model):
     connection = models.ForeignKey(SharedConnection)
+
 
 # Multi-layer ordering
 
@@ -397,6 +406,7 @@ class Node(models.Model):
 
     def __str__(self):
         return "%s" % self.num
+
 
 # Bug #12252
 
@@ -534,6 +544,7 @@ class Responsibility(models.Model):
     def __str__(self):
         return self.description
 
+
 # Models for disjunction join promotion low level testing.
 
 
@@ -599,6 +610,7 @@ class MyObject(models.Model):
     data = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
 # Models for #17600 regressions
 
 
@@ -607,7 +619,7 @@ class Order(models.Model):
     id = models.IntegerField(primary_key=True)
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk
@@ -619,7 +631,7 @@ class OrderItem(models.Model):
     status = models.IntegerField()
 
     class Meta:
-        ordering = ('pk', )
+        ordering = ('pk',)
 
     def __str__(self):
         return '%s' % self.pk
@@ -732,3 +744,7 @@ class RelatedIndividual(models.Model):
 
     class Meta:
         db_table = 'RelatedIndividual'
+
+
+class UnusedModel(models.Model):
+    pass

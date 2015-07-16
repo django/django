@@ -391,6 +391,27 @@ class QuerySet(object):
             (self.model._meta.object_name, num)
         )
 
+    def get_value(self, field, *args, **kwargs):
+        """
+        Performs the query and returns a single field from an object matching the given
+        keyword arguments.
+        """
+        clone = self.filter(*args, **kwargs).values_list(field, flat=True)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+            raise self.model.DoesNotExist(
+                "%s matching query does not exist." %
+                self.model._meta.object_name
+            )
+        raise self.model.MultipleObjectsReturned(
+            "get_value() returned more than one %s -- it returned %s!" %
+            (self.model._meta.object_name, num)
+        )
+
     def create(self, **kwargs):
         """
         Creates a new object with the given kwargs, saving it to the database
