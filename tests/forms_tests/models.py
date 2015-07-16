@@ -72,7 +72,7 @@ class ChoiceOptionModel(models.Model):
 
 
 def choice_default():
-    return ChoiceOptionModel.objects.get_or_create(name='default')[0]
+    return ChoiceOptionModel.objects.get_or_create(name='default')[0].pk
 
 
 def choice_default_list():

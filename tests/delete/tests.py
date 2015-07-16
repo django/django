@@ -31,7 +31,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setvalue')
         a.setvalue.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setvalue)
+        self.assertEqual(self.DEFAULT, a.setvalue.pk)
 
     def test_setnull(self):
         a = create_a('setnull')
@@ -43,7 +43,7 @@ class OnDeleteTests(TestCase):
         a = create_a('setdefault')
         a.setdefault.delete()
         a = A.objects.get(pk=a.pk)
-        self.assertEqual(self.DEFAULT, a.setdefault)
+        self.assertEqual(self.DEFAULT, a.setdefault.pk)
 
     def test_setdefault_none(self):
         a = create_a('setdefault_none')

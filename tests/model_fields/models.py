@@ -26,7 +26,7 @@ class Foo(models.Model):
 
 
 def get_foo():
-    return Foo.objects.get(id=1)
+    return Foo.objects.get(id=1).pk
 
 
 class Bar(models.Model):
