@@ -366,7 +366,8 @@ CSRF_COOKIE_NAME
 Default: ``'csrftoken'``
 
 The name of the cookie to use for the CSRF authentication token. This can be
-whatever you want. See :doc:`/ref/csrf`.
+whatever you want (as long as it's different from the other cookie names in
+your application). See :doc:`/ref/csrf`.
 
 .. setting:: CSRF_COOKIE_PATH
 
@@ -1614,8 +1615,8 @@ LANGUAGE_COOKIE_NAME
 Default: ``'django_language'``
 
 The name of the cookie to use for the language cookie. This can be whatever
-you want (but should be different from :setting:`SESSION_COOKIE_NAME`). See
-:doc:`/topics/i18n/index`.
+you want (as long as it's different from the other cookie names in your
+application). See :doc:`/topics/i18n/index`.
 
 .. setting:: LANGUAGE_COOKIE_PATH
 
@@ -2943,8 +2944,8 @@ SESSION_COOKIE_NAME
 
 Default: ``'sessionid'``
 
-The name of the cookie to use for sessions. This can be whatever you want (but
-should be different from :setting:`LANGUAGE_COOKIE_NAME`).
+The name of the cookie to use for sessions. This can be whatever you want
+(as long as it's different from the other cookie names in your application).
 
 .. setting:: SESSION_COOKIE_PATH
 
