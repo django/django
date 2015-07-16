@@ -4,6 +4,13 @@ import os
 import subprocess
 import sys
 
+try:
+    import closure
+except ImportError:
+    closure_compiler = None
+else:
+    closure_compiler = os.path.join(os.path.dirname(closure.__file__), 'closure.jar')
+
 js_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'admin', 'js')
 
 
@@ -21,7 +28,7 @@ Compiler library and Java version 6 or later."""
                       action="store_false", dest="verbose")
     options = parser.parse_args()
 
-    compiler = os.path.expanduser(options.compiler)
+    compiler = closure_compiler if closure_compiler else os.path.expanduser(options.compiler)
     if not os.path.exists(compiler):
         sys.exit(
             "Google Closure compiler jar file %s not found. Please use the -c "
