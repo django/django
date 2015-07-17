@@ -169,12 +169,12 @@
         this.wkt_f = new OpenLayers.Format.DjangoWKT();
 
         // Mapping from OGRGeomType name to OpenLayers.Geometry name
-        if (options['geom_name'] === 'Unknown') {
-            options['geom_type'] = OpenLayers.Geometry;
-        } else if (options['geom_name'] === 'GeometryCollection') {
-            options['geom_type'] = OpenLayers.Geometry.Collection;
+        if (options.geom_name === 'Unknown') {
+            options.geom_type = OpenLayers.Geometry;
+        } else if (options.geom_name === 'GeometryCollection') {
+            options.geom_type = OpenLayers.Geometry.Collection;
         } else {
-            options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
+            options.geom_type = eval('OpenLayers.Geometry.' + options.geom_name);
         }
 
         // Default options
@@ -183,7 +183,7 @@
             default_lat: 0,
             default_lon: 0,
             default_zoom: 4,
-            is_collection: new options['geom_type']() instanceof OpenLayers.Geometry.Collection,
+            is_collection: new options.geom_type() instanceof OpenLayers.Geometry.Collection,
             layerswitcher: false,
             map_options: {},
             map_srid: 4326,
@@ -210,9 +210,9 @@
             'strokeColor': '#' + this.options.color
         };
         if (this.options.geom_name === 'LineString') {
-            defaults_style['strokeWidth'] = 3;
+            defaults_style.strokeWidth = 3;
         }
-        var styleMap = new OpenLayers.StyleMap({'default': OpenLayers.Util.applyDefaults(defaults_style, OpenLayers.Feature.Vector.style['default'])});
+        var styleMap = new OpenLayers.StyleMap({'default': OpenLayers.Util.applyDefaults(defaults_style, OpenLayers.Feature.Vector.style.default)});
         this.layers.vector = new OpenLayers.Layer.Vector(" " + this.options.name, {styleMap: styleMap});
         this.map.addLayer(this.layers.vector);
         var wkt = document.getElementById(this.options.id).value;
