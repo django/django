@@ -355,11 +355,11 @@ MapWidget.prototype.addSelectControl = function() {
     select.activate();
 };
 
-MapWidget.prototype.enableDrawing = function () {
+MapWidget.prototype.enableDrawing = function() {
     this.map.getControlsByClass('OpenLayers.Control.DrawFeature')[0].activate();
 };
 
-MapWidget.prototype.enableEditing = function () {
+MapWidget.prototype.enableEditing = function() {
     this.map.getControlsByClass('OpenLayers.Control.ModifyFeature')[0].activate();
 };
 
