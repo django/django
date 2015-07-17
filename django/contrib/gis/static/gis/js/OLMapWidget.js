@@ -170,9 +170,13 @@ function MapWidget(options) {
     this.wkt_f = new OpenLayers.Format.DjangoWKT();
 
     // Mapping from OGRGeomType name to OpenLayers.Geometry name
-    if (options['geom_name'] === 'Unknown') options['geom_type'] = OpenLayers.Geometry;
-    else if (options['geom_name'] === 'GeometryCollection') options['geom_type'] = OpenLayers.Geometry.Collection;
-    else options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
+    if (options['geom_name'] === 'Unknown') {
+        options['geom_type'] = OpenLayers.Geometry;
+    } else if (options['geom_name'] === 'GeometryCollection') {
+        options['geom_type'] = OpenLayers.Geometry.Collection;
+    } else {
+        options['geom_type'] = eval('OpenLayers.Geometry.' + options['geom_name']);
+    }
 
     // Default options
     this.options = {
@@ -261,8 +265,11 @@ function MapWidget(options) {
 
 MapWidget.prototype.create_map = function() {
     var map = new OpenLayers.Map(this.options.map_id, this.options.map_options);
-    if (this.options.base_layer) this.layers.base = this.options.base_layer;
-    else this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
+    if (this.options.base_layer) {
+        this.layers.base = this.options.base_layer;
+    } else {
+        this.layers.base = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'});
+    }
     map.addLayer(this.layers.base);
     return map;
 };
@@ -359,8 +366,9 @@ MapWidget.prototype.enableEditing = function () {
 MapWidget.prototype.getControls = function(layer) {
     this.panel = new OpenLayers.Control.Panel({'displayClass': 'olControlEditingToolbar'});
     this.controls = [new OpenLayers.Control.Navigation()];
-    if (!this.options.modifiable && layer.features.length)
+    if (!this.options.modifiable && layer.features.length) {
         return;
+    }
     if (this.options.geom_name.indexOf('LineString') >= 0 || this.options.geom_name === 'GeometryCollection' || this.options.geom_name === 'Unknown') {
         this.controls.push(new OpenLayers.Control.DrawFeature(layer, OpenLayers.Handler.Path, {'displayClass': 'olControlDrawFeaturePath'}));
     }
