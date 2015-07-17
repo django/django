@@ -17,7 +17,7 @@
         "no-eval": [1],
         "no-extend-native": [2, {"exceptions": ["Date", "String"]}],
         "no-multi-spaces": [2],
-        "no-octal-escape": [1],
+        "no-octal-escape": [2],
         "no-underscore-dangle": [1],
         "no-unused-vars": [2, {"vars": "local", "args": "none"}],
         "no-script-url": [1],
