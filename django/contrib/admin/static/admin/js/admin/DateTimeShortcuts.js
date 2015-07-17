@@ -112,9 +112,9 @@ var DateTimeShortcuts = {
             'class', 'clock-icon',
             'title', gettext('Choose a Time')
         );
-        shortcuts_span.appendChild(document.createTextNode('\240'));
+        shortcuts_span.appendChild(document.createTextNode('\u00A0'));
         shortcuts_span.appendChild(now_link);
-        shortcuts_span.appendChild(document.createTextNode('\240|\240'));
+        shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
         shortcuts_span.appendChild(clock_link);
 
         // Create clock link div
@@ -220,9 +220,9 @@ var DateTimeShortcuts = {
             'class', 'date-icon',
             'title', gettext('Choose a Date')
         );
-        shortcuts_span.appendChild(document.createTextNode('\240'));
+        shortcuts_span.appendChild(document.createTextNode('\u00A0'));
         shortcuts_span.appendChild(today_link);
-        shortcuts_span.appendChild(document.createTextNode('\240|\240'));
+        shortcuts_span.appendChild(document.createTextNode('\u00A0|\u00A0'));
         shortcuts_span.appendChild(cal_link);
 
         // Create calendarbox div.
@@ -267,9 +267,9 @@ var DateTimeShortcuts = {
         var shortcuts = quickElement('div', cal_box);
         shortcuts.className = 'calendar-shortcuts';
         quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
-        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
         quickElement('a', shortcuts, gettext('Today'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
-        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
         quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
 
         // cancel bar
