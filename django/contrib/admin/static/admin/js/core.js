@@ -183,7 +183,7 @@ Date.prototype.strftime = function(format) {
         X: this.toLocaleTimeString(),
         y: ('' + this.getFullYear()).substr(2, 4),
         Y: '' + this.getFullYear(),
-        '%' : '%'
+        '%': '%'
     };
     var result = '', i = 0;
     while (i < format.length) {
