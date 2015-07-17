@@ -2,7 +2,7 @@
     "rules": {
         "camelcase": [1, {"properties": "always"}],
         "comma-spacing": [2, {"before": false, "after": true}],
-        "dot-notation": [1, {"allowKeywords": true}],
+        "dot-notation": [2, {"allowKeywords": true}],
         "curly": [2, "all"],
         "indent": [
             2,
