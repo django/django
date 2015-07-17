@@ -91,7 +91,9 @@ var CalendarNamespace = {
 
             // use UTC function; see above for explanation.
             if (isSelectedMonth && currentDay === selected.getUTCDate()) {
-                if (todayClass !== '') todayClass += " ";
+                if (todayClass !== '') {
+                    todayClass += " ";
+                }
                 todayClass += "selected";
             }
 

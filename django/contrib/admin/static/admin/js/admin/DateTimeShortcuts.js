@@ -56,12 +56,14 @@ var DateTimeShortcuts = {
         var timezoneOffset = DateTimeShortcuts.timezoneOffset / 3600;
 
         // Only warn if there is a time zone mismatch.
-        if (!timezoneOffset)
+        if (!timezoneOffset) {
             return;
+        }
 
         // Check if warning is already there.
-        if ($(inp).siblings('.' + warningClass).length)
+        if ($(inp).siblings('.' + warningClass).length) {
             return;
+        }
 
         var message;
         if (timezoneOffset > 0) {

@@ -3,7 +3,7 @@
         "camelcase": [1, {"properties": "always"}],
         "comma-spacing": [1, {"before": false, "after": true}],
         "dot-notation": [1, {"allowKeywords": true}],
-        "curly": [1, "all"],
+        "curly": [2, "all"],
         "indent": [
             2,
             4
