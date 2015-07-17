@@ -8,7 +8,7 @@
             2,
             4
         ],
-        "key-spacing": [1, {
+        "key-spacing": [2, {
             "beforeColon": false,
             "afterColon": true
         }],
