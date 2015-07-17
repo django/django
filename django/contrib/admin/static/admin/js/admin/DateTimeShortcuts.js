@@ -25,7 +25,7 @@ var DateTimeShortcuts = {
         }
 
         var inputs = document.getElementsByTagName('input');
-        for (var i=0; i<inputs.length; i++) {
+        for (var i = 0; i < inputs.length; i++) {
             var inp = inputs[i];
             if (inp.getAttribute('type') === 'text' && inp.className.match(/vTimeField/)) {
                 DateTimeShortcuts.addClock(inp);
@@ -161,8 +161,8 @@ var DateTimeShortcuts = {
         });
     },
     openClock: function(num) {
-        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName+num);
-        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName+num);
+        var clock_box = document.getElementById(DateTimeShortcuts.clockDivName + num);
+        var clock_link = document.getElementById(DateTimeShortcuts.clockLinkName + num);
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
@@ -252,9 +252,9 @@ var DateTimeShortcuts = {
 
         // next-prev links
         var cal_nav = quickElement('div', cal_box);
-        var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', 'javascript:DateTimeShortcuts.drawPrev('+num+');');
+        var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', 'javascript:DateTimeShortcuts.drawPrev(' + num + ');');
         cal_nav_prev.className = 'calendarnav-previous';
-        var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext('+num+');');
+        var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext(' + num + ');');
         cal_nav_next.className = 'calendarnav-next';
 
         // main box
@@ -285,8 +285,8 @@ var DateTimeShortcuts = {
         });
     },
     openCalendar: function(num) {
-        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1+num);
-        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName+num);
+        var cal_box = document.getElementById(DateTimeShortcuts.calendarDivName1 + num);
+        var cal_link = document.getElementById(DateTimeShortcuts.calendarLinkName + num);
         var inp = DateTimeShortcuts.calendarInputs[num];
 
         // Determine if the current value in the input has a valid date.
@@ -320,7 +320,7 @@ var DateTimeShortcuts = {
         addEvent(document, 'click', DateTimeShortcuts.dismissCalendarFunc[num]);
     },
     dismissCalendar: function(num) {
-        document.getElementById(DateTimeShortcuts.calendarDivName1+num).style.display = 'none';
+        document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
         removeEvent(document, 'click', DateTimeShortcuts.dismissCalendarFunc[num]);
     },
     drawPrev: function(num) {

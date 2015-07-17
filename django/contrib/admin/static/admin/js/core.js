@@ -1,7 +1,7 @@
 // Core javascript helper functions
 
 // basic browser identification & version
-var isOpera = (navigator.userAgent.indexOf("Opera")>=0) && parseFloat(navigator.appVersion);
+var isOpera = (navigator.userAgent.indexOf("Opera") >= 0) && parseFloat(navigator.appVersion);
 var isIE = ((document.all) && (!isOpera)) && parseFloat(navigator.appVersion.split("MSIE ")[1].split(";")[0]);
 
 // Cross-browser event handlers.
@@ -48,7 +48,7 @@ function quickElement() {
     }
     var len = arguments.length;
     for (var i = 3; i < len; i += 2) {
-        obj.setAttribute(arguments[i], arguments[i+1]);
+        obj.setAttribute(arguments[i], arguments[i + 1]);
     }
     arguments[1].appendChild(obj);
     return obj;
@@ -132,12 +132,12 @@ Date.prototype.getTwelveHours = function() {
         return 12;
     }
     else {
-        return hours <= 12 ? hours : hours-12;
+        return hours <= 12 ? hours : hours - 12;
     }
 };
 
 Date.prototype.getTwoDigitMonth = function() {
-    return (this.getMonth() < 9) ? '0' + (this.getMonth()+1) : (this.getMonth()+1);
+    return (this.getMonth() < 9) ? '0' + (this.getMonth() + 1) : (this.getMonth() + 1);
 };
 
 Date.prototype.getTwoDigitDate = function() {

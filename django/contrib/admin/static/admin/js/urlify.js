@@ -112,7 +112,7 @@ var Downcoder = {
         }
         Downcoder.map = {};
         Downcoder.chars = [];
-        for (var i=0; i<ALL_DOWNCODE_MAPS.length; i++) {
+        for (var i = 0; i < ALL_DOWNCODE_MAPS.length; i++) {
             var lookup = ALL_DOWNCODE_MAPS[i];
             for (var c in lookup) {
                 if (lookup.hasOwnProperty(c)) {

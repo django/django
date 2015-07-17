@@ -38,7 +38,7 @@
         var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
         // only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
-        var showAddButton = maxForms.val() === '' || (maxForms.val()-totalForms.val()) > 0;
+        var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
         $this.each(function(i) {
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
@@ -66,11 +66,11 @@
                 if (row.is("tr")) {
                     // If the forms are laid out in table rows, insert
                     // the remove button into the last table cell:
-                    row.children(":last").append('<div><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></div>");
+                    row.children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
                 } else if (row.is("ul") || row.is("ol")) {
                     // If they're laid out as an ordered/unordered list,
                     // insert an <li> after the last list item:
-                    row.append('<li><a class="' + options.deleteCssClass +'" href="javascript:void(0)">' + options.deleteText + "</a></li>");
+                    row.append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
                 } else {
                     // Otherwise, just insert the remove button as the
                     // last child element of the form's container:
@@ -85,7 +85,7 @@
                 $(totalForms).val(parseInt(totalForms.val(), 10) + 1);
                 nextIndex += 1;
                 // Hide add button in case we've hit the max, except we want to add infinitely
-                if ((maxForms.val() !== '') && (maxForms.val()-totalForms.val()) <= 0) {
+                if ((maxForms.val() !== '') && (maxForms.val() - totalForms.val()) <= 0) {
                     addButton.parent().hide();
                 }
                 // The delete button of each row triggers a bunch of other things
@@ -103,7 +103,7 @@
                     var forms = $("." + options.formCssClass);
                     $("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
                     // Show add button again once we drop below max
-                    if ((maxForms.val() === '') || (maxForms.val()-forms.length) > 0) {
+                    if ((maxForms.val() === '') || (maxForms.val() - forms.length) > 0) {
                         addButton.parent().show();
                     }
                     // Also, update names and ids for all remaining form controls
@@ -112,8 +112,7 @@
                     var updateElementCallback = function() {
                         updateElementIndex(this, options.prefix, i);
                     };
-                    for (i=0, formCount=forms.length; i<formCount; i++)
-                    {
+                    for (i = 0, formCount = forms.length; i < formCount; i++) {
                         updateElementIndex($(forms).get(i), options.prefix, i);
                         $(forms.get(i)).find("*").each(updateElementCallback);
                     }
@@ -164,11 +163,11 @@
             if (typeof SelectFilter !== 'undefined') {
                 $('.selectfilter').each(function(index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length-1], false);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
                 });
                 $('.selectfilterstacked').each(function(index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length-1], true);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
                 });
             }
         };
@@ -230,11 +229,11 @@
             if (typeof SelectFilter !== "undefined") {
                 $(".selectfilter").each(function(index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length-1], false);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], false);
                 });
                 $(".selectfilterstacked").each(function(index, value) {
                     var namearr = value.name.split('-');
-                    SelectFilter.init(value.id, namearr[namearr.length-1], true);
+                    SelectFilter.init(value.id, namearr[namearr.length - 1], true);
                 });
             }
         };

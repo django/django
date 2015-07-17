@@ -7,7 +7,7 @@
     OpenLayers.Util.properFeatures = function(features, geom_type) {
         if (features.constructor === Array) {
             var geoms = [];
-            for (var i=0; i<features.length; i++) {
+            for (var i = 0; i < features.length; i++) {
                 geoms.push(features[i].geometry);
             }
             var geom = new geom_type(geoms);
@@ -47,7 +47,7 @@
                 var point;
                 var points = OpenLayers.String.trim(str).split(this.regExes.justComma);
                 var components = [];
-                for(var i=0, len=points.length; i<len; ++i) {
+                for(var i = 0, len = points.length; i < len; ++i) {
                     point = points[i].replace(this.regExes.trimParens, '$1');
                     components.push(this.parse.point.apply(this, [point]).geometry);
                 }
@@ -59,7 +59,7 @@
             'linestring': function(str) {
                 var points = OpenLayers.String.trim(str).split(',');
                 var components = [];
-                for(var i=0, len=points.length; i<len; ++i) {
+                for(var i = 0, len = points.length; i < len; ++i) {
                     components.push(this.parse.point.apply(this, [points[i]]).geometry);
                 }
                 return new OpenLayers.Feature.Vector(
@@ -71,7 +71,7 @@
                 var line;
                 var lines = OpenLayers.String.trim(str).split(this.regExes.parenComma);
                 var components = [];
-                for(var i=0, len=lines.length; i<len; ++i) {
+                for(var i = 0, len = lines.length; i < len; ++i) {
                     line = lines[i].replace(this.regExes.trimParens, '$1');
                     components.push(this.parse.linestring.apply(this, [line]).geometry);
                 }
@@ -84,7 +84,7 @@
                 var ring, linestring, linearring;
                 var rings = OpenLayers.String.trim(str).split(this.regExes.parenComma);
                 var components = [];
-                for(var i=0, len=rings.length; i<len; ++i) {
+                for(var i = 0, len = rings.length; i < len; ++i) {
                     ring = rings[i].replace(this.regExes.trimParens, '$1');
                     linestring = this.parse.linestring.apply(this, [ring]).geometry;
                     linearring = new OpenLayers.Geometry.LinearRing(linestring.components);
@@ -99,7 +99,7 @@
                 var polygon;
                 var polygons = OpenLayers.String.trim(str).split(this.regExes.doubleParenComma);
                 var components = [];
-                for(var i=0, len=polygons.length; i<len; ++i) {
+                for(var i = 0, len = polygons.length; i < len; ++i) {
                     polygon = polygons[i].replace(this.regExes.trimParens, '$1');
                     components.push(this.parse.polygon.apply(this, [polygon]).geometry);
                 }
@@ -113,7 +113,7 @@
                 str = str.replace(/,\s*([A-Za-z])/g, '|$1');
                 var wktArray = OpenLayers.String.trim(str).split('|');
                 var components = [];
-                for(var i=0, len=wktArray.length; i<len; ++i) {
+                for(var i = 0, len = wktArray.length; i < len; ++i) {
                     components.push(OpenLayers.Format.WKT.prototype.read.apply(this, [wktArray[i]]));
                 }
                 return components;
@@ -145,8 +145,8 @@
             if (isCollection) {
                 collection = features.geometry.components;
                 pieces.push('GEOMETRYCOLLECTION(');
-                for (var i=0, len=collection.length; i<len; ++i) {
-                    if (i>0) {
+                for (var i = 0, len = collection.length; i < len; ++i) {
+                    if (i > 0) {
                         pieces.push(',');
                     }
                     pieces.push(this.extractGeometry(collection[i]));
@@ -220,7 +220,7 @@
             var feat = OpenLayers.Util.properFeatures(this.read_wkt(wkt), this.options.geom_type);
             this.write_wkt(feat);
             if (this.options.is_collection) {
-                for (var i=0; i<this.num_geom; i++) {
+                for (var i = 0; i < this.num_geom; i++) {
                     this.layers.vector.addFeatures([new OpenLayers.Feature.Vector(feat.geometry.components[i].clone())]);
                 }
             } else {
@@ -298,7 +298,7 @@
     MapWidget.prototype.add_wkt = function(event) {
         if (this.options.is_collection) {
             var feat = new OpenLayers.Feature.Vector(new this.options.geom_type());
-            for (var i=0; i<this.layers.vector.features.length; i++) {
+            for (var i = 0; i < this.layers.vector.features.length; i++) {
                 feat.geometry.addComponents([this.layers.vector.features[i].geometry]);
             }
             this.write_wkt(feat);
@@ -319,7 +319,7 @@
                 return;
             } else {
                 var feat = new OpenLayers.Feature.Vector(new this.options.geom_type());
-                for (var i=0; i<this.num_geom; i++) {
+                for (var i = 0; i < this.num_geom; i++) {
                     feat.geometry.addComponents([this.layers.vector.features[i].geometry]);
                 }
                 this.write_wkt(feat);
