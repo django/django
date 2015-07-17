@@ -24,7 +24,7 @@ Requires core.js, SelectBox.js and addevent.js.
             from_box.className = 'filtered';
 
             var ps = from_box.parentNode.getElementsByTagName('p');
-            for (var i=0; i<ps.length; i++) {
+            for (var i = 0; i < ps.length; i++) {
                 if (ps[i].className.indexOf("info") !== -1) {
                     // Remove <p class="info">, because it just gets in the way.
                     from_box.parentNode.removeChild(ps[i]);

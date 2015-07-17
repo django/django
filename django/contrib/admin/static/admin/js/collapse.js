@@ -6,7 +6,7 @@
             // Don't hide if fields in this fieldset have errors
             if ($(elem).find("div.errors").length === 0) {
                 $(elem).addClass("collapsed").find("h2").first().append(' (<a id="fieldsetcollapser' +
-                    i +'" class="collapse-toggle" href="#">' + gettext("Show") +
+                    i + '" class="collapse-toggle" href="#">' + gettext("Show") +
                     '</a>)');
             }
         });

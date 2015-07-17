@@ -49,7 +49,7 @@ var SelectBox = {
         }
         var j = SelectBox.cache[id].length - 1;
         for (i = delete_index; i < j; i++) {
-            SelectBox.cache[id][i] = SelectBox.cache[id][i+1];
+            SelectBox.cache[id][i] = SelectBox.cache[id][i + 1];
         }
         SelectBox.cache[id].length--;
     },
