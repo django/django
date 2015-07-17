@@ -12,7 +12,7 @@ var CalendarNamespace = {
     isLeapYear: function(year) {
         return (((year % 4)===0) && ((year % 100)!==0) || ((year % 400)===0));
     },
-    getDaysInMonth: function(month,year) {
+    getDaysInMonth: function(month, year) {
         var days;
         if (month===1 || month===3 || month===5 || month===7 || month===8 || month===10 || month===12) {
             days = 31;

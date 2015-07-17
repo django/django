@@ -166,7 +166,7 @@ var DateTimeShortcuts = {
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
-        if (getStyle(document.body,'direction')!=='rtl') {
+        if (getStyle(document.body, 'direction') !== 'rtl') {
             clock_box.style.left = findPosX(clock_link) + 17 + 'px';
         }
         else {
@@ -304,7 +304,7 @@ var DateTimeShortcuts = {
 
         // Recalculate the clockbox position
         // is it left-to-right or right-to-left layout ?
-        if (getStyle(document.body,'direction')!=='rtl') {
+        if (getStyle(document.body, 'direction') !== 'rtl') {
             cal_box.style.left = findPosX(cal_link) + 17 + 'px';
         }
         else {

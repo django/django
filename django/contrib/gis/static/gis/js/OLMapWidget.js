@@ -114,7 +114,7 @@
                 var wktArray = OpenLayers.String.trim(str).split('|');
                 var components = [];
                 for(var i=0, len=wktArray.length; i<len; ++i) {
-                    components.push(OpenLayers.Format.WKT.prototype.read.apply(this,[wktArray[i]]));
+                    components.push(OpenLayers.Format.WKT.prototype.read.apply(this, [wktArray[i]]));
                 }
                 return components;
             }
