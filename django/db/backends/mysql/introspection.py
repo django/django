@@ -38,8 +38,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_field_type(self, data_type, description):
         field_type = super(DatabaseIntrospection, self).get_field_type(data_type, description)
-        if field_type == 'IntegerField' and 'auto_increment' in description.extra:
-            return 'AutoField'
+        if field_type == 'IntegerField':
+            if 'auto_increment' in description.extra:
+                return 'AutoField'
+            elif 'unsigned' in description.extra:
+                return 'PositiveIntegerField'
+        if field_type == 'SmallIntegerField' and 'unsigned' in description.extra:
+            return 'PositiveSmallIntegerField'
         return field_type
 
     def get_table_list(self, cursor):
