@@ -3,6 +3,7 @@ from django.views.generic.dates import (
     ArchiveIndexView, DateDetailView, DayArchiveView, MonthArchiveView,
     TodayArchiveView, WeekArchiveView, YearArchiveView,
 )
+from django.views.generic.decorators import view_decorator
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import (
     CreateView, DeleteView, FormView, UpdateView,
@@ -14,6 +15,7 @@ __all__ = [
     'YearArchiveView', 'MonthArchiveView', 'WeekArchiveView', 'DayArchiveView',
     'TodayArchiveView', 'DateDetailView', 'DetailView', 'FormView',
     'CreateView', 'UpdateView', 'DeleteView', 'ListView', 'GenericViewError',
+    'view_decorator',
 ]
 
 

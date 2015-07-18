@@ -8,7 +8,7 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-from django.views.generic import RedirectView, TemplateView, View
+from django.views.generic import RedirectView, TemplateView, View, view_decorator
 
 from . import views
 
@@ -44,6 +44,11 @@ class DecoratedDispatchView(SimpleView):
     @decorator
     def dispatch(self, request, *args, **kwargs):
         return super(DecoratedDispatchView, self).dispatch(request, *args, **kwargs)
+
+
+@view_decorator(decorator)
+class DecoratedClassView(SimpleView):
+    pass
 
 
 class AboutTemplateView(TemplateView):
@@ -175,6 +180,13 @@ class ViewTest(unittest.TestCase):
         are also present on the closure.
         """
         self.assertTrue(DecoratedDispatchView.as_view().is_decorated)
+
+    def test_class_decoration(self):
+        """
+        Tests that attributes set by decorator applied to the class with
+        view_decorator are also present on the closure returned by as_view.
+        """
+        self.assertTrue(DecoratedClassView.as_view().is_decorated)
 
     def test_options(self):
         """
