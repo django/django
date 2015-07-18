@@ -8,7 +8,9 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-from django.views.generic import RedirectView, TemplateView, View, view_decorator
+from django.views.generic import (
+    RedirectView, TemplateView, View, view_decorator,
+)
 
 from . import views
 
