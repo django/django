@@ -4,6 +4,7 @@
 """
 from __future__ import unicode_literals
 
+import json
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -411,12 +412,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def json(self):
         """
-        Returns GeoJSON representation of this Geometry if GDAL is installed.
+        Returns GeoJSON representation of this Geometry.
         """
-        if gdal.HAS_GDAL:
-            return self.ogr.json
-        else:
-            raise GEOSException('GeoJSON output only supported when GDAL is installed.')
+        return json.dumps({'type': self.__class__.__name__, 'coordinates': self.coords})
     geojson = json
 
     @property
