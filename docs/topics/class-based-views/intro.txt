@@ -262,6 +262,8 @@ To decorate every instance of a class-based view, you need to decorate
 the class definition itself. To do this you apply the decorator to the
 :meth:`~django.views.generic.base.View.dispatch` method of the class.
 
+.. versionadded:: 1.9
+
 A method on a class isn't quite the same as a standalone function, so
 you can't just apply a function decorator to the method -- you need to
 transform it into a method decorator first. The ``view_decorator``
