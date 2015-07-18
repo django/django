@@ -266,7 +266,7 @@ A method on a class isn't quite the same as a standalone function, so
 you can't just apply a function decorator to the method -- you need to
 transform it into a method decorator first. The ``view_decorator``
 decorator transforms a function decorator into a method decorator, and
-applies it to the ``dispatch`` method of the class. For example:
+applies it to the ``dispatch`` method of the class. For example::
 
     from django.contrib.auth.decorators import login_required
     from django.views.generic import TemplateView, view_decorator
