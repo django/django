@@ -338,7 +338,7 @@ class AdminPasswordChangeForm(forms.Form):
     password2 = forms.CharField(
         label=_("Password (again)"),
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."),
+        help_text=_("Enter the same password as before, for verification."),
     )
 
     def __init__(self, user, *args, **kwargs):
