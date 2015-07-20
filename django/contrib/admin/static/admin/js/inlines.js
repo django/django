@@ -57,7 +57,6 @@
             }
             addButton.click(function(e) {
                 e.preventDefault();
-                var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS");
                 var template = $("#" + options.prefix + "-empty");
                 var row = template.clone(true);
                 row.removeClass(options.emptyCssClass)
@@ -89,10 +88,9 @@
                     addButton.parent().hide();
                 }
                 // The delete button of each row triggers a bunch of other things
-                row.find("a." + options.deleteCssClass).click(function(e) {
-                    e.preventDefault();
+                row.find("a." + options.deleteCssClass).click(function(e1) {
+                    e1.preventDefault();
                     // Remove the parent form containing this button:
-                    var row = $(this).parents("." + options.formCssClass);
                     row.remove();
                     nextIndex -= 1;
                     // If a post-delete callback was provided, call it with the deleted form:

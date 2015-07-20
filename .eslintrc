@@ -21,7 +21,7 @@
         "no-underscore-dangle": [1],
         "no-unused-vars": [2, {"vars": "local", "args": "none"}],
         "no-script-url": [1],
-        "no-shadow": [1, {"hoist": "functions"}],
+        "no-shadow": [2, {"hoist": "functions"}],
         "quotes": [
             1,
             "single"
