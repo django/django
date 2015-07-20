@@ -175,13 +175,13 @@ Optional arguments
 ``request``
     An ``HttpRequest`` object, used for creating pagination query strings.
 
-    See :meth:`~Page.next_page_querystring`.
+    See :meth:`~Paginator.page_querystring`.
 
 ``page_kwarg``
     A string specifying the name to use for the page parameter in the
     pagination query strings.
 
-    See :meth:`~Page.next_page_querystring`.
+    See :meth:`~Paginator.page_querystring`.
 
 .. versionadded:: 1.9
 
@@ -194,6 +194,22 @@ Methods
 
     Returns a :class:`Page` object with the given 1-based index. Raises
     :exc:`InvalidPage` if the given page number doesn't exist.
+
+.. method:: Paginator.page_querystring(number)
+
+    .. versionadded:: 1.9
+
+    Returns the query string for the given page number combined with other
+    parameters already in the query string.
+    Raises :exc:`InvalidPage` if the given page number doesn't exist.
+
+    .. admonition:: Note
+
+        If the :class:`Paginator` was not passed an ``HttpRequest`` object
+        when it was instantiated, this method will only return the ``page``
+        parameter. In order to return the whole query string the
+        :class:`Paginator` must have been constructed with a valid
+        ``request`` argument.
 
 Attributes
 ----------
@@ -300,13 +316,7 @@ Methods
     This is useful when there are other parameters in the query string that
     need to remain intact on the the next page, e.g. paginated search results.
 
-    .. admonition:: Where's my query string?
-
-        If the :class:`Page`'s associated :class:`Paginator` was not passed an
-        ``HttpRequest`` object when it was instantiated, this method will
-        only return the ``page`` parameter. In order to return the whole
-        query string the :class:`Paginator` must have been constructed with a
-        valid ``request`` argument.
+    Internally this uses :meth:`~Paginator.page_querystring`.
 
 .. method:: Page.previous_page_querystring()
 
