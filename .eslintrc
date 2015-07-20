@@ -8,7 +8,7 @@
         "key-spacing": [2, {"beforeColon": false, "afterColon": true}],
         "new-cap": [0, {"newIsCap": true, "capIsNew": true}],
         "no-alert": [0],
-        "no-eval": [1],
+        "no-eval": [2],
         "no-extend-native": [2, {"exceptions": ["Date", "String"]}],
         "no-multi-spaces": [2],
         "no-octal-escape": [2],
