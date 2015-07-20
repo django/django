@@ -1149,6 +1149,18 @@ class WidgetTests(TestCase):
         form = SplitDateRequiredForm({'field': ['', '']})
         self.assertFalse(form.is_valid())
 
+    def test_select_deepcopy(self):
+        """
+        Select's deepcopy should copy all attributes properly (#25085).
+        """
+        widget = Select()
+        obj = copy.deepcopy(widget)
+        self.assertIsNot(widget, obj)
+        self.assertEqual(widget.choices, obj.choices)
+        self.assertIsNot(widget.choices, obj.choices)
+        self.assertEqual(widget.attrs, obj.attrs)
+        self.assertIsNot(widget.attrs, obj.attrs)
+
 
 @override_settings(ROOT_URLCONF='forms_tests.urls')
 class LiveWidgetTests(AdminSeleniumWebDriverTestCase):
