@@ -72,7 +72,7 @@ class UserCreationForm(forms.ModelForm):
         widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."))
+        help_text=_("Enter the same password as before, for verification."))
 
     class Meta:
         model = User
@@ -339,7 +339,7 @@ class AdminPasswordChangeForm(forms.Form):
     password2 = forms.CharField(
         label=_("Password (again)"),
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."),
+        help_text=_("Enter the same password as before, for verification."),
     )
 
     def __init__(self, user, *args, **kwargs):
