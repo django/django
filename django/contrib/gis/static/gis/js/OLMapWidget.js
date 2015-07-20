@@ -175,7 +175,7 @@
         } else if (options.geom_name === 'GeometryCollection') {
             options.geom_type = OpenLayers.Geometry.Collection;
         } else {
-            options.geom_type = eval('OpenLayers.Geometry.' + options.geom_name);
+            options.geom_type = OpenLayers.Geometry[options.geom_name];
         }
 
         // Default options
