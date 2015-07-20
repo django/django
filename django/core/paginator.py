@@ -57,14 +57,14 @@ class Paginator(object):
             top = self.count
         return self._get_page(self.object_list[bottom:top], number, self)
 
-    def page_querystring(self, page_number):
+    def page_querystring(self, number):
         """
         Returns a query string for the given page number, preserving any
         GET parameters present.
         """
         params = self.request.GET.copy() \
             if self.request else QueryDict(mutable=True)
-        params[self.page_kwarg] = page_number
+        params[self.page_kwarg] = number
         return params.urlencode()
 
     def _get_page(self, *args, **kwargs):
