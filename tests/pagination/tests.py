@@ -108,6 +108,10 @@ class PaginationTests(unittest.TestCase):
         for params, output in tests:
             self.check_paginator(params, output)
 
+    def test_paginator_querystring(self):
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertEqual('page=1', paginator.page_querystring(1))
+        self.assertEqual('page=2', paginator.page_querystring(2))
     def test_invalid_page_number(self):
         """
         Tests that invalid page numbers result in the correct exception being
