@@ -16,6 +16,7 @@
  * See: http://www.opensource.org/licenses/bsd-license.php
  */
 (function($) {
+    'use strict';
     $.fn.formset = function(opts) {
         var options = $.extend({}, $.fn.formset.defaults, opts);
         var $this = $(this);

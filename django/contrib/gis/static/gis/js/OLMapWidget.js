@@ -1,5 +1,6 @@
 /*global OpenLayers*/
 (function() {
+    'use strict';
     /**
      * Transforms an array of features to a single feature with the merged
      * geometry of geom_type
