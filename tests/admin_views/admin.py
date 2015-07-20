@@ -18,6 +18,7 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
@@ -446,7 +447,6 @@ class PostAdmin(admin.ModelAdmin):
 
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
-    multiline_html.allow_tags = True
 
     value.short_description = 'Value in $US'
 
@@ -570,8 +570,7 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
     def colored_name(self, obj):
-        return '<span style="color: #%s;">%s</span>' % ('ff00ff', obj.name)
-    colored_name.allow_tags = True
+        return format_html('<span style="color: #{};">{}</span>', 'ff00ff', obj.name)
     colored_name.admin_order_field = 'name'
 
 

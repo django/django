@@ -14,7 +14,7 @@ from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.deprecation import RemovedInDjango110Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
@@ -198,10 +198,16 @@ class AdminReadonlyField(object):
                 if boolean:
                     result_repr = _boolean_icon(value)
                 else:
-                    result_repr = smart_text(value)
-                    if getattr(attr, "allow_tags", False):
-                        result_repr = mark_safe(result_repr)
+                    if hasattr(value, "__html__"):
+                        result_repr = value
                     else:
+                        result_repr = smart_text(value)
+                        if getattr(attr, "allow_tags", False):
+                            warnings.warn(
+                                "The allow_tags attribute is deprecated. Return a SafeString instance by "
+                                "using format_html, format_html_join or mark_safe instead.",
+                                RemovedInDjango20Warning, stacklevel=2)
+                            result_repr = mark_safe(value)
                         result_repr = linebreaksbr(result_repr)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:

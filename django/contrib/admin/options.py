@@ -753,7 +753,6 @@ class ModelAdmin(BaseModelAdmin):
         """
         return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, force_text(obj.pk))
     action_checkbox.short_description = mark_safe('<input type="checkbox" id="action-toggle" />')
-    action_checkbox.allow_tags = True
 
     def get_actions(self, request):
         """
