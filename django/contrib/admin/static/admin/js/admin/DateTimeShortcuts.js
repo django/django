@@ -18,8 +18,9 @@ var DateTimeShortcuts = {
     timezoneWarningClass: 'timezonewarning', // class of the warning for timezone mismatch
     timezoneOffset: 0,
     init: function() {
-        if (window.__admin_utc_offset__ !== undefined) {
-            var serverOffset = window.__admin_utc_offset__;
+        var body = document.getElementsByTagName('body')[0];
+        var serverOffset = body.getAttribute('data-admin-utc-offset');
+        if (serverOffset !== undefined) {
             var localOffset = new Date().getTimezoneOffset() * -60;
             DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
         }
@@ -39,8 +40,9 @@ var DateTimeShortcuts = {
     },
     // Return the current time while accounting for the server timezone.
     now: function() {
-        if (window.__admin_utc_offset__ !== undefined) {
-            var serverOffset = window.__admin_utc_offset__;
+        var body = document.getElementsByTagName('body')[0];
+        var serverOffset = body.getAttribute('data-admin-utc-offset');
+        if (serverOffset !== undefined) {
             var localNow = new Date();
             var localOffset = localNow.getTimezoneOffset() * -60;
             localNow.setTime(localNow.getTime() + 1000 * (serverOffset - localOffset));
