@@ -8,6 +8,7 @@ import sys
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import get_default_username
+from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
@@ -130,6 +131,13 @@ class Command(BaseCommand):
                         password2 = getpass.getpass(force_str('Password (again): '))
                         if password != password2:
                             self.stderr.write("Error: Your passwords didn't match.")
+                            password = None
+                            continue
+                        try:
+                            fake_user = self.UserModel(**user_data)
+                            validate_password(password2, fake_user)
+                        except exceptions.ValidationError as err:
+                            self.stderr.write(', '.join(err.messages))
                             password = None
                             continue
                     if password.strip() == '':

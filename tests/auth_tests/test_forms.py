@@ -116,12 +116,40 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, [])
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+            'min_length': 12,
+        }},
+    ])
+    def test_validates_password(self):
+        # Password is too short and too similar to username
+        data = {
+            'username': 'jsmith',
+            'password1': 'jsmith2',
+            'password2': 'jsmith2',
+        }
+        form = UserCreationForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form["password2"].errors), 2)
+        self.assertIn('The password is too similar to the username.', form["password2"].errors)
+        self.assertIn(
+            'This password is too short. It must contain at least 12 characters.',
+            form["password2"].errors
+        )
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+            'min_length': 12,
+        }},
+    ])
     def test_success(self):
         # The success case.
         data = {
             'username': 'jsmith@example.com',
-            'password1': 'test123',
-            'password2': 'test123',
+            'password1': 'test123longpassword',
+            'password2': 'test123longpassword',
         }
         form = UserCreationForm(data)
         self.assertTrue(form.is_valid())

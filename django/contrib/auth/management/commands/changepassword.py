@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 import getpass
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import (
+    password_changed, validate_password,
+)
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
 from django.utils.encoding import force_str
@@ -46,17 +50,25 @@ class Command(BaseCommand):
         MAX_TRIES = 3
         count = 0
         p1, p2 = 1, 2  # To make them initially mismatch.
-        while p1 != p2 and count < MAX_TRIES:
+        validation_failed = True
+        while (p1 != p2 or validation_failed) and count < MAX_TRIES:
             p1 = self._get_pass()
             p2 = self._get_pass("Password (again): ")
             if p1 != p2:
                 self.stdout.write("Passwords do not match. Please try again.\n")
+                count = count + 1
+            try:
+                validate_password(p2, u)
+                validation_failed = False
+            except ValidationError as err:
+                self.stdout.write(', '.join(err.messages))
                 count = count + 1
 
         if count == MAX_TRIES:
             raise CommandError("Aborting password change for user '%s' after %s attempts" % (u, count))
 
         u.set_password(p1)
+        password_changed(p1, u)
         u.save()
 
         return "Password changed successfully for user '%s'" % u
