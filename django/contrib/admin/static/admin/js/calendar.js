@@ -68,13 +68,13 @@ var CalendarNamespace = {
         var startingPos = new Date(year, month - 1, 1 - CalendarNamespace.firstDayOfWeek).getDay();
         var days = CalendarNamespace.getDaysInMonth(month, year);
 
-        var _cell;
+        var nonDayCell;
 
         // Draw blanks before first of month
         tableRow = quickElement('tr', tableBody);
         for (i = 0; i < startingPos; i++) {
-            _cell = quickElement('td', tableRow, ' ');
-            _cell.className = "nonday";
+            nonDayCell = quickElement('td', tableRow, ' ');
+            nonDayCell.className = "nonday";
         }
 
         // Draw days of month
@@ -105,8 +105,8 @@ var CalendarNamespace = {
 
         // Draw blanks after end of month (optional, but makes for valid code)
         while (tableRow.childNodes.length < 7) {
-            _cell = quickElement('td', tableRow, ' ');
-            _cell.className = "nonday";
+            nonDayCell = quickElement('td', tableRow, ' ');
+            nonDayCell.className = "nonday";
         }
 
         calDiv.appendChild(calTable);
