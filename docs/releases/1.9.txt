@@ -846,9 +846,10 @@ Miscellaneous
 * ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
 
 * The ``admin/base.html`` template no longer sets
-  ``window.__admin_media_prefix__``. Image references in JavaScript that used
-  that value to construct absolute URLs have been moved to CSS for easier
-  customization.
+  ``window.__admin_media_prefix__`` or ``window.__admin_utc_offset__``. Image
+  references in JavaScript that used that value to construct absolute URLs have
+  been moved to CSS for easier customization. The UTC offset is stored on a
+  data attribute of the ``<body>`` tag.
 
 * ``CommaSeparatedIntegerField`` validation has been refined to forbid values
   like ``','``, ``',1'``, and ``'1,,2'``.
