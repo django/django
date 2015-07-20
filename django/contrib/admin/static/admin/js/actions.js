@@ -1,5 +1,6 @@
 /*global _actions_icnt, gettext, interpolate, ngettext*/
 (function($) {
+    'use strict';
     var lastChecked;
 
     $.fn.actions = function(opts) {

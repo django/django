@@ -1,5 +1,6 @@
 /*global gettext*/
 (function($) {
+    'use strict';
     $(document).ready(function() {
         // Add anchor tag for Show/Hide link
         $("fieldset.collapse").each(function(i, elem) {
