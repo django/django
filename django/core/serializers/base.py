@@ -27,6 +27,29 @@ class DeserializationError(Exception):
         return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
 
 
+class ProgressBar(object):
+    progress_width = 75
+
+    def __init__(self, output, total_count):
+        self.output = output
+        self.total_count = total_count
+        self.prev_done = 0
+
+    def update(self, count):
+        if not self.output:
+            return
+        perc = count * 100 // self.total_count
+        done = perc * self.progress_width // 100
+        if self.prev_done >= done:
+            return
+        self.prev_done = done
+        cr = '' if self.total_count == 1 else '\r'
+        self.output.write(cr + '[' + '.' * done + ' ' * (self.progress_width - done) + ']')
+        if done == self.progress_width:
+            self.output.write('\n')
+        self.output.flush()
+
+
 class Serializer(object):
     """
     Abstract serializer base class.
@@ -35,6 +58,7 @@ class Serializer(object):
     # Indicates if the implemented serializer is only available for
     # internal Django use.
     internal_use_only = False
+    progress_class = ProgressBar
 
     def serialize(self, queryset, **options):
         """
@@ -46,10 +70,13 @@ class Serializer(object):
         self.selected_fields = options.pop("fields", None)
         self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
+        progress_bar = self.progress_class(
+            options.pop('progress_output', None), options.pop('object_count', 0)
+        )
 
         self.start_serialization()
         self.first = True
-        for obj in queryset:
+        for count, obj in enumerate(queryset, start=1):
             self.start_object(obj)
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
@@ -67,6 +94,7 @@ class Serializer(object):
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
+            progress_bar.update(count)
             if self.first:
                 self.first = False
         self.end_serialization()

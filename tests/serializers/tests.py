@@ -9,6 +9,7 @@ from datetime import datetime
 from xml.dom import minidom
 
 from django.core import management, serializers
+from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
@@ -187,6 +188,16 @@ class SerializersTestBase(object):
         obj_list = list(serializers.deserialize(self.serializer_name, serial_str))
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
+
+    def test_serialize_progressbar(self):
+        fake_stdout = StringIO()
+        serializers.serialize(
+            self.serializer_name, Article.objects.all(),
+            progress_output=fake_stdout, object_count=Article.objects.count()
+        )
+        self.assertTrue(
+            fake_stdout.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n')
+        )
 
     def test_serialize_superfluous_queries(self):
         """Ensure no superfluous queries are made when serializing ForeignKeys

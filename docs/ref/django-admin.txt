@@ -309,6 +309,12 @@ one model.
 
 By default ``dumpdata`` will output all the serialized data to standard output.
 This option allows you to specify the file to which the data is to be written.
+When this option is set and the verbosity is greater than 0 (the default), a
+progress bar is shown in the terminal.
+
+.. versionchanged:: 1.9
+
+    The progress bar in the terminal was added.
 
 flush
 -----
