@@ -95,7 +95,7 @@ class UrlTagTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango110Warning)
     def test_url12(self):
         output = self.engine.render_to_string('url12', {'client': {'id': 1}})
-        self.assertEqual(output, '/client/1/!$&\'()*+,;=~:@,/')
+        self.assertEqual(output, '/client/1/!$&amp;&#39;()*+,;=~:@,/')
 
     @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'url13': '{% url "template_tests.views.client_action" '
@@ -132,6 +132,15 @@ class UrlTagTests(SimpleTestCase):
     def test_url20(self):
         output = self.engine.render_to_string('url20', {'client': {'id': 1}, 'url_name_in_var': 'named.client'})
         self.assertEqual(output, '/named-client/1/')
+
+    @setup({'url21': '{% autoescape off %}'
+                     '{% url "template_tests.views.client_action" '
+                     'id=client.id action="!$&\'()*+,;=~:@," %}'
+                     '{% endautoescape %}'})
+    @ignore_warnings(category=RemovedInDjango110Warning)
+    def test_url21(self):
+        output = self.engine.render_to_string('url21', {'client': {'id': 1}})
+        self.assertEqual(output, '/client/1/!$&\'()*+,;=~:@,/')
 
     # Failures
     @setup({'url-fail01': '{% url %}'})
