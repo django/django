@@ -1024,15 +1024,15 @@ implementation details see :ref:`using-the-views`.
         {% endblock %}
 
     If you have customized authentication (see
-    :doc:`Customizing Authentication </topics/auth/customizing>`) you can pass a custom authentication form
-    to the login view via the ``authentication_form`` parameter. This form must
-    accept a ``request`` keyword argument in its ``__init__`` method, and
-    provide a ``get_user`` method which returns the authenticated user object
-    (this method is only ever called after successful form validation).
+    :doc:`Customizing Authentication </topics/auth/customizing>`) you can pass
+    a custom authentication form to the login view via the
+    ``authentication_form`` parameter. This form must accept a ``request``
+    keyword argument in its ``__init__`` method, and provide a ``get_user()``
+    method which returns the authenticated user object (this method is only
+    ever called after successful form validation).
 
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
-
 
 .. function:: logout(request, [next_page, template_name, redirect_field_name, current_app, extra_context])
 
@@ -1163,7 +1163,6 @@ implementation details see :ref:`using-the-views`.
     :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
     ``password_reset_form`` argument.
 
-
     Users flagged with an unusable password (see
     :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
     allowed to request a password reset to prevent misuse when using an
@@ -1265,8 +1264,9 @@ implementation details see :ref:`using-the-views`.
 
     .. note::
 
-        If the email address provided does not exist in the system, the user is inactive, or has an unusable password,
-        the user will still be redirected to this view but no email will be sent.
+        If the email address provided does not exist in the system, the user is
+        inactive, or has an unusable password, the user will still be
+        redirected to this view but no email will be sent.
 
     **Optional arguments:**
 
@@ -1324,22 +1324,22 @@ implementation details see :ref:`using-the-views`.
 
 .. function:: password_reset_complete(request[,template_name, current_app, extra_context])
 
-   Presents a view which informs the user that the password has been
-   successfully changed.
+    Presents a view which informs the user that the password has been
+    successfully changed.
 
-   **URL name:** ``password_reset_complete``
+    **URL name:** ``password_reset_complete``
 
-   **Optional arguments:**
+    **Optional arguments:**
 
-   * ``template_name``: The full name of a template to display the view.
-     Defaults to :file:`registration/password_reset_complete.html`.
+    * ``template_name``: The full name of a template to display the view.
+      Defaults to :file:`registration/password_reset_complete.html`.
 
-   * ``current_app``: A hint indicating which application contains the current
-     view. See the :ref:`namespaced URL resolution strategy
-     <topics-http-reversing-url-namespaces>` for more information.
+    * ``current_app``: A hint indicating which application contains the current
+      view. See the :ref:`namespaced URL resolution strategy
+      <topics-http-reversing-url-namespaces>` for more information.
 
-   * ``extra_context``: A dictionary of context data that will be added to the
-     default context data passed to the template.
+    * ``extra_context``: A dictionary of context data that will be added to the
+      default context data passed to the template.
 
 Helper functions
 ----------------
@@ -1363,7 +1363,6 @@ Helper functions
     * ``redirect_field_name``: The name of a ``GET`` field containing the
       URL to redirect to after log out. Overrides ``next`` if the given
       ``GET`` parameter is passed.
-
 
 .. _built-in-auth-forms:
 
@@ -1399,14 +1398,16 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     .. method:: confirm_login_allowed(user)
 
-        By default, ``AuthenticationForm`` rejects users whose ``is_active`` flag
-        is set to ``False``. You may override this behavior with a custom policy to
-        determine which users can log in. Do this with a custom form that subclasses
-        ``AuthenticationForm`` and overrides the ``confirm_login_allowed`` method.
-        This method should raise a :exc:`~django.core.exceptions.ValidationError`
-        if the given user may not log in.
+        By default, ``AuthenticationForm`` rejects users whose ``is_active``
+        flag is set to ``False``. You may override this behavior with a custom
+        policy to determine which users can log in. Do this with a custom form
+        that subclasses ``AuthenticationForm`` and overrides the
+        ``confirm_login_allowed()`` method. This method should raise a
+        :exc:`~django.core.exceptions.ValidationError` if the given user may
+        not log in.
 
-        For example, to allow all users to log in, regardless of "active" status::
+        For example, to allow all users to log in regardless of "active"
+        status::
 
             from django.contrib.auth.forms import AuthenticationForm
 
@@ -1447,8 +1448,9 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
         :param subject_template_name: the template for the subject.
         :param email_template_name: the template for the email body.
-        :param context: context passed to the ``subject_template``, ``email_template``,
-            and ``html_email_template`` (if it is not ``None``).
+        :param context: context passed to the ``subject_template``,
+            ``email_template``, and ``html_email_template`` (if it is not
+            ``None``).
         :param from_email: the sender's email.
         :param to_email: the email of the requester.
         :param html_email_template_name: the template for the HTML body;
@@ -1474,7 +1476,6 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. currentmodule:: django.contrib.auth
 
-
 Authentication data in templates
 --------------------------------
 
@@ -1484,11 +1485,11 @@ The currently logged-in user and their permissions are made available in the
 
 .. admonition:: Technicality
 
-   Technically, these variables are only made available in the template
-   context if you use :class:`~django.template.RequestContext` and the
-   ``'django.contrib.auth.context_processors.auth'`` context processor is
-   enabled. It is in the default generated settings file. For more, see the
-   :ref:`RequestContext docs <subclassing-context-requestcontext>`.
+    Technically, these variables are only made available in the template
+    context if you use :class:`~django.template.RequestContext` and the
+    ``'django.contrib.auth.context_processors.auth'`` context processor is
+    enabled. It is in the default generated settings file. For more, see the
+    :ref:`RequestContext docs <subclassing-context-requestcontext>`.
 
 Users
 ~~~~~
