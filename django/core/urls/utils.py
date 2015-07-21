@@ -116,7 +116,7 @@ class URL(object):
         return iri_to_uri(urlunsplit((
             self.scheme,
             self.host,
-            self.path or '/',
+            self.path,
             escape_query_string(self.query_string),
             self.fragment
         )))
@@ -138,7 +138,7 @@ def resolve_error_handler(urlconf, view_type):
     return get_callable(callback), {}
 
 
-def is_valid_path(path, urlconf=None):
+def is_valid_path(path, urlconf=None, request=None):
     """
     Returns True if the given path resolves against the default URL resolver,
     False otherwise.
@@ -148,13 +148,13 @@ def is_valid_path(path, urlconf=None):
     """
     from django.core.urls import Resolver404, resolve
     try:
-        resolve(path, urlconf)
+        resolve(path, urlconf, request)
         return True
     except Resolver404:
         return False
 
 
-def translate_url(url, lang_code):
+def translate_url(url, lang_code, request=None):
     """
     Given a URL (absolute or relative), try to get its translated version in
     the `lang_code` language (either by i18n_patterns or by translated regex).
@@ -163,7 +163,7 @@ def translate_url(url, lang_code):
     from django.core.urls import Resolver404, NoReverseMatch, resolve, reverse
     parsed = urlsplit(url)
     try:
-        match = resolve(parsed.path)
+        match = resolve(parsed.path, request=request)
     except Resolver404:
         pass
     else:

@@ -478,7 +478,7 @@ class Client(RequestFactory):
 
             # Attach the ResolverMatch instance to the response
             response.resolver_match = SimpleLazyObject(
-                lambda: urls.resolve(request['PATH_INFO']))
+                lambda: urls.resolve(request['PATH_INFO'], request=request))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case

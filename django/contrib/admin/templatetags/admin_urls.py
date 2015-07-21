@@ -22,6 +22,11 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
     opts = context.get('opts')
     preserved_filters = context.get('preserved_filters')
 
+    try:
+        request = context.request
+    except AttributeError:
+        request = None
+
     parsed_url = list(urlparse(url))
     parsed_qs = dict(parse_qsl(parsed_url[4]))
     merged_qs = dict()
@@ -31,7 +36,7 @@ def add_preserved_filters(context, url, popup=False, to_field=None):
 
         match_url = '/%s' % url.partition(get_script_prefix())[2]
         try:
-            match = resolve(match_url)
+            match = resolve(match_url, request=request)
         except Resolver404:
             pass
         else:

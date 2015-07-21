@@ -34,11 +34,11 @@ class LocaleMiddleware(object):
                 and self.is_language_prefix_patterns_used):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
-            path_valid = is_valid_path(language_path, urlconf)
+            path_valid = is_valid_path(language_path, urlconf, request)
             path_needs_slash = (
                 not path_valid and (
                     settings.APPEND_SLASH and not language_path.endswith('/')
-                    and is_valid_path('%s/' % language_path, urlconf)
+                    and is_valid_path('%s/' % language_path, urlconf, request)
                 )
             )
 

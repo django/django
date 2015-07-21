@@ -8,8 +8,10 @@ from django.test.client import RequestFactory
 path_data = (
     # format: (path, query_string, fragment, repr, expected)
     ('/test/', 'query=true', 'fragment', "<URL '/test/?query=true#fragment'>", '/test/?query=true#fragment'),
-    # and empty path still returns a slash
-    ('', '', '', "<URL '/'>", '/'),
+    # and empty url returns an empty string
+    ('', '', '', "<URL ''>", ''),
+
+
     # special characters? no problem.
     ('/test/?=;@&$', '', '', "<URL '/test/?=;@&$'>", '/test/?=;@&$'),
     # # in query string must be encoded
@@ -31,7 +33,7 @@ url_data = (
     # format: (scheme, host, path, query, fragment, expected)
     ('http', 'example.org', '/', '', '', 'http://example.org/'),
     ('https', 'example.org', '/test/', 'q', 'fragment', 'https://example.org/test/?q#fragment'),
-    ('', 'example.org', '', 'q', 'fragment', '//example.org/?q#fragment'),
+    ('', 'example.org', '/', 'q', 'fragment', '//example.org/?q#fragment'),
     ('http', '', '/test/', '', '', 'http:///test/'),
 )
 

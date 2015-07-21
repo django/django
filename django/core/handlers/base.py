@@ -131,7 +131,7 @@ class BaseHandler(object):
                     urls.set_urlconf(urlconf)
                     resolver = urls.get_resolver(urlconf)
 
-                resolver_match = resolver.resolve(request.path_info)
+                resolver_match = resolver.resolve(request.path_info, request)
                 callback, callback_args, callback_kwargs = resolver_match
                 request.resolver_match = resolver_match
 

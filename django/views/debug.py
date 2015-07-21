@@ -483,7 +483,7 @@ def technical_404_response(request, exception):
 
     caller = ''
     try:
-        resolver_match = resolve(request.path)
+        resolver_match = resolve(request.path, request=request)
     except Resolver404:
         pass
     else:
@@ -1178,9 +1178,9 @@ TECHNICAL_404_TEMPLATE = """
       <ol>
         {% for pattern in urlpatterns %}
           <li>
-            {% for pat in pattern %}
-                {{ pat.regex.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+            {% for name, resolver in pattern %}
+                {% for c in resolver.constraints %}{{ c.describe }}{% endfor %}
+                {% if forloop.last and name %}[name='{{ name }}']{% endif %}
             {% endfor %}
           </li>
         {% endfor %}

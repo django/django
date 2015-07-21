@@ -64,8 +64,8 @@ class CommonMiddleware(object):
         # trailing slash and there is no pattern for the current path
         if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
             urlconf = getattr(request, 'urlconf', None)
-            if (not urls.is_valid_path(request.path_info, urlconf) and
-                    urls.is_valid_path("%s/" % request.path_info, urlconf)):
+            if (not urls.is_valid_path(request.path_info, urlconf, request) and
+                    urls.is_valid_path("%s/" % request.path_info, urlconf, request)):
                 new_url[1] = request.get_full_path(force_append_slash=True)
                 if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
                     raise RuntimeError((""
