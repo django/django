@@ -169,6 +169,19 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: http://www.postgresql.org/docs/current/static/indexes-opclass.html
 
+Speeding up test execution with non-durable settings
+----------------------------------------------------
+
+You can speed up test execution times by `configuring PostgreSQL to be
+non-durable <http://www.postgresql.org/docs/current/static/non-durability.html>`_.
+
+.. warning::
+
+    This is dangerous: it will make your database more susceptible to data loss
+    or corruption in the case of a server crash or power loss. Only use this on
+    a development machine where you can easily restore the entire contents of
+    all databases in the cluster.
+
 .. _mysql-notes:
 
 MySQL notes
