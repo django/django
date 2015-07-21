@@ -17,13 +17,34 @@ class classonlymethod(classmethod):
         return super(classonlymethod, self).__get__(instance, owner)
 
 
-def method_decorator(decorator):
+def method_decorator(decorator, name=''):
     """
     Converts a function decorator into a method decorator
     """
-    # 'func' is a function at the time it is passed to _dec, but will eventually
-    # be a method of the class it is defined on.
-    def _dec(func):
+    # 'obj' can be a class or a function. If 'obj' is a function at the time it
+    # is passed to _dec,  it will eventually be a method of the class it is
+    # defined on. If 'obj' is a class, the 'name' is required to be the name
+    # of the method that will be decorated.
+    def _dec(obj):
+        is_class = isinstance(obj, type)
+        if is_class:
+            if name and hasattr(obj, name):
+                func = getattr(obj, name)
+                if not callable(func):
+                    raise TypeError(
+                        "Cannot decorate '{0}' as it isn't a callable "
+                        "attribute of {1} ({2})".format(name, obj, func)
+                    )
+            else:
+                raise ValueError(
+                    "The keyword argument `name` must be the name of a method "
+                    "of the decorated class: {0}. Got '{1}' instead".format(
+                        obj, name,
+                    )
+                )
+        else:
+            func = obj
+
         def _wrapper(self, *args, **kwargs):
             @decorator
             def bound_func(*args2, **kwargs2):
@@ -42,6 +63,10 @@ def method_decorator(decorator):
         update_wrapper(_wrapper, dummy)
         # Need to preserve any existing attributes of 'func', including the name.
         update_wrapper(_wrapper, func)
+
+        if is_class:
+            setattr(obj, name, _wrapper)
+            return obj
 
         return _wrapper
 
