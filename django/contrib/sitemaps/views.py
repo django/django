@@ -59,6 +59,7 @@ def sitemap(request, sitemaps, section=None,
     page = request.GET.get("p", 1)
 
     urls = []
+    site = {}
     for site in maps:
         try:
             if callable(site):
@@ -71,7 +72,7 @@ def sitemap(request, sitemaps, section=None,
             raise Http404("No page '%s'" % page)
     response = TemplateResponse(request, template_name, {'urlset': urls},
                                 content_type=content_type)
-    if hasattr(site, 'latest_lastmod'):
+    if 'site' in locals() and hasattr(site, 'latest_lastmod'):
         # if latest_lastmod is defined for site, set header so as
         # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
         lastmod = site.latest_lastmod
