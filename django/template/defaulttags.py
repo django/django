@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.html import format_html
+from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
 
@@ -512,6 +512,8 @@ class URLNode(Node):
             context[self.asvar] = url
             return ''
         else:
+            if context.autoescape:
+                url = conditional_escape(url)
             return url
 
 
