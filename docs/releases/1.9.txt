@@ -364,6 +364,8 @@ Management Commands
   preceded by the operation's description.
 
 * The :djadmin:`dumpdata` command output is now deterministically ordered.
+  Moreover, when the ``--ouput`` option is specified, it also shows a progress
+  bar in the terminal.
 
 * The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
   print out the SQL rather than execute it.
