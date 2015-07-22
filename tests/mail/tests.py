@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import asyncore
+import mimetypes
 import os
 import shutil
 import smtpd
@@ -20,6 +21,7 @@ from django.core.mail import (
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import SimpleTestCase, override_settings
+from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
 from django.utils.six import PY3, StringIO, binary_type
 from django.utils.translation import ugettext_lazy
@@ -304,6 +306,35 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         message = message_from_bytes(msg_bytes)
         payload = message.get_payload()
         self.assertEqual(payload[1].get_filename(), 'une pièce jointe.pdf')
+
+    def test_attach_file(self):
+        """
+        Test attaching a file against different mimetypes and make sure that
+        a file will be attached and sent properly even if an invalid mimetype
+        is specified.
+        """
+        files = (
+            # filename, actual mimetype
+            ('file.txt', 'text/plain'),
+            ('file.png', 'image/png'),
+            ('file_txt', None),
+            ('file_png', None),
+            ('file_txt.png', 'image/png'),
+            ('file_png.txt', 'text/plain'),
+        )
+        test_mimetypes = ['text/plain', 'image/png', None]
+
+        for basename, real_mimetype in files:
+            for mimetype in test_mimetypes:
+                email = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+                self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
+                self.assertEqual(email.attachments, [])
+                file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', basename)
+                email.attach_file(file_path, mimetype=mimetype)
+                self.assertEqual(len(email.attachments), 1)
+                self.assertIn(basename, email.attachments[0])
+                msgs_sent_num = email.send()
+                self.assertEqual(msgs_sent_num, 1)
 
     def test_dummy_backend(self):
         """
