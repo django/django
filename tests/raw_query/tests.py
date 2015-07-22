@@ -5,7 +5,7 @@ from datetime import date
 from django.db.models.query_utils import InvalidQuery
 from django.test import TestCase, skipUnlessDBFeature
 
-from .models import Author, Book, Coffee, FriendlyAuthor, Reviewer
+from .models import Author, Book, BookFkAsPk, Coffee, FriendlyAuthor, Reviewer
 
 
 class RawQueryTests(TestCase):
@@ -274,3 +274,14 @@ class RawQueryTests(TestCase):
             list(Book.objects.raw('SELECT id FROM (SELECT * FROM raw_query_book WHERE paperback IS NOT NULL) sq'))
         except InvalidQuery:
             self.fail("Using a subquery in a RawQuerySet raised InvalidQuery")
+
+    def test_db_column_name_is_used_in_raw_query(self):
+        """
+        Regression test that ensures the `column` attribute on the field is
+        used to generate the list of fields included in the query, as opposed
+        to the `attname`. This is important when the primary key is a
+        ForeignKey field because `attname` and `column` are not necessarily the
+        same.
+        """
+        b = BookFkAsPk.objects.create(book=self.b1)
+        self.assertEqual(list(BookFkAsPk.objects.raw('SELECT not_the_default FROM raw_query_bookfkaspk')), [b])

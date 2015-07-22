@@ -14,3 +14,7 @@ Bugfixes
 
 * Added a system check warning if the old ``TEMPLATE_*`` settings are defined
   in addition to the new ``TEMPLATES`` setting.
+
+* Fixed ``QuerySet.raw()`` so ``InvalidQuery`` is not raised when using the
+  ``db_column`` name of a ``ForeignKey`` field with ``primary_key=True``
+  (:ticket:`12768`).

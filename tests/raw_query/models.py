@@ -23,6 +23,10 @@ class Book(models.Model):
     opening_line = models.TextField()
 
 
+class BookFkAsPk(models.Model):
+    book = models.ForeignKey(Book, primary_key=True, db_column="not_the_default")
+
+
 class Coffee(models.Model):
     brand = models.CharField(max_length=255, db_column="name")
 
