@@ -64,6 +64,11 @@ def login(request, template_name='registration/login.html',
     redirect_to = request.POST.get(redirect_field_name,
                                    request.GET.get(redirect_field_name, ''))
 
+    if hasattr(request, 'user') and request.user.is_authenticated():
+        if not is_safe_url(url=redirect_to, host=request.get_host()):
+            redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+        return HttpResponseRedirect(redirect_to)
+
     if request.method == "POST":
         form = authentication_form(request, data=request.POST)
         if form.is_valid():
