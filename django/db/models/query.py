@@ -1267,11 +1267,11 @@ class RawQuerySet(object):
         """
         Resolve the init field names and value positions
         """
-        model_init_names = [f.attname for f in self.model._meta.fields
-                            if f.attname in self.columns]
+        model_init_fields = [f for f in self.model._meta.fields if f.column in self.columns]
         annotation_fields = [(column, pos) for pos, column in enumerate(self.columns)
                              if column not in self.model_fields]
-        model_init_order = [self.columns.index(fname) for fname in model_init_names]
+        model_init_order = [self.columns.index(f.column) for f in model_init_fields]
+        model_init_names = [f.attname for f in model_init_fields]
         return model_init_names, model_init_order, annotation_fields
 
     def __iter__(self):
