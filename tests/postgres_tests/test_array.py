@@ -13,7 +13,8 @@ from django.utils import timezone
 from . import PostgreSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
-    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel, Tag
+    NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
+    Tag,
 )
 
 try:
