@@ -13,7 +13,13 @@ from django.utils.encoding import python_2_unicode_compatible
 class Book(models.Model):
     title = models.CharField(max_length=50)
     year = models.PositiveIntegerField(null=True, blank=True)
-    author = models.ForeignKey(User, verbose_name="Verbose Author", related_name='books_authored', blank=True, null=True)
+    author = models.ForeignKey(
+        User,
+        models.SET_NULL,
+        verbose_name="Verbose Author",
+        related_name='books_authored',
+        blank=True, null=True,
+    )
     contributors = models.ManyToManyField(User, verbose_name="Verbose Contributors", related_name='books_contributed', blank=True)
     is_best_seller = models.NullBooleanField(default=0)
     date_registered = models.DateField(null=True)
@@ -34,7 +40,7 @@ class Department(models.Model):
 
 @python_2_unicode_compatible
 class Employee(models.Model):
-    department = models.ForeignKey(Department, to_field="code")
+    department = models.ForeignKey(Department, models.CASCADE, to_field="code")
     name = models.CharField(max_length=100)
 
     def __str__(self):
@@ -44,7 +50,7 @@ class Employee(models.Model):
 @python_2_unicode_compatible
 class TaggedItem(models.Model):
     tag = models.SlugField()
-    content_type = models.ForeignKey(ContentType, related_name='tagged_items')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='tagged_items')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 

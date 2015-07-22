@@ -303,6 +303,7 @@ class GenericRelation(ForeignObject):
         )
 
         kwargs['blank'] = True
+        kwargs['on_delete'] = models.CASCADE
         kwargs['editable'] = False
         kwargs['serialize'] = False
 

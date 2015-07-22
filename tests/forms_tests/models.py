@@ -92,11 +92,13 @@ class ChoiceFieldModel(models.Model):
     generation with ModelChoiceField."""
     choice = models.ForeignKey(
         ChoiceOptionModel,
+        models.CASCADE,
         blank=False,
         default=choice_default,
     )
     choice_int = models.ForeignKey(
         ChoiceOptionModel,
+        models.CASCADE,
         blank=False,
         related_name='choice_int',
         default=int_default,

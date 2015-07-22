@@ -228,7 +228,7 @@ class RelatedModelFormTests(SimpleTestCase):
         Test for issue 10405
         """
         class A(models.Model):
-            ref = models.ForeignKey("B")
+            ref = models.ForeignKey("B", models.CASCADE)
 
         class Meta:
             model = A
@@ -244,7 +244,7 @@ class RelatedModelFormTests(SimpleTestCase):
         Test for issue 10405
         """
         class C(models.Model):
-            ref = models.ForeignKey("D")
+            ref = models.ForeignKey("D", models.CASCADE)
 
         class D(models.Model):
             pass

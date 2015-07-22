@@ -71,7 +71,7 @@ class Article(models.Model):
     slug = models.SlugField()
     pub_date = models.DateField()
     created = models.DateField(editable=False)
-    writer = models.ForeignKey(Writer)
+    writer = models.ForeignKey(Writer, models.CASCADE)
     article = models.TextField()
     categories = models.ManyToManyField(Category, blank=True)
     status = models.PositiveIntegerField(choices=ARTICLE_STATUS, blank=True, null=True)
@@ -86,11 +86,11 @@ class Article(models.Model):
 
 
 class ImprovedArticle(models.Model):
-    article = models.OneToOneField(Article)
+    article = models.OneToOneField(Article, models.CASCADE)
 
 
 class ImprovedArticleWithParentLink(models.Model):
-    article = models.OneToOneField(Article, parent_link=True)
+    article = models.OneToOneField(Article, models.CASCADE, parent_link=True)
 
 
 class BetterWriter(Writer):
@@ -124,18 +124,18 @@ class PublicationDefaults(models.Model):
 
 
 class Author(models.Model):
-    publication = models.OneToOneField(Publication, null=True, blank=True)
+    publication = models.OneToOneField(Publication, models.SET_NULL, null=True, blank=True)
     full_name = models.CharField(max_length=255)
 
 
 class Author1(models.Model):
-    publication = models.OneToOneField(Publication, null=False)
+    publication = models.OneToOneField(Publication, models.SET_NULL, null=False)
     full_name = models.CharField(max_length=255)
 
 
 @python_2_unicode_compatible
 class WriterProfile(models.Model):
-    writer = models.OneToOneField(Writer, primary_key=True)
+    writer = models.OneToOneField(Writer, models.CASCADE, primary_key=True)
     age = models.PositiveIntegerField()
 
     def __str__(self):
@@ -262,7 +262,7 @@ class ArticleStatus(models.Model):
 @python_2_unicode_compatible
 class Inventory(models.Model):
     barcode = models.PositiveIntegerField(unique=True)
-    parent = models.ForeignKey('self', to_field='barcode', blank=True, null=True)
+    parent = models.ForeignKey('self', models.SET_NULL, to_field='barcode', blank=True, null=True)
     name = models.CharField(blank=False, max_length=20)
 
     class Meta:
@@ -277,7 +277,7 @@ class Inventory(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=40)
-    author = models.ForeignKey(Writer, blank=True, null=True)
+    author = models.ForeignKey(Writer, models.SET_NULL, blank=True, null=True)
     special_id = models.IntegerField(blank=True, null=True, unique=True)
 
     class Meta:
@@ -418,13 +418,18 @@ class Character(models.Model):
 
 
 class StumpJoke(models.Model):
-    most_recently_fooled = models.ForeignKey(Character, limit_choices_to=today_callable_dict, related_name="+")
+    most_recently_fooled = models.ForeignKey(
+        Character,
+        models.CASCADE,
+        limit_choices_to=today_callable_dict,
+        related_name="+",
+    )
     has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
 
 
 # Model for #13776
 class Student(models.Model):
-    character = models.ForeignKey(Character)
+    character = models.ForeignKey(Character, models.CASCADE)
     study = models.CharField(max_length=30)
 
 

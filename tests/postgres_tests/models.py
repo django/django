@@ -62,7 +62,7 @@ if connection.vendor == 'postgresql' and connection.pg_version >= 90200:
         dates = DateRangeField(blank=True, null=True)
 
     class RangeLookupsModel(PostgreSQLModel):
-        parent = models.ForeignKey(RangesModel, blank=True, null=True)
+        parent = models.ForeignKey(RangesModel, models.SET_NULL, blank=True, null=True)
         integer = models.IntegerField(blank=True, null=True)
         big_integer = models.BigIntegerField(blank=True, null=True)
         float = models.FloatField(blank=True, null=True)
@@ -108,7 +108,7 @@ class StatTestModel(models.Model):
     """
     int1 = models.IntegerField()
     int2 = models.IntegerField()
-    related_field = models.ForeignKey(AggregateTestModel, null=True)
+    related_field = models.ForeignKey(AggregateTestModel, models.SET_NULL, null=True)
 
 
 class NowTestModel(models.Model):

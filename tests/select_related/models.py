@@ -29,7 +29,7 @@ class Domain(models.Model):
 @python_2_unicode_compatible
 class Kingdom(models.Model):
     name = models.CharField(max_length=50)
-    domain = models.ForeignKey(Domain)
+    domain = models.ForeignKey(Domain, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -38,7 +38,7 @@ class Kingdom(models.Model):
 @python_2_unicode_compatible
 class Phylum(models.Model):
     name = models.CharField(max_length=50)
-    kingdom = models.ForeignKey(Kingdom)
+    kingdom = models.ForeignKey(Kingdom, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -47,7 +47,7 @@ class Phylum(models.Model):
 @python_2_unicode_compatible
 class Klass(models.Model):
     name = models.CharField(max_length=50)
-    phylum = models.ForeignKey(Phylum)
+    phylum = models.ForeignKey(Phylum, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -56,7 +56,7 @@ class Klass(models.Model):
 @python_2_unicode_compatible
 class Order(models.Model):
     name = models.CharField(max_length=50)
-    klass = models.ForeignKey(Klass)
+    klass = models.ForeignKey(Klass, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -65,7 +65,7 @@ class Order(models.Model):
 @python_2_unicode_compatible
 class Family(models.Model):
     name = models.CharField(max_length=50)
-    order = models.ForeignKey(Order)
+    order = models.ForeignKey(Order, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -74,7 +74,7 @@ class Family(models.Model):
 @python_2_unicode_compatible
 class Genus(models.Model):
     name = models.CharField(max_length=50)
-    family = models.ForeignKey(Family)
+    family = models.ForeignKey(Family, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -83,7 +83,7 @@ class Genus(models.Model):
 @python_2_unicode_compatible
 class Species(models.Model):
     name = models.CharField(max_length=50)
-    genus = models.ForeignKey(Genus)
+    genus = models.ForeignKey(Genus, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -94,8 +94,8 @@ class Species(models.Model):
 @python_2_unicode_compatible
 class HybridSpecies(models.Model):
     name = models.CharField(max_length=50)
-    parent_1 = models.ForeignKey(Species, related_name='child_1')
-    parent_2 = models.ForeignKey(Species, related_name='child_2')
+    parent_1 = models.ForeignKey(Species, models.CASCADE, related_name='child_1')
+    parent_2 = models.ForeignKey(Species, models.CASCADE, related_name='child_2')
 
     def __str__(self):
         return self.name
@@ -122,7 +122,7 @@ class Pizza(models.Model):
 class TaggedItem(models.Model):
     tag = models.CharField(max_length=30)
 
-    content_type = models.ForeignKey(ContentType, related_name='select_related_tagged_items')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='select_related_tagged_items')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 

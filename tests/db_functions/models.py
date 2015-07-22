@@ -37,7 +37,7 @@ class Article(models.Model):
 class Fan(models.Model):
     name = models.CharField(max_length=50)
     age = models.PositiveSmallIntegerField(default=30)
-    author = models.ForeignKey(Author, related_name='fans')
+    author = models.ForeignKey(Author, models.CASCADE, related_name='fans')
 
     def __str__(self):
         return self.name

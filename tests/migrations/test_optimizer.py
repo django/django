@@ -198,12 +198,12 @@ class OptimizerTests(SimpleTestCase):
         self.assertOptimizesTo(
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
                 migrations.DeleteModel("Foo"),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
-                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo"))]),
+                migrations.CreateModel("Bar", [("other", models.ForeignKey("testapp.Foo", models.CASCADE))]),
                 migrations.DeleteModel("Foo"),
             ],
         )
@@ -260,12 +260,12 @@ class OptimizerTests(SimpleTestCase):
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("Link", [("url", models.TextField())]),
-                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link")),
+                migrations.AddField("Foo", "link", models.ForeignKey("migrations.Link", models.CASCADE)),
             ],
         )
 

@@ -38,7 +38,7 @@ class Group(models.Model):
 
 class Event(models.Model):
     title = models.CharField(max_length=100)
-    group = models.ForeignKey(Group)
+    group = models.ForeignKey(Group, models.CASCADE)
 
 
 class Happening(models.Model):

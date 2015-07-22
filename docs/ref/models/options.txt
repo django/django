@@ -186,7 +186,7 @@ Django quotes column and table names behind the scenes.
             # ...
 
         class Answer(models.Model):
-            question = models.ForeignKey(Question)
+            question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:

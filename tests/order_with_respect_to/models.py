@@ -14,7 +14,7 @@ class Question(models.Model):
 @python_2_unicode_compatible
 class Answer(models.Model):
     text = models.CharField(max_length=200)
-    question = models.ForeignKey(Question)
+    question = models.ForeignKey(Question, models.CASCADE)
 
     class Meta:
         order_with_respect_to = 'question'
@@ -26,7 +26,7 @@ class Answer(models.Model):
 @python_2_unicode_compatible
 class Post(models.Model):
     title = models.CharField(max_length=200)
-    parent = models.ForeignKey("self", related_name="children", null=True)
+    parent = models.ForeignKey("self", models.SET_NULL, related_name="children", null=True)
 
     class Meta:
         order_with_respect_to = "parent"

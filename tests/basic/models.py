@@ -28,8 +28,12 @@ class ArticleSelectOnSave(Article):
 
 @python_2_unicode_compatible
 class SelfRef(models.Model):
-    selfref = models.ForeignKey('self', null=True, blank=True,
-                                related_name='+')
+    selfref = models.ForeignKey(
+        'self',
+        models.SET_NULL,
+        null=True, blank=True,
+        related_name='+',
+    )
 
     def __str__(self):
         # This method intentionally doesn't work for all cases - part

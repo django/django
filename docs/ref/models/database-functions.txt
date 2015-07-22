@@ -113,7 +113,7 @@ Usage example::
     class Comment(models.Model):
         body = models.TextField()
         modified = models.DateTimeField(auto_now=True)
-        blog = models.ForeignKey(Blog)
+        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
 
     >>> from django.db.models.functions import Greatest
     >>> blog = Blog.objects.create(body='Greatest is the best.')

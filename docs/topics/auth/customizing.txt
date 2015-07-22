@@ -312,7 +312,7 @@ you might create an Employee model::
     from django.contrib.auth.models import User
 
     class Employee(models.Model):
-        user = models.OneToOneField(User)
+        user = models.OneToOneField(User, on_delete=models.CASCADE)
         department = models.CharField(max_length=100)
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
@@ -443,7 +443,10 @@ different User model.
         from django.db import models
 
         class Article(models.Model):
-            author = models.ForeignKey(settings.AUTH_USER_MODEL)
+            author = models.ForeignKey
+                settings.AUTH_USER_MODEL,
+                on_delete=models.CASCADE,
+            )
 
     When connecting to signals sent by the ``User`` model, you should specify
     the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::

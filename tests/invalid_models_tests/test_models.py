@@ -305,22 +305,28 @@ class FieldNamesTests(IsolatedModelsTestCase):
                 related_name="rn3",
                 through='m2mcomplex'
             )
-            fk = models.ForeignKey(VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz, related_name="rn4")
+            fk = models.ForeignKey(
+                VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
+                models.CASCADE,
+                related_name="rn4",
+            )
 
         # Models used for setting `through` in M2M field.
         class m2msimple(models.Model):
-            id2 = models.ForeignKey(ModelWithLongField)
+            id2 = models.ForeignKey(ModelWithLongField, models.CASCADE)
 
         class m2mcomplex(models.Model):
-            id2 = models.ForeignKey(ModelWithLongField)
+            id2 = models.ForeignKey(ModelWithLongField, models.CASCADE)
 
         long_field_name = 'a' * (self.max_column_name_length + 1)
         models.ForeignKey(
-            VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+            VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
+            models.CASCADE,
         ).contribute_to_class(m2msimple, long_field_name)
 
         models.ForeignKey(
             VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,
+            models.CASCADE,
             db_column=long_field_name
         ).contribute_to_class(m2mcomplex, long_field_name)
 
@@ -473,7 +479,7 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
 
         class Child(Parent):
             # This field clashes with parent "f_id" field.
-            f = models.ForeignKey(Target)
+            f = models.ForeignKey(Target, models.CASCADE)
 
         errors = Child.check()
         expected = [
@@ -517,7 +523,7 @@ class ShadowingFieldsTests(IsolatedModelsTestCase):
             pass
 
         class Model(models.Model):
-            fk = models.ForeignKey(Target)
+            fk = models.ForeignKey(Target, models.CASCADE)
             fk_id = models.IntegerField()
 
         errors = Model.check()
@@ -584,7 +590,7 @@ class OtherModelTests(IsolatedModelsTestCase):
             pass
 
         class Answer(models.Model):
-            question = models.ForeignKey(Question)
+            question = models.ForeignKey(Question, models.CASCADE)
 
             class Meta:
                 order_with_respect_to = 'question'
@@ -596,7 +602,7 @@ class OtherModelTests(IsolatedModelsTestCase):
             pass
 
         class Answer(models.Model):
-            question = models.ForeignKey(Question)
+            question = models.ForeignKey(Question, models.CASCADE)
             order = models.IntegerField()
 
             class Meta:
@@ -678,7 +684,7 @@ class OtherModelTests(IsolatedModelsTestCase):
             pass
 
         class Child(models.Model):
-            parent = models.ForeignKey(Parent)
+            parent = models.ForeignKey(Parent, models.CASCADE)
 
             class Meta:
                 ordering = ("parent_id",)
@@ -731,8 +737,8 @@ class OtherModelTests(IsolatedModelsTestCase):
                 related_name="secondary")
 
         class Membership(models.Model):
-            person = models.ForeignKey(Person)
-            group = models.ForeignKey(Group)
+            person = models.ForeignKey(Person, models.CASCADE)
+            group = models.ForeignKey(Group, models.CASCADE)
 
         errors = Group.check()
         expected = [

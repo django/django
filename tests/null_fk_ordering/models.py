@@ -19,7 +19,7 @@ class Author(models.Model):
 @python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=150)
-    author = models.ForeignKey(Author, null=True)
+    author = models.ForeignKey(Author, models.SET_NULL, null=True)
 
     def __str__(self):
         return 'Article titled: %s' % (self.title, )
@@ -34,13 +34,13 @@ class SystemInfo(models.Model):
 
 
 class Forum(models.Model):
-    system_info = models.ForeignKey(SystemInfo)
+    system_info = models.ForeignKey(SystemInfo, models.CASCADE)
     forum_name = models.CharField(max_length=32)
 
 
 @python_2_unicode_compatible
 class Post(models.Model):
-    forum = models.ForeignKey(Forum, null=True)
+    forum = models.ForeignKey(Forum, models.SET_NULL, null=True)
     title = models.CharField(max_length=32)
 
     def __str__(self):
@@ -49,7 +49,7 @@ class Post(models.Model):
 
 @python_2_unicode_compatible
 class Comment(models.Model):
-    post = models.ForeignKey(Post, null=True)
+    post = models.ForeignKey(Post, models.SET_NULL, null=True)
     comment_text = models.CharField(max_length=250)
 
     class Meta:

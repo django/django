@@ -269,7 +269,7 @@ model::
         street = models.CharField(max_length=100)
         city = models.CharField(max_length=100)
         state = models.CharField(max_length=2)
-        zipcode = models.ForeignKey(Zipcode)
+        zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
         objects = models.GeoManager()
 
 The geographic manager is needed to do spatial queries on related ``Zipcode`` objects,

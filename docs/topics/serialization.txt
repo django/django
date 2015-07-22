@@ -344,7 +344,7 @@ Consider the following two models::
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
 Ordinarily, serialized data for ``Book`` would use an integer to refer to
 the author. For example, in JSON, a Book might be serialized as::
@@ -514,7 +514,7 @@ example above::
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
         def natural_key(self):
             return (self.name,) + self.author.natural_key()

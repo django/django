@@ -28,7 +28,7 @@ class Publisher(models.Model):
 
 class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -41,8 +41,8 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, related_name='book_contact_set')
-    publisher = models.ForeignKey(Publisher)
+    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
     tags = GenericRelation(ItemTag)
 
@@ -72,7 +72,7 @@ class Entries(models.Model):
 
 class Clues(models.Model):
     ID = models.AutoField(primary_key=True)
-    EntryID = models.ForeignKey(Entries, verbose_name='Entry', db_column='Entry ID')
+    EntryID = models.ForeignKey(Entries, models.CASCADE, verbose_name='Entry', db_column='Entry ID')
     Clue = models.CharField(max_length=150)
 
 
@@ -102,10 +102,10 @@ class Bravo(models.Model):
 
 
 class Charlie(models.Model):
-    alfa = models.ForeignKey(Alfa, null=True)
-    bravo = models.ForeignKey(Bravo, null=True)
+    alfa = models.ForeignKey(Alfa, models.SET_NULL, null=True)
+    bravo = models.ForeignKey(Bravo, models.SET_NULL, null=True)
 
 
 class SelfRefFK(models.Model):
     name = models.CharField(max_length=50)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self', models.SET_NULL, null=True, blank=True, related_name='children')

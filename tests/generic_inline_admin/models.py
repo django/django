@@ -17,7 +17,7 @@ class Media(models.Model):
     """
     Media that can associated to any object.
     """
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
     url = models.URLField()
@@ -36,11 +36,11 @@ class Category(models.Model):
 
 
 class PhoneNumber(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     phone_number = models.CharField(max_length=30)
-    category = models.ForeignKey(Category, null=True, blank=True)
+    category = models.ForeignKey(Category, models.SET_NULL, null=True, blank=True)
 
     class Meta:
         unique_together = (('content_type', 'object_id', 'phone_number',),)

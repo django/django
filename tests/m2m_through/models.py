@@ -32,8 +32,8 @@ class Group(models.Model):
 
 @python_2_unicode_compatible
 class Membership(models.Model):
-    person = models.ForeignKey(Person)
-    group = models.ForeignKey(Group)
+    person = models.ForeignKey(Person, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
     date_joined = models.DateTimeField(default=datetime.now)
     invite_reason = models.CharField(max_length=64, null=True)
 
@@ -46,9 +46,14 @@ class Membership(models.Model):
 
 @python_2_unicode_compatible
 class CustomMembership(models.Model):
-    person = models.ForeignKey(Person, db_column="custom_person_column", related_name="custom_person_related_name")
-    group = models.ForeignKey(Group)
-    weird_fk = models.ForeignKey(Membership, null=True)
+    person = models.ForeignKey(
+        Person,
+        models.CASCADE,
+        db_column="custom_person_column",
+        related_name="custom_person_related_name",
+    )
+    group = models.ForeignKey(Group, models.CASCADE)
+    weird_fk = models.ForeignKey(Membership, models.SET_NULL, null=True)
     date_joined = models.DateTimeField(default=datetime.now)
 
     def __str__(self):
@@ -59,8 +64,8 @@ class CustomMembership(models.Model):
 
 
 class TestNoDefaultsOrNulls(models.Model):
-    person = models.ForeignKey(Person)
-    group = models.ForeignKey(Group)
+    person = models.ForeignKey(Person, models.CASCADE)
+    group = models.ForeignKey(Group, models.CASCADE)
     nodefaultnonull = models.CharField(max_length=5)
 
 
@@ -74,8 +79,8 @@ class PersonSelfRefM2M(models.Model):
 
 
 class Friendship(models.Model):
-    first = models.ForeignKey(PersonSelfRefM2M, related_name="rel_from_set")
-    second = models.ForeignKey(PersonSelfRefM2M, related_name="rel_to_set")
+    first = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name="rel_from_set")
+    second = models.ForeignKey(PersonSelfRefM2M, models.CASCADE, related_name="rel_to_set")
     date_friended = models.DateTimeField()
 
 
@@ -90,10 +95,10 @@ class Event(models.Model):
 
 
 class Invitation(models.Model):
-    event = models.ForeignKey(Event, related_name='invitations')
+    event = models.ForeignKey(Event, models.CASCADE, related_name='invitations')
     # field order is deliberately inverted. the target field is "invitee".
-    inviter = models.ForeignKey(Person, related_name='invitations_sent')
-    invitee = models.ForeignKey(Person, related_name='invitations')
+    inviter = models.ForeignKey(Person, models.CASCADE, related_name='invitations_sent')
+    invitee = models.ForeignKey(Person, models.CASCADE, related_name='invitations')
 
 
 @python_2_unicode_compatible
@@ -110,9 +115,9 @@ class Employee(models.Model):
 
 class Relationship(models.Model):
     # field order is deliberately inverted.
-    another = models.ForeignKey(Employee, related_name="rel_another_set", null=True)
-    target = models.ForeignKey(Employee, related_name="rel_target_set")
-    source = models.ForeignKey(Employee, related_name="rel_source_set")
+    another = models.ForeignKey(Employee, models.SET_NULL, related_name="rel_another_set", null=True)
+    target = models.ForeignKey(Employee, models.CASCADE, related_name="rel_target_set")
+    source = models.ForeignKey(Employee, models.CASCADE, related_name="rel_source_set")
 
 
 class Ingredient(models.Model):
@@ -133,5 +138,5 @@ class Recipe(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    ingredient = models.ForeignKey(Ingredient, to_field='iname')
-    recipe = models.ForeignKey(Recipe, to_field='rname')
+    ingredient = models.ForeignKey(Ingredient, models.CASCADE, to_field='iname')
+    recipe = models.ForeignKey(Recipe, models.CASCADE, to_field='rname')

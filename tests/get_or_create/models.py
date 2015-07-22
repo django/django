@@ -25,7 +25,7 @@ class ManualPrimaryKeyTest(models.Model):
 
 
 class Profile(models.Model):
-    person = models.ForeignKey(Person, primary_key=True)
+    person = models.ForeignKey(Person, models.CASCADE, primary_key=True)
 
 
 class Tag(models.Model):
@@ -48,4 +48,9 @@ class Author(models.Model):
 class Book(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, related_name='books')
-    publisher = models.ForeignKey(Publisher, related_name='books', db_column="publisher_id_column")
+    publisher = models.ForeignKey(
+        Publisher,
+        models.CASCADE,
+        related_name='books',
+        db_column="publisher_id_column",
+    )

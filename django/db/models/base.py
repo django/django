@@ -18,7 +18,7 @@ from django.db import (
 )
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import Collector
+from django.db.models.deletion import CASCADE, Collector
 from django.db.models.fields import AutoField
 from django.db.models.fields.related import (
     ForeignObjectRel, ManyToOneRel, OneToOneField, lazy_related_operation,
@@ -230,8 +230,13 @@ class ModelBase(type):
                     field = parent_links[base_key]
                 elif not is_proxy:
                     attr_name = '%s_ptr' % base._meta.model_name
-                    field = OneToOneField(base, name=attr_name,
-                            auto_created=True, parent_link=True)
+                    field = OneToOneField(
+                        base,
+                        on_delete=CASCADE,
+                        name=attr_name,
+                        auto_created=True,
+                        parent_link=True,
+                    )
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):

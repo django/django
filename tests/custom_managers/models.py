@@ -94,8 +94,8 @@ class Person(models.Model):
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=False)
 
-    favorite_book = models.ForeignKey('Book', null=True, related_name='favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey('Book', models.SET_NULL, null=True, related_name='favorite_books')
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -117,8 +117,13 @@ class FunPerson(models.Model):
     last_name = models.CharField(max_length=30)
     fun = models.BooleanField(default=True)
 
-    favorite_book = models.ForeignKey('Book', null=True, related_name='fun_people_favorite_books')
-    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', null=True)
+    favorite_book = models.ForeignKey(
+        'Book',
+        models.SET_NULL,
+        null=True,
+        related_name='fun_people_favorite_books',
+    )
+    favorite_thing_type = models.ForeignKey('contenttypes.ContentType', models.SET_NULL, null=True)
     favorite_thing_id = models.IntegerField(null=True)
     favorite_thing = GenericForeignKey('favorite_thing_type', 'favorite_thing_id')
 
@@ -181,7 +186,7 @@ class RelatedModel(models.Model):
 class RestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.ForeignKey(RelatedModel)
+    related = models.ForeignKey(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()
@@ -194,7 +199,7 @@ class RestrictedModel(models.Model):
 class OneToOneRestrictedModel(models.Model):
     name = models.CharField(max_length=50)
     is_public = models.BooleanField(default=False)
-    related = models.OneToOneField(RelatedModel)
+    related = models.OneToOneField(RelatedModel, models.CASCADE)
 
     objects = RestrictedManager()
     plain_manager = models.Manager()

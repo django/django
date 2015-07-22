@@ -187,7 +187,7 @@ class ForeignKeyTests(test.TestCase):
 
     def test_warning_when_unique_true_on_fk(self):
         class FKUniqueTrue(models.Model):
-            fk_field = models.ForeignKey(Foo, unique=True)
+            fk_field = models.ForeignKey(Foo, models.CASCADE, unique=True)
 
         model = FKUniqueTrue()
         expected_warnings = [
@@ -213,7 +213,7 @@ class ForeignKeyTests(test.TestCase):
         pending_ops_before = list(apps._pending_operations.items())
 
         class AbstractForeignKeyModel(models.Model):
-            fk = models.ForeignKey('missing.FK')
+            fk = models.ForeignKey('missing.FK', models.CASCADE)
 
             class Meta:
                 abstract = True
@@ -235,7 +235,7 @@ class ManyToManyFieldTests(test.SimpleTestCase):
         pending_ops_before = list(apps._pending_operations.items())
 
         class AbstractManyToManyModel(models.Model):
-            fk = models.ForeignKey('missing.FK')
+            fk = models.ForeignKey('missing.FK', models.CASCADE)
 
             class Meta:
                 abstract = True

@@ -1119,7 +1119,7 @@ you have these two models::
         name = models.CharField(max_length=100)
 
     class Book(models.Model):
-        author = models.ForeignKey(Author)
+        author = models.ForeignKey(Author, on_delete=models.CASCADE)
         title = models.CharField(max_length=100)
 
 If you want to create a formset that allows you to edit books belonging to
@@ -1178,8 +1178,16 @@ need to resolve the ambiguity manually using ``fk_name``. For example, consider
 the following model::
 
     class Friendship(models.Model):
-        from_friend = models.ForeignKey(Friend, related_name='from_friends')
-        to_friend = models.ForeignKey(Friend, related_name='friends')
+        from_friend = models.ForeignKey(
+            Friend,
+            on_delete=models.CASCADE,
+            related_name='from_friends',
+        )
+        to_friend = models.ForeignKey(
+            Friend,
+            on_delete=models.CASCADE,
+            related_name='friends',
+        )
         length_in_months = models.IntegerField()
 
 To resolve this, you can use ``fk_name`` to
