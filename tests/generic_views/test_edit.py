@@ -4,11 +4,11 @@ import warnings
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urls import reverse
 from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.views.generic.base import View
 from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin

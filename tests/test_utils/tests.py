@@ -7,7 +7,6 @@ from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.core.urls import NoReverseMatch, reverse
 from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
@@ -17,6 +16,7 @@ from django.test import (
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils._os import abspathu
 

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import warnings
 from threading import local
 
+from django.urls.exceptions import NoReverseMatch
 from django.utils import lru_cache, six
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
@@ -10,10 +11,8 @@ from django.utils.functional import lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
 
 from .constraints import RegexPattern
-from .exceptions import NoReverseMatch
 from .resolvers import Resolver
 from .utils import URL
-
 
 # SCRIPT_NAME prefixes for each thread are stored here. If there's no entry for
 # the current thread (which is the only one we ever access), it is assumed to
@@ -54,7 +53,7 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, st
     original_lookup = viewname
     try:
         if resolver._is_callback(viewname):
-            from django.core.urls.utils import get_callable
+            from django.urls.utils import get_callable
             viewname = get_callable(viewname, True)
     except (ImportError, AttributeError) as e:
         raise NoReverseMatch("Error importing '%s': %s." % (viewname, e))

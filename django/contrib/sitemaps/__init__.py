@@ -1,6 +1,7 @@
+from django import urls
 from django.apps import apps as django_apps
 from django.conf import settings
-from django.core import paginator, urls
+from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import translation
 from django.utils.six.moves.urllib.parse import urlencode

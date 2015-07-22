@@ -7,11 +7,11 @@ import copy
 
 from django import forms
 from django.contrib.admin.templatetags.admin_static import static
-from django.core.urls import reverse
 from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
 from django.forms.widgets import RadioFieldRenderer
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import (

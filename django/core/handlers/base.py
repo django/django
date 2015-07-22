@@ -5,9 +5,9 @@ import sys
 import types
 import warnings
 
-from django import http
+from django import http, urls
 from django.conf import settings
-from django.core import signals, urls
+from django.core import signals
 from django.core.exceptions import (
     MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
 )

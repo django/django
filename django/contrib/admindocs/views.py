@@ -3,18 +3,17 @@ import os
 import re
 from importlib import import_module
 
+from django import urls
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
-from django.core import urls
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urls import get_resolver, get_urlconf
-from django.core.urls.utils import get_mod_func
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
+from django.urls.utils import get_mod_func
 from django.utils.decorators import method_decorator
 from django.utils.inspect import func_has_no_args
 from django.utils.translation import ugettext as _
@@ -146,8 +145,8 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        urlconf = get_urlconf()
-        if get_resolver(urlconf)._is_callback(view):
+        urlconf = urls.get_urlconf()
+        if urls.get_resolver(urlconf)._is_callback(view):
             mod, func = get_mod_func(view)
             view_func = getattr(import_module(mod), func)
         else:

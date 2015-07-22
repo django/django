@@ -2,8 +2,8 @@ import datetime
 from calendar import timegm
 from functools import wraps
 
+from django import urls
 from django.contrib.sites.shortcuts import get_current_site
-from django.core import urls
 from django.core.paginator import EmptyPage, PageNotAnInteger
 from django.http import Http404
 from django.template.response import TemplateResponse

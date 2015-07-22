@@ -35,7 +35,7 @@ def permalink(func):
         (viewname, viewargs)
         (viewname, viewargs, viewkwargs)
     """
-    from django.core.urls import reverse
+    from django.urls import reverse
 
     @wraps(func)
     def inner(*args, **kwargs):

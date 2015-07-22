@@ -6,7 +6,7 @@ for convenience's sake.
 
 import warnings
 
-from django.core import urls
+from django import urls
 from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet

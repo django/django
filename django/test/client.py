@@ -9,9 +9,9 @@ from copy import copy
 from importlib import import_module
 from io import BytesIO
 
+from django import urls
 from django.apps import apps
 from django.conf import settings
-from django.core import urls
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (

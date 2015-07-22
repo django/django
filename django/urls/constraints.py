@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 import re
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls.exceptions import NoReverseMatch, Resolver404
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.regex_helper import normalize
 from django.utils.translation import get_language
-
-from .exceptions import NoReverseMatch, Resolver404
 
 
 class Constraint(object):

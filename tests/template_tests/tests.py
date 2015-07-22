@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 import sys
 
+from django import urls
 from django.contrib.auth.models import Group
-from django.core import urls
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings

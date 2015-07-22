@@ -1,7 +1,7 @@
 # coding: utf-8
-from django.core.urls import NoReverseMatch
 from django.template import TemplateSyntaxError
 from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.urls import NoReverseMatch
 from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import setup

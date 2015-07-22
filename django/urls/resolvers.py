@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured
+from django.urls.exceptions import NoReverseMatch, Resolver404
 from django.utils import six
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_module
 
-from .exceptions import NoReverseMatch, Resolver404
 from .utils import get_callable
 
 

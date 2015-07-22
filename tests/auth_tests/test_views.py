@@ -20,7 +20,6 @@ from django.contrib.auth.views import login as login_view, redirect_to_login
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.contrib.sites.requests import RequestSite
 from django.core import mail
-from django.core.urls import NoReverseMatch, reverse, reverse_lazy
 from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
@@ -28,6 +27,7 @@ from django.test import (
     TestCase, ignore_warnings, modify_settings, override_settings,
 )
 from django.test.utils import patch_logger
+from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote

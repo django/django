@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
 from django.contrib.auth.views import logout
-from django.core.urls import NoReverseMatch, reverse_lazy
 from django.shortcuts import resolve_url
 from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
 

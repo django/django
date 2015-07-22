@@ -2,9 +2,8 @@ import hashlib
 import logging
 import re
 
-from django import http
+from django import http, urls
 from django.conf import settings
-from django.core import urls
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
 from django.utils.encoding import force_text

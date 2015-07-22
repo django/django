@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.contrib.admin.utils import quote
 from django.contrib.contenttypes.models import ContentType
-from django.core.urls import NoReverseMatch, reverse
 from django.db import models
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.translation import ugettext, ugettext_lazy as _
 

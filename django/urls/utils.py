@@ -4,7 +4,7 @@ from importlib import import_module
 
 from django.core.exceptions import ViewDoesNotExist
 from django.utils import lru_cache, six
-from django.utils.encoding import iri_to_uri, escape_query_string
+from django.utils.encoding import escape_query_string, iri_to_uri
 from django.utils.module_loading import module_has_submodule
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import override
@@ -146,7 +146,7 @@ def is_valid_path(path, urlconf=None, request=None):
     This is a convenience method to make working with "is this a match?" cases
     easier, avoiding unnecessarily indented try...except blocks.
     """
-    from django.core.urls import Resolver404, resolve
+    from django.urls import Resolver404, resolve
     try:
         resolve(path, urlconf, request)
         return True
@@ -160,7 +160,7 @@ def translate_url(url, lang_code, request=None):
     the `lang_code` language (either by i18n_patterns or by translated regex).
     Return the original URL if no translated version is found.
     """
-    from django.core.urls import Resolver404, NoReverseMatch, resolve, reverse
+    from django.urls import Resolver404, NoReverseMatch, resolve, reverse
     parsed = urlsplit(url)
     try:
         match = resolve(parsed.path, request=request)
@@ -179,6 +179,6 @@ def translate_url(url, lang_code, request=None):
 
 
 def clear_url_caches():
-    from django.core.urls import get_resolver
+    from django.urls import get_resolver
     get_callable.cache_clear()
     get_resolver.cache_clear()

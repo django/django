@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.urls import URL
 from django.test import SimpleTestCase
 from django.test.client import RequestFactory
+from django.urls import URL
 
 path_data = (
     # format: (path, query_string, fragment, repr, expected)

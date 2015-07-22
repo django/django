@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
-from django.core.urls import (
-    RegexPattern, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
-)
-from django.core.urls.resolvers import BaseResolver
 from django.test import RequestFactory, SimpleTestCase
+from django.urls import (
+    BaseResolver, RegexPattern, Resolver, Resolver404, ResolverEndpoint,
+    ResolverMatch,
+)
 
 from .decorators import inner_decorator, outer_decorator
 from .views import class_based_view, empty_view

@@ -13,11 +13,6 @@ from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
-from django.core.urls import (
-    NoReverseMatch, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
-    get_callable, get_resolver, resolve, reverse, reverse_lazy,
-)
-from django.core.urls.utils import resolve_error_handler
 from django.http import (
     HttpRequest, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
@@ -26,6 +21,11 @@ from django.test import (
     SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import override_script_prefix
+from django.urls import (
+    NoReverseMatch, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
+    get_callable, get_resolver, resolve, resolve_error_handler, reverse,
+    reverse_lazy,
+)
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
@@ -419,7 +419,7 @@ class ReverseLazySettingsTest(AdminScriptTestCase):
     """
     def setUp(self):
         self.write_settings('settings.py', extra="""
-from django.core.urls import reverse_lazy
+from django.urls import reverse_lazy
 LOGIN_URL = reverse_lazy('login')""")
 
     def tearDown(self):

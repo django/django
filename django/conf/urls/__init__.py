@@ -2,11 +2,10 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urls import (
-    LocalePrefix, LocalizedRegexPattern, RegexPattern, Resolver,
+from django.urls import (
+    BaseResolver, LocalePrefix, LocalizedRegexPattern, RegexPattern, Resolver,
     ResolverEndpoint,
 )
-from django.core.urls.resolvers import BaseResolver
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
@@ -97,7 +96,7 @@ def patterns(prefix, *args):
     return pattern_list
 
 
-def url(constraints, view, kwargs=None, name=None, prefix=''):
+def url(constraints, view, kwargs=None, name=None, prefix='', decorators=None):
     if isinstance(constraints, six.string_types):
         constraints = RegexPattern(constraints)
     elif isinstance(constraints, Promise):
@@ -107,7 +106,7 @@ def url(constraints, view, kwargs=None, name=None, prefix=''):
 
     if isinstance(view, (list, tuple)):
         resolvers, app_name, namespace = view
-        return namespace, Resolver(resolvers, app_name, constraints=constraints, kwargs=kwargs)
+        return namespace, Resolver(resolvers, app_name, constraints=constraints, kwargs=kwargs, decorators=decorators)
     else:
         if isinstance(view, six.string_types):
             warnings.warn(
@@ -120,4 +119,4 @@ def url(constraints, view, kwargs=None, name=None, prefix=''):
                 raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % constraints)
             if prefix:
                 view = prefix + '.' + view
-        return None, ResolverEndpoint(view, name, constraints=constraints, kwargs=kwargs)
+        return None, ResolverEndpoint(view, name, constraints=constraints, kwargs=kwargs, decorators=decorators)
