@@ -183,17 +183,17 @@ class AutodetectorTests(TestCase):
     author_with_book = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("book", models.ForeignKey("otherapp.Book")),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     author_with_book_order_wrt = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("book", models.ForeignKey("otherapp.Book")),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ], options={"order_with_respect_to": "book"})
     author_renamed_with_book = ModelState("testapp", "Writer", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("book", models.ForeignKey("otherapp.Book")),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     author_with_publisher_string = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
@@ -203,17 +203,17 @@ class AutodetectorTests(TestCase):
     author_with_publisher = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("publisher", models.ForeignKey("testapp.Publisher")),
+        ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
     ])
     author_with_user = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("user", models.ForeignKey("auth.User")),
+        ("user", models.ForeignKey("auth.User", models.CASCADE)),
     ])
     author_with_custom_user = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200)),
-        ("user", models.ForeignKey("thirdapp.CustomUser")),
+        ("user", models.ForeignKey("thirdapp.CustomUser", models.CASCADE)),
     ])
     author_proxy = ModelState("testapp", "AuthorProxy", [], {"proxy": True}, ("testapp.author",))
     author_proxy_options = ModelState("testapp", "AuthorProxy", [], {
@@ -265,8 +265,8 @@ class AutodetectorTests(TestCase):
     ], {"db_table": "author_three"})
     contract = ModelState("testapp", "Contract", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
-        ("publisher", models.ForeignKey("testapp.Publisher")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+        ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
     ])
     publisher = ModelState("testapp", "Publisher", [
         ("id", models.AutoField(primary_key=True)),
@@ -274,17 +274,17 @@ class AutodetectorTests(TestCase):
     ])
     publisher_with_author = ModelState("testapp", "Publisher", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     publisher_with_aardvark_author = ModelState("testapp", "Publisher", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Aardvark")),
+        ("author", models.ForeignKey("testapp.Aardvark", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     publisher_with_book = ModelState("testapp", "Publisher", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("otherapp.Book")),
+        ("author", models.ForeignKey("otherapp.Book", models.CASCADE)),
         ("name", models.CharField(max_length=100)),
     ])
     other_pony = ModelState("otherapp", "Pony", [
@@ -301,17 +301,17 @@ class AutodetectorTests(TestCase):
     third_thing = ModelState("thirdapp", "Thing", [("id", models.AutoField(primary_key=True))])
     book = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_proxy_fk = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("thirdapp.AuthorProxy")),
+        ("author", models.ForeignKey("thirdapp.AuthorProxy", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_migrations_fk = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("migrations.UnmigratedModel")),
+        ("author", models.ForeignKey("migrations.UnmigratedModel", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_no_author = ModelState("otherapp", "Book", [
@@ -320,12 +320,12 @@ class AutodetectorTests(TestCase):
     ])
     book_with_author_renamed = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Writer")),
+        ("author", models.ForeignKey("testapp.Writer", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_field_and_author_renamed = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("writer", models.ForeignKey("testapp.Writer")),
+        ("writer", models.ForeignKey("testapp.Writer", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ])
     book_with_multiple_authors = ModelState("otherapp", "Book", [
@@ -340,7 +340,7 @@ class AutodetectorTests(TestCase):
     ])
     book_foo_together = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "index_together": {("author", "title")},
@@ -348,7 +348,7 @@ class AutodetectorTests(TestCase):
     })
     book_foo_together_2 = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "index_together": {("title", "author")},
@@ -357,7 +357,7 @@ class AutodetectorTests(TestCase):
     book_foo_together_3 = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
         ("newfield", models.IntegerField()),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "index_together": {("title", "newfield")},
@@ -366,7 +366,7 @@ class AutodetectorTests(TestCase):
     book_foo_together_4 = ModelState("otherapp", "Book", [
         ("id", models.AutoField(primary_key=True)),
         ("newfield2", models.IntegerField()),
-        ("author", models.ForeignKey("testapp.Author")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
         ("title", models.CharField(max_length=200)),
     ], {
         "index_together": {("title", "newfield2")},
@@ -374,12 +374,12 @@ class AutodetectorTests(TestCase):
     })
     attribution = ModelState("otherapp", "Attribution", [
         ("id", models.AutoField(primary_key=True)),
-        ("author", models.ForeignKey("testapp.Author")),
-        ("book", models.ForeignKey("otherapp.Book")),
+        ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     edition = ModelState("thirdapp", "Edition", [
         ("id", models.AutoField(primary_key=True)),
-        ("book", models.ForeignKey("otherapp.Book")),
+        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
     ])
     custom_user = ModelState("thirdapp", "CustomUser", [
         ("id", models.AutoField(primary_key=True)),
@@ -393,13 +393,13 @@ class AutodetectorTests(TestCase):
     aardvark_testapp = ModelState("testapp", "Aardvark", [("id", models.AutoField(primary_key=True))])
     aardvark_based_on_author = ModelState("testapp", "Aardvark", [], bases=("testapp.Author", ))
     aardvark_pk_fk_author = ModelState("testapp", "Aardvark", [
-        ("id", models.OneToOneField("testapp.Author", primary_key=True)),
+        ("id", models.OneToOneField("testapp.Author", models.CASCADE, primary_key=True)),
     ])
     knight = ModelState("eggs", "Knight", [("id", models.AutoField(primary_key=True))])
     rabbit = ModelState("eggs", "Rabbit", [
         ("id", models.AutoField(primary_key=True)),
-        ("knight", models.ForeignKey("eggs.Knight")),
-        ("parent", models.ForeignKey("eggs.Rabbit")),
+        ("knight", models.ForeignKey("eggs.Knight", models.CASCADE)),
+        ("parent", models.ForeignKey("eggs.Rabbit", models.CASCADE)),
     ], {"unique_together": {("parent", "knight")}})
 
     def repr_changes(self, changes, include_dependencies=False):
@@ -767,7 +767,7 @@ class AutodetectorTests(TestCase):
             ModelState("testapp", "EntityB", [
                 ("id", models.AutoField(primary_key=True)),
                 ("some_label", models.CharField(max_length=255)),
-                ("entity_a", models.ForeignKey("testapp.EntityA")),
+                ("entity_a", models.ForeignKey("testapp.EntityA", models.CASCADE)),
             ]),
         ])
         after = self.make_project_state([
@@ -776,7 +776,7 @@ class AutodetectorTests(TestCase):
             ]),
             ModelState("testapp", "RenamedEntityB", [
                 ("id", models.AutoField(primary_key=True)),
-                ("entity_a", models.ForeignKey("testapp.EntityA")),
+                ("entity_a", models.ForeignKey("testapp.EntityA", models.CASCADE)),
                 ("some_label", models.CharField(max_length=255)),
             ]),
         ])
@@ -1926,14 +1926,14 @@ class AutodetectorTests(TestCase):
         """
         address = ModelState("a", "Address", [
             ("id", models.AutoField(primary_key=True)),
-            ("country", models.ForeignKey("b.DeliveryCountry")),
+            ("country", models.ForeignKey("b.DeliveryCountry", models.CASCADE)),
         ])
         person = ModelState("a", "Person", [
             ("id", models.AutoField(primary_key=True)),
         ])
         apackage = ModelState("b", "APackage", [
             ("id", models.AutoField(primary_key=True)),
-            ("person", models.ForeignKey("a.Person")),
+            ("person", models.ForeignKey("a.Person", models.CASCADE)),
         ])
         country = ModelState("b", "DeliveryCountry", [
             ("id", models.AutoField(primary_key=True)),
@@ -1958,12 +1958,12 @@ class AutodetectorTests(TestCase):
         """
         tenant = ModelState("a", "Tenant", [
             ("id", models.AutoField(primary_key=True)),
-            ("primary_address", models.ForeignKey("b.Address"))],
+            ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
             bases=(AbstractBaseUser, )
         )
         address = ModelState("b", "Address", [
             ("id", models.AutoField(primary_key=True)),
-            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
         ])
         # Make state
         before = self.make_project_state([])
@@ -1990,11 +1990,11 @@ class AutodetectorTests(TestCase):
         """
         address = ModelState("a", "Address", [
             ("id", models.AutoField(primary_key=True)),
-            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL)),
+            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
         ])
         tenant = ModelState("b", "Tenant", [
             ("id", models.AutoField(primary_key=True)),
-            ("primary_address", models.ForeignKey("a.Address"))],
+            ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
             bases=(AbstractBaseUser, )
         )
         # Make state
@@ -2021,7 +2021,7 @@ class AutodetectorTests(TestCase):
         """
         person = ModelState("a", "Person", [
             ("id", models.AutoField(primary_key=True)),
-            ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, related_name='children'))
+            ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='children'))
         ])
         # Make state
         before = self.make_project_state([])

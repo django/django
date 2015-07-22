@@ -350,7 +350,11 @@ related model ordering can change the expected results.
     Consider this case::
 
          class Event(Model):
-            parent = models.ForeignKey('self', related_name='children')
+            parent = models.ForeignKey(
+                'self',
+                on_delete=models.CASCADE,
+                related_name='children',
+            )
             date = models.DateField()
 
          Event.objects.order_by('children__date')
@@ -806,11 +810,16 @@ following models::
 
     class Person(models.Model):
         # ...
-        hometown = models.ForeignKey(City)
+        hometown = models.ForeignKey(
+            City,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
     class Book(models.Model):
         # ...
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
 ... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::

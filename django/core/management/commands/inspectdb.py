@@ -40,6 +40,7 @@ class Command(BaseCommand):
             yield "# You'll have to do the following manually to clean this up:"
             yield "#   * Rearrange models' order"
             yield "#   * Make sure each model has one field with primary_key=True"
+            yield "#   * Make sure each ForeignKey has `on_delete` set to the desidered behavior."
             yield (
                 "#   * Remove `managed = False` lines if you wish to allow "
                 "Django to create, modify, and delete the table"
@@ -128,6 +129,9 @@ class Command(BaseCommand):
                         '' if '.' in field_type else 'models.',
                         field_type,
                     )
+                    if field_type.startswith('ForeignKey('):
+                        field_desc += ', models.DO_NOTHING'
+
                     if extra_params:
                         if not field_desc.endswith('('):
                             field_desc += ', '

@@ -19,7 +19,7 @@ Related objects reference
                 pass
 
             class Article(models.Model):
-                reporter = models.ForeignKey(Reporter)
+                reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
       In the above example, the methods below will be available on
       the manager ``reporter.article_set``.

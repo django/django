@@ -44,7 +44,7 @@ class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=30)
-    content_type = models.ForeignKey(ContentType, related_name='backend_tags')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='backend_tags')
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -76,9 +76,13 @@ class ReporterProxy(Reporter):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateField()
-    reporter = models.ForeignKey(Reporter)
-    reporter_proxy = models.ForeignKey(ReporterProxy, null=True,
-                                       related_name='reporter_proxy')
+    reporter = models.ForeignKey(Reporter, models.CASCADE)
+    reporter_proxy = models.ForeignKey(
+        ReporterProxy,
+        models.SET_NULL,
+        null=True,
+        related_name='reporter_proxy',
+    )
 
     def __str__(self):
         return self.headline
@@ -105,7 +109,7 @@ class Object(models.Model):
 
 @python_2_unicode_compatible
 class ObjectReference(models.Model):
-    obj = models.ForeignKey(Object, db_constraint=False)
+    obj = models.ForeignKey(Object, models.CASCADE, db_constraint=False)
 
     def __str__(self):
         return str(self.obj_id)
