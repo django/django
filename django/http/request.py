@@ -40,6 +40,62 @@ class RawPostDataException(Exception):
     pass
 
 
+class LimitChecker(object):
+    """
+    Stateful counter for enforcing a maximum number of parameters
+    """
+    def __init__(self, limit):
+        self.limit = limit
+        self.count = 0
+
+    def incr(self):
+        self.count += 1
+        if self.count > self.limit:
+            raise SuspiciousOperation('Too many fields')
+
+    def active(self):
+        return self.limit is not None
+
+    def start_split(self):
+        if self.count > 0:
+            self.count -= 1
+
+
+class SplitWrapper(str):
+    """
+    Exposes a custom split implementation when a max element
+    limit is configured that raises a SuspiciousOperation
+    exception when the limit is breached.
+    """
+
+    delims = ('&', ';')
+
+    def __new__(cls, query_string, limit_checker):
+        obj = str.__new__(cls, query_string)
+        obj.limit_checker = limit_checker
+        return obj
+
+    def __custom_split(self, sep):
+        sepsize = len(sep)
+        start = 0
+        result = []
+        self.limit_checker.start_split()
+        while True:
+            self.limit_checker.incr()
+            idx = self.__str__().find(sep, start)
+            if idx == -1:
+                result.append(SplitWrapper(self.__str__()[start:], self.limit_checker))
+                return result
+            result.append(SplitWrapper(self.__str__()[start:idx], self.limit_checker))
+            start = idx + sepsize
+
+    def split(self, sep=' ', maxsplit=-1):
+        if self.limit_checker.active() and sep in SplitWrapper.delims:
+            return self.__custom_split(sep)
+        else:
+            return super(SplitWrapper, self).split(sep, maxsplit)
+
+
 class HttpRequest(object):
     """A basic HTTP request."""
 
@@ -273,7 +329,7 @@ class HttpRequest(object):
                 raise SuspiciousOperation('Request data too large')
 
             try:
-                self._body = self.read()
+                self._body = self.read(size=content_length)
             except IOError as e:
                 six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
@@ -381,6 +437,7 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
+        limit_checker = LimitChecker(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS)
         if six.PY3:
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -389,18 +446,12 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
-            if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and query_string:
-                if query_string.count('&') + 1 > settings.DATA_UPLOAD_MAX_NUMBER_FIELDS:
-                    raise SuspiciousOperation('Too many fields')
-            for key, value in parse_qsl(query_string or '',
+            for key, value in parse_qsl(SplitWrapper(query_string or '', limit_checker),
                                         keep_blank_values=True,
                                         encoding=encoding):
                 self.appendlist(key, value)
         else:
-            if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and query_string:
-                if query_string.count(b'&') + 1 > settings.DATA_UPLOAD_MAX_NUMBER_FIELDS:
-                    raise SuspiciousOperation('Too many fields')
-            for key, value in parse_qsl(query_string or '',
+            for key, value in parse_qsl(SplitWrapper(query_string or '', limit_checker),
                                         keep_blank_values=True):
                 try:
                     value = value.decode(encoding)

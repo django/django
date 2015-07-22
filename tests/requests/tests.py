@@ -836,7 +836,7 @@ class DataUploadMaxMemorySizeGetTests(SimpleTestCase):
             content_length_header: 3,
         })
 
-        # ... or DATA_UPLOAD_MAX_MEMORY_SIZE=None
+        # no problem for DATA_UPLOAD_MAX_MEMORY_SIZE=None
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
             request.body
 
@@ -900,12 +900,12 @@ class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):
         })
 
     def test_number_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
             with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
                 self.request._load_post_and_files()
 
     def test_number_not_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=3):
             self.request._load_post_and_files()
 
     def test_no_limit(self):
@@ -916,7 +916,7 @@ class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):
 class DataUploadMaxNumberOfFieldsFPost(SimpleTestCase):
     def setUp(self):
         payload = FakePayload("\r\n".join([
-            'a=1&a=2',
+            'a=1&a=2;a=3',
             ''
         ]))
         self.request = WSGIRequest({

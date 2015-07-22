@@ -822,7 +822,7 @@ Maximum number of form parameters is now limited
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The new :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` setting limits the number of
-form parameters parsed before a
+form fields parsed before a
 :exc:`~django.core.exceptions.SuspiciousOperation` is raised.
 
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
