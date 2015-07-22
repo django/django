@@ -15,7 +15,7 @@ from . import PostgreSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
-    PostgreSQLModel,
+    PostgreSQLModel, Tag
 )
 
 try:
@@ -92,12 +92,14 @@ class TestSaveLoad(PostgreSQLTestCase):
             ips=['192.168.0.1', '::1'],
             uuids=[uuid.uuid4()],
             decimals=[decimal.Decimal(1.25), 1.75],
+            tags=[Tag(1), Tag(2), Tag(3)]
         )
         instance.save()
         loaded = OtherTypesArrayModel.objects.get()
         self.assertEqual(instance.ips, loaded.ips)
         self.assertEqual(instance.uuids, loaded.uuids)
         self.assertEqual(instance.decimals, loaded.decimals)
+        self.assertEqual(instance.tags, loaded.tags)
 
     def test_model_set_on_base_field(self):
         instance = IntegerArrayModel()

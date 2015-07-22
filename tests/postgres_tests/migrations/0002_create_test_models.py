@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 from ..fields import *  # NOQA
+from ..models import TagField
 
 
 class Migration(migrations.Migration):
@@ -55,6 +56,7 @@ class Migration(migrations.Migration):
                 ('ips', ArrayField(models.GenericIPAddressField(), size=None)),
                 ('uuids', ArrayField(models.UUIDField(), size=None)),
                 ('decimals', ArrayField(models.DecimalField(max_digits=5, decimal_places=2), size=None)),
+                ('tags', ArrayField(TagField(), size=None)),
             ],
             options={
                 'required_db_vendor': 'postgresql',

@@ -6,6 +6,32 @@ from .fields import (
 )
 
 
+class Tag(object):
+    def __init__(self, tag_id):
+        self.tag_id = tag_id
+
+    def __eq__(self, other):
+        return type(other) is Tag and self.tag_id == other.tag_id
+
+
+class TagField(models.SmallIntegerField):
+
+    def from_db_value(self, value, expression, connection, context):
+        if value is None:
+            return value
+        return Tag(int(value))
+
+    def to_python(self, value):
+        if isinstance(value, Tag):
+            return value
+        if value is None:
+            return value
+        return Tag(int(value))
+
+    def get_prep_value(self, value):
+        return value.tag_id
+
+
 class PostgreSQLModel(models.Model):
     class Meta:
         abstract = True
@@ -38,6 +64,7 @@ class OtherTypesArrayModel(PostgreSQLModel):
     ips = ArrayField(models.GenericIPAddressField())
     uuids = ArrayField(models.UUIDField())
     decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2))
+    tags = ArrayField(TagField())
 
 
 class HStoreModel(PostgreSQLModel):
