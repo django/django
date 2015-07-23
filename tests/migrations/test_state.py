@@ -886,18 +886,18 @@ class ModelStateTests(SimpleTestCase):
         class ItermidiateMetaClass(ModelBase, DummyMetaClass):
             pass
 
-        # create the same Model without metaclassmaker as you would normally do
+        # Create the same Model without metaclassmaker as you would normally do.
         class MetaclassTestModel(six.with_metaclass(ItermidiateMetaClass, models.Model, Mixin)):
             class Meta:
                 app_label = "migrations"
                 apps = new_apps
                 swappable = 'TEST_SWAPPABLE_MODEL'
 
-        # Reset apps to be able to render __fake__ modules
+        # Reset apps to be able to render __fake__ modules.
         new_apps = Apps(['migrations'])
         model_state = ModelState.from_model(MetaclassTestModel)
 
-        # This rises metaclass conflict if it's not done properly
+        # This raises metaclass conflict if it's not done properly.
         class_obj = model_state.render(new_apps)
 
         self.assertEqual(getattr(class_obj, 'mixin_attr', False), True)
