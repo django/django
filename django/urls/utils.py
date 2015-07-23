@@ -110,7 +110,7 @@ class URL(object):
         )
 
     def __repr__(self):
-        return "<URL '%s'>" % urlunsplit((self.scheme, self.host, self.path, self.query_string, self.fragment))
+        return "<URL '%s'>" % str(self)
 
     def __str__(self):
         return iri_to_uri(urlunsplit((

@@ -10,22 +10,20 @@ path_data = (
     ('/test/', 'query=true', 'fragment', "<URL '/test/?query=true#fragment'>", '/test/?query=true#fragment'),
     # and empty url returns an empty string
     ('', '', '', "<URL ''>", ''),
-
-
     # special characters? no problem.
     ('/test/?=;@&$', '', '', "<URL '/test/?=;@&$'>", '/test/?=;@&$'),
     # # in query string must be encoded
-    ('/test/', 'query=#hashtag', 'fragment', "<URL '/test/?query=#hashtag#fragment'>", '/test/?query=%23hashtag#fragment'),
+    ('/test/', 'query=#hashtag', 'fragment', "<URL '/test/?query=%23hashtag#fragment'>", '/test/?query=%23hashtag#fragment'),
     # / and ? in query string are allowed
     ('/test/', 'query/string=what?', '', "<URL '/test/?query/string=what?'>", '/test/?query/string=what?'),
     # # in fragment is allowed
     ('/test/', '', '#fragment#', "<URL '/test/##fragment#'>", '/test/##fragment#'),
     # characters outside ASCII range are encoded in the path
-    ('/I ♥ Django/', '', '', "<URL '/I ♥ Django/'>", '/I%20%E2%99%A5%20Django/'),
+    ('/I ♥ Django/', '', '', "<URL '/I%20%E2%99%A5%20Django/'>", '/I%20%E2%99%A5%20Django/'),
     # and in the query string
-    ('/test/', 'django=♥', '', "<URL '/test/?django=♥'>", '/test/?django=%E2%99%A5'),
+    ('/test/', 'django=♥', '', "<URL '/test/?django=%E2%99%A5'>", '/test/?django=%E2%99%A5'),
     # and in the fragment
-    ('/test/', '', '♥', "<URL '/test/#♥'>", '/test/#%E2%99%A5'),
+    ('/test/', '', '♥', "<URL '/test/#%E2%99%A5'>", '/test/#%E2%99%A5'),
 )
 
 
