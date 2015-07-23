@@ -105,9 +105,12 @@ class ArrayField(Field):
     def from_db_value(self, value, expression, connection, context):
         if value is None:
             return value
-        if hasattr(value, 'from_db_value'):
-            return [self.base_field.from_db_value(val, expression, connection, context) for val in value]
-        return [self.base_field.to_python(val) for val in value]
+        return [
+            self.base_field.from_db_value(val, expression, connection, context)
+            if hasattr(self.base_field, 'from_db_value') else
+            self.base_field.to_python(val)
+            for val in value
+        ]
 
     def value_to_string(self, obj):
         values = []
