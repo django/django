@@ -29,12 +29,8 @@ class MetaClassTest(unittest.TestCase):
         class MixinClass(six.with_metaclass(Dummy2MetaClass, object)):
             mixin_attr = True
 
-        try:
-            class MetaclassTestModel(six_with_metaclassmaker(NormalClass, MixinClass)):
-                pass
-        except TypeError:
-            # TypeError: Error when calling the metaclass bases
-            raise AssertionError('Not resolved metaclass conflict"')
+        class MetaclassTestModel(six_with_metaclassmaker(NormalClass, MixinClass)):
+            pass
 
         obj = MetaclassTestModel()
         self.assertIsInstance(obj, MixinClass)
