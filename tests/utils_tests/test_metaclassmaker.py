@@ -34,8 +34,8 @@ class MetaClassTest(unittest.TestCase):
                 pass
         except TypeError:
             # TypeError: Error when calling the metaclass bases
-            MetaclassTestModel = None
-        self.assertIsNotNone(MetaclassTestModel)
+            raise AssertionError('Not resolved metaclass conflict"')
+
         obj = MetaclassTestModel()
         self.assertIsInstance(obj, MixinClass)
         self.assertIsInstance(obj, NormalClass)

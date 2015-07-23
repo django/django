@@ -893,14 +893,15 @@ class ModelStateTests(SimpleTestCase):
                 apps = new_apps
                 swappable = 'TEST_SWAPPABLE_MODEL'
 
-        model_state = ModelState('migrations', 'migrations.test_state.MetaclassTestModel',
-                                 [], bases=[models.Model, Mixin])
+        # Reset apps to be able to render __fake__ modules
+        new_apps = Apps(['migrations'])
+        model_state = ModelState.from_model(MetaclassTestModel)
+
         try:
             class_obj = model_state.render(new_apps)
         except TypeError:
-            class_obj = None
+            raise AssertionError("Not resolved metaclass conflict")
 
-        self.assertIsNotNone(class_obj, "Not resolved metaclass conflict")
         self.assertEqual(getattr(class_obj, 'mixin_attr', False), True)
 
 
