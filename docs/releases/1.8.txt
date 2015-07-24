@@ -685,8 +685,22 @@ This has one backwards incompatible side effect, signal handlers triggered from
 these methods are now executed within the method's transaction and any
 exception in a signal handler will prevent the whole operation.
 
+.. _unsaved-model-instance-check-18:
+
 Assigning unsaved objects to relations raises an error
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. note::
+
+    To more easily allow in-memory usage of models, this change was reverted in
+    Django 1.8.4 and replaced with a check during ``model.save()``. For example::
+
+        >>> book = Book.objects.create(name="Django")
+        >>> book.author = Author(name="John")
+        >>> book.save()
+        Traceback (most recent call last):
+        ...
+        ValueError: save() prohibited to prevent data loss due to unsaved related object 'author'.
 
 Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
@@ -714,8 +728,8 @@ Now, an error will be raised to prevent data loss::
 If you require allowing the assignment of unsaved instances (the old behavior)
 and aren't concerned about the data loss possibility (e.g. you never save the
 objects to the database), you can disable this check by using the
-:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
-attribute.
+``ForeignKey.allow_unsaved_instance_assignment`` attribute. (This attribute was
+removed in 1.8.4 as it's no longer relevant.)
 
 Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
