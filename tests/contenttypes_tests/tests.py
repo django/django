@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.db import connections, models
-from django.test import TestCase, override_settings
+from django.test import TestCase, mock, override_settings
 from django.test.utils import captured_stdout
 from django.utils.encoding import force_str, force_text
 
@@ -429,6 +429,27 @@ class UpdateContentTypesTests(TestCase):
         self.assertIn("Deleting stale content type", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count)
 
+    def test_force_remove_true(self):
+        """
+        force_remove argument of update_contenttypes() should delete stale
+        contenttypes without keyboard input.
+        """
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config, force_remove=True)
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
+    def test_force_remove_false(self):
+        """
+        force_remove argument of update_contenttypes() should default to
+        required keyboard input to remove stale content types.
+        """
+        management.input = lambda x: force_str("yes")
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config)
+        self.assertIn("Deleting stale content type", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count)
+
     def test_interactive_false(self):
         """
         non-interactive mode of update_contenttypes() shouldn't delete stale
@@ -438,6 +459,31 @@ class UpdateContentTypesTests(TestCase):
             management.update_contenttypes(self.app_config, interactive=False)
         self.assertIn("Stale content types remain.", stdout.getvalue())
         self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+    def test_force_remove_interactive_false(self):
+        """
+        non-interactive and non-force_remove modes of update_contenttypes()
+        shouldn't delete stale content types.
+        """
+        with captured_stdout() as stdout:
+            management.update_contenttypes(self.app_config, interactive=False, force_remove=False)
+        self.assertIn("Stale content types remain.", stdout.getvalue())
+        self.assertEqual(ContentType.objects.count(), self.before_count + 1)
+
+
+class RemoveContentTypesTests(TestCase):
+    def setUp(self):
+        self.before_count = ContentType.objects.count()
+        ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
+        self.app_config = apps.get_app_config('contenttypes_tests')
+
+    @mock.patch('django.contrib.contenttypes.management.update_contenttypes')
+    def test_remove_contenttypes(self, mocked_update):
+        """
+        remove_contenttypes should call update_contenttypes.
+        """
+        management.remove_contenttypes(self.app_config.name)
+        self.assertEqual(mocked_update.call_count, 1)
 
 
 class TestRouter(object):
