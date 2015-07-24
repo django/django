@@ -316,8 +316,11 @@ need to convert it to use migrations; this is a simple process::
 
     $ python manage.py makemigrations your_app_label
 
-This will make a new initial migration for your app. Now, run ``python
-manage.py migrate --fake-initial``, and Django will detect that you have an
+This will make a new initial migration for your app. Now, run::
+
+    $ python manage.py migrate --fake-initial
+
+and Django will detect that you have an
 initial migration *and* that the tables it wants to create already exist, and
 will mark the migration as already applied. (Without the
 :djadminopt:`--fake-initial` flag, the :djadmin:`migrate` command would error
@@ -332,6 +335,12 @@ Note that this only works given two things:
 * You have not manually edited your database - Django won't be able to detect
   that your database doesn't match your models, you'll just get errors when
   migrations try to modify those tables.
+
+Note: if you have upgraded from Django 1.7 or before, and get
+'foreign key constraint' errors (for example, when you run manage.py test),
+check that you have created and fake-applied the initial migrations for all
+your apps. Otherwise, the database tables may be created in the wrong order,
+which results in this error.
 
 .. versionchanged: 1.8
 
