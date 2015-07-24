@@ -27,3 +27,7 @@ Bugfixes
 
 * Fixed the recording of squashed migrations when running the ``migrate``
   command (:ticket:`25231`).
+
+* Moved the :ref:`unsaved model instance assignment data loss check
+  <unsaved-model-instance-check-18>` to ``Model.save()`` to allow easier usage
+  of in-memory models (:ticket:`25160`).
