@@ -12,7 +12,7 @@ from django.contrib.admin.utils import (
 )
 from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 from django.db import DEFAULT_DB_ALIAS, models
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
@@ -94,7 +94,8 @@ class NestedObjectsTests(TestCase):
         n.collect([Vehicle.objects.first()])
 
 
-class UtilsTests(TestCase):
+class UtilsTests(SimpleTestCase):
+
     def test_values_from_lookup_field(self):
         """
         Regression test for #12654: lookup_field
@@ -112,7 +113,7 @@ class UtilsTests(TestCase):
 
         simple_function = lambda obj: SIMPLE_FUNCTION
 
-        site_obj = Site.objects.create(domain=SITE_NAME)
+        site_obj = Site(domain=SITE_NAME)
         article = Article(
             site=site_obj,
             title=TITLE_TEXT,

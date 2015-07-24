@@ -55,19 +55,17 @@ relationship. For example, creating an ``Article`` with unsaved ``Reporter``
 raises ``ValueError``::
 
     >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
-    >>> Article(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    >>> Article.objects.create(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
     Traceback (most recent call last):
     ...
-    ValueError: 'Cannot assign "<Reporter: John Smith>": "Reporter" instance isn't saved in the database.'
+    ValueError: save() prohibited to prevent data loss due to unsaved related object 'reporter'.
 
-If you want to disable the unsaved instance check, you can use the
-:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
-attribute.
+.. versionchanged:: 1.8.4
 
-.. versionchanged:: 1.8
-
-    Previously, assigning unsaved objects did not raise an error and could
-    result in silent data loss.
+    Previously, saving an object with unsaved related objects did not raise an
+    error and could result in silent data loss. In 1.8-1.8.3, unsaved model
+    instances couldn't be assigned to related fields, but this restriction was
+    removed to allow easier usage of in-memory models.
 
 Article objects have access to their related Reporter objects::
 

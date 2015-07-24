@@ -92,23 +92,17 @@ relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
 raises ``ValueError``::
 
     >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
-    >>> Restaurant(place=p3, serves_hot_dogs=True, serves_pizza=False)
+    >>> Restaurant.objects.create(place=p3, serves_hot_dogs=True, serves_pizza=False)
     Traceback (most recent call last):
     ...
-    ValueError: 'Cannot assign "<Place: Demon Dogs>": "Place" instance isn't saved in the database.'
-    >>> p.restaurant = Restaurant(place=p, serves_hot_dogs=True, serves_pizza=False)
-    Traceback (most recent call last):
-    ...
-    ValueError: 'Cannot assign "<Restaurant: Demon Dogs the restaurant>": "Restaurant" instance isn't saved in the database.'
+    ValueError: save() prohibited to prevent data loss due to unsaved related object 'place'.
 
-If you want to disable the unsaved instance check, you can use the
-:attr:`~django.db.models.ForeignKey.allow_unsaved_instance_assignment`
-attribute.
+.. versionchanged:: 1.8.4
 
-.. versionchanged:: 1.8
-
-    Previously, assigning unsaved objects did not raise an error and could
-    result in silent data loss.
+    Previously, saving an object with unsaved related objects did not raise an
+    error and could result in silent data loss. In 1.8-1.8.3, unsaved model
+    instances couldn't be assigned to related fields, but this restriction was
+    removed to allow easier usage of in-memory models.
 
 Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
 that there are two restaurants - Ace Hardware the Restaurant was created in the

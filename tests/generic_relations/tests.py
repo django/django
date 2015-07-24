@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
+from django.db import IntegrityError
 from django.db.models import Q
 from django.test import TestCase
 from django.utils import six
@@ -407,6 +408,15 @@ class GenericRelationsTests(TestCase):
         msg = "Field 'content_object' does not generate an automatic reverse relation"
         with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.get(content_object='')
+
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        Assigning an unsaved object to GenericForeignKey should raise an
+        exception on model.save().
+        """
+        quartz = Mineral(name="Quartz", hardness=7)
+        with self.assertRaises(IntegrityError):
+            TaggedItem.objects.create(tag="shiny", content_object=quartz)
 
 
 class CustomWidget(forms.TextInput):

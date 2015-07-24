@@ -506,7 +506,7 @@ class SingleRelatedObjectDescriptor(object):
                     raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        if not self.related.field.allow_unsaved_instance_assignment and None in related_pk:
+        if None in related_pk:
             raise ValueError(
                 'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                 (value, instance._meta.object_name)
@@ -669,12 +669,6 @@ class ReverseSingleRelatedObjectDescriptor(object):
         # Set the values of the related field.
         else:
             for lh_field, rh_field in self.field.related_fields:
-                pk = value._get_pk_val()
-                if not self.field.allow_unsaved_instance_assignment and pk is None:
-                    raise ValueError(
-                        'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                        (value, self.field.rel.to._meta.object_name)
-                    )
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
         # Since we already know what the related object is, seed the related
@@ -1491,6 +1485,7 @@ class ForeignObject(RelatedField):
     one_to_many = False
     one_to_one = False
 
+    # For backwards compatibility; ignored as of Django 1.8.4.
     allow_unsaved_instance_assignment = False
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor

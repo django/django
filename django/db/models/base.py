@@ -661,6 +661,30 @@ class Model(six.with_metaclass(ModelBase)):
         that the "save" must be an SQL insert or update (or equivalent for
         non-SQL backends), respectively. Normally, they should not be set.
         """
+        # Ensure that a model instance without a PK hasn't been assigned to
+        # a ForeignKey or OneToOneField on this model. If the field is
+        # nullable, allowing the save() would result in silent data loss.
+        for field in self._meta.concrete_fields:
+            if field.is_relation:
+                # If the related field isn't cached, then an instance hasn't
+                # been assigned and there's no need to worry about this check.
+                try:
+                    getattr(self, field.get_cache_name())
+                except AttributeError:
+                    continue
+                obj = getattr(self, field.name, None)
+                # A pk may have been assigned manually to a model instance not
+                # saved to the database (or auto-generated in a case like
+                # UUIDField), but we allow the save to proceed and rely on the
+                # database to raise an IntegrityError if applicable. If
+                # constraints aren't supported by the database, there's the
+                # unavoidable risk of data corruption.
+                if obj and obj.pk is None:
+                    raise ValueError(
+                        "save() prohibited to prevent data loss due to "
+                        "unsaved related object '%s'." % field.name
+                    )
+
         using = using or router.db_for_write(self.__class__, instance=self)
         if force_insert and (force_update or update_fields):
             raise ValueError("Cannot force both insert and updating in model saving.")

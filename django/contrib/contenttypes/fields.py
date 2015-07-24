@@ -32,6 +32,7 @@ class GenericForeignKey(object):
     one_to_one = False
     related_model = None
 
+    # For backwards compatibility; ignored as of Django 1.8.4.
     allow_unsaved_instance_assignment = False
 
     def __init__(self, ct_field="content_type", fk_field="object_id", for_concrete_model=True):
@@ -243,11 +244,6 @@ class GenericForeignKey(object):
         if value is not None:
             ct = self.get_content_type(obj=value)
             fk = value._get_pk_val()
-            if not self.allow_unsaved_instance_assignment and fk is None:
-                raise ValueError(
-                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                    (value, value._meta.object_name)
-                )
 
         setattr(instance, self.ct_field, ct)
         setattr(instance, self.fk_field, fk)

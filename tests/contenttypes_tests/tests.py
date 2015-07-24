@@ -212,54 +212,6 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         errors = checks.run_checks()
         self.assertEqual(errors, ['performed!'])
 
-    def test_unsaved_instance_on_generic_foreign_key(self):
-        """
-        #10811 -- Assigning an unsaved object to GenericForeignKey
-        should raise an exception.
-        """
-        class Model(models.Model):
-            content_type = models.ForeignKey(ContentType, null=True)
-            object_id = models.PositiveIntegerField(null=True)
-            content_object = GenericForeignKey('content_type', 'object_id')
-
-        author = Author(name='Author')
-        model = Model()
-        model.content_object = None   # no error here as content_type allows None
-        with self.assertRaisesMessage(ValueError,
-                                    'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                                    % (author, author._meta.object_name)):
-            model.content_object = author   # raised ValueError here as author is unsaved
-
-        author.save()
-        model.content_object = author   # no error because the instance is saved
-
-    def test_unsaved_instance_on_generic_foreign_key_allowed_when_wanted(self):
-        """
-        #24495 - Assigning an unsaved object to a GenericForeignKey
-        should be allowed when the allow_unsaved_instance_assignment
-        attribute has been set to True.
-        """
-        class UnsavedGenericForeignKey(GenericForeignKey):
-            # A GenericForeignKey which can point to an unsaved object
-            allow_unsaved_instance_assignment = True
-
-        class Band(models.Model):
-            name = models.CharField(max_length=50)
-
-        class BandMember(models.Model):
-            band_ct = models.ForeignKey(ContentType)
-            band_id = models.PositiveIntegerField()
-            band = UnsavedGenericForeignKey('band_ct', 'band_id')
-            first_name = models.CharField(max_length=50)
-            last_name = models.CharField(max_length=50)
-
-        beatles = Band(name='The Beatles')
-        john = BandMember(first_name='John', last_name='Lennon')
-        # This should not raise an exception as the GenericForeignKey between
-        # member and band has allow_unsaved_instance_assignment=True.
-        john.band = beatles
-        self.assertEqual(john.band, beatles)
-
 
 class GenericRelationshipTests(IsolatedModelsTestCase):
 
