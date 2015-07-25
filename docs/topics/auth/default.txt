@@ -205,7 +205,8 @@ These permissions will be created when you run :djadmin:`manage.py migrate
 will be created for all previously-installed models, as well as for any new
 models being installed at that time. Afterward, it will create default
 permissions for new models each time you run :djadmin:`manage.py migrate
-<migrate>`.
+<migrate>` (the function that creates permissions is connected to the
+:data:`~django.db.models.signals.post_migrate` signal).
 
 Assuming you have an application with an
 :attr:`~django.db.models.Options.app_label` ``foo`` and a model named ``Bar``,
