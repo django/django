@@ -338,7 +338,13 @@ def compare_xml(want, got):
             if node.nodeType != Node.COMMENT_NODE:
                 return node
 
+    def strip_witespaces(want, got):
+        want = want.strip()
+        got = got.strip()
+        return want, got
+
     want, got = strip_quotes(want, got)
+    want, got = strip_witespaces(want, got)
     want = want.replace('\\n', '\n')
     got = got.replace('\\n', '\n')
 
