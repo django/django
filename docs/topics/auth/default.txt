@@ -618,7 +618,7 @@ redirects to the login page::
             def test_func(self):
                 return self.request.user.email.endswith('@example.com')
 
-    .. admonition: Stacking UserPassesTestMixin
+    .. admonition:: Stacking ``UserPassesTestMixin``
 
         Due to the way ``UserPassesTestMixin`` is implemented, you cannot stack
         them in your inheritance list. The following does NOT work::
