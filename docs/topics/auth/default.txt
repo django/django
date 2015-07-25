@@ -712,6 +712,21 @@ To apply permission checks to :doc:`class-based views
     :class:`~django.contrib.auth.mixins.AccessMixin` to customize the handling
     of unauthorized users.
 
+    You may also override these methods:
+
+    .. method:: get_permission_required()
+
+        Returns an iterable of permission names used by the mixin. Defaults to
+        the ``permission_required`` attribute, converted to a tuple if
+        necessary.
+
+    .. method:: has_permission()
+
+        Returns a boolean denoting whether the current user has permission to
+        execute the decorated view. By default, this returns the result of
+        calling :meth:`~django.contrib.auth.models.User.has_perms()` with the
+        list of permissions returned by :meth:`get_permission_required()`.
+
 Redirecting unauthorized requests in class-based views
 ------------------------------------------------------
 
