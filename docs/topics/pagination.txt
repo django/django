@@ -104,7 +104,9 @@ The view function looks like this::
         return render_to_response('list.html', {"contacts": contacts})
 
 In the template :file:`list.html`, you'll want to include navigation between
-pages along with any interesting information from the objects themselves::
+pages along with any interesting information from the objects themselves:
+
+.. code-block:: html+django
 
     {% for contact in contacts %}
         {# Each "contact" is a Contact model object. #}
@@ -115,7 +117,7 @@ pages along with any interesting information from the objects themselves::
     <div class="pagination">
         <span class="step-links">
             {% if contacts.has_previous %}
-                <a href="?page={{ contacts.previous_page_number }}">previous</a>
+                <a href="?{{ contacts.previous_page_querystring }}">previous</a>
             {% endif %}
 
             <span class="current">
@@ -123,17 +125,26 @@ pages along with any interesting information from the objects themselves::
             </span>
 
             {% if contacts.has_next %}
-                <a href="?page={{ contacts.next_page_number }}">next</a>
+                <a href="?{{ contacts.next_page_querystring }}">next</a>
             {% endif %}
         </span>
     </div>
+
+.. admonition:: What about Page.previous_page_number() and Page.next_page_number()?
+
+    Prior to Django 1.9 the documentation encouraged users to create links to
+    adjacent pages using :meth:`Page.previous_page_number` and
+    :meth:`Page.next_page_number` to manually build the querystring, e.g.
+    ``<a href="?page={{ contacts.next_page_number }}">next</a>``. This is still
+    a viable method, but the new querystring methods referenced above may be
+    simpler to use.
 
 ``Paginator`` objects
 =====================
 
 The :class:`Paginator` class has this constructor:
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, request=None, page_kwarg=None)
 
 Required arguments
 ------------------
@@ -163,6 +174,21 @@ Optional arguments
     Whether or not the first page is allowed to be empty.  If ``False`` and
     ``object_list`` is  empty, then an ``EmptyPage`` error will be raised.
 
+``request``
+    An ``HttpRequest`` object, used for creating pagination query strings.
+
+    See :meth:`~Paginator.page_querystring`.
+
+``page_kwarg``
+    A string specifying the name to use for the page parameter in the
+    pagination query strings.
+
+    See :meth:`~Paginator.page_querystring`.
+
+.. versionadded:: 1.9
+
+    The ``request`` and ``page_kwarg`` keyword arguments were added.
+
 Methods
 -------
 
@@ -170,6 +196,22 @@ Methods
 
     Returns a :class:`Page` object with the given 1-based index. Raises
     :exc:`InvalidPage` if the given page number doesn't exist.
+
+.. method:: Paginator.page_querystring(number)
+
+    .. versionadded:: 1.9
+
+    Returns the query string for the given page number combined with other
+    parameters already in the query string.
+    Raises :exc:`InvalidPage` if the given page number doesn't exist.
+
+    .. admonition:: Note
+
+        If the :class:`Paginator` was not passed an ``HttpRequest`` object
+        when it was instantiated, this method will only return the ``page``
+        parameter. In order to return the whole query string the
+        :class:`Paginator` must have been constructed with a valid
+        ``request`` argument.
 
 Attributes
 ----------
@@ -261,6 +303,35 @@ Methods
 
     Returns the previous page number. Raises :exc:`InvalidPage` if previous
     page doesn't exist.
+
+.. method:: Page.next_page_querystring()
+
+    .. versionadded:: 1.9
+
+    Returns the query string for the next page.  Raises :exc:`InvalidPage` if
+    next page doesn't exist.
+
+    Use this instead of :meth:`~Page.next_page_number` in your templates:
+
+    .. code-block:: html+django
+
+        {% if contacts.has_next %}
+            <a href="?{{ contacts.next_page_querystring }}">next</a>
+        {% endif %}
+
+    This is useful when there are other parameters in the query string that
+    need to remain intact on the the next page, e.g. paginated search results.
+
+    Internally this uses :meth:`~Paginator.page_querystring`.
+
+.. method:: Page.previous_page_querystring()
+
+    .. versionadded:: 1.9
+
+    Returns the query string for the previous page.
+    Raises :exc:`InvalidPage` if previous page doesn't exist.
+
+    See :meth:`~Page.next_page_querystring`.
 
 .. method:: Page.start_index()
 

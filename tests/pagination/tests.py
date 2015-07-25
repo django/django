@@ -108,6 +108,12 @@ class PaginationTests(unittest.TestCase):
         for params, output in tests:
             self.check_paginator(params, output)
 
+    def test_paginator_querystring(self):
+        paginator = Paginator([1, 2, 3], 2)
+        self.assertEqual('page=1', paginator.page_querystring(1))
+        self.assertEqual('page=2', paginator.page_querystring(2))
+        self.assertRaises(InvalidPage, paginator.page_querystring, 3)
+
     def test_invalid_page_number(self):
         """
         Tests that invalid page numbers result in the correct exception being
@@ -115,6 +121,7 @@ class PaginationTests(unittest.TestCase):
         """
         paginator = Paginator([1, 2, 3], 2)
         self.assertRaises(InvalidPage, paginator.page, 3)
+        self.assertRaises(InvalidPage, paginator.page_querystring, 3)
         self.assertRaises(PageNotAnInteger, paginator.validate_number, None)
         self.assertRaises(PageNotAnInteger, paginator.validate_number, 'x')
         # With no content and allow_empty_first_page=True, 1 is a valid page number

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.core.exceptions import ImproperlyConfigured
+from django.core.paginator import EmptyPage
 from django.test import TestCase, override_settings
 from django.utils.encoding import force_str
 from django.views.generic.base import View
@@ -87,6 +88,23 @@ class ListViewTests(TestCase):
         self.assertIs(res.context['author_list'], res.context['object_list'])
         self.assertEqual(res.context['author_list'][0].name, 'Author 90')
         self.assertEqual(res.context['page_obj'].number, 4)
+
+    def test_paginated_with_querystring(self):
+        self._make_authors(100)
+        res = self.client.get('/list/authors/paginated/', {'page': '2', 'parameter': 'preserved'})
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['page_obj'].number, 2)
+        self.assertIn('parameter=preserved', res.context['page_obj'].next_page_querystring())
+        self.assertIn('parameter=preserved', res.context['page_obj'].previous_page_querystring())
+
+    def test_paginated_first_page(self):
+        self._make_authors(100)
+        res = self.client.get('/list/authors/paginated/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['page_obj'].number, 1)
+        self.assertEqual(res.context['page_obj'].next_page_querystring(), 'page=2')
+        with self.assertRaises(EmptyPage):
+            res.context['page_obj'].previous_page_querystring()
 
     def test_paginated_get_page_by_urlvar(self):
         self._make_authors(100)
