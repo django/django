@@ -16,12 +16,12 @@ if HAS_GEOIP:
 
 # Note: Requires use of both the GeoIP country and city datasets.
 # The GEOIP_DATA path should be the only setting set (the directory
-# should contain links or the actual database files 'GeoIP.dat' and
-# 'GeoLiteCity.dat'.
+# should contain links or the actual database files 'GeoIP.dat',
+# 'GeoIPv6.dat', 'GeoLiteCity.dat' and 'GeoLiteCityv6.dat'.
 
 
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
-    "GeoIP is required along with the GEOIP_PATH setting.")
+            "GeoIP is required along with the GEOIP_PATH setting.")
 class GeoIPTest(unittest.TestCase):
 
     def test01_init(self):
@@ -118,3 +118,9 @@ class GeoIPTest(unittest.TestCase):
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
+
+    def test06_ipv6_query(self):
+        "Testing that GeoIP can lookup ipv6 addresses."
+        g = GeoIP()
+        d = g.city('2a03:2880:2110:3f01:face:b00c::')
+        self.assertNotEqual(d, None)

@@ -86,6 +86,26 @@ GEOIP_CITY
 The basename to use for the GeoIP city data file.
 Defaults to ``'GeoLiteCity.dat'``.
 
+.. setting:: GEOIP_COUNTRY6
+
+GEOIP_COUNTRY6
+--------------
+
+.. versionadded:: 1.9
+
+The basename to use for the GeoIPv6 country data file.
+Defaults to ``'GeoIPv6.dat'``.
+
+.. setting:: GEOIP_CITY6
+
+GEOIP_CITY6
+-----------
+
+.. versionadded:: 1.9
+
+The basename to use for the GeoIPv6 city data file.
+Defaults to ``'GeoLiteCityv6.dat'``.
+
 ``GeoIP`` API
 =============
 
@@ -132,6 +152,10 @@ All the following querying routines may take either a string IP address
 or a fully qualified domain name (FQDN).  For example, both
 ``'205.186.163.125'`` and ``'djangoproject.com'`` would be valid query
 parameters.
+
+.. versionchanged:: 1.9
+
+    You can specify IPv6 addresses, like '2a03:2880:2110:3f01:face:b00c::'
 
 .. method:: GeoIP.city(query)
 
