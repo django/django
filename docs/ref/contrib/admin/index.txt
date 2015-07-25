@@ -1,4 +1,4 @@
-=====================
+﻿=====================
 The Django admin site
 =====================
 
@@ -101,7 +101,7 @@ Other topics
 The register decorator
 ----------------------
 
-.. function:: register(*models, [site=django.admin.sites.site])
+.. function:: register(*models, site=django.admin.sites.site)
 
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
@@ -2830,7 +2830,7 @@ supplied by the admin views for the current model.
 The ``staff_member_required`` decorator
 =======================================
 
-.. function:: staff_member_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url='admin:login'])
+.. function:: staff_member_required(redirect_field_name=REDIRECT_FIELD_NAME, login_url='admin:login')
 
     This decorator is used on the admin views that require authorization. A
     view decorated with this function will having the following behavior:

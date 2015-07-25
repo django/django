@@ -782,7 +782,7 @@ Example::
     >>> from django.contrib.gis.geos import fromfile
     >>> g = fromfile('/home/bob/geom.wkt')
 
-.. function:: fromstr(string, [,srid=None])
+.. function:: fromstr(string, ,srid=None)
 
    :param string: string that contains spatial data
    :type string: string
