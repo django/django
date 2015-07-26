@@ -121,9 +121,13 @@ class DiscoverRunnerTest(TestCase):
         """
         Tests shouldn't be discovered twice when discovering on overlapping paths.
         """
-        single = DiscoverRunner().build_suite(["gis_tests"]).countTestCases()
-        dups = DiscoverRunner().build_suite(
-            ["gis_tests", "gis_tests.geo3d"]).countTestCases()
+        with self.modify_settings(INSTALLED_APPS = {'append': 'gis_tests.geo3d'}):
+            suite = DiscoverRunner().build_suite(
+                ['gis_tests.geo3d', 'gis_tests.geo3d'])
+            single = DiscoverRunner().build_suite(
+                ['gis_tests']).countTestCases()
+            dups = DiscoverRunner().build_suite(
+                ['gis_tests', 'gis_tests.geo3d']).countTestCases()
         self.assertEqual(single, dups)
 
     def test_reverse(self):
