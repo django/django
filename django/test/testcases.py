@@ -1017,7 +1017,11 @@ class TestCase(TransactionTestCase):
                     except Exception:
                         cls._rollback_atomics(cls.cls_atomics)
                         raise
-        cls.setUpTestData()
+        try:
+            cls.setUpTestData()
+        except Exception:
+            cls._rollback_atomics(cls.cls_atomics)
+            raise
 
     @classmethod
     def tearDownClass(cls):
