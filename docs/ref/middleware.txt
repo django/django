@@ -448,7 +448,7 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
-   ``CacheMiddleware`` (modifies ``Vary`` header).
+   ``UpdateCacheMiddleware`` (modifies ``Vary`` header).
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 
