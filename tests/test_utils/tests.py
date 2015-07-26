@@ -914,3 +914,36 @@ class OverrideSettingsTests(TestCase):
         with self.settings(STATICFILES_DIRS=[test_path]):
             finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
             self.assertIn(expected_location, finder.locations)
+
+
+class TestBadSetUpTestData(TestCase):
+    """
+    An exception in setUpTestData() shouldn't leak a transaction which would
+    cascade across the rest of the test suite.
+    """
+    class MyException(Exception):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            super(TestBadSetUpTestData, cls).setUpClass()
+        except cls.MyException:
+            cls._in_atomic_block = connection.in_atomic_block
+
+    @classmethod
+    def tearDownClass(Cls):
+        # override to avoid a second cls._rollback_atomics() which would fail.
+        # Normal setUpClass() methods won't have exception handling so this
+        # method wouldn't typically be run.
+        pass
+
+    @classmethod
+    def setUpTestData(cls):
+        # Simulate a broken setUpTestData() method.
+        raise cls.MyException()
+
+    def test_failure_in_setUpTestData_should_rollback_transaction(self):
+        # setUpTestData() should call _rollback_atomics() so that the
+        # transaction doesn't leak.
+        self.assertFalse(self._in_atomic_block)

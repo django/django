@@ -18,3 +18,6 @@ Bugfixes
 * Fixed ``QuerySet.raw()`` so ``InvalidQuery`` is not raised when using the
   ``db_column`` name of a ``ForeignKey`` field with ``primary_key=True``
   (:ticket:`12768`).
+
+* Prevented an exception in ``TestCase.setUpTestData()`` from leaking the
+  transaction (:ticket:`25176`).
