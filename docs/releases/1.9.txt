@@ -915,6 +915,9 @@ Miscellaneous
   Set ``request.current_app`` to ``None`` if you don't want to use a namespace
   hint.
 
+* The ``views.generic.dates.timezone_today()`` function has been moved to
+  ``django.utils.timezone.localdate()``.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9

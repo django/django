@@ -928,7 +928,7 @@ appropriate entities.
 
         ``override`` is now usable as a function decorator.
 
-.. function:: localtime(value, timezone=None)
+.. function:: localtime(value=None, timezone=None)
 
     Converts an aware :class:`~datetime.datetime` to a different time zone,
     by default the :ref:`current time zone <default-current-time-zone>`.
@@ -953,6 +953,17 @@ appropriate entities.
       times in UTC regardless of the value of :setting:`TIME_ZONE`;
       you can use :func:`localtime` to convert to a time in the current
       time zone.
+
+.. function:: localdate(value=None, timezone=None)
+
+    .. versionadded:: 1.9
+
+    Returns a :class:`~datetime.date`. This function assumes ``value``
+    is a :class:`~datetime.datetime`.  If USE_TZ is True, ``value`` and
+    ``timezone`` arguments will be passed to the ``localtime()`` and result of
+    this function will be converted to a date. Otherwise, if ``value`` is
+    specified, it will be converted to a date, or ``date.today()`` will
+    be returned.
 
 .. function:: is_aware(value)
 
