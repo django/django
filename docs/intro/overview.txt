@@ -40,7 +40,7 @@ database-schema problems. Here's a quick example:
         pub_date = models.DateField()
         headline = models.CharField(max_length=200)
         content = models.TextField()
-        reporter = models.ForeignKey(Reporter)
+        reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
         def __str__(self):              # __unicode__ on Python 2
             return self.headline
@@ -154,7 +154,7 @@ as easy as registering your model in the admin site:
         pub_date = models.DateField()
         headline = models.CharField(max_length=200)
         content = models.TextField()
-        reporter = models.ForeignKey(Reporter)
+        reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
 
 .. snippet::
     :filename: mysite/news/admin.py

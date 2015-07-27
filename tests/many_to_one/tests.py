@@ -173,7 +173,7 @@ class ManyToOneTests(TestCase):
             name = models.CharField(max_length=50)
 
         class BandMember(models.Model):
-            band = UnsavedForeignKey(Band)
+            band = UnsavedForeignKey(Band, models.CASCADE)
             first_name = models.CharField(max_length=50)
             last_name = models.CharField(max_length=50)
 
@@ -609,7 +609,7 @@ class ManyToOneTests(TestCase):
     def test_fk_instantiation_outside_model(self):
         # Regression for #12190 -- Should be able to instantiate a FK outside
         # of a model, and interrogate its related field.
-        cat = models.ForeignKey(Category)
+        cat = models.ForeignKey(Category, models.CASCADE)
         self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):

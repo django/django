@@ -101,7 +101,7 @@ class TimeData(models.Model):
 class Tag(models.Model):
     """A tag on an item."""
     data = models.SlugField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
 
     content_object = GenericForeignKey()
@@ -153,11 +153,11 @@ class UniqueAnchor(models.Model):
 
 
 class FKData(models.Model):
-    data = models.ForeignKey(Anchor, null=True)
+    data = models.ForeignKey(Anchor, models.SET_NULL, null=True)
 
 
 class FKDataNaturalKey(models.Model):
-    data = models.ForeignKey(NaturalKeyAnchor, null=True)
+    data = models.ForeignKey(NaturalKeyAnchor, models.SET_NULL, null=True)
 
 
 class M2MData(models.Model):
@@ -166,11 +166,11 @@ class M2MData(models.Model):
 
 class O2OData(models.Model):
     # One to one field can't be null here, since it is a PK.
-    data = models.OneToOneField(Anchor, primary_key=True)
+    data = models.OneToOneField(Anchor, models.CASCADE, primary_key=True)
 
 
 class FKSelfData(models.Model):
-    data = models.ForeignKey('self', null=True)
+    data = models.ForeignKey('self', models.CASCADE, null=True)
 
 
 class M2MSelfData(models.Model):
@@ -178,11 +178,11 @@ class M2MSelfData(models.Model):
 
 
 class FKDataToField(models.Model):
-    data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
+    data = models.ForeignKey(UniqueAnchor, models.SET_NULL, null=True, to_field='data')
 
 
 class FKDataToO2O(models.Model):
-    data = models.ForeignKey(O2OData, null=True)
+    data = models.ForeignKey(O2OData, models.SET_NULL, null=True)
 
 
 class M2MIntermediateData(models.Model):
@@ -190,8 +190,8 @@ class M2MIntermediateData(models.Model):
 
 
 class Intermediate(models.Model):
-    left = models.ForeignKey(M2MIntermediateData)
-    right = models.ForeignKey(Anchor)
+    left = models.ForeignKey(M2MIntermediateData, models.CASCADE)
+    right = models.ForeignKey(Anchor, models.CASCADE)
     extra = models.CharField(max_length=30, blank=True, default="doesn't matter")
 
 # The following test classes are for validating the
@@ -277,7 +277,7 @@ class UUIDData(models.Model):
 
 
 class FKToUUID(models.Model):
-    data = models.ForeignKey(UUIDData)
+    data = models.ForeignKey(UUIDData, models.CASCADE)
 
 
 class ComplexModel(models.Model):
@@ -329,7 +329,7 @@ class InheritBaseModel(BaseModel):
 
 
 class ExplicitInheritBaseModel(BaseModel):
-    parent = models.OneToOneField(BaseModel)
+    parent = models.OneToOneField(BaseModel, models.CASCADE)
     child_data = models.IntegerField()
 
 

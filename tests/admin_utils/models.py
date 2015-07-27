@@ -15,7 +15,7 @@ class Article(models.Model):
     """
     A simple Article model for testing
     """
-    site = models.ForeignKey(Site, related_name="admin_articles")
+    site = models.ForeignKey(Site, models.CASCADE, related_name="admin_articles")
     title = models.CharField(max_length=100)
     title2 = models.CharField(max_length=100, verbose_name="another name")
     created = models.DateTimeField()
@@ -31,7 +31,7 @@ class Article(models.Model):
 @python_2_unicode_compatible
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
-    parent = models.ForeignKey('self', null=True)
+    parent = models.ForeignKey('self', models.CASCADE, null=True)
 
     def __str__(self):
         return six.text_type(self.num)
@@ -42,11 +42,11 @@ class Event(models.Model):
 
 
 class Location(models.Model):
-    event = models.OneToOneField(Event, verbose_name='awesome event')
+    event = models.OneToOneField(Event, models.CASCADE, verbose_name='awesome event')
 
 
 class Guest(models.Model):
-    event = models.OneToOneField(Event)
+    event = models.OneToOneField(Event, models.CASCADE)
     name = models.CharField(max_length=255)
 
     class Meta:
@@ -54,7 +54,7 @@ class Guest(models.Model):
 
 
 class EventGuide(models.Model):
-    event = models.ForeignKey(Event, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(Event, models.DO_NOTHING)
 
 
 class Vehicle(models.Model):
@@ -62,7 +62,12 @@ class Vehicle(models.Model):
 
 
 class VehicleMixin(Vehicle):
-    vehicle = models.OneToOneField(Vehicle, parent_link=True, related_name='vehicle_%(app_label)s_%(class)s')
+    vehicle = models.OneToOneField(
+        Vehicle,
+        models.CASCADE,
+        parent_link=True,
+        related_name='vehicle_%(app_label)s_%(class)s',
+    )
 
     class Meta:
         abstract = True

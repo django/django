@@ -1116,15 +1116,22 @@ Django also defines a set of fields that represent relations.
 ``ForeignKey``
 --------------
 
-.. class:: ForeignKey(othermodel, **options)
+.. class:: ForeignKey(othermodel, on_delete, **options)
 
 A many-to-one relationship. Requires a positional argument: the class to which
 the model is related.
 
+.. versionchanged:: 1.9
+
+    ``on_delete`` can be used as the second positional argument in Django 1.9+
+    (previously it was typically only passed as a keyword argument). It will be
+    a required argument in Django 2.0.
+
 .. _recursive-relationships:
 
 To create a recursive relationship -- an object that has a many-to-one
-relationship with itself -- use ``models.ForeignKey('self')``.
+relationship with itself -- use ``models.ForeignKey('self',
+on_delete=models.CASCADE)``.
 
 .. _lazy-relationships:
 
@@ -1134,7 +1141,10 @@ you can use the name of the model, rather than the model object itself::
     from django.db import models
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey('Manufacturer')
+        manufacturer = models.ForeignKey(
+            'Manufacturer',
+            on_delete=models.CASCADE,
+        )
         # ...
 
     class Manufacturer(models.Model):
@@ -1147,7 +1157,10 @@ model above is defined in another application called ``production``, you'd
 need to use::
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey('production.Manufacturer')
+        manufacturer = models.ForeignKey(
+            'production.Manufacturer',
+            on_delete=models.CASCADE,
+        )
 
 This sort of reference can be useful when resolving circular import
 dependencies between two applications.
@@ -1173,8 +1186,79 @@ deal with the field names of your model object.
 Arguments
 ~~~~~~~~~
 
-:class:`ForeignKey` accepts an extra set of arguments -- all optional -- that
-define the details of how the relation works.
+:class:`ForeignKey` accepts other arguments that define the details of how the
+relation works.
+
+.. attribute:: ForeignKey.on_delete
+
+    When an object referenced by a :class:`ForeignKey` is deleted, Django will
+    emulate the behavior of the SQL constraint specified by the
+    :attr:`on_delete` argument. For example, if you have a nullable
+    :class:`ForeignKey` and you want it to be set null when the referenced
+    object is deleted::
+
+        user = models.ForeignKey(
+            User,
+            models.SET_NULL,
+            blank=True,
+            null=True,
+        )
+
+    .. deprecated:: 1.9
+
+        :attr:`~ForeignKey.on_delete` will become a required argument in Django
+        2.0. In older versions it defaults to ``CASCADE``.
+
+The possible values for :attr:`~ForeignKey.on_delete` are found in
+:mod:`django.db.models`:
+
+* .. attribute:: CASCADE
+
+    Cascade deletes. Django emulates the behavior of the SQL constraint ON
+    DELETE CASCADE and also deletes the object containing the ForeignKey.
+
+* .. attribute:: PROTECT
+
+    Prevent deletion of the referenced object by raising
+    :exc:`~django.db.models.ProtectedError`, a subclass of
+    :exc:`django.db.IntegrityError`.
+
+* .. attribute:: SET_NULL
+
+    Set the :class:`ForeignKey` null; this is only possible if
+    :attr:`~Field.null` is ``True``.
+
+* .. attribute:: SET_DEFAULT
+
+    Set the :class:`ForeignKey` to its default value; a default for the
+    :class:`ForeignKey` must be set.
+
+* .. function:: SET()
+
+    Set the :class:`ForeignKey` to the value passed to
+    :func:`~django.db.models.SET()`, or if a callable is passed in,
+    the result of calling it. In most cases, passing a callable will be
+    necessary to avoid executing queries at the time your models.py is
+    imported::
+
+        from django.conf import settings
+        from django.contrib.auth import get_user_model
+        from django.db import models
+
+        def get_sentinel_user():
+            return get_user_model().objects.get_or_create(username='deleted')[0]
+
+        class MyModel(models.Model):
+            user = models.ForeignKey(
+                settings.AUTH_USER_MODEL,
+                on_delete=models.SET(get_sentinel_user),
+            )
+
+* .. attribute:: DO_NOTHING
+
+    Take no action. If your database backend enforces referential
+    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
+    you manually add an SQL ``ON DELETE`` constraint to the database field.
 
 .. attribute:: ForeignKey.limit_choices_to
 
@@ -1186,7 +1270,11 @@ define the details of how the relation works.
 
     For example::
 
-        staff_member = models.ForeignKey(User, limit_choices_to={'is_staff': True})
+        staff_member = models.ForeignKey(
+            User,
+            on_delete=models.CASCADE,
+            limit_choices_to={'is_staff': True},
+        )
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
     that have ``is_staff=True``. This may be helpful in the Django admin.
@@ -1231,7 +1319,11 @@ define the details of how the relation works.
     ensure that the ``User`` model won't have a backwards relation to this
     model::
 
-        user = models.ForeignKey(User, related_name='+')
+        user = models.ForeignKey(
+            User,
+            on_delete=models.CASCADE,
+            related_name='+',
+        )
 
 .. attribute:: ForeignKey.related_query_name
 
@@ -1241,7 +1333,12 @@ define the details of how the relation works.
 
         # Declare the ForeignKey with related_query_name
         class Tag(models.Model):
-            article = models.ForeignKey(Article, related_name="tags", related_query_name="tag")
+            article = models.ForeignKey(
+                Article,
+                on_delete=models.CASCADE,
+                related_name="tags",
+                related_query_name="tag",
+            )
             name = models.CharField(max_length=255)
 
         # That's now the name of the reverse filter
@@ -1264,65 +1361,6 @@ define the details of how the relation works.
 
     If this is set to ``False``, accessing a related object that doesn't exist
     will raise its ``DoesNotExist`` exception.
-
-.. attribute:: ForeignKey.on_delete
-
-    When an object referenced by a :class:`ForeignKey` is deleted, Django by
-    default emulates the behavior of the SQL constraint ``ON DELETE CASCADE``
-    and also deletes the object containing the ``ForeignKey``. This behavior
-    can be overridden by specifying the :attr:`on_delete` argument. For
-    example, if you have a nullable :class:`ForeignKey` and you want it to be
-    set null when the referenced object is deleted::
-
-        user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-
-The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
-
-* .. attribute:: CASCADE
-
-    Cascade deletes; the default.
-
-* .. attribute:: PROTECT
-
-    Prevent deletion of the referenced object by raising
-    :exc:`~django.db.models.ProtectedError`, a subclass of
-    :exc:`django.db.IntegrityError`.
-
-* .. attribute:: SET_NULL
-
-    Set the :class:`ForeignKey` null; this is only possible if
-    :attr:`~Field.null` is ``True``.
-
-* .. attribute:: SET_DEFAULT
-
-    Set the :class:`ForeignKey` to its default value; a default for the
-    :class:`ForeignKey` must be set.
-
-* .. function:: SET()
-
-    Set the :class:`ForeignKey` to the value passed to
-    :func:`~django.db.models.SET()`, or if a callable is passed in,
-    the result of calling it. In most cases, passing a callable will be
-    necessary to avoid executing queries at the time your models.py is
-    imported::
-
-        from django.conf import settings
-        from django.contrib.auth import get_user_model
-        from django.db import models
-
-        def get_sentinel_user():
-            return get_user_model().objects.get_or_create(username='deleted')[0]
-
-        class MyModel(models.Model):
-            user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                                     on_delete=models.SET(get_sentinel_user))
-
-* .. attribute:: DO_NOTHING
-
-    Take no action. If your database backend enforces referential
-    integrity, this will cause an :exc:`~django.db.IntegrityError` unless
-    you manually add an SQL ``ON DELETE`` constraint to the database field.
 
 .. attribute:: ForeignKey.swappable
 
@@ -1367,7 +1405,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
             allow_unsaved_instance_assignment = True
 
         class Book(models.Model):
-            author = UnsavedForeignKey(Author)
+            author = UnsavedForeignKey(Author, on_delete=models.CASCADE)
 
 .. _ref-manytomany:
 
@@ -1492,12 +1530,20 @@ that control how the relationship functions.
 
         class Group(models.Model):
             name = models.CharField(max_length=128)
-            members = models.ManyToManyField(Person, through='Membership', through_fields=('group', 'person'))
+            members = models.ManyToManyField(
+                Person,
+                through='Membership',
+                through_fields=('group', 'person'),
+            )
 
         class Membership(models.Model):
-            group = models.ForeignKey(Group)
-            person = models.ForeignKey(Person)
-            inviter = models.ForeignKey(Person, related_name="membership_invites")
+            group = models.ForeignKey(Group, on_delete=models.CASCADE)
+            person = models.ForeignKey(Person, on_delete=models.CASCADE)
+            inviter = models.ForeignKey(
+                Person,
+                on_delete=models.CASCADE,
+                related_name="membership_invites",
+            )
             invite_reason = models.CharField(max_length=64)
 
     ``Membership`` has *two* foreign keys to ``Person`` (``person`` and
@@ -1577,11 +1623,17 @@ relationship at the database level.
 ``OneToOneField``
 -----------------
 
-.. class:: OneToOneField(othermodel, parent_link=False, **options)
+.. class:: OneToOneField(othermodel, on_delete, parent_link=False, **options)
 
 A one-to-one relationship. Conceptually, this is similar to a
 :class:`ForeignKey` with :attr:`unique=True <Field.unique>`, but the
 "reverse" side of the relation will directly return a single object.
+
+.. versionchanged:: 1.9
+
+    ``on_delete`` can be used as the second positional argument in Django 1.9+
+    (previously it was typically only passed as a keyword argument). It will be
+    a required argument in Django 2.0.
 
 This is most useful as the primary key of a model which "extends"
 another model in some way; :ref:`multi-table-inheritance` is
@@ -1603,8 +1655,15 @@ With the following example::
     from django.db import models
 
     class MySpecialUser(models.Model):
-        user = models.OneToOneField(settings.AUTH_USER_MODEL)
-        supervisor = models.OneToOneField(settings.AUTH_USER_MODEL, related_name='supervisor_of')
+        user = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+        )
+        supervisor = models.OneToOneField(
+            settings.AUTH_USER_MODEL,
+            on_delete=models.CASCADE,
+            related_name='supervisor_of',
+        )
 
 your resulting ``User`` model will have the following attributes::
 
@@ -1931,6 +1990,6 @@ have boolean values (rather than ``None``) if the field is a relation type
 .. attribute:: Field.related_model
 
     Points to the model the field relates to. For example, ``Author`` in
-    ``ForeignKey(Author)``. If a field has a generic relation (such as a
-    ``GenericForeignKey`` or a ``GenericRelation``) then ``related_model``
-    will be ``None``.
+    ``ForeignKey(Author, on_delete=models.CASCADE)``. If a field has a generic
+    relation (such as a ``GenericForeignKey`` or a ``GenericRelation``) then
+    ``related_model`` will be ``None``.
