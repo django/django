@@ -4,7 +4,7 @@ GeoQuerySet API Reference
 
 .. currentmodule:: django.contrib.gis.db.models
 
-.. class:: GeoQuerySet([model=None])
+.. class:: GeoQuerySet(model=None)
 
 .. _spatial-lookups:
 

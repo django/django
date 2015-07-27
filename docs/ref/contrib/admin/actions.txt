@@ -257,7 +257,7 @@ Writing this view is left as an exercise to the reader.
 Making actions available site-wide
 ----------------------------------
 
-.. method:: AdminSite.add_action(action[, name])
+.. method:: AdminSite.add_action(action, name=None)
 
     Some actions are best if they're made available to *any* object in the admin
     site -- the export action defined above would be a good candidate. You can
