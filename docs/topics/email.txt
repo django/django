@@ -447,7 +447,7 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
+.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
     This is the default backend. Email will be sent through a SMTP server.
 

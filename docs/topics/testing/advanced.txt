@@ -570,7 +570,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True, keepdb=False])
+.. function:: create_test_db(verbosity=1, autoclobber=False, serialize=True, keepdb=False)
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -612,7 +612,7 @@ can be useful during testing.
 
         The ``keepdb`` argument was added.
 
-.. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
+.. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of

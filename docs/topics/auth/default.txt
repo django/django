@@ -429,7 +429,7 @@ login page::
 The ``login_required`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: login_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url=None])
+.. function:: login_required(redirect_field_name='next', login_url=None)
 
     As a shortcut, you can use the convenient
     :func:`~django.contrib.auth.decorators.login_required` decorator::
@@ -556,7 +556,7 @@ redirects to the login page::
             return redirect('/login/?next=%s' % request.path)
         # ...
 
-.. function:: user_passes_test(func, [login_url=None, redirect_field_name=REDIRECT_FIELD_NAME])
+.. function:: user_passes_test(func, login_url=None, redirect_field_name='next')
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator
     which performs a redirect when the callable returns ``False``::
@@ -643,7 +643,7 @@ redirects to the login page::
 The ``permission_required`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. function:: permission_required(perm, [login_url=None, raise_exception=False])
+.. function:: permission_required(perm, login_url=None, raise_exception=False)
 
     It's a relatively common task to check whether a user has a particular
     permission. For that reason, Django provides a shortcut for that case: the
@@ -923,7 +923,7 @@ All authentication views
 This is a list with all the views ``django.contrib.auth`` provides. For
 implementation details see :ref:`using-the-views`.
 
-.. function:: login(request, [template_name, redirect_field_name, authentication_form, current_app, extra_context])
+.. function:: login(request, template_name=`registration/login.html`, redirect_field_name=, authentication_form, current_app, extra_context])
 
     **URL name:** ``login``
 
@@ -1055,7 +1055,7 @@ implementation details see :ref:`using-the-views`.
     .. _forms documentation: ../forms/
     .. _site framework docs: ../sites/
 
-.. function:: logout(request, [next_page, template_name, redirect_field_name, current_app, extra_context])
+.. function:: logout(request, next_page=None, template_name='registration/logged_out.html', redirect_field_name='next', current_app=None, extra_context=None)
 
     Logs a user out.
 
@@ -1108,7 +1108,7 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-.. function:: logout_then_login(request[, login_url, current_app, extra_context])
+.. function:: logout_then_login(request, login_url=None, current_app=None, extra_context=None)
 
     Logs a user out, then redirects to the login page.
 
@@ -1131,7 +1131,7 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
-.. function:: password_change(request[, template_name, post_change_redirect, password_change_form, current_app, extra_context])
+.. function:: password_change(request, template_name='registration/password_change_form.html', post_change_redirect=None, password_change_form=PasswordChangeForm, current_app=None, extra_context=None)
 
     Allows a user to change their password.
 
@@ -1167,7 +1167,7 @@ implementation details see :ref:`using-the-views`.
 
     * ``form``: The password change form (see ``password_change_form`` above).
 
-.. function:: password_change_done(request[, template_name, current_app, extra_context])
+.. function:: password_change_done(request, template_name='registration/password_change_done.html', current_app=None, extra_context=None)
 
     The page shown after a user has changed their password.
 
@@ -1191,7 +1191,7 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
-.. function:: password_reset(request[, is_admin_site, template_name, email_template_name, password_reset_form, token_generator, post_reset_redirect, from_email, current_app, extra_context, html_email_template_name])
+.. function:: password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', password_reset_form='registration/password_reset_subject.txt', token_generator=default_token_generator, post_reset_redirect=None, from_email=None, current_app=None, extra_context=None, html_email_template_name=None)
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
@@ -1300,7 +1300,7 @@ implementation details see :ref:`using-the-views`.
     The same template context is used for subject template. Subject must be
     single line plain text string.
 
-.. function:: password_reset_done(request[, template_name, current_app, extra_context])
+.. function:: password_reset_done(request, template_name='registration/password_reset_done.html', current_app=None, extra_context=None)
 
     The page shown after a user has been emailed a link to reset their
     password. This view is called by default if the :func:`password_reset` view
@@ -1332,7 +1332,7 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
-.. function:: password_reset_confirm(request[, uidb64, token, template_name, token_generator, set_password_form, post_reset_redirect, current_app, extra_context])
+.. function:: password_reset_confirm(request, uidb64=None, token=None, template_name='registration/password_reset_confirm.html', token_generator=default_token_generator, set_password_form=SetPasswordForm, post_reset_redirect=None, current_app=None, extra_context=None)
 
     Presents a form for entering a new password.
 
@@ -1378,7 +1378,7 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
-.. function:: password_reset_complete(request[,template_name, current_app, extra_context])
+.. function:: password_reset_complete(request, template_name='registration/password_reset_complete.html', current_app=None, extra_context=None)
 
     Presents a view which informs the user that the password has been
     successfully changed.
@@ -1407,7 +1407,7 @@ Helper functions
 
 .. currentmodule:: django.contrib.auth.views
 
-.. function:: redirect_to_login(next[, login_url, redirect_field_name])
+.. function:: redirect_to_login(next, login_url=None, redirect_field_name='next')
 
     Redirects to the login page, and then back to another URL after a
     successful login.
@@ -1500,7 +1500,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form for generating and emailing a one-time use link to reset a
     user's password.
 
-    .. method:: send_email(subject_template_name, email_template_name, context, from_email, to_email, [html_email_template_name=None])
+    .. method:: send_email(subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None)
 
         .. versionadded:: 1.8
 

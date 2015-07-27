@@ -198,7 +198,7 @@ Lookup reference
         The name of this lookup, used to identify it on parsing query
         expressions. It cannot contain the string ``"__"``.
 
-    .. method:: process_lhs(compiler, connection[, lhs=None])
+    .. method:: process_lhs(compiler, connection, lhs=None)
 
         Returns a tuple ``(lhs_string, lhs_params)``, as returned by
         ``compiler.compile(lhs)``. This method can be overridden to tune how
