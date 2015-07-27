@@ -928,6 +928,16 @@ versions:
 Its parsing caused bugs with the current syntax, so support for the old syntax
 will be removed in Django 2.0 following an accelerated deprecation.
 
+``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The ``on_delete`` argument of ``ForeignKey`` and ``OneToOneField`` will be
+required in Django 2.0.
+
+Update existing migrations to explicitly set the argument. Since the default is
+``models.CASCADE``, add ``on_delete=models.CASCADE`` to all ``ForeignKey`` and
+``OneToOneField``\s that don't use a different option.
+
 ``Field.rel`` changes
 ~~~~~~~~~~~~~~~~~~~~~
 
