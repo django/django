@@ -128,9 +128,9 @@ parameter is useful.
 include()
 ---------
 
-.. function:: include(module[, namespace=None, app_name=None])
+.. function:: include(module, namespace=None, app_name=None)
               include(pattern_list)
-              include((pattern_list, app_namespace)[, namespace=None])
+              include((pattern_list, app_namespace), namespace=None)
               include((pattern_list, app_namespace, instance_namespace))
 
     A function that takes a full Python import path to another URLconf module

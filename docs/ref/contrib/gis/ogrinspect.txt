@@ -10,10 +10,10 @@ OGR Inspection
 ``ogrinspect``
 ==============
 
-.. function:: ogrinspect(data_source, model_name[, **kwargs])
+.. function:: ogrinspect(data_source, model_name, **kwargs)
     :noindex:
 
 ``mapping``
 ===========
 
-.. function:: mapping(data_source, [geom_name='geom', layer_key=0, multi_geom=False])
+.. function:: mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False)

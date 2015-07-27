@@ -58,7 +58,7 @@ points, polygons, etc.), as well as the names and types of any
 additional fields (:class:`Field`) of data that may be associated with
 each feature in that layer.
 
-.. class:: DataSource(ds_input, [encoding='utf-8'])
+.. class:: DataSource(ds_input, encoding='utf-8')
 
    The constructor for ``DataSource`` only requires one parameter: the path of
    the file you want to read. However, OGR
@@ -244,7 +244,7 @@ __ http://www.gdal.org/ogr/ogr_formats.html
       >>> layer.get_fields('Name')
       ['Pueblo', 'Lawrence', 'Houston']
 
-   .. method:: get_geoms([geos=False])
+   .. method:: get_geoms(geos=False)
 
    A method that returns a list containing the geometry of each feature
    in the layer.  If the optional argument ``geos`` is set to ``True``
@@ -445,7 +445,7 @@ systems and coordinate transformation::
     >>> from django.contrib.gis.gdal import OGRGeometry
     >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
 
-.. class:: OGRGeometry(geom_input[, srs=None])
+.. class:: OGRGeometry(geom_input, srs=None)
 
    This object is a wrapper for the `OGR Geometry`__ class.
    These objects are instantiated directly from the given ``geom_input``
@@ -1416,7 +1416,7 @@ blue.
 
             This property can now be set as well.
 
-    .. method:: datatype([as_string=False])
+    .. method:: datatype(as_string=False)
 
         The data type contained in the band, as an integer constant between 0
         (Unknown) and 11. If ``as_string`` is ``True``, the data type is

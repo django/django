@@ -312,7 +312,7 @@ Saving objects
 
 To save an object back to the database, call ``save()``:
 
-.. method:: Model.save([force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None])
+.. method:: Model.save(force_insert=False, force_update=False, using=DEFAULT_DB_ALIAS, update_fields=None)
 
 If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
@@ -533,7 +533,7 @@ value, the field will be added to the updated fields.
 Deleting objects
 ================
 
-.. method:: Model.delete([using=DEFAULT_DB_ALIAS, keep_parents=False])
+.. method:: Model.delete(using=DEFAULT_DB_ALIAS, keep_parents=False)
 
 Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in

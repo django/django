@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name[, context][, context_instance][, content_type][, status][, current_app][, dirs][, using])
+.. function:: render(request, template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, current_app=_current_app_undefined, dirs=_dirs_undefined, using=None)
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -117,7 +117,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name[, context][, context_instance][, content_type][, status][, dirs][, using])
+.. function:: render_to_response(template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, dirs=_dirs_undefined, using=None)
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -207,7 +207,7 @@ This example is equivalent to::
 ``redirect``
 ============
 
-.. function:: redirect(to[, permanent=False], *args, **kwargs)
+.. function:: redirect(to, permanent=False, *args, **kwargs)
 
    Returns an :class:`~django.http.HttpResponseRedirect` to the appropriate URL
    for the arguments passed.

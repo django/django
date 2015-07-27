@@ -95,7 +95,7 @@ Usage
 
 The ``django.template.loader`` module defines two functions to load templates.
 
-.. function:: get_template(template_name[, dirs][, using])
+.. function:: get_template(template_name, dirs=_dirs_undefined, using=None)
 
     This function loads the template with the given name and returns a
     ``Template`` object.
@@ -128,7 +128,7 @@ The ``django.template.loader`` module defines two functions to load templates.
         ``get_template()`` returns a backend-dependent ``Template`` instead
         of a :class:`django.template.Template`.
 
-.. function:: select_template(template_name_list[, dirs][, using])
+.. function:: select_template(template_name_list, dirs=_dirs_undefined, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
@@ -269,7 +269,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name[, context][, context_instance][, request][, using])
+.. function:: render_to_string(template_name, context=None, context_instance=_context_instance_undefined, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
