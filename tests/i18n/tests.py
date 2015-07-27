@@ -1140,6 +1140,17 @@ class MiscTests(SimpleTestCase):
         with self.settings(LANGUAGES=[('en', 'English')]):
             self.assertNotEqual('pt-br', g(r))
 
+    @translation.override('pl')
+    def test_custom_gettext_domains(self):
+        """
+        This test checks whether locale files with custom names
+        (as specified in settings.LOCALE_FILENAMES) have been successfully loaded.
+
+        The locale file is located in i18n/locale/pl/LC_MESSAGES.
+        """
+        self.assertEqual(ugettext('This is a test of the custom ugettext domain loading.'),
+                         'To jest test wczywtwania niestandardowych domen ugettext.')
+
 
 class ResolutionOrderI18NTests(SimpleTestCase):
 

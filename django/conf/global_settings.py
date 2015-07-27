@@ -142,6 +142,10 @@ LANGUAGES_BIDI = ["he", "ar", "fa", "ur"]
 USE_I18N = True
 LOCALE_PATHS = []
 
+# Additional locale filenames to be loaded
+# by the internationalization system
+LOCALE_FILENAMES = []
+
 # Settings for language cookie
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = None

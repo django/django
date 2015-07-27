@@ -1675,6 +1675,25 @@ Here's a sample settings file::
         ('en', _('English')),
     ]
 
+.. setting:: LOCALE_FILENAMES
+
+LOCALE_FILENAMES
+----------------
+
+.. versionadded:: 1.9
+
+Default ``[]`` (Empty list)
+
+A list of additional translation file names for which Django should look.
+See :ref:`how-django-discovers-translations`.
+
+Example::
+
+    LOCALE_FILENAMES = ['name1', 'name2',]
+
+Django will look for ``name1.(po|mo)`` and ``name2.(po|mo)`` in directories specified in :setting:`LOCALE_PATHS`
+and in those belonging to specific applications.
+
 .. setting:: LOCALE_PATHS
 
 LOCALE_PATHS

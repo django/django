@@ -353,6 +353,10 @@ Internationalization
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
 
+* Added the :setting:`LOCALE_FILENAMES` setting, which allows specifying
+  additional translation file names to be searched for by the internationalization
+  system.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 

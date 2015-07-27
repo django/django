@@ -133,6 +133,7 @@ def setup(verbosity, test_labels):
         },
     }]
     settings.LANGUAGE_CODE = 'en'
+    settings.LOCALE_FILENAMES = ['custom_domain']
     settings.SITE_ID = 1
     settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
     settings.MIGRATION_MODULES = {

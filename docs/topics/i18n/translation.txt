@@ -2054,9 +2054,13 @@ message file specific to the project you are composing. The choice is yours.
 All message file repositories are structured the same way. They are:
 
 * All paths listed in :setting:`LOCALE_PATHS` in your settings file are
-  searched for ``<language>/LC_MESSAGES/django.(po|mo)``
-* ``$APPPATH/locale/<language>/LC_MESSAGES/django.(po|mo)``
-* ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/django.(po|mo)``
+  searched for ``<language>/LC_MESSAGES/``
+* ``$APPPATH/locale/<language>/LC_MESSAGES/``
+* ``$PYTHONPATH/django/conf/locale/<language>/LC_MESSAGES/``
+
+By default, these locations are searched for ``django.(po|mo)`` files.
+You can also specify additional translation file names to be searched for
+by setting the :setting:`LOCALE_FILENAMES` value.
 
 To create message files, you use the :djadmin:`django-admin makemessages <makemessages>`
 tool. And you use :djadmin:`django-admin compilemessages <compilemessages>`
