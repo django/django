@@ -22,7 +22,7 @@ class State(NamedModel):
 
 
 class County(NamedModel):
-    state = models.ForeignKey(State)
+    state = models.ForeignKey(State, models.CASCADE)
     mpoly = models.MultiPolygonField(srid=4269)  # Multipolygon in NAD83
 
 

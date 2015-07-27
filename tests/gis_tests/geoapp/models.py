@@ -57,7 +57,7 @@ class Track(NamedModel):
 
 
 class MultiFields(NamedModel):
-    city = models.ForeignKey(City)
+    city = models.ForeignKey(City, models.CASCADE)
     point = models.PointField()
     poly = models.PolygonField()
 

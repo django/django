@@ -111,8 +111,8 @@ class OperationTestBase(MigrationTestBase):
                 "Rider",
                 [
                     ("id", models.AutoField(primary_key=True)),
-                    ("pony", models.ForeignKey("Pony")),
-                    ("friend", models.ForeignKey("self"))
+                    ("pony", models.ForeignKey("Pony", models.CASCADE)),
+                    ("friend", models.ForeignKey("self", models.CASCADE))
                 ],
             ))
         if mti_model:
@@ -120,11 +120,12 @@ class OperationTestBase(MigrationTestBase):
                 "ShetlandPony",
                 fields=[
                     ('pony_ptr', models.OneToOneField(
+                        'Pony',
+                        models.CASCADE,
                         auto_created=True,
                         primary_key=True,
                         to_field='id',
                         serialize=False,
-                        to='Pony',
                     )),
                     ("cuteness", models.IntegerField(default=1)),
                 ],
@@ -215,7 +216,7 @@ class OperationTests(OperationTestBase):
             [
                 ("id", models.AutoField(primary_key=True)),
                 ("number", models.IntegerField(default=1)),
-                ("pony", models.ForeignKey("test_crmoua.Pony")),
+                ("pony", models.ForeignKey("test_crmoua.Pony", models.CASCADE)),
             ],
         )
         operation3 = migrations.AlterUniqueTogether(
@@ -290,11 +291,12 @@ class OperationTests(OperationTestBase):
             "ShetlandPony",
             [
                 ('pony_ptr', models.OneToOneField(
+                    'test_crmoih.Pony',
+                    models.CASCADE,
                     auto_created=True,
                     primary_key=True,
                     to_field='id',
                     serialize=False,
-                    to='test_crmoih.Pony',
                 )),
                 ("cuteness", models.IntegerField(default=1)),
             ],
@@ -934,8 +936,8 @@ class OperationTests(OperationTestBase):
         self.assertTableNotExists("test_rmflmmwt_ponystables")
         project_state = self.apply_operations("test_rmflmmwt", project_state, operations=[
             migrations.CreateModel("PonyStables", fields=[
-                ("pony", models.ForeignKey('test_rmflmmwt.Pony')),
-                ("stable", models.ForeignKey('test_rmflmmwt.Stable')),
+                ("pony", models.ForeignKey('test_rmflmmwt.Pony', models.CASCADE)),
+                ("stable", models.ForeignKey('test_rmflmmwt.Stable', models.CASCADE)),
             ]),
             migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt.PonyStables'))
         ])
@@ -1414,7 +1416,7 @@ class OperationTests(OperationTestBase):
             name="Rider",
             fields=[
                 ("id", models.AutoField(primary_key=True)),
-                ("pony", models.ForeignKey(to="Pony")),
+                ("pony", models.ForeignKey("Pony", models.CASCADE)),
             ],
         )
         create_state = project_state.clone()
@@ -1422,7 +1424,7 @@ class OperationTests(OperationTestBase):
         alter_operation = migrations.AlterField(
             model_name='Rider',
             name='pony',
-            field=models.ForeignKey(editable=False, to="Pony"),
+            field=models.ForeignKey("Pony", models.CASCADE, editable=False),
         )
         alter_state = create_state.clone()
         alter_operation.state_forwards("test_alfk", alter_state)
@@ -1754,7 +1756,7 @@ class OperationTests(OperationTestBase):
             [
                 ("id", models.AutoField(primary_key=True)),
                 ("title", models.CharField(max_length=100)),
-                ("author", models.ForeignKey("test_authors.Author"))
+                ("author", models.ForeignKey("test_authors.Author", models.CASCADE))
             ],
             options={},
         )

@@ -48,4 +48,4 @@ class Bar(models.Model):
 
 
 class Foo(models.Model):
-    bar = models.ForeignKey(Bar)
+    bar = models.ForeignKey(Bar, models.CASCADE)

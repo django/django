@@ -25,9 +25,11 @@ class Company(models.Model):
     num_chairs = models.PositiveIntegerField()
     ceo = models.ForeignKey(
         Employee,
+        models.CASCADE,
         related_name='company_ceo_set')
     point_of_contact = models.ForeignKey(
         Employee,
+        models.SET_NULL,
         related_name='company_point_of_contact_set',
         null=True)
 

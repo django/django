@@ -13,7 +13,7 @@ __all__ = ('Link', 'Place', 'Restaurant', 'Person', 'Address',
 
 @python_2_unicode_compatible
 class Link(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
@@ -42,7 +42,7 @@ class Address(models.Model):
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=2)
     zipcode = models.CharField(max_length=5)
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
@@ -61,13 +61,13 @@ class Person(models.Model):
 
 
 class CharLink(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.CharField(max_length=100)
     content_object = GenericForeignKey()
 
 
 class TextLink(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.TextField()
     content_object = GenericForeignKey()
 
@@ -84,7 +84,7 @@ class OddRelation2(models.Model):
 
 # models for test_q_object_or:
 class Note(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
     note = models.TextField()
@@ -135,7 +135,7 @@ class Guild(models.Model):
 
 
 class Tag(models.Model):
-    content_type = models.ForeignKey(ContentType, related_name='g_r_r_tags')
+    content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='g_r_r_tags')
     object_id = models.CharField(max_length=15)
     content_object = GenericForeignKey()
     label = models.CharField(max_length=15)
@@ -168,7 +168,7 @@ class HasLinkThing(HasLinks):
 
 class A(models.Model):
     flag = models.NullBooleanField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -181,14 +181,14 @@ class B(models.Model):
 
 
 class C(models.Model):
-    b = models.ForeignKey(B)
+    b = models.ForeignKey(B, models.CASCADE)
 
     class Meta:
         ordering = ('id',)
 
 
 class D(models.Model):
-    b = models.ForeignKey(B, null=True)
+    b = models.ForeignKey(B, models.SET_NULL, null=True)
 
     class Meta:
         ordering = ('id',)
@@ -197,14 +197,14 @@ class D(models.Model):
 # Ticket #22998
 
 class Node(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content = GenericForeignKey('content_type', 'object_id')
 
 
 class Content(models.Model):
     nodes = GenericRelation(Node)
-    related_obj = models.ForeignKey('Related', on_delete=models.CASCADE)
+    related_obj = models.ForeignKey('Related', models.CASCADE)
 
 
 class Related(models.Model):

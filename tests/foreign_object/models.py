@@ -24,7 +24,11 @@ class Person(models.Model):
 
     # Relation Fields
     person_country = models.ForeignObject(
-        Country, from_fields=['person_country_id'], to_fields=['id'])
+        Country,
+        from_fields=['person_country_id'],
+        to_fields=['id'],
+        on_delete=models.CASCADE,
+    )
     friends = models.ManyToManyField('self', through='Friendship', symmetrical=False)
 
     class Meta:
@@ -38,7 +42,7 @@ class Person(models.Model):
 class Group(models.Model):
     # Table Column Fields
     name = models.CharField(max_length=128)
-    group_country = models.ForeignKey(Country)
+    group_country = models.ForeignKey(Country, models.CASCADE)
     members = models.ManyToManyField(Person, related_name='groups', through='Membership')
 
     class Meta:
@@ -51,7 +55,7 @@ class Group(models.Model):
 @python_2_unicode_compatible
 class Membership(models.Model):
     # Table Column Fields
-    membership_country = models.ForeignKey(Country)
+    membership_country = models.ForeignKey(Country, models.CASCADE)
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     invite_reason = models.CharField(max_length=64, null=True)
     person_id = models.IntegerField()
@@ -61,11 +65,15 @@ class Membership(models.Model):
     person = models.ForeignObject(
         Person,
         from_fields=['membership_country', 'person_id'],
-        to_fields=['person_country_id', 'id'])
+        to_fields=['person_country_id', 'id'],
+        on_delete=models.CASCADE,
+    )
     group = models.ForeignObject(
         Group,
         from_fields=['membership_country', 'group_id'],
-        to_fields=['group_country', 'id'])
+        to_fields=['group_country', 'id'],
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
         ordering = ('date_joined', 'invite_reason')
@@ -76,7 +84,7 @@ class Membership(models.Model):
 
 class Friendship(models.Model):
     # Table Column Fields
-    from_friend_country = models.ForeignKey(Country, related_name="from_friend_country")
+    from_friend_country = models.ForeignKey(Country, models.CASCADE, related_name="from_friend_country")
     from_friend_id = models.IntegerField()
     to_friend_country_id = models.IntegerField()
     to_friend_id = models.IntegerField()
@@ -84,6 +92,7 @@ class Friendship(models.Model):
     # Relation Fields
     from_friend = models.ForeignObject(
         Person,
+        on_delete=models.CASCADE,
         from_fields=['from_friend_country', 'from_friend_id'],
         to_fields=['person_country_id', 'id'],
         related_name='from_friend')
@@ -92,13 +101,17 @@ class Friendship(models.Model):
         Country,
         from_fields=['to_friend_country_id'],
         to_fields=['id'],
-        related_name='to_friend_country')
+        related_name='to_friend_country',
+        on_delete=models.CASCADE,
+    )
 
     to_friend = models.ForeignObject(
         Person,
         from_fields=['to_friend_country_id', 'to_friend_id'],
         to_fields=['person_country_id', 'id'],
-        related_name='to_friend')
+        related_name='to_friend',
+        on_delete=models.CASCADE,
+    )
 
 
 class ArticleTranslationDescriptor(ReverseSingleRelatedObjectDescriptor):
@@ -148,7 +161,9 @@ class Article(models.Model):
         from_fields=['id'],
         to_fields=['article'],
         related_name='+',
-        null=True)
+        on_delete=models.CASCADE,
+        null=True,
+    )
     pub_date = models.DateField()
 
     def __str__(self):
@@ -163,7 +178,7 @@ class NewsArticle(Article):
 
 
 class ArticleTranslation(models.Model):
-    article = models.ForeignKey(Article)
+    article = models.ForeignKey(Article, models.CASCADE)
     lang = models.CharField(max_length=2)
     title = models.CharField(max_length=100)
     body = models.TextField()
@@ -175,7 +190,7 @@ class ArticleTranslation(models.Model):
 
 
 class ArticleTag(models.Model):
-    article = models.ForeignKey(Article, related_name="tags", related_query_name="tag")
+    article = models.ForeignKey(Article, models.CASCADE, related_name="tags", related_query_name="tag")
     name = models.CharField(max_length=255)
 
 

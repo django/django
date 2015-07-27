@@ -1,11 +1,16 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import warnings
+
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
+from django.test import ignore_warnings
 from django.test.testcases import skipIfDBFeature
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.version import get_docs_version
 
 from .base import IsolatedModelsTestCase
 
@@ -18,18 +23,47 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             model = models.IntegerField()
 
         class Model(models.Model):
-            field = models.ForeignKey(Target, related_name='+')
+            field = models.ForeignKey(Target, models.CASCADE, related_name='+')
 
         field = Model._meta.get_field('field')
         errors = field.check()
         self.assertEqual(errors, [])
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_valid_foreign_key_without_on_delete(self):
+        class Target(models.Model):
+            model = models.IntegerField()
+
+        class Model(models.Model):
+            field = models.ForeignKey(Target, related_name='+')
+
+    def test_foreign_key_without_on_delete_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+
+            class Target(models.Model):
+                model = models.IntegerField()
+
+            class Model(models.Model):
+                field = models.ForeignKey(Target, related_name='+')
+
+            self.assertEqual(len(warns), 1)
+            msg = str(warns[0].message)
+            self.assertEqual(
+                msg,
+                'on_delete will be a required arg for ForeignKey in Django '
+                '2.0. Set it to models.CASCADE if you want to maintain the '
+                'current default behavior. See '
+                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
+            )
 
     def test_foreign_key_to_missing_model(self):
         # Model names are resolved when a model is being created, so we cannot
         # test relative fields in isolation and we need to attach them to a
         # model.
         class Model(models.Model):
-            foreign_key = models.ForeignKey('Rel1')
+            foreign_key = models.ForeignKey('Rel1', models.CASCADE)
 
         field = Model._meta.get_field('foreign_key')
         errors = field.check()
@@ -101,9 +135,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         class AmbiguousRelationship(models.Model):
             # Too much foreign keys to Person.
-            first_person = models.ForeignKey(Person, related_name="first")
-            second_person = models.ForeignKey(Person, related_name="second")
-            second_model = models.ForeignKey(Group)
+            first_person = models.ForeignKey(Person, models.CASCADE, related_name="first")
+            second_person = models.ForeignKey(Person, models.CASCADE, related_name="second")
+            second_model = models.ForeignKey(Group, models.CASCADE)
 
         field = Group._meta.get_field('field')
         errors = field.check(from_model=Group)
@@ -135,8 +169,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 through="InvalidRelationship")
 
         class InvalidRelationship(models.Model):
-            person = models.ForeignKey(Person)
-            wrong_foreign_key = models.ForeignKey(WrongModel)
+            person = models.ForeignKey(Person, models.CASCADE)
+            wrong_foreign_key = models.ForeignKey(WrongModel, models.CASCADE)
             # The last foreign key should point to Group model.
 
         field = Group._meta.get_field('members')
@@ -162,7 +196,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 through="InvalidRelationship")
 
         class InvalidRelationship(models.Model):
-            group = models.ForeignKey(Group)
+            group = models.ForeignKey(Group, models.CASCADE)
             # No foreign key to Person
 
         field = Group._meta.get_field('members')
@@ -206,8 +240,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             friends = models.ManyToManyField('self', through="Relationship")
 
         class Relationship(models.Model):
-            first = models.ForeignKey(Person, related_name="rel_from_set")
-            second = models.ForeignKey(Person, related_name="rel_to_set")
+            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
+            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
 
         field = Person._meta.get_field('friends')
         errors = field.check(from_model=Person)
@@ -227,9 +261,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 through="InvalidRelationship", symmetrical=False)
 
         class InvalidRelationship(models.Model):
-            first = models.ForeignKey(Person, related_name="rel_from_set_2")
-            second = models.ForeignKey(Person, related_name="rel_to_set_2")
-            third = models.ForeignKey(Person, related_name="too_many_by_far")
+            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set_2")
+            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set_2")
+            third = models.ForeignKey(Person, models.CASCADE, related_name="too_many_by_far")
 
         field = Person._meta.get_field('friends')
         errors = field.check(from_model=Person)
@@ -254,8 +288,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 through="Relationship", symmetrical=True)
 
         class Relationship(models.Model):
-            first = models.ForeignKey(Person, related_name="rel_from_set")
-            second = models.ForeignKey(Person, related_name="rel_to_set")
+            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
+            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
 
         field = Person._meta.get_field('friends')
         errors = field.check(from_model=Person)
@@ -279,9 +313,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 through_fields=('first', 'second'))
 
         class Relationship(models.Model):
-            first = models.ForeignKey(Person, related_name="rel_from_set")
-            second = models.ForeignKey(Person, related_name="rel_to_set")
-            referee = models.ForeignKey(Person, related_name="referred")
+            first = models.ForeignKey(Person, models.CASCADE, related_name="rel_from_set")
+            second = models.ForeignKey(Person, models.CASCADE, related_name="rel_to_set")
+            referee = models.ForeignKey(Person, models.CASCADE, related_name="referred")
 
         field = Person._meta.get_field('friends')
         errors = field.check(from_model=Person)
@@ -297,7 +331,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
     def test_foreign_key_to_abstract_model(self):
         class Model(models.Model):
-            foreign_key = models.ForeignKey('AbstractModel')
+            foreign_key = models.ForeignKey('AbstractModel', models.CASCADE)
 
         class AbstractModel(models.Model):
             class Meta:
@@ -361,7 +395,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             bad = models.IntegerField()  # No unique=True
 
         class Model(models.Model):
-            foreign_key = models.ForeignKey('Target', to_field='bad')
+            foreign_key = models.ForeignKey('Target', models.CASCADE, to_field='bad')
 
         field = Model._meta.get_field('foreign_key')
         errors = field.check()
@@ -380,7 +414,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             bad = models.IntegerField()
 
         class Model(models.Model):
-            field = models.ForeignKey(Target, to_field='bad')
+            field = models.ForeignKey(Target, models.CASCADE, to_field='bad')
 
         field = Model._meta.get_field('field')
         errors = field.check()
@@ -405,6 +439,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             person_city_id = models.IntegerField()
 
             person = models.ForeignObject(Person,
+                on_delete=models.CASCADE,
                 from_fields=['person_country_id', 'person_city_id'],
                 to_fields=['country_id', 'city_id'])
 
@@ -426,8 +461,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Model(models.Model):
-            foreign_key = models.ForeignKey('Person',
-                on_delete=models.SET_NULL)
+            foreign_key = models.ForeignKey('Person', models.SET_NULL)
 
         field = Model._meta.get_field('foreign_key')
         errors = field.check()
@@ -446,8 +480,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             pass
 
         class Model(models.Model):
-            foreign_key = models.ForeignKey('Person',
-                on_delete=models.SET_DEFAULT)
+            foreign_key = models.ForeignKey('Person', models.SET_DEFAULT)
 
         field = Model._meta.get_field('foreign_key')
         errors = field.check()
@@ -487,8 +520,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         class Model(models.Model):
             explicit_fk = models.ForeignKey(SwappableModel,
+                models.CASCADE,
                 related_name='explicit_fk')
             implicit_fk = models.ForeignKey('invalid_models_tests.SwappableModel',
+                models.CASCADE,
                 related_name='implicit_fk')
             explicit_m2m = models.ManyToManyField(SwappableModel,
                 related_name='explicit_m2m')
@@ -519,8 +554,10 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         class Model(models.Model):
             explicit_fk = models.ForeignKey(SwappedModel,
+                models.CASCADE,
                 related_name='explicit_fk')
             implicit_fk = models.ForeignKey('invalid_models_tests.SwappedModel',
+                models.CASCADE,
                 related_name='implicit_fk')
             explicit_m2m = models.ManyToManyField(SwappedModel,
                 related_name='explicit_m2m')
@@ -572,7 +609,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         for invalid_related_name in invalid_related_names:
             Child = type(str('Child_%s') % str(invalid_related_name), (models.Model,), {
-                'parent': models.ForeignKey('Parent', related_name=invalid_related_name),
+                'parent': models.ForeignKey('Parent', models.CASCADE, related_name=invalid_related_name),
                 '__module__': Parent.__module__,
             })
 
@@ -613,7 +650,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
 
         for related_name in related_names:
             Child = type(str('Child_%s') % str(related_name), (models.Model,), {
-                'parent': models.ForeignKey('Parent', related_name=related_name),
+                'parent': models.ForeignKey('Parent', models.CASCADE, related_name=related_name),
                 '__module__': Parent.__module__,
             })
 
@@ -626,17 +663,17 @@ class AccessorClashTests(IsolatedModelsTestCase):
     def test_fk_to_integer(self):
         self._test_accessor_clash(
             target=models.IntegerField(),
-            relative=models.ForeignKey('Target'))
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_fk_to_fk(self):
         self._test_accessor_clash(
-            target=models.ForeignKey('Another'),
-            relative=models.ForeignKey('Target'))
+            target=models.ForeignKey('Another', models.CASCADE),
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_fk_to_m2m(self):
         self._test_accessor_clash(
             target=models.ManyToManyField('Another'),
-            relative=models.ForeignKey('Target'))
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_m2m_to_integer(self):
         self._test_accessor_clash(
@@ -645,7 +682,7 @@ class AccessorClashTests(IsolatedModelsTestCase):
 
     def test_m2m_to_fk(self):
         self._test_accessor_clash(
-            target=models.ForeignKey('Another'),
+            target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target'))
 
     def test_m2m_to_m2m(self):
@@ -681,7 +718,7 @@ class AccessorClashTests(IsolatedModelsTestCase):
             pass
 
         class Model(models.Model):
-            foreign = models.ForeignKey(Target)
+            foreign = models.ForeignKey(Target, models.CASCADE)
             m2m = models.ManyToManyField(Target)
 
         errors = Model.check()
@@ -738,17 +775,17 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
     def test_fk_to_integer(self):
         self._test_reverse_query_name_clash(
             target=models.IntegerField(),
-            relative=models.ForeignKey('Target'))
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_fk_to_fk(self):
         self._test_reverse_query_name_clash(
-            target=models.ForeignKey('Another'),
-            relative=models.ForeignKey('Target'))
+            target=models.ForeignKey('Another', models.CASCADE),
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_fk_to_m2m(self):
         self._test_reverse_query_name_clash(
             target=models.ManyToManyField('Another'),
-            relative=models.ForeignKey('Target'))
+            relative=models.ForeignKey('Target', models.CASCADE))
 
     def test_m2m_to_integer(self):
         self._test_reverse_query_name_clash(
@@ -757,7 +794,7 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
 
     def test_m2m_to_fk(self):
         self._test_reverse_query_name_clash(
-            target=models.ForeignKey('Another'),
+            target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target'))
 
     def test_m2m_to_m2m(self):
@@ -794,17 +831,17 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
     def test_fk_to_integer(self):
         self._test_explicit_related_name_clash(
             target=models.IntegerField(),
-            relative=models.ForeignKey('Target', related_name='clash'))
+            relative=models.ForeignKey('Target', models.CASCADE, related_name='clash'))
 
     def test_fk_to_fk(self):
         self._test_explicit_related_name_clash(
-            target=models.ForeignKey('Another'),
-            relative=models.ForeignKey('Target', related_name='clash'))
+            target=models.ForeignKey('Another', models.CASCADE),
+            relative=models.ForeignKey('Target', models.CASCADE, related_name='clash'))
 
     def test_fk_to_m2m(self):
         self._test_explicit_related_name_clash(
             target=models.ManyToManyField('Another'),
-            relative=models.ForeignKey('Target', related_name='clash'))
+            relative=models.ForeignKey('Target', models.CASCADE, related_name='clash'))
 
     def test_m2m_to_integer(self):
         self._test_explicit_related_name_clash(
@@ -813,7 +850,7 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
 
     def test_m2m_to_fk(self):
         self._test_explicit_related_name_clash(
-            target=models.ForeignKey('Another'),
+            target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target', related_name='clash'))
 
     def test_m2m_to_m2m(self):
@@ -859,18 +896,21 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         self._test_explicit_related_query_name_clash(
             target=models.IntegerField(),
             relative=models.ForeignKey('Target',
+                models.CASCADE,
                 related_query_name='clash'))
 
     def test_fk_to_fk(self):
         self._test_explicit_related_query_name_clash(
-            target=models.ForeignKey('Another'),
+            target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ForeignKey('Target',
+                models.CASCADE,
                 related_query_name='clash'))
 
     def test_fk_to_m2m(self):
         self._test_explicit_related_query_name_clash(
             target=models.ManyToManyField('Another'),
             relative=models.ForeignKey('Target',
+                models.CASCADE,
                 related_query_name='clash'))
 
     def test_m2m_to_integer(self):
@@ -881,7 +921,7 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
 
     def test_m2m_to_fk(self):
         self._test_explicit_related_query_name_clash(
-            target=models.ForeignKey('Another'),
+            target=models.ForeignKey('Another', models.CASCADE),
             relative=models.ManyToManyField('Target',
                 related_query_name='clash'))
 
@@ -1013,7 +1053,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
 
     def test_accessor_clash(self):
         class Model(models.Model):
-            model_set = models.ForeignKey("Model")
+            model_set = models.ForeignKey("Model", models.CASCADE)
 
         errors = Model.check()
         expected = [
@@ -1030,7 +1070,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
 
     def test_reverse_query_name_clash(self):
         class Model(models.Model):
-            model = models.ForeignKey("Model")
+            model = models.ForeignKey("Model", models.CASCADE)
 
         errors = Model.check()
         expected = [
@@ -1048,7 +1088,7 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
     def test_clash_under_explicit_related_name(self):
         class Model(models.Model):
             clash = models.CharField(max_length=10)
-            foreign = models.ForeignKey("Model", related_name='clash')
+            foreign = models.ForeignKey("Model", models.CASCADE, related_name='clash')
 
         errors = Model.check()
         expected = [
@@ -1087,8 +1127,8 @@ class ComplexClashTests(IsolatedModelsTestCase):
         class Model(models.Model):
             src_safe = models.CharField(max_length=10)
 
-            foreign_1 = models.ForeignKey(Target, related_name='id')
-            foreign_2 = models.ForeignKey(Target, related_name='src_safe')
+            foreign_1 = models.ForeignKey(Target, models.CASCADE, related_name='id')
+            foreign_2 = models.ForeignKey(Target, models.CASCADE, related_name='src_safe')
 
             m2m_1 = models.ManyToManyField(Target, related_name='id')
             m2m_2 = models.ManyToManyField(Target, related_name='src_safe')
@@ -1211,9 +1251,9 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('invitee', 'event'))
 
         class Invitation(models.Model):
-            event = models.ForeignKey(Event)
-            invitee = models.ForeignKey(Fan)
-            inviter = models.ForeignKey(Fan, related_name='+')
+            event = models.ForeignKey(Event, models.CASCADE)
+            invitee = models.ForeignKey(Fan, models.CASCADE)
+            inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
         errors = field.check(from_model=Event)
@@ -1243,9 +1283,9 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('invalid_field_1', 'invalid_field_2'))
 
         class Invitation(models.Model):
-            event = models.ForeignKey(Event)
-            invitee = models.ForeignKey(Fan)
-            inviter = models.ForeignKey(Fan, related_name='+')
+            event = models.ForeignKey(Event, models.CASCADE)
+            invitee = models.ForeignKey(Fan, models.CASCADE)
+            inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
         errors = field.check(from_model=Event)
@@ -1275,9 +1315,9 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=(None, 'invitee'))
 
         class Invitation(models.Model):
-            event = models.ForeignKey(Event)
-            invitee = models.ForeignKey(Fan)
-            inviter = models.ForeignKey(Fan, related_name='+')
+            event = models.ForeignKey(Event, models.CASCADE)
+            invitee = models.ForeignKey(Fan, models.CASCADE)
+            inviter = models.ForeignKey(Fan, models.CASCADE, related_name='+')
 
         field = Event._meta.get_field('invitees')
         errors = field.check(from_model=Event)
