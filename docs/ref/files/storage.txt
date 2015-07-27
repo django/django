@@ -15,7 +15,7 @@ Django provides two convenient ways to access the current storage class:
     :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
     :func:`~django.core.files.storage.get_storage_class` internally.
 
-.. function:: get_storage_class([import_path=None])
+.. function:: get_storage_class(import_path=None)
 
     Returns a class or module which implements the storage API.
 
