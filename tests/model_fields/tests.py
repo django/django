@@ -225,6 +225,21 @@ class ForeignKeyTests(test.TestCase):
             "Pending lookup added for a foreign key on an abstract model"
         )
 
+    def test_deconstruct(self):
+        field = models.ForeignKey('missing.FK', models.CASCADE)
+        self.assertEqual(
+            field.deconstruct(),
+            (
+                None,
+                'django.db.models.ForeignKey',
+                [],
+                {
+                    'on_delete': models.CASCADE,
+                    'to': 'missing.FK',
+                },
+            ),
+        )
+
 
 class ManyToManyFieldTests(test.SimpleTestCase):
     def test_abstract_model_pending_operations(self):

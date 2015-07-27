@@ -1652,9 +1652,9 @@ class ForeignObject(RelatedField):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ForeignObject, self).deconstruct()
+        kwargs['on_delete'] = self.remote_field.on_delete
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
-        kwargs['on_delete'] = self.remote_field.on_delete
 
         if self.remote_field.related_name is not None:
             kwargs['related_name'] = self.remote_field.related_name
@@ -1902,8 +1902,7 @@ class ForeignKey(ForeignObject):
         elif not callable(on_delete):
             warnings.warn(
                 "The signature for {0} will change in Django 2.0. "
-                "Pass to_field='{1}' as a kwarg instead of as an arg. "
-                "#django.db.models.ForeignKey.on_delete".format(
+                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
                     self.__class__.__name__,
                     on_delete,
                 ),
@@ -1922,7 +1921,7 @@ class ForeignKey(ForeignObject):
         kwargs['db_index'] = kwargs.get('db_index', True)
 
         super(ForeignKey, self).__init__(
-            to, from_fields=['self'], to_fields=[to_field], on_delete=on_delete, **kwargs)
+            to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 
         self.db_constraint = db_constraint
 
@@ -2138,19 +2137,19 @@ class OneToOneField(ForeignKey):
                     self.__class__.__name__,
                     get_docs_version(),
                 ),
-                RemovedInDjango20Warning, 3)
+                RemovedInDjango20Warning, 2)
             on_delete = CASCADE
 
         elif not callable(on_delete):
             warnings.warn(
                 "The signature for {0} will change in Django 2.0. "
-                "Pass to_field as a kwarg instead of as an arg. "
-                "#django.db.models.ForeignKey.on_delete".format(
+                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
                     self.__class__.__name__,
-                    get_docs_version(),
+                    on_delete,
                 ),
-                RemovedInDjango20Warning, 3)
-            on_delete, to_field = to_field, on_delete
+                RemovedInDjango20Warning, 2)
+            to_field = on_delete
+            on_delete = CASCADE  # Avoid warning in superclass
 
         super(OneToOneField, self).__init__(to, on_delete, to_field=to_field, **kwargs)
 

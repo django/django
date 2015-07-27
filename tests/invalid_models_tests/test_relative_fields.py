@@ -48,14 +48,67 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 field = models.ForeignKey(Target, related_name='+')
 
             self.assertEqual(len(warns), 1)
-            msg = str(warns[0].message)
             self.assertEqual(
-                msg,
+                str(warns[0].message),
                 'on_delete will be a required arg for ForeignKey in Django '
                 '2.0. Set it to models.CASCADE if you want to maintain the '
                 'current default behavior. See '
                 'https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
+            )
+
+    def test_foreign_key_to_field_as_arg(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+
+            class Target(models.Model):
+                model = models.IntegerField()
+
+            class Model(models.Model):
+                field = models.ForeignKey(Target, 'id')
+
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns[0].message),
+                "The signature for ForeignKey will change in Django 2.0. "
+                "Pass to_field='id' as a kwarg instead of as an arg."
+            )
+
+    def test_one_to_one_field_without_on_delete_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+
+            class Target(models.Model):
+                model = models.IntegerField()
+
+            class Model(models.Model):
+                field = models.OneToOneField(Target, related_name='+')
+
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns[0].message),
+                'on_delete will be a required arg for OneToOneField in Django '
+                '2.0. Set it to models.CASCADE if you want to maintain the '
+                'current default behavior. See '
+                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
+            )
+
+    def test_one_to_one_field_to_field_as_arg(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')  # prevent warnings from appearing as errors
+
+            class Target(models.Model):
+                model = models.IntegerField()
+
+            class Model(models.Model):
+                field = models.OneToOneField(Target, 'id')
+
+            self.assertEqual(len(warns), 1)
+            self.assertEqual(
+                str(warns[0].message),
+                "The signature for OneToOneField will change in Django 2.0. "
+                "Pass to_field='id' as a kwarg instead of as an arg."
             )
 
     def test_foreign_key_to_missing_model(self):
