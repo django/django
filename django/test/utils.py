@@ -12,11 +12,11 @@ from django.apps import apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
-from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
 from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
+from django.urls import get_script_prefix, set_script_prefix
 from django.utils import six
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_str

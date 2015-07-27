@@ -1,9 +1,9 @@
 from functools import update_wrapper
 
 from django.contrib import admin
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -30,7 +30,7 @@ class ActionAdmin(admin.ModelAdmin):
         Remove all entries named 'name' from the ModelAdmin instance URL
         patterns list
         """
-        return [url for url in super(ActionAdmin, self).get_urls() if url.name != name]
+        return [url for url in super(ActionAdmin, self).get_urls() if url[1].url_name != name]
 
     def get_urls(self):
         # Add the URL of our custom 'add_view' view to the front of the URLs

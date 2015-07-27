@@ -15,9 +15,9 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.db.models import CharField, DateField
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 from django.utils import six, translation
 
 from . import models

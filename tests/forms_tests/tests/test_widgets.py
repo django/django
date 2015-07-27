@@ -6,7 +6,6 @@ import datetime
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.forms import (
     BooleanField, CharField, CheckboxInput, CheckboxSelectMultiple,
     ChoiceField, ClearableFileInput, DateField, DateInput, DateTimeInput,
@@ -19,6 +18,7 @@ from django.forms.widgets import (
     ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
 )
 from django.test import SimpleTestCase, override_settings
+from django.urls import reverse
 from django.utils import six, translation
 from django.utils.dates import MONTHS_AP
 from django.utils.encoding import force_text, python_2_unicode_compatible

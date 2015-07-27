@@ -1,0 +1,10 @@
+URL dispatching in Django
+=========================
+
+Information on Django's URL dispatcher and how to customize it:
+
+.. toctree::
+   :maxdepth: 1
+
+   overview
+   how-it-works

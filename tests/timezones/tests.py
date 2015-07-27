@@ -10,7 +10,6 @@ from xml.dom.minidom import parseString
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
 from django.db import connection, connections
 from django.db.models import Max, Min
 from django.http import HttpRequest
@@ -22,6 +21,7 @@ from django.test import (
     skipIfDBFeature, skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
+from django.urls import reverse
 from django.utils import six, timezone
 
 from .forms import (

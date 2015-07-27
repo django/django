@@ -1,7 +1,7 @@
-from django.core.urlresolvers import reverse
 from django.db import models
 from django.db.models import QuerySet
 from django.db.models.manager import BaseManager
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 
 

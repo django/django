@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import get_script_prefix
 from django.db import models
+from django.urls import get_script_prefix
 from django.utils.encoding import iri_to_uri, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 

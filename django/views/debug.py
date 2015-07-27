@@ -5,10 +5,12 @@ import sys
 import types
 
 from django.conf import settings
-from django.core.urlresolvers import Resolver404, resolve
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import (
+    HttpResponse, HttpResponseNotFound,
+)
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
+from django.urls import Resolver404, resolve
 from django.utils import lru_cache, six, timezone
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
@@ -459,20 +461,20 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        error_url = exception.args[0]['path']
-    except (IndexError, TypeError, KeyError):
+        error_url = exception.path
+    except AttributeError:
         error_url = request.path_info[1:]  # Trim leading slash
 
     try:
-        tried = exception.args[0]['tried']
-    except (IndexError, TypeError, KeyError):
+        tried = exception.tried
+    except AttributeError:
         tried = []
     else:
         if (not tried                           # empty URLconf
             or (request.path == '/'
                 and len(tried) == 1             # default URLconf
                 and len(tried[0]) == 1
-                and getattr(tried[0][0], 'app_name', '') == getattr(tried[0][0], 'namespace', '') == 'admin')):
+                and getattr(tried[0][0][1], 'app_name', '') == tried[0][0][0] == 'admin')):
             return default_urlconf(request)
 
     urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)
@@ -481,7 +483,7 @@ def technical_404_response(request, exception):
 
     caller = ''
     try:
-        resolver_match = resolve(request.path)
+        resolver_match = resolve(request.path, request=request)
     except Resolver404:
         pass
     else:
@@ -1176,9 +1178,9 @@ TECHNICAL_404_TEMPLATE = """
       <ol>
         {% for pattern in urlpatterns %}
           <li>
-            {% for pat in pattern %}
-                {{ pat.regex.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+            {% for name, resolver in pattern %}
+                {% for c in resolver.constraints %}{{ c.describe }}{% endfor %}
+                {% if forloop.last and name %}[name='{{ name }}']{% endif %}
             {% endfor %}
           </li>
         {% endfor %}

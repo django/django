@@ -2,13 +2,15 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import (
-    LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
+from django.urls import (
+    BaseResolver, LocalePrefix, LocalizedRegexPattern, RegexPattern, Resolver,
+    ResolverEndpoint,
 )
 from django.utils import six
 from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
+from django.utils.functional import Promise
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
 
@@ -66,10 +68,10 @@ def include(arg, namespace=None, app_name=None):
     # Make sure we can iterate through the patterns (without this, some
     # testcases will break).
     if isinstance(patterns, (list, tuple)):
-        for url_pattern in patterns:
+        for name, resolver in patterns:
             # Test if the LocaleRegexURLResolver is used within the include;
             # this should throw an error since this is not allowed!
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+            if any(isinstance(constraint, LocalePrefix) for constraint in resolver.constraints):
                 raise ImproperlyConfigured(
                     'Using i18n_patterns in an included URLconf is not allowed.')
 
@@ -86,28 +88,35 @@ def patterns(prefix, *args):
     pattern_list = []
     for t in args:
         if isinstance(t, (list, tuple)):
-            t = url(prefix=prefix, *t)
-        elif isinstance(t, RegexURLPattern):
-            t.add_prefix(prefix)
+            if len(t) != 2 or not isinstance(t[1], BaseResolver):
+                t = url(prefix=prefix, *t)
+            elif len(t) == 2 and isinstance(t[1], ResolverEndpoint):
+                t[1].add_prefix(prefix)
         pattern_list.append(t)
     return pattern_list
 
 
-def url(regex, view, kwargs=None, name=None, prefix=''):
+def url(constraints, view, kwargs=None, name=None, prefix='', decorators=None):
+    if isinstance(constraints, six.string_types):
+        constraints = RegexPattern(constraints)
+    elif isinstance(constraints, Promise):
+        constraints = LocalizedRegexPattern(constraints)
+    if not isinstance(constraints, (list, tuple)):
+        constraints = [constraints]
+
     if isinstance(view, (list, tuple)):
-        # For include(...) processing.
-        urlconf_module, app_name, namespace = view
-        return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
+        resolvers, app_name, namespace = view
+        return namespace, Resolver(resolvers, app_name, constraints=constraints, kwargs=kwargs, decorators=decorators)
     else:
         if isinstance(view, six.string_types):
             warnings.warn(
                 'Support for string view arguments to url() is deprecated and '
-                'will be removed in Django 1.10 (got %s). Pass the callable '
+                'will be removed in Django 2.0 (got %s). Pass the callable '
                 'instead.' % view,
                 RemovedInDjango110Warning, stacklevel=2
             )
             if not view:
-                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
+                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % constraints)
             if prefix:
                 view = prefix + '.' + view
-        return RegexURLPattern(regex, view, kwargs, name)
+        return None, ResolverEndpoint(view, name, constraints=constraints, kwargs=kwargs, decorators=decorators)

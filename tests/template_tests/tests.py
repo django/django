@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 
 import sys
 
+from django import urls
 from django.contrib.auth.models import Group
-from django.core import urlresolvers
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import UNKNOWN_SOURCE
 from django.test import SimpleTestCase, override_settings
@@ -26,7 +26,7 @@ class TemplateTests(SimpleTestCase):
         """
         t = Engine(debug=True).from_string('{% url will_not_match %}')
         c = Context()
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(urls.NoReverseMatch):
             t.render(c)
 
     def test_url_reverse_view_name(self):
@@ -38,7 +38,7 @@ class TemplateTests(SimpleTestCase):
         c = Context()
         try:
             t.render(c)
-        except urlresolvers.NoReverseMatch:
+        except urls.NoReverseMatch:
             tb = sys.exc_info()[2]
             depth = 0
             while tb.tb_next is not None:
@@ -111,7 +111,7 @@ class TemplateTests(SimpleTestCase):
         """
         engine = Engine(app_dirs=True)
         t = engine.get_template('included_content.html')
-        with self.assertRaises(urlresolvers.NoReverseMatch):
+        with self.assertRaises(urls.NoReverseMatch):
             t.render(Context())
 
     def test_debug_tag_non_ascii(self):

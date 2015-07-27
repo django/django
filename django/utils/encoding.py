@@ -230,6 +230,10 @@ def escape_uri_path(path):
     return quote(force_bytes(path), safe=b"/:@&+$,-_.!~*'()")
 
 
+def escape_query_string(query):
+    return quote(force_bytes(query), safe=b"/:@&+$,-_.!~*'()=?;")
+
+
 def repercent_broken_unicode(path):
     """
     As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,

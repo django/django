@@ -15,8 +15,8 @@ from django.core.exceptions import (
     FieldDoesNotExist, ImproperlyConfigured, SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.core.urlresolvers import reverse
 from django.db import models
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
