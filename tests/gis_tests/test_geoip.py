@@ -73,9 +73,9 @@ class GeoIPTest(unittest.TestCase):
 
         for query in (fqdn, addr):
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
-                self.assertEqual('US', func(query))
+                self.assertEqual('US', func(query), 'Failed for func %s and query %s' % (func, query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
-                self.assertEqual('United States', func(query))
+                self.assertEqual('United States', func(query), 'Failed for func %s and query %s' % (func, query))
             self.assertEqual({'country_code': 'US', 'country_name': 'United States'},
                              g.country(query))
 
