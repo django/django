@@ -359,6 +359,11 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
 
+    def test_serialize_builtins(self):
+        string, imports = MigrationWriter.serialize(range)
+        self.assertEqual(string, 'range')
+        self.assertEqual(imports, set())
+
     @unittest.skipUnless(six.PY2, "Only applies on Python 2")
     def test_serialize_direct_function_reference(self):
         """

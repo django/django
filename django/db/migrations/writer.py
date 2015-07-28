@@ -472,6 +472,9 @@ class MigrationWriter(object):
                     "For more information, see "
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
                     % (value.__name__, module_name, get_docs_version()))
+            # Needed on Python 2 only
+            if module_name == '__builtin__':
+                return value.__name__, set()
             return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
         # Other iterables
         elif isinstance(value, collections.Iterable):
