@@ -30,11 +30,12 @@ class SessionStore(DBStore):
             data = None
         if data is None:
             data = super(SessionStore, self).load()
-            cache.set(self.cache_key, data, settings.SESSION_COOKIE_AGE)
+            if self.session_key:
+                cache.set(self.cache_key, data, settings.SESSION_COOKIE_AGE)
         return data
 
     def exists(self, session_key):
-        if (KEY_PREFIX + session_key) in cache:
+        if session_key and (KEY_PREFIX + session_key) in cache:
             return True
         return super(SessionStore, self).exists(session_key)
 

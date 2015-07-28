@@ -56,11 +56,11 @@ class SessionStore(SessionBase):
                     try:
                         session_data = self.decode(file_data)
                     except (EOFError, SuspiciousOperation):
-                        self.create()
+                        self._session_key = None
             finally:
                 session_file.close()
         except IOError:
-            self.create()
+            self._session_key = None
         return session_data
 
     def create(self):
@@ -71,10 +71,11 @@ class SessionStore(SessionBase):
             except CreateError:
                 continue
             self.modified = True
-            self._session_cache = {}
             return
 
     def save(self, must_create=False):
+        if self.session_key is None:
+            return self.create()
         # Get the session data now, before we start messing
         # with the file it is stored within.
         session_data = self._get_session(no_load=must_create)

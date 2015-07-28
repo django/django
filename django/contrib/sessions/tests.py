@@ -162,6 +162,11 @@ class SessionTestsMixin(object):
         self.assertNotEqual(self.session.session_key, prev_key)
         self.assertEqual(self.session.items(), prev_data)
 
+    def test_save_doesnt_clear_data(self):
+        self.session['a'] = 'b'
+        self.session.save()
+        self.assertEqual(self.session['a'], 'b')
+
     def test_invalid_key(self):
         # Submitting an invalid session key (either by guessing, or if the db has
         # removed the key) results in a new key being generated.
@@ -256,6 +261,20 @@ class SessionTestsMixin(object):
         encoded = self.session.encode(data)
         self.assertEqual(self.session.decode(encoded), data)
 
+    def test_session_load_does_not_create_record(self):
+        """
+        Loading an unknown session key does not create a session record.
+
+        Creating session records on load is a DOS vulnerability.
+        """
+        if self.backend is CookieSession:
+            raise unittest.SkipTest("Cookie backend doesn't have an external store to create records in.")
+        session = self.backend('deadbeef')
+        session.load()
+
+        self.assertFalse(session.exists(session.session_key))
+        # provided unknown key was cycled, not reused
+        self.assertNotEqual(session.session_key, 'deadbeef')
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
 
