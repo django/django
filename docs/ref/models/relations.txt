@@ -64,7 +64,7 @@ Related objects reference
 
         .. versionchanged:: 1.9
 
-            The ``bulk`` parameter was added. In order versions, foreign key
+            The ``bulk`` parameter was added. In older versions, foreign key
             updates were always done using ``save()``. Use ``bulk=False`` if
             you require the old behavior.
 
