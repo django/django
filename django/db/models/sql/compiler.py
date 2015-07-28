@@ -230,7 +230,7 @@ class SQLCompiler(object):
 
     def get_order_by(self):
         """
-        Returns a list of 2-tuples of form (expr, (sql, params)) for the
+        Returns a list of 2-tuples of form (expr, (sql, params, is_ref)) for the
         ORDER BY clause.
 
         The order_by clause can alter the select clause (for example it
