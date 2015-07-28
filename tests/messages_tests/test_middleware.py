@@ -17,3 +17,7 @@ class MiddlewareTest(unittest.TestCase):
         request = http.HttpRequest()
         response = http.HttpResponse()
         self.middleware.process_response(request, response)
+
+    def test_repr(self):
+        expected = '<MessageMiddleware MESSAGE_STORAGE="django.contrib.messages.storage.fallback.FallbackStorage">'
+        self.assertEqual(repr(self.middleware), expected)

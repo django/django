@@ -381,3 +381,8 @@ class BaseTests(object):
         tags = [msg.tags for msg in storage]
         self.assertEqual(tags,
                      ['info', 'custom', 'extra-tag', '', 'bad', 'success'])
+
+    def test_message_repr(self):
+        msg = Message(constants.INFO, 'Test message 1', extra_tags='tag')
+        expected = '<Message level=20, level_tag="info", message="Test message 1">'
+        self.assertEqual(repr(msg), expected)

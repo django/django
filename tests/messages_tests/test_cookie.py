@@ -177,3 +177,8 @@ class CookieTest(BaseTests, SimpleTestCase):
         # Decode the messages in the old format (without is_safedata)
         decoded_messages = json.loads(encoded_messages, cls=MessageDecoder)
         self.assertEqual(messages, decoded_messages)
+
+    def test_repr(self):
+        storage = self.get_storage([Message(constants.INFO, 'Test message 1')])
+        expected = '<CookieStorage [1] used=False, added_new=False, cookie_name="messages">'
+        self.assertEqual(repr(storage), expected)

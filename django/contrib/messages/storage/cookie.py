@@ -163,3 +163,12 @@ class CookieStorage(BaseStorage):
         # with the data.
         self.used = True
         return None
+
+    def __repr__(self):
+        return '<%(cls)s [%(count)d] used=%(used)r, added_new=%(added)r, cookie_name="%(name)s">' % {
+            'cls': self.__class__.__name__,
+            'used': self.used,
+            'added': self.added_new,
+            'count': len(self),
+            'name': self.cookie_name,
+        }

@@ -52,3 +52,8 @@ class SessionTest(BaseTests, TestCase):
         message = Message(constants.DEBUG, mark_safe("<b>Hello Django!</b>"))
         set_session_data(storage, [message])
         self.assertIsInstance(list(storage)[0].message, SafeData)
+
+    def test_repr(self):
+        storage = self.get_storage([Message(constants.INFO, 'Test message 1')])
+        expected = '<SessionStorage [1] used=False, added_new=False>'
+        self.assertEqual(repr(storage), expected)
