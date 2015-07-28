@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import functools
 import math
 import os
 import re
@@ -413,6 +414,13 @@ class WriterTests(SimpleTestCase):
     def test_serialize_timedelta(self):
         self.assertSerializedEqual(datetime.timedelta())
         self.assertSerializedEqual(datetime.timedelta(minutes=42))
+
+    def test_serialize_functools_partial(self):
+        value = functools.partial(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
 
     def test_simple_migration(self):
         """
