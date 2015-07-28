@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import decimal
+import functools
 import math
 import os
 import re
@@ -439,6 +440,22 @@ class MigrationWriter(object):
             string, imports = OperationWriter(value, indentation=0).serialize()
             # Nested operation, trailing comma is handled in upper OperationWriter._write()
             return string.rstrip(','), imports
+        elif isinstance(value, functools.partial):
+            imports = {'import functools'}
+            # Serialize functools.partial() arguments
+            func_string, func_imports = cls.serialize(value.func)
+            args_string, args_imports = cls.serialize(value.args)
+            keywords_string, keywords_imports = cls.serialize(value.keywords)
+            # Add any imports needed by arguments
+            imports.update(func_imports)
+            imports.update(args_imports)
+            imports.update(keywords_imports)
+            return (
+                "functools.partial(%s, *%s, **%s)" % (
+                    func_string, args_string, keywords_string,
+                ),
+                imports,
+            )
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
