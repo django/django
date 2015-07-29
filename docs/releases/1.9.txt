@@ -1077,6 +1077,10 @@ Miscellaneous
 * ``django.template.loaders.eggs.Loader`` is deprecated as distributing
   applications as eggs is not recommended.
 
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` is deprecated. Pass the callable as
+  a positional argument instead.
+
 .. removed-features-1.9:
 
 Features removed in 1.9

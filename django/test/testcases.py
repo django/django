@@ -618,6 +618,10 @@ class SimpleTestCase(unittest.TestCase):
         # callable_obj was a documented kwarg in Django 1.8 and older.
         callable_obj = kwargs.pop('callable_obj', None)
         if callable_obj:
+            warnings.warn(
+                'The callable_obj kwarg is deprecated. Pass the callable '
+                'as a positional argument instead.', RemovedInDjango20Warning
+            )
             args = (callable_obj,) + args
         return six.assertRaisesRegex(self, expected_exception,
                 re.escape(expected_message), *args, **kwargs)
