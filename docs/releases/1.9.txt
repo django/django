@@ -214,6 +214,9 @@ Minor features
   raster into a different spatial reference system by specifying a target
   ``srid``.
 
+* The new :class:`~django.contrib.gis.geoip2.GeoIP2` class allows using
+  MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
