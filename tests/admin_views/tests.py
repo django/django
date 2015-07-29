@@ -1558,6 +1558,34 @@ class AdminViewPermissionsTest(TestCase):
         self.assertFalse(login.context)
         self.client.get(reverse('admin:logout'))
 
+    def test_logged_in_as_non_admin_behaviour(self):
+        """
+        A logged-in non-admin user trying to access the admin index
+        should be presented with login page and a hint indicating that the
+        current user doesn't have access to it. Refs #25163
+        """
+
+        hint_template = (
+            "While you are authenticated as {}, you are unfortunately not "
+            "authorized to access this page -- would you care to re-login?"
+        )
+
+        # Anonymous user should not be shown the hint
+        response = self.client.get(self.index_url, follow=True)
+        self.assertContains(response, 'login-form')
+        self.assertNotContains(
+            response, hint_template.format(''), status_code=200
+        )
+
+        # Non admin user should be shown the hint
+        self.client.login(**self.nostaff_login)
+        response = self.client.get(self.index_url, follow=True)
+        self.assertContains(response, 'login-form')
+
+        self.assertContains(
+            response, hint_template.format(self.u6.username), status_code=200
+        )
+
     def test_add_view(self):
         """Test add view restricts access and actually adds items."""
 
