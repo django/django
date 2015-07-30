@@ -173,8 +173,11 @@ class BaseDatabaseCreation(object):
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
-                            print("Destroying old test database '%s'..."
-                                  % self.connection.alias)
+                            test_db_repr = ''
+                            if verbosity >= 2:
+                                test_db_repr = " ('%s')" % test_database_name
+                            print("Destroying old test database for alias '%s'%s..."
+                                  % (self.connection.alias, test_db_repr))
                         cursor.execute(
                             "DROP DATABASE %s" % qn(test_database_name))
                         cursor.execute(
