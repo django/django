@@ -44,4 +44,4 @@ class HStoreField(forms.CharField):
         # is None, replace it w/ {}.
         if isinstance(initial_value, six.string_types):
             initial_value = self.to_python(initial_value)
-        return super(forms.CharField, self).has_changed(initial_value, data)
+        return super(HStoreField, self).has_changed(initial_value, data)
