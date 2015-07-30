@@ -1049,6 +1049,13 @@ As of Django 1.8, ``current_app`` is set on the ``request`` object. For
 consistency, these views will require the caller to set ``current_app`` on the
 ``request`` instead of passing it in a separate argument.
 
+``django.contrib.gis.geoip``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :mod:`django.contrib.gis.geoip2` module supersedes
+``django.contrib.gis.geoip``. The new module provides a similar API except that
+it doesn't provide the legacy GeoIP-Python API compatibility methods.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
