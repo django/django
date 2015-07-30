@@ -48,7 +48,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         "Type 'yes' to delete it, or 'no' to cancel: " % parameters['user'])
                 if autoclobber or confirm == 'yes':
                     if verbosity >= 1:
-                        print("Destroying old test database '%s'..." % self.connection.alias)
+                        print("Destroying old test database for alias '%s'..." % self.connection.alias)
                     try:
                         self._execute_test_db_destruction(cursor, parameters, verbosity)
                     except DatabaseError as e:
@@ -149,7 +149,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                     sys.exit(2)
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database '%s'..." % self.connection.alias)
+                        print("Destroying old test database for alias '%s'..." % self.connection.alias)
                     self._execute_test_db_destruction(cursor, parameters, verbosity)
                 except Exception as e:
                     sys.stderr.write("Got an error destroying the test database: %s\n" % e)

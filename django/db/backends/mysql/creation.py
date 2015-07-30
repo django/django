@@ -30,7 +30,9 @@ class DatabaseCreation(BaseDatabaseCreation):
                     return
                 try:
                     if verbosity >= 1:
-                        print("Destroying old test database '%s'..." % self.connection.alias)
+                        print("Destroying old test database for alias %s..." % (
+                            self._get_database_display_str(target_database_name, verbosity),
+                        ))
                     cursor.execute("DROP DATABASE %s" % qn(target_database_name))
                     cursor.execute("CREATE DATABASE %s" % qn(target_database_name))
                 except Exception as e:
