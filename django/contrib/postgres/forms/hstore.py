@@ -35,12 +35,13 @@ class HStoreField(forms.CharField):
             value[key] = six.text_type(val)
         return value
 
-    def has_changed(self, initial, data):
+    def has_changed(self, initial_value, data):
         """
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
         # the same as an empty dict, if the data or initial value we get
         # is None, replace it w/ {}.
-        initial_value = self.to_python(initial)
+        if isinstance(initial_value, six.string_types):
+            initial_value = self.to_python(initial_value)
         return super(forms.HStoreField, self).has_changed(initial_value, data)
