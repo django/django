@@ -5,13 +5,13 @@ import errno
 import json
 import os
 import posixpath
-import re
 import socket
 import sys
 import threading
 import unittest
 import warnings
 from collections import Counter
+from contextlib import contextmanager
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
@@ -604,10 +604,16 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
+    @contextmanager
+    def _assert_raises_message_cm(self, expected_exception, expected_message):
+        with self.assertRaises(expected_exception) as cm:
+            yield cm
+        self.assertIn(expected_message, str(cm.exception))
+
     def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
-        Asserts that the message in a raised exception matches the passed
-        value.
+        Asserts that expected_message is found in the the message of a raised
+        exception.
 
         Args:
             expected_exception: Exception class expected to be raised.
@@ -622,9 +628,17 @@ class SimpleTestCase(unittest.TestCase):
                 'The callable_obj kwarg is deprecated. Pass the callable '
                 'as a positional argument instead.', RemovedInDjango20Warning
             )
-            args = (callable_obj,) + args
-        return six.assertRaisesRegex(self, expected_exception,
-                re.escape(expected_message), *args, **kwargs)
+        elif len(args):
+            callable_obj = args[0]
+            args = args[1:]
+
+        cm = self._assert_raises_message_cm(expected_exception, expected_message)
+        # Assertion used in context manager fashion.
+        if callable_obj is None:
+            return cm
+        # Assertion was passed a callable.
+        with cm:
+            callable_obj(*args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
             field_kwargs=None, empty_value=''):
