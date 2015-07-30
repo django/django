@@ -133,6 +133,16 @@ class GeoIP2(object):
         if self._reader:
             self._reader.close()
 
+    def __repr__(self):
+        meta = self._reader.metadata()
+        version = '[v%s.%s]' % (meta.binary_format_major_version, meta.binary_format_minor_version)
+        return '<%(cls)s %(version)s _country_file="%(country)s", _city_file="%(city)s">' % {
+            'cls': self.__class__.__name__,
+            'version': version,
+            'country': self._country_file,
+            'city': self._city_file,
+        }
+
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."
         # Making sure a string was passed in for the query.
