@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 from ctypes import c_char_p
 
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
@@ -11,6 +12,7 @@ from django.contrib.gis.geoip.prototypes import (
 )
 from django.core.validators import ipv4_re
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 
 # Regular expressions for recognizing the GeoIP free database editions.
@@ -81,6 +83,13 @@ class GeoIP(object):
         * city: The name of the GeoIP city data file.  Defaults to
             'GeoLiteCity.dat'; overrides the GEOIP_CITY settings attribute.
         """
+
+        warnings.warn(
+            "django.contrib.gis.geoip is deprecated in favor of "
+            "django.contrib.gis.geoip2 and the MaxMind GeoLite2 database "
+            "format.", RemovedInDjango20Warning, 2
+        )
+
         # Checking the given cache option.
         if cache in self.cache_options:
             self._cache = cache

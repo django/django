@@ -3,12 +3,15 @@ from __future__ import unicode_literals
 
 import os
 import unittest
+import warnings
 from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip import HAS_GEOIP
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
+from django.test import ignore_warnings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
@@ -22,6 +25,7 @@ if HAS_GEOIP:
 
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting.")
+@ignore_warnings(category=RemovedInDjango20Warning)
 class GeoIPTest(unittest.TestCase):
     addr = '128.249.1.1'
     fqdn = 'tmc.edu'
@@ -115,3 +119,12 @@ class GeoIPTest(unittest.TestCase):
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
+
+    def test_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            GeoIP()
+
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertIn('django.contrib.gis.geoip is deprecated', msg)
