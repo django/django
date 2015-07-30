@@ -115,6 +115,18 @@ though:
 
 .. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
 
+New admin interface
+~~~~~~~~~~~~~~~~~~~
+
+Admin now has modern user interface powered by clean flat design and popular
+Roboto font.
+
+Admin still provides a fully-functional experience to `YUI's A-grade`_ browsers.
+Bear in mind that there may be minor differences between supported browsers -
+this is fine for old ones (e.g. IE7-8) in terms of graceful degradation.
+
+.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
+
 Minor features
 ~~~~~~~~~~~~~~
 
