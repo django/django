@@ -138,13 +138,14 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  jinja2_ 2.7+
 *  numpy_
 *  Pillow_
 *  PyYAML_
 *  pytz_
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  mock_ (for Python < 3.3)
+*  mock_ (for Python 2)
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
 *  sqlparse_
@@ -169,6 +170,7 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy
 .. _Pillow: https://pypi.python.org/pypi/Pillow/
 .. _PyYAML: http://pyyaml.org/wiki/PyYAML

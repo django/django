@@ -233,6 +233,12 @@ class PaginationTests(unittest.TestCase):
         self.assertEqual(page2.previous_page_number(), 1)
         self.assertIsNone(page2.next_page_number())
 
+    def test_page_range_iterator(self):
+        """
+        Paginator.page_range should be an iterator.
+        """
+        self.assertIsInstance(Paginator([1, 2, 3], 2).page_range, type(six.moves.range(0)))
+
 
 class ModelPaginationTests(TestCase):
     """

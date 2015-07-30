@@ -57,7 +57,11 @@ class ManyToOneTests(TestCase):
 
         # Create a new article, and add it to the article set.
         new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        self.r.article_set.add(new_article2)
+        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.r.article_set.add(new_article2)
+
+        self.r.article_set.add(new_article2, bulk=False)
         self.assertEqual(new_article2.reporter.id, self.r.id)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
@@ -173,7 +177,7 @@ class ManyToOneTests(TestCase):
             name = models.CharField(max_length=50)
 
         class BandMember(models.Model):
-            band = UnsavedForeignKey(Band)
+            band = UnsavedForeignKey(Band, models.CASCADE)
             first_name = models.CharField(max_length=50)
             last_name = models.CharField(max_length=50)
 
@@ -609,7 +613,7 @@ class ManyToOneTests(TestCase):
     def test_fk_instantiation_outside_model(self):
         # Regression for #12190 -- Should be able to instantiate a FK outside
         # of a model, and interrogate its related field.
-        cat = models.ForeignKey(Category)
+        cat = models.ForeignKey(Category, models.CASCADE)
         self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):

@@ -9,6 +9,7 @@ from datetime import datetime
 from xml.dom import minidom
 
 from django.core import management, serializers
+from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
 from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
@@ -188,6 +189,16 @@ class SerializersTestBase(object):
         mv_obj = obj_list[0].object
         self.assertEqual(mv_obj.title, movie_title)
 
+    def test_serialize_progressbar(self):
+        fake_stdout = StringIO()
+        serializers.serialize(
+            self.serializer_name, Article.objects.all(),
+            progress_output=fake_stdout, object_count=Article.objects.count()
+        )
+        self.assertTrue(
+            fake_stdout.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n')
+        )
+
     def test_serialize_superfluous_queries(self):
         """Ensure no superfluous queries are made when serializing ForeignKeys
 
@@ -223,6 +234,15 @@ class SerializersTestBase(object):
         deserial_objs = list(serializers.deserialize(self.serializer_name,
                                                 serial_str))
         self.assertEqual(deserial_objs[0].object.score, Approximate(3.4, places=1))
+
+    def test_deferred_field_serialization(self):
+        author = Author.objects.create(name='Victor Hugo')
+        author = Author.objects.defer('name').get(pk=author.pk)
+        serial_str = serializers.serialize(self.serializer_name, [author])
+        deserial_objs = list(serializers.deserialize(self.serializer_name, serial_str))
+        # Check the class instead of using isinstance() because model instances
+        # with deferred fields (e.g. Author_Deferred_name) will pass isinstance.
+        self.assertEqual(deserial_objs[0].object.__class__, Author)
 
     def test_custom_field_serialization(self):
         """Tests that custom fields serialize and deserialize intact"""

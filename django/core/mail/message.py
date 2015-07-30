@@ -14,6 +14,7 @@ from email.mime.message import MIMEMessage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formataddr, formatdate, getaddresses, parseaddr
+from io import BytesIO
 
 from django.conf import settings
 from django.core.mail.utils import DNS_NAME
@@ -145,7 +146,7 @@ class MIMEMixin():
             This overrides the default as_bytes() implementation to not mangle
             lines that begin with 'From '. See bug #13433 for details.
             """
-            fp = six.BytesIO()
+            fp = BytesIO()
             g = generator.BytesGenerator(fp, mangle_from_=False)
             g.flatten(self, unixfrom=unixfrom, linesep=linesep)
             return fp.getvalue()
@@ -307,10 +308,36 @@ class EmailMessage(object):
             self.attachments.append((filename, content, mimetype))
 
     def attach_file(self, path, mimetype=None):
-        """Attaches a file from the filesystem."""
+        """
+        Attaches a file from the filesystem.
+
+        The mimetype will be set to the DEFAULT_ATTACHMENT_MIME_TYPE if it is
+        not specified and cannot be guessed or (PY3 only) if it suggests
+        text/* for a binary file.
+        """
         filename = os.path.basename(path)
-        with open(path, 'rb') as f:
-            content = f.read()
+        if not mimetype:
+            mimetype, _ = mimetypes.guess_type(filename)
+            if not mimetype:
+                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+        basetype, subtype = mimetype.split('/', 1)
+        read_mode = 'r' if basetype == 'text' else 'rb'
+        content = None
+
+        with open(path, read_mode) as f:
+            try:
+                content = f.read()
+            except UnicodeDecodeError:
+                # If mimetype suggests the file is text but it's actually
+                # binary, read() will raise a UnicodeDecodeError on Python 3.
+                pass
+
+        # If the previous read in text mode failed, try binary mode.
+        if content is None:
+            with open(path, 'rb') as f:
+                content = f.read()
+                mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+
         self.attach(filename, content, mimetype)
 
     def _create_message(self, msg):

@@ -1,7 +1,9 @@
 # coding: utf-8
-from django.core.urlresolvers import NoReverseMatch
-from django.template import TemplateSyntaxError
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.core.urlresolvers import NoReverseMatch, resolve
+from django.template import RequestContext, TemplateSyntaxError
+from django.test import (
+    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
+)
 from django.utils.deprecation import RemovedInDjango110Warning
 
 from ..utils import setup
@@ -95,7 +97,7 @@ class UrlTagTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango110Warning)
     def test_url12(self):
         output = self.engine.render_to_string('url12', {'client': {'id': 1}})
-        self.assertEqual(output, '/client/1/!$&\'()*+,;=~:@,/')
+        self.assertEqual(output, '/client/1/!$&amp;&#39;()*+,;=~:@,/')
 
     @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'url13': '{% url "template_tests.views.client_action" '
@@ -132,6 +134,15 @@ class UrlTagTests(SimpleTestCase):
     def test_url20(self):
         output = self.engine.render_to_string('url20', {'client': {'id': 1}, 'url_name_in_var': 'named.client'})
         self.assertEqual(output, '/named-client/1/')
+
+    @setup({'url21': '{% autoescape off %}'
+                     '{% url "template_tests.views.client_action" '
+                     'id=client.id action="!$&\'()*+,;=~:@," %}'
+                     '{% endautoescape %}'})
+    @ignore_warnings(category=RemovedInDjango110Warning)
+    def test_url21(self):
+        output = self.engine.render_to_string('url21', {'client': {'id': 1}})
+        self.assertEqual(output, '/client/1/!$&\'()*+,;=~:@,/')
 
     # Failures
     @setup({'url-fail01': '{% url %}'})
@@ -243,3 +254,29 @@ class UrlTagTests(SimpleTestCase):
     def test_url_asvar03(self):
         output = self.engine.render_to_string('url-asvar03')
         self.assertEqual(output, '')
+
+    @setup({'url-namespace01': '{% url "app:named.client" 42 %}'})
+    def test_url_namespace01(self):
+        request = RequestFactory().get('/')
+        request.resolver_match = resolve('/ns1/')
+        template = self.engine.get_template('url-namespace01')
+        context = RequestContext(request)
+        output = template.render(context)
+        self.assertEqual(output, '/ns1/named-client/42/')
+
+    @setup({'url-namespace02': '{% url "app:named.client" 42 %}'})
+    def test_url_namespace02(self):
+        request = RequestFactory().get('/')
+        request.resolver_match = resolve('/ns2/')
+        template = self.engine.get_template('url-namespace02')
+        context = RequestContext(request)
+        output = template.render(context)
+        self.assertEqual(output, '/ns2/named-client/42/')
+
+    @setup({'url-namespace03': '{% url "app:named.client" 42 %}'})
+    def test_url_namespace03(self):
+        request = RequestFactory().get('/')
+        template = self.engine.get_template('url-namespace03')
+        context = RequestContext(request)
+        output = template.render(context)
+        self.assertEqual(output, '/ns2/named-client/42/')

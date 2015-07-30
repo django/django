@@ -45,15 +45,17 @@ Compressing JavaScript
 
 To simplify the process of providing optimized JavaScript code, Django
 includes a handy Python script which should be used to create a "minified"
-version. To run it::
+version. To run it:
 
-    python django/contrib/admin/bin/compress.py
+.. code-block:: console
+
+    $ pip install closure
+    $ python django/contrib/admin/bin/compress.py
 
 Behind the scenes, ``compress.py`` is a front-end for Google's
-`Closure Compiler`_ which is written in Java. However, the Closure Compiler
-library is not bundled with Django directly, so those wishing to contribute
-complete JavaScript patches will need to download and install the library
-independently. The Closure Compiler library requires `Java`_ 7 or higher.
+`Closure Compiler`_ which is written in Java. The Closure Compiler library is
+not bundled with Django, but you can install it using pip as done above. The
+Closure Compiler library requires `Java`_ 7 or higher.
 
 Please don't forget to run ``compress.py`` and include the ``diff`` of the
 minified scripts when submitting patches for Django's JavaScript.

@@ -775,10 +775,9 @@ Composite widgets
 .. class:: SelectDateWidget
 
     Wrapper around three :class:`~django.forms.Select` widgets: one each for
-    month, day, and year. Note that this widget lives in a separate file from
-    the standard widgets.
+    month, day, and year.
 
-    Takes one optional argument:
+    Takes several optional arguments:
 
     .. attribute:: SelectDateWidget.years
 

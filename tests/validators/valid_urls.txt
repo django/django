@@ -7,6 +7,7 @@ http://www.example.com/
 http://www.example.com:8000/test
 http://valid-with-hyphens.com/
 http://subdomain.example.com/
+http://a.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 http://200.8.9.10/
 http://200.8.9.10:8000/test
 http://su--b.valid-----hyphens.com/
@@ -48,6 +49,7 @@ http://مثال.إختبار
 http://例子.测试
 http://उदाहरण.परीक्षा
 http://-.~_!$&'()*+,;=:%40:80%2f::::::@example.com
+http://xn--7sbb4ac0ad0be6cf.xn--p1ai
 http://1337.net
 http://a.b-c.de
 http://223.255.255.254

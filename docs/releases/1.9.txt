@@ -151,6 +151,8 @@ Minor features
 * The time picker widget includes a '6 p.m' option for consistency of having
   predefined options every 6 hours.
 
+* JavaScript slug generation now supports Romanian characters.
+
 :mod:`django.contrib.auth`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -171,6 +173,10 @@ Minor features
 * The permission argument of
   :func:`~django.contrib.auth.decorators.permission_required()` accepts all
   kinds of iterables, not only list and tuples.
+
+* The new :class:`~django.contrib.auth.middleware.PersistentRemoteUserMiddleware`
+  makes it possible to use ``REMOTE_USER`` for setups where the header is only
+  populated on login pages instead of every request in the session.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -302,6 +308,18 @@ Forms
 * You can now :ref:`specify keyword arguments <custom-formset-form-kwargs>`
   that you want to pass to the constructor of forms in a formset.
 
+* :class:`~django.forms.SlugField` now accepts an
+  :attr:`~django.forms.SlugField.allow_unicode` argument to allow Unicode
+  characters in slugs.
+
+* :class:`~django.forms.CharField` now accepts a
+  :attr:`~django.forms.CharField.strip` argument to strip input data of leading
+  and trailing whitespace.  As this defaults to ``True`` this is different
+  behavior from previous releases.
+
+* Form fields now support the :attr:`~django.forms.Field.disabled` argument,
+  allowing the field widget to be displayed disabled by browsers.
+
 Generic Views
 ^^^^^^^^^^^^^
 
@@ -346,6 +364,8 @@ Management Commands
   preceded by the operation's description.
 
 * The :djadmin:`dumpdata` command output is now deterministically ordered.
+  Moreover, when the ``--ouput`` option is specified, it also shows a progress
+  bar in the terminal.
 
 * The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
   print out the SQL rather than execute it.
@@ -357,8 +377,21 @@ Management Commands
   to the database using the password from your settings file (instead of
   requiring it to be manually entered).
 
+Migrations
+^^^^^^^^^^
+
+* Initial migrations are now marked with an :attr:`initial = True
+  <django.db.migrations.Migration.initial>` class attribute which allows
+  :djadminopt:`migrate --fake-initial <--fake-initial>` to more easily detect
+  initial migrations.
+
+* Added support for serialization of ``functools.partial`` objects.
+
 Models
 ^^^^^^
+
+* :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
+  now works on proxy models.
 
 * Database configuration gained a :setting:`TIME_ZONE <DATABASE-TIME_ZONE>`
   option for interacting with databases that store datetimes in local time and
@@ -368,6 +401,11 @@ Models
   <django.db.models.fields.related.RelatedManager.set()>` method to the related
   managers created by ``ForeignKey``, ``GenericForeignKey``, and
   ``ManyToManyField``.
+
+* The :meth:`~django.db.models.fields.related.RelatedManager.add` method on
+  a reverse foreign key now has a ``bulk`` parameter to allow executing one
+  query regardless of the number of objects being added rather than one query
+  per object.
 
 * Added the ``keep_parents`` parameter to :meth:`Model.delete()
   <django.db.models.Model.delete>` to allow deleting only a child's data in a
@@ -400,6 +438,10 @@ Models
 
 * Added the :class:`~django.db.models.functions.Now` database function, which
   returns the current date and time.
+
+* :class:`~django.db.models.SlugField` now accepts an
+  :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
+  characters in slugs.
 
 CSRF
 ^^^^
@@ -468,6 +510,9 @@ Requests and Responses
   :class:`~django.template.response.TemplateResponse`, commonly used with
   class-based views.
 
+* Exceptions raised by the ``render()`` method are now passed to the
+  ``process_exception()`` method of each middleware.
+
 * Request middleware can now set :attr:`HttpRequest.urlconf
   <django.http.HttpRequest.urlconf>` to ``None`` to revert any changes made
   by previous middleware and return to using the :setting:`ROOT_URLCONF`.
@@ -507,6 +552,9 @@ Validators
 
 * :class:`~django.core.validators.EmailValidator` now limits the length of
   domain name labels to 63 characters per :rfc:`1034`.
+
+* Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
+  that may contain Unicode characters.
 
 Backwards incompatible changes in 1.9
 =====================================
@@ -552,7 +600,7 @@ Database backend API
   SQLite backend to add time lookups (hour, minute, second) to
   :class:`~django.db.models.TimeField`, and may be needed by third-party
   database backends.
-  
+
 * The ``DatabaseOperations.datetime_cast_sql()`` method (not to be confused
   with ``DatabaseOperations.datetime_cast_date_sql()`` mentioned above)
   has been removed. This method served to format dates on Oracle long
@@ -628,6 +676,15 @@ Dropped support for PostgreSQL 9.0
 Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
 Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
 
+Bulk behavior of ``add()`` method of related managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To improve performance, the ``add()`` methods of the related managers created
+by ``ForeignKey`` and ``GenericForeignKey`` changed from a series of
+``Model.save()`` calls to a single ``QuerySet.update()`` call. The change means
+that ``pre_save`` and ``post_save`` signals aren't sent anymore. You can use
+the ``bulk=False`` keyword argument to revert to the previous behavior.
+
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -657,6 +714,20 @@ console, for example.
 
 If you are overriding Django's default logging, you should check to see how
 your configuration merges with the new defaults.
+
+``HttpRequest`` details in error reporting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+It was redundant to display the full details of the
+:class:`~django.http.HttpRequest` each time it appeared as a stack frame
+variable in the HTML version of the debug page and error email. Thus, the HTTP
+request will now display the same standard representation as other variables
+(``repr(request)``). As a result, the method
+``ExceptionReporterFilter.get_request_repr()`` was removed.
+
+The contents of the text version of the email were modified to provide a
+traceback of the same structure as in the case of AJAX requests. The traceback
+details are rendered by the ``ExceptionReporter.get_traceback_text()`` method.
 
 Removal of time zone aware global adapters and converters for datetimes
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -758,6 +829,19 @@ To fix your ``simple_tag``\s, it is best to apply the following practices:
 Tags that follow these rules will be correct and safe whether they are run on
 Django 1.9+ or earlier.
 
+``Paginator.page_range``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+:attr:`Paginator.page_range <django.core.paginator.Paginator.page_range>` is
+now an iterator instead of a list.
+
+In versions of Django previous to 1.8, ``Paginator.page_range`` returned a
+``list`` in Python 2 and a ``range`` in Python 3. Django 1.8 consistently
+returned a list, but an iterator is more efficient.
+
+Existing code that depends on ``list`` specific features, such as indexing,
+can be ported by converting the iterator into a ``list`` using ``list()``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -780,9 +864,10 @@ Miscellaneous
 * ``ValuesQuerySet`` and ``ValuesListQuerySet`` have been removed.
 
 * The ``admin/base.html`` template no longer sets
-  ``window.__admin_media_prefix__``. Image references in JavaScript that used
-  that value to construct absolute URLs have been moved to CSS for easier
-  customization.
+  ``window.__admin_media_prefix__`` or ``window.__admin_utc_offset__``. Image
+  references in JavaScript that used that value to construct absolute URLs have
+  been moved to CSS for easier customization. The UTC offset is stored on a
+  data attribute of the ``<body>`` tag.
 
 * ``CommaSeparatedIntegerField`` validation has been refined to forbid values
   like ``','``, ``',1'``, and ``'1,,2'``.
@@ -822,6 +907,16 @@ Miscellaneous
   be serialized contains any control characters not allowed in the XML 1.0
   standard, the serialization will fail with a :exc:`ValueError`.
 
+* :class:`~django.forms.CharField` now strips input of leading and trailing
+  whitespace by default. This can be disabled by setting the new
+  :attr:`~django.forms.CharField.strip` argument to ``False``.
+
+* If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
+  nor :class:`Context.current_app <django.template.Context>` are set, the
+  :ttag:`url` template tag will now use the namespace of the current request.
+  Set ``request.current_app`` to ``None`` if you don't want to use a namespace
+  hint.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
@@ -848,6 +943,19 @@ versions:
 
 Its parsing caused bugs with the current syntax, so support for the old syntax
 will be removed in Django 2.0 following an accelerated deprecation.
+
+``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In order to increase awareness about cascading model deletion, the
+``on_delete`` argument of ``ForeignKey`` and ``OneToOneField`` will be required
+in Django 2.0.
+
+Update models and existing migrations to explicitly set the argument. Since the
+default is ``models.CASCADE``, add ``on_delete=models.CASCADE`` to all
+``ForeignKey`` and ``OneToOneField``\s that don't use a different option. You
+can also pass it as the second positional argument if you don't care about
+compatibility with older versions of Django.
 
 ``Field.rel`` changes
 ~~~~~~~~~~~~~~~~~~~~~
@@ -911,6 +1019,24 @@ impossible to reverse the patterns if there was an application namespace
 with the same name. Includes that specify an instance namespace require that
 the included URLconf sets an application namespace.
 
+``current_app`` parameter to ``contrib.auth`` views
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All views in ``django.contrib.auth.views`` have the following structure::
+
+    def view(request, ..., current_app=None, ...):
+
+        ...
+
+        if current_app is not None:
+            request.current_app = current_app
+
+        return TemplateResponse(request, template_name, context)
+
+As of Django 1.8, ``current_app`` is set on the ``request`` object. For
+consistency, these views will require the caller to set ``current_app`` on the
+``request`` instead of passing it in a separate argument.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -941,6 +1067,15 @@ Miscellaneous
 * The ``django.utils.feedgenerator.Atom1Feed.mime_type`` and
   ``django.utils.feedgenerator.RssFeed.mime_type`` attributes are deprecated in
   favor of ``content_type``.
+
+* :class:`~django.core.signing.Signer` now issues a warning if an invalid
+  separator is used. This will become an exception in Django 1.10.
+
+* ``django.db.models.Field._get_val_from_obj()`` is deprecated in favor of
+  ``Field.value_from_object()``.
+
+* ``django.template.loaders.eggs.Loader`` is deprecated as distributing
+  applications as eggs is not recommended.
 
 .. removed-features-1.9:
 

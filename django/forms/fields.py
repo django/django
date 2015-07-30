@@ -70,7 +70,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False, label_suffix=None):
+                 validators=[], localize=False, disabled=False, label_suffix=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -90,11 +90,14 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         #                        hidden widget with initial value after widget.
         # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
+        # disabled -- Boolean that specifies whether the field is disabled, that
+        #             is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
+        self.disabled = disabled
         self.label_suffix = label_suffix
         widget = widget or self.widget
         if isinstance(widget, type):
@@ -210,8 +213,10 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
+    def __init__(self, max_length=None, min_length=None, strip=True, *args, **kwargs):
+        self.max_length = max_length
+        self.min_length = min_length
+        self.strip = strip
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
@@ -222,7 +227,10 @@ class CharField(Field):
         "Returns a Unicode object."
         if value in self.empty_values:
             return ''
-        return smart_text(value)
+        value = force_text(value)
+        if self.strip:
+            value = value.strip()
+        return value
 
     def widget_attrs(self, widget):
         attrs = super(CharField, self).widget_attrs(widget)
@@ -539,6 +547,7 @@ class RegexField(CharField):
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
+        kwargs.setdefault('strip', False)
         # error_message is just kept for backwards compatibility:
         if error_message is not None:
             warnings.warn(
@@ -1231,9 +1240,11 @@ class GenericIPAddressField(CharField):
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(SlugField, self).clean(value)
+    def __init__(self, *args, **kwargs):
+        self.allow_unicode = kwargs.pop('allow_unicode', False)
+        if self.allow_unicode:
+            self.default_validators = [validators.validate_unicode_slug]
+        super(SlugField, self).__init__(*args, **kwargs)
 
 
 class UUIDField(CharField):

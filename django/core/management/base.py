@@ -89,7 +89,7 @@ class OutputWrapper(object):
 
     @style_func.setter
     def style_func(self, style_func):
-        if style_func and hasattr(self._out, 'isatty') and self._out.isatty():
+        if style_func and self.isatty():
             self._style_func = style_func
         else:
             self._style_func = lambda x: x
@@ -101,6 +101,9 @@ class OutputWrapper(object):
 
     def __getattr__(self, name):
         return getattr(self._out, name)
+
+    def isatty(self):
+        return hasattr(self._out, 'isatty') and self._out.isatty()
 
     def write(self, msg, style_func=None, ending=None):
         ending = self.ending if ending is None else ending

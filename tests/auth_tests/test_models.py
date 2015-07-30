@@ -1,13 +1,15 @@
 import datetime
 
+from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import get_hasher
 from django.contrib.auth.models import (
     AbstractUser, Group, Permission, User, UserManager,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.db.models.signals import post_save
-from django.test import TestCase, override_settings
+from django.test import TestCase, mock, override_settings
 
 
 @override_settings(USE_TZ=False)
@@ -215,6 +217,41 @@ class AbstractUserTestCase(TestCase):
 
         user2 = User.objects.create_user(username='user2')
         self.assertIsNone(user2.last_login)
+
+    def test_user_double_save(self):
+        """
+        Calling user.save() twice should trigger password_changed() once.
+        """
+        user = User.objects.create_user(username='user', password='foo')
+        user.set_password('bar')
+        with mock.patch('django.contrib.auth.password_validation.password_changed') as pw_changed:
+            user.save()
+            self.assertEqual(pw_changed.call_count, 1)
+            user.save()
+            self.assertEqual(pw_changed.call_count, 1)
+
+    @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
+    def test_check_password_upgrade(self):
+        """
+        password_changed() shouldn't be called if User.check_password()
+        triggers a hash iteration upgrade.
+        """
+        user = User.objects.create_user(username='user', password='foo')
+        initial_password = user.password
+        self.assertTrue(user.check_password('foo'))
+        hasher = get_hasher('default')
+        self.assertEqual('pbkdf2_sha256', hasher.algorithm)
+
+        old_iterations = hasher.iterations
+        try:
+            # Upgrade the password iterations
+            hasher.iterations = old_iterations + 1
+            with mock.patch('django.contrib.auth.password_validation.password_changed') as pw_changed:
+                user.check_password('foo')
+                self.assertEqual(pw_changed.call_count, 0)
+            self.assertNotEqual(initial_password, user.password)
+        finally:
+            hasher.iterations = old_iterations
 
 
 class IsActiveTestCase(TestCase):

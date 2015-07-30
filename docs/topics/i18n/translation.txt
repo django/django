@@ -355,8 +355,12 @@ You can mark names of :class:`~django.db.models.ForeignKey`,
 their :attr:`~django.db.models.Options.verbose_name` options::
 
     class MyThing(models.Model):
-        kind = models.ForeignKey(ThingKind, related_name='kinds',
-                                 verbose_name=_('kind'))
+        kind = models.ForeignKey(
+            ThingKind,
+            on_delete=models.CASCADE,
+            related_name='kinds',
+            verbose_name=_('kind'),
+        )
 
 Just like you would do in :attr:`~django.db.models.Options.verbose_name` you
 should provide a lowercase verbose name text for the relation as Django will
@@ -391,8 +395,12 @@ with the ``short_description`` attribute::
     from django.utils.translation import ugettext_lazy as _
 
     class MyThing(models.Model):
-        kind = models.ForeignKey(ThingKind, related_name='kinds',
-                                 verbose_name=_('kind'))
+        kind = models.ForeignKey(
+            ThingKind,
+            on_delete=models.CASCADE,
+            related_name='kinds',
+            verbose_name=_('kind'),
+        )
 
         def is_mouse(self):
             return self.kind.type == MOUSE_TYPE
@@ -843,8 +851,8 @@ language name (translated into the currently active locale).
 
 .. templatetag:: get_current_language
 
-``get_current_languages``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+``get_current_language``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``{% get_current_language as LANGUAGE_CODE %}`` returns the current user's
 preferred language as a string. Example: ``en-us``. See

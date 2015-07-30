@@ -6,6 +6,7 @@ http://.com
 http://invalid-.com
 http://-invalid.com
 http://invalid.com-
+http://invalid.c-m
 http://inv-.alid-.com
 http://inv-.-alid.com
 file://localhost/path
@@ -34,6 +35,8 @@ http://foo.bar/foo(bar)baz quux
 http://-error-.invalid/
 http://-a.b.co
 http://a.b-.co
+http://a.-b.co
+http://a.b-.c.co
 http:/
 http://
 http://

@@ -101,7 +101,7 @@ Other topics
 The register decorator
 ----------------------
 
-.. function:: register(*models, [site=django.admin.sites.site])
+.. function:: register(*models, site=django.admin.sites.site)
 
     There is also a decorator for registering your ``ModelAdmin`` classes::
 
@@ -1746,7 +1746,7 @@ templates used by the :class:`ModelAdmin` views:
     documentation for more details. One difference is that the level may be
     passed as a string label in addition to integer/constant.
 
-.. method:: ModelAdmin.get_paginator(queryset, per_page, orphans=0, allow_empty_first_page=True)
+.. method:: ModelAdmin.get_paginator(request, queryset, per_page, orphans=0, allow_empty_first_page=True)
 
     Returns an instance of the paginator to use for this view. By default,
     instantiates an instance of :attr:`paginator`.
@@ -1957,7 +1957,7 @@ information.
             name = models.CharField(max_length=100)
 
          class Book(models.Model):
-            author = models.ForeignKey(Author)
+            author = models.ForeignKey(Author, on_delete=models.CASCADE)
             title = models.CharField(max_length=100)
 
     You can edit the books authored by an author on the author page. You add
@@ -2174,8 +2174,8 @@ Take this model for instance::
     from django.db import models
 
     class Friendship(models.Model):
-        to_person = models.ForeignKey(Person, related_name="friends")
-        from_person = models.ForeignKey(Person, related_name="from_friends")
+        to_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="friends")
+        from_person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="from_friends")
 
 If you wanted to display an inline on the ``Person`` admin add/change pages
 you need to explicitly define the foreign key since it is unable to do so
@@ -2281,8 +2281,8 @@ models::
         members = models.ManyToManyField(Person, through='Membership')
 
     class Membership(models.Model):
-        person = models.ForeignKey(Person)
-        group = models.ForeignKey(Group)
+        person = models.ForeignKey(Person, on_delete=models.CASCADE)
+        group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
@@ -2326,7 +2326,7 @@ you have the following models::
 
     class Image(models.Model):
         image = models.ImageField(upload_to="images")
-        content_type = models.ForeignKey(ContentType)
+        content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
         object_id = models.PositiveIntegerField()
         content_object = GenericForeignKey("content_type", "object_id")
 
@@ -2830,7 +2830,7 @@ supplied by the admin views for the current model.
 The ``staff_member_required`` decorator
 =======================================
 
-.. function:: staff_member_required([redirect_field_name=REDIRECT_FIELD_NAME, login_url='admin:login'])
+.. function:: staff_member_required(redirect_field_name='next', login_url='admin:login')
 
     This decorator is used on the admin views that require authorization. A
     view decorated with this function will having the following behavior:

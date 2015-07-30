@@ -14,7 +14,7 @@ from django.core.validators import (
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
     int_list_validator, validate_comma_separated_integer_list, validate_email,
     validate_integer, validate_ipv4_address, validate_ipv6_address,
-    validate_ipv46_address, validate_slug,
+    validate_ipv46_address, validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
@@ -28,10 +28,12 @@ TEST_DATA = [
     (validate_integer, '42', None),
     (validate_integer, '-42', None),
     (validate_integer, -42, None),
-    (validate_integer, -42.5, None),
 
+    (validate_integer, -42.5, ValidationError),
     (validate_integer, None, ValidationError),
     (validate_integer, 'a', ValidationError),
+    (validate_integer, '\n42', ValidationError),
+    (validate_integer, '42\n', ValidationError),
 
     (validate_email, 'email@here.com', None),
     (validate_email, 'weirder-email@here.and.there.com', None),
@@ -77,18 +79,45 @@ TEST_DATA = [
     # Max length of domain name labels is 63 characters per RFC 1034.
     (validate_email, 'a@%s.us' % ('a' * 63), None),
     (validate_email, 'a@%s.us' % ('a' * 64), ValidationError),
+    # Trailing newlines in username or domain not allowed
+    (validate_email, 'a@b.com\n', ValidationError),
+    (validate_email, 'a\n@b.com', ValidationError),
+    (validate_email, '"test@test"\n@example.com', ValidationError),
+    (validate_email, 'a@[127.0.0.1]\n', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
     (validate_slug, '--------', None),
     (validate_slug, 'nohyphensoranything', None),
+    (validate_slug, 'a', None),
+    (validate_slug, '1', None),
+    (validate_slug, 'a1', None),
 
     (validate_slug, '', ValidationError),
     (validate_slug, ' text ', ValidationError),
     (validate_slug, ' ', ValidationError),
     (validate_slug, 'some@mail.com', ValidationError),
     (validate_slug, '你好', ValidationError),
+    (validate_slug, '你 好', ValidationError),
     (validate_slug, '\n', ValidationError),
+    (validate_slug, 'trailing-newline\n', ValidationError),
+
+    (validate_unicode_slug, 'slug-ok', None),
+    (validate_unicode_slug, 'longer-slug-still-ok', None),
+    (validate_unicode_slug, '--------', None),
+    (validate_unicode_slug, 'nohyphensoranything', None),
+    (validate_unicode_slug, 'a', None),
+    (validate_unicode_slug, '1', None),
+    (validate_unicode_slug, 'a1', None),
+    (validate_unicode_slug, '你好', None),
+
+    (validate_unicode_slug, '', ValidationError),
+    (validate_unicode_slug, ' text ', ValidationError),
+    (validate_unicode_slug, ' ', ValidationError),
+    (validate_unicode_slug, 'some@mail.com', ValidationError),
+    (validate_unicode_slug, '\n', ValidationError),
+    (validate_unicode_slug, '你 好', ValidationError),
+    (validate_unicode_slug, 'trailing-newline\n', ValidationError),
 
     (validate_ipv4_address, '1.1.1.1', None),
     (validate_ipv4_address, '255.0.0.0', None),
@@ -98,6 +127,7 @@ TEST_DATA = [
     (validate_ipv4_address, '25.1.1.', ValidationError),
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
+    (validate_ipv4_address, '1.1.1.1\n', ValidationError),
 
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
@@ -142,6 +172,7 @@ TEST_DATA = [
 
     (int_list_validator(sep='.'), '1.2.3', None),
     (int_list_validator(sep='.'), '1,2,3', ValidationError),
+    (int_list_validator(sep='.'), '1.2.3\n', ValidationError),
 
     (MaxValueValidator(10), 10, None),
     (MaxValueValidator(10), -10, None),
@@ -175,6 +206,12 @@ TEST_DATA = [
     (URLValidator(EXTENDED_SCHEMES), 'git://example.com/', None),
 
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
+    # Trailing newlines not accepted
+    (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
+    (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
+    # Trailing junk does not take forever to reject
+    (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
+    (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),
 
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),

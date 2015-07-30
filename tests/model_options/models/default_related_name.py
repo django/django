@@ -8,13 +8,13 @@ class Author(models.Model):
 
 class Editor(models.Model):
     name = models.CharField(max_length=128)
-    bestselling_author = models.ForeignKey(Author)
+    bestselling_author = models.ForeignKey(Author, models.CASCADE)
 
 
 class Book(models.Model):
     title = models.CharField(max_length=128)
     authors = models.ManyToManyField(Author)
-    editor = models.ForeignKey(Editor, related_name="edited_books")
+    editor = models.ForeignKey(Editor, models.CASCADE, related_name="edited_books")
 
     class Meta:
         default_related_name = "books"
@@ -34,7 +34,7 @@ class BookStore(Store):
 
 
 class EditorStore(Store):
-    editor = models.ForeignKey(Editor)
+    editor = models.ForeignKey(Editor, models.CASCADE)
     available_books = models.ManyToManyField(Book)
 
     class Meta:

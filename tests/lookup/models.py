@@ -30,7 +30,7 @@ class Author(models.Model):
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     pub_date = models.DateTimeField()
-    author = models.ForeignKey(Author, blank=True, null=True)
+    author = models.ForeignKey(Author, models.SET_NULL, blank=True, null=True)
 
     class Meta:
         ordering = ('-pub_date', 'headline')
@@ -58,7 +58,7 @@ class Season(models.Model):
 
 @python_2_unicode_compatible
 class Game(models.Model):
-    season = models.ForeignKey(Season, related_name='games')
+    season = models.ForeignKey(Season, models.CASCADE, related_name='games')
     home = models.CharField(max_length=100)
     away = models.CharField(max_length=100)
 

@@ -30,6 +30,9 @@ details on these changes.
 
 * ``Field.remote_field.to`` attribute will be removed.
 
+* The ``on_delete`` argument for ``ForeignKey`` and ``OneToOneField``  will be
+  required.
+
 * ``django.db.models.fields.add_lazy_relation()`` will be removed.
 
 * When time zone support is enabled, database backends that don't support time
@@ -78,6 +81,13 @@ details on these changes.
 
 * Support for setting a URL instance namespace without an application
   namespace will be removed.
+
+* ``Field._get_val_from_obj()`` will be removed in favor of
+  ``Field.value_from_object()``.
+
+* ``django.template.loaders.eggs.Loader`` will be removed.
+
+* The ``current_app`` parameter to the ``contrib.auth`` views will be removed.
 
 .. _deprecation-removed-in-1.10:
 
@@ -246,6 +256,9 @@ details on these changes.
 
 * Support for the syntax of ``{% cycle %}`` that uses comma-separated arguments
   will be removed.
+
+* The warning that :class:`~django.core.signing.Signer` issues when given an
+  invalid separator will become an exception.
 
 .. _deprecation-removed-in-1.9:
 

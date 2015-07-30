@@ -114,6 +114,14 @@ and override its methods.
 Filtering error reports
 -----------------------
 
+.. warning::
+
+    Filtering sensitive data is a hard problem, and it's nearly impossible to
+    guarantee that sensitive won't leak into an error report. Therefore, error
+    reports should only be available to trusted team members and you should
+    avoid transmitting error reports unencrypted over the Internet (such as
+    through email).
+
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -254,13 +262,6 @@ following methods:
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
-
-.. method:: SafeExceptionReporterFilter.get_request_repr(request)
-
-    Returns the representation string of the request object, that is, the
-    value that would be returned by ``repr(request)``, except it uses the
-    filtered dictionary of POST parameters as determined by
-    :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 

@@ -26,12 +26,12 @@ class Foo(models.Model):
 
 
 def get_foo():
-    return Foo.objects.get(id=1)
+    return Foo.objects.get(id=1).pk
 
 
 class Bar(models.Model):
     b = models.CharField(max_length=10)
-    a = models.ForeignKey(Foo, default=get_foo, related_name=b'bars')
+    a = models.ForeignKey(Foo, models.CASCADE, default=get_foo, related_name=b'bars')
 
 
 class Whiz(models.Model):
@@ -84,6 +84,10 @@ class FloatModel(models.Model):
 
 class BigS(models.Model):
     s = models.SlugField(max_length=255)
+
+
+class UnicodeSlugField(models.Model):
+    s = models.SlugField(max_length=255, allow_unicode=True)
 
 
 class SmallIntegerModel(models.Model):
@@ -141,13 +145,13 @@ class PrimaryKeyCharModel(models.Model):
 
 class FksToBooleans(models.Model):
     """Model with FKs to models with {Null,}BooleanField's, #15040"""
-    bf = models.ForeignKey(BooleanModel)
-    nbf = models.ForeignKey(NullBooleanModel)
+    bf = models.ForeignKey(BooleanModel, models.CASCADE)
+    nbf = models.ForeignKey(NullBooleanModel, models.CASCADE)
 
 
 class FkToChar(models.Model):
     """Model with FK to a model with a CharField primary key, #19299"""
-    out = models.ForeignKey(PrimaryKeyCharModel)
+    out = models.ForeignKey(PrimaryKeyCharModel, models.CASCADE)
 
 
 class RenamedField(models.Model):
@@ -339,19 +343,21 @@ class AllFieldsModel(models.Model):
 
     fo = ForeignObject(
         'self',
+        on_delete=models.CASCADE,
         from_fields=['abstract_non_concrete_id'],
         to_fields=['id'],
         related_name='reverse'
     )
     fk = ForeignKey(
         'self',
+        models.CASCADE,
         related_name='reverse2'
     )
     m2m = ManyToManyField('self')
-    oto = OneToOneField('self')
+    oto = OneToOneField('self', models.CASCADE)
 
     object_id = models.PositiveIntegerField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
 
@@ -372,7 +378,7 @@ class PrimaryKeyUUIDModel(models.Model):
 
 
 class RelatedToUUIDModel(models.Model):
-    uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel')
+    uuid_fk = models.ForeignKey('PrimaryKeyUUIDModel', models.CASCADE)
 
 
 class UUIDChild(PrimaryKeyUUIDModel):

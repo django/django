@@ -17,7 +17,7 @@ class Article(models.Model):
 
 @python_2_unicode_compatible
 class Comment(models.Model):
-    article = models.ForeignKey(Article, related_name="comments")
+    article = models.ForeignKey(Article, models.CASCADE, related_name="comments")
     text = models.TextField()
     pub_date = models.DateTimeField()
     approval_date = models.DateTimeField(null=True)

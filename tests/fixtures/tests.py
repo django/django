@@ -9,6 +9,7 @@ import warnings
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
+from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
     TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
@@ -285,6 +286,31 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         management.call_command('loaddata', 'fixture1.json', verbosity=0)
         self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
                 filename='dumpdata.json')
+
+    def test_dumpdata_progressbar(self):
+        """
+        Dumpdata shows a progress bar on the command line when --output is set,
+        stdout is a tty, and verbosity > 0.
+        """
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        new_io = six.StringIO()
+        new_io.isatty = lambda: True
+        _, filename = tempfile.mkstemp()
+        options = {
+            'format': 'json',
+            'stdout': new_io,
+            'stderr': new_io,
+            'output': filename,
+        }
+        management.call_command('dumpdata', 'fixtures', **options)
+        self.assertTrue(new_io.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n'))
+
+        # Test no progress bar when verbosity = 0
+        options['verbosity'] = 0
+        new_io = six.StringIO()
+        new_io.isatty = lambda: True
+        management.call_command('dumpdata', 'fixtures', **options)
+        self.assertEqual(new_io.getvalue(), '')
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification

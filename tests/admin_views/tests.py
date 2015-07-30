@@ -1421,7 +1421,7 @@ class AdminViewPermissionsTest(TestCase):
         login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         # Super User
         response = self.client.get(self.index_url)
-        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, login_url)
         login = self.client.post(login_url, self.super_login)
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
@@ -1479,6 +1479,15 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(login.status_code, 200)
         form = login.context[0].get('form')
         self.assertEqual(form.errors['username'][0], 'This field is required.')
+
+    def test_login_redirect_for_direct_get(self):
+        """
+        Login redirect should be to the admin index page when going directly to
+        /admin/login/.
+        """
+        response = self.client.get(reverse('admin:login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context[REDIRECT_FIELD_NAME], reverse('admin:index'))
 
     def test_login_has_permission(self):
         # Regular User should not be able to login.
@@ -1548,6 +1557,25 @@ class AdminViewPermissionsTest(TestCase):
         self.assertRedirects(login, self.index_url)
         self.assertFalse(login.context)
         self.client.get(reverse('admin:logout'))
+
+    def test_login_page_notice_for_non_staff_users(self):
+        """
+        A logged-in non-staff user trying to access the admin index should be
+        presented with the login page and a hint indicating that the current
+        user doesn't have access to it.
+        """
+        hint_template = 'You are authenticated as {}'
+
+        # Anonymous user should not be shown the hint
+        response = self.client.get(self.index_url, follow=True)
+        self.assertContains(response, 'login-form')
+        self.assertNotContains(response, hint_template.format(''), status_code=200)
+
+        # Non-staff user should be shown the hint
+        self.client.login(**self.nostaff_login)
+        response = self.client.get(self.index_url, follow=True)
+        self.assertContains(response, 'login-form')
+        self.assertContains(response, hint_template.format(self.u6.username), status_code=200)
 
     def test_add_view(self):
         """Test add view restricts access and actually adds items."""
@@ -4403,11 +4431,13 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Main form ----------------------------------------------------------
         self.selenium.find_element_by_css_selector('#id_pubdate').send_keys('2012-02-18')
         self.get_select_option('#id_status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšome')
+        self.selenium.find_element_by_css_selector('#id_name').send_keys(' this is the mAin nÀMë and it\'s awεšomeııı')
         slug1 = self.selenium.find_element_by_css_selector('#id_slug1').get_attribute('value')
         slug2 = self.selenium.find_element_by_css_selector('#id_slug2').get_attribute('value')
-        self.assertEqual(slug1, 'main-name-and-its-awesome-2012-02-18')
-        self.assertEqual(slug2, 'option-two-main-name-and-its-awesome')
+        slug3 = self.selenium.find_element_by_css_selector('#id_slug3').get_attribute('value')
+        self.assertEqual(slug1, 'main-name-and-its-awesomeiii-2012-02-18')
+        self.assertEqual(slug2, 'option-two-main-name-and-its-awesomeiii')
+        self.assertEqual(slug3, 'main-n\xe0m\xeb-and-its-aw\u03b5\u0161ome\u0131\u0131\u0131')
 
         # Stacked inlines ----------------------------------------------------
         # Initial inline
@@ -4454,11 +4484,11 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.wait_page_loaded()
         self.assertEqual(MainPrepopulated.objects.all().count(), 1)
         MainPrepopulated.objects.get(
-            name=' this is the mAin nÀMë and it\'s awεšome',
+            name=' this is the mAin nÀMë and it\'s awεšomeııı',
             pubdate='2012-02-18',
             status='option two',
-            slug1='main-name-and-its-awesome-2012-02-18',
-            slug2='option-two-main-name-and-its-awesome',
+            slug1='main-name-and-its-awesomeiii-2012-02-18',
+            slug2='option-two-main-name-and-its-awesomeiii',
         )
         self.assertEqual(RelatedPrepopulated.objects.all().count(), 4)
         RelatedPrepopulated.objects.get(

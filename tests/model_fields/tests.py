@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 import datetime
@@ -20,6 +21,7 @@ from django.db.models.fields import (
 from django.db.models.fields.files import FileField, ImageField
 from django.test.utils import requires_tz_support
 from django.utils import six, timezone
+from django.utils.encoding import force_str
 from django.utils.functional import lazy
 
 from .models import (
@@ -27,7 +29,8 @@ from .models import (
     Document, FksToBooleans, FkToChar, FloatModel, Foo, GenericIPAddress,
     IntegerModel, NullBooleanModel, PositiveIntegerModel,
     PositiveSmallIntegerModel, Post, PrimaryKeyCharModel, RenamedField,
-    SmallIntegerModel, VerboseNameField, Whiz, WhizIter, WhizIterEmpty,
+    SmallIntegerModel, UnicodeSlugField, VerboseNameField, Whiz, WhizIter,
+    WhizIterEmpty,
 )
 
 
@@ -113,7 +116,6 @@ class BasicFieldTests(test.TestCase):
         self.assertIsInstance(field.formfield(choices_form_class=klass), klass)
 
     def test_field_str(self):
-        from django.utils.encoding import force_str
         f = Foo._meta.get_field('a')
         self.assertEqual(force_str(f), "model_fields.Foo.a")
 
@@ -185,7 +187,7 @@ class ForeignKeyTests(test.TestCase):
 
     def test_warning_when_unique_true_on_fk(self):
         class FKUniqueTrue(models.Model):
-            fk_field = models.ForeignKey(Foo, unique=True)
+            fk_field = models.ForeignKey(Foo, models.CASCADE, unique=True)
 
         model = FKUniqueTrue()
         expected_warnings = [
@@ -211,7 +213,7 @@ class ForeignKeyTests(test.TestCase):
         pending_ops_before = list(apps._pending_operations.items())
 
         class AbstractForeignKeyModel(models.Model):
-            fk = models.ForeignKey('missing.FK')
+            fk = models.ForeignKey('missing.FK', models.CASCADE)
 
             class Meta:
                 abstract = True
@@ -233,7 +235,7 @@ class ManyToManyFieldTests(test.SimpleTestCase):
         pending_ops_before = list(apps._pending_operations.items())
 
         class AbstractManyToManyModel(models.Model):
-            fk = models.ForeignKey('missing.FK')
+            fk = models.ForeignKey('missing.FK', models.CASCADE)
 
             class Meta:
                 abstract = True
@@ -514,6 +516,14 @@ class SlugFieldTests(test.TestCase):
         bs = BigS.objects.create(s='slug' * 50)
         bs = BigS.objects.get(pk=bs.pk)
         self.assertEqual(bs.s, 'slug' * 50)
+
+    def test_slugfield_unicode_max_length(self):
+        """
+        SlugField with allow_unicode=True should honor max_length.
+        """
+        bs = UnicodeSlugField.objects.create(s='你好你好' * 50)
+        bs = UnicodeSlugField.objects.get(pk=bs.pk)
+        self.assertEqual(bs.s, '你好你好' * 50)
 
 
 class ValidationTest(test.SimpleTestCase):

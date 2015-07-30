@@ -41,7 +41,7 @@ lower level APIs:
 Configuring an engine
 =====================
 
-.. class:: Engine([dirs][, app_dirs][, allowed_include_roots][, context_processors][, debug][, loaders][, string_if_invalid][, file_charset][, libraries][, builtins])
+.. class:: Engine(dirs=None, app_dirs=False, allowed_include_roots=None, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
 
     .. versionadded:: 1.8
 
@@ -202,7 +202,7 @@ Once you have a compiled :class:`Template` object, you can render a context
 with it. You can reuse the same template to render it several times with
 different contexts.
 
-.. class:: Context([dict_][, current_app])
+.. class:: Context(dict_=None, current_app=_current_app_undefined)
 
     This class lives at ``django.template.Context``. The constructor takes
     two optional arguments:
@@ -585,7 +585,7 @@ against ``dict``::
 Subclassing Context: RequestContext
 -----------------------------------
 
-.. class:: RequestContext(request[, dict_][, processors])
+.. class:: RequestContext(request, dict_=None, processors=None)
 
 Django comes with a special ``Context`` class,
 ``django.template.RequestContext``, that acts slightly differently from the
@@ -892,6 +892,10 @@ loaders that come with Django:
 ``django.template.loaders.eggs.Loader``
 
 .. class:: eggs.Loader
+
+    .. deprecated:: 1.9
+
+        Distributing applications as eggs is not recommended.
 
     Just like ``app_directories`` above, but it loads templates from Python
     eggs rather than from the filesystem.

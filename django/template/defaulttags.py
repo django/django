@@ -12,7 +12,7 @@ from django.conf import settings
 from django.utils import six, timezone
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.html import format_html
+from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
 from django.utils.safestring import mark_safe
 
@@ -479,9 +479,16 @@ class URLNode(Node):
         try:
             current_app = context.request.current_app
         except AttributeError:
-            # Change the fallback value to None when the deprecation path for
+            # Leave only the else block when the deprecation path for
             # Context.current_app completes in Django 1.10.
-            current_app = context.current_app
+            # Can also remove the Context.is_current_app_set property.
+            if context.is_current_app_set:
+                current_app = context.current_app
+            else:
+                try:
+                    current_app = context.request.resolver_match.namespace
+                except AttributeError:
+                    current_app = None
 
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
@@ -512,6 +519,8 @@ class URLNode(Node):
             context[self.asvar] = url
             return ''
         else:
+            if context.autoescape:
+                url = conditional_escape(url)
             return url
 
 

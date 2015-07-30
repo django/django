@@ -37,14 +37,15 @@ class Serializer(base.Serializer):
         self._current = None
 
     def get_dump_object(self, obj):
-        data = OrderedDict([('model', force_text(obj._meta))])
+        model = obj._meta.proxy_for_model if obj._deferred else obj.__class__
+        data = OrderedDict([('model', force_text(model._meta))])
         if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
             data["pk"] = force_text(obj._get_pk_val(), strings_only=True)
         data['fields'] = self._current
         return data
 
     def handle_field(self, obj, field):
-        value = field._get_val_from_obj(obj)
+        value = field.value_from_object(obj)
         # Protected types (i.e., primitives like None, numbers, dates,
         # and Decimals) are passed through as is. All other values are
         # converted to string first.

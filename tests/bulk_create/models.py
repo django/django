@@ -6,6 +6,25 @@ class Country(models.Model):
     iso_two_letter = models.CharField(max_length=2)
 
 
+class ProxyCountry(Country):
+    class Meta:
+        proxy = True
+
+
+class ProxyProxyCountry(ProxyCountry):
+    class Meta:
+        proxy = True
+
+
+class ProxyMultiCountry(ProxyCountry):
+    pass
+
+
+class ProxyMultiProxyCountry(ProxyMultiCountry):
+    class Meta:
+        proxy = True
+
+
 class Place(models.Model):
     name = models.CharField(max_length=100)
 

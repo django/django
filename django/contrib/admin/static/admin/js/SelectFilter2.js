@@ -5,6 +5,7 @@ SelectFilter2 - Turns a multiple-select box into a filter interface.
 Requires core.js, SelectBox.js and addevent.js.
 */
 (function($) {
+    'use strict';
     function findForm(node) {
         // returns the node of the form containing the given node
         if (node.tagName.toLowerCase() !== 'form') {
@@ -24,7 +25,7 @@ Requires core.js, SelectBox.js and addevent.js.
             from_box.className = 'filtered';
 
             var ps = from_box.parentNode.getElementsByTagName('p');
-            for (var i=0; i<ps.length; i++) {
+            for (var i = 0; i < ps.length; i++) {
                 if (ps[i].className.indexOf("info") !== -1) {
                     // Remove <p class="info">, because it just gets in the way.
                     from_box.parentNode.removeChild(ps[i]);

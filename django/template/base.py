@@ -35,7 +35,7 @@ will be raised if the template doesn't have proper syntax.
 Sample code:
 
 >>> from django import template
->>> s = u'<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
+>>> s = '<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>'
 >>> t = template.Template(s)
 
 (t is now a compiled template, and its render() method can be called multiple
@@ -43,10 +43,10 @@ times with multiple contexts)
 
 >>> c = template.Context({'test':True, 'varvalue': 'Hello'})
 >>> t.render(c)
-u'<html><h1>Hello</h1></html>'
+'<html><h1>Hello</h1></html>'
 >>> c = template.Context({'test':False, 'varvalue': 'Hello'})
 >>> t.render(c)
-u'<html></html>'
+'<html></html>'
 """
 
 from __future__ import unicode_literals
@@ -102,9 +102,6 @@ COMMENT_TAG_END = '#}'
 TRANSLATOR_COMMENT_MARK = 'Translators'
 SINGLE_BRACE_START = '{'
 SINGLE_BRACE_END = '}'
-
-ALLOWED_VARIABLE_CHARS = ('abcdefghijklmnopqrstuvwxyz'
-                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.')
 
 # what to report as the origin for templates that come from non-loader sources
 # (e.g. strings)
@@ -759,15 +756,15 @@ class Variable(object):
     be a hard-coded string (if it begins and ends with single or double quote
     marks)::
 
-        >>> c = {'article': {'section':u'News'}}
+        >>> c = {'article': {'section':'News'}}
         >>> Variable('article.section').resolve(c)
-        u'News'
+        'News'
         >>> Variable('article').resolve(c)
-        {'section': u'News'}
+        {'section': 'News'}
         >>> class AClass: pass
         >>> c = AClass()
         >>> c.article = AClass()
-        >>> c.article.section = u'News'
+        >>> c.article.section = 'News'
 
     (The example assumes VARIABLE_ATTRIBUTE_SEPARATOR is '.')
     """

@@ -5,16 +5,16 @@ import re
 
 from django import forms
 from django.contrib.auth.forms import (
-    AuthenticationForm, PasswordChangeForm, PasswordResetForm,
-    ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget, SetPasswordForm,
-    UserChangeForm, UserCreationForm,
+    AdminPasswordChangeForm, AuthenticationForm, PasswordChangeForm,
+    PasswordResetForm, ReadOnlyPasswordHashField, ReadOnlyPasswordHashWidget,
+    SetPasswordForm, UserChangeForm, UserCreationForm,
 )
 from django.contrib.auth.models import User
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.mail import EmailMultiAlternatives
 from django.forms.fields import CharField, Field
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, mock, override_settings
 from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.text import capfirst
@@ -116,7 +116,8 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form['password1'].errors, required_error)
         self.assertEqual(form['password2'].errors, [])
 
-    def test_success(self):
+    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    def test_success(self, password_changed):
         # The success case.
         data = {
             'username': 'jsmith@example.com',
@@ -125,8 +126,32 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         }
         form = UserCreationForm(data)
         self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(password_changed.call_count, 0)
         u = form.save()
+        self.assertEqual(password_changed.call_count, 1)
         self.assertEqual(repr(u), '<User: jsmith@example.com>')
+
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[
+        {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+        {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {
+            'min_length': 12,
+        }},
+    ])
+    def test_validates_password(self):
+        data = {
+            'username': 'testclient',
+            'password1': 'testclient',
+            'password2': 'testclient',
+        }
+        form = UserCreationForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form['password2'].errors), 2)
+        self.assertIn('The password is too similar to the username.', form['password2'].errors)
+        self.assertIn(
+            'This password is too short. It must contain at least 12 characters.',
+            form['password2'].errors
+        )
 
 
 @override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
@@ -254,7 +279,8 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         self.assertEqual(form["new_password2"].errors,
                          [force_text(form.error_messages['password_mismatch'])])
 
-    def test_success(self):
+    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    def test_success(self, password_changed):
         user = User.objects.get(username='testclient')
         data = {
             'new_password1': 'abc123',
@@ -262,6 +288,10 @@ class SetPasswordFormTest(TestDataMixin, TestCase):
         }
         form = SetPasswordForm(user, data)
         self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(password_changed.call_count, 0)
+        form.save()
+        self.assertEqual(password_changed.call_count, 1)
 
     @override_settings(AUTH_PASSWORD_VALIDATORS=[
         {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -313,7 +343,8 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         self.assertEqual(form["new_password2"].errors,
                          [force_text(form.error_messages['password_mismatch'])])
 
-    def test_success(self):
+    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    def test_success(self, password_changed):
         # The success case.
         user = User.objects.get(username='testclient')
         data = {
@@ -323,6 +354,10 @@ class PasswordChangeFormTest(TestDataMixin, TestCase):
         }
         form = PasswordChangeForm(user, data)
         self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(password_changed.call_count, 0)
+        form.save()
+        self.assertEqual(password_changed.call_count, 1)
 
     def test_field_order(self):
         # Regression test - check the order of fields:
@@ -586,3 +621,21 @@ class ReadOnlyPasswordHashTest(SimpleTestCase):
     def test_readonly_field_has_changed(self):
         field = ReadOnlyPasswordHashField()
         self.assertFalse(field.has_changed('aaa', 'bbb'))
+
+
+@override_settings(USE_TZ=False, PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'])
+class AdminPasswordChangeFormTest(TestDataMixin, TestCase):
+
+    @mock.patch('django.contrib.auth.password_validation.password_changed')
+    def test_success(self, password_changed):
+        user = User.objects.get(username='testclient')
+        data = {
+            'password1': 'test123',
+            'password2': 'test123',
+        }
+        form = AdminPasswordChangeForm(user, data)
+        self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(password_changed.call_count, 0)
+        form.save()
+        self.assertEqual(password_changed.call_count, 1)

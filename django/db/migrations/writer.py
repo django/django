@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import collections
 import datetime
 import decimal
+import functools
 import math
 import os
 import re
@@ -155,6 +156,7 @@ class MigrationWriter(object):
         """
         items = {
             "replaces_str": "",
+            "initial_str": "",
         }
 
         imports = set()
@@ -210,6 +212,9 @@ class MigrationWriter(object):
         # If there's a replaces, make a string for it
         if self.migration.replaces:
             items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+
+        if self.migration.initial:
+            items['initial_str'] = "\n    initial = True\n"
 
         return (MIGRATION_TEMPLATE % items).encode("utf8")
 
@@ -435,6 +440,22 @@ class MigrationWriter(object):
             string, imports = OperationWriter(value, indentation=0).serialize()
             # Nested operation, trailing comma is handled in upper OperationWriter._write()
             return string.rstrip(','), imports
+        elif isinstance(value, functools.partial):
+            imports = {'import functools'}
+            # Serialize functools.partial() arguments
+            func_string, func_imports = cls.serialize(value.func)
+            args_string, args_imports = cls.serialize(value.args)
+            keywords_string, keywords_imports = cls.serialize(value.keywords)
+            # Add any imports needed by arguments
+            imports.update(func_imports)
+            imports.update(args_imports)
+            imports.update(keywords_imports)
+            return (
+                "functools.partial(%s, *%s, **%s)" % (
+                    func_string, args_string, keywords_string,
+                ),
+                imports,
+            )
         # Anything that knows how to deconstruct itself.
         elif hasattr(value, 'deconstruct'):
             return cls.serialize_deconstructed(*value.deconstruct())
@@ -468,6 +489,9 @@ class MigrationWriter(object):
                     "For more information, see "
                     "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
                     % (value.__name__, module_name, get_docs_version()))
+            # Needed on Python 2 only
+            if module_name == '__builtin__':
+                return value.__name__, set()
             return "%s.%s" % (module_name, value.__name__), {"import %s" % module_name}
         # Other iterables
         elif isinstance(value, collections.Iterable):
@@ -508,7 +532,7 @@ from __future__ import unicode_literals
 %(imports)s
 
 class Migration(migrations.Migration):
-%(replaces_str)s
+%(replaces_str)s%(initial_str)s
     dependencies = [
 %(dependencies)s\
     ]
