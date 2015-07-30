@@ -26,6 +26,8 @@ if HAS_GEOS:
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting.")
 class GeoIPTest(unittest.TestCase):
+    addr = '128.249.1.1'
+    fqdn = 'tmc.edu'
 
     def test01_init(self):
         "Testing GeoIP initialization."
@@ -71,10 +73,7 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP country querying methods."
         g = GeoIP(city='<foo>')
 
-        fqdn = 'www.google.com'
-        addr = '12.215.42.19'
-
-        for query in (fqdn, addr):
+        for query in (self.fqdn, self.addr):
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
@@ -87,9 +86,7 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
 
-        addr = '128.249.1.1'
-        fqdn = 'tmc.edu'
-        for query in (fqdn, addr):
+        for query in (self.fqdn, self.addr):
             # Country queries should still work.
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
