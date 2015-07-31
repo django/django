@@ -1292,6 +1292,10 @@ implementation details see :ref:`using-the-views`.
 
     Sample ``registration/password_reset_email.html`` (email body template):
 
+    .. versionadded:: 1.9 
+       
+    Passes ``extra_context`` parameter to the opt dictionary used for email template
+ 
     .. code-block:: html+django
 
         Someone asked for password reset for email {{ email }}. Follow the link below:
