@@ -12,6 +12,16 @@ class Stub(object):
 
 
 class WSGIRequestHandlerTestCase(TestCase):
+
+    def test_log_message(self):
+        request = WSGIRequest(RequestFactory().get('/').environ)
+        request.makefile = lambda *args, **kwargs: BytesIO()
+        handler = WSGIRequestHandler(request, '192.168.0.2', None)
+
+        with captured_stderr() as stderr:
+            handler.log_message('GET %s %s', 'A', 'B')
+        self.assertIn('] GET A B', stderr.getvalue())
+
     def test_https(self):
         request = WSGIRequest(RequestFactory().get('/').environ)
         request.makefile = lambda *args, **kwargs: BytesIO()

@@ -107,7 +107,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
     def log_message(self, format, *args):
 
-        msg = "[%s]" % self.log_date_time_string()
+        msg = "[%s] " % self.log_date_time_string()
         try:
             msg += "%s\n" % (format % args)
         except UnicodeDecodeError:
