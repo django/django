@@ -472,6 +472,16 @@ the manager class::
         use_for_related_fields = True
         # ...
 
+If you're using the :meth:`QuerySet.as_manager()
+<django.db.models.query.QuerySet.as_manager>` method described above, you can
+also set the attribute on your QuerySet object, too::
+
+    class MyQuerySet(models.QuerySet):
+        use_for_related_fields = True
+        # ...
+    ...
+    objects = MyQuerySet.as_manager()
+
 If this attribute is set on the *default* manager for a model (only the
 default manager is considered in these situations), Django will use that class
 whenever it needs to automatically create a manager for the class.  Otherwise,
@@ -510,9 +520,9 @@ in ``get_queryset()`` is not appropriate for use as an automatic manager.
 Set ``use_for_related_fields`` when you define the class
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``use_for_related_fields`` attribute must be set on the manager *class*, not
-on an *instance* of the class. The earlier example shows the correct way to set
-it, whereas the following will not work::
+The ``use_for_related_fields`` attribute must be set on the manager or
+queryset *class*, not on an *instance* of the class. The earlier example shows
+the correct way to set it, whereas the following will not work::
 
     # BAD: Incorrect code
     class MyManager(models.Manager):
