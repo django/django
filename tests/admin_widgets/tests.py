@@ -755,7 +755,7 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
 
             # Get the expected caption
             may_translation = month_names.split(' ')[4]
-            expected_caption = '{0:s} {1:d}'.format(may_translation, 1984)
+            expected_caption = '{0:s} {1:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
             with override_settings(LANGUAGE_CODE=language_code, USE_L10N=True):

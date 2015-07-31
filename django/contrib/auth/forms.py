@@ -72,7 +72,7 @@ class UserCreationForm(forms.ModelForm):
         widget=forms.PasswordInput)
     password2 = forms.CharField(label=_("Password confirmation"),
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."))
+        help_text=_("Enter the same password as before, for verification."))
 
     class Meta:
         model = User
@@ -86,6 +86,8 @@ class UserCreationForm(forms.ModelForm):
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
+        self.instance.username = self.cleaned_data.get('username')
+        password_validation.validate_password(self.cleaned_data.get('password2'), self.instance)
         return password2
 
     def save(self, commit=True):
@@ -289,7 +291,6 @@ class SetPasswordForm(forms.Form):
     def save(self, commit=True):
         password = self.cleaned_data["new_password1"]
         self.user.set_password(password)
-        password_validation.password_changed(password, self.user)
         if commit:
             self.user.save()
         return self.user
@@ -338,7 +339,7 @@ class AdminPasswordChangeForm(forms.Form):
     password2 = forms.CharField(
         label=_("Password (again)"),
         widget=forms.PasswordInput,
-        help_text=_("Enter the same password as above, for verification."),
+        help_text=_("Enter the same password as before, for verification."),
     )
 
     def __init__(self, user, *args, **kwargs):
@@ -363,7 +364,6 @@ class AdminPasswordChangeForm(forms.Form):
         """
         password = self.cleaned_data["password1"]
         self.user.set_password(password)
-        password_validation.password_changed(password, self.user)
         if commit:
             self.user.save()
         return self.user

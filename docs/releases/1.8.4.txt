@@ -1,0 +1,20 @@
+==========================
+Django 1.8.4 release notes
+==========================
+
+*Under development*
+
+Django 1.8.4 fixes several bugs in 1.8.3.
+
+Bugfixes
+========
+
+* Added the ability to serialize values from the newly added
+  :class:`~django.db.models.UUIDField` (:ticket:`25019`).
+
+* Added a system check warning if the old ``TEMPLATE_*`` settings are defined
+  in addition to the new ``TEMPLATES`` setting.
+
+* Fixed ``QuerySet.raw()`` so ``InvalidQuery`` is not raised when using the
+  ``db_column`` name of a ``ForeignKey`` field with ``primary_key=True``
+  (:ticket:`12768`).

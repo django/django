@@ -334,7 +334,7 @@ SyndicationFeed
 
     Base class for all syndication feeds. Subclasses should provide write().
 
-    .. method:: __init__(title, link, description, [language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs])
+    .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
 
         Initialize the feed with the given dictionary of metadata, which applies
         to the entire feed.
@@ -345,7 +345,7 @@ SyndicationFeed
         All parameters should be Unicode objects, except ``categories``, which
         should be a sequence of Unicode objects.
 
-    .. method:: add_item(title, link, description, [author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs])
+    .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs)
 
         Adds an item to the feed. All args are expected to be Python ``unicode``
         objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
@@ -836,11 +836,11 @@ appropriate entities.
 .. module:: django.utils.text
     :synopsis: Text manipulation.
 
-.. function:: slugify
+.. function:: slugify(allow_unicode=False)
 
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase. Also
-    strips leading and trailing whitespace.
+    Converts to ASCII if ``allow_unicode`` is ``False`` (default). Converts spaces to
+    hyphens. Removes characters that aren't alphanumerics, underscores, or
+    hyphens. Converts to lowercase. Also strips leading and trailing whitespace.
 
     For example::
 
@@ -848,6 +848,17 @@ appropriate entities.
 
     If ``value`` is ``"Joel is a slug"``, the output will be
     ``"joel-is-a-slug"``.
+
+    You can set the ``allow_unicode`` parameter to ``True``, if you want to
+    allow Unicode characters::
+
+        slugify(value, allow_unicode=True)
+
+    If ``value`` is ``"你好 World"``, the output will be ``"你好-world"``.
+
+    .. versionchanged:: 1.9
+
+        The ``allow_unicode`` parameter was added.
 
 .. _time-zone-selection-functions:
 

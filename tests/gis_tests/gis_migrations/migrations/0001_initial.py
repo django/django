@@ -19,7 +19,12 @@ ops = [
         name='Household',
         fields=[
             ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-            ('neighborhood', models.ForeignKey(to='gis_migrations.Neighborhood', to_field='id', null=True)),
+            ('neighborhood', models.ForeignKey(
+                'gis_migrations.Neighborhood',
+                models.SET_NULL,
+                to_field='id',
+                null=True,
+            )),
             ('address', models.CharField(max_length=100)),
             ('zip_code', models.IntegerField(null=True, blank=True)),
             ('geom', gis_models.PointField(srid=4326, geography=True)),
@@ -42,7 +47,7 @@ ops = [
     migrations.AddField(
         model_name='household',
         name='family',
-        field=models.ForeignKey(blank=True, to='gis_migrations.Family', null=True),
+        field=models.ForeignKey('gis_migrations.Family', models.SET_NULL, blank=True, null=True),
         preserve_default=True,
     )
 ]

@@ -30,6 +30,7 @@ from django.utils.deprecation import (
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
+from django.utils.version import get_docs_version
 
 RECURSIVE_RELATIONSHIP_CONSTANT = 'self'
 
@@ -764,16 +765,36 @@ def create_foreign_related_manager(superclass, rel):
             cache_name = self.field.related_query_name()
             return queryset, rel_obj_attr, instance_attr, False, cache_name
 
-        def add(self, *objs):
+        def add(self, *objs, **kwargs):
+            bulk = kwargs.pop('bulk', True)
             objs = list(objs)
             db = router.db_for_write(self.model, instance=self.instance)
-            with transaction.atomic(using=db, savepoint=False):
+
+            def check_and_update_obj(obj):
+                if not isinstance(obj, self.model):
+                    raise TypeError("'%s' instance expected, got %r" % (
+                        self.model._meta.object_name, obj,
+                    ))
+                setattr(obj, self.field.name, self.instance)
+
+            if bulk:
+                pks = []
                 for obj in objs:
-                    if not isinstance(obj, self.model):
-                        raise TypeError("'%s' instance expected, got %r" %
-                                        (self.model._meta.object_name, obj))
-                    setattr(obj, self.field.name, self.instance)
-                    obj.save()
+                    check_and_update_obj(obj)
+                    if obj._state.adding or obj._state.db != db:
+                        raise ValueError(
+                            "%r instance isn't saved. Use bulk=False or save "
+                            "the object first." % obj
+                        )
+                    pks.append(obj.pk)
+                self.model._base_manager.using(db).filter(pk__in=pks).update(**{
+                    self.field.name: self.instance,
+                })
+            else:
+                with transaction.atomic(using=db, savepoint=False):
+                    for obj in objs:
+                        check_and_update_obj(obj)
+                        obj.save()
         add.alters_data = True
 
         def create(self, **kwargs):
@@ -834,6 +855,7 @@ def create_foreign_related_manager(superclass, rel):
             # could be affected by `manager.clear()`. Refs #19816.
             objs = tuple(objs)
 
+            bulk = kwargs.pop('bulk', True)
             clear = kwargs.pop('clear', False)
 
             if self.field.null:
@@ -841,7 +863,7 @@ def create_foreign_related_manager(superclass, rel):
                 with transaction.atomic(using=db, savepoint=False):
                     if clear:
                         self.clear()
-                        self.add(*objs)
+                        self.add(*objs, bulk=bulk)
                     else:
                         old_objs = set(self.using(db).all())
                         new_objs = []
@@ -851,10 +873,10 @@ def create_foreign_related_manager(superclass, rel):
                             else:
                                 new_objs.append(obj)
 
-                        self.remove(*old_objs)
-                        self.add(*new_objs)
+                        self.remove(*old_objs, bulk=bulk)
+                        self.add(*new_objs, bulk=bulk)
             else:
-                self.add(*objs)
+                self.add(*objs, bulk=bulk)
         set.alters_data = True
 
     return RelatedManager
@@ -1584,9 +1606,10 @@ class ForeignObject(RelatedField):
     related_accessor_class = ForeignRelatedObjectsDescriptor
     rel_class = ForeignObjectRel
 
-    def __init__(self, to, from_fields, to_fields, rel=None, related_name=None,
+    def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
             related_query_name=None, limit_choices_to=None, parent_link=False,
-            on_delete=CASCADE, swappable=True, **kwargs):
+            swappable=True, **kwargs):
+
         if rel is None:
             rel = self.rel_class(
                 self, to,
@@ -1650,14 +1673,14 @@ class ForeignObject(RelatedField):
 
     def deconstruct(self):
         name, path, args, kwargs = super(ForeignObject, self).deconstruct()
+        kwargs['on_delete'] = self.remote_field.on_delete
         kwargs['from_fields'] = self.from_fields
         kwargs['to_fields'] = self.to_fields
+
         if self.remote_field.related_name is not None:
             kwargs['related_name'] = self.remote_field.related_name
         if self.remote_field.related_query_name is not None:
             kwargs['related_query_name'] = self.remote_field.related_query_name
-        if self.remote_field.on_delete != CASCADE:
-            kwargs['on_delete'] = self.remote_field.on_delete
         if self.remote_field.parent_link:
             kwargs['parent_link'] = self.remote_field.parent_link
         # Work out string form of "to"
@@ -1866,8 +1889,8 @@ class ForeignKey(ForeignObject):
     }
     description = _("Foreign Key (type determined by related field)")
 
-    def __init__(self, to, to_field=None, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, on_delete=CASCADE,
+    def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
+            limit_choices_to=None, parent_link=False, to_field=None,
             db_constraint=True, **kwargs):
         try:
             to._meta.model_name
@@ -1885,6 +1908,28 @@ class ForeignKey(ForeignObject):
             # be correct until contribute_to_class is called. Refs #12190.
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
 
+        if on_delete is None:
+            warnings.warn(
+                "on_delete will be a required arg for %s in Django 2.0. "
+                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
+                "#django.db.models.ForeignKey.on_delete" % (
+                    self.__class__.__name__,
+                    get_docs_version(),
+                ),
+                RemovedInDjango20Warning, 2)
+            on_delete = CASCADE
+
+        elif not callable(on_delete):
+            warnings.warn(
+                "The signature for {0} will change in Django 2.0. "
+                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
+                    self.__class__.__name__,
+                    on_delete,
+                ),
+                RemovedInDjango20Warning, 2)
+            on_delete, to_field = to_field, on_delete
+
         kwargs['rel'] = self.rel_class(
             self, to, to_field,
             related_name=related_name,
@@ -1897,7 +1942,7 @@ class ForeignKey(ForeignObject):
         kwargs['db_index'] = kwargs.get('db_index', True)
 
         super(ForeignKey, self).__init__(
-            to, from_fields=['self'], to_fields=[to_field], **kwargs)
+            to, on_delete, from_fields=['self'], to_fields=[to_field], **kwargs)
 
         self.db_constraint = db_constraint
 
@@ -2101,9 +2146,33 @@ class OneToOneField(ForeignKey):
 
     description = _("One-to-one relationship")
 
-    def __init__(self, to, to_field=None, **kwargs):
+    def __init__(self, to, on_delete=None, to_field=None, **kwargs):
         kwargs['unique'] = True
-        super(OneToOneField, self).__init__(to, to_field, **kwargs)
+
+        if on_delete is None:
+            warnings.warn(
+                "on_delete will be a required arg for %s in Django 2.0. "
+                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
+                "#django.db.models.ForeignKey.on_delete" % (
+                    self.__class__.__name__,
+                    get_docs_version(),
+                ),
+                RemovedInDjango20Warning, 2)
+            on_delete = CASCADE
+
+        elif not callable(on_delete):
+            warnings.warn(
+                "The signature for {0} will change in Django 2.0. "
+                "Pass to_field='{1}' as a kwarg instead of as an arg.".format(
+                    self.__class__.__name__,
+                    on_delete,
+                ),
+                RemovedInDjango20Warning, 2)
+            to_field = on_delete
+            on_delete = CASCADE  # Avoid warning in superclass
+
+        super(OneToOneField, self).__init__(to, on_delete, to_field=to_field, **kwargs)
 
     def deconstruct(self):
         name, path, args, kwargs = super(OneToOneField, self).deconstruct()
@@ -2162,12 +2231,14 @@ def create_many_to_many_intermediary_model(field, klass):
             related_name='%s+' % name,
             db_tablespace=field.db_tablespace,
             db_constraint=field.remote_field.db_constraint,
+            on_delete=CASCADE,
         ),
         to: models.ForeignKey(
             to_model,
             related_name='%s+' % name,
             db_tablespace=field.db_tablespace,
             db_constraint=field.remote_field.db_constraint,
+            on_delete=CASCADE,
         )
     })
 

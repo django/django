@@ -40,7 +40,7 @@ class CategoryMetaData(models.Model):
 @python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
-    meta_data = models.ForeignKey(CategoryMetaData, null=True, default=None)
+    meta_data = models.ForeignKey(CategoryMetaData, models.SET_NULL, null=True, default=None)
 
     class Meta:
         ordering = ('name',)
@@ -62,7 +62,7 @@ class Author(models.Model):
 
 @python_2_unicode_compatible
 class Article(models.Model):
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
@@ -77,7 +77,7 @@ class Article(models.Model):
 
 @python_2_unicode_compatible
 class AuthorProfile(models.Model):
-    author = models.OneToOneField(Author, primary_key=True)
+    author = models.OneToOneField(Author, models.CASCADE, primary_key=True)
     date_of_birth = models.DateField()
 
     def __str__(self):
@@ -97,7 +97,7 @@ class Actor(models.Model):
 
 @python_2_unicode_compatible
 class Movie(models.Model):
-    actor = models.ForeignKey(Actor)
+    actor = models.ForeignKey(Actor, models.CASCADE)
     title = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
 
@@ -141,7 +141,7 @@ class TeamField(models.CharField):
         return Team(value)
 
     def value_to_string(self, obj):
-        return self._get_val_from_obj(obj).to_string()
+        return self.value_from_object(obj).to_string()
 
     def deconstruct(self):
         name, path, args, kwargs = super(TeamField, self).deconstruct()

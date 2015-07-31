@@ -137,11 +137,11 @@ class RelatedModel(models.Model):
 
 @python_2_unicode_compatible
 class RelationModel(models.Model):
-    fk = models.ForeignKey(RelatedModel, related_name='test_fk')
+    fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name='test_fk')
 
     m2m = models.ManyToManyField(RelatedModel, related_name='test_m2m')
 
-    gfk_ctype = models.ForeignKey(ContentType, null=True)
+    gfk_ctype = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     gfk_id = models.IntegerField(null=True)
     gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
 

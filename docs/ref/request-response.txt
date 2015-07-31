@@ -539,7 +539,7 @@ In addition, ``QueryDict`` has the following methods:
         >>> q.dict()
         {'a': '5'}
 
-.. method:: QueryDict.urlencode([safe])
+.. method:: QueryDict.urlencode(safe=None)
 
     Returns a string of the data in query-string format. Example::
 
@@ -1047,7 +1047,7 @@ Attributes
 FileResponse objects
 ====================
 
-.. versionadded:: 1.8
+.. versionadded:: 1.7.4
 
 .. class:: FileResponse
 

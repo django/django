@@ -8,7 +8,8 @@
         id: '#{{ field.field.auto_id }}',
         dependency_ids: [],
         dependency_list: [],
-        maxLength: {{ field.field.field.max_length|default_if_none:"50"|unlocalize }}
+        maxLength: {{ field.field.field.max_length|default:"50"|unlocalize }},
+        allowUnicode: {{ field.field.field.allow_unicode|default:"false"|lower }}
     };
 
     {% for dependency in field.dependencies %}
@@ -21,7 +22,7 @@
     {% endcomment %}
     $('.empty-form .form-row .field-{{ field.field.name }}, .empty-form.form-row .field-{{ field.field.name }}').addClass('prepopulated_field');
     $(field.id).data('dependency_list', field['dependency_list'])
-               .prepopulate(field['dependency_ids'], field.maxLength);
+               .prepopulate(field['dependency_ids'], field.maxLength, field.allowUnicode);
 {% endfor %}
 })(django.jQuery);
 </script>

@@ -68,7 +68,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``RegexValidator``
 ------------------
 
-.. class:: RegexValidator([regex=None, message=None, code=None, inverse_match=None, flags=0])
+.. class:: RegexValidator(regex=None, message=None, code=None, inverse_match=None, flags=0)
 
     :param regex: If not ``None``, overrides :attr:`regex`. Can be a regular
         expression string or a pre-compiled regular expression.
@@ -115,7 +115,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``EmailValidator``
 ------------------
 
-.. class:: EmailValidator([message=None, code=None, whitelist=None])
+.. class:: EmailValidator(message=None, code=None, whitelist=None)
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -144,7 +144,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``URLValidator``
 ----------------
 
-.. class:: URLValidator([schemes=None, regex=None, message=None, code=None])
+.. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
     A :class:`RegexValidator` that ensures a value looks like a URL, and raises
     an error code of ``'invalid'`` if it doesn't.
@@ -182,6 +182,16 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     A :class:`RegexValidator` instance that ensures a value consists of only
     letters, numbers, underscores or hyphens.
+
+``validate_unicode_slug``
+-------------------------
+
+.. data:: validate_unicode_slug
+
+    .. versionadded:: 1.9
+
+    A :class:`RegexValidator` instance that ensures a value consists of only
+    Unicode letters, numbers, underscores, or hyphens.
 
 ``validate_ipv4_address``
 -------------------------

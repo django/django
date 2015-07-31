@@ -128,7 +128,7 @@ QuerySet API
 
 Here's the formal declaration of a ``QuerySet``:
 
-.. class:: QuerySet([model=None, query=None, using=None])
+.. class:: QuerySet(model=None, query=None, using=None)
 
     Usually when you'll interact with a ``QuerySet`` you'll use it by
     :ref:`chaining filters <chaining-filters>`. To make this work, most
@@ -350,7 +350,11 @@ related model ordering can change the expected results.
     Consider this case::
 
          class Event(Model):
-            parent = models.ForeignKey('self', related_name='children')
+            parent = models.ForeignKey(
+                'self',
+                on_delete=models.CASCADE,
+                related_name='children',
+            )
             date = models.DateField()
 
          Event.objects.order_by('children__date')
@@ -429,7 +433,7 @@ remain undefined afterward).
 distinct
 ~~~~~~~~
 
-.. method:: distinct([*fields])
+.. method:: distinct(*fields)
 
 Returns a new ``QuerySet`` that uses ``SELECT DISTINCT`` in its SQL query. This
 eliminates duplicate rows from the query results.
@@ -806,11 +810,16 @@ following models::
 
     class Person(models.Model):
         # ...
-        hometown = models.ForeignKey(City)
+        hometown = models.ForeignKey(
+            City,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
     class Book(models.Model):
         # ...
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
 ... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
 will cache the related ``Person`` *and* the related ``City``::

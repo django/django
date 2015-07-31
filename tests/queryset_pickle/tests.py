@@ -2,9 +2,11 @@ from __future__ import unicode_literals
 
 import datetime
 import pickle
+import unittest
 import warnings
 
 from django.test import TestCase
+from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.version import get_version
 
@@ -28,20 +30,15 @@ class PickleabilityTestCase(TestCase):
     def test_datetime_callable_default_filter(self):
         self.assert_pickles(Happening.objects.filter(when=datetime.datetime.now()))
 
-    def test_lambda_as_default(self):
+    def test_string_as_default(self):
         self.assert_pickles(Happening.objects.filter(name="test"))
 
     def test_standalone_method_as_default(self):
         self.assert_pickles(Happening.objects.filter(number1=1))
 
+    @unittest.skipIf(six.PY2, "Field doesn't exist on Python 2.")
     def test_staticmethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number2=1))
-
-    def test_classmethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number3=1))
-
-    def test_membermethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number4=1))
 
     def test_filter_reverse_fk(self):
         self.assert_pickles(Group.objects.filter(event=1))

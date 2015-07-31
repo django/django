@@ -176,6 +176,10 @@ class FieldsTests(SimpleTestCase):
         self.assertEqual(f.clean(' 1'), ' 1')
         self.assertEqual(f.clean('1 '), '1 ')
 
+    def test_charfield_disabled(self):
+        f = CharField(disabled=True)
+        self.assertWidgetRendersTo(f, '<input type="text" name="f" id="id_f" disabled />')
+
     # IntegerField ################################################################
 
     def test_integerfield_1(self):
@@ -847,19 +851,23 @@ class FieldsTests(SimpleTestCase):
         This also tests the situation when Pillow doesn't detect the MIME type
         of the image (#24948).
         """
-        f = ImageField()
+        from PIL.BmpImagePlugin import BmpImageFile
+        try:
+            Image.register_mime(BmpImageFile.format, None)
+            f = ImageField()
+            img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.bmp'
+            with open(img_path, 'rb') as img_file:
+                img_data = img_file.read()
 
-        img_path = os.path.dirname(upath(__file__)) + '/filepath_test_files/1x1.bmp'
-        with open(img_path, 'rb') as img_file:
-            img_data = img_file.read()
+            img_file = SimpleUploadedFile('1x1.bmp', img_data)
+            img_file.content_type = 'text/plain'
 
-        img_file = SimpleUploadedFile('1x1.bmp', img_data)
-        img_file.content_type = 'text/plain'
+            uploaded_file = f.clean(img_file)
 
-        uploaded_file = f.clean(img_file)
-
-        self.assertEqual('BMP', uploaded_file.image.format)
-        self.assertIsNone(uploaded_file.content_type)
+            self.assertEqual('BMP', uploaded_file.image.format)
+            self.assertIsNone(uploaded_file.content_type)
+        finally:
+            Image.register_mime(BmpImageFile.format, 'image/bmp')
 
     # URLField ##################################################################
 
@@ -1071,6 +1079,12 @@ class FieldsTests(SimpleTestCase):
         choices = [('P', 'Paul')]
         form = ChoiceFieldForm()
         self.assertEqual([('P', 'Paul')], list(form.fields['choicefield'].choices))
+
+    def test_choicefield_disabled(self):
+        f = ChoiceField(choices=[('J', 'John'), ('P', 'Paul')], disabled=True)
+        self.assertWidgetRendersTo(f,
+            '<select id="id_f" name="f" disabled><option value="J">John</option>'
+            '<option value="P">Paul</option></select>')
 
     # TypedChoiceField ############################################################
     # TypedChoiceField is just like ChoiceField, except that coerced types will
@@ -1541,6 +1555,16 @@ class FieldsTests(SimpleTestCase):
     def test_slugfield_normalization(self):
         f = SlugField()
         self.assertEqual(f.clean('    aa-bb-cc    '), 'aa-bb-cc')
+
+    def test_slugfield_unicode_normalization(self):
+        f = SlugField(allow_unicode=True)
+        self.assertEqual(f.clean('a'), 'a')
+        self.assertEqual(f.clean('1'), '1')
+        self.assertEqual(f.clean('a1'), 'a1')
+        self.assertEqual(f.clean('你好'), '你好')
+        self.assertEqual(f.clean('  你-好  '), '你-好')
+        self.assertEqual(f.clean('ıçğüş'), 'ıçğüş')
+        self.assertEqual(f.clean('foo-ıç-bar'), 'foo-ıç-bar')
 
     # UUIDField ###################################################################
 

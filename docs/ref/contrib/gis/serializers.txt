@@ -7,9 +7,17 @@ GeoJSON Serializer
 .. module:: django.contrib.gis.serializers.geojson
    :synopsis: Serialization of GeoDjango models in the GeoJSON format.
 
-GeoDjango provides a specific serializer for the `GeoJSON`__ format. The GDAL
-library is required for this serializer. See :doc:`/topics/serialization` for
-more information on serialization.
+GeoDjango provides a specific serializer for the `GeoJSON`__ format. See
+:doc:`/topics/serialization` for more information on serialization.
+
+The GDAL library is required if any of the serialized geometries need
+coordinate transformations (that is if the geometry's spatial reference system
+differs from the ``srid`` serializer option).
+
+.. versionchanged:: 1.9
+
+    The GeoJSON serializer no longer needs GDAL if all geometries are in the
+    same coordinate system as the ``srid`` serializer option.
 
 __ http://geojson.org/
 

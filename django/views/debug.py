@@ -6,9 +6,7 @@ import types
 
 from django.conf import settings
 from django.core.urlresolvers import Resolver404, resolve
-from django.http import (
-    HttpRequest, HttpResponse, HttpResponseNotFound, build_request_repr,
-)
+from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
 from django.utils import lru_cache, six, timezone
@@ -113,12 +111,6 @@ class ExceptionReporterFilter(object):
     contain lenient default behaviors.
     """
 
-    def get_request_repr(self, request):
-        if request is None:
-            return repr(None)
-        else:
-            return build_request_repr(request, POST_override=self.get_post_parameters(request))
-
     def get_post_parameters(self, request):
         if request is None:
             return {}
@@ -186,16 +178,13 @@ class SafeExceptionReporterFilter(ExceptionReporterFilter):
     def cleanse_special_types(self, request, value):
         try:
             # If value is lazy or a complex object of another kind, this check
-            # might raise an exception. isinstance checks that lazy HttpRequests
-            # or MultiValueDicts will have a return value.
-            is_request = isinstance(value, HttpRequest)
+            # might raise an exception. isinstance checks that lazy
+            # MultiValueDicts will have a return value.
+            is_multivalue_dict = isinstance(value, MultiValueDict)
         except Exception as e:
             return '{!r} while evaluating {!r}'.format(e, value)
 
-        if is_request:
-            # Cleanse the request's POST parameters.
-            value = self.get_request_repr(value)
-        elif isinstance(value, MultiValueDict):
+        if is_multivalue_dict:
             # Cleanse MultiValueDicts (request.POST is the one we usually care about)
             value = self.get_cleansed_multivaluedict(request, value)
         return value
@@ -657,7 +646,7 @@ TECHNICAL_500_TEMPLATE = ("""
     function switchPastebinFriendly(link) {
       s1 = "Switch to copy-and-paste view";
       s2 = "Switch back to interactive view";
-      link.innerHTML = link.innerHTML == s1 ? s2: s1;
+      link.innerHTML = link.innerHTML.trim() == s1 ? s2: s1;
       toggle('browserTraceback', 'pastebinTraceback');
       return false;
     }
@@ -762,11 +751,9 @@ TECHNICAL_500_TEMPLATE = ("""
    {% for source_line in template_info.source_lines %}
    {% ifequal source_line.0 template_info.line %}
    <tr class="error"><th>{{ source_line.0 }}</th>
-     <td>
-      {{ template_info.before }}
-      <span class="specific">{{ template_info.during }}</span>
-      {{ template_info.after }}
-      </td>
+     <td>{{ template_info.before }}"""
+      """<span class="specific">{{ template_info.during }}</span>"""
+      """{{ template_info.after }}</td>
    </tr>
    {% else %}
       <tr><th>{{ source_line.0 }}</th>
@@ -808,7 +795,7 @@ TECHNICAL_500_TEMPLATE = ("""
               {% endif %}
               <ol start="{{ frame.lineno }}" class="context-line">
                 <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>
-            {{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
+"""            """{{ frame.context_line|escape }}</pre>{% if not is_email %} <span>...</span>{% endif %}</li></ol>
               {% if frame.post_context and not is_email  %}
                 <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
                   {% for line in frame.post_context %}
@@ -883,12 +870,14 @@ Using engine {{ entry.backend.name }}:
 {% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
-   {{ template_info.message }}{% for source_line in template_info.source_lines %}
-{% ifequal source_line.0 template_info.line %}
-   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
-{% else %}
-   {{ source_line.0 }} : {{ source_line.1 }}
-{% endifequal %}{% endfor %}{% endif %}
+   {{ template_info.message }}"""
+"{% for source_line in template_info.source_lines %}"
+"{% ifequal source_line.0 template_info.line %}"
+"   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}"
+"{% else %}"
+"   {{ source_line.0 }} : {{ source_line.1 }}"
+"""{% endifequal %}{% endfor %}{% endif %}
+
 Traceback:{% for frame in frames %}
 {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}{% if frame.exc_cause_explicit %}
 The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
@@ -1055,7 +1044,7 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """)
 
-TECHNICAL_500_TEXT_TEMPLATE = """{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = ("""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
@@ -1081,16 +1070,18 @@ Using engine {{ entry.backend.name }}:
 {% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
-   {{ template_info.message }}{% for source_line in template_info.source_lines %}
-{% ifequal source_line.0 template_info.line %}
-   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}
-{% else %}
-   {{ source_line.0 }} : {{ source_line.1 }}
-   {% endifequal %}{% endfor %}{% endif %}{% if frames %}
-Traceback:
-{% for frame in frames %}
-{% ifchanged frame.exc_cause %}
-  {% if frame.exc_cause %}
+   {{ template_info.message }}
+{% for source_line in template_info.source_lines %}"""
+"{% ifequal source_line.0 template_info.line %}"
+"   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}"
+"{% else %}"
+"   {{ source_line.0 }} : {{ source_line.1 }}"
+"""{% endifequal %}{% endfor %}{% endif %}{% if frames %}
+
+Traceback:"""
+"{% for frame in frames %}"
+"{% ifchanged frame.exc_cause %}"
+"  {% if frame.exc_cause %}" """
     {% if frame.exc_cause_explicit %}
       The above exception ({{ frame.exc_cause }}) was the direct cause of the following exception:
     {% else %}
@@ -1124,10 +1115,12 @@ Settings:
 Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:"0" %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 
+{% if not is_email %}
 You're seeing this error because you have DEBUG = True in your
 Django settings file. Change that to False, and Django will
 display a standard page generated by the handler for this status code.
-"""
+{% endif %}
+""")
 
 TECHNICAL_404_TEMPLATE = """
 <!DOCTYPE html>

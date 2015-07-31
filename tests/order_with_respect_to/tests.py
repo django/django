@@ -91,7 +91,7 @@ class OrderWithRespectToTests2(TestCase):
             pass
 
         class Foo(models.Model):
-            bar = models.ForeignKey(Bar)
+            bar = models.ForeignKey(Bar, models.CASCADE)
             order = models.OrderWrt()
 
             class Meta:

@@ -299,6 +299,17 @@ as the rendered output.
 See the :ref:`format localization <format-localization>` documentation for
 more information.
 
+``disabled``
+~~~~~~~~~~~~
+
+.. attribute:: Field.disabled
+
+.. versionadded:: 1.9
+
+The ``disabled`` boolean argument, when set to ``True``, disables a form field
+using the ``disabled`` HTML attribute so that it won't be editable by users.
+Even if a user tampers with the field's value submitted to the server, it will
+be ignored in favor of the value from the form's initial data.
 
 Checking if the field data has changed
 --------------------------------------
@@ -863,6 +874,15 @@ For each field, we describe the default widget used if you don't specify
 
    This field is intended for use in representing a model
    :class:`~django.db.models.SlugField` in forms.
+
+   Takes an optional parameter:
+
+   .. attribute:: allow_unicode
+
+       .. versionadded:: 1.9
+
+       A boolean instructing the field to accept Unicode letters in addition
+       to ASCII letters. Defaults to ``False``.
 
 ``TimeField``
 ~~~~~~~~~~~~~

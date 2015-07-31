@@ -579,7 +579,7 @@ Robert Wittams
     forms, admin, amongst others; he is most known for his work on
     multiple-database support in Django.
 
-    Alex lives in San Francisco, CA, USA.
+    Alex lives in Washington, DC, USA.
 
     .. _Alex Gaynor: https://alexgaynor.net
 

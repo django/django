@@ -74,7 +74,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
 
     def test_bookmarklets(self):
         response = self.client.get(reverse('django-admindocs-bookmarklets'))
-        self.assertContains(response, 'http://testserver/admin/doc/views/')
+        self.assertContains(response, '/admindocs/views/')
 
     def test_templatetag_index(self):
         response = self.client.get(reverse('django-admindocs-tags'))

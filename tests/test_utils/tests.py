@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import unittest
+import warnings
 
 from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
@@ -13,12 +14,14 @@ from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.test import (
-    SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature,
+    SimpleTestCase, TestCase, ignore_warnings, skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
 from django.utils._os import abspathu
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .models import Car, Person, PossessedCar
 from .views import empty_response
@@ -752,11 +755,22 @@ class AssertRaisesMsgTest(SimpleTestCase):
             raise ValueError("[.*x+]y?")
         self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_callable_obj_param(self):
         # callable_obj was a documented kwarg in Django 1.8 and older.
         def func1():
             raise ValueError("[.*x+]y?")
-        self.assertRaisesMessage(ValueError, "[.*x+]y?", callable_obj=func1)
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            self.assertRaisesMessage(ValueError, "[.*x+]y?", callable_obj=func1)
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            'The callable_obj kwarg is deprecated. Pass the callable '
+            'as a positional argument instead.'
+        )
 
 
 class AssertFieldOutputTests(SimpleTestCase):

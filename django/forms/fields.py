@@ -70,7 +70,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False, label_suffix=None):
+                 validators=[], localize=False, disabled=False, label_suffix=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -90,11 +90,14 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         #                        hidden widget with initial value after widget.
         # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
+        # disabled -- Boolean that specifies whether the field is disabled, that
+        #             is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
+        self.disabled = disabled
         self.label_suffix = label_suffix
         widget = widget or self.widget
         if isinstance(widget, type):
@@ -1236,6 +1239,12 @@ class GenericIPAddressField(CharField):
 
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
+
+    def __init__(self, *args, **kwargs):
+        self.allow_unicode = kwargs.pop('allow_unicode', False)
+        if self.allow_unicode:
+            self.default_validators = [validators.validate_unicode_slug]
+        super(SlugField, self).__init__(*args, **kwargs)
 
 
 class UUIDField(CharField):

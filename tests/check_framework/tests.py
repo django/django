@@ -282,8 +282,12 @@ class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
             pass
 
         class ModelWithDescriptorCalledCheck(models.Model):
-            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck)
-            article = models.ForeignKey(ModelWithRelatedManagerCalledCheck, related_name='check')
+            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck, models.CASCADE)
+            article = models.ForeignKey(
+                ModelWithRelatedManagerCalledCheck,
+                models.CASCADE,
+                related_name='check',
+            )
 
         errors = checks.run_checks()
         expected = [

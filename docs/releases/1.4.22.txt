@@ -1,0 +1,9 @@
+===========================
+Django 1.4.22 release notes
+===========================
+
+*Under development*
+
+Django 1.4.22 fixes support with pip 7+ by disabling wheel support. Older
+versions of 1.4 would silently build a broken wheel when installed with those
+versions of pip.

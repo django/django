@@ -99,7 +99,7 @@ Example::
         instrument = models.CharField(max_length=100)
 
     class Album(models.Model):
-        artist = models.ForeignKey(Musician)
+        artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
         name = models.CharField(max_length=100)
         release_date = models.DateField()
         num_stars = models.IntegerField()
@@ -281,9 +281,17 @@ In this example, the verbose name is ``"first name"``::
 :class:`~django.db.models.OneToOneField` require the first argument to be a
 model class, so use the :attr:`~Field.verbose_name` keyword argument::
 
-    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        verbose_name="the related poll",
+    )
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
-    place = models.OneToOneField(Place, verbose_name="related place")
+    place = models.OneToOneField(
+        Place,
+        on_delete=models.CASCADE,
+        verbose_name="related place",
+    )
 
 The convention is not to capitalize the first letter of the
 :attr:`~Field.verbose_name`. Django will automatically capitalize the first
@@ -317,7 +325,7 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         pass
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey(Manufacturer)
+        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
         # ...
 
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
@@ -331,7 +339,10 @@ above) be the name of the model, lowercase. You can, of course, call the field
 whatever you want. For example::
 
     class Car(models.Model):
-        company_that_makes_it = models.ForeignKey(Manufacturer)
+        company_that_makes_it = models.ForeignKey(
+            Manufacturer,
+            on_delete=models.CASCADE,
+        )
         # ...
 
 .. seealso::
@@ -445,8 +456,8 @@ something like this::
             return self.name
 
     class Membership(models.Model):
-        person = models.ForeignKey(Person)
-        group = models.ForeignKey(Group)
+        person = models.ForeignKey(Person, on_delete=models.CASCADE)
+        group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
@@ -621,7 +632,12 @@ just refer to the other model class wherever needed. For example::
 
     class Restaurant(models.Model):
         # ...
-        zip_code = models.ForeignKey(ZipCode)
+        zip_code = models.ForeignKey(
+            ZipCode,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
 Field name restrictions
 -----------------------

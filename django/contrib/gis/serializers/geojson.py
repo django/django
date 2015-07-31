@@ -17,17 +17,14 @@ class Serializer(JSONSerializer):
     def _init_options(self):
         super(Serializer, self)._init_options()
         self.geometry_field = self.json_kwargs.pop('geometry_field', None)
-        self.srs = SpatialReference(self.json_kwargs.pop('srid', 4326))
+        self.srid = self.json_kwargs.pop('srid', 4326)
 
     def start_serialization(self):
-        if not HAS_GDAL:
-            # GDAL is needed for the geometry.geojson call
-            raise SerializationError("The geojson serializer requires the GDAL library.")
         self._init_options()
         self._cts = {}  # cache of CoordTransform's
         self.stream.write(
             '{"type": "FeatureCollection", "crs": {"type": "name", "properties": {"name": "EPSG:%d"}},'
-            ' "features": [' % self.srs.srid)
+            ' "features": [' % self.srid)
 
     def end_serialization(self):
         self.stream.write(']}')
@@ -48,10 +45,15 @@ class Serializer(JSONSerializer):
             "properties": self._current,
         }
         if self._geometry:
-            if self._geometry.srid != self.srs.srid:
+            if self._geometry.srid != self.srid:
                 # If needed, transform the geometry in the srid of the global geojson srid
+                if not HAS_GDAL:
+                    raise SerializationError(
+                        'Unable to convert geometry to SRID %s when GDAL is not installed.' % self.srid
+                    )
                 if self._geometry.srid not in self._cts:
-                    self._cts[self._geometry.srid] = CoordTransform(self._geometry.srs, self.srs)
+                    srs = SpatialReference(self.srid)
+                    self._cts[self._geometry.srid] = CoordTransform(self._geometry.srs, srs)
                 self._geometry.transform(self._cts[self._geometry.srid])
             data["geometry"] = eval(self._geometry.geojson)
         else:
@@ -60,7 +62,7 @@ class Serializer(JSONSerializer):
 
     def handle_field(self, obj, field):
         if field.name == self.geometry_field:
-            self._geometry = field._get_val_from_obj(obj)
+            self._geometry = field.value_from_object(obj)
         else:
             super(Serializer, self).handle_field(obj, field)
 

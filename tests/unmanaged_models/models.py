@@ -24,7 +24,7 @@ class A01(models.Model):
 
 @python_2_unicode_compatible
 class B01(models.Model):
-    fk_a = models.ForeignKey(A01)
+    fk_a = models.ForeignKey(A01, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
@@ -72,7 +72,7 @@ class B02(models.Model):
         db_table = 'b01'
         managed = False
 
-    fk_a = models.ForeignKey(A02)
+    fk_a = models.ForeignKey(A02, models.CASCADE)
     f_a = models.CharField(max_length=10, db_index=True)
     f_b = models.IntegerField()
 
@@ -97,8 +97,8 @@ class C02(models.Model):
 
 
 class Intermediate(models.Model):
-    a02 = models.ForeignKey(A02, db_column="a01_id")
-    c02 = models.ForeignKey(C02, db_column="c01_id")
+    a02 = models.ForeignKey(A02, models.CASCADE, db_column="a01_id")
+    c02 = models.ForeignKey(C02, models.CASCADE, db_column="c01_id")
 
     class Meta:
         db_table = 'd01'

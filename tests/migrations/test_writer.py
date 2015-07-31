@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import functools
 import math
 import os
 import re
@@ -359,6 +360,11 @@ class WriterTests(SimpleTestCase):
         self.assertSerializedEqual(one_item_tuple)
         self.assertSerializedEqual(many_items_tuple)
 
+    def test_serialize_builtins(self):
+        string, imports = MigrationWriter.serialize(range)
+        self.assertEqual(string, 'range')
+        self.assertEqual(imports, set())
+
     @unittest.skipUnless(six.PY2, "Only applies on Python 2")
     def test_serialize_direct_function_reference(self):
         """
@@ -408,6 +414,13 @@ class WriterTests(SimpleTestCase):
     def test_serialize_timedelta(self):
         self.assertSerializedEqual(datetime.timedelta())
         self.assertSerializedEqual(datetime.timedelta(minutes=42))
+
+    def test_serialize_functools_partial(self):
+        value = functools.partial(datetime.timedelta, 1, seconds=2)
+        result = self.serialize_round_trip(value)
+        self.assertEqual(result.func, value.func)
+        self.assertEqual(result.args, value.args)
+        self.assertEqual(result.keywords, value.keywords)
 
     def test_simple_migration(self):
         """

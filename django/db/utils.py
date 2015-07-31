@@ -8,7 +8,7 @@ from threading import local
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
-from django.utils._os import upath
+from django.utils._os import npath, upath
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
@@ -113,8 +113,8 @@ def load_backend(backend_name):
         backend_dir = os.path.join(os.path.dirname(upath(__file__)), 'backends')
         try:
             builtin_backends = [
-                name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-                if ispkg and name != 'dummy']
+                name for _, name, ispkg in pkgutil.iter_modules([npath(backend_dir)])
+                if ispkg and name not in {'base', 'dummy'}]
         except EnvironmentError:
             builtin_backends = []
         if backend_name not in ['django.db.backends.%s' % b for b in
