@@ -443,7 +443,7 @@ different User model.
         from django.db import models
 
         class Article(models.Model):
-            author = models.ForeignKey
+            author = models.ForeignKey(
                 settings.AUTH_USER_MODEL,
                 on_delete=models.CASCADE,
             )
