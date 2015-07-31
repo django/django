@@ -181,7 +181,11 @@ class QuerySet(object):
     def as_manager(cls):
         # Address the circular dependency between `Queryset` and `Manager`.
         from django.db.models.manager import Manager
-        manager = Manager.from_queryset(cls)()
+        manager_cls = Manager.from_queryset(cls)
+        # Lets allow use_for_related_fields to be set on
+        # QuerySet._built_with_as_manager objects, too
+        manager_cls.use_for_related_fields = getattr(cls, 'use_for_related_fields', False)
+        manager = manager_cls()
         manager._built_with_as_manager = True
         return manager
     as_manager.queryset_only = True
