@@ -1228,7 +1228,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
 
         # Click the Change User button to change it
         self.selenium.find_element_by_id('change_id_user').click()
-        self.selenium.switch_to_window('id_user')
+        self.selenium.switch_to.window('id_user')
         self.wait_page_loaded()
 
         username_field = self.selenium.find_element_by_id('id_username')
@@ -1238,7 +1238,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
 
         save_button_css_selector = '.submit-row > input[type=submit]'
         self.selenium.find_element_by_css_selector(save_button_css_selector).click()
-        self.selenium.switch_to_window(main_window)
+        self.selenium.switch_to.window(main_window)
         # Wait up to 2 seconds for the new option to show up after clicking save in the popup.
         self.selenium.implicitly_wait(2)
         self.selenium.find_element_by_css_selector('#id_user option[value=changednewuser]')
