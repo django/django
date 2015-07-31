@@ -1169,6 +1169,12 @@ Miscellaneous
   automatically faked if all tables created in an initial migration already
   existed.
 
+* An app *without* migrations with a ``ForeignKey`` to an app *with* migrations
+  may now result in a foreign key constraint error when migrating the database
+  or running tests. In Django 1.7, this could fail silently and result in a
+  missing constraint. To resolve the error, add migrations to the app without
+  them.
+
 .. _deprecated-features-1.8:
 
 Features deprecated in 1.8
