@@ -17,6 +17,12 @@ ArrayField
     <ArrayField.size>`. ``ArrayField`` can be nested to store multi-dimensional
     arrays.
 
+    If you give the field a :attr:`~django.db.models.Field.default`, ensure
+    it's a callable such as ``list`` (for an empty default) or a callable that
+    returns a list (such as a function). Incorrectly using ``default=[]``
+    creates a mutable default that is shared between all instances of
+    ``ArrayField``.
+
     .. attribute:: base_field
 
         This is a required argument.
