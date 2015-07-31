@@ -120,8 +120,9 @@ Supported versions
 ==================
 
 At any moment in time, Django's developer team will support a set of releases to
-varying levels. See `the download page`_ for the current state of support for
-each version.
+varying levels. See `the supported versions section
+<https://www.djangoproject.com/download/#supported-versions>`_ of the download
+page for the current state of support for each version.
 
 * The current development master will get new features and bug fixes
   requiring non-trivial refactoring.
