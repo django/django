@@ -23,6 +23,7 @@ of spatially enabled data.
    geos
    gdal
    geoip
+   geoip2
    utils
    commands
    admin
