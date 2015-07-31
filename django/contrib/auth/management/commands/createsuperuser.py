@@ -125,13 +125,13 @@ class Command(BaseCommand):
 
                 # Get a password
                 while password is None:
-                    if not password:
-                        password = getpass.getpass()
-                        password2 = getpass.getpass(force_str('Password (again): '))
-                        if password != password2:
-                            self.stderr.write("Error: Your passwords didn't match.")
-                            password = None
-                            continue
+                    password = getpass.getpass()
+                    password2 = getpass.getpass(force_str('Password (again): '))
+                    if password != password2:
+                        self.stderr.write("Error: Your passwords didn't match.")
+                        password = None
+                        continue
+
                     if password.strip() == '':
                         self.stderr.write("Error: Blank passwords aren't allowed.")
                         password = None
