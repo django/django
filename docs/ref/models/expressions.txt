@@ -213,7 +213,7 @@ or they can be used to build a library of database functions::
     class Lower(Func):
         function = 'LOWER'
 
-    queryset.annotate(field_lower=Lower(F('field')))
+    queryset.annotate(field_lower=Lower('field'))
 
 But both cases will result in a queryset where each model is annotated with an
 extra attribute ``field_lower`` produced, roughly, from the following SQL::
