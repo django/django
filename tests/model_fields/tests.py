@@ -247,6 +247,25 @@ class ManyToManyFieldTests(test.SimpleTestCase):
             "Pending lookup added for a many-to-many field on an abstract model"
         )
 
+    def test_attribute_lookup_on_an_invalid_relation(self):
+        """
+        Tests that calling _get_m2m_attr fails properly when the relation is
+        inconsistent (through model does not point back to the origin).
+        """
+        class A(models.Model):
+            class Meta:
+                app_label = "something"
+
+        class B(models.Model):
+            class Meta:
+                app_label = "something"
+
+        field = models.ManyToManyField('A', through=B)
+        field.contribute_to_class(A, 'to_a')
+        self.assertRaises(
+            AttributeError,
+            lambda: field._get_m2m_attr(field.related, 'name'))
+
 
 class TextFieldTests(test.TestCase):
     def test_to_python(self):
