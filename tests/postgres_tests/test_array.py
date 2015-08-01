@@ -14,6 +14,7 @@ from . import PostgreSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
+    PostgreSQLModel,
 )
 
 try:
@@ -246,16 +247,20 @@ class TestQuerying(PostgreSQLTestCase):
 class TestChecks(PostgreSQLTestCase):
 
     def test_field_checks(self):
-        field = ArrayField(models.CharField())
-        field.set_attributes_from_name('field')
-        errors = field.check()
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.CharField())
+
+        model = MyModel()
+        errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E001')
 
     def test_invalid_base_fields(self):
-        field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
-        field.set_attributes_from_name('field')
-        errors = field.check()
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
+
+        model = MyModel()
+        errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
 

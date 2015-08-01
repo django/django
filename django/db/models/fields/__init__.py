@@ -19,7 +19,7 @@ from django.core import checks, exceptions, validators
 # django.core.exceptions. It is retained here for backwards compatibility
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
-from django.db import connection
+from django.db import connection, connections, router
 from django.db.models.lookups import (
     Lookup, RegisterLookupMixin, Transform, default_lookups,
 )
@@ -315,7 +315,11 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_backend_specific_checks(self, **kwargs):
-        return connection.validation.check_field(self, **kwargs)
+        app_label = self.model._meta.app_label
+        for db in connections:
+            if router.allow_migrate(db, app_label, model=self.model):
+                return connections[db].validation.check_field(self, **kwargs)
+        return []
 
     def _check_deprecation_details(self):
         if self.system_check_removed_details is not None:
