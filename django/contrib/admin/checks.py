@@ -135,7 +135,7 @@ class BaseModelAdminChecks(object):
                 )
             ]
         elif not isinstance(fieldset[1]['fields'], (list, tuple)):
-            return must_be('a list or tuple', option="fieldsets[1]['fields']", obj=cls, id='admin.E008')
+            return must_be('a list or tuple', option="%s[1]['fields']" % label, obj=cls, id='admin.E008')
 
         fields = flatten(fieldset[1]['fields'])
         if len(fields) != len(set(fields)):
