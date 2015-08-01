@@ -955,7 +955,7 @@ class TestBadSetUpTestData(TestCase):
     @classmethod
     def setUpClass(cls):
         try:
-            super(TestBadSetupTestData, cls).setUpClass()
+            super(TestBadSetUpTestData, cls).setUpClass()
         except cls.MyException:
             cls._in_atomic_block = connection.in_atomic_block
 
