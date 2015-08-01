@@ -962,3 +962,25 @@ class OrderBy(BaseExpression):
 
     def desc(self):
         self.descending = True
+
+
+class Cast(Func):
+    """Coerce a lookup to a new field type."""
+    mysql_types = {
+        fields.CharField: 'char',
+        fields.IntegerField: 'signed integer',
+        fields.FloatField: 'signed',
+    }
+
+    def __init__(self, expression, output_field):
+        super(Cast, self).__init__(expression, output_field=output_field)
+
+    def as_sql(self, compiler, connection):
+        sql, params = compiler.compile(self.get_source_expressions()[0])
+        database_type = self._output_field.db_type(connection)
+        return 'CAST({} as {})'.format(sql, database_type), params
+
+    def as_mysql(self, compiler, connection):
+        sql, params = compiler.compile(self.get_source_expressions()[0])
+        database_type = self.mysql_types[type(self._output_field)]
+        return 'CAST({} as {})'.format(sql, database_type), params
