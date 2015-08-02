@@ -428,6 +428,7 @@ DEFAULT_INDEX_TABLESPACE = ''
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 USE_X_FORWARDED_HOST = False
+USE_X_FORWARDED_PORT = False
 
 # The Python dotted path to the WSGI application that Django's internal server
 # (runserver) will use. If `None`, the return value of

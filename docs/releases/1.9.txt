@@ -538,6 +538,9 @@ Requests and Responses
   returning an :class:`~django.http.HttpResponseForbidden` so that
   :data:`~django.conf.urls.handler403` is invoked.
 
+* Added :meth:`HttpRequest.get_port() <django.http.HttpRequest.get_port>` to
+  fetch the originating port of the request.
+
 Tests
 ^^^^^
 
