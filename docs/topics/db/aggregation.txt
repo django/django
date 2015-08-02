@@ -184,16 +184,43 @@ of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
 ``order_by()``, or even additional calls to ``annotate()``.
 
+Combining multiple aggregations
+-------------------------------
+
+Combining multiple aggregations with ``annotate()`` will yield the wrong
+results, as multiple tables are cross joined. Due to the use of
+``LEFT OUTER JOIN``, duplicate records will be generated if some of the joined
+tables contains more records than the others:
+
+    >>> Book.objects.first().authors.count()
+    2
+    >>> Book.objects.first().chapters.count()
+    3
+    >>> q = Book.objects.annotate(Count('authors'), Count('chapters'))
+    >>> q[0].authors__count
+    6
+    >>> q[0].chapters__count
+    6
+
+The :class:`django.db.models.Count` class has a ``distinct`` parameter that may
+help in this case:
+
+    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('chapters', distinct=True))
+    >>> q[0].authors__count
+    2
+    >>> q[0].chapters__count
+    3
+
 .. admonition:: If in doubt, inspect the SQL query!
+
+    Although the ``distinct`` parameter is only applicable to the ``Count``
+    class, other aggregate classes may also led to the same wrong results
+    when `combining multiple tables`_.
 
     In order to understand what happens in your query, consider inspecting the
     ``query`` property of your ``QuerySet``.
 
-    For instance, combining multiple aggregations with ``annotate()`` will
-    yield the wrong results, as `multiple tables are cross joined`_,
-    resulting in duplicate row aggregations.
-
-.. _multiple tables are cross joined: https://code.djangoproject.com/ticket/10060
+.. _combining multiple tables: https://code.djangoproject.com/ticket/10060
 
 Joins and aggregates
 ====================
