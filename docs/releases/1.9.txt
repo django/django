@@ -538,6 +538,15 @@ Requests and Responses
   returning an :class:`~django.http.HttpResponseForbidden` so that
   :data:`~django.conf.urls.handler403` is invoked.
 
+* Added :meth:`~django.http.HttpRequest.get_port()` to fetch the
+  originating port of the request potentially taking into account the
+  ``X-Forwarded-Port`` header if :setting:`USE_X_FORWARDED_PORT` is set
+  to ``True``, and falling back to ``request.META['SERVER_PORT']``.
+
+* Added :setting:`USE_X_FORWARDED_PORT`, defaulting to ``False`` which tells
+  :meth:`~django.http.HttpRequest.get_port()` to use the ``X-Forwarded-Port``
+  header instead of ``request.META['SERVER_PORT']`` if found.
+
 Tests
 ^^^^^
 
