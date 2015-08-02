@@ -651,6 +651,38 @@ class HostValidationTests(SimpleTestCase):
                 }
                 request.get_host()
 
+    @override_settings(USE_X_FORWARDED_PORT=False)
+    def test_get_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_PORT': '80',
+        }
+        # Shouldn't use the X-Forwarded-Port header
+        self.assertEqual(request.get_port(), '8080')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_PORT=True)
+    def test_get_port_with_x_forwarded_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_PORT': '80',
+        }
+        # Should use the X-Forwarded-Port header
+        self.assertEqual(request.get_port(), '80')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_disabled_in_debug_mode(self):
         """If ALLOWED_HOSTS is empty and DEBUG is True, all hosts pass."""
