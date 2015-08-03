@@ -46,7 +46,8 @@ def get_backend(alias=DEFAULT_TASK_ALIAS):
 class Task(object):
     def __init__(self, func=None, name=None, using=DEFAULT_TASK_ALIAS, options=None):
         if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
-            raise
+            raise ImproperlyConfigured(
+                "You must either pass in a callable or override the run method and provide a name.")
         self.run = func
         self.alias = using
         self.options = options or {}
