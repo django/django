@@ -391,6 +391,33 @@ Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
 expressions. For more details see :doc:`conditional-expressions`.
 
+Raw SQL expressions
+-------------------
+
+.. versionadded:: 1.8
+
+.. currentmodule:: django.db.models.expressions
+
+.. class:: RawSQL(sql, params, output_field=None)
+
+Sometimes database expressions can't easily express a complex ``WHERE`` clause.
+In these edge cases, use the ``RawSQL`` expression. For example::
+
+    >>> from django.db.models.expressions import RawSQL
+    >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (someparam,)))
+
+These extra lookups may not be portable to different database engines (because
+you're explicitly writing SQL code) and violate the DRY principle, so you
+should avoid them if possible.
+
+.. warning::
+
+    You should be very careful to escape any parameters that the user can
+    control by using ``params`` in order to protect against :ref:`SQL injection
+    attacks <sql-injection-protection>`.
+
+.. currentmodule:: django.db.models
+
 Technical Information
 =====================
 
