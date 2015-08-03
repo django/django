@@ -1,7 +1,7 @@
 from itertools import count
 
-from ..utils.six import string_types
 from . import constants
+from ..utils.six import string_types
 from .base import get_backend
 from .exceptions import ResultUnavailable
 
