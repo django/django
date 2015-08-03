@@ -542,6 +542,10 @@ Models
 * Added a new model field check that makes sure
   :attr:`~django.db.models.Field.default` is a valid value.
 
+* :doc:`Query expressions </ref/models/expressions>` can now be used when
+  creating new model instances using ``save()``, ``create()``, and
+  ``bulk_create()``.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
