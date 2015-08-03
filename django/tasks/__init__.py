@@ -1,5 +1,5 @@
-from .base import Task, get_backend  # NOQA
 from .backends import TaskResult  # NOQA
+from .base import Task, get_backend  # NOQA
 from .constants import *  # NOQA
 from .register import registry
 
