@@ -146,7 +146,7 @@ class ActiveTranslationField(models.ForeignObject):
     def get_extra_restriction(self, where_class, alias, related_alias):
         return ColConstraint(alias, 'lang', get_language())
 
-    def get_extra_descriptor_filter(self):
+    def get_extra_descriptor_filter(self, instance):
         return {'lang': get_language()}
 
     def contribute_to_class(self, cls, name):
