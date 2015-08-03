@@ -17,8 +17,6 @@ def _create_task_backend(alias):
     try:
         conf = settings.TASKS[alias]
     except KeyError:
-        if alias != DEFAULT_TASK_ALIAS:
-            return _create_task_backend(DEFAULT_TASK_ALIAS)
         raise ImproperlyConfigured("%s is not defined in TASKS" % alias)
 
     args = conf.copy()
@@ -49,12 +47,12 @@ UNDEFINED = object()
 class Task(object):
     name = UNDEFINED
 
-    def __init__(self, func=None, name=None, using=DEFAULT_TASK_ALIAS, options=None):
+    def __init__(self, func=None, name=None, using=None, options=None):
         if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
             raise ImproperlyConfigured(
                 "You must either pass in a callable or override the run method and provide a name.")
         self.run = func
-        self.alias = using
+        self.alias = using or DEFAULT_TASK_ALIAS
         self.options = options or {}
         if name is not None:
             self.name = name

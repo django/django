@@ -35,11 +35,6 @@ class TestDummyBackend(SimpleTestCase):
 
         self.assertIs(backend, backend2)
 
-    def test_unknown_backend_will_fallback_to_default(self):
-        backend = get_backend('non-default')
-
-        self.assertIsInstance(backend, backends.DummyTaskBackend)
-
     def test_delay_runs_and_returns_result_with_status_and_result(self):
         t = Task(dummy_task)
         o = object()
