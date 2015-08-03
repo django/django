@@ -15,7 +15,7 @@ class TaskResult(object):
         self.task_id = task_id
 
     def __repr__(self):
-        return '<TaskResult %s - %r>' % (self.alias, self.task_id)
+        return 'TaskResul(%r, backend=%r)' % (self.task_id, self.alias)
 
     @property
     def alias(self):
