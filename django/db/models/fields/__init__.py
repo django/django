@@ -826,14 +826,6 @@ class Field(RegisterLookupMixin):
     def get_choices_default(self):
         return self.get_choices()
 
-    def get_flatchoices(self, include_blank=True,
-                        blank_choice=BLANK_CHOICE_DASH):
-        """
-        Returns flattened choices with a default blank choice included.
-        """
-        first_choice = blank_choice if include_blank else []
-        return first_choice + list(self.flatchoices)
-
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',
         RemovedInDjango20Warning
