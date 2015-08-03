@@ -8,7 +8,7 @@ class TaskResult(object):
     Wrapper class representing a status of a task. Provides methods to retrieve
     the task's status and result value/error.
     """
-    def __init__(self, backend, task_id):
+    def __init__(self, task_id, backend='default'):
         if not isinstance(backend, BaseBackend):
             backend = get_backend(backend)
         self._backend = backend
@@ -76,8 +76,8 @@ class DummyTaskResult(TaskResult):
     TaskResult subclass used by DummyTaskBackend. It embeds the status and the
     result.
     """
-    def __init__(self, backend, task_id, status, result):
-        super(DummyTaskResult, self).__init__(backend, task_id)
+    def __init__(self, task_id, backend, status, result):
+        super(DummyTaskResult, self).__init__(task_id, backend)
         self._status = status
         self._result = result
 
@@ -116,4 +116,4 @@ class DummyTaskBackend(BaseBackend):
             result = e
             status = constants.FAILED
 
-        return DummyTaskResult(self, task_id, status, result)
+        return DummyTaskResult(task_id, self, status, result)
