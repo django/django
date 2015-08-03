@@ -253,13 +253,14 @@ access to more than a single field::
     import datetime
     from django.core.exceptions import ValidationError
     from django.db import models
+    from django.utils.translation import ugettext_lazy as _
 
     class Article(models.Model):
         ...
         def clean(self):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError('Draft entries may not have a publication date.')
+                raise ValidationError(_('Draft entries may not have a publication date.'))
             # Set the pub_date for published items if it hasn't been set already.
             if self.status == 'published' and self.pub_date is None:
                 self.pub_date = datetime.date.today()
@@ -289,8 +290,16 @@ error to the ``pub_date`` field::
         def clean(self):
             # Don't allow draft entries to have a pub_date.
             if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError({'pub_date': 'Draft entries may not have a publication date.'})
+                raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
             ...
+
+If you detect errors in multiple fields during ``Model.clean()``, you can also
+pass a dictionary mapping field names to errors::
+
+    raise ValidationError({
+        'title': ValidationError(_('Missing title.'), code='required'),
+        'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
+    })
 
 Finally, ``full_clean()`` will check any unique constraints on your model.
 
