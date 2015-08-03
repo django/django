@@ -94,7 +94,8 @@ write :ref:`raw queries <executing-raw-queries>` or execute
 :ref:`custom sql <executing-custom-sql>`. These capabilities should be used
 sparingly and you should always be careful to properly escape any parameters
 that the user can control. In addition, you should exercise caution when using
-:meth:`extra() <django.db.models.query.QuerySet.extra>`.
+:meth:`~django.db.models.query.QuerySet.extra` and
+:class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
