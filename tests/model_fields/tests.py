@@ -480,8 +480,8 @@ class BooleanFieldTests(test.TestCase):
 class ChoicesTests(test.SimpleTestCase):
     def test_choices_and_field_display(self):
         """
-        Check that get_choices and get_flatchoices interact with
-        get_FIELD_display to return the expected values (#7913).
+        Check that get_choices() interacts with get_FIELD_display() to return
+        the expected values (#7913).
         """
         self.assertEqual(Whiz(c=1).get_c_display(), 'First')    # A nested value
         self.assertEqual(Whiz(c=0).get_c_display(), 'Other')    # A top level value
