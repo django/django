@@ -173,7 +173,7 @@ class AdjacentToLookup(lookups.PostgresSimpleLookup):
 
 
 @RangeField.register_lookup
-class RangeStartsWith(lookups.FunctionTransform):
+class RangeStartsWith(models.Transform):
     lookup_name = 'startswith'
     function = 'lower'
 
@@ -183,7 +183,7 @@ class RangeStartsWith(lookups.FunctionTransform):
 
 
 @RangeField.register_lookup
-class RangeEndsWith(lookups.FunctionTransform):
+class RangeEndsWith(models.Transform):
     lookup_name = 'endswith'
     function = 'upper'
 
@@ -193,7 +193,7 @@ class RangeEndsWith(lookups.FunctionTransform):
 
 
 @RangeField.register_lookup
-class IsEmpty(lookups.FunctionTransform):
+class IsEmpty(models.Transform):
     lookup_name = 'isempty'
     function = 'isempty'
     output_field = models.BooleanField()

@@ -81,14 +81,14 @@ class KeyTransformFactory(object):
 
 
 @HStoreField.register_lookup
-class KeysTransform(lookups.FunctionTransform):
+class KeysTransform(Transform):
     lookup_name = 'keys'
     function = 'akeys'
     output_field = ArrayField(TextField())
 
 
 @HStoreField.register_lookup
-class ValuesTransform(lookups.FunctionTransform):
+class ValuesTransform(Transform):
     lookup_name = 'values'
     function = 'avals'
     output_field = ArrayField(TextField())

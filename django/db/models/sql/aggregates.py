@@ -5,7 +5,7 @@ import copy
 import warnings
 
 from django.db.models.fields import FloatField, IntegerField
-from django.db.models.lookups import RegisterLookupMixin
+from django.db.models.query_utils import RegisterLookupMixin
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 
