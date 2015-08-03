@@ -130,12 +130,12 @@ For instance:
 
 If these aren't enough to generate the SQL you need:
 
-Use ``QuerySet.extra()``
-------------------------
+Use ``RawSQL``
+--------------
 
-A less portable but more powerful method is
-:meth:`~django.db.models.query.QuerySet.extra()`, which allows some SQL to be
-explicitly added to the query. If that still isn't powerful enough:
+A less portable but more powerful method is the
+:class:`~django.db.models.expressions.RawSQL` expression, which allows some SQL
+to be explicitly added to the query. If that still isn't powerful enough:
 
 Use raw SQL
 -----------
