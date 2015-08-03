@@ -469,6 +469,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         Creation should fail if the password fails validation.
         """
         new_io = six.StringIO()
+
         # Returns '1234567890' the first two times it is called, then
         # 'password' subsequently.
         def bad_then_good_password(index=[0]):
