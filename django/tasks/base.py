@@ -15,11 +15,11 @@ backends = {}
 
 def _create_task_backend(alias):
     try:
-        conf = settings.QUEUES[alias]
+        conf = settings.TASKS[alias]
     except KeyError:
         if alias != DEFAULT_TASK_ALIAS:
             return _create_task_backend(DEFAULT_TASK_ALIAS)
-        raise ImproperlyConfigured("%s is not defined in QUEUES" % alias)
+        raise ImproperlyConfigured("%s is not defined in TASKS" % alias)
 
     args = conf.copy()
     backend = args.pop('BACKEND')

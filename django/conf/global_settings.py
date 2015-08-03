@@ -507,7 +507,7 @@ CACHE_MIDDLEWARE_ALIAS = 'default'
 #########
 
 # The task backends to use.
-QUEUES = {
+TASKS = {
     'default': {
         'BACKEND': 'django.tasks.backends.DummyTaskBackend',
     }

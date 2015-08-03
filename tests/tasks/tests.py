@@ -19,7 +19,7 @@ dummier_task = DummierTask()
 
 
 @override_settings(
-    QUEUES={
+    TASKS={
         'default': {'BACKEND': 'django.tasks.backends.DummyTaskBackend'},
     }
 )
