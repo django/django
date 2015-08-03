@@ -1,3 +1,5 @@
+from itertools import count
+
 from ..utils.six import string_types
 from . import constants
 from .base import get_backend
@@ -101,7 +103,7 @@ class DummyTaskBackend(BaseBackend):
     """
     def __init__(self, *args, **kwargs):
         super(DummyTaskBackend, self).__init__(*args, **kwargs)
-        self._next_task_id = 1
+        self._next_task_id = count()
 
     def get_status(self, task_id):
         return constants.UNKNOWN
@@ -111,8 +113,7 @@ class DummyTaskBackend(BaseBackend):
             "DummyTaskBackend doesn't support storing and retrieving results.")
 
     def delay(self, task, *args, **kwargs):
-        task_id = self._next_task_id
-        self._next_task_id += 1
+        task_id = self._next_task_id.next()
         result = None
         status = constants.SUCCESS
         try:
