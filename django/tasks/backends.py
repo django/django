@@ -24,6 +24,8 @@ class TaskResult(object):
     def get_status(self, **kwargs):
         """
         Retrieve the status of the task from the backend.
+
+        All keyword arguments are passed to the backend.
         """
         return self._backend.status(self.task_id, **kwargs)
 
@@ -32,7 +34,9 @@ class TaskResult(object):
         Retrieve the result of the task from the backend if the task has
         successfully finished or the causing error if the task has failed.
 
-        raises a ResultUnavailable exception when there is no result available:
+        All keyword arguments are passed to the backend.
+
+        Raises a ResultUnavailable exception when there is no result available:
             ResultUnknown if status is UNKNOWN
             ResultPending if status is PENDING
         """
@@ -43,18 +47,18 @@ class BaseBackend(object):
     def __init__(self, alias, **kwargs):
         self.alias = alias
 
-    def get_status(self, task_id):
+    def get_status(self, task_id, **kwargs):
         """
         The current status of the task.
 
+        UNKNOWN: unable to determine the status of the task
         PENDING: the task is currently in-queue, and waiting to be ran.
         FAILED: the task attempted to run, but failed for some reason
         SUCCESS: the task successfully ran
-        UNKNOWN: unable to determine the status of the task
         """
         raise NotImplementedError
 
-    def get_result(self, task_id):
+    def get_result(self, task_id, **kwargs):
         """
         If the task has ran and returned a result, return that result.
 
