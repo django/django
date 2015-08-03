@@ -212,26 +212,35 @@ class ModelBase(type):
                 if isinstance(field, OneToOneField):
                     related = resolve_relation(new_class, field.remote_field.model)
                     parent_links[make_model_tuple(related)] = field
+
+        # Track fields inherited from base models.
+        inherited_attributes = set()
         # Do the appropriate setup for any model parents.
-        for base in parents:
+        for base in new_class.mro():
             original_base = base
-            if not hasattr(base, '_meta'):
+            if base not in parents or not hasattr(base, '_meta'):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
+                inherited_attributes |= set(base.__dict__.keys())
                 continue
 
             parent_fields = base._meta.local_fields + base._meta.local_many_to_many
-            # Check for clashes between locally declared fields and those
-            # on the base classes (we cannot handle shadowed fields at the
-            # moment).
-            for field in parent_fields:
-                if field.name in field_names:
-                    raise FieldError(
-                        'Local field %r in class %r clashes '
-                        'with field of similar name from '
-                        'base class %r' % (field.name, name, base.__name__)
-                    )
             if not base._meta.abstract:
+                # Check for clashes between locally declared fields and those
+                # on the base classes.
+                for field in parent_fields:
+                    if field.name in field_names:
+                        raise FieldError(
+                            'Local field %r in class %r clashes with field of '
+                            'the same name from base class %r.' % (
+                                field.name,
+                                name,
+                                base.__name__,
+                            )
+                        )
+                    else:
+                        inherited_attributes.add(field.name)
+
                 # Concrete classes...
                 base = base._meta.concrete_model
                 base_key = make_model_tuple(base)
@@ -246,6 +255,18 @@ class ModelBase(type):
                         auto_created=True,
                         parent_link=True,
                     )
+
+                    if attr_name in field_names:
+                        raise FieldError(
+                            "Auto-generated field '%s' in class %r for "
+                            "parent_link to base class %r clashes with "
+                            "declared field of the same name." % (
+                                attr_name,
+                                name,
+                                base.__name__,
+                            )
+                        )
+
                     # Only add the ptr field if it's not already present;
                     # e.g. migrations will already have it specified
                     if not hasattr(new_class, attr_name):
@@ -256,16 +277,19 @@ class ModelBase(type):
             else:
                 base_parents = base._meta.parents.copy()
 
-                # .. and abstract ones.
+                # Add fields from abstract base class if it wasn't overridden.
                 for field in parent_fields:
-                    new_field = copy.deepcopy(field)
-                    new_class.add_to_class(field.name, new_field)
-                    # Replace parent links defined on this base by the new
-                    # field as it will be appropriately resolved if required.
-                    if field.one_to_one:
-                        for parent, parent_link in base_parents.items():
-                            if field == parent_link:
-                                base_parents[parent] = new_field
+                    if (field.name not in field_names and
+                            field.name not in new_class.__dict__ and
+                            field.name not in inherited_attributes):
+                        new_field = copy.deepcopy(field)
+                        new_class.add_to_class(field.name, new_field)
+                        # Replace parent links defined on this base by the new
+                        # field. It will be appropriately resolved if required.
+                        if field.one_to_one:
+                            for parent, parent_link in base_parents.items():
+                                if field == parent_link:
+                                    base_parents[parent] = new_field
 
                 # Pass any non-abstract parent classes onto child.
                 new_class._meta.parents.update(base_parents)
@@ -281,13 +305,18 @@ class ModelBase(type):
             # Inherit private fields (like GenericForeignKey) from the parent
             # class
             for field in base._meta.private_fields:
-                if base._meta.abstract and field.name in field_names:
-                    raise FieldError(
-                        'Local field %r in class %r clashes '
-                        'with field of similar name from '
-                        'abstract base class %r' % (field.name, name, base.__name__)
-                    )
-                new_class.add_to_class(field.name, copy.deepcopy(field))
+                if field.name in field_names:
+                    if not base._meta.abstract:
+                        raise FieldError(
+                            'Local field %r in class %r clashes with field of '
+                            'the same name from base class %r.' % (
+                                field.name,
+                                name,
+                                base.__name__,
+                            )
+                        )
+                else:
+                    new_class.add_to_class(field.name, copy.deepcopy(field))
 
         if abstract:
             # Abstract base models can't be instantiated and don't appear in
