@@ -4,7 +4,9 @@ from itertools import chain
 
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import OrderBy, Random, RawSQL, Ref
+from django.db.models.expressions import (
+    F, CombinedExpression, OrderBy, Random, RawSQL, Ref,
+)
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
@@ -903,17 +905,67 @@ class SQLInsertCompiler(SQLCompiler):
         self.return_id = False
         super(SQLInsertCompiler, self).__init__(*args, **kwargs)
 
-    def placeholder(self, field, val):
+    def field_as_sql(self, field, val):
+        """
+        Take a field, and a value intended to be saved on that field, and
+        return placeholder SQL and accompanying params. Checks for raw values,
+        expressions and fields with get_placeholder() defined in that order.
+        """
+
         if field is None:
             # A field value of None means the value is raw.
-            return val
+            return val, []
+
+        elif hasattr(val, 'as_sql'):
+            # This is an expression, let's compile it.
+            return self.compile(val)
+
         elif hasattr(field, 'get_placeholder'):
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            return field.get_placeholder(val, self, self.connection)
+            return field.get_placeholder(val, self, self.connection), [val]
+
         else:
             # Return the common case for the placeholder
-            return '%s'
+            return '%s', [val]
+
+    def prepare_value(self, field, value):
+        """
+        Prepare a value to be used in a query, by resolving it if it is an
+        expression, and otherwise calling the field's get_db_prep_save().
+        """
+
+        def find_fs(expr):
+            """Walk this expression tree depth-first and yield all F nodes."""
+            if isinstance(expr, F):
+                yield expr
+            elif isinstance(expr, CombinedExpression):
+                for e in chain(find_fs(expr.lhs), find_fs(expr.rhs)):
+                    yield e
+
+        if hasattr(value, 'resolve_expression'):
+            # Don't allow F() expressions. They refer to existing columns on a
+            # row, but in the case of insert the row doesn't exist yet.
+            if any(find_fs(value)):
+                raise ValueError(
+                    'Failed to insert expression "%s" on %s. F() expressions '
+                    'can only be used to update, not to insert.' % (value, field)
+                )
+            value = value.resolve_expression(self.query, allow_joins=False, for_save=True)
+            if value.contains_aggregate:
+                raise FieldError("Aggregate functions are not allowed in this query")
+        else:
+            value = field.get_db_prep_save(value, connection=self.connection)
+        return value
+
+    def pre_save_val(self, field, obj):
+        """
+        Get the given field's value off the given obj. pre_save() is used for
+        things like auto_now on DateTimeField. Skip it if this is a raw query.
+        """
+        if self.query.raw:
+            return getattr(obj, field.attname)
+        return field.pre_save(obj, add=True)
 
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
@@ -927,35 +979,52 @@ class SQLInsertCompiler(SQLCompiler):
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
-            params = values = [
-                [
-                    f.get_db_prep_save(
-                        getattr(obj, f.attname) if self.query.raw else f.pre_save(obj, True),
-                        connection=self.connection
-                    ) for f in fields
-                ]
+            param_rows = value_rows = [
+                [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs
             ]
         else:
-            values = [[self.connection.ops.pk_default_value()] for obj in self.query.objs]
-            params = [[]]
+            # I guess this case is just for an entirely empty object.
+            value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
+            param_rows = [[]]
             fields = [None]
+
+        # Currently, the backends just accept values when generating bulk queries, and
+        # generate their own placeholders. Doing that isn't necessary, and it should
+        # be possible to use placeholders and expressions in bulk inserts too.
         can_bulk = (not any(hasattr(field, "get_placeholder") for field in fields) and
             not self.return_id and self.connection.features.has_bulk_insert)
 
         if can_bulk:
-            placeholders = [["%s"] * len(fields)]
+            placeholder_rows = [["%s"] * len(fields)]
         else:
-            placeholders = [
-                [self.placeholder(field, v) for field, v in zip(fields, val)]
-                for val in values
-            ]
-            # Oracle Spatial needs to remove some values due to #10888
-            params = self.connection.ops.modify_insert_params(placeholders, params)
+            # list of (sql, [params]) tuples for each object to be saved
+            # Shape: [n_objs][n_fields][2]
+            rows_of_fields_as_sql = (
+                (self.field_as_sql(field, v) for field, v in zip(fields, row))
+                for row in value_rows
+            )
+
+            # tuple like ([sqls], [[params]s]) for each object to be saved
+            # Shape: [n_objs][2][n_fields]
+            sql_and_param_pair_rows = (zip(*row) for row in rows_of_fields_as_sql)
+
+            # Extract separate lists for placeholders and params.
+            # Each of these has shape [n_objs][n_fields]
+            placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
+
+            # Oracle Spatial needs to remove some values due to #10888.
+            # This has to happen before params are flattened.
+            param_rows = self.connection.ops.modify_insert_params(placeholder_rows, param_rows)
+
+            # Params for each field are still lists, and need to be flattened.
+            flatten = lambda lists: [item for lst in lists for item in lst]
+            param_rows = [flatten(row) for row in param_rows]
+
         if self.return_id and self.connection.features.can_return_id_from_insert:
-            params = params[0]
+            params = param_rows[0]
             col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
-            result.append("VALUES (%s)" % ", ".join(placeholders[0]))
+            result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
             r_fmt, r_params = self.connection.ops.return_insert_id()
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
@@ -963,13 +1032,14 @@ class SQLInsertCompiler(SQLCompiler):
                 result.append(r_fmt % col)
                 params += r_params
             return [(" ".join(result), tuple(params))]
+
         if can_bulk:
-            result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
-            return [(" ".join(result), tuple(v for val in values for v in val))]
+            result.append(self.connection.ops.bulk_insert_sql(fields, len(value_rows)))
+            return [(" ".join(result), tuple(v for val in value_rows for v in val))]
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
-                for p, vals in zip(placeholders, params)
+                for p, vals in zip(placeholder_rows, param_rows)
             ]
 
     def execute_sql(self, return_id=False):
@@ -1028,10 +1098,11 @@ class SQLUpdateCompiler(SQLCompiler):
                         connection=self.connection,
                     )
                 else:
-                    raise TypeError("Database is trying to update a relational field "
-                                    "of type %s with a value of type %s. Make sure "
-                                    "you are setting the correct relations" %
-                                    (field.__class__.__name__, val.__class__.__name__))
+                    raise TypeError(
+                        "Tried to update field %s with a model instance, %s. "
+                        "Use a value compatible with %s."
+                        % (field, repr(val), field.__class__.__name__))
+
             else:
                 val = field.get_db_prep_save(val, connection=self.connection)
 

@@ -249,6 +249,20 @@ class BasicExpressionsTests(TestCase):
         test_gmbh = Company.objects.get(pk=test_gmbh.pk)
         self.assertEqual(test_gmbh.num_employees, 36)
 
+    def test_object_create(self):
+        # We should be able to use Funcs when inserting new data
+
+        test_co = Company(
+            name=Lower(Value("UPPER")), num_employees=32, num_chairs=1,
+            ceo=Employee.objects.create(firstname="Just", lastname="Doit", salary=30),
+        )
+
+        test_co.save()
+
+        test_co = Company.objects.get(pk=test_co.pk)
+
+        self.assertEqual(test_co.name, "upper")
+
     def test_object_update_fk(self):
         # F expressions cannot be used to update attributes which are foreign
         # keys, or attributes which involve joins.
@@ -272,7 +286,7 @@ class BasicExpressionsTests(TestCase):
             ceo=test_gmbh.ceo
         )
         acme.num_employees = F("num_employees") + 16
-        self.assertRaises(TypeError, acme.save)
+        self.assertRaisesMessage(ValueError, 'Failed to insert expression', acme.save)
 
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
