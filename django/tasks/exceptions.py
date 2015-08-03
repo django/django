@@ -15,3 +15,11 @@ class ResultPending(ResultUnavailable):
 
 class InvalidTaskBackendError(ImproperlyConfigured):
     pass
+
+
+class AlreadyRegistered(Exception):
+    pass
+
+
+class TaskDoesNotExist(Exception):
+    pass

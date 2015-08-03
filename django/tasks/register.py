@@ -1,9 +1,4 @@
-class AlreadyRegistered(Exception):
-    pass
-
-
-class TaskDoesNotExist(Exception):
-    pass
+from .exceptions import AlreadyRegistered, TaskDoesNotExist
 
 
 class TaskRegistry(object):
