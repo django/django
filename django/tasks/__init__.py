@@ -5,6 +5,10 @@ from .register import registry
 
 
 def task(name_or_func=None, name=None, using=None, options=None):
+    """
+    Decorator to define a task from a callable. Can be used empty, or with
+    parameters. Returns an instance of Task around that callable.
+    """
     # @task
     if callable(name_or_func):
         if isinstance(name_or_func, Task):
