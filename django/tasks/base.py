@@ -42,8 +42,13 @@ def get_backend(alias=DEFAULT_TASK_ALIAS):
     backends[alias] = _create_task_backend(alias)
     return backends[alias]
 
+# sentinel value to check for undefined name
+UNDEFINED = object()
+
 
 class Task(object):
+    name = UNDEFINED
+
     def __init__(self, func=None, name=None, using=DEFAULT_TASK_ALIAS, options=None):
         if not func and not (hasattr(self, 'run') and hasattr(self, 'name')):
             raise ImproperlyConfigured(
@@ -54,7 +59,7 @@ class Task(object):
         if name is not None:
             self.name = name
         # name hasn't been defined on class
-        elif not hasattr(self, 'name'):
+        elif self.name is UNDEFINED:
             n = getattr(func, '__name__', func.__class__.__name__)
             self.name = '%s.%s' % (func.__module__, n)
 
