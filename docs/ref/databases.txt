@@ -558,11 +558,13 @@ query for ``WHERE mycolumn=0``, both rows will match. Similarly, ``WHERE mycolum
 will match the value ``'abc1'``. Therefore, string type fields included in Django
 will always cast the value to a string before using it in a query.
 
-If you implement custom model fields that inherit from :class:`~django.db.models.Field`
-directly, are overriding :meth:`~django.db.models.Field.get_prep_value`, or use
-:meth:`extra() <django.db.models.query.QuerySet.extra>` or
-:meth:`raw() <django.db.models.Manager.raw>`, you should ensure that you
-perform the appropriate typecasting.
+If you implement custom model fields that inherit from
+:class:`~django.db.models.Field` directly, are overriding
+:meth:`~django.db.models.Field.get_prep_value`, or use
+:class:`~django.db.models.expressions.RawSQL`,
+:meth:`~django.db.models.query.QuerySet.extra`, or
+:meth:`~django.db.models.Manager.raw`, you should ensure that you perform
+appropriate typecasting.
 
 .. _sqlite-notes:
 
