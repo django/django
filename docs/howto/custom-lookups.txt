@@ -120,10 +120,7 @@ function ``ABS()`` to transform the value before comparison::
 
   class AbsoluteValue(Transform):
       lookup_name = 'abs'
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "ABS(%s)" % lhs, params
+      function = 'ABS'
 
 Next, let's register it for ``IntegerField``::
 
@@ -157,10 +154,7 @@ be done by adding an ``output_field`` attribute to the transform::
 
     class AbsoluteValue(Transform):
         lookup_name = 'abs'
-
-        def as_sql(self, compiler, connection):
-            lhs, params = compiler.compile(self.lhs)
-            return "ABS(%s)" % lhs, params
+        function = 'ABS'
 
         @property
         def output_field(self):
@@ -243,11 +237,8 @@ this transformation should apply to both ``lhs`` and ``rhs``::
 
   class UpperCase(Transform):
       lookup_name = 'upper'
+      function = 'UPPER'
       bilateral = True
-
-      def as_sql(self, compiler, connection):
-          lhs, params = compiler.compile(self.lhs)
-          return "UPPER(%s)" % lhs, params
 
 Next, let's register it::
 

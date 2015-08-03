@@ -520,6 +520,14 @@ Models
 * Added the :class:`~django.db.models.functions.Now` database function, which
   returns the current date and time.
 
+* :class:`~django.db.models.Transform` is now a subclass of
+  :ref:`Func() <func-expressions>` which allows ``Transform``\s to be used on
+  the right hand side of an expression, just like regular ``Func``\s. This
+  allows registering some database functions like
+  :class:`~django.db.models.functions.Length`,
+  :class:`~django.db.models.functions.Lower`, and
+  :class:`~django.db.models.functions.Upper` as transforms.
+
 * :class:`~django.db.models.SlugField` now accepts an
   :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
   characters in slugs.

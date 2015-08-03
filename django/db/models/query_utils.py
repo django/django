@@ -7,6 +7,7 @@ circular import difficulties.
 """
 from __future__ import unicode_literals
 
+import inspect
 from collections import namedtuple
 
 from django.apps import apps
@@ -167,6 +168,60 @@ class DeferredAttribute(object):
         if f.primary_key and f != link_field:
             return getattr(instance, link_field.attname)
         return None
+
+
+class RegisterLookupMixin(object):
+    def _get_lookup(self, lookup_name):
+        try:
+            return self.class_lookups[lookup_name]
+        except KeyError:
+            # To allow for inheritance, check parent class' class_lookups.
+            for parent in inspect.getmro(self.__class__):
+                if 'class_lookups' not in parent.__dict__:
+                    continue
+                if lookup_name in parent.class_lookups:
+                    return parent.class_lookups[lookup_name]
+        except AttributeError:
+            # This class didn't have any class_lookups
+            pass
+        return None
+
+    def get_lookup(self, lookup_name):
+        from django.db.models.lookups import Lookup
+        found = self._get_lookup(lookup_name)
+        if found is None and hasattr(self, 'output_field'):
+            return self.output_field.get_lookup(lookup_name)
+        if found is not None and not issubclass(found, Lookup):
+            return None
+        return found
+
+    def get_transform(self, lookup_name):
+        from django.db.models.lookups import Transform
+        found = self._get_lookup(lookup_name)
+        if found is None and hasattr(self, 'output_field'):
+            return self.output_field.get_transform(lookup_name)
+        if found is not None and not issubclass(found, Transform):
+            return None
+        return found
+
+    @classmethod
+    def register_lookup(cls, lookup, lookup_name=None):
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        if 'class_lookups' not in cls.__dict__:
+            cls.class_lookups = {}
+        cls.class_lookups[lookup_name] = lookup
+        return lookup
+
+    @classmethod
+    def _unregister_lookup(cls, lookup, lookup_name=None):
+        """
+        Remove given lookup from cls lookups. For use in tests only as it's
+        not thread-safe.
+        """
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        del cls.class_lookups[lookup_name]
 
 
 def select_related_descend(field, restricted, requested, load_fields, reverse=False):

@@ -1,8 +1,9 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import DateTimeField, IntegerField
-from django.db.models.expressions import Func, Value
+from django.db.models import (
+    DateTimeField, Func, IntegerField, Transform, Value,
+)
 
 
 class Coalesce(Func):
@@ -123,9 +124,10 @@ class Least(Func):
         return super(Least, self).as_sql(compiler, connection, function='MIN')
 
 
-class Length(Func):
+class Length(Transform):
     """Returns the number of characters in the expression"""
     function = 'LENGTH'
+    lookup_name = 'length'
 
     def __init__(self, expression, **extra):
         output_field = extra.pop('output_field', IntegerField())
@@ -136,8 +138,9 @@ class Length(Func):
         return super(Length, self).as_sql(compiler, connection)
 
 
-class Lower(Func):
+class Lower(Transform):
     function = 'LOWER'
+    lookup_name = 'lower'
 
     def __init__(self, expression, **extra):
         super(Lower, self).__init__(expression, **extra)
@@ -188,8 +191,9 @@ class Substr(Func):
         return super(Substr, self).as_sql(compiler, connection)
 
 
-class Upper(Func):
+class Upper(Transform):
     function = 'UPPER'
+    lookup_name = 'upper'
 
     def __init__(self, expression, **extra):
         super(Upper, self).__init__(expression, **extra)
