@@ -2,7 +2,6 @@
 branch = True
 omit =
     */django/utils/autoreload.py
-parallel = True
 source = django
 
 [report]
