@@ -1,3 +1,4 @@
+from ..utils.six import string_types
 from . import constants
 from .base import get_backend
 from .exceptions import ResultUnavailable
@@ -9,7 +10,7 @@ class TaskResult(object):
     the task's status and result value/error.
     """
     def __init__(self, task_id, backend='default'):
-        if not isinstance(backend, BaseBackend):
+        if isinstance(backend, string_types):
             backend = get_backend(backend)
         self._backend = backend
         self.task_id = task_id
