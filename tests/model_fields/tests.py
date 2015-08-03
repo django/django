@@ -98,8 +98,13 @@ class BasicFieldTests(test.TestCase):
         self.assertTrue(instance.id)
         # Set field to object on saved instance
         instance.size = instance
+        msg = (
+            "Tried to update field model_fields.FloatModel.size with a model "
+            "instance, <FloatModel: FloatModel object>. Use a value "
+            "compatible with FloatField."
+        )
         with transaction.atomic():
-            with self.assertRaises(TypeError):
+            with self.assertRaisesMessage(TypeError, msg):
                 instance.save()
         # Try setting field to object on retrieved object
         obj = FloatModel.objects.get(pk=instance.id)

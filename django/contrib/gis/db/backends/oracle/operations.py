@@ -263,11 +263,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         from django.contrib.gis.db.backends.oracle.models import OracleSpatialRefSys
         return OracleSpatialRefSys
 
-    def modify_insert_params(self, placeholders, params):
+    def modify_insert_params(self, placeholder, params):
         """Drop out insert parameters for NULL placeholder. Needed for Oracle Spatial
-        backend due to #10888
+        backend due to #10888.
         """
-        # This code doesn't work for bulk insert cases.
-        assert len(placeholders) == 1
-        return [[param for pholder, param
-                 in six.moves.zip(placeholders[0], params[0]) if pholder != 'NULL'], ]
+        if placeholder == 'NULL':
+            return []
+        return super(OracleOperations, self).modify_insert_params(placeholder, params)
