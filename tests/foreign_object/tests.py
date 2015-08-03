@@ -319,6 +319,9 @@ class MultiColumnFKTests(TestCase):
         at1_fi.save()
         at2_en = ArticleTranslation(article=a1, lang='en', title='Title', body='Lalalalala')
         at2_en.save()
+
+        self.assertEqual(Article.objects.get(pk=a1.pk).active_translation, at1_fi)
+
         with self.assertNumQueries(1):
             fetched = Article.objects.select_related('active_translation').get(
                 active_translation__title='Otsikko')
