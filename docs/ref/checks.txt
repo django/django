@@ -222,6 +222,7 @@ Related Fields
 * **fields.W341**: ``ManyToManyField`` does not support ``validators``.
 * **fields.W342**: Setting ``unique=True`` on a ``ForeignKey`` has the same
   effect as using a ``OneToOneField``.
+* **fields.W343**: Setting ``default`` on a ``ManyToManyField`` has no effect.
 
 Signals
 ~~~~~~~

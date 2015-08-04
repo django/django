@@ -2298,6 +2298,8 @@ class ManyToManyField(RelatedField):
             db_constraint=db_constraint,
         )
         self.has_null_arg = 'null' in kwargs
+        self.has_default_arg = 'default' in kwargs
+        self.has_validators_arg = 'validators' in kwargs
 
         super(ManyToManyField, self).__init__(**kwargs)
 
@@ -2338,13 +2340,23 @@ class ManyToManyField(RelatedField):
                 )
             )
 
-        if len(self._validators) > 0:
+        if self.has_validators_arg:
             warnings.append(
                 checks.Warning(
                     'ManyToManyField does not support validators.',
                     hint=None,
                     obj=self,
                     id='fields.W341',
+                )
+            )
+
+        if self.has_default_arg:
+            warnings.append(
+                checks.Warning(
+                    'default has no effect on ManyToManyField.',
+                    hint=None,
+                    obj=self,
+                    id='fields.W343',
                 )
             )
 
