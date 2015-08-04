@@ -2298,6 +2298,7 @@ class ManyToManyField(RelatedField):
             db_constraint=db_constraint,
         )
         self.has_null_arg = 'null' in kwargs
+        self.has_default_arg = 'default' in kwargs
 
         super(ManyToManyField, self).__init__(**kwargs)
 
@@ -2345,6 +2346,16 @@ class ManyToManyField(RelatedField):
                     hint=None,
                     obj=self,
                     id='fields.W341',
+                )
+            )
+
+        if self.has_default_arg:
+            warnings.append(
+                checks.Warning(
+                    'default has no effect on ManyToManyField.',
+                    hint=None,
+                    obj=self,
+                    id='fields.W343',
                 )
             )
 
