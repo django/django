@@ -784,6 +784,10 @@ class SimpleTestCase(unittest.TestCase):
         else:
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                diff = ('\n' + '\n'.join(difflib.ndiff(
+                               six.text_type(xml1).splitlines(),
+                               six.text_type(xml2).splitlines())))
+                standardMsg = self._truncateMessage(standardMsg, diff)
                 self.fail(self._formatMessage(msg, standardMsg))
 
     def assertXMLNotEqual(self, xml1, xml2, msg=None):
