@@ -87,7 +87,13 @@ class Command(BaseCommand):
             del options['liveserver']
 
         test_runner = TestRunner(**options)
-        failures = test_runner.run_tests(test_labels)
+        try:
+            failures = test_runner.run_tests(test_labels)
+        finally:
+            # We can't do I/O cleanly as the test runner
+            # is not an instance of BaseCommand, so do the reporting here
+            for notice in getattr(test_runner, 'migration_notices', []):
+                self.stdout.write(self.style.NOTICE(notice))
 
         if failures:
             sys.exit(bool(failures))
