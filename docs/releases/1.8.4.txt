@@ -21,3 +21,6 @@ Bugfixes
 
 * Prevented an exception in ``TestCase.setUpTestData()`` from leaking the
   transaction (:ticket:`25176`).
+
+* Fixed ``has_changed()`` method in
+  :class:`django.contrib.postgres.forms.HStoreField`.
