@@ -28,6 +28,10 @@ class ArrayField(Field):
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
         super(ArrayField, self).__init__(**kwargs)
 
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(ArrayField, self).contribute_to_class(cls, name, **kwargs)
+        self.base_field.model = cls
+
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
         if self.base_field.remote_field:
