@@ -16,6 +16,7 @@ from django.utils import six
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
+from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
@@ -92,7 +93,6 @@ class BaseForm(object):
         self.label_suffix = label_suffix if label_suffix is not None else _(':')
         self.empty_permitted = empty_permitted
         self._errors = None  # Stores the errors after clean() has been called.
-        self._changed_data = None
 
         # The base_fields class attribute is the *class-wide* definition of
         # fields. Because a particular *instance* of the class might want to
@@ -434,30 +434,29 @@ class BaseForm(object):
         """
         return bool(self.changed_data)
 
-    @property
+    @cached_property
     def changed_data(self):
-        if self._changed_data is None:
-            self._changed_data = []
-            for name, field in self.fields.items():
-                prefixed_name = self.add_prefix(name)
-                data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
-                if not field.show_hidden_initial:
-                    initial_value = self.initial.get(name, field.initial)
-                    if callable(initial_value):
-                        initial_value = initial_value()
-                else:
-                    initial_prefixed_name = self.add_initial_prefix(name)
-                    hidden_widget = field.hidden_widget()
-                    try:
-                        initial_value = field.to_python(hidden_widget.value_from_datadict(
-                            self.data, self.files, initial_prefixed_name))
-                    except ValidationError:
-                        # Always assume data has changed if validation fails.
-                        self._changed_data.append(name)
-                        continue
-                if field.has_changed(initial_value, data_value):
-                    self._changed_data.append(name)
-        return self._changed_data
+        data = []
+        for name, field in self.fields.items():
+            prefixed_name = self.add_prefix(name)
+            data_value = field.widget.value_from_datadict(self.data, self.files, prefixed_name)
+            if not field.show_hidden_initial:
+                initial_value = self.initial.get(name, field.initial)
+                if callable(initial_value):
+                    initial_value = initial_value()
+            else:
+                initial_prefixed_name = self.add_initial_prefix(name)
+                hidden_widget = field.hidden_widget()
+                try:
+                    initial_value = field.to_python(hidden_widget.value_from_datadict(
+                        self.data, self.files, initial_prefixed_name))
+                except ValidationError:
+                    # Always assume data has changed if validation fails.
+                    data.append(name)
+                    continue
+            if field.has_changed(initial_value, data_value):
+                data.append(name)
+        return data
 
     @property
     def media(self):
