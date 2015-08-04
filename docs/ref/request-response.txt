@@ -254,6 +254,14 @@ Methods
         :class:`~django.middleware.common.CommonMiddleware` or
         :class:`~django.middleware.csrf.CsrfViewMiddleware`.
 
+.. method:: HttpRequest.get_port()
+
+    .. versionadded:: 1.9
+
+    Returns the originating port of the request using information from the
+    ``HTTP_X_FORWARDED_PORT`` (if :setting:`USE_X_FORWARDED_PORT` is enabled)
+    and ``SERVER_PORT`` ``META`` variable, in that order.
+
 .. method:: HttpRequest.get_full_path()
 
     Returns the ``path``, plus an appended query string, if applicable.
