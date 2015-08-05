@@ -459,7 +459,7 @@ other database types. This example is for PostgreSQL::
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'mydatabase',
             'USER': 'mydatabaseuser',
             'PASSWORD': 'mypassword',
@@ -500,14 +500,19 @@ Default: ``''`` (Empty string)
 
 The database backend to use. The built-in database backends are:
 
-* ``'django.db.backends.postgresql_psycopg2'``
+* ``'django.db.backends.postgresql'``
 * ``'django.db.backends.mysql'``
 * ``'django.db.backends.sqlite3'``
 * ``'django.db.backends.oracle'``
 
 You can use a database backend that doesn't ship with Django by setting
-``ENGINE`` to a fully-qualified path (i.e.
-``mypackage.backends.whatever``).
+``ENGINE`` to a fully-qualified path (i.e. ``mypackage.backends.whatever``).
+
+.. versionchanged:: 1.9
+
+    The ``django.db.backends.postgresql`` backend is named
+    ``django.db.backends.postgresql_psycopg2`` in older releases. For backwards
+    compatibility, the old name still works in newer versions.
 
 .. setting:: HOST
 
@@ -657,8 +662,7 @@ The character set encoding used to create the test database. The value of this
 string is passed directly through to the database, so its format is
 backend-specific.
 
-Supported for the PostgreSQL_ (``postgresql_psycopg2``) and MySQL_ (``mysql``)
-backends.
+Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
 .. _MySQL: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html

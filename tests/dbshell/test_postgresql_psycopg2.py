@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import locale
 import os
 
-from django.db.backends.postgresql_psycopg2.client import DatabaseClient
+from django.db.backends.postgresql.client import DatabaseClient
 from django.test import SimpleTestCase, mock
 from django.utils import six
 from django.utils.encoding import force_bytes, force_str
