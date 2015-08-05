@@ -914,20 +914,29 @@ class SQLInsertCompiler(SQLCompiler):
 
         if field is None:
             # A field value of None means the value is raw.
-            return val, []
+            sql, params = val, []
 
         elif hasattr(val, 'as_sql'):
             # This is an expression, let's compile it.
-            return self.compile(val)
+            sql, params = self.compile(val)
 
         elif hasattr(field, 'get_placeholder'):
             # Some fields (e.g. geo fields) need special munging before
             # they can be inserted.
-            return field.get_placeholder(val, self, self.connection), [val]
+            sql, params = field.get_placeholder(val, self, self.connection), [val]
 
         else:
             # Return the common case for the placeholder
-            return '%s', [val]
+            sql, params = '%s', [val]
+
+        # The following hook is only used by Oracle Spatial, which sometimes
+        # needs to yield 'NULL' and [] as its placeholder and params instead
+        # of '%s' and [None]. The 'NULL' placeholder is produced earlier by
+        # OracleOperations.get_geom_placeholder(). The following line removes
+        # the corresponding None parameter. See ticket #10888.
+        params = self.connection.ops.modify_insert_params(sql, params)
+
+        return sql, params
 
     def prepare_value(self, field, value):
         """
@@ -1012,10 +1021,6 @@ class SQLInsertCompiler(SQLCompiler):
             # Extract separate lists for placeholders and params.
             # Each of these has shape [n_objs][n_fields]
             placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
-
-            # Oracle Spatial needs to remove some values due to #10888.
-            # This has to happen before params are flattened.
-            param_rows = self.connection.ops.modify_insert_params(placeholder_rows, param_rows)
 
             # Params for each field are still lists, and need to be flattened.
             flatten = lambda lists: [item for lst in lists for item in lst]
