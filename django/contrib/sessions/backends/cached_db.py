@@ -58,4 +58,4 @@ class SessionStore(DBStore):
         """
         self.clear()
         self.delete(self.session_key)
-        self.create()
+        self._session_key = None
