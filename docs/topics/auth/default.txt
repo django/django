@@ -660,7 +660,8 @@ The ``permission_required`` decorator
     (i.e. ``polls.can_vote`` for a permission on a model in the ``polls``
     application).
 
-    The decorator may also take an iterable of permissions.
+    The decorator may also take an iterable of permissions, in which case the
+    user must have all of the permissions in order to access the view.
 
     Note that :func:`~django.contrib.auth.decorators.permission_required()`
     also takes an optional ``login_url`` parameter::
