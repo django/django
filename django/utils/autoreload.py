@@ -37,6 +37,7 @@ import traceback
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
+from django.utils import six
 from django.utils._os import npath
 from django.utils.six.moves import _thread as thread
 
@@ -72,6 +73,7 @@ I18N_MODIFIED = 2
 _mtimes = {}
 _win = (sys.platform == "win32")
 
+_exception = None
 _error_files = []
 _cached_modules = set()
 _cached_filenames = []
@@ -219,11 +221,14 @@ def code_changed():
 
 def check_errors(fn):
     def wrapper(*args, **kwargs):
+        global _exception
         try:
             fn(*args, **kwargs)
         except (ImportError, IndentationError, NameError, SyntaxError,
                 TypeError, AttributeError):
-            et, ev, tb = sys.exc_info()
+            _exception = sys.exc_info()
+
+            et, ev, tb = _exception
 
             if getattr(ev, 'filename', None) is None:
                 # get the filename from the last item in the stack
@@ -237,6 +242,12 @@ def check_errors(fn):
             raise
 
     return wrapper
+
+
+def raise_last_exception():
+    global _exception
+    if _exception is not None:
+        six.reraise(*_exception)
 
 
 def ensure_echo_on():
