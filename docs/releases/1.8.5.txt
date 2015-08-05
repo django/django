@@ -9,4 +9,5 @@ Django 1.8.5 fixes several bugs in 1.8.4.
 Bugfixes
 ========
 
-* ...
+* Fixed ``AssertionError`` in some delete queries with a model containing a
+  field that is both a foreign and primary key (:ticket:`24951`).

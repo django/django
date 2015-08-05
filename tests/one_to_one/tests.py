@@ -5,7 +5,8 @@ from django.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, School, Target, UndergroundBar, Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
+    Waiter,
 )
 
 
@@ -255,6 +256,11 @@ class OneToOneTests(TestCase):
             Target.objects.exclude(second_pointer=None),
             []
         )
+
+    def test_o2o_primary_key_delete(self):
+        t = Target.objects.create(name='name')
+        Pointer.objects.create(other=t)
+        Pointer.objects.filter(other__name='name').delete()
 
     def test_reverse_object_does_not_exist_cache(self):
         """
