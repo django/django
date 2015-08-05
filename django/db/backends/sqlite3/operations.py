@@ -193,13 +193,14 @@ class DatabaseOperations(BaseDatabaseOperations):
             value = uuid.UUID(value)
         return value
 
-    def bulk_insert_sql(self, fields, num_values):
-        res = []
-        res.append("SELECT %s" % ", ".join(
-            "%%s AS %s" % self.quote_name(f.column) for f in fields
-        ))
-        res.extend(["UNION ALL SELECT %s" % ", ".join(["%s"] * len(fields))] * (num_values - 1))
-        return " ".join(res)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        return " UNION ALL ".join(
+            "SELECT %s" % ", ".join(
+                p if not_first else '%s AS %s' % (p, self.quote_name(f.column))
+                for p, f in zip(row, fields)
+            )
+            for not_first, row in enumerate(placeholder_rows)
+        )
 
     def combine_expression(self, connector, sub_expressions):
         # SQLite doesn't have a power function, so we fake it with a

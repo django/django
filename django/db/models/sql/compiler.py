@@ -976,6 +976,32 @@ class SQLInsertCompiler(SQLCompiler):
             return getattr(obj, field.attname)
         return field.pre_save(obj, add=True)
 
+    def assemble_as_sql(self, fields, value_rows):
+
+        if not value_rows:
+            return [], []
+
+        # list of (sql, [params]) tuples for each object to be saved
+        # Shape: [n_objs][n_fields][2]
+        rows_of_fields_as_sql = (
+            (self.field_as_sql(field, v) for field, v in zip(fields, row))
+            for row in value_rows
+        )
+
+        # tuple like ([sqls], [[params]s]) for each object to be saved
+        # Shape: [n_objs][2][n_fields]
+        sql_and_param_pair_rows = (zip(*row) for row in rows_of_fields_as_sql)
+
+        # Extract separate lists for placeholders and params.
+        # Each of these has shape [n_objs][n_fields]
+        placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
+
+        # Params for each field are still lists, and need to be flattened.
+        flatten = lambda lists: [item for lst in lists for item in lst]
+        param_rows = [flatten(row) for row in param_rows]
+
+        return placeholder_rows, param_rows
+
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
@@ -988,43 +1014,21 @@ class SQLInsertCompiler(SQLCompiler):
         result.append('(%s)' % ', '.join(qn(f.column) for f in fields))
 
         if has_fields:
-            param_rows = value_rows = [
+            value_rows = [
                 [self.prepare_value(field, self.pre_save_val(field, obj)) for field in fields]
                 for obj in self.query.objs
             ]
         else:
             # I guess this case is just for an entirely empty object.
             value_rows = [[self.connection.ops.pk_default_value()] for _ in self.query.objs]
-            param_rows = [[]]
             fields = [None]
 
         # Currently, the backends just accept values when generating bulk queries, and
         # generate their own placeholders. Doing that isn't necessary, and it should
         # be possible to use placeholders and expressions in bulk inserts too.
-        can_bulk = (not any(hasattr(field, "get_placeholder") for field in fields) and
-            not self.return_id and self.connection.features.has_bulk_insert)
+        can_bulk = (not self.return_id and self.connection.features.has_bulk_insert)
 
-        if can_bulk:
-            placeholder_rows = [["%s"] * len(fields)]
-        else:
-            # list of (sql, [params]) tuples for each object to be saved
-            # Shape: [n_objs][n_fields][2]
-            rows_of_fields_as_sql = (
-                (self.field_as_sql(field, v) for field, v in zip(fields, row))
-                for row in value_rows
-            )
-
-            # tuple like ([sqls], [[params]s]) for each object to be saved
-            # Shape: [n_objs][2][n_fields]
-            sql_and_param_pair_rows = (zip(*row) for row in rows_of_fields_as_sql)
-
-            # Extract separate lists for placeholders and params.
-            # Each of these has shape [n_objs][n_fields]
-            placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
-
-            # Params for each field are still lists, and need to be flattened.
-            flatten = lambda lists: [item for lst in lists for item in lst]
-            param_rows = [flatten(row) for row in param_rows]
+        placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
 
         if self.return_id and self.connection.features.can_return_id_from_insert:
             params = param_rows[0]
@@ -1039,8 +1043,8 @@ class SQLInsertCompiler(SQLCompiler):
             return [(" ".join(result), tuple(params))]
 
         if can_bulk:
-            result.append(self.connection.ops.bulk_insert_sql(fields, len(value_rows)))
-            return [(" ".join(result), tuple(v for val in value_rows for v in val))]
+            result.append(self.connection.ops.bulk_insert_sql(fields, placeholder_rows))
+            return [(" ".join(result), tuple(p for ps in param_rows for p in ps))]
         else:
             return [
                 (" ".join(result + ["VALUES (%s)" % ", ".join(p)]), vals)
