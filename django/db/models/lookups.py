@@ -60,6 +60,8 @@ class RegisterLookupMixin(object):
 class Transform(RegisterLookupMixin, BaseExpression):
 
     bilateral = False
+    args = ()
+    kwargs = {}
 
     def set_source_expressions(self, lhs):
         self.lhs = lhs[0]
@@ -81,7 +83,7 @@ class Transform(RegisterLookupMixin, BaseExpression):
         else:
             bilateral_transforms = []
         if self.bilateral:
-            bilateral_transforms.append((self.__class__, self.init_lookups))
+            bilateral_transforms.append((self.__class__, self.init_lookups, self.args, self.kwargs))
         return bilateral_transforms
 
 
@@ -89,10 +91,15 @@ class Lookup(RegisterLookupMixin, BaseExpression):
     lookup_name = None
 
     def set_source_expressions(self, exprs):
-        self.lhs, self.rhs = exprs
+        self.lhs = exprs[0]
+        if len(exprs) == 2:
+            self.rhs = exprs[1]
 
     def get_source_expressions(self):
-        return [self.lhs, self.rhs]
+        if isinstance(self.rhs, BaseExpression):
+            return [self.lhs, self.rhs]
+        else:
+            return [self.lhs]
 
     def __init__(self, lhs, rhs):
         self.set_source_expressions([lhs, rhs])
@@ -116,8 +123,8 @@ class Lookup(RegisterLookupMixin, BaseExpression):
         return self
 
     def apply_bilateral_transforms(self, value):
-        for transform, lookups in self.bilateral_transforms:
-            value = transform(value, lookups)
+        for transform, lookups, args, kwargs in self.bilateral_transforms:
+            value = transform(value, lookups, *args, **kwargs)
         return value
 
     def batch_process_rhs(self, compiler, connection, rhs=None):

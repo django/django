@@ -987,4 +987,37 @@ class OrderBy(BaseExpression):
     def desc(self):
         self.descending = True
 
+
+class E(object):
+    def __init__(self, ref):
+        self.lookups = []
+        self.ref = F(ref)
+
+    def __getattr__(self, attr):
+        if not attr.startswith('_'):
+            def callme(*args, **kwargs):
+                self.lookups.append((attr, args, kwargs))
+                return self
+            return callme
+        return super().__getattr__(attr)
+
+    def __eq__(self, other):
+        self.lookups.append(('exact', (other,), {}))
+        return self
+
+    def resolve_expression(self, *args, **kwargs):
+        lhs = self.ref.resolve_expression(*args, **kwargs)
+        for pos, (attr, args, kwargs) in enumerate(self.lookups):
+            last = pos == len(self.lookups) - 1
+            if last:
+                next = lhs.get_lookup(attr)
+                if next:
+                    return next(lhs, *args, **kwargs)
+            next = lhs.get_transform(attr)
+            if next:
+                lhs = next(lhs, [], *args, **kwargs)
+            else:
+                raise Exception("Transform %s not found from %s" % (attr, lhs))
+        return lhs
+
 from django.db.models import fields

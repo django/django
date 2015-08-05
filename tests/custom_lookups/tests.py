@@ -6,6 +6,7 @@ from datetime import date, datetime
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
+from django.db.models.expressions import E
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
@@ -254,7 +255,7 @@ class LookupTests(TestCase):
             a4 = Author.objects.create(name='a4', age=4)
             baseqs = Author.objects.order_by('name')
             self.assertQuerysetEqual(
-                baseqs.filter(age__div3=2),
+                baseqs.filter(E('age').div3() == 2),
                 [a2], lambda x: x)
             self.assertQuerysetEqual(
                 baseqs.filter(age__div3__lte=3),
