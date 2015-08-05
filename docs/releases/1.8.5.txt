@@ -9,6 +9,8 @@ Django 1.8.5 fixes several bugs in 1.8.4.
 Bugfixes
 ========
 
+* Made the development server's autoreload more robust (:ticket:`24704`).
+
 * Fixed ``AssertionError`` in some delete queries with a model containing a
   field that is both a foreign and primary key (:ticket:`24951`).
 
