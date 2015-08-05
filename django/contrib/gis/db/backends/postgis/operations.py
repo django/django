@@ -11,8 +11,7 @@ from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
-from django.db.backends.postgresql_psycopg2.operations import \
-    DatabaseOperations
+from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 

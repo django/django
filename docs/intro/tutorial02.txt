@@ -26,7 +26,7 @@ settings:
 
 * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
   ``'django.db.backends.sqlite3'``,
-  ``'django.db.backends.postgresql_psycopg2'``,
+  ``'django.db.backends.postgresql'``,
   ``'django.db.backends.mysql'``, or
   ``'django.db.backends.oracle'``. Other backends are :ref:`also available
   <third-party-notes>`.
