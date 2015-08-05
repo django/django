@@ -109,6 +109,33 @@ class DeletionTests(TestCase):
             obj.save()
         self.assertEqual(school.child_set.count(), 1)
 
+    def test_save_new_get_updated_models(self):
+        """
+        Make sure inlineformsets respect get_updated_models()
+        as an alias for save(commit=False)
+        regression for #10750
+        test for new utility method get_updated_models() #25227
+        """
+        # exclude some required field from the forms
+        ChildFormSet = inlineformset_factory(School, Child, exclude=['father', 'mother'])
+        school = School.objects.create(name='test')
+        mother = Parent.objects.create(name='mother')
+        father = Parent.objects.create(name='father')
+        data = {
+            'child_set-TOTAL_FORMS': '1',
+            'child_set-INITIAL_FORMS': '0',
+            'child_set-MAX_NUM_FORMS': '0',
+            'child_set-0-name': 'child',
+        }
+        formset = ChildFormSet(data, instance=school)
+        self.assertEqual(formset.is_valid(), True)
+        objects = formset.get_updated_models()
+        for obj in objects:
+            obj.mother = mother
+            obj.father = father
+            obj.save()
+        self.assertEqual(school.child_set.count(), 1)
+
 
 class InlineFormsetFactoryTest(TestCase):
     def test_inline_formset_factory(self):

@@ -65,16 +65,18 @@ def construct_instance(form, instance, fields=None, exclude=None):
     return instance
 
 
-def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True, exclude=None, construct=True):
+def get_updated_instance(form, instance, fields=None, fail_message='updated',
+                         exclude=None, construct=True):
     """
-    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
-
-    If commit=True, then the changes to ``instance`` will be saved to the
-    database. Returns ``instance``.
+    Updates bound Form ``form``'s cleaned_data into model instance ``instance``.
 
     If construct=False, assume ``instance`` has already been constructed and
-    just needs to be saved.
+    just needs to be updated.
+
+    Side effects: Mutates ``form`` by giving it a new method, ``save_m2m()``,
+    for deferred saving of m2m data.
+
+    Returns ``instance``.
     """
     if construct:
         instance = construct_instance(form, instance, fields, exclude)
@@ -98,14 +100,25 @@ def save_instance(form, instance, fields=None, fail_message='saved',
                 continue
             if f.name in cleaned_data:
                 f.save_form_data(instance, cleaned_data[f.name])
+
+    # We're not committing yet. Add a method to the form
+    # to allow deferred saving of m2m data.
+    form.save_m2m = save_m2m
+    return instance
+
+
+def save_instance(form, instance, fields=None, fail_message='saved',
+                  commit=True, exclude=None, construct=True):
+    """
+    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
+
+    Returns ``instance``.
+    """
+    instance = get_updated_instance(form, instance, fields, fail_message,
+                                    exclude, construct)
     if commit:
-        # If we are committing, save the instance and the m2m data immediately.
         instance.save()
-        save_m2m()
-    else:
-        # We're not committing. Add a method to the form to allow deferred
-        # saving of m2m data.
-        form.save_m2m = save_m2m
+        form.save_m2m()
     return instance
 
 
@@ -464,6 +477,25 @@ class BaseModelForm(BaseForm):
 
     save.alters_data = True
 
+    def get_updated_model(self):
+        """
+        Updates this ``form``'s cleaned_data into model instance ``self.instance``.
+
+        Side effects: This ``form`` acquires an updated ``save_m2m()`` method for
+        deferred saving of m2m data.
+
+        Returns ``instance``.
+
+        Changes to ``instance`` are never saved to database.
+
+        This is a utility method so newcomers following tutorials never have to write
+        something that looks like "save but not save" (``form.save(commit=False)``)
+        just to acquire an updated instance of a model.
+        """
+        fail_message = 'updated'
+        return get_updated_instance(self, self.instance, self._meta.fields,
+                                    fail_message, self._meta.exclude, construct=False)
+
 
 class ModelForm(six.with_metaclass(ModelFormMetaclass, BaseModelForm)):
     pass
@@ -642,15 +674,34 @@ class BaseModelFormSet(BaseFormSet):
         as necessary, and returns the list of instances.
         """
         if not commit:
-            self.saved_forms = []
-
-            def save_m2m():
-                for form in self.saved_forms:
-                    form.save_m2m()
-            self.save_m2m = save_m2m
+            self._update_save_m2m()
         return self.save_existing_objects(commit) + self.save_new_objects(commit)
 
     save.alters_data = True
+
+    def get_updated_models(self):
+        """
+        Saves each ``form``'s cleaned_data into the corresponding new or modified
+        model instances, and returns the list of instances.
+
+        Changes to the models are never saved to database.
+
+        This is a utility method parallell to ``BaseModelForm.get_updated_model()``
+        """
+        self._update_save_m2m()
+        return self.save_existing_objects(commit=False) + self.save_new_objects(commit=False)
+
+    def _update_save_m2m(self):
+        """
+        Make sure that the many-to-many fields will be properly saved later, when
+        ``FormSet.save()`` is called with ``commit=True``.
+        """
+        self.saved_forms = []
+
+        def save_m2m():
+            for form in self.saved_forms:
+                form.save_m2m()
+        self.save_m2m = save_m2m
 
     def clean(self):
         self.validate_unique()
