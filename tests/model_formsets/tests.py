@@ -330,6 +330,48 @@ class ModelFormsetTest(TestCase):
             '<Author: Walt Whitman>',
         ])
 
+    def test_apply(self):
+        # Test the behavior of get_updated_models as a utility method
+        # for save(commit=False) and its relation to save_m2m
+
+        author1 = Author.objects.create(name='Charles Baudelaire')
+        author2 = Author.objects.create(name='Paul Verlaine')
+        author3 = Author.objects.create(name='Walt Whitman')
+
+        meeting = AuthorMeeting.objects.create(created=date.today())
+        meeting.authors = Author.objects.all()
+
+        # create an Author instance to add to the meeting.
+
+        author4 = Author.objects.create(name='John Steinbeck')
+
+        AuthorMeetingFormSet = modelformset_factory(AuthorMeeting, fields="__all__", extra=1, can_delete=True)
+        data = {
+            'form-TOTAL_FORMS': '2',  # the number of forms rendered
+            'form-INITIAL_FORMS': '1',  # the number of forms with initial data
+            'form-MAX_NUM_FORMS': '',  # the max number of forms
+            'form-0-id': str(meeting.id),
+            'form-0-name': '2nd Tuesday of the Week Meeting',
+            'form-0-authors': [author2.id, author1.id, author3.id, author4.id],
+            'form-1-name': '',
+            'form-1-authors': '',
+            'form-1-DELETE': '',
+        }
+        formset = AuthorMeetingFormSet(data=data, queryset=AuthorMeeting.objects.all())
+        self.assertTrue(formset.is_valid())
+
+        instances = formset.apply()
+        for instance in instances:
+            instance.created = date.today()
+            instance.save()
+        formset.save_m2m()
+        self.assertQuerysetEqual(instances[0].authors.all(), [
+            '<Author: Charles Baudelaire>',
+            '<Author: John Steinbeck>',
+            '<Author: Paul Verlaine>',
+            '<Author: Walt Whitman>',
+        ])
+
     def test_max_num(self):
         # Test the behavior of max_num with model formsets. It should allow
         # all existing related objects/inlines for a given object to be
@@ -410,7 +452,7 @@ class ModelFormsetTest(TestCase):
         class PoetForm(forms.ModelForm):
             def save(self, commit=True):
                 # change the name to "Vladimir Mayakovsky" just to be a jerk.
-                author = super(PoetForm, self).save(commit=False)
+                author = self.apply()
                 author.name = "Vladimir Mayakovsky"
                 if commit:
                     author.save()
@@ -739,7 +781,7 @@ class ModelFormsetTest(TestCase):
         class PoemForm(forms.ModelForm):
             def save(self, commit=True):
                 # change the name to "Brooklyn Bridge" just to be a jerk.
-                poem = super(PoemForm, self).save(commit=False)
+                poem = self.apply()
                 poem.name = "Brooklyn Bridge"
                 if commit:
                     poem.save()
@@ -817,7 +859,6 @@ class ModelFormsetTest(TestCase):
             'book_set-2-title': '',
         }
         formset = AuthorBooksFormSet(data, instance=author, queryset=custom_qs)
-        self.assertTrue(formset.is_valid())
 
     def test_inline_formsets_with_custom_save_method_related_instance(self):
         """
@@ -850,12 +891,81 @@ class ModelFormsetTest(TestCase):
         poet.save()
         poem = formset.save()[0]
         self.assertEqual(poem.name, 'Le Lac by Lamartine')
+        self.assertTrue(formset.is_valid())
+
+    def test_inline_formsets_with_custom_save_method_using_apply(self):
+        """
+        Same test as above, but using utility method ModelForm.apply()
+
+        The ModelForm.save() method should be able to access the related object
+        if it exists in the database (#24395).
+        """
+        class PoemForm_apply(forms.ModelForm):
+            def save(self, commit=True):
+                poem = self.apply()
+                poem.name = "%s by %s" % (poem.name, poem.poet.name)
+                if commit:
+                    poem.save()
+                return poem
+
+        PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemForm_apply, fields="__all__")
+        data = {
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '',
+            'poem_set-0-name': 'Le Lac',
+        }
+        poet = Poet()
+        formset = PoemFormSet(data=data, instance=poet)
+        self.assertTrue(formset.is_valid())
+
+        # The Poet instance is saved after the formset instantiation. This
+        # happens in admin's changeform_view() when adding a new object and
+        # some inlines in the same request.
+        poet.name = 'Lamartine'
+        poet.save()
+        poem = formset.save()[0]
+        self.assertEqual(poem.name, 'Le Lac by Lamartine')
 
     def test_inline_formsets_with_wrong_fk_name(self):
         """ Regression for #23451 """
         message = "fk_name 'title' is not a ForeignKey to 'model_formsets.Author'."
         with self.assertRaisesMessage(ValueError, message):
             inlineformset_factory(Author, Book, fields="__all__", fk_name='title')
+
+    def test_inline_formsets_with_custom_save_method_saving_via_form_not_model(self):
+        """
+        Same test as above, but saving using super() on the form's save(), not the model's.
+
+        The ModelForm.save() method should be able to access the related objectj
+        if it exists in the database (#24395).
+        """
+        class PoemForm_save_via_form_not_model(forms.ModelForm):
+            def save(self, commit=True):
+                poem = self.apply()
+                poem.name = "%s by %s" % (poem.name, poem.poet.name)
+                if commit:
+                    super(PoemForm_save_via_form_not_model, self).save()
+                return poem
+
+        PoemFormSet = inlineformset_factory(Poet, Poem, form=PoemForm_save_via_form_not_model, fields="__all__")
+        data = {
+            'poem_set-TOTAL_FORMS': '1',
+            'poem_set-INITIAL_FORMS': '0',
+            'poem_set-MAX_NUM_FORMS': '',
+            'poem_set-0-name': 'Le Lac',
+        }
+        poet = Poet()
+        formset = PoemFormSet(data=data, instance=poet)
+        self.assertTrue(formset.is_valid())
+
+        # The Poet instance is saved after the formset instantiation. This
+        # happens in admin's changeform_view() when adding a new object and
+        # some inlines in the same request.
+        poet.name = 'Lamartine'
+        poet.save()
+        poem = formset.save()[0]
+        self.assertEqual(poem.name, 'Le Lac by Lamartine')
 
     def test_custom_pk(self):
         # We need to ensure that it is displayed

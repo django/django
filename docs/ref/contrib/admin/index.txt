@@ -1315,7 +1315,7 @@ templates used by the :class:`ModelAdmin` views:
 
         class ArticleAdmin(admin.ModelAdmin):
             def save_formset(self, request, form, formset, change):
-                instances = formset.save(commit=False)
+                instances = formset.apply()
                 for obj in formset.deleted_objects:
                     obj.delete()
                 for instance in instances:
