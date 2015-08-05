@@ -595,7 +595,8 @@ The permission_required decorator
     .. versionchanged:: 1.7
 
         The :func:`~django.contrib.auth.decorators.permission_required`
-        decorator can take a list of permissions as well as a single permission.
+        decorator can take a list of permissions, in which case the user must
+        have all of the permissions in order to access the view.
 
 .. _applying-permissions-to-generic-views:
 
