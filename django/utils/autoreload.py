@@ -92,7 +92,7 @@ def gen_filenames(only_new=False):
         if only_new:
             return []
         else:
-            return _cached_filenames
+            return _cached_filenames + clean_files(_error_files)
 
     new_modules = module_values - _cached_modules
     new_filenames = clean_files(
@@ -119,7 +119,7 @@ def gen_filenames(only_new=False):
     _cached_modules = _cached_modules.union(new_modules)
     _cached_filenames += new_filenames
     if only_new:
-        return new_filenames
+        return new_filenames + clean_files(_error_files)
     else:
         return _cached_filenames + clean_files(_error_files)
 
