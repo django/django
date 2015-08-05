@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 from importlib import import_module
 
@@ -6,6 +7,7 @@ from django import conf
 from django.contrib import admin
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import extend_sys_path
+from django.utils import autoreload
 from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
 
@@ -98,3 +100,41 @@ class TestFilenameGenerator(SimpleTestCase):
         self.assertIn(npath(filename), gen_filenames())
         os.unlink(filename)
         self.assertNotIn(filename, gen_filenames())
+
+    def test_check_errors(self):
+        """
+        When a file containing an error is imported in a function wrapped by
+        check_errors(), gen_filenames() returns it.
+
+        Run assertions twice to test uncached and cached access.
+        """
+        dirname = tempfile.mkdtemp()
+        filename = os.path.join(dirname, 'test_syntax_error.py')
+        self.addCleanup(shutil.rmtree, dirname)
+        with open(filename, 'w') as f:
+            f.write("Ceci n'est pas du Python.")
+
+        with extend_sys_path(dirname):
+            with self.assertRaises(SyntaxError):
+                autoreload.check_errors(import_module)('test_syntax_error')
+        self.assertIn(npath(filename), gen_filenames())
+        self.assertIn(npath(filename), gen_filenames())
+
+    def test_check_errors_only_new(self):
+        """
+        When a file containing an error is imported in a function wrapped by
+        check_errors(), gen_filenames(only_new=True) returns it.
+
+        Run assertions twice to test uncached and cached access.
+        """
+        dirname = tempfile.mkdtemp()
+        filename = os.path.join(dirname, 'test_syntax_error.py')
+        self.addCleanup(shutil.rmtree, dirname)
+        with open(filename, 'w') as f:
+            f.write("Ceci n'est pas du Python.")
+
+        with extend_sys_path(dirname):
+            with self.assertRaises(SyntaxError):
+                autoreload.check_errors(import_module)('test_syntax_error')
+        self.assertIn(npath(filename), gen_filenames(only_new=True))
+        self.assertNotIn(npath(filename), gen_filenames(only_new=True))
