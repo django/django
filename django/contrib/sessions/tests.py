@@ -159,6 +159,7 @@ class SessionTestsMixin(object):
         self.session.flush()
         self.assertFalse(self.session.exists(prev_key))
         self.assertNotEqual(self.session.session_key, prev_key)
+        self.assertIsNone(self.session.session_key)
         self.assertTrue(self.session.modified)
         self.assertTrue(self.session.accessed)
 
@@ -588,6 +589,75 @@ class SessionMiddlewareTests(unittest.TestCase):
 
         # Check that the value wasn't saved above.
         self.assertNotIn('hello', request.session.load())
+
+    def test_session_delete_on_end(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Before deleting, there has to be an existing cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the cookie was deleted, not recreated.
+        # A deleted cookie header looks like:
+        #  Set-Cookie: sessionid=; expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        self.assertEqual(
+            'Set-Cookie: {0}=; expires=Thu, 01-Jan-1970 00:00:00 GMT; '
+            'Max-Age=0; Path=/'.format(settings.SESSION_COOKIE_NAME),
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
+
+    @override_settings(SESSION_COOKIE_DOMAIN='.example.local')
+    def test_session_delete_on_end_with_custom_domain(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Before deleting, there has to be an existing cookie
+        request.COOKIES[settings.SESSION_COOKIE_NAME] = 'abc'
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # Check that the cookie was deleted, not recreated.
+        # A deleted cookie header with a custom domain looks like:
+        #  Set-Cookie: sessionid=; Domain=.example.local;
+        #              expires=Thu, 01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/
+        self.assertEqual(
+            'Set-Cookie: {}=; Domain=.example.local; expires=Thu, '
+            '01-Jan-1970 00:00:00 GMT; Max-Age=0; Path=/'.format(
+                settings.SESSION_COOKIE_NAME,
+            ),
+            str(response.cookies[settings.SESSION_COOKIE_NAME])
+        )
+
+    def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # A cookie should not be set.
+        self.assertEqual(response.cookies, {})
+        # The session is accessed so "Vary: Cookie" should be set.
+        self.assertEqual(response['Vary'], 'Cookie')
 
 
 class CookieSessionTests(SessionTestsMixin, TestCase):
