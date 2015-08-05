@@ -660,6 +660,23 @@ class SessionMiddlewareTests(TestCase):
             str(response.cookies[settings.SESSION_COOKIE_NAME])
         )
 
+    def test_flush_empty_without_session_cookie_doesnt_set_cookie(self):
+        request = RequestFactory().get('/')
+        response = HttpResponse('Session test')
+        middleware = SessionMiddleware()
+
+        # Simulate a request that ends the session
+        middleware.process_request(request)
+        request.session.flush()
+
+        # Handle the response through the middleware
+        response = middleware.process_response(request, response)
+
+        # A cookie should not be set.
+        self.assertEqual(response.cookies, {})
+        # The session is accessed so "Vary: Cookie" should be set.
+        self.assertEqual(response['Vary'], 'Cookie')
+
 
 # Don't need DB flushing for these tests, so can use unittest.TestCase as base class
 class CookieSessionTests(SessionTestsMixin, unittest.TestCase):

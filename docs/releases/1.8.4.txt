@@ -6,6 +6,19 @@ Django 1.8.4 release notes
 
 Django 1.8.4 fixes a security issue and several bugs in 1.8.3.
 
+Denial-of-service possibility in ``logout()`` view by filling session store
+===========================================================================
+
+Previously, a session could be created when anonymously accessing the
+:func:`django.contrib.auth.views.logout` view (provided it wasn't decorated
+with :func:`~django.contrib.auth.decorators.login_required` as done in the
+admin). This could allow an attacker to easily create many new session records
+by sending repeated requests, potentially filling up the session store or
+causing other users' session records to be evicted.
+
+The :class:`~django.contrib.sessions.middleware.SessionMiddleware` has been
+modified to no longer create empty session records.
+
 Bugfixes
 ========
 
