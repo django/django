@@ -903,18 +903,6 @@ class SQLInsertCompiler(SQLCompiler):
         self.return_id = False
         super(SQLInsertCompiler, self).__init__(*args, **kwargs)
 
-    def placeholder(self, field, val):
-        if field is None:
-            # A field value of None means the value is raw.
-            return val
-        elif hasattr(field, 'get_placeholder'):
-            # Some fields (e.g. geo fields) need special munging before
-            # they can be inserted.
-            return field.get_placeholder(val, self, self.connection)
-        else:
-            # Return the common case for the placeholder
-            return '%s'
-
     def field_as_sql(self, field, val):
         """
         Take a field, and a value intended to be saved on that field, and
@@ -925,12 +913,22 @@ class SQLInsertCompiler(SQLCompiler):
         placeholder, with no corresponding parameters returned.
         """
 
-        if hasattr(val, 'as_sql'):
+        if field is None:
+            # A field value of None means the value is raw.
+            sql, params = val, []
+
+        elif hasattr(val, 'as_sql'):
             # This is an expression, let's compile it.
             sql, params = self.compile(val)
+
+        elif hasattr(field, 'get_placeholder'):
+            # Some fields (e.g. geo fields) need special munging before
+            # they can be inserted.
+            sql, params = field.get_placeholder(val, self, self.connection), [val]
+
         else:
-            sql = self.placeholder(field, val)
-            params = [val] if field is not None else []
+            # Return the common case for the placeholder
+            sql, params = '%s', [val]
 
         # The following hook is only used by Oracle Spatial, which sometimes
         # needs to yield 'NULL' and [] as its placeholder and params instead
