@@ -989,8 +989,7 @@ class SQLInsertCompiler(SQLCompiler):
         placeholder_rows, param_rows = zip(*sql_and_param_pair_rows)
 
         # Params for each field are still lists, and need to be flattened.
-        flatten = lambda lists: [item for lst in lists for item in lst]
-        param_rows = [flatten(row) for row in param_rows]
+        param_rows = [[p for ps in row for p in ps] for row in param_rows]
 
         return placeholder_rows, param_rows
 
