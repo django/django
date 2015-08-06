@@ -910,6 +910,9 @@ class SQLInsertCompiler(SQLCompiler):
         Take a field, and a value intended to be saved on that field, and
         return placeholder SQL and accompanying params. Checks for raw values,
         expressions and fields with get_placeholder() defined in that order.
+
+        When field is None, the value is considered raw, and is used as the
+        placeholder, with no corresponding parameters returned.
         """
 
         if field is None:
@@ -969,6 +972,17 @@ class SQLInsertCompiler(SQLCompiler):
         return field.pre_save(obj, add=True)
 
     def assemble_as_sql(self, fields, value_rows):
+        """
+        Take a sequence of N fields and a sequence of M rows of values,
+        generate placeholder SQL and parameters for each field and value,
+        and return a pair containing:
+         * a sequence of M rows of N SQL placeholder strings, and
+         * a sequence of M rows of corresponding parameter values.
+
+        Each placeholder string may contain any number of '%s' interpolation
+        strings, and each parameter row will contain exactly as many params
+        as the total number of '%s's in the corresponding placeholder row.
+        """
 
         if not value_rows:
             return [], []
