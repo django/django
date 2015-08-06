@@ -327,33 +327,77 @@ Note that if the form :ref:`hasn't been validated
 doesn't validate -- i.e., if ``form.errors`` evaluates to ``True``.
 
 This ``save()`` method accepts an optional ``commit`` keyword argument, which
-accepts either ``True`` or ``False``. If you call ``save()`` with
-``commit=False``, then it will return an object that hasn't yet been saved to
-the database. In this case, it's up to you to call ``save()`` on the resulting
-model instance. This is useful if you want to do custom processing on the
-object before saving it, or if you want to use one of the specialized
-:ref:`model saving options <ref-models-force-insert>`. ``commit`` is ``True``
-by default.
+accepts either ``True`` or ``False``. This is because calling ``save()`` on a
+``ModelForm`` is interpreted as "save to the model", where ``save(commit=False)``
+means "save to the model but not to the database", and ``save(commit=True)`` means
+"save to the model and also to the database". ``commit`` is ``True`` by default.
 
-Another side effect of using ``commit=False`` is seen when your model has
-a many-to-many relation with another model. If your model has a many-to-many
-relation and you specify ``commit=False`` when you save a form, Django cannot
-immediately save the form data for the many-to-many relation. This is because
-it isn't possible to save many-to-many data for an instance until the instance
-exists in the database.
+Because some people might have considered that confusing, :ref:`the new
+get_updated_model() method<get-updated-model-method>` was added to
+``ModelForm``. And because old code and tutorials exist that use
+``save(commit=False)``, the old way of doing things will still work. If you call
+``save()`` with ``commit=False``, then it will have the same behaviour as if you
+call ``get_updated_model()``.
 
-To work around this problem, every time you save a form using ``commit=False``,
-Django adds a ``save_m2m()`` method to your ``ModelForm`` subclass. After
-you've manually saved the instance produced by the form, you can invoke
-``save_m2m()`` to save the many-to-many form data. For example:
+There is a second ``save`` method called ``save_m2m()``, which is used for
+saving many-to-many data for a given model. This is only necessary when you've
+modified a ``ModelForm``'s data after acquiring a related model with either
+``get_updated_model`` or ``save(commit=False)``. :ref:`We'll explain `save_m2m()`
+<save-m2m-method> below`.
+
+.. _get-updated-model-method:
+
+The ``get_updated_model()`` method
+----------------------------------
+
+Sometimes you want to save a form's data straight to the database. Other times,
+you may instead want to do custom processing on the data before saving it, or
+perhaps you want to use one of the specialized :ref:`model saving options
+<ref-models-force-insert>`.
+
+As explained above, a ``ModelForm``'s ``get_updated_model()`` method has the
+same behaviour as ``save(commit=False)``, and will do all of the things that
+``save()`` does, except saving to the database.
+
+Most importantly, as its name suggests, ``get_updated_model()`` will return a
+database model instance updated with the data from the form. It can also accept
+an existing model instance as the keyword argument ``instance``. If this is
+supplied, ``get_updated_model(instance=instance)`` will update the passed-in
+instance. If it's not, ``get_updated_model()`` will just create a new one.
+
+``get_updated_model()`` is used primarily for adding to or modifying the data
+from a form. For example, we may want to add a timestamp whenever a newspaper
+article is first posted by a reporter:
+
+.. code-block:: python
+
+    class ArticleForm(forms.ModelForm):
+        def save(self, commit=True):
+            article = self.get_updated_model()
+            article.posted_date = timezone.now()
+            if commit:
+                article.save()
+            return
+
+.. _save-m2m-method:
+
+The ``save_m2m()`` method
+-----------------------
+
+Another side effect of using ``get_updated_model()`` -- or its synonym
+``save(commit=False)`` -- is seen when your model has a many-to-many relation
+with another model. If your model has a many-to-many relation,
+``get_updated_model()`` adds a ``save_m2m()`` method to your ``ModelForm``
+subclass. After you've manually saved the instance produced by the form, you can
+invoke ``save_m2m()`` to save the many-to-many form data. For example:
 
 .. code-block:: python
 
     # Create a form instance with POST data.
     >>> f = AuthorForm(request.POST)
 
-    # Create, but don't save the new author instance.
-    >>> new_author = f.save(commit=False)
+    # Create, but don't save the new author model instance.
+    >>> new_author = f.get_updated_model()
 
     # Modify the author in some way.
     >>> new_author.some_field = 'some_value'
@@ -364,10 +408,10 @@ you've manually saved the instance produced by the form, you can invoke
     # Now, save the many-to-many data for the form.
     >>> f.save_m2m()
 
-Calling ``save_m2m()`` is only required if you use ``save(commit=False)``.
-When you use a simple ``save()`` on a form, all data -- including
-many-to-many data -- is saved without the need for any additional method calls.
-For example:
+Calling ``save_m2m()`` is only required if you use ``save(commit=False)`` or
+``get_updated_model()``. When you use a simple ``save()`` on a form, all data --
+including many-to-many data -- is saved without the need for any additional
+method calls. For example:
 
 .. code-block:: python
 
@@ -378,12 +422,15 @@ For example:
     # Create and save the new author instance. There's no need to do anything else.
     >>> new_author = f.save()
 
-Other than the ``save()`` and ``save_m2m()`` methods, a ``ModelForm`` works
-exactly the same way as any other ``forms`` form. For example, the
-``is_valid()`` method is used to check for validity, the ``is_multipart()``
-method is used to determine whether a form requires multipart file upload (and
-hence whether ``request.FILES`` must be passed to the form), etc. See
-:ref:`binding-uploaded-files` for more information.
+Other ``ModelForm`` methods
+---------------------------
+
+Other than the ``save()``, ``get_updated_model`` and ``save_m2m()`` methods, a
+``ModelForm`` works exactly the same way as any other ``forms`` form. For
+example, the ``is_valid()`` method is used to check for validity, the
+``is_multipart()`` method is used to determine whether a form requires multipart
+file upload (and hence whether ``request.FILES`` must be passed to the form),
+etc. See :ref:`binding-uploaded-files` for more information.
 
 .. _modelforms-selecting-fields:
 

@@ -98,6 +98,20 @@ class ModelFormsTests(TestCase):
         article.author = self.author
         article.save()
 
+    def test_partial_validation_get_updated_model(self):
+        # Make sure model validation still works when "get_updated_model"
+        # replaces "save(commit=False)" in the idiom
+        # "commit=False and set field values later" idiom still
+        data = {
+            'title': 'The state of model validation',
+            'pub_date': '2010-1-10 14:49:00'
+        }
+        form = ArticleForm(data)
+        self.assertEqual(list(form.errors), [])
+        article = form.get_updated_model()
+        article.author = self.author
+        article.save()
+
     def test_validation_with_empty_blank_field(self):
         # Since a value for pub_date wasn't provided and the field is
         # blank=True, model-validation should pass.

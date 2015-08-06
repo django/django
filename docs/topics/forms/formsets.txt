@@ -511,6 +511,12 @@ On the other hand, if you are using a plain ``FormSet``, it's up to you to
 handle ``formset.deleted_forms``, perhaps in your formset's ``save()`` method,
 as there's no general notion of what it means to delete a form.
 
+``formset.get_updated_models()`` will also return all of a ``FormSet`` instance's model instances without deleting them. In fact, it's a synonym for ``formset.save(commit=False)``, so the above code can be written as follows::
+
+    >>> instances = formset.get_updated_models() 
+    >>> for obj in formset.deleted_objects:
+    ...     obj.delete()
+
 Adding additional fields to a formset
 -------------------------------------
 

@@ -1150,6 +1150,20 @@ class ModelFormBasicTests(TestCase):
         c1.save()
         self.assertEqual(Category.objects.count(), 1)
 
+    def test_get_updated_model(self):
+        # Test that #25227 didn't break anything when it added ModelForm.get_updated_model().
+        # If you call get_updated_model() it should have the effect and return value as
+        # if you call save() with commit=False, then it will return an object that
+        # hasn't yet been saved to the database. In this case, it's up to you to call
+        # save() on the resulting model instance.
+        f = BaseCategoryForm({'name': 'Third test', 'slug': 'third-test', 'url': 'third'})
+        self.assertTrue(f.is_valid())
+        c1 = f.get_updated_model()
+        self.assertEqual(c1.name, "Third test")
+        self.assertEqual(Category.objects.count(), 0)
+        c1.save()
+        self.assertEqual(Category.objects.count(), 1)
+
     def test_save_with_data_errors(self):
         # If you call save() with invalid data, you'll get a ValueError.
         f = BaseCategoryForm({'name': '', 'slug': 'not a slug!', 'url': 'foo'})
@@ -1309,6 +1323,63 @@ class ModelFormBasicTests(TestCase):
 
         # Save the m2m data on the form
         f.save_m2m()
+        self.assertQuerysetEqual(new_art.categories.order_by('name'),
+            ["Entertainment", "It's a test"])
+
+    def test_m2m_editing_get_updated_model(self):
+        # as above, but testing #25227 didn't break anything
+        # when adding ModelForm.get_updated_model
+        self.create_basic_data()
+        form_data = {
+            'headline': 'New headline',
+            'slug': 'new-headline',
+            'pub_date': '1988-01-04',
+            'writer': six.text_type(self.w_royko.pk),
+            'article': 'Hello.',
+            'categories': [six.text_type(self.c1.id), six.text_type(self.c2.id)]
+        }
+        # Create a new article, with categories, via the form.
+        f = ArticleForm(form_data)
+        new_art = f.save()
+        new_art = Article.objects.get(id=new_art.id)
+        art_id_1 = new_art.id
+        self.assertQuerysetEqual(new_art.categories.order_by('name'),
+                         ["Entertainment", "It's a test"])
+
+        # Now, submit form data with no categories. This deletes the existing categories.
+        form_data['categories'] = []
+        f = ArticleForm(form_data, instance=new_art)
+        new_art = f.save()
+        self.assertEqual(new_art.id, art_id_1)
+        new_art = Article.objects.get(id=art_id_1)
+        self.assertQuerysetEqual(new_art.categories.all(), [])
+
+        # Create a new article, with no categories, via the form.
+        f = ArticleForm(form_data)
+        new_art = f.save()
+        art_id_2 = new_art.id
+        self.assertNotIn(art_id_2, (None, art_id_1))
+        new_art = Article.objects.get(id=art_id_2)
+        self.assertQuerysetEqual(new_art.categories.all(), [])
+
+        # Create a new article, with categories, via the form, but use get_updated_model()
+        # The m2m data won't be saved until save_m2m() is invoked on the form.
+        form_data['categories'] = [six.text_type(self.c1.id), six.text_type(self.c2.id)]
+        f = ArticleForm(form_data)
+        new_art = f.get_updated_model()
+
+        # Manually save the instance
+        new_art.save()
+        art_id_3 = new_art.id
+        self.assertNotIn(art_id_3, (None, art_id_1, art_id_2))
+
+        # The instance doesn't have m2m data yet
+        new_art = Article.objects.get(id=art_id_3)
+        self.assertQuerysetEqual(new_art.categories.all(), [])
+
+        # Save the m2m data on the form calling ModelForm.save()
+        # no need to call ModelForm.save_m2m() independently.
+        f.save()
         self.assertQuerysetEqual(new_art.categories.order_by('name'),
             ["Entertainment", "It's a test"])
 
