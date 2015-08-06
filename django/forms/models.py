@@ -111,7 +111,7 @@ def save_instance(form, instance, fields=None, fail_message='saved',
 
 # ModelForms #################################################################
 
-def model_to_dict(instance, fields=None, exclude=None):
+def model_to_dict(instance, fields=None, exclude=None, include_hidden=False):
     """
     Returns a dict containing the data in ``instance`` suitable for passing as
     a Form's ``initial`` keyword argument.
@@ -122,13 +122,16 @@ def model_to_dict(instance, fields=None, exclude=None):
     ``exclude`` is an optional list of field names. If provided, the named
     fields will be excluded from the returned dict, even if they are listed in
     the ``fields`` argument.
+
+    ``include_hidden`` is an option to return all fields, including hidden ones.
+    By default this function returns only editable fields.
     """
     # avoid a circular import
     from django.db.models.fields.related import ManyToManyField
     opts = instance._meta
     data = {}
     for f in chain(opts.concrete_fields, opts.virtual_fields, opts.many_to_many):
-        if not getattr(f, 'editable', False):
+        if not include_hidden and not getattr(f, 'editable', False):
             continue
         if fields and f.name not in fields:
             continue
