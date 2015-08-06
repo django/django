@@ -4,9 +4,7 @@ from itertools import chain
 
 from django.core.exceptions import FieldError
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.expressions import (
-    F, CombinedExpression, OrderBy, Random, RawSQL, Ref,
-)
+from django.db.models.expressions import Col, OrderBy, Random, RawSQL, Ref
 from django.db.models.query_utils import QueryWrapper, select_related_descend
 from django.db.models.sql.constants import (
     CURSOR, GET_ITERATOR_CHUNK_SIZE, MULTI, NO_RESULTS, ORDER_DIR, SINGLE,
@@ -950,14 +948,14 @@ class SQLInsertCompiler(SQLCompiler):
         """
 
         if hasattr(value, 'resolve_expression'):
+            value = value.resolve_expression(self.query, allow_joins=False, for_save=True)
             # Don't allow F() expressions. They refer to existing columns on a
             # row, but in the case of insert the row doesn't exist yet.
-            if any(isinstance(expr, F) for expr in value.flatten()):
+            if any(isinstance(expr, Col) for expr in value.flatten()):
                 raise ValueError(
                     'Failed to insert expression "%s" on %s. F() expressions '
                     'can only be used to update, not to insert.' % (value, field)
                 )
-            value = value.resolve_expression(self.query, allow_joins=False, for_save=True)
             if value.contains_aggregate:
                 raise FieldError("Aggregate functions are not allowed in this query")
         else:
