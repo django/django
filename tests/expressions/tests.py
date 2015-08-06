@@ -288,6 +288,10 @@ class BasicExpressionsTests(TestCase):
         acme.num_employees = F("num_employees") + 16
         self.assertRaisesMessage(ValueError, 'Failed to insert expression', acme.save)
 
+        acme.num_employees = 12
+        acme.name = Lower(F('name'))
+        self.assertRaisesMessage(ValueError, 'Failed to insert expression', acme.save)
+
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
         Employee.objects.create(firstname="Test", lastname="test")

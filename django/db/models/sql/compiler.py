@@ -944,18 +944,10 @@ class SQLInsertCompiler(SQLCompiler):
         expression, and otherwise calling the field's get_db_prep_save().
         """
 
-        def find_fs(expr):
-            """Walk this expression tree depth-first and yield all F nodes."""
-            if isinstance(expr, F):
-                yield expr
-            elif isinstance(expr, CombinedExpression):
-                for e in chain(find_fs(expr.lhs), find_fs(expr.rhs)):
-                    yield e
-
         if hasattr(value, 'resolve_expression'):
             # Don't allow F() expressions. They refer to existing columns on a
             # row, but in the case of insert the row doesn't exist yet.
-            if any(find_fs(value)):
+            if any(isinstance(expr, F) for expr in value.flatten()):
                 raise ValueError(
                     'Failed to insert expression "%s" on %s. F() expressions '
                     'can only be used to update, not to insert.' % (value, field)
