@@ -1014,6 +1014,11 @@ class AggregationTests(TestCase):
             ['Peter Norvig'],
             lambda b: b.name
         )
+        # Referencing the auto-generated name in an aggregate() also works.
+        self.assertEqual(
+            Author.objects.annotate(Count('book')).aggregate(Max('book__count')),
+            {'book__count__max': 2}
+        )
 
     def test_annotate_joins(self):
         """
