@@ -454,7 +454,7 @@ class BaseModelForm(BaseForm):
         If commit=True, then the changes to ``instance`` will be saved to the
         database. Returns ``instance``.
         """
-        if self.instance.pk is None:
+        if self.instance._state.adding:
             fail_message = 'created'
         else:
             fail_message = 'changed'

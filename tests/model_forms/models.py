@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import datetime
 import os
 import tempfile
+import uuid
 
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -447,3 +448,8 @@ class Photo(models.Model):
     def save(self, force_insert=False, force_update=False):
         super(Photo, self).save(force_insert, force_update)
         self._savecount += 1
+
+
+class UUIDPK(models.Model):
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=30)
