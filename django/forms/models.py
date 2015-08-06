@@ -25,9 +25,9 @@ from django.utils.translation import ugettext, ugettext_lazy as _
 
 __all__ = (
     'ModelForm', 'BaseModelForm', 'model_to_dict', 'fields_for_model',
-    'save_instance', 'ModelChoiceField', 'ModelMultipleChoiceField',
-    'ALL_FIELDS', 'BaseModelFormSet', 'modelformset_factory',
-    'BaseInlineFormSet', 'inlineformset_factory', 'modelform_factory',
+    'ModelChoiceField', 'ModelMultipleChoiceField', 'ALL_FIELDS',
+    'BaseModelFormSet', 'modelformset_factory', 'BaseInlineFormSet',
+    'inlineformset_factory', 'modelform_factory',
 )
 
 ALL_FIELDS = '__all__'
@@ -62,50 +62,6 @@ def construct_instance(form, instance, fields=None, exclude=None):
     for f in file_field_list:
         f.save_form_data(instance, cleaned_data[f.name])
 
-    return instance
-
-
-def save_instance(form, instance, fields=None, fail_message='saved',
-                  commit=True, exclude=None, construct=True):
-    """
-    Saves bound Form ``form``'s cleaned_data into model instance ``instance``.
-
-    If commit=True, then the changes to ``instance`` will be saved to the
-    database. Returns ``instance``.
-
-    If construct=False, assume ``instance`` has already been constructed and
-    just needs to be saved.
-    """
-    if construct:
-        instance = construct_instance(form, instance, fields, exclude)
-    opts = instance._meta
-    if form.errors:
-        raise ValueError("The %s could not be %s because the data didn't"
-                         " validate." % (opts.object_name, fail_message))
-
-    # Wrap up the saving of m2m data as a function.
-    def save_m2m():
-        cleaned_data = form.cleaned_data
-        # Note that for historical reasons we want to include also
-        # virtual_fields here. (GenericRelation was previously a fake
-        # m2m field).
-        for f in chain(opts.many_to_many, opts.virtual_fields):
-            if not hasattr(f, 'save_form_data'):
-                continue
-            if fields and f.name not in fields:
-                continue
-            if exclude and f.name in exclude:
-                continue
-            if f.name in cleaned_data:
-                f.save_form_data(instance, cleaned_data[f.name])
-    if commit:
-        # If we are committing, save the instance and the m2m data immediately.
-        instance.save()
-        save_m2m()
-    else:
-        # We're not committing. Add a method to the form to allow deferred
-        # saving of m2m data.
-        form.save_m2m = save_m2m
     return instance
 
 
@@ -446,21 +402,49 @@ class BaseModelForm(BaseForm):
         except ValidationError as e:
             self._update_errors(e)
 
+    def _save_m2m(self):
+        """
+        Save the many-to-many fields and generic relations for this form.
+        """
+        cleaned_data = self.cleaned_data
+        exclude = self._meta.exclude
+        fields = self._meta.fields
+        opts = self.instance._meta
+        # Note that for historical reasons we want to include also
+        # virtual_fields here. (GenericRelation was previously a fake
+        # m2m field).
+        for f in chain(opts.many_to_many, opts.virtual_fields):
+            if not hasattr(f, 'save_form_data'):
+                continue
+            if fields and f.name not in fields:
+                continue
+            if exclude and f.name in exclude:
+                continue
+            if f.name in cleaned_data:
+                f.save_form_data(self.instance, cleaned_data[f.name])
+
     def save(self, commit=True):
         """
-        Saves this ``form``'s cleaned_data into model instance
-        ``self.instance``.
-
-        If commit=True, then the changes to ``instance`` will be saved to the
-        database. Returns ``instance``.
+        Save this form's self.instance object if commit=True. Otherwise, add
+        a save_m2m() method to the form which can be called after the instance
+        is saved manually at a later time. Return the model instance.
         """
-        if self.instance._state.adding:
-            fail_message = 'created'
+        if self.errors:
+            raise ValueError(
+                "The %s could not be %s because the data didn't validate." % (
+                    self.instance._meta.object_name,
+                    'created' if self.instance._state.adding else 'changed',
+                )
+            )
+        if commit:
+            # If committing, save the instance and the m2m data immediately.
+            self.instance.save()
+            self._save_m2m()
         else:
-            fail_message = 'changed'
-        return save_instance(self, self.instance, self._meta.fields,
-                             fail_message, commit, self._meta.exclude,
-                             construct=False)
+            # If not committing, add a method to the form to allow deferred
+            # saving of m2m data.
+            self.save_m2m = self._save_m2m
+        return self.instance
 
     save.alters_data = True
 
