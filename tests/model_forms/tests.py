@@ -1978,7 +1978,7 @@ class FileAndImageFieldTests(TestCase):
         form = FPForm()
         names = [p[1] for p in form['path'].field.choices]
         names.sort()
-        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
+        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'test_uuid.py', 'tests.py'])
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
