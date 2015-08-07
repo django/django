@@ -10,6 +10,7 @@ from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
 from django.db.migrations import questioner
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
@@ -337,6 +338,51 @@ class MigrateTests(MigrationTestBase):
         soft-applied migrations.
         """
         call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_record_replaced(self):
+        """
+        Running a single squashed migration should record all of the original
+        replaced migrations as run.
+        """
+        recorder = MigrationRecorder(connection)
+        out = six.StringIO()
+        call_command("migrate", "migrations", verbosity=0)
+        call_command("showmigrations", "migrations", stdout=out, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            out.getvalue().lower()
+        )
+        applied_migrations = recorder.applied_migrations()
+        self.assertIn(("migrations", "0001_initial"), applied_migrations)
+        self.assertIn(("migrations", "0002_second"), applied_migrations)
+        self.assertIn(("migrations", "0001_squashed_0002"), applied_migrations)
+        # Rollback changes
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_record_squashed(self):
+        """
+        Running migrate for a squashed migration should record as run
+        if all of the replaced migrations have been run (#25231).
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        out = six.StringIO()
+        call_command("migrate", "migrations", verbosity=0)
+        call_command("showmigrations", "migrations", stdout=out, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            out.getvalue().lower()
+        )
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations()
+        )
+        # No changes were actually applied so there is nothing to rollback
 
 
 class MakeMigrationsTests(MigrationTestBase):
