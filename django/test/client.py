@@ -442,7 +442,8 @@ class Client(RequestFactory):
         signal_uid = "template-render-%s" % id(request)
         signals.template_rendered.connect(on_template_render, dispatch_uid=signal_uid)
         # Capture exceptions created by the handler.
-        got_request_exception.connect(self.store_exc_info, dispatch_uid="request-exception")
+        exception_uid = "request-exception-%s" % id(request)
+        got_request_exception.connect(self.store_exc_info, dispatch_uid=exception_uid)
         try:
 
             try:
@@ -493,7 +494,7 @@ class Client(RequestFactory):
             return response
         finally:
             signals.template_rendered.disconnect(dispatch_uid=signal_uid)
-            got_request_exception.disconnect(dispatch_uid="request-exception")
+            got_request_exception.disconnect(dispatch_uid=exception_uid)
 
     def get(self, path, data=None, follow=False, secure=False, **extra):
         """
