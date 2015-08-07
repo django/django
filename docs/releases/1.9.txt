@@ -578,6 +578,13 @@ Validators
 * Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
   that may contain Unicode characters.
 
+Database backends
+^^^^^^^^^^^^^^^^^
+
+* The PostgreSQL backend (``django.db.backends.postgresql_psycopg2``) is also
+  available as ``django.db.backends.postgresql``. The old name will continue to
+  be available for backwards compatibility.
+
 Backwards incompatible changes in 1.9
 =====================================
 

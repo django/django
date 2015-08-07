@@ -1512,7 +1512,7 @@ make the call non-blocking. If a conflicting lock is already acquired by
 another transaction, :exc:`~django.db.DatabaseError` will be raised when the
 queryset is evaluated.
 
-Currently, the ``postgresql_psycopg2``, ``oracle``, and ``mysql`` database
+Currently, the ``postgresql``, ``oracle``, and ``mysql`` database
 backends support ``select_for_update()``. However, MySQL has no support for the
 ``nowait`` argument. Obviously, users of external third-party backends should
 check with their backend's documentation for specifics in those cases.
