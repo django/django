@@ -206,6 +206,12 @@ class TestFormField(PostgreSQLTestCase):
         form_w_hstore = HStoreFormTest({'f1': '{"a": 2}'}, initial={'f1': '{"a": 1}'})
         self.assertTrue(form_w_hstore.has_changed())
 
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 1}'}, initial={'f1': {"a": 1}})
+        self.assertFalse(form_w_hstore.has_changed())
+
+        form_w_hstore = HStoreFormTest({'f1': '{"a": 2}'}, initial={'f1': {"a": 1}})
+        self.assertTrue(form_w_hstore.has_changed())
+
 
 class TestValidator(PostgreSQLTestCase):
 
