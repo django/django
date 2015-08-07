@@ -645,7 +645,7 @@ class ClientTest(TestCase):
         signals from the outer client request
         """
         with self.assertRaisesRegexp(Exception, '^exception message$'):
-            response = self.client.get('/nesting_exception_view/')
+            self.client.get('/nesting_exception_view/')
 
 
 @override_settings(
