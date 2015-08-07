@@ -141,7 +141,7 @@ class I18nTagTests(SimpleTestCase):
 
     @setup({'i18n12': '{% load i18n %}'
                       '{% get_available_languages as langs %}{% for lang in langs %}'
-                      '{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}'})
+                      '{% if lang.0 == "de" %}{{ lang.0 }}{% endif %}{% endfor %}'})
     def test_i18n12(self):
         """
         usage of the get_available_languages tag
