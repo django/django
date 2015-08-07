@@ -84,6 +84,17 @@ All attributes should be considered read-only, unless stated otherwise.
     from ``GET`` or ``POST``) will use the new ``encoding`` value.  Useful if
     you know the form data is not in the :setting:`DEFAULT_CHARSET` encoding.
 
+.. attribute:: HttpRequest.content_type
+
+    .. versionadded:: 1.10
+
+    A string representing the MIME type of the request, parsed from the
+    CONTENT_TYPE header.
+
+.. attribute:: HttpRequest.content_params
+
+    A dictionary of key/value parameters included in the CONTENT_TYPE header.
+
 .. attribute:: HttpRequest.GET
 
     A dictionary-like object containing all given HTTP GET parameters. See the
