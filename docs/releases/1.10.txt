@@ -299,6 +299,11 @@ Requests and Responses
   :meth:`~django.http.HttpResponse.seekable()` to make an instance a
   stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
 
+* Added the :attr:`HttpResponse.content_type
+  <django.http.HttpRequest.content_type>` and
+  :attr:`~django.http.HttpRequest.content_params` attributes which are
+  parsed from the ``CONTENT_TYPE`` header.
+
 Serialization
 ~~~~~~~~~~~~~
 

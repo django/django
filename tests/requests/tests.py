@@ -38,6 +38,9 @@ class RequestsTests(SimpleTestCase):
         # and FILES should be MultiValueDict
         self.assertEqual(request.FILES.getlist('foo'), [])
 
+        self.assertIsNone(request.content_type)
+        self.assertIsNone(request.content_params)
+
     def test_httprequest_full_path(self):
         request = HttpRequest()
         request.path = request.path_info = '/;some/?awful/=path/foo:bar/'
@@ -72,14 +75,24 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
 
     def test_wsgirequest(self):
-        request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': 'bogus',
+            'REQUEST_METHOD': 'bogus',
+            'CONTENT_TYPE': 'text/html; charset=utf8',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(list(request.GET.keys()), [])
         self.assertEqual(list(request.POST.keys()), [])
         self.assertEqual(list(request.COOKIES.keys()), [])
-        self.assertEqual(set(request.META.keys()), {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'wsgi.input'})
+        self.assertEqual(
+            set(request.META.keys()),
+            {'PATH_INFO', 'REQUEST_METHOD', 'SCRIPT_NAME', 'CONTENT_TYPE', 'wsgi.input'}
+        )
         self.assertEqual(request.META['PATH_INFO'], 'bogus')
         self.assertEqual(request.META['REQUEST_METHOD'], 'bogus')
         self.assertEqual(request.META['SCRIPT_NAME'], '')
+        self.assertEqual(request.content_type, 'text/html')
+        self.assertEqual(request.content_params, {'charset': 'utf8'})
 
     def test_wsgirequest_with_script_name(self):
         """
