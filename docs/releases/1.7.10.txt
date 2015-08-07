@@ -1,0 +1,7 @@
+===========================
+Django 1.7.10 release notes
+===========================
+
+*August 18, 2015*
+
+Django 1.7.10 fixes a security issue in 1.7.9.

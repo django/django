@@ -2,9 +2,9 @@
 Django 1.8.4 release notes
 ==========================
 
-*Under development*
+*August 18, 2015*
 
-Django 1.8.4 fixes several bugs in 1.8.3.
+Django 1.8.4 fixes a security issue and several bugs in 1.8.3.
 
 Bugfixes
 ========
