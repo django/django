@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed ``has_changed()`` method in ``contrib.postgres.forms.HStoreField``
   (:ticket:`25215`, :ticket:`25233`).
+
+* Fixed the recording of squashed migrations when running the ``migrate``
+  command (:ticket:`25231`).
