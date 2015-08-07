@@ -439,6 +439,8 @@ WHEN (new.%(col_name)s IS NULL)
         name_length = self.max_name_length() - 3
         return '%s_TR' % truncate_name(table, name_length).upper()
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "SELECT %s FROM DUAL" % ", ".join(["%s"] * len(fields))
-        return " UNION ALL ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, placeholder_rows):
+        return " UNION ALL ".join(
+            "SELECT %s FROM DUAL" % ", ".join(row)
+            for row in placeholder_rows
+        )

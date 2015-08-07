@@ -458,6 +458,8 @@ class QuerySet(object):
         specifying whether an object was created.
         """
         lookup, params = self._extract_model_params(defaults, **kwargs)
+        # The get needs to be targeted at the write database in order
+        # to avoid potential transaction consistency problems
         self._for_write = True
         try:
             return self.get(**lookup), False
