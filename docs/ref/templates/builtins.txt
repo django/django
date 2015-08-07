@@ -568,14 +568,6 @@ If you need different precedence, you will need to use nested :ttag:`if` tags.
 Sometimes that is better for clarity anyway, for the sake of those who do not
 know the precedence rules.
 
-``ifequal`` and ``ifnotequal``
-""""""""""""""""""""""""""""""
-
-``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
-``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
-{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
-The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
-
 .. templatetag:: ifchanged
 
 ifchanged
