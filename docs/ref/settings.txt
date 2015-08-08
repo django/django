@@ -84,7 +84,7 @@ Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
 Some browsers include a trailing dot in the ``Host`` header which Django
 strips when performing host validation.
 
-.. _`fully qualified domain name (FQDN)`: http://en.wikipedia.org/wiki/Fully_qualified_domain_name
+.. _`fully qualified domain name (FQDN)`: https://en.wikipedia.org/wiki/Fully_qualified_domain_name
 
 If the ``Host`` header (or ``X-Forwarded-Host`` if
 :setting:`USE_X_FORWARDED_HOST` is enabled) does not match any value in this
@@ -2529,7 +2529,7 @@ to ensure your processes are running in the correct environment.
     If you're running Django on Windows, :setting:`TIME_ZONE` must be set to
     match the system time zone.
 
-.. _list of time zones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+.. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
 .. setting:: USE_ETAGS
 

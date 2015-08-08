@@ -19,7 +19,7 @@ Although you can use Django without a database, it comes with an
 `object-relational mapper`_ in which you describe your database layout in Python
 code.
 
-.. _object-relational mapper: http://en.wikipedia.org/wiki/Object-relational_mapping
+.. _object-relational mapper: https://en.wikipedia.org/wiki/Object-relational_mapping
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
 representing your models -- so far, it's been solving many years' worth of

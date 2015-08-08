@@ -849,7 +849,7 @@ least as many as the number of potential parallel processes). For example:
 Then, during test execution, each new live test server will try every specified
 port until it finds one that is free and takes it.
 
-.. _continuous integration: http://en.wikipedia.org/wiki/Continuous_integration
+.. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your

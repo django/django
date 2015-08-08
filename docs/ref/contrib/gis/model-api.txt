@@ -20,7 +20,7 @@ of a `Digital Elevation Model`__ as our examples::
         name = models.CharField(max_length=100)
         rast = models.RasterField()
 
-__ http://en.wikipedia.org/wiki/ZIP_code
+__ https://en.wikipedia.org/wiki/ZIP_code
 __ https://en.wikipedia.org/wiki/Digital_elevation_model
 
 Spatial Field Types
@@ -100,7 +100,7 @@ Sets the SRID [#fnogcsrid]_ (Spatial Reference System Identity) of the geometry 
 the given value. Defaults to 4326 (also known as `WGS84`__, units are in degrees
 of longitude and latitude).
 
-__ http://en.wikipedia.org/wiki/WGS84
+__ https://en.wikipedia.org/wiki/WGS84
 
 .. _selecting-an-srid:
 
@@ -153,8 +153,8 @@ Additional Resources:
   data encountered will be in one of these coordinate systems rather than
   in a geographic coordinate system such as WGS84.
 
-__ http://en.wikipedia.org/wiki/Geodesy
-__ http://en.wikipedia.org/wiki/Great_circle
+__ https://en.wikipedia.org/wiki/Geodesy
+__ https://en.wikipedia.org/wiki/Great_circle
 __ http://www.spatialreference.org/ref/epsg/2796/
 __ http://spatialreference.org/
 __ http://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html

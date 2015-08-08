@@ -48,7 +48,7 @@ something like this::
 
         # ... (other possibly useful methods omitted) ...
 
-.. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
+.. _Bridge: https://en.wikipedia.org/wiki/Contract_bridge
 
 This is just an ordinary Python class, with nothing Django-specific about it.
 We'd like to be able to do things like this in our models (we assume the

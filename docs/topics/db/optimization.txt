@@ -48,7 +48,7 @@ Use standard DB optimization techniques
   database-dependent topic that will depend on your particular application.
   The overhead of maintaining an index may outweigh any gains in query speed.
 
-.. _Indexes: http://en.wikipedia.org/wiki/Database_index
+.. _Indexes: https://en.wikipedia.org/wiki/Database_index
 
 * Appropriate use of field types.
 

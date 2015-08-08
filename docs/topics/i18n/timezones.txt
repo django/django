@@ -711,4 +711,4 @@ Usage
 .. _more examples: http://pytz.sourceforge.net/#example-usage
 .. _these issues: http://pytz.sourceforge.net/#problems-with-localtime
 .. _helpers: http://pytz.sourceforge.net/#helpers
-.. _tz database: http://en.wikipedia.org/wiki/Tz_database
+.. _tz database: https://en.wikipedia.org/wiki/Tz_database

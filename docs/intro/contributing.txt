@@ -320,7 +320,7 @@ is not very helpful at preventing that bug from reoccurring down the road.
 
 Now for our hands-on example.
 
-__ http://en.wikipedia.org/wiki/Test-driven_development
+__ https://en.wikipedia.org/wiki/Test-driven_development
 
 Writing some tests for ticket #24788
 ------------------------------------
