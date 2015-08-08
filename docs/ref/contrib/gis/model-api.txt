@@ -118,7 +118,7 @@ are not.
 
 Most people are familiar with using latitude and longitude to reference a
 location on the earth's surface.  However, latitude and longitude are angles,
-not distances. [#fnharvard]_  In other words, while the shortest path between two points on
+not distances. In other words, while the shortest path between two points on
 a flat surface is a straight line, the shortest path between two points on a curved
 surface (such as the earth) is an *arc* of a `great circle`__. [#fnthematic]_  Thus,
 additional computation is required to obtain distances in planar units (e.g.,
@@ -281,7 +281,6 @@ for example::
 .. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <http://www.opengeospatial.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
 .. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
-.. [#fnharvard] Harvard Graduate School of Design, `An Overview of Geodesy and Geographic Referencing Systems <http://www.gsd.harvard.edu/gis/manual/projections/fundamentals/>`_.  This is an excellent resource for an overview of principles relating to geographic and Cartesian coordinate systems.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
 .. [#fndist] This limitation does not apply to PostGIS.
 .. [#fngeography] Please refer to the `PostGIS Geography Type <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.

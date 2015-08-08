@@ -52,7 +52,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 .. _soundslice: https://www.soundslice.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
-.. _jacob kaplan-moss: http://jacobian.org/
+.. _jacob kaplan-moss: https://jacobian.org/
 .. _revolution systems: http://revsys.com/
 .. _wilson miner: http://wilsonminer.com/
 .. _heroku: https://heroku.com/
@@ -151,7 +151,7 @@ Karen Tracey
     .. _Jannis Leidel: https://jezdez.com/
     .. _Bauhaus-University Weimar: http://www.uni-weimar.de/
     .. _virtualenv: http://www.virtualenv.org/
-    .. _pip: http://www.pip-installer.org/
+    .. _pip: https://pip.pypa.io/
     .. _Mozilla: https://www.mozilla.org/
 
 `Andrew Godwin`_
@@ -232,7 +232,7 @@ Tim Graham
     things Django and Python.
 
     .. _Idan Gazit: http://idan.gazit.me
-    .. _photographer: http://flickr.com/photos/idangazit
+    .. _photographer: https://flickr.com/photos/idangazit
     .. _Pixane: http://pixane.com
     .. _Skills: http://skillsapp.com
 
@@ -421,8 +421,8 @@ Daniele Procida
     that goal in mind. Erik lives in Amsterdam, The Netherlands.
 
     .. _Erik Romijn: http://erik.io/
-    .. _Solid Links: http://solidlinks.nl/
-    .. _Erik's Pony Checkup: http://ponycheckup.com/
+    .. _Solid Links: https://solidlinks.nl/
+    .. _Erik's Pony Checkup: https://ponycheckup.com/
 
 `Loïc Bistuer`_
     Loïc studied telecommunications engineering and works as an independent
@@ -537,7 +537,7 @@ Daniele Procida
 
     .. _Tomek Paczkowski: https://hauru.eu
     .. _DjangoCon Europe 2013: http://love.djangocircus.com
-    .. _Django Girls: http://djangogirls.org
+    .. _Django Girls: https://djangogirls.org
     .. _Squirrel: http://squirrel.me
 
 `Ola Sitarska`_
@@ -558,8 +558,8 @@ Daniele Procida
     .. _Ola Sitarska: http://ola.sitarska.com/
     .. _DjangoCon Europe 2013: http://love.djangocircus.com
     .. _Django Girls Tutorial: http://tutorial.djangogirls.org
-    .. _Django Girls: http://djangogirls.org
-    .. _Potato: http://p.ota.to
+    .. _Django Girls: https://djangogirls.org
+    .. _Potato: https://p.ota.to
 
 Past team members
 =================

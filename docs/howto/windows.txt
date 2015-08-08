@@ -39,7 +39,7 @@ your Python version and follow the installation instructions given there.
 Install PIP
 ===========
 
-`PIP <http://www.pip-installer.org/>`_ is a package manager for Python that
+`PIP <https://pip.pypa.io/>`_ is a package manager for Python that
 uses the `Python Package Index <https://pypi.python.org>`_ to install Python
 packages. PIP will later be used to install Django from PyPI. If you've
 installed Python 3.4, ``pip`` is included so you may skip this section.
@@ -48,7 +48,7 @@ Open a command prompt and execute ``easy_install pip``. This will install
 ``pip`` on your system. This command will work if you have successfully
 installed Setuptools.
 
-Alternatively, go to `<http://www.pip-installer.org/en/latest/installing.html>`_
+Alternatively, go to `<https://pip.pypa.io/en/latest/installing.html>`_
 for installing/upgrading instructions.
 
 Install Django
