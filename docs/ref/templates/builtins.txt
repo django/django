@@ -568,6 +568,14 @@ If you need different precedence, you will need to use nested :ttag:`if` tags.
 Sometimes that is better for clarity anyway, for the sake of those who do not
 know the precedence rules.
 
+``ifequal`` and ``ifnotequal``
+""""""""""""""""""""""""""""""
+
+``{% ifequal a b %} ... {% endifequal %}`` is an obsolete way to write
+``{% if a == b %} ... {% endif %}``. Likewise, ``{% ifnotequal a b %} ...
+{% endifnotequal %}`` is superseded by ``{% if a != b %} ... {% endif %}``.
+The ``ifequal`` and ``ifnotequal`` tags will be deprecated in a future release.
+
 .. templatetag:: ifchanged
 
 ifchanged
@@ -612,41 +620,6 @@ will be displayed if the value has not changed::
                 {% endifchanged %}
             ">{{ match }}</div>
         {% endfor %}
-
-.. templatetag:: ifequal
-
-ifequal
-^^^^^^^
-
-Output the contents of the block if the two arguments equal each other.
-
-Example::
-
-    {% ifequal user.pk comment.user_id %}
-        ...
-    {% endifequal %}
-
-As in the :ttag:`if` tag, an ``{% else %}`` clause is optional.
-
-The arguments can be hard-coded strings, so the following is valid::
-
-    {% ifequal user.username "adrian" %}
-        ...
-    {% endifequal %}
-
-An alternative to the ``ifequal`` tag is to use the :ttag:`if` tag and the
-``==`` operator.
-
-.. templatetag:: ifnotequal
-
-ifnotequal
-^^^^^^^^^^
-
-Just like :ttag:`ifequal`, except it tests that the two arguments are not
-equal.
-
-An alternative to the ``ifnotequal`` tag is to use the :ttag:`if` tag and
-the ``!=`` operator.
 
 .. templatetag:: include
 
