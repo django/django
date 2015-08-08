@@ -31,3 +31,6 @@ Bugfixes
 * Moved the :ref:`unsaved model instance assignment data loss check
   <unsaved-model-instance-check-18>` to ``Model.save()`` to allow easier usage
   of in-memory models (:ticket:`25160`).
+
+* Prevented ``varchar_patterns_ops`` and ``text_patterns_ops`` indexes for
+  ``ArrayField`` (:ticket:`25180`).
