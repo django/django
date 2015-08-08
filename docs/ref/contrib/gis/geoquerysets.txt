@@ -747,7 +747,7 @@ the distance from the `Tasmanian`__ city of Hobart to every other
     :ref:`supported_units`.
 
 __ https://github.com/django/django/blob/master/tests/gis_tests/distapp/models.py
-__ http://en.wikipedia.org/wiki/Tasmania
+__ https://en.wikipedia.org/wiki/Tasmania
 
 ``length``
 ~~~~~~~~~~
@@ -1100,7 +1100,7 @@ Keyword Argument       Description
                        of 2 or 3.  The default value is 2.
 =====================  =====================================================
 
-__ http://en.wikipedia.org/wiki/Geography_Markup_Language
+__ https://en.wikipedia.org/wiki/Geography_Markup_Language
 
 ``kml``
 ~~~~~~~

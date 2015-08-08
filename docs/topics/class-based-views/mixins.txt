@@ -421,7 +421,7 @@ that we're heavily invested in `REST`_, so we want to use the same URL for
 displaying the author as for capturing the message from the
 user. Let's rewrite our ``AuthorDetailView`` to do that.
 
-.. _REST: http://en.wikipedia.org/wiki/Representational_state_transfer
+.. _REST: https://en.wikipedia.org/wiki/Representational_state_transfer
 
 We'll keep the ``GET`` handling from :class:`DetailView`, although
 we'll have to add a :class:`~django.forms.Form` into the context data so we can

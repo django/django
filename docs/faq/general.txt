@@ -40,7 +40,7 @@ Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
 
 We've also recorded an `audio clip of the pronunciation`_.
 
-.. _Django Reinhardt: http://en.wikipedia.org/wiki/Django_Reinhardt
+.. _Django Reinhardt: https://en.wikipedia.org/wiki/Django_Reinhardt
 .. _audio clip of the pronunciation: http://red-bean.com/~adrian/django_pronunciation.mp3
 
 Is Django stable?

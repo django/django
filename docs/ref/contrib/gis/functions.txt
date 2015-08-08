@@ -106,7 +106,7 @@ Keyword Argument       Description
                        default value is 2.
 =====================  =====================================================
 
-__ http://en.wikipedia.org/wiki/Geography_Markup_Language
+__ https://en.wikipedia.org/wiki/Geography_Markup_Language
 
 AsKML
 -----
@@ -264,7 +264,7 @@ GeoHash
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
 
-__ http://en.wikipedia.org/wiki/Geohash
+__ https://en.wikipedia.org/wiki/Geohash
 
 Intersection
 ------------

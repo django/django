@@ -50,7 +50,7 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 
 .. _W3C Web Internationalization FAQ: http://www.w3.org/International/questions/qa-i18n
 .. _GNU gettext documentation: http://www.gnu.org/software/gettext/manual/gettext.html#Concepts
-.. _Wikipedia article: http://en.wikipedia.org/wiki/Internationalization_and_localization
+.. _Wikipedia article: https://en.wikipedia.org/wiki/Internationalization_and_localization
 
 .. warning::
 

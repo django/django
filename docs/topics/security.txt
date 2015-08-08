@@ -249,7 +249,7 @@ User-uploaded content
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 
-.. _same-origin policy: http://en.wikipedia.org/wiki/Same-origin_policy
+.. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
 
 .. _additional-security-topics:
 

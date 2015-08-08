@@ -203,7 +203,7 @@ Here's some examples of some of the general-purpose aggregation functions::
 
 The next example shows the usage of statistical aggregate functions. The
 underlying math will be not described (you can read about this, for example, at
-`wikipedia <http://en.wikipedia.org/wiki/Regression_analysis>`_)::
+`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_)::
 
     >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
     {'count': 2}
