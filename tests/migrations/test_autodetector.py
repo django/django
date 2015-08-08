@@ -55,6 +55,18 @@ class AutodetectorTests(TestCase):
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default='Ada Lovelace')),
     ])
+    author_dates_of_birth_auto_now = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("date_of_birth", models.DateField(auto_now=True)),
+        ("date_time_of_birth", models.DateTimeField(auto_now=True)),
+        ("time_of_birth", models.TimeField(auto_now=True)),
+    ])
+    author_dates_of_birth_auto_now_add = ModelState("testapp", "Author", [
+        ("id", models.AutoField(primary_key=True)),
+        ("date_of_birth", models.DateField(auto_now_add=True)),
+        ("date_time_of_birth", models.DateTimeField(auto_now_add=True)),
+        ("time_of_birth", models.TimeField(auto_now_add=True)),
+    ])
     author_name_deconstructable_1 = ModelState("testapp", "Author", [
         ("id", models.AutoField(primary_key=True)),
         ("name", models.CharField(max_length=200, default=DeconstructableObject())),
@@ -627,6 +639,36 @@ class AutodetectorTests(TestCase):
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AddField"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, name="name")
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_add_date_fields_with_auto_now_not_asking_for_default(self, mocked_ask_method):
+        # Make state
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_dates_of_birth_auto_now])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField", "AddField"])
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 0, auto_now=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 1, auto_now=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 2, auto_now=True)
+
+    @mock.patch('django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition',
+                side_effect=AssertionError("Should not have prompted for not null addition"))
+    def test_add_date_fields_with_auto_now_add_not_asking_for_default(self, mocked_ask_method):
+        # Make state
+        before = self.make_project_state([self.author_empty])
+        after = self.make_project_state([self.author_dates_of_birth_auto_now_add])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, 'testapp', 1)
+        self.assertOperationTypes(changes, 'testapp', 0, ["AddField", "AddField", "AddField"])
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 0, auto_now_add=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 1, auto_now_add=True)
+        self.assertOperationFieldAttributes(changes, "testapp", 0, 2, auto_now_add=True)
 
     def test_remove_field(self):
         """Tests autodetection of removed fields."""
