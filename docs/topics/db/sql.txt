@@ -225,7 +225,7 @@ argument.
     fall victim to SQL injection. As long as you remember to always use the
     ``params`` argument you'll be protected.
 
-__ http://en.wikipedia.org/wiki/SQL_injection
+__ https://en.wikipedia.org/wiki/SQL_injection
 
 .. _executing-custom-sql:
 

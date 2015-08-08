@@ -239,7 +239,7 @@ be vulnerable via an insecure connection to a subdomain.
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: http://en.wikipedia.org/wiki/Strict_Transport_Security
+.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
 
 .. _x-content-type-options:
 
@@ -298,7 +298,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     browsers support the header. Ensure you are still :ref:`validating and
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
-.. _XSS attack: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
 .. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
 
 .. _ssl-redirect:

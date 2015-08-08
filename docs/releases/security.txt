@@ -11,7 +11,7 @@ reporting and disclosure of security-related issues, as outlined in
 As part of that commitment, we maintain the following historical list
 of issues which have been fixed and disclosed. For each issue, the
 list below includes the date, a brief description, the `CVE identifier
-<http://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures>`_
+<https://en.wikipedia.org/wiki/Common_Vulnerabilities_and_Exposures>`_
 if applicable, a list of affected versions, a link to the full
 disclosure and links to the appropriate patch(es).
 

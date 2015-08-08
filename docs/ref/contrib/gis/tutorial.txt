@@ -158,7 +158,7 @@ extensions:
   data stored in the shapefile.
 
 __ http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
-__ http://en.wikipedia.org/wiki/Shapefile
+__ https://en.wikipedia.org/wiki/Shapefile
 
 Use ``ogrinfo`` to examine spatial data
 ---------------------------------------
@@ -259,7 +259,7 @@ longitude, latitude pairs in units of degrees.  To use a different
 coordinate system, set the SRID of the geometry field with the ``srid``
 argument. Use an integer representing the coordinate system's EPSG code.
 
-__ http://en.wikipedia.org/wiki/SRID
+__ https://en.wikipedia.org/wiki/SRID
 
 Run ``migrate``
 ---------------

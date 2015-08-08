@@ -83,7 +83,7 @@ team <core-team>`.
     as a freelance developer.
 
     .. _luke plant: http://lukeplant.me.uk/
-    .. _michael meeks: http://en.wikipedia.org/wiki/Michael_Meeks_(software)
+    .. _michael meeks: https://en.wikipedia.org/wiki/Michael_Meeks_(software)
 
 `Russell Keith-Magee`_
     Russell studied physics as an undergraduate, and studied neural networks for
@@ -603,7 +603,7 @@ Joseph Kocherhans
 
     Joseph lives in Chicago, USA.
 
-    .. _charango: http://en.wikipedia.org/wiki/Charango
+    .. _charango: https://en.wikipedia.org/wiki/Charango
 
 `Gary Wilson`_
     Gary starting contributing patches to Django in 2006 while developing Web

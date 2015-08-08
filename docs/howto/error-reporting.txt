@@ -140,8 +140,8 @@ control which information should be filtered out of error reports in a
 production environment (that is, where :setting:`DEBUG` is set to ``False``):
 :func:`sensitive_variables` and :func:`sensitive_post_parameters`.
 
-.. _`full traceback`: http://en.wikipedia.org/wiki/Stack_trace
-.. _`traceback frame`: http://en.wikipedia.org/wiki/Stack_frame
+.. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
+.. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
 
 .. function:: sensitive_variables(*variables)
 

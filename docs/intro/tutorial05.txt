@@ -121,7 +121,7 @@ the next time you make a change, either when you add a new feature or fix a bug.
 
 So let's do that right away.
 
-.. _test-driven development: http://en.wikipedia.org/wiki/Test-driven_development
+.. _test-driven development: https://en.wikipedia.org/wiki/Test-driven_development
 
 Writing our first test
 ======================
@@ -681,7 +681,7 @@ Coverage will help to identify dead code. See
 information about testing.
 
 .. _Selenium: http://seleniumhq.org/
-.. _continuous integration: http://en.wikipedia.org/wiki/Continuous_integration
+.. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
 What's next?
 ============

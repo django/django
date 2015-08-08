@@ -273,10 +273,10 @@ uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
 a different algorithm (including the popular bcrypt_ algorithm). For more
 details, see :ref:`auth_password_storage`.
 
-.. _sha1: http://en.wikipedia.org/wiki/SHA1
-.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _sha1: https://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: https://en.wikipedia.org/wiki/PBKDF2
 .. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
-.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _bcrypt: https://en.wikipedia.org/wiki/Bcrypt
 
 HTML5 doctype
 ~~~~~~~~~~~~~
@@ -483,7 +483,7 @@ Simple clickjacking protection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
+<https://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
 header. It's not enabled by default for backwards compatibility reasons, but
 you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
 plug that security hole for browsers that support the header.
