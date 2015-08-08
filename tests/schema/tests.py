@@ -178,6 +178,36 @@ class SchemaTests(TransactionTestCase):
             self.fail("No FK constraint for author_id found")
 
     @skipUnlessDBFeature('supports_foreign_keys')
+    def test_fk_to_proxy(self):
+        "Tests that creating a FK to a proxy model creates database constraints."
+        class AuthorProxy(Author):
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+                proxy = True
+
+        class AuthorRef(Model):
+            author = ForeignKey(AuthorProxy, on_delete=CASCADE)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+
+        self.local_models = [AuthorProxy, AuthorRef]
+
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(AuthorRef)
+        constraints = self.get_constraints(AuthorRef._meta.db_table)
+        for details in constraints.values():
+            if details['columns'] == ['author_id'] and details['foreign_key']:
+                self.assertEqual(details['foreign_key'], ('schema_author', 'id'))
+                break
+        else:
+            self.fail('No FK constraint for author_id found')
+
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_db_constraint(self):
         "Tests that the db_constraint parameter is respected"
         # Create the table
