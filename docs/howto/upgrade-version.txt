@@ -62,7 +62,7 @@ If you use some other installation process, you might have to manually
 :ref:`uninstall the old Django version <removing-old-versions-of-django>` and
 should look at the complete installation instructions.
 
-.. _pip: http://www.pip-installer.org/
+.. _pip: https://pip.pypa.io/
 .. _virtualenv: http://www.virtualenv.org/
 
 Testing

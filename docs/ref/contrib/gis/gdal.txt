@@ -22,7 +22,7 @@ to raster (image) data.
      some of the capabilities of OGR and GDAL's raster features at this time.
 
 __ http://www.gdal.org/
-__ http://www.gdal.org/ogr/
+__ http://www.gdal.org/ogr_arch.html
 
 Overview
 ========
@@ -94,7 +94,7 @@ each feature in that layer.
 
    Returns the name of the data source.
 
-__ http://www.gdal.org/ogr/ogr_formats.html
+__ http://www.gdal.org/ogr_formats.html
 
 ``Layer``
 ---------
@@ -455,7 +455,7 @@ systems and coordinate transformation::
    reading vector data from :class:`Layer` (which is in turn a part of
    a :class:`DataSource`).
 
-   __ http://www.gdal.org/ogr/classOGRGeometry.html
+   __ http://www.gdal.org/classOGRGeometry.html
 
    .. classmethod:: from_bbox(bbox)
 

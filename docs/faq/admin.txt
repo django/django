@@ -106,4 +106,4 @@ There *may* be minor stylistic differences between supported browsers—for
 example, some browsers may not support rounded corners. These are considered
 acceptable variations in rendering.
 
-.. _YUI's A-grade: http://yuilibrary.com/yui/docs/tutorials/gbs/
+.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support

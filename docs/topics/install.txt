@@ -184,10 +184,10 @@ This is the recommended way to install Django.
    privileges, and this will install Django in the virtualenv's
    ``site-packages`` directory.
 
-.. _pip: http://www.pip-installer.org/
+.. _pip: https://pip.pypa.io/
 .. _virtualenv: http://www.virtualenv.org/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
-.. _standalone pip installer: http://www.pip-installer.org/en/latest/installing.html#install-pip
+.. _standalone pip installer: https://pip.pypa.io/en/latest/installing.html#install-pip
 
 Installing an official release manually
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

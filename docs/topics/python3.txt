@@ -245,7 +245,7 @@ consequence, the following pattern is sometimes necessary::
 
 Be cautious if you have to `index bytestrings`_.
 
-.. _index bytestrings: https://docs.python.org/3/howto/pyporting.html#indexing-bytes-objects
+.. _index bytestrings: https://docs.python.org/3/howto/pyporting.html#text-versus-binary-data
 
 Exceptions
 ~~~~~~~~~~
