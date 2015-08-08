@@ -17,7 +17,9 @@ from django.db.models.fields.related import (
     ForeignKey, ForeignObject, ManyToManyField, OneToOneField,
 )
 from django.db.transaction import atomic
-from django.test import TransactionTestCase, skipIfDBFeature
+from django.test import (
+    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+)
 
 from .fields import (
     CustomManyToManyField, InheritedManyToManyField, MediumBlobField,
@@ -142,7 +144,7 @@ class SchemaTests(TransactionTestCase):
             lambda: list(Author.objects.all()),
         )
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk(self):
         "Tests that creating tables out of FK order, then repointing, works"
         # Create the table
@@ -175,7 +177,7 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_fk_db_constraint(self):
         "Tests that the db_constraint parameter is respected"
         # Create the table
@@ -255,15 +257,15 @@ class SchemaTests(TransactionTestCase):
             if details['columns'] == ["tag_id"] and details['foreign_key']:
                 self.fail("FK constraint for tag_id found")
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_m2m_db_constraint(self):
         self._test_m2m_db_constraint(ManyToManyField)
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_m2m_db_constraint_custom(self):
         self._test_m2m_db_constraint(CustomManyToManyField)
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_m2m_db_constraint_inherited(self):
         self._test_m2m_db_constraint(InheritedManyToManyField)
 
@@ -589,7 +591,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Note, old_field, new_field)
 
-    @unittest.skipUnless(connection.features.supports_combined_alters, "No combined ALTER support")
+    @skipUnlessDBFeature('supports_combined_alters')
     def test_alter_null_to_not_null_keeping_default(self):
         """
         #23738 - Can change a nullable field with default to non-nullable
@@ -611,7 +613,7 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(AuthorWithDefaultHeight)
         self.assertFalse(columns['height'][1][6])
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk(self):
         """
         Tests altering of FKs
@@ -649,7 +651,7 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_to_fk(self):
         """
         #24447 - Tests adding a FK constraint for an existing column
@@ -688,7 +690,7 @@ class SchemaTests(TransactionTestCase):
         else:
             self.fail("No FK constraint for author_id found")
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_o2o_to_fk(self):
         """
         #24163 - Tests altering of OneToOneField to ForeignKey
@@ -735,7 +737,7 @@ class SchemaTests(TransactionTestCase):
                     author_is_fk = True
         self.assertTrue(author_is_fk, "No FK constraint for author_id found")
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_fk_to_o2o(self):
         """
         #24163 - Tests altering of ForeignKey to OneToOneField
@@ -1131,7 +1133,7 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_repoint_inherited(self):
         self._test_m2m_repoint(InheritedManyToManyField)
 
-    @unittest.skipUnless(connection.features.supports_column_check_constraints, "No check constraints")
+    @skipUnlessDBFeature('supports_column_check_constraints')
     def test_check_constraints(self):
         """
         Tests creating/deleting CHECK constraints
@@ -1473,7 +1475,7 @@ class SchemaTests(TransactionTestCase):
         except SomeError:
             self.assertFalse(connection.in_atomic_block)
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_foreign_key_index_long_names_regression(self):
         """
         Regression test for #21497.
@@ -1492,7 +1494,7 @@ class SchemaTests(TransactionTestCase):
             self.get_indexes(BookWithLongName._meta.db_table),
         )
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_add_foreign_key_long_names(self):
         """
         Regression test for #23009.
@@ -1540,7 +1542,7 @@ class SchemaTests(TransactionTestCase):
             lambda: list(Thing.objects.all()),
         )
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_remove_constraints_capital_letters(self):
         """
         #23065 - Constraint names must be quoted if they contain capital letters.
