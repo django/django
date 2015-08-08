@@ -295,6 +295,33 @@ class TestMigrations(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))
 
+    @override_settings(MIGRATION_MODULES={
+        "postgres_tests": "postgres_tests.array_index_migrations",
+    })
+    def test_adding_arrayfield_with_index(self):
+        """
+        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops indexes.
+        """
+        table_name = 'postgres_tests_chartextarrayindexmodel'
+        call_command('migrate', 'postgres_tests', verbosity=0)
+        with connection.cursor() as cursor:
+            like_constraint_field_names = [
+                c.rsplit('_', 2)[0].rsplit('_')[-1]
+                for c in connection.introspection.get_constraints(cursor, table_name)
+                if c.endswith('_like')
+            ]
+        # Only the CharField should have a LIKE index.
+        self.assertEqual(like_constraint_field_names, ['char2'])
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, table_name)
+        # All fields should have regular indexes.
+        self.assertIn('char', indexes)
+        self.assertIn('char2', indexes)
+        self.assertIn('text', indexes)
+        call_command('migrate', 'postgres_tests', 'zero', verbosity=0)
+        with connection.cursor() as cursor:
+            self.assertNotIn(table_name, connection.introspection.table_names(cursor))
+
 
 class TestSerialization(TestCase):
     test_data = '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'

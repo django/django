@@ -26,6 +26,11 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 # a second index that specifies their operator class, which is
                 # needed when performing correct LIKE queries outside the
                 # C locale. See #12234.
+                #
+                # The same doesn't apply to array fields such as varchar[size]
+                # and text[size], so skip them.
+                if '[' in db_type:
+                    continue
                 if db_type.startswith('varchar'):
                     output.append(self._create_index_sql(
                         model, [field], suffix='_like', sql=self.sql_create_varchar_index))
