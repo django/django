@@ -77,14 +77,6 @@ class AutoescapeTagTests(SimpleTestCase):
         with self.assertRaises(TemplateSyntaxError):
             self.engine.render_to_string('autoescape-filtertag01', {'first': '<a>'})
 
-    @setup({'autoescape-ifequal01': '{% ifequal var "this & that" %}yes{% endifequal %}'})
-    def test_autoescape_ifequal01(self):
-        """
-        ifequal compares unescaped vales.
-        """
-        output = self.engine.render_to_string('autoescape-ifequal01', {'var': 'this & that'})
-        self.assertEqual(output, 'yes')
-
     # Arguments to filters are 'safe' and manipulate their input unescaped.
     @setup({'autoescape-filters01': '{{ var|cut:"&" }}'})
     def test_autoescape_filters01(self):

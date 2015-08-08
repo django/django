@@ -896,52 +896,6 @@ def do_for(parser, token):
     return ForNode(loopvars, sequence, is_reversed, nodelist_loop, nodelist_empty)
 
 
-def do_ifequal(parser, token, negate):
-    bits = list(token.split_contents())
-    if len(bits) != 3:
-        raise TemplateSyntaxError("%r takes two arguments" % bits[0])
-    end_tag = 'end' + bits[0]
-    nodelist_true = parser.parse(('else', end_tag))
-    token = parser.next_token()
-    if token.contents == 'else':
-        nodelist_false = parser.parse((end_tag,))
-        parser.delete_first_token()
-    else:
-        nodelist_false = NodeList()
-    val1 = parser.compile_filter(bits[1])
-    val2 = parser.compile_filter(bits[2])
-    return IfEqualNode(val1, val2, nodelist_true, nodelist_false, negate)
-
-
-@register.tag
-def ifequal(parser, token):
-    """
-    Outputs the contents of the block if the two arguments equal each other.
-
-    Examples::
-
-        {% ifequal user.id comment.user_id %}
-            ...
-        {% endifequal %}
-
-        {% ifnotequal user.id comment.user_id %}
-            ...
-        {% else %}
-            ...
-        {% endifnotequal %}
-    """
-    return do_ifequal(parser, token, False)
-
-
-@register.tag
-def ifnotequal(parser, token):
-    """
-    Outputs the contents of the block if the two arguments are not equal.
-    See ifequal.
-    """
-    return do_ifequal(parser, token, True)
-
-
 class TemplateLiteral(Literal):
     def __init__(self, value, text):
         self.value = value
