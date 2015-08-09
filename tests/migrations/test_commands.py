@@ -920,6 +920,39 @@ class MakeMigrationsTests(MigrationTestBase):
             except CommandError:
                 self.fail("Makemigrations fails resolving conflicts in an unspecified app")
 
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.conflicting_app_with_dependencies"])
+    def test_makemigrations_merge_dont_output_dependency_operations(self):
+        """
+        Makes sure that makemigrations --merge does not output any operations
+        from apps that don't belong to a given app.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+            out = six.StringIO()
+            with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+                call_command(
+                    "makemigrations", "conflicting_app_with_dependencies",
+                    merge=True, interactive=True, stdout=out
+                )
+            val = out.getvalue().lower()
+            self.assertIn('merging conflicting_app_with_dependencies\n', val)
+            self.assertIn(
+                '  branch 0002_conflicting_second\n'
+                '    - create model something\n',
+                val
+            )
+            self.assertIn(
+                '  branch 0002_second\n'
+                '    - delete model tribble\n'
+                '    - remove field silly_field from author\n'
+                '    - add field rating to author\n'
+                '    - create model book\n',
+                val
+            )
+
     def test_makemigrations_with_custom_name(self):
         """
         Makes sure that makemigrations generate a custom migration.
