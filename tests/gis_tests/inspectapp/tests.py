@@ -40,7 +40,6 @@ class InspectDbTests(TestCase):
         else:
             self.assertIn('geom = models.GeometryField(', output)
             self.assertIn('point = models.GeometryField(', output)
-        self.assertIn('objects = models.GeoManager()', output)
 
     @skipUnlessDBFeature("supports_3d_storage")
     def test_3d_columns(self):
@@ -59,7 +58,6 @@ class InspectDbTests(TestCase):
             self.assertIn('point = models.GeometryField(', output)
             self.assertIn('line = models.GeometryField(', output)
             self.assertIn('poly = models.GeometryField(', output)
-        self.assertIn('objects = models.GeoManager()', output)
 
 
 @skipUnless(HAS_GDAL, "OGRInspectTest needs GDAL support")
@@ -82,7 +80,6 @@ class OGRInspectTest(TestCase):
             '    int = models.{}()'.format('BigIntegerField' if GDAL_VERSION >= (2, 0) else 'FloatField'),
             '    str = models.CharField(max_length=80)',
             '    geom = models.PolygonField(srid=-1)',
-            '    objects = models.GeoManager()',
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -110,7 +107,6 @@ class OGRInspectTest(TestCase):
             '    density = models.FloatField()',
             '    created = models.DateField()',
             '    geom = models.PointField(srid=-1)',
-            '    objects = models.GeoManager()',
         ]
 
         self.assertEqual(model_def, '\n'.join(expected))
@@ -147,9 +143,8 @@ class OGRInspectTest(TestCase):
         self.assertIn('    f_char = models.CharField(max_length=10)', model_def)
         self.assertIn('    f_date = models.DateField()', model_def)
 
-        self.assertIsNotNone(re.search(
-            r'    geom = models.PolygonField\(([^\)])*\)\n'  # Some backends may have srid=-1
-            r'    objects = models.GeoManager\(\)', model_def))
+        # Some backends may have srid=-1
+        self.assertIsNotNone(re.search(r'    geom = models.PolygonField\(([^\)])*\)', model_def))
 
     def test_management_command(self):
         shp_file = os.path.join(TEST_DATA, 'cities', 'cities.shp')
