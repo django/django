@@ -690,6 +690,11 @@ Useful attributes on ``{{ field }}`` include:
     :class:`~django.forms.Field` attributes, e.g.
     ``{{ char_field.field.max_length }}``.
 
+.. seealso::
+
+    For a complete list of attributes and methods, see
+    :class:`~django.forms.BoundField`.
+
 Looping over hidden and visible fields
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
