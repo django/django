@@ -932,6 +932,48 @@ and using the template above, would render something like:
 
     <label for="myFIELD">...</label><input id="myFIELD" type="text" name="my_field" />
 
+Customizing ``BoundField``
+--------------------------
+
+.. versionadded:: 1.9
+
+If you need to access some additional information about a form field in a
+template and using a subclass of :class:`~django.forms.Field` isn't
+sufficient, consider also customizing :class:`~django.forms.BoundField`.
+
+A custom form field can override ``get_bound_field()``:
+
+.. method:: Field.get_bound_field(form, field_name)
+
+    Takes an instance of :class:`~django.forms.Form` and the name of the field.
+    The return value will be used when accessing the field in a template. Most
+    likely it will be an instance of a subclass of
+    :class:`~django.forms.BoundField`.
+
+If you have a ``GPSCoordinatesField``, for example, and want to be able to
+access additional information about the coordinates in a template, this could
+be implemented as follows::
+
+    class GPSCoordinatesBoundField(BoundField):
+        @property
+        def country(self):
+            """
+            Return the country the coordinates lie in or None if it can't be
+            determined.
+            """
+            value = self.value()
+            if value:
+                return get_country_from_coordinates(value)
+            else:
+                return None
+
+    class GPSCoordinatesField(Field):
+        def get_bound_field(self, form, field_name):
+            return GPSCoordinatesBoundField(form, self, field_name)
+
+Now you can access the country in a template with
+``{{ form.coordinates.country }}``.
+
 .. _binding-uploaded-files:
 
 Binding uploaded files to a form
