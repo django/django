@@ -237,7 +237,7 @@ arguments to pass to ``__init__()`` to re-create it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
-you're, changing the arguments passed in ``__init__()`` (like we are in
+you're changing the arguments passed in ``__init__()`` (like we are in
 ``HandField``), you'll need to supplement the values being passed.
 
 The contract of ``deconstruct()`` is simple; it returns a tuple of four items:
