@@ -1486,6 +1486,17 @@ class FormsTestCase(SimpleTestCase):
         f = SampleForm(data={'name': 'bar'})
         self.assertIsInstance(force_text(f['name']), SafeData)
 
+    def test_custom_boundfield(self):
+        class CustomField(CharField):
+            def get_bound_field(self, form, name):
+                return (form, name)
+
+        class SampleForm(Form):
+            name = CustomField()
+
+        f = SampleForm()
+        self.assertEqual(f['name'], (f, 'name'))
+
     def test_initial_datetime_values(self):
         now = datetime.datetime.now()
         # Nix microseconds (since they should be ignored). #22502
