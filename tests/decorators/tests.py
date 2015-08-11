@@ -291,6 +291,35 @@ class MethodDecoratorTests(SimpleTestCase):
 
         self.assertTrue(Test().method())
 
+    def test_iterable_of_decorators(self):
+        """
+        @method_decorator can accept an iterable of decorators.
+        """
+        def deco_2(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "?"
+            return _wrapper
+
+        def deco_1(func):
+            def _wrapper(*args, **kwargs):
+                return func(*args, **kwargs) + "!"
+            return _wrapper
+
+        decorators = (deco_1, deco_2)
+
+        @method_decorator(decorators, name="method")
+        class TestFirst(object):
+            def method(self):
+                return "hello world"
+
+        class TestSecond(object):
+            @method_decorator(decorators)
+            def method(self):
+                return "hello world"
+
+        self.assertTrue(TestFirst().method() == "hello world!?")
+        self.assertTrue(TestSecond().method() == "hello world!?")
+
     def test_invalid_non_callable_attribute_decoration(self):
         """
         @method_decorator on a non-callable attribute raises an error.
