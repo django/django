@@ -45,13 +45,17 @@ def method_decorator(decorator, name=''):
         else:
             func = obj
 
+        def decorate(function):
+            if hasattr(decorator, "__iter__"):
+                for dec in decorator:
+                    function = dec(function)
+                return function
+            return decorator(function)
+
         def _wrapper(self, *args, **kwargs):
+            @decorate
             def bound_func(*args2, **kwargs2):
                 return func.__get__(self, type(self))(*args2, **kwargs2)
-            if hasattr(decorator, "__iter__"):
-                bound_func = reduce(lambda acc, dec: dec(acc), decorator, bound_func)
-            else:
-                bound_func = decorator(bound_func)
             # bound_func has the signature that 'decorator' expects i.e.  no
             # 'self' argument, but it is a closure over self so it can call
             # 'func' correctly.
@@ -60,7 +64,7 @@ def method_decorator(decorator, name=''):
         # want to copy those. We don't have access to bound_func in this scope,
         # but we can cheat by using it on a dummy function.
 
-        @decorator
+        @decorate
         def dummy(*args, **kwargs):
             pass
         update_wrapper(_wrapper, dummy)

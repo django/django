@@ -307,7 +307,7 @@ class MethodDecoratorTests(SimpleTestCase):
 
         decorators = (deco_1, deco_2)
 
-        @method_decorator(deco, name="method")
+        @method_decorator(decorators, name="method")
         class Test(object):
             def method(self):
                 return "hello world"
