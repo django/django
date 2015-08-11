@@ -49,7 +49,7 @@ def method_decorator(decorator, name=''):
             def bound_func(*args2, **kwargs2):
                 return func.__get__(self, type(self))(*args2, **kwargs2)
             if hasattr(decorator, "__iter__"):
-                bound_func = reduce(lambda acc, dec: dec(acc)), decorator, bound_func)
+                bound_func = reduce(lambda acc, dec: dec(acc), decorator, bound_func)
             else:
                 bound_func = decorator(bound_func)
             # bound_func has the signature that 'decorator' expects i.e.  no
