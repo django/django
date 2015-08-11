@@ -312,7 +312,7 @@ class MethodDecoratorTests(SimpleTestCase):
             def method(self):
                 return "hello world"
 
-        self.assertTrue(not Test().method() == "hello world!?")
+        self.assertTrue(Test().method() == "hello world!?")
 
     def test_invalid_non_callable_attribute_decoration(self):
         """
