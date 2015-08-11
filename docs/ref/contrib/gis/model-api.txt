@@ -14,7 +14,6 @@ of a `Digital Elevation Model`__ as our examples::
     class Zipcode(models.Model):
         code = models.CharField(max_length=5)
         poly = models.PolygonField()
-        objects = models.GeoManager()
 
     class Elevation(models.Model):
         name = models.CharField(max_length=100)
@@ -240,11 +239,19 @@ For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
 <http://postgis.net/docs/manual-2.1/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
-``GeoManager``
-==============
+``GeoManager`` 
+===============
 
 .. currentmodule:: django.contrib.gis.db.models
 .. class:: GeoManager
+
+.. deprecated:: 1.9 
+
+    This class has been deprecated. Custom ``GeoQuerySet`` methods are replaced
+    with equivalent geographic functions in 
+    ``django.contrib.gis.db.models.functions``.
+    Therefore the custom ``GeoManager`` is no longer needed. Use of a default manager 
+    will do the same job.
 
 In order to conduct geographic queries, each geographic model requires
 a ``GeoManager`` model manager.  This manager allows for the proper SQL
@@ -270,7 +277,6 @@ model::
         city = models.CharField(max_length=100)
         state = models.CharField(max_length=2)
         zipcode = models.ForeignKey(Zipcode, on_delete=models.CASCADE)
-        objects = models.GeoManager()
 
 The geographic manager is needed to do spatial queries on related ``Zipcode`` objects,
 for example::
