@@ -155,12 +155,20 @@ The functions defined in this module share the following properties:
 
     Converts a function decorator into a method decorator. It can be used to
     decorate methods or classes; in the latter case, ``name`` is the name
-    of the method to be decorated and is required. See :ref:`decorating
-    class-based views<decorating-class-based-views>` for example usage.
+    of the method to be decorated and is required.
+
+    ``decorator`` may also be a a list or tuple of functions. They are wrapped
+    in reverse order so that the call order is the order in which the functions
+    appear in the list/tuple.
+
+    See :ref:`decorating class based views <decorating-class-based-views>` for
+    example usage.
 
     .. versionchanged:: 1.9
 
-       The ability to decorate classes and the ``name`` parameter were added.
+       The ability to decorate classes, the ``name`` parameter, and the ability
+       for ``decorator`` to accept a list/tuple of decorator functions were
+       added.
 
 .. function:: decorator_from_middleware(middleware_class)
 
