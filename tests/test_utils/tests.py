@@ -2,23 +2,32 @@
 from __future__ import unicode_literals
 
 import unittest
+import warnings
 
 from django.conf.urls import url
+from django.contrib.staticfiles.finders import get_finder, get_finders
+from django.contrib.staticfiles.storage import staticfiles_storage
+from django.core.files.storage import default_storage
 from django.core.urlresolvers import NoReverseMatch, reverse
-from django.db import connection
+from django.db import connection, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
-from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    SimpleTestCase, TestCase, ignore_warnings, skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 from django.test.html import HTMLParseError, parse_html
 from django.test.utils import CaptureQueriesContext, override_settings
 from django.utils import six
+from django.utils._os import abspathu
+from django.utils.deprecation import RemovedInDjango20Warning
 
-from .models import Person
+from .models import Car, Person, PossessedCar
 from .views import empty_response
 
 
-class SkippingTestCase(TestCase):
+class SkippingTestCase(SimpleTestCase):
     def _assert_skipping(self, func, expected_exc):
         # We cannot simply use assertRaises because a SkipTest exception will go unnoticed
         try:
@@ -86,7 +95,7 @@ class SkippingTestCase(TestCase):
         self._assert_skipping(test_func5, ValueError)
 
 
-class SkippingClassTestCase(TestCase):
+class SkippingClassTestCase(SimpleTestCase):
     def test_skip_class_unless_db_feature(self):
         @skipUnlessDBFeature("__class__")
         class NotSkippedTests(unittest.TestCase):
@@ -176,6 +185,33 @@ class AssertQuerysetEqualTests(TestCase):
         self.assertQuerysetEqual(
             Person.objects.filter(name='p1'),
             [repr(self.p1)]
+        )
+
+    def test_repeated_values(self):
+        """
+        Test that assertQuerysetEqual checks the number of appearance of each item
+        when used with option ordered=False.
+        """
+        batmobile = Car.objects.create(name='Batmobile')
+        k2000 = Car.objects.create(name='K 2000')
+        PossessedCar.objects.bulk_create([
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=batmobile, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+            PossessedCar(car=k2000, belongs_to=self.p1),
+        ])
+        with self.assertRaises(AssertionError):
+            self.assertQuerysetEqual(
+                self.p1.cars.all(),
+                [repr(batmobile), repr(k2000)],
+                ordered=False
+            )
+        self.assertQuerysetEqual(
+            self.p1.cars.all(),
+            [repr(batmobile)] * 2 + [repr(k2000)] * 4,
+            ordered=False
         )
 
 
@@ -273,7 +309,7 @@ class AssertNumQueriesContextManagerTests(TestCase):
 
 
 @override_settings(ROOT_URLCONF='test_utils.urls')
-class AssertTemplateUsedContextManagerTests(TestCase):
+class AssertTemplateUsedContextManagerTests(SimpleTestCase):
 
     def test_usage(self):
         with self.assertTemplateUsed('template_used/base.html'):
@@ -357,8 +393,20 @@ class AssertTemplateUsedContextManagerTests(TestCase):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
+    def test_assert_used_on_http_response(self):
+        response = HttpResponse()
+        error_msg = (
+            'assertTemplateUsed() and assertTemplateNotUsed() are only '
+            'usable on responses fetched using the Django test Client.'
+        )
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateUsed(response, 'template.html')
 
-class HTMLEqualTests(TestCase):
+        with self.assertRaisesMessage(ValueError, error_msg):
+            self.assertTemplateNotUsed(response, 'template.html')
+
+
+class HTMLEqualTests(SimpleTestCase):
     def test_html_parser(self):
         element = parse_html('<div><p>Hello</p></div>')
         self.assertEqual(len(element.children), 1)
@@ -514,24 +562,24 @@ class HTMLEqualTests(TestCase):
         # equal html contains each other
         dom1 = parse_html('<p>foo')
         dom2 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertIn(dom2, dom1)
 
         dom2 = parse_html('<div><p>foo</p></div>')
-        self.assertTrue(dom1 in dom2)
-        self.assertTrue(dom2 not in dom1)
+        self.assertIn(dom1, dom2)
+        self.assertNotIn(dom2, dom1)
 
-        self.assertFalse('<p>foo</p>' in dom2)
-        self.assertTrue('foo' in dom2)
+        self.assertNotIn('<p>foo</p>', dom2)
+        self.assertIn('foo', dom2)
 
         # when a root element is used ...
         dom1 = parse_html('<p>foo</p><p>bar</p>')
         dom2 = parse_html('<p>foo</p><p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>foo</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
         dom1 = parse_html('<p>bar</p>')
-        self.assertTrue(dom1 in dom2)
+        self.assertIn(dom1, dom2)
 
     def test_count(self):
         # equal html contains each other one time
@@ -600,7 +648,7 @@ class HTMLEqualTests(TestCase):
         self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
 
 
-class JSONEqualTests(TestCase):
+class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
         json2 = '{"attr1": "foo", "attr2":"baz"}'
@@ -645,7 +693,7 @@ class JSONEqualTests(TestCase):
             self.assertJSONNotEqual(valid_json, invalid_json)
 
 
-class XMLEqualTests(TestCase):
+class XMLEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         xml1 = "<elem attr1='a' attr2='b' />"
         xml2 = "<elem attr1='a' attr2='b' />"
@@ -660,6 +708,19 @@ class XMLEqualTests(TestCase):
         xml1 = "<elem attr1='a' />"
         xml2 = "<elem attr2='b' attr1='a' />"
         with self.assertRaises(AssertionError):
+            self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_equal_raises_message(self):
+        xml1 = "<elem attr1='a' />"
+        xml2 = "<elem attr2='b' attr1='a' />"
+
+        msg = '''{xml1} != {xml2}
+- <elem attr1='a' />
++ <elem attr2='b' attr1='a' />
+?      ++++++++++
+'''.format(xml1=repr(xml1), xml2=repr(xml2))
+
+        with self.assertRaisesMessage(AssertionError, msg):
             self.assertXMLEqual(xml1, xml2)
 
     def test_simple_not_equal(self):
@@ -701,11 +762,42 @@ class SkippingExtraTests(TestCase):
 
 class AssertRaisesMsgTest(SimpleTestCase):
 
+    def test_assert_raises_message(self):
+        msg = "'Expected message' not found in 'Unexpected message'"
+        # context manager form of assertRaisesMessage()
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertRaisesMessage(ValueError, "Expected message"):
+                raise ValueError("Unexpected message")
+
+        # callable form
+        def func():
+            raise ValueError("Unexpected message")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertRaisesMessage(ValueError, "Expected message", func)
+
     def test_special_re_chars(self):
         """assertRaisesMessage shouldn't interpret RE special chars."""
         def func1():
             raise ValueError("[.*x+]y?")
         self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_callable_obj_param(self):
+        # callable_obj was a documented kwarg in Django 1.8 and older.
+        def func1():
+            raise ValueError("[.*x+]y?")
+
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            self.assertRaisesMessage(ValueError, "[.*x+]y?", callable_obj=func1)
+
+        self.assertEqual(len(warns), 1)
+        self.assertEqual(
+            str(warns[0].message),
+            'The callable_obj kwarg is deprecated. Pass the callable '
+            'as a positional argument instead.'
+        )
 
 
 class AssertFieldOutputTests(SimpleTestCase):
@@ -733,9 +825,9 @@ class SecondUrls:
     urlpatterns = [url(r'second/$', empty_response, name='second')]
 
 
-class OverrideSettingsTests(TestCase):
+class OverrideSettingsTests(SimpleTestCase):
 
-    # #21518 -- If neither override_settings nor a settings_changed receiver
+    # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
     # test_second will fail.
 
@@ -764,3 +856,153 @@ class OverrideSettingsTests(TestCase):
 
         self.assertRaises(NoReverseMatch, lambda: reverse('first'))
         self.assertRaises(NoReverseMatch, lambda: reverse('second'))
+
+    def test_override_media_root(self):
+        """
+        Overriding the MEDIA_ROOT setting should be reflected in the
+        base_location attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_ROOT='test_value'):
+            self.assertEqual(default_storage.base_location, 'test_value')
+
+    def test_override_media_url(self):
+        """
+        Overriding the MEDIA_URL setting should be reflected in the
+        base_url attribute of django.core.files.storage.default_storage.
+        """
+        self.assertEqual(default_storage.base_location, '')
+        with self.settings(MEDIA_URL='/test_value/'):
+            self.assertEqual(default_storage.base_url, '/test_value/')
+
+    def test_override_file_upload_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_PERMISSIONS setting should be reflected in
+        the file_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.file_permissions_mode)
+        with self.settings(FILE_UPLOAD_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.file_permissions_mode, 0o777)
+
+    def test_override_file_upload_directory_permissions(self):
+        """
+        Overriding the FILE_UPLOAD_DIRECTORY_PERMISSIONS setting should be
+        reflected in the directory_permissions_mode attribute of
+        django.core.files.storage.default_storage.
+        """
+        self.assertIsNone(default_storage.directory_permissions_mode)
+        with self.settings(FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o777):
+            self.assertEqual(default_storage.directory_permissions_mode, 0o777)
+
+    def test_override_database_routers(self):
+        """
+        Overriding DATABASE_ROUTERS should update the master router.
+        """
+        test_routers = (object(),)
+        with self.settings(DATABASE_ROUTERS=test_routers):
+            self.assertSequenceEqual(router.routers, test_routers)
+
+    def test_override_static_url(self):
+        """
+        Overriding the STATIC_URL setting should be reflected in the
+        base_url attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_URL='/test/'):
+            self.assertEqual(staticfiles_storage.base_url, '/test/')
+
+    def test_override_static_root(self):
+        """
+        Overriding the STATIC_ROOT setting should be reflected in the
+        location attribute of
+        django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        with self.settings(STATIC_ROOT='/tmp/test'):
+            self.assertEqual(staticfiles_storage.location, abspathu('/tmp/test'))
+
+    def test_override_staticfiles_storage(self):
+        """
+        Overriding the STATICFILES_STORAGE setting should be reflected in
+        the value of django.contrib.staticfiles.storage.staticfiles_storage.
+        """
+        new_class = 'CachedStaticFilesStorage'
+        new_storage = 'django.contrib.staticfiles.storage.' + new_class
+        with self.settings(STATICFILES_STORAGE=new_storage):
+            self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
+
+    def test_override_staticfiles_finders(self):
+        """
+        Overriding the STATICFILES_FINDERS setting should be reflected in
+        the return value of django.contrib.staticfiles.finders.get_finders.
+        """
+        current = get_finders()
+        self.assertGreater(len(list(current)), 1)
+        finders = ['django.contrib.staticfiles.finders.FileSystemFinder']
+        with self.settings(STATICFILES_FINDERS=finders):
+            self.assertEqual(len(list(get_finders())), len(finders))
+
+    def test_override_staticfiles_dirs(self):
+        """
+        Overriding the STATICFILES_DIRS setting should be reflected in
+        the locations attribute of the
+        django.contrib.staticfiles.finders.FileSystemFinder instance.
+        """
+        finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+        test_path = '/tmp/test'
+        expected_location = ('', test_path)
+        self.assertNotIn(expected_location, finder.locations)
+        with self.settings(STATICFILES_DIRS=[test_path]):
+            finder = get_finder('django.contrib.staticfiles.finders.FileSystemFinder')
+            self.assertIn(expected_location, finder.locations)
+
+
+class TestBadSetUpTestData(TestCase):
+    """
+    An exception in setUpTestData() shouldn't leak a transaction which would
+    cascade across the rest of the test suite.
+    """
+    class MyException(Exception):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        try:
+            super(TestBadSetUpTestData, cls).setUpClass()
+        except cls.MyException:
+            cls._in_atomic_block = connection.in_atomic_block
+
+    @classmethod
+    def tearDownClass(Cls):
+        # override to avoid a second cls._rollback_atomics() which would fail.
+        # Normal setUpClass() methods won't have exception handling so this
+        # method wouldn't typically be run.
+        pass
+
+    @classmethod
+    def setUpTestData(cls):
+        # Simulate a broken setUpTestData() method.
+        raise cls.MyException()
+
+    def test_failure_in_setUpTestData_should_rollback_transaction(self):
+        # setUpTestData() should call _rollback_atomics() so that the
+        # transaction doesn't leak.
+        self.assertFalse(self._in_atomic_block)
+
+
+class DisallowedDatabaseQueriesTests(SimpleTestCase):
+    def test_disallowed_database_queries(self):
+        expected_message = (
+            "Database queries aren't allowed in SimpleTestCase. "
+            "Either use TestCase or TransactionTestCase to ensure proper test isolation or "
+            "set DisallowedDatabaseQueriesTests.allow_database_queries to True to silence this failure."
+        )
+        with self.assertRaisesMessage(AssertionError, expected_message):
+            Car.objects.first()
+
+
+class AllowedDatabaseQueriesTests(SimpleTestCase):
+    allow_database_queries = True
+
+    def test_allowed_database_queries(self):
+        Car.objects.first()

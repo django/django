@@ -8,12 +8,13 @@ from psycopg2.extensions import ISQLQuote
 
 
 class PostGISAdapter(object):
-    def __init__(self, geom):
+    def __init__(self, geom, geography=False):
         "Initializes on the geometry."
         # Getting the WKB (in string form, to allow easy pickling of
         # the adaptor) and the SRID from the geometry.
         self.ewkb = bytes(geom.ewkb)
         self.srid = geom.srid
+        self.geography = geography
         self._adapter = Binary(self.ewkb)
 
     def __conform__(self, proto):
@@ -28,6 +29,9 @@ class PostGISAdapter(object):
             return False
         return (self.ewkb == other.ewkb) and (self.srid == other.srid)
 
+    def __hash__(self):
+        return hash((self.ewkb, self.srid))
+
     def __str__(self):
         return self.getquoted()
 
@@ -41,7 +45,7 @@ class PostGISAdapter(object):
     def getquoted(self):
         "Returns a properly quoted string for use in PostgreSQL/PostGIS."
         # psycopg will figure out whether to use E'\\000' or '\000'
-        return str('ST_GeomFromEWKB(%s)' % self._adapter.getquoted().decode())
-
-    def prepare_database_save(self, unused):
-        return self
+        return str('%s(%s)' % (
+            'ST_GeogFromWKB' if self.geography else 'ST_GeomFromEWKB',
+            self._adapter.getquoted().decode())
+        )

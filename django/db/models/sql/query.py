@@ -6,32 +6,43 @@ themselves do not have to (and could be backed by things other than SQL
 databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
-
-from collections import Mapping, OrderedDict
 import copy
 import warnings
+from collections import Iterator, Mapping, OrderedDict
+from itertools import chain, count, product
+from string import ascii_uppercase
 
-from django.core.exceptions import FieldError
-from django.db import connections, DEFAULT_DB_ALIAS
+from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.aggregates import refs_aggregate
-from django.db.models.expressions import ExpressionNode
-from django.db.models.fields import FieldDoesNotExist
-from django.db.models.query_utils import Q
-from django.db.models.related import PathInfo
-from django.db.models.sql import aggregates as base_aggregates_module
-from django.db.models.sql.constants import (QUERY_TERMS, ORDER_DIR, SINGLE,
-        ORDER_PATTERN, JoinInfo, SelectInfo)
-from django.db.models.sql.datastructures import EmptyResultSet, Empty, MultiJoin, Col
-from django.db.models.sql.expressions import SQLEvaluator
-from django.db.models.sql.where import (WhereNode, Constraint, EverythingNode,
-    ExtraWhere, AND, OR, EmptyWhere)
+from django.db.models.expressions import Col, Ref
+from django.db.models.fields.related_lookups import MultiColSource
+from django.db.models.query_utils import (
+    Q, PathInfo, check_rel_lookup_compatibility, refs_expression,
+)
+from django.db.models.sql.constants import (
+    INNER, LOUTER, ORDER_DIR, ORDER_PATTERN, QUERY_TERMS, SINGLE,
+)
+from django.db.models.sql.datastructures import (
+    BaseTable, Empty, EmptyResultSet, Join, MultiJoin,
+)
+from django.db.models.sql.where import (
+    AND, OR, ExtraWhere, NothingNode, WhereNode,
+)
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
 __all__ = ['Query', 'RawQuery']
+
+
+def get_field_names_from_opts(opts):
+    return set(chain.from_iterable(
+        (f.name, f.attname) if f.concrete else (f.name,)
+        for f in opts.get_fields()
+    ))
 
 
 class RawQuery(object):
@@ -39,7 +50,7 @@ class RawQuery(object):
     A single raw SQL query
     """
 
-    def __init__(self, sql, using, params=None):
+    def __init__(self, sql, using, params=None, context=None):
         self.params = params or ()
         self.sql = sql
         self.using = using
@@ -49,10 +60,11 @@ class RawQuery(object):
         # the compiler can be used to process results.
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.extra_select = {}
-        self.aggregate_select = {}
+        self.annotation_select = {}
+        self.context = context or {}
 
     def clone(self, using):
-        return RawQuery(self.sql, using, params=self.params)
+        return RawQuery(self.sql, using, params=self.params, context=self.context.copy())
 
     def get_columns(self):
         if self.cursor is None:
@@ -76,28 +88,39 @@ class RawQuery(object):
     def __repr__(self):
         return "<RawQuery: %s>" % self
 
+    @property
+    def params_type(self):
+        return dict if isinstance(self.params, Mapping) else tuple
+
     def __str__(self):
-        _type = dict if isinstance(self.params, Mapping) else tuple
-        return self.sql % _type(self.params)
+        return self.sql % self.params_type(self.params)
 
     def _execute_query(self):
-        self.cursor = connections[self.using].cursor()
-        self.cursor.execute(self.sql, self.params)
+        connection = connections[self.using]
+
+        # Adapt parameters to the database, as much as possible considering
+        # that the target type isn't known. See #17755.
+        params_type = self.params_type
+        adapter = connection.ops.adapt_unknown_value
+        if params_type is tuple:
+            params = tuple(adapter(val) for val in self.params)
+        elif params_type is dict:
+            params = dict((key, adapter(val)) for key, val in six.iteritems(self.params))
+        else:
+            raise RuntimeError("Unexpected params type: %s" % params_type)
+
+        self.cursor = connection.cursor()
+        self.cursor.execute(self.sql, params)
 
 
 class Query(object):
     """
     A single SQL query.
     """
-    # SQL join types. These are part of the class because their string forms
-    # vary from database to database and can be customised by a subclass.
-    INNER = 'INNER JOIN'
-    LOUTER = 'LEFT OUTER JOIN'
 
     alias_prefix = 'T'
     subq_aliases = frozenset([alias_prefix])
     query_terms = QUERY_TERMS
-    aggregates_module = base_aggregates_module
 
     compiler = 'SQLCompiler'
 
@@ -106,56 +129,65 @@ class Query(object):
         self.alias_refcount = {}
         # alias_map is the most important data structure regarding joins.
         # It's used for recording which joins exist in the query and what
-        # type they are. The key is the alias of the joined table (possibly
-        # the table name) and the value is JoinInfo from constants.py.
+        # types they are. The key is the alias of the joined table (possibly
+        # the table name) and the value is a Join-like object (see
+        # sql.datastructures.Join for more information).
         self.alias_map = {}
+        # Sometimes the query contains references to aliases in outer queries (as
+        # a result of split_exclude). Correct alias quoting needs to know these
+        # aliases too.
+        self.external_aliases = set()
         self.table_map = {}     # Maps table names to list of aliases.
-        self.join_map = {}
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
         self.used_aliases = set()
         self.filter_is_sticky = False
-        self.included_inherited_models = {}
 
         # SQL-related attributes
-        # Select and related select clauses as SelectInfo instances.
+        # Select and related select clauses are expressions to use in the
+        # SELECT clause of the query.
         # The select is used for cases where we want to set up the select
-        # clause to contain other than default fields (values(), annotate(),
-        # subqueries...)
+        # clause to contain other than default fields (values(), subqueries...)
+        # Note that annotations go to annotations dictionary.
         self.select = []
-        # The related_select_cols is used for columns needed for
-        # select_related - this is populated in the compile stage.
-        self.related_select_cols = []
         self.tables = []    # Aliases in the order they are created.
         self.where = where()
         self.where_class = where
+        # The group_by attribute can have one of the following forms:
+        #  - None: no group by at all in the query
+        #  - A list of expressions: group by (at least) those expressions.
+        #    String refs are also allowed for now.
+        #  - True: group by all select fields of the model
+        # See compiler.get_group_by() for details.
         self.group_by = None
-        self.having = where()
         self.order_by = []
         self.low_mark, self.high_mark = 0, None  # Used for offset/limit
         self.distinct = False
         self.distinct_fields = []
         self.select_for_update = False
         self.select_for_update_nowait = False
+
         self.select_related = False
-
-        # SQL aggregate-related attributes
-        # The _aggregates will be an OrderedDict when used. Due to the cost
-        # of creating OrderedDict this attribute is created lazily (in
-        # self.aggregates property).
-        self._aggregates = None  # Maps alias -> SQL aggregate function
-        self.aggregate_select_mask = None
-        self._aggregate_select_cache = None
-
-        # Arbitrary maximum limit for select_related. Prevents infinite
-        # recursion. Can be changed by the depth parameter to select_related().
+        # Arbitrary limit for select_related to prevents infinite recursion.
         self.max_depth = 5
+
+        # Holds the selects defined by a call to values() or values_list()
+        # excluding annotation_select and extra_select.
+        self.values_select = []
+
+        # SQL annotation-related attributes
+        # The _annotations will be an OrderedDict when used. Due to the cost
+        # of creating OrderedDict this attribute is created lazily (in
+        # self.annotations property).
+        self._annotations = None  # Maps alias -> Annotation Expression
+        self.annotation_select_mask = None
+        self._annotation_select_cache = None
 
         # These are for extensions. The contents are more or less appended
         # verbatim to the appropriate clause.
         # The _extra attribute is an OrderedDict, lazily created similarly to
-        # .aggregates
+        # .annotations
         self._extra = None  # Maps col_alias -> (col_sql, params).
         self.extra_select_mask = None
         self._extra_select_cache = None
@@ -168,6 +200,8 @@ class Query(object):
         # load.
         self.deferred_loading = (set(), True)
 
+        self.context = {}
+
     @property
     def extra(self):
         if self._extra is None:
@@ -175,10 +209,17 @@ class Query(object):
         return self._extra
 
     @property
+    def annotations(self):
+        if self._annotations is None:
+            self._annotations = OrderedDict()
+        return self._annotations
+
+    @property
     def aggregates(self):
-        if self._aggregates is None:
-            self._aggregates = OrderedDict()
-        return self._aggregates
+        warnings.warn(
+            "The aggregates property is deprecated. Use annotations instead.",
+            RemovedInDjango110Warning, stacklevel=2)
+        return self.annotations
 
     def __str__(self):
         """
@@ -203,7 +244,7 @@ class Query(object):
         memo[id(self)] = result
         return result
 
-    def prepare(self):
+    def _prepare(self):
         return self
 
     def get_compiler(self, using=None, connection=None):
@@ -211,11 +252,6 @@ class Query(object):
             raise ValueError("Need either using or connection")
         if using:
             connection = connections[using]
-
-        # Check that the compiler will be able to execute the query
-        for alias, aggregate in self.aggregate_select.items():
-            connection.ops.check_aggregate_support(aggregate)
-
         return connection.ops.compiler(self.compiler)(self, connection, using)
 
     def get_meta(self):
@@ -236,22 +272,21 @@ class Query(object):
         obj.model = self.model
         obj.alias_refcount = self.alias_refcount.copy()
         obj.alias_map = self.alias_map.copy()
+        obj.external_aliases = self.external_aliases.copy()
         obj.table_map = self.table_map.copy()
-        obj.join_map = self.join_map.copy()
         obj.default_cols = self.default_cols
         obj.default_ordering = self.default_ordering
         obj.standard_ordering = self.standard_ordering
-        obj.included_inherited_models = self.included_inherited_models.copy()
         obj.select = self.select[:]
-        obj.related_select_cols = []
         obj.tables = self.tables[:]
         obj.where = self.where.clone()
         obj.where_class = self.where_class
         if self.group_by is None:
             obj.group_by = None
+        elif self.group_by is True:
+            obj.group_by = True
         else:
             obj.group_by = self.group_by[:]
-        obj.having = self.having.clone()
         obj.order_by = self.order_by[:]
         obj.low_mark, obj.high_mark = self.low_mark, self.high_mark
         obj.distinct = self.distinct
@@ -259,18 +294,18 @@ class Query(object):
         obj.select_for_update = self.select_for_update
         obj.select_for_update_nowait = self.select_for_update_nowait
         obj.select_related = self.select_related
-        obj.related_select_cols = []
-        obj._aggregates = self._aggregates.copy() if self._aggregates is not None else None
-        if self.aggregate_select_mask is None:
-            obj.aggregate_select_mask = None
+        obj.values_select = self.values_select[:]
+        obj._annotations = self._annotations.copy() if self._annotations is not None else None
+        if self.annotation_select_mask is None:
+            obj.annotation_select_mask = None
         else:
-            obj.aggregate_select_mask = self.aggregate_select_mask.copy()
-        # _aggregate_select_cache cannot be copied, as doing so breaks the
-        # (necessary) state in which both aggregates and
-        # _aggregate_select_cache point to the same underlying objects.
+            obj.annotation_select_mask = self.annotation_select_mask.copy()
+        # _annotation_select_cache cannot be copied, as doing so breaks the
+        # (necessary) state in which both annotations and
+        # _annotation_select_cache point to the same underlying objects.
         # It will get re-populated in the cloned queryset the next time it's
         # used.
-        obj._aggregate_select_cache = None
+        obj._annotation_select_cache = None
         obj.max_depth = self.max_depth
         obj._extra = self._extra.copy() if self._extra is not None else None
         if self.extra_select_mask is None:
@@ -297,139 +332,168 @@ class Query(object):
         obj.__dict__.update(kwargs)
         if hasattr(obj, '_setup_query'):
             obj._setup_query()
+        obj.context = self.context.copy()
         return obj
 
-    def resolve_aggregate(self, value, aggregate, connection):
-        """Resolve the value of aggregates returned by the database to
-        consistent (and reasonable) types.
+    def add_context(self, key, value):
+        self.context[key] = value
 
-        This is required because of the predisposition of certain backends
-        to return Decimal and long types when they are not needed.
-        """
-        if value is None:
-            if aggregate.is_ordinal:
-                return 0
-            # Return None as-is
-            return value
-        elif aggregate.is_ordinal:
-            # Any ordinal aggregate (e.g., count) returns an int
-            return int(value)
-        elif aggregate.is_computed:
-            # Any computed aggregate (e.g., avg) returns a float
-            return float(value)
-        else:
-            # Return value depends on the type of the field being processed.
-            backend_converters = connection.ops.get_db_converters(aggregate.field.get_internal_type())
-            field_converters = aggregate.field.get_db_converters(connection)
-            for converter in backend_converters:
-                value = converter(value, aggregate.field)
-            for converter in field_converters:
-                value = converter(value, connection)
-            return value
+    def get_context(self, key, default=None):
+        return self.context.get(key, default)
 
-    def get_aggregation(self, using, force_subq=False):
+    def relabeled_clone(self, change_map):
+        clone = self.clone()
+        clone.change_aliases(change_map)
+        return clone
+
+    def rewrite_cols(self, annotation, col_cnt):
+        # We must make sure the inner query has the referred columns in it.
+        # If we are aggregating over an annotation, then Django uses Ref()
+        # instances to note this. However, if we are annotating over a column
+        # of a related model, then it might be that column isn't part of the
+        # SELECT clause of the inner query, and we must manually make sure
+        # the column is selected. An example case is:
+        #    .aggregate(Sum('author__awards'))
+        # Resolving this expression results in a join to author, but there
+        # is no guarantee the awards column of author is in the select clause
+        # of the query. Thus we must manually add the column to the inner
+        # query.
+        orig_exprs = annotation.get_source_expressions()
+        new_exprs = []
+        for expr in orig_exprs:
+            if isinstance(expr, Ref):
+                # Its already a Ref to subquery (see resolve_ref() for
+                # details)
+                new_exprs.append(expr)
+            elif isinstance(expr, Col):
+                # Reference to column. Make sure the referenced column
+                # is selected.
+                col_cnt += 1
+                col_alias = '__col%d' % col_cnt
+                self.annotations[col_alias] = expr
+                self.append_annotation_mask([col_alias])
+                new_exprs.append(Ref(col_alias, expr))
+            else:
+                # Some other expression not referencing database values
+                # directly. Its subexpression might contain Cols.
+                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
+                new_exprs.append(new_expr)
+        annotation.set_source_expressions(new_exprs)
+        return annotation, col_cnt
+
+    def get_aggregation(self, using, added_aggregate_names):
         """
         Returns the dictionary with the values of the existing aggregations.
         """
-        if not self.aggregate_select:
+        if not self.annotation_select:
             return {}
-
-        # If there is a group by clause, aggregating does not add useful
-        # information but retrieves only the first row. Aggregate
-        # over the subquery instead.
-        if self.group_by is not None or force_subq:
-
+        has_limit = self.low_mark != 0 or self.high_mark is not None
+        has_existing_annotations = any(
+            annotation for alias, annotation
+            in self.annotations.items()
+            if alias not in added_aggregate_names
+        )
+        # Decide if we need to use a subquery.
+        #
+        # Existing annotations would cause incorrect results as get_aggregation()
+        # must produce just one result and thus must not use GROUP BY. But we
+        # aren't smart enough to remove the existing annotations from the
+        # query, so those would force us to use GROUP BY.
+        #
+        # If the query has limit or distinct, then those operations must be
+        # done in a subquery so that we are aggregating on the limit and/or
+        # distinct results instead of applying the distinct and limit after the
+        # aggregation.
+        if (isinstance(self.group_by, list) or has_limit or has_existing_annotations or
+                self.distinct):
             from django.db.models.sql.subqueries import AggregateQuery
-            query = AggregateQuery(self.model)
-            obj = self.clone()
-            if not force_subq:
-                # In forced subq case the ordering and limits will likely
-                # affect the results.
-                obj.clear_ordering(True)
-                obj.clear_limits()
-            obj.select_for_update = False
-            obj.select_related = False
-            obj.related_select_cols = []
+            outer_query = AggregateQuery(self.model)
+            inner_query = self.clone()
+            inner_query.select_for_update = False
+            inner_query.select_related = False
+            if not has_limit and not self.distinct_fields:
+                # Queries with distinct_fields need ordering and when a limit
+                # is applied we must take the slice from the ordered query.
+                # Otherwise no need for ordering.
+                inner_query.clear_ordering(True)
+            if not inner_query.distinct:
+                # If the inner query uses default select and it has some
+                # aggregate annotations, then we must make sure the inner
+                # query is grouped by the main model's primary key. However,
+                # clearing the select clause can alter results if distinct is
+                # used.
+                if inner_query.default_cols and has_existing_annotations:
+                    inner_query.group_by = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
+                inner_query.default_cols = False
 
-            relabels = dict((t, 'subquery') for t in self.tables)
+            relabels = {t: 'subquery' for t in inner_query.tables}
+            relabels[None] = 'subquery'
             # Remove any aggregates marked for reduction from the subquery
             # and move them to the outer AggregateQuery.
-            for alias, aggregate in self.aggregate_select.items():
-                if aggregate.is_summary:
-                    query.aggregates[alias] = aggregate.relabeled_clone(relabels)
-                    del obj.aggregate_select[alias]
-
+            col_cnt = 0
+            for alias, expression in list(inner_query.annotation_select.items()):
+                if expression.is_summary:
+                    expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
+                    outer_query.annotations[alias] = expression.relabeled_clone(relabels)
+                    del inner_query.annotations[alias]
+                # Make sure the annotation_select wont use cached results.
+                inner_query.set_annotation_mask(inner_query.annotation_select_mask)
+            if inner_query.select == [] and not inner_query.default_cols and not inner_query.annotation_select_mask:
+                # In case of Model.objects[0:3].count(), there would be no
+                # field selected in the inner query, yet we must use a subquery.
+                # So, make sure at least one field is selected.
+                inner_query.select = [self.model._meta.pk.get_col(inner_query.get_initial_alias())]
             try:
-                query.add_subquery(obj, using)
+                outer_query.add_subquery(inner_query, using)
             except EmptyResultSet:
-                return dict(
-                    (alias, None)
-                    for alias in query.aggregate_select
-                )
+                return {
+                    alias: None
+                    for alias in outer_query.annotation_select
+                }
         else:
-            query = self
+            outer_query = self
             self.select = []
             self.default_cols = False
             self._extra = {}
-            self.remove_inherited_models()
 
-        query.clear_ordering(True)
-        query.clear_limits()
-        query.select_for_update = False
-        query.select_related = False
-        query.related_select_cols = []
-
-        result = query.get_compiler(using).execute_sql(SINGLE)
+        outer_query.clear_ordering(True)
+        outer_query.clear_limits()
+        outer_query.select_for_update = False
+        outer_query.select_related = False
+        compiler = outer_query.get_compiler(using)
+        result = compiler.execute_sql(SINGLE)
         if result is None:
-            result = [None for q in query.aggregate_select.items()]
+            result = [None for q in outer_query.annotation_select.items()]
 
-        return dict(
-            (alias, self.resolve_aggregate(val, aggregate, connection=connections[using]))
-            for (alias, aggregate), val
-            in zip(query.aggregate_select.items(), result)
-        )
+        converters = compiler.get_converters(outer_query.annotation_select.values())
+        result = compiler.apply_converters(result, converters)
+
+        return {
+            alias: val
+            for (alias, annotation), val
+            in zip(outer_query.annotation_select.items(), result)
+        }
 
     def get_count(self, using):
         """
         Performs a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        if len(self.select) > 1 or self.aggregate_select or (self.distinct and self.distinct_fields):
-            # If a select clause exists, then the query has already started to
-            # specify the columns that are to be returned.
-            # In this case, we need to use a subquery to evaluate the count.
-            from django.db.models.sql.subqueries import AggregateQuery
-            subquery = obj
-            subquery.clear_ordering(True)
-            subquery.clear_limits()
-
-            obj = AggregateQuery(obj.model)
-            try:
-                obj.add_subquery(subquery, using=using)
-            except EmptyResultSet:
-                # add_subquery evaluates the query, if it's an EmptyResultSet
-                # then there are can be no results, and therefore there the
-                # count is obviously 0
-                return 0
-
-        obj.add_count_column()
-        number = obj.get_aggregation(using=using)[None]
-
-        # Apply offset and limit constraints manually, since using LIMIT/OFFSET
-        # in SQL (in variants that provide them) doesn't change the COUNT
-        # output.
-        number = max(0, number - self.low_mark)
-        if self.high_mark is not None:
-            number = min(number, self.high_mark - self.low_mark)
-
+        obj.add_annotation(Count('*'), alias='__count', is_summary=True)
+        number = obj.get_aggregation(using, ['__count'])['__count']
+        if number is None:
+            number = 0
         return number
 
     def has_filters(self):
-        return self.where or self.having
+        return self.where
 
     def has_results(self, using):
         q = self.clone()
         if not q.distinct:
+            if q.group_by is True:
+                q.add_fields((f.attname for f in self.model._meta.concrete_fields), False)
+                q.set_group_by()
             q.clear_select_clause()
         q.clear_ordering(True)
         q.set_limits(high=1)
@@ -454,7 +518,6 @@ class Query(object):
         assert self.distinct_fields == rhs.distinct_fields, \
             "Cannot combine queries with different distinct fields."
 
-        self.remove_inherited_models()
         # Work out how to relabel the rhs aliases, if necessary.
         change_map = {}
         conjunction = (connector == AND)
@@ -477,19 +540,17 @@ class Query(object):
         self.get_initial_alias()
         joinpromoter = JoinPromoter(connector, 2, False)
         joinpromoter.add_votes(
-            j for j in self.alias_map if self.alias_map[j].join_type == self.INNER)
+            j for j in self.alias_map if self.alias_map[j].join_type == INNER)
         rhs_votes = set()
         # Now, add the joins from rhs query into the new query (skipping base
         # table).
         for alias in rhs.tables[1:]:
-            table, _, join_type, lhs, join_cols, nullable, join_field = rhs.alias_map[alias]
+            join = rhs.alias_map[alias]
             # If the left side of the join was already relabeled, use the
             # updated alias.
-            lhs = change_map.get(lhs, lhs)
-            new_alias = self.join(
-                (lhs, table, join_cols), reuse=reuse,
-                nullable=nullable, join_field=join_field)
-            if join_type == self.INNER:
+            join = join.relabeled_clone(change_map)
+            new_alias = self.join(join, reuse=reuse)
+            if join.join_type == INNER:
                 rhs_votes.add(new_alias)
             # We can't reuse the same join again in the query. If we have two
             # distinct joins for the same connection in rhs query, then the
@@ -507,31 +568,14 @@ class Query(object):
 
         # Now relabel a copy of the rhs where-clause and add it to the current
         # one.
-        if rhs.where:
-            w = rhs.where.clone()
-            w.relabel_aliases(change_map)
-            if not self.where:
-                # Since 'self' matches everything, add an explicit "include
-                # everything" where-constraint so that connections between the
-                # where clauses won't exclude valid results.
-                self.where.add(EverythingNode(), AND)
-        elif self.where:
-            # rhs has an empty where clause.
-            w = self.where_class()
-            w.add(EverythingNode(), AND)
-        else:
-            w = self.where_class()
+        w = rhs.where.clone()
+        w.relabel_aliases(change_map)
         self.where.add(w, connector)
 
         # Selection columns and extra extensions are those provided by 'rhs'.
         self.select = []
-        for col, field in rhs.select:
-            if isinstance(col, (list, tuple)):
-                new_col = change_map.get(col[0], col[0]), col[1]
-                self.select.append(SelectInfo(new_col, field))
-            else:
-                new_col = col.relabeled_clone(change_map)
-                self.select.append(SelectInfo(new_col, field))
+        for col in rhs.select:
+            self.add_select(col.relabeled_clone(change_map))
 
         if connector == OR:
             # It would be nice to be able to handle this, but the queries don't
@@ -581,11 +625,11 @@ class Query(object):
             opts = orig_opts
             for name in parts[:-1]:
                 old_model = cur_model
-                source = opts.get_field_by_name(name)[0]
+                source = opts.get_field(name)
                 if is_reverse_o2o(source):
-                    cur_model = source.model
+                    cur_model = source.related_model
                 else:
-                    cur_model = source.rel.to
+                    cur_model = source.remote_field.model
                 opts = cur_model._meta
                 # Even if we're "just passing through" this model, we must add
                 # both the current model's pk and the related reference field
@@ -593,8 +637,11 @@ class Query(object):
                 if not is_reverse_o2o(source):
                     must_include[old_model].add(source)
                 add_to_dict(must_include, cur_model, opts.pk)
-            field, model, _, _ = opts.get_field_by_name(parts[-1])
-            if model is None:
+            field = opts.get_field(parts[-1])
+            is_reverse_object = field.auto_created and not field.concrete
+            model = field.related_model if is_reverse_object else field.model
+            model = model._meta.concrete_model
+            if model == opts.model:
                 model = cur_model
             if not is_reverse_o2o(field):
                 add_to_dict(seen, model, field)
@@ -606,10 +653,11 @@ class Query(object):
             # models.
             workset = {}
             for model, values in six.iteritems(seen):
-                for field, m in model._meta.get_fields_with_model():
+                for field in model._meta.fields:
                     if field in values:
                         continue
-                    add_to_dict(workset, m or model, field)
+                    m = field.model._meta.concrete_model
+                    add_to_dict(workset, m, field)
             for model, values in six.iteritems(must_include):
                 # If we haven't included a model in workset, we don't add the
                 # corresponding must_include fields for that model, since an
@@ -636,17 +684,6 @@ class Query(object):
                     seen[model] = set()
             for model, values in six.iteritems(seen):
                 callback(target, model, values)
-
-    def deferred_to_columns_cb(self, target, model, fields):
-        """
-        Callback used by deferred_to_columns(). The "target" parameter should
-        be a set instance.
-        """
-        table = model._meta.db_table
-        if table not in target:
-            target[table] = set()
-        for field in fields:
-            target[table].add(field.column)
 
     def table_alias(self, table_name, create=False):
         """
@@ -696,27 +733,26 @@ class Query(object):
         aliases = list(aliases)
         while aliases:
             alias = aliases.pop(0)
-            if self.alias_map[alias].join_cols[0][1] is None:
+            if self.alias_map[alias].join_type is None:
                 # This is the base table (first FROM entry) - this table
                 # isn't really joined at all in the query, so we should not
                 # alter its join type.
                 continue
             # Only the first alias (skipped above) should have None join_type
             assert self.alias_map[alias].join_type is not None
-            parent_alias = self.alias_map[alias].lhs_alias
+            parent_alias = self.alias_map[alias].parent_alias
             parent_louter = (
                 parent_alias
-                and self.alias_map[parent_alias].join_type == self.LOUTER)
-            already_louter = self.alias_map[alias].join_type == self.LOUTER
+                and self.alias_map[parent_alias].join_type == LOUTER)
+            already_louter = self.alias_map[alias].join_type == LOUTER
             if ((self.alias_map[alias].nullable or parent_louter) and
                     not already_louter):
-                data = self.alias_map[alias]._replace(join_type=self.LOUTER)
-                self.alias_map[alias] = data
+                self.alias_map[alias] = self.alias_map[alias].promote()
                 # Join type of 'alias' changed, so re-examine all aliases that
                 # refer to this one.
                 aliases.extend(
                     join for join in self.alias_map.keys()
-                    if (self.alias_map[join].lhs_alias == alias
+                    if (self.alias_map[join].parent_alias == alias
                         and join not in aliases))
 
     def demote_joins(self, aliases):
@@ -732,10 +768,10 @@ class Query(object):
         aliases = list(aliases)
         while aliases:
             alias = aliases.pop(0)
-            if self.alias_map[alias].join_type == self.LOUTER:
-                self.alias_map[alias] = self.alias_map[alias]._replace(join_type=self.INNER)
-                parent_alias = self.alias_map[alias].lhs_alias
-                if self.alias_map[parent_alias].join_type == self.INNER:
+            if self.alias_map[alias].join_type == LOUTER:
+                self.alias_map[alias] = self.alias_map[alias].demote()
+                parent_alias = self.alias_map[alias].parent_alias
+                if self.alias_map[parent_alias].join_type == INNER:
                     aliases.append(parent_alias)
 
     def reset_refcounts(self, to_counts):
@@ -762,29 +798,23 @@ class Query(object):
             else:
                 return col.relabeled_clone(change_map)
         # 1. Update references in "select" (normal columns plus aliases),
-        # "group by", "where" and "having".
+        # "group by" and "where".
         self.where.relabel_aliases(change_map)
-        self.having.relabel_aliases(change_map)
-        if self.group_by:
+        if isinstance(self.group_by, list):
             self.group_by = [relabel_column(col) for col in self.group_by]
-        self.select = [SelectInfo(relabel_column(s.col), s.field)
-                       for s in self.select]
-        if self._aggregates:
-            self._aggregates = OrderedDict(
-                (key, relabel_column(col)) for key, col in self._aggregates.items())
+        self.select = [col.relabeled_clone(change_map) for col in self.select]
+        if self._annotations:
+            self._annotations = OrderedDict(
+                (key, relabel_column(col)) for key, col in self._annotations.items())
 
         # 2. Rename the alias in the internal table/alias datastructures.
-        for ident, aliases in self.join_map.items():
-            del self.join_map[ident]
-            aliases = tuple(change_map.get(a, a) for a in aliases)
-            ident = (change_map.get(ident[0], ident[0]),) + ident[1:]
-            self.join_map[ident] = aliases
         for old_alias, new_alias in six.iteritems(change_map):
-            alias_data = self.alias_map[old_alias]
-            alias_data = alias_data._replace(rhs_alias=new_alias)
+            if old_alias not in self.alias_map:
+                continue
+            alias_data = self.alias_map[old_alias].relabeled_clone(change_map)
+            self.alias_map[new_alias] = alias_data
             self.alias_refcount[new_alias] = self.alias_refcount[old_alias]
             del self.alias_refcount[old_alias]
-            self.alias_map[new_alias] = alias_data
             del self.alias_map[old_alias]
 
             table_aliases = self.table_map[alias_data.table_name]
@@ -796,16 +826,8 @@ class Query(object):
                 if alias == old_alias:
                     self.tables[pos] = new_alias
                     break
-        for key, alias in self.included_inherited_models.items():
-            if alias in change_map:
-                self.included_inherited_models[key] = change_map[alias]
-
-        # 3. Update any joins that refer to the old alias.
-        for alias, data in six.iteritems(self.alias_map):
-            lhs = data.lhs_alias
-            if lhs in change_map:
-                data = data._replace(lhs_alias=change_map[lhs])
-                self.alias_map[alias] = data
+        self.external_aliases = {change_map.get(alias, alias)
+                                 for alias in self.external_aliases}
 
     def bump_prefix(self, outer_query):
         """
@@ -814,13 +836,37 @@ class Query(object):
         conflict. Even tables that previously had no alias will get an alias
         after this call.
         """
+        def prefix_gen():
+            """
+            Generates a sequence of characters in alphabetical order:
+                -> 'A', 'B', 'C', ...
+
+            When the alphabet is finished, the sequence will continue with the
+            Cartesian product:
+                -> 'AA', 'AB', 'AC', ...
+            """
+            alphabet = ascii_uppercase
+            prefix = chr(ord(self.alias_prefix) + 1)
+            yield prefix
+            for n in count(1):
+                seq = alphabet[alphabet.index(prefix):] if prefix else alphabet
+                for s in product(seq, repeat=n):
+                    yield ''.join(s)
+                prefix = None
+
         if self.alias_prefix != outer_query.alias_prefix:
             # No clashes between self and outer query should be possible.
             return
-        self.alias_prefix = chr(ord(self.alias_prefix) + 1)
-        while self.alias_prefix in self.subq_aliases:
-            self.alias_prefix = chr(ord(self.alias_prefix) + 1)
-            assert self.alias_prefix < 'Z'
+
+        local_recursion_limit = 127  # explicitly avoid infinite loop
+        for pos, prefix in enumerate(prefix_gen()):
+            if prefix not in self.subq_aliases:
+                self.alias_prefix = prefix
+                break
+            if pos > local_recursion_limit:
+                raise RuntimeError(
+                    'Maximum recursion depth exceeded: too many subqueries.'
+                )
         self.subq_aliases = self.subq_aliases.union([self.alias_prefix])
         outer_query.subq_aliases = outer_query.subq_aliases.union(self.subq_aliases)
         change_map = OrderedDict()
@@ -839,7 +885,7 @@ class Query(object):
             alias = self.tables[0]
             self.ref_alias(alias)
         else:
-            alias = self.join((None, self.get_meta().db_table, None))
+            alias = self.join(BaseTable(self.get_meta().db_table, None))
         return alias
 
     def count_active_tables(self):
@@ -850,7 +896,7 @@ class Query(object):
         """
         return len([1 for count in self.alias_refcount.values() if count])
 
-    def join(self, connection, reuse=None, nullable=False, join_field=None):
+    def join(self, join, reuse=None):
         """
         Returns an alias for the join in 'connection', either reusing an
         existing alias for that join or creating a new one. 'connection' is a
@@ -874,62 +920,23 @@ class Query(object):
 
         The 'join_field' is the field we are joining along (if any).
         """
-        lhs, table, join_cols = connection
-        assert lhs is None or join_field is not None
-        existing = self.join_map.get(connection, ())
-        if reuse is None:
-            reuse = existing
-        else:
-            reuse = [a for a in existing if a in reuse]
-        for alias in reuse:
-            if join_field and self.alias_map[alias].join_field != join_field:
-                # The join_map doesn't contain join_field (mainly because
-                # fields in Query structs are problematic in pickling), so
-                # check that the existing join is created using the same
-                # join_field used for the under work join.
-                continue
-            self.ref_alias(alias)
-            return alias
+        reuse = [a for a, j in self.alias_map.items()
+                 if (reuse is None or a in reuse) and j == join]
+        if reuse:
+            self.ref_alias(reuse[0])
+            return reuse[0]
 
         # No reuse is possible, so we need a new alias.
-        alias, _ = self.table_alias(table, create=True)
-        if not lhs:
-            # Not all tables need to be joined to anything. No join type
-            # means the later columns are ignored.
-            join_type = None
-        elif self.alias_map[lhs].join_type == self.LOUTER or nullable:
-            join_type = self.LOUTER
-        else:
-            join_type = self.INNER
-        join = JoinInfo(table, alias, join_type, lhs, join_cols or ((None, None),), nullable,
-                        join_field)
+        alias, _ = self.table_alias(join.table_name, create=True)
+        if join.join_type:
+            if self.alias_map[join.parent_alias].join_type == LOUTER or join.nullable:
+                join_type = LOUTER
+            else:
+                join_type = INNER
+            join.join_type = join_type
+        join.table_alias = alias
         self.alias_map[alias] = join
-        if connection in self.join_map:
-            self.join_map[connection] += (alias,)
-        else:
-            self.join_map[connection] = (alias,)
         return alias
-
-    def setup_inherited_models(self):
-        """
-        If the model that is the basis for this QuerySet inherits other models,
-        we need to ensure that those other models have their tables included in
-        the query.
-
-        We do this as a separate step so that subclasses know which
-        tables are going to be active in the query, without needing to compute
-        all the select columns (this method is called from pre_sql_setup(),
-        whereas column determination is a later part, and side-effect, of
-        as_sql()).
-        """
-        opts = self.get_meta()
-        root_alias = self.tables[0]
-        seen = {None: root_alias}
-
-        for field, model in opts.get_fields_with_model():
-            if model not in seen:
-                self.join_parent_model(opts, model, root_alias, seen)
-        self.included_inherited_models = seen
 
     def join_parent_model(self, opts, model, alias, seen):
         """
@@ -948,7 +955,9 @@ class Query(object):
         curr_opts = opts
         for int_model in chain:
             if int_model in seen:
-                return seen[int_model]
+                curr_opts = int_model._meta
+                alias = seen[int_model]
+                continue
             # Proxy model have elements in base chain
             # with no parents, assign the new options
             # object and skip to the next base in that
@@ -963,66 +972,24 @@ class Query(object):
             alias = seen[int_model] = joins[-1]
         return alias or seen[None]
 
-    def remove_inherited_models(self):
-        """
-        Undoes the effects of setup_inherited_models(). Should be called
-        whenever select columns (self.select) are set explicitly.
-        """
-        for key, alias in self.included_inherited_models.items():
-            if key:
-                self.unref_alias(alias)
-        self.included_inherited_models = {}
-
     def add_aggregate(self, aggregate, model, alias, is_summary):
+        warnings.warn(
+            "add_aggregate() is deprecated. Use add_annotation() instead.",
+            RemovedInDjango110Warning, stacklevel=2)
+        self.add_annotation(aggregate, alias, is_summary)
+
+    def add_annotation(self, annotation, alias, is_summary=False):
         """
-        Adds a single aggregate expression to the Query
+        Adds a single annotation expression to the Query
         """
-        opts = model._meta
-        field_list = aggregate.lookup.split(LOOKUP_SEP)
-        if len(field_list) == 1 and self._aggregates and aggregate.lookup in self.aggregates:
-            # Aggregate is over an annotation
-            field_name = field_list[0]
-            col = field_name
-            source = self.aggregates[field_name]
-            if not is_summary:
-                raise FieldError("Cannot compute %s('%s'): '%s' is an aggregate" % (
-                    aggregate.name, field_name, field_name))
-        elif ((len(field_list) > 1) or
-                (field_list[0] not in [i.name for i in opts.fields]) or
-                self.group_by is None or
-                not is_summary):
-            # If:
-            #   - the field descriptor has more than one part (foo__bar), or
-            #   - the field descriptor is referencing an m2m/m2o field, or
-            #   - this is a reference to a model field (possibly inherited), or
-            #   - this is an annotation over a model field
-            # then we need to explore the joins that are required.
+        annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None,
+                                                   summarize=is_summary)
+        self.append_annotation_mask([alias])
+        self.annotations[alias] = annotation
 
-            # Join promotion note - we must not remove any rows here, so use
-            # outer join if there isn't any existing join.
-            _, sources, opts, join_list, path = self.setup_joins(
-                field_list, opts, self.get_initial_alias())
-
-            # Process the join chain to see if it can be trimmed
-            targets, _, join_list = self.trim_joins(sources, join_list, path)
-
-            col = targets[0].column
-            source = sources[0]
-            col = (join_list[-1], col)
-        else:
-            # The simplest cases. No joins required -
-            # just reference the provided column alias.
-            field_name = field_list[0]
-            source = opts.get_field(field_name)
-            col = field_name
-        # We want to have the alias in SELECT clause even if mask is set.
-        self.append_aggregate_mask([alias])
-
-        # Add the aggregate to the query
-        aggregate.add_to_query(self, alias, col=col, source=source, is_summary=is_summary)
-
-    def prepare_lookup_value(self, value, lookups, can_reuse):
+    def prepare_lookup_value(self, value, lookups, can_reuse, allow_joins=True):
         # Default lookup if none given is exact.
+        used_joins = []
         if len(lookups) == 0:
             lookups = ['exact']
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
@@ -1032,14 +999,13 @@ class Query(object):
                 raise ValueError("Cannot use None as a query value")
             lookups[-1] = 'isnull'
             value = True
-        elif callable(value):
-            warnings.warn(
-                "Passing callable arguments to queryset is deprecated.",
-                RemovedInDjango19Warning, stacklevel=2)
-            value = value()
-        elif isinstance(value, ExpressionNode):
-            # If value is a query expression, evaluate it
-            value = SQLEvaluator(value, self, reuse=can_reuse)
+        elif hasattr(value, 'resolve_expression'):
+            pre_joins = self.alias_refcount.copy()
+            value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
+            used_joins = [k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)]
+        # Subqueries need to use a different set of aliases than the
+        # outer query. Call bump_prefix to change aliases of the inner
+        # query (the value).
         if hasattr(value, 'query') and hasattr(value.query, 'bump_prefix'):
             value = value._clone()
             value.query.bump_prefix(self)
@@ -1054,17 +1020,17 @@ class Query(object):
                 lookups[-1] == 'exact' and value == ''):
             value = True
             lookups[-1] = 'isnull'
-        return value, lookups
+        return value, lookups, used_joins
 
     def solve_lookup_type(self, lookup):
         """
         Solve the lookup type from the lookup (eg: 'foobar__id__icontains')
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
-        if self._aggregates:
-            aggregate, aggregate_lookups = refs_aggregate(lookup_splitted, self.aggregates)
-            if aggregate:
-                return aggregate_lookups, (), aggregate
+        if self._annotations:
+            expression, expression_lookups = refs_expression(lookup_splitted, self.annotations)
+            if expression:
+                return expression_lookups, (), expression
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
         field_parts = lookup_splitted[0:len(lookup_splitted) - len(lookup_parts)]
         if len(lookup_parts) == 0:
@@ -1076,15 +1042,13 @@ class Query(object):
                     (lookup, self.get_meta().model.__name__))
         return lookup_parts, field_parts, False
 
-    def check_query_object_type(self, value, opts):
+    def check_query_object_type(self, value, opts, field):
         """
         Checks whether the object passed while querying is of the correct type.
         If not, it raises a ValueError specifying the wrong object.
         """
         if hasattr(value, '_meta'):
-            if not (value._meta.concrete_model == opts.concrete_model
-                    or opts.concrete_model in value._meta.get_parent_list()
-                    or value._meta.concrete_model in opts.get_parent_list()):
+            if not check_rel_lookup_compatibility(value._meta.model, opts, field):
                 raise ValueError(
                     'Cannot query "%s": Must be "%s" instance.' %
                     (value, opts.object_name))
@@ -1093,53 +1057,68 @@ class Query(object):
         """
         Checks the type of object passed to query relations.
         """
-        if field.rel:
-            # testing for iterable of models
-            if hasattr(value, '__iter__'):
-                # Check if the iterable has a model attribute, if so
-                # it is likely something like a QuerySet.
-                if hasattr(value, 'model') and hasattr(value.model, '_meta'):
-                    model = value.model
-                    if not (model == opts.concrete_model
-                            or opts.concrete_model in model._meta.get_parent_list()
-                            or model in opts.get_parent_list()):
-                        raise ValueError(
-                            'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
-                            (model._meta.model_name, opts.object_name))
-                else:
-                    for v in value:
-                        self.check_query_object_type(v, opts)
-            else:
-                # expecting single model instance here
-                self.check_query_object_type(value, opts)
+        if field.is_relation:
+            # QuerySets implement is_compatible_query_object_type() to
+            # determine compatibility with the given field.
+            if hasattr(value, 'is_compatible_query_object_type'):
+                if not value.is_compatible_query_object_type(opts, field):
+                    raise ValueError(
+                        'Cannot use QuerySet for "%s": Use a QuerySet for "%s".' %
+                        (value.model._meta.model_name, opts.object_name)
+                    )
+            elif hasattr(value, '_meta'):
+                self.check_query_object_type(value, opts, field)
+            elif hasattr(value, '__iter__'):
+                for v in value:
+                    self.check_query_object_type(v, opts, field)
 
     def build_lookup(self, lookups, lhs, rhs):
+        """
+        Tries to extract transforms and lookup from given lhs.
+
+        The lhs value is something that works like SQLExpression.
+        The rhs value is what the lookup is going to compare against.
+        The lookups is a list of names to extract using get_lookup()
+        and get_transform().
+        """
         lookups = lookups[:]
         while lookups:
-            lookup = lookups[0]
+            name = lookups[0]
+            # If there is just one part left, try first get_lookup() so
+            # that if the lhs supports both transform and lookup for the
+            # name, then lookup will be picked.
             if len(lookups) == 1:
-                final_lookup = lhs.get_lookup(lookup)
-                if final_lookup:
-                    return final_lookup(lhs, rhs)
-                # We didn't find a lookup, so we are going to try get_transform
-                # + get_lookup('exact').
-                lookups.append('exact')
-            next = lhs.get_transform(lookup)
-            if next:
-                lhs = next(lhs, lookups)
-            else:
-                raise FieldError(
-                    "Unsupported lookup '%s' for %s or join on the field not "
-                    "permitted." %
-                    (lookup, lhs.output_field.__class__.__name__))
+                final_lookup = lhs.get_lookup(name)
+                if not final_lookup:
+                    # We didn't find a lookup. We are going to interpret
+                    # the name as transform, and do an Exact lookup against
+                    # it.
+                    lhs = self.try_transform(lhs, name, lookups)
+                    final_lookup = lhs.get_lookup('exact')
+                return final_lookup(lhs, rhs)
+            lhs = self.try_transform(lhs, name, lookups)
             lookups = lookups[1:]
 
+    def try_transform(self, lhs, name, rest_of_lookups):
+        """
+        Helper method for build_lookup. Tries to fetch and initialize
+        a transform for name parameter from lhs.
+        """
+        next = lhs.get_transform(name)
+        if next:
+            return next(lhs, rest_of_lookups)
+        else:
+            raise FieldError(
+                "Unsupported lookup '%s' for %s or join on the field not "
+                "permitted." %
+                (name, lhs.output_field.__class__.__name__))
+
     def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None, connector=AND):
+                     can_reuse=None, connector=AND, allow_joins=True, split_subq=True):
         """
         Builds a WhereNode for a single filter clause, but doesn't add it
         to this Query. Query.add_q() will then add this filter to the where
-        or having Node.
+        Node.
 
         The 'branch_negated' tells us if the current branch contains any
         negations. This will be used to determine if subqueries are needed.
@@ -1161,34 +1140,36 @@ class Query(object):
         query. However, if the filter isn't added to the query then the caller
         is responsible for unreffing the joins used.
         """
+        if isinstance(filter_expr, dict):
+            raise FieldError("Cannot parse keyword query as dict")
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
-        lookups, parts, reffed_aggregate = self.solve_lookup_type(arg)
+        lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+        if not allow_joins and len(parts) > 1:
+            raise FieldError("Joined field references are not permitted in this query")
 
         # Work out the lookup type and remove it from the end of 'parts',
         # if necessary.
-        value, lookups = self.prepare_lookup_value(value, lookups, can_reuse)
-        used_joins = getattr(value, '_used_joins', [])
+        value, lookups, used_joins = self.prepare_lookup_value(value, lookups, can_reuse, allow_joins)
 
         clause = self.where_class()
-        if reffed_aggregate:
-            condition = self.build_lookup(lookups, reffed_aggregate, value)
-            if not condition:
-                # Backwards compat for custom lookups
-                assert len(lookups) == 1
-                condition = (reffed_aggregate, lookups[0], value)
+        if reffed_expression:
+            condition = self.build_lookup(lookups, reffed_expression, value)
             clause.add(condition, AND)
             return clause, []
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
-        allow_many = not branch_negated
+        allow_many = not branch_negated or not split_subq
 
         try:
             field, sources, opts, join_list, path = self.setup_joins(
                 parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
 
+            # Prevent iterator from being consumed by check_related_objects()
+            if isinstance(value, Iterator):
+                value = list(value)
             self.check_related_objects(field, value, opts)
 
             # split_exclude() needs to know which joins were generated for the
@@ -1201,35 +1182,22 @@ class Query(object):
         if can_reuse is not None:
             can_reuse.update(join_list)
         used_joins = set(used_joins).union(set(join_list))
-
-        # Process the join list to see if we can remove any non-needed joins from
-        # the far end (fewer tables in a query is better).
         targets, alias, join_list = self.trim_joins(sources, join_list, path)
 
-        if hasattr(field, 'get_lookup_constraint'):
-            # For now foreign keys get special treatment. This should be
-            # refactored when composite fields lands.
-            condition = field.get_lookup_constraint(self.where_class, alias, targets, sources,
-                                                    lookups, value)
-            lookup_type = lookups[-1]
-        else:
-            assert(len(targets) == 1)
-            col = Col(alias, targets[0], field)
-            condition = self.build_lookup(lookups, col, value)
-            if not condition:
-                # Backwards compat for custom lookups
-                if lookups[0] not in self.query_terms:
-                    raise FieldError(
-                        "Join on field '%s' not permitted. Did you "
-                        "misspell '%s' for the lookup type?" %
-                        (col.output_field.name, lookups[0]))
-                if len(lookups) > 1:
-                    raise FieldError("Nested lookup '%s' not supported." %
-                                     LOOKUP_SEP.join(lookups))
-                condition = (Constraint(alias, targets[0].column, field), lookups[0], value)
-                lookup_type = lookups[-1]
+        if field.is_relation:
+            # No support for transforms for relational fields
+            assert len(lookups) == 1
+            lookup_class = field.get_lookup(lookups[0])
+            if len(targets) == 1:
+                lhs = targets[0].get_col(alias, field)
             else:
-                lookup_type = condition.lookup_name
+                lhs = MultiColSource(alias, targets, sources, field)
+            condition = lookup_class(lhs, value)
+            lookup_type = lookup_class.lookup_name
+        else:
+            col = targets[0].get_col(alias, field)
+            condition = self.build_lookup(lookups, col, value)
+            lookup_type = condition.lookup_name
 
         clause.add(condition, AND)
 
@@ -1238,7 +1206,7 @@ class Query(object):
             require_outer = True
             if (lookup_type != 'isnull' and (
                     self.is_nullable(targets[0]) or
-                    self.alias_map[join_list[-1]].join_type == self.LOUTER)):
+                    self.alias_map[join_list[-1]].join_type == LOUTER)):
                 # The condition added here will be SQL like this:
                 # NOT (col IS NOT NULL), where the first NOT is added in
                 # upper layers of code. The reason for addition is that if col
@@ -1249,65 +1217,17 @@ class Query(object):
                 #   <=>
                 # NOT (col IS NOT NULL AND col = someval).
                 lookup_class = targets[0].get_lookup('isnull')
-                clause.add(lookup_class(Col(alias, targets[0], sources[0]), False), AND)
+                clause.add(lookup_class(targets[0].get_col(alias, sources[0]), False), AND)
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_clause):
         self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
-    def need_having(self, obj):
-        """
-        Returns whether or not all elements of this q_object need to be put
-        together in the HAVING clause.
-        """
-        if not self._aggregates:
-            return False
-        if not isinstance(obj, Node):
-            return (refs_aggregate(obj[0].split(LOOKUP_SEP), self.aggregates)[0]
-                    or (hasattr(obj[1], 'contains_aggregate')
-                        and obj[1].contains_aggregate(self.aggregates)))
-        return any(self.need_having(c) for c in obj.children)
-
-    def split_having_parts(self, q_object, negated=False):
-        """
-        Returns a list of q_objects which need to go into the having clause
-        instead of the where clause. Removes the splitted out nodes from the
-        given q_object. Note that the q_object is altered, so cloning it is
-        needed.
-        """
-        having_parts = []
-        for c in q_object.children[:]:
-            # When constructing the having nodes we need to take care to
-            # preserve the negation status from the upper parts of the tree
-            if isinstance(c, Node):
-                # For each negated child, flip the in_negated flag.
-                in_negated = c.negated ^ negated
-                if c.connector == OR and self.need_having(c):
-                    # A subtree starting from OR clause must go into having in
-                    # whole if any part of that tree references an aggregate.
-                    q_object.children.remove(c)
-                    having_parts.append(c)
-                    c.negated = in_negated
-                else:
-                    having_parts.extend(
-                        self.split_having_parts(c, in_negated)[1])
-            elif self.need_having(c):
-                q_object.children.remove(c)
-                new_q = self.where_class(children=[c], negated=negated)
-                having_parts.append(new_q)
-        return q_object, having_parts
-
     def add_q(self, q_object):
         """
-        A preprocessor for the internal _add_q(). Responsible for
-        splitting the given q_object into where and having parts and
-        setting up some internal variables.
+        A preprocessor for the internal _add_q(). Responsible for doing final
+        join promotion.
         """
-        if not self.need_having(q_object):
-            where_part, having_parts = q_object, []
-        else:
-            where_part, having_parts = self.split_having_parts(
-                q_object.clone(), q_object.negated)
         # For join promotion this case is doing an AND for the added q_object
         # and existing conditions. So, any existing inner join forces the join
         # type to remain inner. Existing outer joins can however be demoted.
@@ -1315,16 +1235,14 @@ class Query(object):
         # rel_a doesn't produce any rows, then the whole condition must fail.
         # So, demotion is OK.
         existing_inner = set(
-            (a for a in self.alias_map if self.alias_map[a].join_type == self.INNER))
-        clause, require_inner = self._add_q(where_part, self.used_aliases)
-        self.where.add(clause, AND)
-        for hp in having_parts:
-            clause, _ = self._add_q(hp, self.used_aliases)
-            self.having.add(clause, AND)
+            (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
+        clause, _ = self._add_q(q_object, self.used_aliases)
+        if clause:
+            self.where.add(clause, AND)
         self.demote_joins(existing_inner)
 
     def _add_q(self, q_object, used_aliases, branch_negated=False,
-               current_negated=False):
+               current_negated=False, allow_joins=True, split_subq=True):
         """
         Adds a Q-object to the current filter.
         """
@@ -1338,29 +1256,36 @@ class Query(object):
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
                     child, used_aliases, branch_negated,
-                    current_negated)
+                    current_negated, allow_joins, split_subq)
                 joinpromoter.add_votes(needed_inner)
             else:
                 child_clause, needed_inner = self.build_filter(
                     child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, connector=connector)
+                    current_negated=current_negated, connector=connector,
+                    allow_joins=allow_joins, split_subq=split_subq,
+                )
                 joinpromoter.add_votes(needed_inner)
-            target_clause.add(child_clause, connector)
+            if child_clause:
+                target_clause.add(child_clause, connector)
         needed_inner = joinpromoter.update_join_types(self)
         return target_clause, needed_inner
 
     def names_to_path(self, names, opts, allow_many=True, fail_on_missing=False):
         """
-        Walks the names path and turns them PathInfo tuples. Note that a
-        single name in 'names' can generate multiple PathInfos (m2m for
+        Walks the list of names and turns them into PathInfo tuples. Note that
+        a single name in 'names' can generate multiple PathInfos (m2m for
         example).
 
         'names' is the path of names to travel, 'opts' is the model Options we
         start the name resolving from, 'allow_many' is as for setup_joins().
+        If fail_on_missing is set to True, then a name that can't be resolved
+        will generate a FieldError.
 
         Returns a list of PathInfo tuples. In addition returns the final field
         (the last used join field), and target (which is a field guaranteed to
-        contain the same value as the final field).
+        contain the same value as the final field). Finally, the method returns
+        those names that weren't found (which are likely transforms and the
+        final lookup).
         """
         path, names_with_path = [], []
         for pos, name in enumerate(names):
@@ -1368,20 +1293,33 @@ class Query(object):
             if name == 'pk':
                 name = opts.pk.name
             try:
-                field, model, direct, m2m = opts.get_field_by_name(name)
+                field = opts.get_field(name)
+
+                # Fields that contain one-to-many relations with a generic
+                # model (like a GenericForeignKey) cannot generate reverse
+                # relations and therefore cannot be used for reverse querying.
+                if field.is_relation and not field.related_model:
+                    raise FieldError(
+                        "Field %r does not generate an automatic reverse "
+                        "relation and therefore cannot be used for reverse "
+                        "querying. If it is a GenericForeignKey, consider "
+                        "adding a GenericRelation." % name
+                    )
+                model = field.model._meta.concrete_model
             except FieldDoesNotExist:
                 # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1
                 if pos == -1 or fail_on_missing:
-                    available = opts.get_all_field_names() + list(self.aggregate_select)
+                    field_names = list(get_field_names_from_opts(opts))
+                    available = sorted(field_names + list(self.annotation_select))
                     raise FieldError("Cannot resolve keyword %r into field. "
                                      "Choices are: %s" % (name, ", ".join(available)))
                 break
             # Check if we need any joins for concrete inheritance cases (the
             # field lives in parent, but we are currently in one of its
             # children)
-            if model:
+            if model is not opts.model:
                 # The field lives on a base class of the current model.
                 # Skip the chain of proxy to the concrete proxied model
                 proxied_model = opts.concrete_model
@@ -1391,7 +1329,7 @@ class Query(object):
                         opts = int_model._meta
                     else:
                         final_field = opts.parents[int_model]
-                        targets = (final_field.rel.get_related_field(),)
+                        targets = (final_field.remote_field.get_related_field(),)
                         opts = int_model._meta
                         path.append(PathInfo(final_field.model._meta, opts, targets, final_field, False, True))
                         cur_names_with_path[1].append(
@@ -1456,19 +1394,16 @@ class Query(object):
         # Then, add the path to the query's joins. Note that we can't trim
         # joins at this stage - we will need the information about join type
         # of the trimmed joins.
-        for pos, join in enumerate(path):
+        for join in path:
             opts = join.to_opts
             if join.direct:
                 nullable = self.is_nullable(join.join_field)
             else:
                 nullable = True
-            connection = alias, opts.db_table, join.join_field.get_joining_columns()
+            connection = Join(opts.db_table, alias, None, INNER, join.join_field, nullable)
             reuse = can_reuse if join.m2m else None
-            alias = self.join(
-                connection, reuse=reuse, nullable=nullable, join_field=join.join_field)
+            alias = self.join(connection, reuse=reuse)
             joins.append(alias)
-        if hasattr(final_field, 'field'):
-            final_field = final_field.field
         return final_field, targets, opts, joins, path
 
     def trim_joins(self, targets, joins, path):
@@ -1497,6 +1432,32 @@ class Query(object):
             self.unref_alias(joins.pop())
         return targets, joins[-1], joins
 
+    def resolve_ref(self, name, allow_joins=True, reuse=None, summarize=False):
+        if not allow_joins and LOOKUP_SEP in name:
+            raise FieldError("Joined field references are not permitted in this query")
+        if name in self.annotations:
+            if summarize:
+                # Summarize currently means we are doing an aggregate() query
+                # which is executed as a wrapped subquery if any of the
+                # aggregate() elements reference an existing annotation. In
+                # that case we need to return a Ref to the subquery's annotation.
+                return Ref(name, self.annotation_select[name])
+            else:
+                return self.annotation_select[name]
+        else:
+            field_list = name.split(LOOKUP_SEP)
+            field, sources, opts, join_list, path = self.setup_joins(
+                field_list, self.get_meta(),
+                self.get_initial_alias(), reuse)
+            targets, _, join_list = self.trim_joins(sources, join_list, path)
+            if len(targets) > 1:
+                raise FieldError("Referencing multicolumn fields with F() objects "
+                                 "isn't supported")
+            if reuse is not None:
+                reuse.update(join_list)
+            col = targets[0].get_col(join_list[-1], sources[0])
+            return col
+
     def split_exclude(self, filter_expr, prefix, can_reuse, names_with_path):
         """
         When doing an exclude against any kind of N-to-many relation, we need
@@ -1523,27 +1484,30 @@ class Query(object):
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
         trimmed_prefix, contains_louter = query.trim_start(names_with_path)
-        query.remove_inherited_models()
 
         # Add extra check to make sure the selected field will not be null
         # since we are adding an IN <subquery> clause. This prevents the
         # database from tripping over IN (...,NULL,...) selects and returning
         # nothing
-        alias, col = query.select[0].col
-        if self.is_nullable(query.select[0].field):
-            lookup_class = query.select[0].field.get_lookup('isnull')
-            lookup = lookup_class(Col(alias, query.select[0].field, query.select[0].field), False)
+        col = query.select[0]
+        select_field = col.target
+        alias = col.alias
+        if self.is_nullable(select_field):
+            lookup_class = select_field.get_lookup('isnull')
+            lookup = lookup_class(select_field.get_col(alias), False)
             query.where.add(lookup, AND)
         if alias in can_reuse:
-            select_field = query.select[0].field
             pk = select_field.model._meta.pk
             # Need to add a restriction so that outer query's filters are in effect for
             # the subquery, too.
             query.bump_prefix(self)
             lookup_class = select_field.get_lookup('exact')
-            lookup = lookup_class(Col(query.select[0].col[0], pk, pk),
-                                  Col(alias, pk, pk))
+            # Note that the query.select[0].alias is different from alias
+            # due to bump_prefix above.
+            lookup = lookup_class(pk.get_col(query.select[0].alias),
+                                  pk.get_col(alias))
             query.where.add(lookup, AND)
+            query.external_aliases.add(alias)
 
         condition, needed_inner = self.build_filter(
             ('%s__in' % trimmed_prefix, query),
@@ -1562,11 +1526,10 @@ class Query(object):
         return condition, needed_inner
 
     def set_empty(self):
-        self.where = EmptyWhere()
-        self.having = EmptyWhere()
+        self.where.add(NothingNode(), AND)
 
     def is_empty(self):
-        return isinstance(self.where, EmptyWhere) or isinstance(self.having, EmptyWhere)
+        return any(isinstance(c, NothingNode) for c in self.where.children)
 
     def set_limits(self, low=None, high=None):
         """
@@ -1611,7 +1574,7 @@ class Query(object):
         self.default_cols = False
         self.select_related = False
         self.set_extra_mask(())
-        self.set_aggregate_mask(())
+        self.set_annotation_mask(())
 
     def clear_select_fields(self):
         """
@@ -1620,6 +1583,15 @@ class Query(object):
         columns.
         """
         self.select = []
+        self.values_select = []
+
+    def add_select(self, col):
+        self.default_cols = False
+        self.select.append(col)
+
+    def set_select(self, cols):
+        self.default_cols = False
+        self.select = cols
 
     def add_distinct_fields(self, *field_names):
         """
@@ -1644,7 +1616,7 @@ class Query(object):
                     name.split(LOOKUP_SEP), opts, alias, allow_many=allow_m2m)
                 targets, final_alias, joins = self.trim_joins(targets, joins, path)
                 for target in targets:
-                    self.select.append(SelectInfo((final_alias, target.column), target))
+                    self.add_select(target.get_col(final_alias))
         except MultiJoin:
             raise FieldError("Invalid field name: '%s'" % name)
         except FieldError:
@@ -1653,25 +1625,29 @@ class Query(object):
                 # from the model on which the lookup failed.
                 raise
             else:
-                names = sorted(opts.get_all_field_names() + list(self.extra)
-                               + list(self.aggregate_select))
+                names = sorted(list(get_field_names_from_opts(opts)) + list(self.extra)
+                               + list(self.annotation_select))
                 raise FieldError("Cannot resolve keyword %r into field. "
                                  "Choices are: %s" % (name, ", ".join(names)))
-        self.remove_inherited_models()
 
     def add_ordering(self, *ordering):
         """
         Adds items from the 'ordering' sequence to the query's "order by"
         clause. These items are either field names (not column names) --
-        possibly with a direction prefix ('-' or '?') -- or ordinals,
-        corresponding to column positions in the 'select' list.
+        possibly with a direction prefix ('-' or '?') -- or OrderBy
+        expressions.
 
         If 'ordering' is empty, all ordering is cleared from the query.
         """
         errors = []
         for item in ordering:
-            if not ORDER_PATTERN.match(item):
+            if not hasattr(item, 'resolve_expression') and not ORDER_PATTERN.match(item):
                 errors.append(item)
+            if getattr(item, 'contains_aggregate', False):
+                raise FieldError(
+                    'Using an aggregate in order_by() without also including '
+                    'it in annotate() is not allowed: %s' % item
+                )
         if errors:
             raise FieldError('Invalid order_by arguments: %s' % errors)
         if ordering:
@@ -1700,43 +1676,13 @@ class Query(object):
         """
         self.group_by = []
 
-        for col, _ in self.select:
+        for col in self.select:
             self.group_by.append(col)
 
-    def add_count_column(self):
-        """
-        Converts the query to do count(...) or count(distinct(pk)) in order to
-        get its size.
-        """
-        if not self.distinct:
-            if not self.select:
-                count = self.aggregates_module.Count('*', is_summary=True)
-            else:
-                assert len(self.select) == 1, \
-                    "Cannot add count col with multiple cols in 'select': %r" % self.select
-                count = self.aggregates_module.Count(self.select[0].col)
-        else:
-            opts = self.get_meta()
-            if not self.select:
-                count = self.aggregates_module.Count(
-                    (self.join((None, opts.db_table, None)), opts.pk.column),
-                    is_summary=True, distinct=True)
-            else:
-                # Because of SQL portability issues, multi-column, distinct
-                # counts need a sub-query -- see get_count() for details.
-                assert len(self.select) == 1, \
-                    "Cannot add count col with multiple cols in 'select'."
-
-                count = self.aggregates_module.Count(self.select[0].col, distinct=True)
-            # Distinct handling is done in Count(), so don't do it at this
-            # level.
-            self.distinct = False
-
-        # Set only aggregate to be the count column.
-        # Clear out the select cache to reflect the new unmasked aggregates.
-        self._aggregates = {None: count}
-        self.set_aggregate_mask(None)
-        self.group_by = None
+        if self.annotation_select:
+            for alias, annotation in six.iteritems(self.annotation_select):
+                for col in annotation.get_group_by_cols():
+                    self.group_by.append(col)
 
     def add_select_related(self, fields):
         """
@@ -1753,7 +1699,6 @@ class Query(object):
             for part in field.split(LOOKUP_SEP):
                 d = d.setdefault(part, {})
         self.select_related = field_dict
-        self.related_select_cols = []
 
     def add_extra(self, select, select_params, where, params, tables, order_by):
         """
@@ -1861,19 +1806,31 @@ class Query(object):
         """
         Callback used by get_deferred_field_names().
         """
-        target[model] = set(f.name for f in fields)
+        target[model] = {f.attname for f in fields}
 
     def set_aggregate_mask(self, names):
-        "Set the mask of aggregates that will actually be returned by the SELECT"
+        warnings.warn(
+            "set_aggregate_mask() is deprecated. Use set_annotation_mask() instead.",
+            RemovedInDjango110Warning, stacklevel=2)
+        self.set_annotation_mask(names)
+
+    def set_annotation_mask(self, names):
+        "Set the mask of annotations that will actually be returned by the SELECT"
         if names is None:
-            self.aggregate_select_mask = None
+            self.annotation_select_mask = None
         else:
-            self.aggregate_select_mask = set(names)
-        self._aggregate_select_cache = None
+            self.annotation_select_mask = set(names)
+        self._annotation_select_cache = None
 
     def append_aggregate_mask(self, names):
-        if self.aggregate_select_mask is not None:
-            self.set_aggregate_mask(set(names).union(self.aggregate_select_mask))
+        warnings.warn(
+            "append_aggregate_mask() is deprecated. Use append_annotation_mask() instead.",
+            RemovedInDjango110Warning, stacklevel=2)
+        self.append_annotation_mask(names)
+
+    def append_annotation_mask(self, names):
+        if self.annotation_select_mask is not None:
+            self.set_annotation_mask(set(names).union(self.annotation_select_mask))
 
     def set_extra_mask(self, names):
         """
@@ -1888,24 +1845,31 @@ class Query(object):
         self._extra_select_cache = None
 
     @property
-    def aggregate_select(self):
+    def annotation_select(self):
         """The OrderedDict of aggregate columns that are not masked, and should
         be used in the SELECT clause.
 
         This result is cached for optimization purposes.
         """
-        if self._aggregate_select_cache is not None:
-            return self._aggregate_select_cache
-        elif not self._aggregates:
+        if self._annotation_select_cache is not None:
+            return self._annotation_select_cache
+        elif not self._annotations:
             return {}
-        elif self.aggregate_select_mask is not None:
-            self._aggregate_select_cache = OrderedDict(
-                (k, v) for k, v in self.aggregates.items()
-                if k in self.aggregate_select_mask
+        elif self.annotation_select_mask is not None:
+            self._annotation_select_cache = OrderedDict(
+                (k, v) for k, v in self.annotations.items()
+                if k in self.annotation_select_mask
             )
-            return self._aggregate_select_cache
+            return self._annotation_select_cache
         else:
-            return self.aggregates
+            return self.annotations
+
+    @property
+    def aggregate_select(self):
+        warnings.warn(
+            "aggregate_select() is deprecated. Use annotation_select() instead.",
+            RemovedInDjango110Warning, stacklevel=2)
+        return self.annotation_select
 
     @property
     def extra_select(self):
@@ -1946,9 +1910,10 @@ class Query(object):
         for trimmed_paths, path in enumerate(all_paths):
             if path.m2m:
                 break
-            if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type == self.LOUTER:
+            if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type == LOUTER:
                 contains_louter = True
-            self.unref_alias(lookup_tables[trimmed_paths])
+            alias = lookup_tables[trimmed_paths]
+            self.unref_alias(alias)
         # The path.join_field is a Rel, lets get the other side's field
         join_field = path.join_field.field
         # Build the filter prefix.
@@ -1965,7 +1930,7 @@ class Query(object):
         # Lets still see if we can trim the first join from the inner query
         # (that is, self). We can't do this for LEFT JOINs because we would
         # miss those rows that have nothing on the outer side.
-        if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != self.LOUTER:
+        if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != LOUTER:
             select_fields = [r[0] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths + 1]
             self.unref_alias(lookup_tables[trimmed_paths])
@@ -1979,7 +1944,13 @@ class Query(object):
             # values in select_fields. Lets punt this one for now.
             select_fields = [r[1] for r in join_field.related_fields]
             select_alias = lookup_tables[trimmed_paths]
-        self.select = [SelectInfo((select_alias, f.column), f) for f in select_fields]
+        # The found starting point is likely a Join instead of a BaseTable reference.
+        # But the first entry in the query's FROM clause must not be a JOIN.
+        for table in self.tables:
+            if self.alias_refcount[table] > 0:
+                self.alias_map[table] = BaseTable(self.alias_map[table].table_name, table)
+                break
+        self.set_select([f.get_col(select_alias) for f in select_fields])
         return trimmed_prefix, contains_louter
 
     def is_nullable(self, field):
@@ -2032,18 +2003,7 @@ def is_reverse_o2o(field):
     A little helper to check if the given field is reverse-o2o. The field is
     expected to be some sort of relation field or related object.
     """
-    return not hasattr(field, 'rel') and field.field.unique
-
-
-def alias_diff(refcounts_before, refcounts_after):
-    """
-    Given the before and after copies of refcounts works out which aliases
-    have been added to the after copy.
-    """
-    # Use -1 as default value so that any join that is created, then trimmed
-    # is seen as added.
-    return set(t for t in refcounts_after
-               if refcounts_after[t] > refcounts_before.get(t, -1))
+    return field.is_relation and field.one_to_one and not field.concrete
 
 
 class JoinPromoter(object):

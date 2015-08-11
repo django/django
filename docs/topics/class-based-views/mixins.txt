@@ -206,7 +206,7 @@ the box.
     course, you can always dip into Django's implementation of the generic
     class based views for inspiration on how to tackle problems.)
 
-.. _method resolution order: http://www.python.org/download/releases/2.3/mro/
+.. _method resolution order: https://www.python.org/download/releases/2.3/mro/
 
 
 Using SingleObjectMixin with View
@@ -421,7 +421,7 @@ that we're heavily invested in `REST`_, so we want to use the same URL for
 displaying the author as for capturing the message from the
 user. Let's rewrite our ``AuthorDetailView`` to do that.
 
-.. _REST: http://en.wikipedia.org/wiki/Representational_state_transfer
+.. _REST: https://en.wikipedia.org/wiki/Representational_state_transfer
 
 We'll keep the ``GET`` handling from :class:`DetailView`, although
 we'll have to add a :class:`~django.forms.Form` into the context data so we can
@@ -463,16 +463,14 @@ Our new ``AuthorDetail`` looks like this::
 
         def get_context_data(self, **kwargs):
             context = super(AuthorDetail, self).get_context_data(**kwargs)
-            form_class = self.get_form_class()
-            context['form'] = self.get_form(form_class)
+            context['form'] = self.get_form()
             return context
 
         def post(self, request, *args, **kwargs):
             if not request.user.is_authenticated():
                 return HttpResponseForbidden()
             self.object = self.get_object()
-            form_class = self.get_form_class()
-            form = self.get_form(form_class)
+            form = self.get_form()
             if form.is_valid():
                 return self.form_valid(form)
             else:

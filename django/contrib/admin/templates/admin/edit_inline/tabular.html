@@ -74,11 +74,10 @@
 <script type="text/javascript">
 
 (function($) {
-  $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr").tabularFormset({
-    prefix: "{{ inline_admin_formset.formset.prefix }}",
-    adminStaticPrefix: '{% static "admin/" %}',
-    addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|capfirst as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
-    deleteText: "{% trans 'Remove' %}"
+  $("#{{ inline_admin_formset.formset.prefix|escapejs }}-group .tabular.inline-related tbody tr").tabularFormset({
+    prefix: "{{ inline_admin_formset.formset.prefix|escapejs }}",
+    addText: "{% filter escapejs %}{% blocktrans with inline_admin_formset.opts.verbose_name|capfirst as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}{% endfilter %}",
+    deleteText: "{% filter escapejs %}{% trans 'Remove' %}{% endfilter %}"
   });
 })(django.jQuery);
 </script>

@@ -1,9 +1,9 @@
 import copy
 import inspect
+from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
-from django.db.models.fields import FieldDoesNotExist
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
@@ -15,22 +15,16 @@ def ensure_default_manager(cls):
     points to a plain Manager instance (which could be the same as
     _default_manager if it's not a subclass of Manager).
     """
-    if cls._meta.abstract:
-        setattr(cls, 'objects', AbstractManagerDescriptor(cls))
-        return
-    elif cls._meta.swapped:
+    if cls._meta.swapped:
         setattr(cls, 'objects', SwappedManagerDescriptor(cls))
         return
     if not getattr(cls, '_default_manager', None):
-        # Create the default manager, if needed.
-        try:
-            cls._meta.get_field('objects')
+        if any(f.name == 'objects' for f in cls._meta.fields):
             raise ValueError(
                 "Model %s must specify a custom Manager, because it has a "
                 "field named 'objects'" % cls.__name__
             )
-        except FieldDoesNotExist:
-            pass
+        # Create the default manager, if needed.
         cls.add_to_class('objects', Manager())
         cls._base_manager = cls.objects
     elif not getattr(cls, '_base_manager', None):
@@ -58,23 +52,65 @@ class BaseManager(object):
     # Tracks each time a Manager instance is created. Used to retain order.
     creation_counter = 0
 
+    #: If set to True the manager will be serialized into migrations and will
+    #: thus be available in e.g. RunPython operations
+    use_in_migrations = False
+
+    def __new__(cls, *args, **kwargs):
+        # We capture the arguments to make returning them trivial
+        obj = super(BaseManager, cls).__new__(cls)
+        obj._constructor_args = (args, kwargs)
+        return obj
+
     def __init__(self):
         super(BaseManager, self).__init__()
         self._set_creation_counter()
         self.model = None
+        self.name = None
         self._inherited = False
         self._db = None
         self._hints = {}
 
     def __str__(self):
         """ Return "app_label.model_label.manager_name". """
-        model = self.model
-        opts = model._meta
-        app = model._meta.app_label
-        manager_name = next(name for (_, name, manager)
-            in opts.concrete_managers + opts.abstract_managers
-            if manager == self)
-        return '%s.%s.%s' % (app, model._meta.object_name, manager_name)
+        return '%s.%s' % (self.model._meta.label, self.name)
+
+    def deconstruct(self):
+        """
+        Returns a 5-tuple of the form (as_manager (True), manager_class,
+        queryset_class, args, kwargs).
+
+        Raises a ValueError if the manager is dynamically generated.
+        """
+        qs_class = self._queryset_class
+        if getattr(self, '_built_with_as_manager', False):
+            # using MyQuerySet.as_manager()
+            return (
+                True,  # as_manager
+                None,  # manager_class
+                '%s.%s' % (qs_class.__module__, qs_class.__name__),  # qs_class
+                None,  # args
+                None,  # kwargs
+            )
+        else:
+            module_name = self.__module__
+            name = self.__class__.__name__
+            # Make sure it's actually there and not an inner class
+            module = import_module(module_name)
+            if not hasattr(module, name):
+                raise ValueError(
+                    "Could not find manager %s in %s.\n"
+                    "Please note that you need to inherit from managers you "
+                    "dynamically generated with 'from_queryset()'."
+                    % (name, module_name)
+                )
+            return (
+                False,  # as_manager
+                '%s.%s' % (module_name, name),  # manager_class
+                None,  # qs_class
+                self._constructor_args[0],  # args
+                self._constructor_args[1],  # kwargs
+            )
 
     def check(self, **kwargs):
         return []
@@ -116,6 +152,8 @@ class BaseManager(object):
     def contribute_to_class(self, model, name):
         # TODO: Use weakref because of possible memory leak / circular reference.
         self.model = model
+        if not self.name:
+            self.name = name
         # Only contribute the manager if the model is concrete
         if model._meta.abstract:
             setattr(model, name, AbstractManagerDescriptor(model))
@@ -127,12 +165,11 @@ class BaseManager(object):
         if (not getattr(model, '_default_manager', None) or
                 self.creation_counter < model._default_manager.creation_counter):
             model._default_manager = self
+
+        abstract = False
         if model._meta.abstract or (self._inherited and not self.model._meta.proxy):
-            model._meta.abstract_managers.append((self.creation_counter, name,
-                    self))
-        else:
-            model._meta.concrete_managers.append((self.creation_counter, name,
-                self))
+            abstract = True
+        model._meta.managers.append((self.creation_counter, self, abstract))
 
     def _set_creation_counter(self):
         """
@@ -174,7 +211,7 @@ class BaseManager(object):
         Returns a new QuerySet object.  Subclasses can override this method to
         easily customize the behavior of the Manager.
         """
-        return self._queryset_class(self.model, using=self._db, hints=self._hints)
+        return self._queryset_class(model=self.model, using=self._db, hints=self._hints)
 
     def all(self):
         # We can't proxy this method through the `QuerySet` like we do for the
@@ -184,6 +221,18 @@ class BaseManager(object):
         # implementation of `RelatedManager.get_queryset()` for a better
         # understanding of how this comes into play.
         return self.get_queryset()
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, self.__class__) and
+            self._constructor_args == other._constructor_args
+        )
+
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __hash__(self):
+        return id(self)
 
 
 class Manager(BaseManager.from_queryset(QuerySet)):
@@ -221,9 +270,13 @@ class SwappedManagerDescriptor(object):
         self.model = model
 
     def __get__(self, instance, type=None):
-        raise AttributeError("Manager isn't available; %s has been swapped for '%s'" % (
-            self.model._meta.object_name, self.model._meta.swapped
-        ))
+        raise AttributeError(
+            "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
+                self.model._meta.app_label,
+                self.model._meta.object_name,
+                self.model._meta.swapped,
+            )
+        )
 
 
 class EmptyManager(Manager):

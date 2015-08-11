@@ -1,9 +1,9 @@
-from django.test import TestCase, override_settings, Client
+from django.test import Client, SimpleTestCase, override_settings
 from django.utils.translation import override
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
-class CsrfViewTests(TestCase):
+class CsrfViewTests(SimpleTestCase):
 
     def setUp(self):
         super(CsrfViewTests, self).setUp()
@@ -11,17 +11,16 @@ class CsrfViewTests(TestCase):
 
     @override_settings(
         USE_I18N=True,
-        MIDDLEWARE_CLASSES=(
+        MIDDLEWARE_CLASSES=[
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.common.CommonMiddleware',
             'django.middleware.csrf.CsrfViewMiddleware',
-        ),
+        ],
     )
     def test_translation(self):
         """
         Test that an invalid request is rejected with a localized error message.
         """
-
         response = self.client.post('/')
         self.assertContains(response, "Forbidden", status_code=403)
         self.assertContains(response,
@@ -63,3 +62,15 @@ class CsrfViewTests(TestCase):
                             "ensure that your browser is not being hijacked "
                             "by third parties.",
                             status_code=403)
+
+    # In Django 1.10, this can be changed to TEMPLATES=[] because the code path
+    # that reads the TEMPLATE_* settings in that case will have been removed.
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
+    }])
+    def test_no_django_template_engine(self):
+        """
+        The CSRF view doesn't depend on the TEMPLATES configuration (#24388).
+        """
+        response = self.client.post('/')
+        self.assertContains(response, "Forbidden", status_code=403)

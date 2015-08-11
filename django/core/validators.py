@@ -3,13 +3,12 @@ from __future__ import unicode_literals
 import re
 
 from django.core.exceptions import ValidationError
+from django.utils import six
 from django.utils.deconstruct import deconstructible
-from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 from django.utils.encoding import force_text
 from django.utils.ipv6 import is_valid_ipv6_address
-from django.utils import six
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
-
+from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
@@ -66,14 +65,25 @@ class RegexValidator(object):
 
 @deconstructible
 class URLValidator(RegexValidator):
+    ul = '\u00a1-\uffff'  # unicode letters range (must be a unicode string, not a raw string)
+
+    # IP patterns
+    ipv4_re = r'(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}'
+    ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
+
+    # Host patterns
+    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
+    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]*(?<!-))*'
+    tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
+    host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
+
     regex = re.compile(
         r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}(?<!-)\.?)|'  # domain...
-        r'localhost|'  # localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|'  # ...or ipv4
-        r'\[?[A-F0-9]*:[A-F0-9:]+\]?)'  # ...or ipv6
-        r'(?::\d+)?'  # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
+        r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
+        r'(?::\d{2,5})?'  # port
+        r'(?:[/?#][^\s]*)?'  # resource path
+        r'\Z', re.IGNORECASE)
     message = _('Enter a valid URL.')
     schemes = ['http', 'https', 'ftp', 'ftps']
 
@@ -105,14 +115,25 @@ class URLValidator(RegexValidator):
             else:
                 raise
         else:
+            # Now verify IPv6 in the netloc part
+            host_match = re.search(r'^\[(.+)\](?::\d{2,5})?$', urlsplit(value).netloc)
+            if host_match:
+                potential_ip = host_match.groups()[0]
+                try:
+                    validate_ipv6_address(potential_ip)
+                except ValidationError:
+                    raise ValidationError(self.message, code=self.code)
             url = value
+
+integer_validator = RegexValidator(
+    re.compile('^-?\d+\Z'),
+    message=_('Enter a valid integer.'),
+    code='invalid',
+)
 
 
 def validate_integer(value):
-    try:
-        int(value)
-    except (ValueError, TypeError):
-        raise ValidationError(_('Enter a valid integer.'), code='invalid')
+    return integer_validator(value)
 
 
 @deconstructible
@@ -120,17 +141,16 @@ class EmailValidator(object):
     message = _('Enter a valid email address.')
     code = 'invalid'
     user_regex = re.compile(
-        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*$"  # dot-atom
-        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"$)',  # quoted-string
+        r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
+        r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
         re.IGNORECASE)
     domain_regex = re.compile(
-        # max length of the domain is 249: 254 (max email length) minus one
-        # period, two characters for the TLD, @ sign, & one character before @.
-        r'(?:[A-Z0-9](?:[A-Z0-9-]{0,247}[A-Z0-9])?\.)+(?:[A-Z]{2,6}|[A-Z0-9-]{2,}(?<!-))$',
+        # max length for domain name labels is 63 characters per RFC 1034
+        r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
         re.IGNORECASE)
     literal_regex = re.compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
-        r'\[([A-f0-9:\.]+)\]$',
+        r'\[([A-f0-9:\.]+)\]\Z',
         re.IGNORECASE)
     domain_whitelist = ['localhost']
 
@@ -188,14 +208,21 @@ class EmailValidator(object):
 
 validate_email = EmailValidator()
 
-slug_re = re.compile(r'^[-a-zA-Z0-9_]+$')
+slug_re = re.compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
     'invalid'
 )
 
-ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}$')
+slug_unicode_re = re.compile(r'^[-\w]+\Z', re.U)
+validate_unicode_slug = RegexValidator(
+    slug_unicode_re,
+    _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
+    'invalid'
+)
+
+ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\Z')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
 
 
@@ -236,11 +263,14 @@ def ip_address_validators(protocol, unpack_ipv4):
         raise ValueError("The protocol '%s' is unknown. Supported: %s"
                          % (protocol, list(ip_address_validator_map)))
 
-comma_separated_int_list_re = re.compile('^[\d,]+$')
-validate_comma_separated_integer_list = RegexValidator(
-    comma_separated_int_list_re,
-    _('Enter only digits separated by commas.'),
-    'invalid'
+
+def int_list_validator(sep=',', message=None, code='invalid'):
+    regexp = re.compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
+    return RegexValidator(regexp, message=message, code=code)
+
+
+validate_comma_separated_integer_list = int_list_validator(
+    message=_('Enter only digits separated by commas.'),
 )
 
 

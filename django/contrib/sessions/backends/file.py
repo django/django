@@ -6,12 +6,13 @@ import shutil
 import tempfile
 
 from django.conf import settings
-from django.contrib.sessions.backends.base import SessionBase, CreateError, VALID_KEY_CHARS
-from django.core.exceptions import SuspiciousOperation, ImproperlyConfigured
+from django.contrib.sessions.backends.base import (
+    VALID_KEY_CHARS, CreateError, SessionBase,
+)
+from django.contrib.sessions.exceptions import InvalidSessionKey
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils import timezone
 from django.utils.encoding import force_text
-
-from django.contrib.sessions.exceptions import InvalidSessionKey
 
 
 class SessionStore(SessionBase):
@@ -96,7 +97,7 @@ class SessionStore(SessionBase):
                     self.delete()
                     self.create()
         except (IOError, SuspiciousOperation):
-            self.create()
+            self._session_key = None
         return session_data
 
     def create(self):
@@ -107,10 +108,11 @@ class SessionStore(SessionBase):
             except CreateError:
                 continue
             self.modified = True
-            self._session_cache = {}
             return
 
     def save(self, must_create=False):
+        if self.session_key is None:
+            return self.create()
         # Get the session data now, before we start messing
         # with the file it is stored within.
         session_data = self._get_session(no_load=must_create)

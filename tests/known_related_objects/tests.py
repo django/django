@@ -2,21 +2,32 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from .models import Tournament, Organiser, Pool, PoolStyle
+from .models import Organiser, Pool, PoolStyle, Tournament
 
 
 class ExistingRelatedInstancesTests(TestCase):
-    fixtures = ['tournament.json']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.t1 = Tournament.objects.create(name='Tourney 1')
+        cls.t2 = Tournament.objects.create(name='Tourney 2')
+        cls.o1 = Organiser.objects.create(name='Organiser 1')
+        cls.p1 = Pool.objects.create(name='T1 Pool 1', tournament=cls.t1, organiser=cls.o1)
+        cls.p2 = Pool.objects.create(name='T1 Pool 2', tournament=cls.t1, organiser=cls.o1)
+        cls.p3 = Pool.objects.create(name='T2 Pool 1', tournament=cls.t2, organiser=cls.o1)
+        cls.p4 = Pool.objects.create(name='T2 Pool 2', tournament=cls.t2, organiser=cls.o1)
+        cls.ps1 = PoolStyle.objects.create(name='T1 Pool 2 Style', pool=cls.p2)
+        cls.ps2 = PoolStyle.objects.create(name='T2 Pool 1 Style', pool=cls.p3)
 
     def test_foreign_key(self):
         with self.assertNumQueries(2):
-            tournament = Tournament.objects.get(pk=1)
+            tournament = Tournament.objects.get(pk=self.t1.pk)
             pool = tournament.pool_set.all()[0]
             self.assertIs(tournament, pool.tournament)
 
     def test_foreign_key_prefetch_related(self):
         with self.assertNumQueries(2):
-            tournament = (Tournament.objects.prefetch_related('pool_set').get(pk=1))
+            tournament = (Tournament.objects.prefetch_related('pool_set').get(pk=self.t1.pk))
             pool = tournament.pool_set.all()[0]
             self.assertIs(tournament, pool.tournament)
 
@@ -29,54 +40,54 @@ class ExistingRelatedInstancesTests(TestCase):
             self.assertIs(tournaments[1], pool2.tournament)
 
     def test_queryset_or(self):
-        tournament_1 = Tournament.objects.get(pk=1)
-        tournament_2 = Tournament.objects.get(pk=2)
+        tournament_1 = self.t1
+        tournament_2 = self.t2
         with self.assertNumQueries(1):
             pools = tournament_1.pool_set.all() | tournament_2.pool_set.all()
             related_objects = set(pool.tournament for pool in pools)
             self.assertEqual(related_objects, {tournament_1, tournament_2})
 
     def test_queryset_or_different_cached_items(self):
-        tournament = Tournament.objects.get(pk=1)
-        organiser = Organiser.objects.get(pk=1)
+        tournament = self.t1
+        organiser = self.o1
         with self.assertNumQueries(1):
             pools = tournament.pool_set.all() | organiser.pool_set.all()
-            first = pools.filter(pk=1)[0]
+            first = pools.filter(pk=self.p1.pk)[0]
             self.assertIs(first.tournament, tournament)
             self.assertIs(first.organiser, organiser)
 
     def test_queryset_or_only_one_with_precache(self):
-        tournament_1 = Tournament.objects.get(pk=1)
-        tournament_2 = Tournament.objects.get(pk=2)
-        # 2 queries here as pool id 3 has tournament 2, which is not cached
+        tournament_1 = self.t1
+        tournament_2 = self.t2
+        # 2 queries here as pool 3 has tournament 2, which is not cached
         with self.assertNumQueries(2):
-            pools = tournament_1.pool_set.all() | Pool.objects.filter(pk=3)
+            pools = tournament_1.pool_set.all() | Pool.objects.filter(pk=self.p3.pk)
             related_objects = set(pool.tournament for pool in pools)
             self.assertEqual(related_objects, {tournament_1, tournament_2})
         # and the other direction
         with self.assertNumQueries(2):
-            pools = Pool.objects.filter(pk=3) | tournament_1.pool_set.all()
+            pools = Pool.objects.filter(pk=self.p3.pk) | tournament_1.pool_set.all()
             related_objects = set(pool.tournament for pool in pools)
             self.assertEqual(related_objects, {tournament_1, tournament_2})
 
     def test_queryset_and(self):
-        tournament = Tournament.objects.get(pk=1)
-        organiser = Organiser.objects.get(pk=1)
+        tournament = self.t1
+        organiser = self.o1
         with self.assertNumQueries(1):
             pools = tournament.pool_set.all() & organiser.pool_set.all()
-            first = pools.filter(pk=1)[0]
+            first = pools.filter(pk=self.p1.pk)[0]
             self.assertIs(first.tournament, tournament)
             self.assertIs(first.organiser, organiser)
 
     def test_one_to_one(self):
         with self.assertNumQueries(2):
-            style = PoolStyle.objects.get(pk=1)
+            style = PoolStyle.objects.get(pk=self.ps1.pk)
             pool = style.pool
             self.assertIs(style, pool.poolstyle)
 
     def test_one_to_one_select_related(self):
         with self.assertNumQueries(1):
-            style = PoolStyle.objects.select_related('pool').get(pk=1)
+            style = PoolStyle.objects.select_related('pool').get(pk=self.ps1.pk)
             pool = style.pool
             self.assertIs(style, pool.poolstyle)
 
@@ -88,7 +99,7 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_one_to_one_prefetch_related(self):
         with self.assertNumQueries(2):
-            style = PoolStyle.objects.prefetch_related('pool').get(pk=1)
+            style = PoolStyle.objects.prefetch_related('pool').get(pk=self.ps1.pk)
             pool = style.pool
             self.assertIs(style, pool.poolstyle)
 
@@ -100,19 +111,19 @@ class ExistingRelatedInstancesTests(TestCase):
 
     def test_reverse_one_to_one(self):
         with self.assertNumQueries(2):
-            pool = Pool.objects.get(pk=2)
+            pool = Pool.objects.get(pk=self.p2.pk)
             style = pool.poolstyle
             self.assertIs(pool, style.pool)
 
     def test_reverse_one_to_one_select_related(self):
         with self.assertNumQueries(1):
-            pool = Pool.objects.select_related('poolstyle').get(pk=2)
+            pool = Pool.objects.select_related('poolstyle').get(pk=self.p2.pk)
             style = pool.poolstyle
             self.assertIs(pool, style.pool)
 
     def test_reverse_one_to_one_prefetch_related(self):
         with self.assertNumQueries(2):
-            pool = Pool.objects.prefetch_related('poolstyle').get(pk=2)
+            pool = Pool.objects.prefetch_related('poolstyle').get(pk=self.p2.pk)
             style = pool.poolstyle
             self.assertIs(pool, style.pool)
 

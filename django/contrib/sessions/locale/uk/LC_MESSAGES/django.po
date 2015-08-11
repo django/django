@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-11-02 20:28+0000\n"
+"Last-Translator: Mykola Zamkovoi <nickzam@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
-msgstr ""
+msgstr "Сесії"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "ключ сесії"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "дані сесії"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "термін придатності"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "сесія"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "сесії"

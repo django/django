@@ -173,29 +173,6 @@ that inherits from ``View`` - for example, trying to use a form at the top of a
 list and combining :class:`~django.views.generic.edit.ProcessFormView` and
 :class:`~django.views.generic.list.ListView` - won't work as expected.
 
-.. _mixins_that_wrap_as_view:
-
-Mixins that wrap ``as_view()``
-------------------------------
-
-One way to apply common behavior to many classes is to write a mixin that wraps
-the :meth:`~django.views.generic.base.View.as_view()` method.
-
-For example, if you have many generic views that should be decorated with
-:func:`~django.contrib.auth.decorators.login_required` you could implement a
-mixin like this::
-
-    from django.contrib.auth.decorators import login_required
-
-    class LoginRequiredMixin(object):
-        @classmethod
-        def as_view(cls, **initkwargs):
-            view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
-            return login_required(view)
-
-    class MyView(LoginRequiredMixin, ...):
-        # this is a generic view
-        ...
 
 Handling forms with class-based views
 =====================================
@@ -251,10 +228,9 @@ more of the methods (or both!).
 Decorating class-based views
 ============================
 
-The extension of class-based views isn't limited to using mixins. You
-can use also use decorators. Since class-based views aren't functions,
-decorating them works differently depending on if you're using ``as_view`` or
-creating a subclass.
+The extension of class-based views isn't limited to using mixins. You can also
+use decorators. Since class-based views aren't functions, decorating them works
+differently depending on if you're using ``as_view()`` or creating a subclass.
 
 Decorating in URLconf
 ---------------------
@@ -303,8 +279,18 @@ that it can be used on an instance method. For example::
         def dispatch(self, *args, **kwargs):
             return super(ProtectedView, self).dispatch(*args, **kwargs)
 
-In this example, every instance of ``ProtectedView`` will have
-login protection.
+Or, more succinctly, you can decorate the class instead and pass the name
+of the method to be decorated as the keyword argument ``name``::
+
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+.. versionchanged:: 1.9
+
+    The ability to use ``method_decorator()`` on a class was added.
+
+In this example, every instance of ``ProtectedView`` will have login protection.
 
 .. note::
 

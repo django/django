@@ -6,21 +6,15 @@ import logging
 import sys
 from io import BytesIO
 from threading import Lock
-import warnings
 
 from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
 from django.core.urlresolvers import set_script_prefix
-from django.utils import datastructures
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property
-from django.utils import six
-
-# For backwards compatibility -- lots of code uses this in the wild!
-from django.http.response import REASON_PHRASES as STATUS_CODE_TEXT  # NOQA
 
 logger = logging.getLogger('django.request')
 
@@ -121,13 +115,6 @@ class WSGIRequest(http.HttpRequest):
     def _get_scheme(self):
         return self.environ.get('wsgi.url_scheme')
 
-    def _get_request(self):
-        warnings.warn('`request.REQUEST` is deprecated, use `request.GET` or '
-                      '`request.POST` instead.', RemovedInDjango19Warning, 2)
-        if not hasattr(self, '_request'):
-            self._request = datastructures.MergeDict(self.POST, self.GET)
-        return self._request
-
     @cached_property
     def GET(self):
         # The WSGI spec says 'QUERY_STRING' may be absent.
@@ -154,7 +141,6 @@ class WSGIRequest(http.HttpRequest):
 
     POST = property(_get_post, _set_post)
     FILES = property(_get_files)
-    REQUEST = property(_get_request)
 
 
 class WSGIHandler(base.BaseHandler):
@@ -197,6 +183,8 @@ class WSGIHandler(base.BaseHandler):
         for c in response.cookies.values():
             response_headers.append((str('Set-Cookie'), str(c.output(header=''))))
         start_response(force_str(status), response_headers)
+        if getattr(response, 'file_to_stream', None) is not None and environ.get('wsgi.file_wrapper'):
+            response = environ['wsgi.file_wrapper'](response.file_to_stream)
         return response
 
 
@@ -206,7 +194,6 @@ def get_path_info(environ):
     """
     path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '/')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return path_info.decode(UTF_8)
 
 
@@ -232,11 +219,10 @@ def get_script_name(environ):
 
     if script_url:
         path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
-        script_name = script_url[:-len(path_info)]
+        script_name = script_url[:-len(path_info)] if path_info else script_url
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 
-    # It'd be better to implement URI-to-IRI decoding, see #19508.
     return script_name.decode(UTF_8)
 
 
@@ -251,16 +237,15 @@ def get_bytes_from_wsgi(environ, key, default):
     # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
     # decoded with ISO-8859-1. This is wrong for Django websites where UTF-8
     # is the default. Re-encode to recover the original bytestring.
-    return value if six.PY2 else value.encode(ISO_8859_1)
+    return value.encode(ISO_8859_1) if six.PY3 else value
 
 
 def get_str_from_wsgi(environ, key, default):
     """
-    Get a value from the WSGI environ dictionary as bytes.
+    Get a value from the WSGI environ dictionary as str.
 
     key and default should be str objects. Under Python 2 they may also be
     unicode objects provided they only contain ASCII characters.
     """
-    value = environ.get(str(key), str(default))
-    # Same comment as above
-    return value if six.PY2 else value.encode(ISO_8859_1).decode(UTF_8)
+    value = get_bytes_from_wsgi(environ, key, default)
+    return value.decode(UTF_8, errors='replace') if six.PY3 else value

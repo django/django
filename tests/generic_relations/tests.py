@@ -4,14 +4,16 @@ from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
+from django.db import IntegrityError
 from django.db.models import Q
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
-from .models import (TaggedItem, ValuableTaggedItem, Comparison, Animal,
-                     Vegetable, Mineral, Gecko, Rock, ManualPK,
-                     ForProxyModelModel, ForConcreteModelModel,
-                     ProxyRelatedModel, ConcreteRelatedModel, AllowsNullGFK)
+from .models import (
+    AllowsNullGFK, Animal, Comparison, ConcreteRelatedModel,
+    ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
+    ProxyRelatedModel, Rock, TaggedItem, ValuableTaggedItem, Vegetable,
+)
 
 
 class GenericRelationsTests(TestCase):
@@ -34,6 +36,53 @@ class GenericRelationsTests(TestCase):
         self.comp_func = lambda obj: (
             obj.tag, obj.content_type.model_class(), obj.object_id
         )
+
+    def test_generic_update_or_create_when_created(self):
+        """
+        Should be able to use update_or_create from the generic related manager
+        to create a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag, created = self.bacon.tags.update_or_create(tag='stinky')
+        self.assertTrue(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+
+    def test_generic_update_or_create_when_updated(self):
+        """
+        Should be able to use update_or_create from the generic related manager
+        to update a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag = self.bacon.tags.create(tag='stinky')
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        tag, created = self.bacon.tags.update_or_create(defaults={'tag': 'juicy'}, id=tag.id)
+        self.assertFalse(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        self.assertEqual(tag.tag, 'juicy')
+
+    def test_generic_get_or_create_when_created(self):
+        """
+        Should be able to use get_or_create from the generic related manager
+        to create a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag, created = self.bacon.tags.get_or_create(tag='stinky')
+        self.assertTrue(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+
+    def test_generic_get_or_create_when_exists(self):
+        """
+        Should be able to use get_or_create from the generic related manager
+        to get a tag. Refs #23611.
+        """
+        count = self.bacon.tags.count()
+        tag = self.bacon.tags.create(tag="stinky")
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        tag, created = self.bacon.tags.get_or_create(id=tag.id, defaults={'tag': 'juicy'})
+        self.assertFalse(created)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        # shouldn't had changed the tag
+        self.assertEqual(tag.tag, 'stinky')
 
     def test_generic_relations_m2m_mimic(self):
         """
@@ -199,6 +248,84 @@ class GenericRelationsTests(TestCase):
             self.comp_func
         )
 
+    def test_add_bulk(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        t1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        t2 = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        # One update() query.
+        with self.assertNumQueries(1):
+            bacon.tags.add(t1, t2)
+        self.assertEqual(t1.content_object, bacon)
+        self.assertEqual(t2.content_object, bacon)
+
+    def test_add_bulk_false(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        t1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        t2 = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        # One save() for each object.
+        with self.assertNumQueries(2):
+            bacon.tags.add(t1, t2, bulk=False)
+        self.assertEqual(t1.content_object, bacon)
+        self.assertEqual(t2.content_object, bacon)
+
+    def test_add_rejects_unsaved_objects(self):
+        t1 = TaggedItem(content_object=self.quartz, tag="shiny")
+        msg = "<TaggedItem: shiny> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.bacon.tags.add(t1)
+
+    def test_set(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        fatty = bacon.tags.create(tag="fatty")
+        salty = bacon.tags.create(tag="salty")
+
+        bacon.tags.set([fatty, salty])
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+            "<TaggedItem: salty>",
+        ])
+
+        bacon.tags.set([fatty])
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+        ])
+
+        bacon.tags.set([])
+        self.assertQuerysetEqual(bacon.tags.all(), [])
+
+        bacon.tags.set([fatty, salty], bulk=False, clear=True)
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+            "<TaggedItem: salty>",
+        ])
+
+        bacon.tags.set([fatty], bulk=False, clear=True)
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+        ])
+
+        bacon.tags.set([], clear=True)
+        self.assertQuerysetEqual(bacon.tags.all(), [])
+
+    def test_assign(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        fatty = bacon.tags.create(tag="fatty")
+        salty = bacon.tags.create(tag="salty")
+
+        bacon.tags = [fatty, salty]
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+            "<TaggedItem: salty>",
+        ])
+
+        bacon.tags = [fatty]
+        self.assertQuerysetEqual(bacon.tags.all(), [
+            "<TaggedItem: fatty>",
+        ])
+
+        bacon.tags = []
+        self.assertQuerysetEqual(bacon.tags.all(), [])
+
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse GFK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
@@ -356,8 +483,18 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(tag.content_object.id, diamond.id)
 
     def test_query_content_type(self):
-        with six.assertRaisesRegex(self, FieldError, "^Cannot resolve keyword 'content_object' into field."):
+        msg = "Field 'content_object' does not generate an automatic reverse relation"
+        with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.get(content_object='')
+
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        Assigning an unsaved object to GenericForeignKey should raise an
+        exception on model.save().
+        """
+        quartz = Mineral(name="Quartz", hardness=7)
+        with self.assertRaises(IntegrityError):
+            TaggedItem.objects.create(tag="shiny", content_object=quartz)
 
 
 class CustomWidget(forms.TextInput):
@@ -517,7 +654,7 @@ class ProxyRelatedModelTest(TestCase):
         self.assertEqual(base, newrel.bases.get())
 
 
-class TestInitWithNoneArgument(TestCase):
+class TestInitWithNoneArgument(SimpleTestCase):
     def test_none_not_allowed(self):
         # TaggedItem requires a content_type, initializing with None should
         # raise a ValueError.

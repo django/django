@@ -1,13 +1,10 @@
 from django.conf import settings
-from django.test import TestCase
+from django.core.checks.security import base, csrf, sessions
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
 
-from django.core.checks.security import base
-from django.core.checks.security import csrf
-from django.core.checks.security import sessions
 
-
-class CheckSessionCookieSecureTest(TestCase):
+class CheckSessionCookieSecureTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.sessions import check_session_cookie_secure
@@ -58,7 +55,7 @@ class CheckSessionCookieSecureTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckSessionCookieHttpOnlyTest(TestCase):
+class CheckSessionCookieHttpOnlyTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.sessions import check_session_cookie_httponly
@@ -109,7 +106,7 @@ class CheckSessionCookieHttpOnlyTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckCSRFMiddlewareTest(TestCase):
+class CheckCSRFMiddlewareTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.csrf import check_csrf_middleware
@@ -128,7 +125,7 @@ class CheckCSRFMiddlewareTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckCSRFCookieSecureTest(TestCase):
+class CheckCSRFCookieSecureTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.csrf import check_csrf_cookie_secure
@@ -159,7 +156,7 @@ class CheckCSRFCookieSecureTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckCSRFCookieHttpOnlyTest(TestCase):
+class CheckCSRFCookieHttpOnlyTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.csrf import check_csrf_cookie_httponly
@@ -190,7 +187,7 @@ class CheckCSRFCookieHttpOnlyTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckSecurityMiddlewareTest(TestCase):
+class CheckSecurityMiddlewareTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_security_middleware
@@ -209,7 +206,7 @@ class CheckSecurityMiddlewareTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckStrictTransportSecurityTest(TestCase):
+class CheckStrictTransportSecurityTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_sts
@@ -241,7 +238,7 @@ class CheckStrictTransportSecurityTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckStrictTransportSecuritySubdomainsTest(TestCase):
+class CheckStrictTransportSecuritySubdomainsTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_sts_include_subdomains
@@ -285,7 +282,7 @@ class CheckStrictTransportSecuritySubdomainsTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXFrameOptionsMiddlewareTest(TestCase):
+class CheckXFrameOptionsMiddlewareTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_xframe_options_middleware
@@ -303,7 +300,7 @@ class CheckXFrameOptionsMiddlewareTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXFrameOptionsDenyTest(TestCase):
+class CheckXFrameOptionsDenyTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_xframe_deny
@@ -336,7 +333,7 @@ class CheckXFrameOptionsDenyTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckContentTypeNosniffTest(TestCase):
+class CheckContentTypeNosniffTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_content_type_nosniff
@@ -368,7 +365,7 @@ class CheckContentTypeNosniffTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckXssFilterTest(TestCase):
+class CheckXssFilterTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_xss_filter
@@ -400,7 +397,7 @@ class CheckXssFilterTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckSSLRedirectTest(TestCase):
+class CheckSSLRedirectTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_ssl_redirect
@@ -432,7 +429,7 @@ class CheckSSLRedirectTest(TestCase):
         self.assertEqual(self.func(None), [])
 
 
-class CheckSecretKeyTest(TestCase):
+class CheckSecretKeyTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_secret_key
@@ -469,7 +466,7 @@ class CheckSecretKeyTest(TestCase):
         self.assertEqual(self.func(None), [base.W009])
 
 
-class CheckDebugTest(TestCase):
+class CheckDebugTest(SimpleTestCase):
     @property
     def func(self):
         from django.core.checks.security.base import check_debug
@@ -484,4 +481,19 @@ class CheckDebugTest(TestCase):
 
     @override_settings(DEBUG=False)
     def test_debug_false(self):
+        self.assertEqual(self.func(None), [])
+
+
+class CheckAllowedHostsTest(SimpleTestCase):
+    @property
+    def func(self):
+        from django.core.checks.security.base import check_allowed_hosts
+        return check_allowed_hosts
+
+    @override_settings(ALLOWED_HOSTS=[])
+    def test_allowed_hosts_empty(self):
+        self.assertEqual(self.func(None), [base.W020])
+
+    @override_settings(ALLOWED_HOSTS=['.example.com', ])
+    def test_allowed_hosts_set(self):
         self.assertEqual(self.func(None), [])

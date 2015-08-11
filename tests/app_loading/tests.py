@@ -3,13 +3,13 @@ from __future__ import unicode_literals
 import os
 
 from django.apps import apps
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import extend_sys_path
-from django.utils._os import upath
 from django.utils import six
+from django.utils._os import upath
 
 
-class EggLoadingTest(TestCase):
+class EggLoadingTest(SimpleTestCase):
 
     def setUp(self):
         self.egg_dir = '%s/eggs' % os.path.dirname(upath(__file__))
@@ -62,7 +62,7 @@ class EggLoadingTest(TestCase):
                     pass
 
 
-class GetModelsTest(TestCase):
+class GetModelsTest(SimpleTestCase):
     def setUp(self):
         from .not_installed import models
         self.not_installed_module = models

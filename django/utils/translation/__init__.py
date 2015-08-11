@@ -2,12 +2,13 @@
 Internationalization support.
 """
 from __future__ import unicode_literals
+
 import re
+
+from django.utils import six
 from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
-from django.utils import six
-
 
 __all__ = [
     'activate', 'deactivate', 'override', 'deactivate_all',
@@ -215,16 +216,21 @@ def get_language_info(lang_code):
     try:
         lang_info = LANG_INFO[lang_code]
         if 'fallback' in lang_info and 'name' not in lang_info:
-            return get_language_info(lang_info['fallback'][0])
-        return lang_info
+            info = get_language_info(lang_info['fallback'][0])
+        else:
+            info = lang_info
     except KeyError:
         if '-' not in lang_code:
             raise KeyError("Unknown language code %s." % lang_code)
         generic_lang_code = lang_code.split('-')[0]
         try:
-            return LANG_INFO[generic_lang_code]
+            info = LANG_INFO[generic_lang_code]
         except KeyError:
             raise KeyError("Unknown language code %s and %s." % (lang_code, generic_lang_code))
+
+    if info:
+        info['name_translated'] = ugettext_lazy(info['name'])
+    return info
 
 trim_whitespace_re = re.compile('\s*\n\s*')
 

@@ -1,8 +1,8 @@
 import argparse
-import inspect
 
 from django.contrib.gis import gdal
 from django.core.management.base import BaseCommand, CommandError
+from django.utils.inspect import get_func_args
 
 
 class LayerOptionAction(argparse.Action):
@@ -83,15 +83,15 @@ class Command(BaseCommand):
         # Getting the OGR DataSource from the string parameter.
         try:
             ds = gdal.DataSource(data_source)
-        except gdal.OGRException as msg:
+        except gdal.GDALException as msg:
             raise CommandError(msg)
 
         # Returning the output of ogrinspect with the given arguments
         # and options.
         from django.contrib.gis.utils.ogrinspect import _ogrinspect, mapping
         # Filter options to params accepted by `_ogrinspect`
-        ogr_options = dict((k, v) for k, v in options.items()
-                           if k in inspect.getargspec(_ogrinspect).args and v is not None)
+        ogr_options = {k: v for k, v in options.items()
+                       if k in get_func_args(_ogrinspect) and v is not None}
         output = [s for s in _ogrinspect(ds, model_name, **ogr_options)]
 
         if options['mapping']:
@@ -104,7 +104,7 @@ class Command(BaseCommand):
             mapping_dict = mapping(ds, **kwargs)
             # This extra legwork is so that the dictionary definition comes
             # out in the same order as the fields in the model definition.
-            rev_mapping = dict((v, k) for k, v in mapping_dict.items())
+            rev_mapping = {v: k for k, v in mapping_dict.items()}
             output.extend(['', '# Auto-generated `LayerMapping` dictionary for %s model' % model_name,
                            '%s_mapping = {' % model_name.lower()])
             output.extend("    '%s' : '%s'," % (

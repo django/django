@@ -119,7 +119,7 @@ parameter is useful.
 .. deprecated:: 1.8
 
     Support for string ``view`` arguments is deprecated and will be removed in
-    Django 2.0. Pass the callable  instead.
+    Django 1.10. Pass the callable  instead.
 
     The ``prefix`` parameter has the same meaning as the first argument to
     ``patterns()`` and is only relevant when you're passing a string as the
@@ -128,8 +128,9 @@ parameter is useful.
 include()
 ---------
 
-.. function:: include(module[, namespace=None, app_name=None])
+.. function:: include(module, namespace=None, app_name=None)
               include(pattern_list)
+              include((pattern_list, app_namespace), namespace=None)
               include((pattern_list, app_namespace, instance_namespace))
 
     A function that takes a full Python import path to another URLconf module
@@ -137,9 +138,14 @@ include()
     namespace` and :term:`instance namespace` where the entries will be included
     into can also be specified.
 
+    Usually, the application namespace should be specified by the included
+    module. If an application namespace is set, the ``namespace`` argument
+    can be used to set a different instance namespace.
+
     ``include()`` also accepts as an argument either an iterable that returns
-    URL patterns or a 3-tuple containing such iterable plus the names of the
-    application and instance namespaces.
+    URL patterns, a 2-tuple containing such iterable plus the names of the
+    application namespaces, or a 3-tuple containing the iterable and the names
+    of both the application and instance namespace.
 
     :arg module: URLconf module (or module name)
     :arg namespace: Instance namespace for the URL entries being included
@@ -153,6 +159,20 @@ include()
     :type instance_namespace: string
 
 See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
+
+.. deprecated:: 1.9
+
+    Support for the ``app_name`` argument is deprecated and will be removed in
+    Django 2.0. Specify the ``app_name`` as explained in
+    :ref:`namespaces-and-include` instead.
+
+    Support for passing a 3-tuple is also deprecated and will be removed in
+    Django 2.0. Pass a 2-tuple containing the pattern list and application
+    namespace, and use the ``namespace`` argument instead.
+
+    Lastly, support for an instance namespace without an application namespace
+    has been deprecated and will be removed in Django 2.0. Specify the
+    application namespace or remove the instance namespace.
 
 handler400
 ----------

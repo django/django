@@ -4,8 +4,10 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
-from .models import (SelfRefer, Tag, TagCollection, Entry, SelfReferChild,
-    SelfReferChildSibling, Worksheet, RegressionModelSplit)
+from .models import (
+    Entry, Line, Post, RegressionModelSplit, SelfRefer, SelfReferChild,
+    SelfReferChildSibling, Tag, TagCollection, Worksheet,
+)
 
 
 class M2MRegressionTests(TestCase):
@@ -85,15 +87,38 @@ class M2MRegressionTests(TestCase):
         t2 = Tag.objects.create()
 
         # Get same manager twice in a row:
-        self.assertTrue(t1.entry_set.__class__ is t1.entry_set.__class__)
-        self.assertTrue(e1.topics.__class__ is e1.topics.__class__)
+        self.assertIs(t1.entry_set.__class__, t1.entry_set.__class__)
+        self.assertIs(e1.topics.__class__, e1.topics.__class__)
 
         # Get same manager for different instances
-        self.assertTrue(e1.topics.__class__ is e2.topics.__class__)
-        self.assertTrue(t1.entry_set.__class__ is t2.entry_set.__class__)
+        self.assertIs(e1.topics.__class__, e2.topics.__class__)
+        self.assertIs(t1.entry_set.__class__, t2.entry_set.__class__)
 
     def test_m2m_abstract_split(self):
         # Regression for #19236 - an abstract class with a 'split' method
         # causes a TypeError in add_lazy_relation
         m1 = RegressionModelSplit(name='1')
         m1.save()
+
+    def test_assigning_invalid_data_to_m2m_doesnt_clear_existing_relations(self):
+        t1 = Tag.objects.create(name='t1')
+        t2 = Tag.objects.create(name='t2')
+        c1 = TagCollection.objects.create(name='c1')
+        c1.tags = [t1, t2]
+
+        with self.assertRaises(TypeError):
+            c1.tags = 7
+
+        c1.refresh_from_db()
+        self.assertQuerysetEqual(c1.tags.order_by('name'), ["<Tag: t1>", "<Tag: t2>"])
+
+    def test_multiple_forwards_only_m2m(self):
+        # Regression for #24505 - Multiple ManyToManyFields to same "to"
+        # model with related_name set to '+'.
+        foo = Line.objects.create(name='foo')
+        bar = Line.objects.create(name='bar')
+        post = Post.objects.create()
+        post.primary_lines.add(foo)
+        post.secondary_lines.add(bar)
+        self.assertQuerysetEqual(post.primary_lines.all(), ['<Line: foo>'])
+        self.assertQuerysetEqual(post.secondary_lines.all(), ['<Line: bar>'])

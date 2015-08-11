@@ -15,6 +15,7 @@ class Tags(object):
     models = 'models'
     security = 'security'
     signals = 'signals'
+    templates = 'templates'
 
 
 class CheckRegistry(object):
@@ -23,11 +24,11 @@ class CheckRegistry(object):
         self.registered_checks = []
         self.deployment_checks = []
 
-    def register(self, *tags, **kwargs):
+    def register(self, check=None, *tags, **kwargs):
         """
-        Decorator. Register given function `f` labeled with given `tags`. The
-        function should receive **kwargs and return list of Errors and
-        Warnings.
+        Can be used as a function or a decorator. Register given function
+        `f` labeled with given `tags`. The function should receive **kwargs
+        and return list of Errors and Warnings.
 
         Example::
 
@@ -36,6 +37,8 @@ class CheckRegistry(object):
             def my_check(apps, **kwargs):
                 # ... perform checks and collect `errors` ...
                 return errors
+            # or
+            registry.register(my_check, 'mytag', 'anothertag')
 
         """
         kwargs.setdefault('deploy', False)
@@ -49,7 +52,12 @@ class CheckRegistry(object):
                 self.registered_checks.append(check)
             return check
 
-        return inner
+        if callable(check):
+            return inner(check)
+        else:
+            if check:
+                tags += (check, )
+            return inner
 
     def run_checks(self, app_configs=None, tags=None, include_deployment_checks=False):
         """ Run all registered checks and return list of Errors and Warnings.

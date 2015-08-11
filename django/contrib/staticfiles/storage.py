@@ -1,22 +1,25 @@
 from __future__ import unicode_literals
-from collections import OrderedDict
+
 import hashlib
+import json
 import os
 import posixpath
 import re
-import json
+from collections import OrderedDict
 
 from django.conf import settings
-from django.core.cache import (caches, InvalidCacheBackendError,
-                               cache as default_cache)
+from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.core.cache import (
+    InvalidCacheBackendError, cache as default_cache, caches,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, get_storage_class
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import LazyObject
-from django.utils.six.moves.urllib.parse import unquote, urlsplit, urlunsplit, urldefrag
-
-from django.contrib.staticfiles.utils import check_settings, matches_patterns
+from django.utils.six.moves.urllib.parse import (
+    unquote, urldefrag, urlsplit, urlunsplit,
+)
 
 
 class StaticFilesStorage(FileSystemStorage):
@@ -72,7 +75,7 @@ class HashedFilesMixin(object):
 
     def file_hash(self, name, content=None):
         """
-        Retuns a hash of the file with the given name and optional content.
+        Returns a hash of the file with the given name and optional content.
         """
         if content is None:
             return None
@@ -305,7 +308,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         except ValueError:
             pass
         else:
-            version = stored.get('version', None)
+            version = stored.get('version')
             if version == '1.0':
                 return stored.get('paths', OrderedDict())
         raise ValueError("Couldn't load manifest '%s' (version %s)" %
@@ -338,7 +341,7 @@ class _MappingCache(object):
         self.cache.set(key, value)
 
     def __getitem__(self, key):
-        value = self.cache.get(key, None)
+        value = self.cache.get(key)
         if value is None:
             raise KeyError("Couldn't find a file name '%s'" % key)
         return value

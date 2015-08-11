@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import hashlib
+
 from django.utils.encoding import force_bytes
 from django.utils.http import urlquote
 

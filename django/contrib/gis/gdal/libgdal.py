@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 import logging
 import os
 import re
-from ctypes import c_char_p, c_int, CDLL, CFUNCTYPE
+from ctypes import CDLL, CFUNCTYPE, c_char_p, c_int
 from ctypes.util import find_library
 
-from django.contrib.gis.gdal.error import OGRException
+from django.contrib.gis.gdal.error import GDALException
 from django.core.exceptions import ImproperlyConfigured
 
 logger = logging.getLogger('django.contrib.gis')
@@ -29,7 +29,7 @@ elif os.name == 'posix':
     lib_names = ['gdal', 'GDAL', 'gdal1.11.0', 'gdal1.10.0', 'gdal1.9.0',
         'gdal1.8.0', 'gdal1.7.0']
 else:
-    raise OGRException('Unsupported OS "%s"' % os.name)
+    raise GDALException('Unsupported OS "%s"' % os.name)
 
 # Using the ctypes `find_library` utility  to find the
 # path to the GDAL library from the list of library names.
@@ -40,7 +40,7 @@ if lib_names:
             break
 
 if lib_path is None:
-    raise OGRException('Could not find the GDAL library (tried "%s"). '
+    raise GDALException('Could not find the GDAL library (tried "%s"). '
                        'Try setting GDAL_LIBRARY_PATH in your settings.' %
                        '", "'.join(lib_names))
 
@@ -66,7 +66,7 @@ def std_call(func):
     else:
         return lgdal[func]
 
-#### Version-information functions. ####
+# #### Version-information functions. ####
 
 # Returns GDAL library version information with the given key.
 _version_info = std_call('GDALVersionInfo')
@@ -90,8 +90,8 @@ def gdal_version_info():
     ver = gdal_version().decode()
     m = version_regex.match(ver)
     if not m:
-        raise OGRException('Could not parse GDAL version string "%s"' % ver)
-    return dict((key, m.group(key)) for key in ('major', 'minor', 'subminor'))
+        raise GDALException('Could not parse GDAL version string "%s"' % ver)
+    return {key: m.group(key) for key in ('major', 'minor', 'subminor')}
 
 _verinfo = gdal_version_info()
 GDAL_MAJOR_VERSION = int(_verinfo['major'])

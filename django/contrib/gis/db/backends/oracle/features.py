@@ -1,0 +1,8 @@
+from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
+from django.db.backends.oracle.features import \
+    DatabaseFeatures as OracleDatabaseFeatures
+
+
+class DatabaseFeatures(BaseSpatialFeatures, OracleDatabaseFeatures):
+    supports_add_srs_entry = False
+    supports_geometry_field_introspection = False

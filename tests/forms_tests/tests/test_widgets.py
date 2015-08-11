@@ -3,30 +3,31 @@ from __future__ import unicode_literals
 
 import copy
 import datetime
-import warnings
 
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.forms import (
-    BooleanField, CheckboxInput, CheckboxSelectMultiple, ChoiceField,
-    ClearableFileInput, DateInput, DateTimeField, DateTimeInput, FileInput,
-    Form, HiddenInput, MultipleHiddenInput, MultiWidget, NullBooleanSelect,
-    PasswordInput, RadioSelect, Select, SelectMultiple, SplitDateTimeWidget,
-    Textarea, TextInput, TimeInput,
+    BooleanField, CharField, CheckboxInput, CheckboxSelectMultiple,
+    ChoiceField, ClearableFileInput, DateField, DateInput, DateTimeInput,
+    FileInput, Form, HiddenInput, MultipleChoiceField, MultipleHiddenInput,
+    MultiValueField, MultiWidget, NullBooleanSelect, PasswordInput,
+    RadioSelect, Select, SelectDateWidget, SelectMultiple, SplitDateTimeField,
+    SplitDateTimeWidget, Textarea, TextInput, TimeInput, ValidationError,
 )
-from django.forms.widgets import RadioFieldRenderer
-from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.safestring import mark_safe, SafeData
-from django.utils import six
-from django.utils.translation import activate, deactivate, override
-from django.test import TestCase, override_settings
-from django.utils.encoding import python_2_unicode_compatible, force_text
+from django.forms.widgets import (
+    ChoiceFieldRenderer, ChoiceInput, RadioFieldRenderer,
+)
+from django.test import SimpleTestCase, override_settings
+from django.utils import six, translation
+from django.utils.dates import MONTHS_AP
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.safestring import SafeData, mark_safe
 
 from ..models import Article
 
 
-class FormsWidgetTestCase(TestCase):
+class FormsWidgetTests(SimpleTestCase):
     # Each Widget class corresponds to an HTML form widget. A Widget knows how to
     # render itself, given a field name and some data. Widgets don't perform
     # validation.
@@ -1022,6 +1023,149 @@ beatle J R Ringo False""")
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51, 34)), '<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:34" />')
         self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="2007-09-17" /><input type="hidden" name="date_1" value="12:51:00" />')
 
+    def test_multiwidget(self):
+        # MultiWidgets are widgets composed of other widgets. They are usually
+        # combined with MultiValueFields - a field that is composed of other fields.
+        # MulitWidgets can themselves be composed of other MultiWidgets.
+        # SplitDateTimeWidget is one example of a MultiWidget.
+
+        class ComplexMultiWidget(MultiWidget):
+            def __init__(self, attrs=None):
+                widgets = (
+                    TextInput(),
+                    SelectMultiple(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+                    SplitDateTimeWidget(),
+                )
+                super(ComplexMultiWidget, self).__init__(widgets, attrs)
+
+            def decompress(self, value):
+                if value:
+                    data = value.split(',')
+                    return [data[0], list(data[1]), datetime.datetime.strptime(data[2], "%Y-%m-%d %H:%M:%S")]
+                return [None, None, None]
+
+            def format_output(self, rendered_widgets):
+                return '\n'.join(rendered_widgets)
+
+        w = ComplexMultiWidget()
+        self.assertHTMLEqual(
+            w.render('name', 'some text,JP,2007-04-25 06:24:00'),
+            """
+            <input type="text" name="name_0" value="some text" />
+            <select multiple="multiple" name="name_1">
+                <option value="J" selected="selected">John</option>
+                <option value="P" selected="selected">Paul</option>
+                <option value="G">George</option>
+                <option value="R">Ringo</option>
+            </select>
+            <input type="text" name="name_2_0" value="2007-04-25" />
+            <input type="text" name="name_2_1" value="06:24:00" />
+            """,
+        )
+
+        class ComplexField(MultiValueField):
+            def __init__(self, required=True, widget=None, label=None, initial=None):
+                fields = (
+                    CharField(),
+                    MultipleChoiceField(choices=(('J', 'John'), ('P', 'Paul'), ('G', 'George'), ('R', 'Ringo'))),
+                    SplitDateTimeField()
+                )
+                super(ComplexField, self).__init__(fields, required, widget, label, initial)
+
+            def compress(self, data_list):
+                if data_list:
+                    return '%s,%s,%s' % (data_list[0], ''.join(data_list[1]), data_list[2])
+                return None
+
+        f = ComplexField(widget=w)
+        self.assertEqual(
+            f.clean(['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]),
+            'some text,JP,2007-04-25 06:24:00',
+        )
+
+        with self.assertRaisesMessage(ValidationError,
+                "'Select a valid choice. X is not one of the available choices.'"):
+            f.clean(['some text', ['X'], ['2007-04-25', '6:24:00']])
+
+        # If insufficient data is provided, None is substituted
+        self.assertRaisesMessage(ValidationError, "'This field is required.'", f.clean, ['some text', ['JP']])
+
+        # test with no initial data
+        self.assertTrue(f.has_changed(None, ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+
+        # test when the data is the same as initial
+        self.assertFalse(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+
+        # test when the first widget's data has changed
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['other text', ['J', 'P'], ['2007-04-25', '6:24:00']]))
+
+        # test when the last widget's data has changed. this ensures that it is not
+        # short circuiting while testing the widgets.
+        self.assertTrue(f.has_changed('some text,JP,2007-04-25 06:24:00',
+            ['some text', ['J', 'P'], ['2009-04-25', '11:44:00']]))
+
+        class ComplexFieldForm(Form):
+            field1 = ComplexField(widget=w)
+
+        f = ComplexFieldForm()
+        self.assertHTMLEqual(
+            f.as_table(),
+            """
+            <tr><th><label for="id_field1_0">Field1:</label></th>
+            <td><input type="text" name="field1_0" id="id_field1_0" />
+            <select multiple="multiple" name="field1_1" id="id_field1_1">
+            <option value="J">John</option>
+            <option value="P">Paul</option>
+            <option value="G">George</option>
+            <option value="R">Ringo</option>
+            </select>
+            <input type="text" name="field1_2_0" id="id_field1_2_0" />
+            <input type="text" name="field1_2_1" id="id_field1_2_1" /></td></tr>
+            """,
+        )
+
+        f = ComplexFieldForm({
+            'field1_0': 'some text',
+            'field1_1': ['J', 'P'],
+            'field1_2_0': '2007-04-25',
+            'field1_2_1': '06:24:00',
+        })
+        self.assertHTMLEqual(
+            f.as_table(),
+            """
+            <tr><th><label for="id_field1_0">Field1:</label></th>
+            <td><input type="text" name="field1_0" value="some text" id="id_field1_0" />
+            <select multiple="multiple" name="field1_1" id="id_field1_1">
+            <option value="J" selected="selected">John</option>
+            <option value="P" selected="selected">Paul</option>
+            <option value="G">George</option>
+            <option value="R">Ringo</option>
+            </select>
+            <input type="text" name="field1_2_0" value="2007-04-25" id="id_field1_2_0" />
+            <input type="text" name="field1_2_1" value="06:24:00" id="id_field1_2_1" /></td></tr>
+            """,
+        )
+        self.assertEqual(f.cleaned_data['field1'], 'some text,JP,2007-04-25 06:24:00')
+
+    def test_sub_widget_html_safe(self):
+        widget = TextInput()
+        subwidget = next(widget.subwidgets('username', 'John Doe'))
+        self.assertTrue(hasattr(subwidget, '__html__'))
+        self.assertEqual(force_text(subwidget), subwidget.__html__())
+
+    def test_choice_input_html_safe(self):
+        widget = ChoiceInput('choices', 'CHOICE1', {}, ('CHOICE1', 'first choice'), 0)
+        self.assertTrue(hasattr(ChoiceInput, '__html__'))
+        self.assertEqual(force_text(widget), widget.__html__())
+
+    def test_choice_field_renderer_html_safe(self):
+        renderer = ChoiceFieldRenderer('choices', 'CHOICE1', {}, [('CHOICE1', 'first_choice')])
+        renderer.choice_input_class = lambda *args: args
+        self.assertTrue(hasattr(ChoiceFieldRenderer, '__html__'))
+        self.assertEqual(force_text(renderer), renderer.__html__())
+
 
 class NullBooleanSelectLazyForm(Form):
     """Form to test for lazy evaluation. Refs #17190"""
@@ -1029,14 +1173,14 @@ class NullBooleanSelectLazyForm(Form):
 
 
 @override_settings(USE_L10N=True)
-class FormsI18NWidgetsTestCase(TestCase):
+class FormsI18NWidgetsTests(SimpleTestCase):
     def setUp(self):
-        super(FormsI18NWidgetsTestCase, self).setUp()
-        activate('de-at')
+        super(FormsI18NWidgetsTests, self).setUp()
+        translation.activate('de-at')
 
     def tearDown(self):
-        deactivate()
-        super(FormsI18NWidgetsTestCase, self).tearDown()
+        translation.deactivate()
+        super(FormsI18NWidgetsTests, self).tearDown()
 
     def test_datetimeinput(self):
         w = DateTimeInput()
@@ -1058,14 +1202,20 @@ class FormsI18NWidgetsTestCase(TestCase):
         d = datetime.datetime(2007, 9, 17, 12, 51, 34, 482548)
         with self.settings(USE_L10N=False):
             self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="2007-09-17 12:51:34" />')
-        with override('es'):
+        with translation.override('es'):
             self.assertHTMLEqual(w.render('date', d), '<input type="text" name="date" value="17/09/2007 12:51:34" />')
 
     def test_splithiddendatetime(self):
         from django.forms.widgets import SplitHiddenDateTimeWidget
 
         w = SplitHiddenDateTimeWidget()
-        self.assertHTMLEqual(w.render('date', datetime.datetime(2007, 9, 17, 12, 51)), '<input type="hidden" name="date_0" value="17.09.2007" /><input type="hidden" name="date_1" value="12:51:00" />')
+        self.assertHTMLEqual(
+            w.render('date', datetime.datetime(2007, 9, 17, 12, 51)),
+            """
+            <input type="hidden" name="date_0" value="17.09.2007" />
+            <input type="hidden" name="date_1" value="12:51:00" />
+            """,
+        )
 
     def test_nullbooleanselect(self):
         """
@@ -1074,7 +1224,16 @@ class FormsI18NWidgetsTestCase(TestCase):
         Refs #17190
         """
         f = NullBooleanSelectLazyForm()
-        self.assertHTMLEqual(f.fields['bool'].widget.render('id_bool', True), '<select name="id_bool">\n<option value="1">Unbekannt</option>\n<option value="2" selected="selected">Ja</option>\n<option value="3">Nein</option>\n</select>')
+        self.assertHTMLEqual(
+            f.fields['bool'].widget.render('id_bool', True),
+            """
+            <select name="id_bool">
+                <option value="1">Unbekannt</option>
+                <option value="2" selected="selected">Ja</option>
+                <option value="3">Nein</option>
+            </select>
+            """,
+        )
 
 
 class SelectAndTextWidget(MultiWidget):
@@ -1102,7 +1261,7 @@ class SelectAndTextWidget(MultiWidget):
     choices = property(_get_choices, _set_choices)
 
 
-class WidgetTests(TestCase):
+class WidgetTests(SimpleTestCase):
     def test_12048(self):
         # See ticket #12048.
         w1 = SelectAndTextWidget(choices=[1, 2, 3])
@@ -1111,28 +1270,6 @@ class WidgetTests(TestCase):
         # w2 ought to be independent of w1, since MultiWidget ought
         # to make a copy of its sub-widgets when it is copied.
         self.assertEqual(w1.choices, [1, 2, 3])
-
-    def test_13390(self):
-        # See ticket #13390
-        class SplitDateForm(Form):
-            field = DateTimeField(widget=SplitDateTimeWidget, required=False)
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
-            form = SplitDateForm({'field': ''})
-            self.assertTrue(form.is_valid())
-            form = SplitDateForm({'field': ['', '']})
-            self.assertTrue(form.is_valid())
-
-        class SplitDateRequiredForm(Form):
-            field = DateTimeField(widget=SplitDateTimeWidget, required=True)
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore", category=RemovedInDjango19Warning)
-            form = SplitDateRequiredForm({'field': ''})
-            self.assertFalse(form.is_valid())
-            form = SplitDateRequiredForm({'field': ['', '']})
-            self.assertFalse(form.is_valid())
 
 
 @override_settings(ROOT_URLCONF='forms_tests.urls')
@@ -1166,7 +1303,7 @@ class FakeFieldFile(object):
         return self.url
 
 
-class ClearableFileInputTests(TestCase):
+class ClearableFileInputTests(SimpleTestCase):
     def test_clear_input_renders(self):
         """
         A ClearableFileInput with is_required False and rendered with
@@ -1175,8 +1312,15 @@ class ClearableFileInputTests(TestCase):
         """
         widget = ClearableFileInput()
         widget.is_required = False
-        self.assertHTMLEqual(widget.render('myfile', FakeFieldFile()),
-                         'Currently: <a href="something">something</a> <input type="checkbox" name="myfile-clear" id="myfile-clear_id" /> <label for="myfile-clear_id">Clear</label><br />Change: <input type="file" name="myfile" />')
+        self.assertHTMLEqual(
+            widget.render('myfile', FakeFieldFile()),
+            """
+            Currently: <a href="something">something</a>
+            <input type="checkbox" name="myfile-clear" id="myfile-clear_id" />
+            <label for="myfile-clear_id">Clear</label><br />
+            Change: <input type="file" name="myfile" />
+            """,
+        )
 
     def test_html_escaped(self):
         """
@@ -1194,12 +1338,31 @@ class ClearableFileInputTests(TestCase):
         widget = ClearableFileInput()
         field = StrangeFieldFile()
         output = widget.render('my<div>file', field)
-        self.assertFalse(field.url in output)
-        self.assertTrue('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"' in output)
-        self.assertFalse(six.text_type(field) in output)
-        self.assertTrue('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg' in output)
-        self.assertTrue('my&lt;div&gt;file' in output)
-        self.assertFalse('my<div>file' in output)
+        self.assertNotIn(field.url, output)
+        self.assertIn('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"', output)
+        self.assertNotIn(six.text_type(field), output)
+        self.assertIn('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg', output)
+        self.assertIn('my&lt;div&gt;file', output)
+        self.assertNotIn('my<div>file', output)
+
+    def test_html_does_not_mask_exceptions(self):
+        """
+        A ClearableFileInput should not mask exceptions produced while
+        checking that it has a value.
+        """
+        @python_2_unicode_compatible
+        class FailingURLFieldFile(object):
+            @property
+            def url(self):
+                raise RuntimeError('Canary')
+
+            def __str__(self):
+                return 'value'
+
+        widget = ClearableFileInput()
+        field = FailingURLFieldFile()
+        with self.assertRaisesMessage(RuntimeError, 'Canary'):
+            widget.render('myfile', field)
 
     def test_clear_input_renders_only_if_not_required(self):
         """
@@ -1209,8 +1372,13 @@ class ClearableFileInputTests(TestCase):
         """
         widget = ClearableFileInput()
         widget.is_required = True
-        self.assertHTMLEqual(widget.render('myfile', FakeFieldFile()),
-                         'Currently: <a href="something">something</a> <br />Change: <input type="file" name="myfile" />')
+        self.assertHTMLEqual(
+            widget.render('myfile', FakeFieldFile()),
+            """
+            Currently: <a href="something">something</a> <br />
+            Change: <input type="file" name="myfile" />
+            """,
+        )
 
     def test_clear_input_renders_only_if_initial(self):
         """
@@ -1262,3 +1430,585 @@ class ClearableFileInputTests(TestCase):
             '<input type="checkbox" name="myfile-clear" id="myfile-clear_id" /> '
             '<label for="myfile-clear_id">Clear</label><br />Change: <input type="file" name="myfile" />'
         )
+
+
+class GetDate(Form):
+    mydate = DateField(widget=SelectDateWidget)
+
+
+class SelectDateWidgetTests(SimpleTestCase):
+
+    # The forms library comes with some extra, higher-level Field and Widget
+    def test_selectdate(self):
+        self.maxDiff = None
+        w = SelectDateWidget(years=('2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'))
+
+        # Rendering the default state.
+        self.assertHTMLEqual(
+            w.render('mydate', ''),
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option value="0">---</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <select name="mydate_day" id="id_mydate_day">
+                <option value="0">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+
+            <select name="mydate_year" id="id_mydate_year">
+                <option value="0">---</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010">2010</option>
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option>
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+            </select>
+            """,
+        )
+
+        # Rendering the None or '' values should yield the same output.
+        self.assertHTMLEqual(w.render('mydate', None), w.render('mydate', ''))
+
+        # Rendering a string value.
+        self.assertHTMLEqual(
+            w.render('mydate', '2010-04-15'),
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option value="0">---</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4" selected="selected">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <select name="mydate_day" id="id_mydate_day">
+                <option value="0">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15" selected="selected">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+
+            <select name="mydate_year" id="id_mydate_year">
+                <option value="0">---</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010" selected="selected">2010</option>
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option>
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+            </select>
+            """,
+        )
+
+        # Rendering a datetime value.
+        self.assertHTMLEqual(w.render('mydate', datetime.date(2010, 4, 15)), w.render('mydate', '2010-04-15'))
+
+        # Invalid dates should still render the failed date.
+        self.assertHTMLEqual(
+            w.render('mydate', '2010-02-31'),
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option value="0">---</option>
+                <option value="1">January</option>
+                <option value="2" selected="selected">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <select name="mydate_day" id="id_mydate_day">
+                <option value="0">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31" selected="selected">31</option>
+            </select>
+
+            <select name="mydate_year" id="id_mydate_year">
+                <option value="0">---</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010" selected="selected">2010</option>
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option>
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+            </select>
+            """,
+        )
+
+        # Rendering with a custom months dict.
+        w = SelectDateWidget(months=MONTHS_AP, years=('2013',))
+        self.assertHTMLEqual(
+            w.render('mydate', ''),
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option value="0">---</option>
+                <option value="1">Jan.</option>
+                <option value="2">Feb.</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">Aug.</option>
+                <option value="9">Sept.</option>
+                <option value="10">Oct.</option>
+                <option value="11">Nov.</option>
+                <option value="12">Dec.</option>
+            </select>
+
+            <select name="mydate_day" id="id_mydate_day">
+                <option value="0">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+
+            <select name="mydate_year" id="id_mydate_year">
+                <option value="0">---</option>
+                <option value="2013">2013</option>
+            </select>
+            """,
+        )
+
+        a = GetDate({'mydate_month': '4', 'mydate_day': '1', 'mydate_year': '2008'})
+        self.assertTrue(a.is_valid())
+        self.assertEqual(a.cleaned_data['mydate'], datetime.date(2008, 4, 1))
+
+        # As with any widget that implements get_value_from_datadict,
+        # we must be prepared to accept the input from the "as_hidden"
+        # rendering as well.
+
+        self.assertHTMLEqual(
+            a['mydate'].as_hidden(),
+            '<input type="hidden" name="mydate" value="2008-4-1" id="id_mydate" />',
+        )
+
+        b = GetDate({'mydate': '2008-4-1'})
+        self.assertTrue(b.is_valid())
+        self.assertEqual(b.cleaned_data['mydate'], datetime.date(2008, 4, 1))
+
+        # Invalid dates shouldn't be allowed
+        c = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
+        self.assertFalse(c.is_valid())
+        self.assertEqual(c.errors, {'mydate': ['Enter a valid date.']})
+
+        # label tag is correctly associated with month dropdown
+        d = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
+        self.assertIn('<label for="id_mydate_month">', d.as_p())
+
+    def test_selectdate_required(self):
+        class GetNotRequiredDate(Form):
+            mydate = DateField(widget=SelectDateWidget, required=False)
+
+        class GetRequiredDate(Form):
+            mydate = DateField(widget=SelectDateWidget, required=True)
+
+        self.assertFalse(GetNotRequiredDate().fields['mydate'].widget.is_required)
+        self.assertTrue(GetRequiredDate().fields['mydate'].widget.is_required)
+
+    def test_selectdate_empty_label(self):
+        w = SelectDateWidget(years=('2014',), empty_label='empty_label')
+
+        # Rendering the default state with empty_label setted as string.
+        self.assertInHTML('<option value="0">empty_label</option>', w.render('mydate', ''), count=3)
+
+        w = SelectDateWidget(years=('2014',), empty_label=('empty_year', 'empty_month', 'empty_day'))
+
+        # Rendering the default state with empty_label tuple.
+        self.assertHTMLEqual(
+            w.render('mydate', ''),
+            """
+            <select name="mydate_month" id="id_mydate_month">
+                <option value="0">empty_month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
+
+            <select name="mydate_day" id="id_mydate_day">
+                <option value="0">empty_day</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+
+            <select name="mydate_year" id="id_mydate_year">
+                <option value="0">empty_year</option>
+                <option value="2014">2014</option>
+            </select>
+            """,
+        )
+
+        self.assertRaisesMessage(ValueError, 'empty_label list/tuple must have 3 elements.',
+            SelectDateWidget, years=('2014',), empty_label=('not enough', 'values'))
+
+    @override_settings(USE_L10N=True)
+    @translation.override('nl')
+    def test_l10n(self):
+        w = SelectDateWidget(years=('2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016'))
+        self.assertEqual(
+            w.value_from_datadict({'date_year': '2010', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
+            '13-08-2010',
+        )
+
+        self.assertHTMLEqual(
+            w.render('date', '13-08-2010'),
+            """
+            <select name="date_day" id="id_date_day">
+                <option value="0">---</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13" selected="selected">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+                <option value="16">16</option>
+                <option value="17">17</option>
+                <option value="18">18</option>
+                <option value="19">19</option>
+                <option value="20">20</option>
+                <option value="21">21</option>
+                <option value="22">22</option>
+                <option value="23">23</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="26">26</option>
+                <option value="27">27</option>
+                <option value="28">28</option>
+                <option value="29">29</option>
+                <option value="30">30</option>
+                <option value="31">31</option>
+            </select>
+
+            <select name="date_month" id="id_date_month">
+                <option value="0">---</option>
+                <option value="1">januari</option>
+                <option value="2">februari</option>
+                <option value="3">maart</option>
+                <option value="4">april</option>
+                <option value="5">mei</option>
+                <option value="6">juni</option>
+                <option value="7">juli</option>
+                <option value="8" selected="selected">augustus</option>
+                <option value="9">september</option>
+                <option value="10">oktober</option>
+                <option value="11">november</option>
+                <option value="12">december</option>
+            </select>
+
+            <select name="date_year" id="id_date_year">
+                <option value="0">---</option>
+                <option value="2007">2007</option>
+                <option value="2008">2008</option>
+                <option value="2009">2009</option>
+                <option value="2010" selected="selected">2010</option>
+                <option value="2011">2011</option>
+                <option value="2012">2012</option>
+                <option value="2013">2013</option>
+                <option value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+            </select>
+            """,
+        )
+
+        # Even with an invalid date, the widget should reflect the entered value (#17401).
+        self.assertEqual(w.render('mydate', '2010-02-30').count('selected="selected"'), 3)
+
+        # Years before 1900 work
+        w = SelectDateWidget(years=('1899',))
+        self.assertEqual(
+            w.value_from_datadict({'date_year': '1899', 'date_month': '8', 'date_day': '13'}, {}, 'date'),
+            '13-08-1899',
+        )
+
+    @override_settings(USE_L10N=True)
+    @translation.override('nl')
+    def test_l10n_date_changed(self):
+        """
+        Ensure that DateField.has_changed() with SelectDateWidget works
+        correctly with a localized date format.
+        Refs #17165.
+        """
+        # With Field.show_hidden_initial=False -----------------------
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDate({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '2',
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        # With Field.show_hidden_initial=True ------------------------
+        class GetDateShowHiddenInitial(Form):
+            mydate = DateField(widget=SelectDateWidget, show_hidden_initial=True)
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '1',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 1))
+        }, initial={'mydate': datetime.date(2008, 4, 22)})
+        self.assertTrue(b.has_changed())
+
+        b = GetDateShowHiddenInitial({
+            'mydate_year': '2008',
+            'mydate_month': '4',
+            'mydate_day': '22',
+            'initial-mydate': HiddenInput()._format_value(datetime.date(2008, 4, 22))
+        }, initial={'mydate': datetime.date(2008, 4, 1)})
+        self.assertFalse(b.has_changed())
+
+    @override_settings(USE_L10N=True)
+    @translation.override('nl')
+    def test_l10n_invalid_date_in(self):
+        # Invalid dates shouldn't be allowed
+        a = GetDate({'mydate_month': '2', 'mydate_day': '31', 'mydate_year': '2010'})
+        self.assertFalse(a.is_valid())
+        # 'Geef een geldige datum op.' = 'Enter a valid date.'
+        self.assertEqual(a.errors, {'mydate': ['Geef een geldige datum op.']})
+
+    @override_settings(USE_L10N=True)
+    @translation.override('nl')
+    def test_form_label_association(self):
+        # label tag is correctly associated with first rendered dropdown
+        a = GetDate({'mydate_month': '1', 'mydate_day': '1', 'mydate_year': '2010'})
+        self.assertIn('<label for="id_mydate_day">', a.as_p())
+
+
+class SelectWidgetTests(SimpleTestCase):
+
+    def test_deepcopy(self):
+        """
+        __deepcopy__() should copy all attributes properly (#25085).
+        """
+        widget = Select()
+        obj = copy.deepcopy(widget)
+        self.assertIsNot(widget, obj)
+        self.assertEqual(widget.choices, obj.choices)
+        self.assertIsNot(widget.choices, obj.choices)
+        self.assertEqual(widget.attrs, obj.attrs)
+        self.assertIsNot(widget.attrs, obj.attrs)

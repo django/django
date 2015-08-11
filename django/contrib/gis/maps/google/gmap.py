@@ -1,12 +1,13 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.gis.maps.google.overlays import (
+    GMarker, GPolygon, GPolyline,
+)
 from django.template.loader import render_to_string
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import xrange
-
-from django.contrib.gis.maps.google.overlays import GPolygon, GPolyline, GMarker
+from django.utils.six.moves import range
 
 
 class GoogleMapException(Exception):
@@ -121,17 +122,17 @@ class GoogleMap(object):
     @property
     def body(self):
         "Returns HTML body tag for loading and unloading Google Maps javascript."
-        return format_html('<body {0} {1}>', self.onload, self.onunload)
+        return format_html('<body {} {}>', self.onload, self.onunload)
 
     @property
     def onload(self):
         "Returns the `onload` HTML <body> attribute."
-        return format_html('onload="{0}.{1}_load()"', self.js_module, self.dom_id)
+        return format_html('onload="{}.{}_load()"', self.js_module, self.dom_id)
 
     @property
     def api_script(self):
         "Returns the <script> tag for the Google Maps API javascript."
-        return format_html('<script src="{0}{1}" type="text/javascript"></script>',
+        return format_html('<script src="{}{}" type="text/javascript"></script>',
                            self.api_url, self.key)
 
     @property
@@ -142,18 +143,18 @@ class GoogleMap(object):
     @property
     def scripts(self):
         "Returns all <script></script> tags required with Google Maps JavaScript."
-        return format_html('{0}\n  <script type="text/javascript">\n//<![CDATA[\n{1}//]]>\n  </script>',
+        return format_html('{}\n  <script type="text/javascript">\n//<![CDATA[\n{}//]]>\n  </script>',
                            self.api_script, mark_safe(self.js))
 
     @property
     def style(self):
         "Returns additional CSS styling needed for Google Maps on IE."
-        return format_html('<style type="text/css">{0}</style>', self.vml_css)
+        return format_html('<style type="text/css">{}</style>', self.vml_css)
 
     @property
     def xhtml(self):
         "Returns XHTML information needed for IE VML overlays."
-        return format_html('<html xmlns="http://www.w3.org/1999/xhtml" {0}>', self.xmlns)
+        return format_html('<html xmlns="http://www.w3.org/1999/xhtml" {}>', self.xmlns)
 
     @property
     def icons(self):
@@ -192,7 +193,7 @@ class GoogleMapSet(GoogleMap):
             self.maps = args
 
         # Generating DOM ids for each of the maps in the set.
-        self.dom_ids = ['map%d' % i for i in xrange(len(self.maps))]
+        self.dom_ids = ['map%d' % i for i in range(len(self.maps))]
 
     def load_map_js(self):
         """

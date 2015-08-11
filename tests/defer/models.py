@@ -15,7 +15,7 @@ class Secondary(models.Model):
 class Primary(models.Model):
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
-    related = models.ForeignKey(Secondary)
+    related = models.ForeignKey(Secondary, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -32,3 +32,17 @@ class BigChild(Primary):
 class ChildProxy(Child):
     class Meta:
         proxy = True
+
+
+class RefreshPrimaryProxy(Primary):
+    class Meta:
+        proxy = True
+
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        # Reloads all deferred fields if any of the fields is deferred.
+        if fields is not None:
+            fields = set(fields)
+            deferred_fields = self.get_deferred_fields()
+            if fields.intersection(deferred_fields):
+                fields = fields.union(deferred_fields)
+        super(RefreshPrimaryProxy, self).refresh_from_db(using, fields, **kwargs)

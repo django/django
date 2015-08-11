@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
-
 CHOICES = (
     (1, 'first'),
     (2, 'second'),
@@ -29,7 +28,7 @@ class Article(models.Model):
 
 
 class Movie(models.Model):
-    #5218: Test models with non-default primary keys / AutoFields
+    # Test models with non-default primary keys / AutoFields #5218
     movie_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=60)
 
@@ -53,7 +52,7 @@ class Department(models.Model):
 
 @python_2_unicode_compatible
 class Worker(models.Model):
-    department = models.ForeignKey(Department)
+    department = models.ForeignKey(Department, models.CASCADE)
     name = models.CharField(max_length=200)
 
     def __str__(self):
@@ -73,14 +72,14 @@ class NonAutoPK(models.Model):
     name = models.CharField(max_length=10, primary_key=True)
 
 
-#18432: Chained foreign keys with to_field produce incorrect query
+# Chained foreign keys with to_field produce incorrect query #18432
 class Model1(models.Model):
     pkey = models.IntegerField(unique=True, db_index=True)
 
 
 class Model2(models.Model):
-    model1 = models.ForeignKey(Model1, unique=True, to_field='pkey')
+    model1 = models.ForeignKey(Model1, models.CASCADE, unique=True, to_field='pkey')
 
 
 class Model3(models.Model):
-    model2 = models.ForeignKey(Model2, unique=True, to_field='model1')
+    model2 = models.ForeignKey(Model2, models.CASCADE, unique=True, to_field='model1')

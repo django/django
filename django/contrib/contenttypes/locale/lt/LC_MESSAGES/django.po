@@ -2,14 +2,15 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-12 12:28+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -19,33 +20,26 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Turinio tipai"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "python modelio klasės vardas"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "turinio tipas"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "turinio tipai"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Tūrinio tipo %(ct_id)s objektas neturi priskirto modelio"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Tūrinio tipo %(ct_id)s objektas %(obj_id)s neegzistuoja"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s objektai neturi get_absolute_url() metodo"

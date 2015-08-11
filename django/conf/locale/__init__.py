@@ -33,7 +33,7 @@ LANG_INFO = {
         'bidi': True,
         'code': 'az',
         'name': 'Azerbaijani',
-        'name_local': 'azərbaycan dili',
+        'name_local': 'Azərbaycanca',
     },
     'be': {
         'bidi': False,
@@ -511,10 +511,6 @@ LANG_INFO = {
     },
     'zh-cn': {
         'fallback': ['zh-hans'],
-        'bidi': False,
-        'code': 'zh-cn',
-        'name': 'Simplified Chinese',
-        'name_local': '简体中文',
     },
     'zh-hans': {
         'bidi': False,
@@ -542,9 +538,5 @@ LANG_INFO = {
     },
     'zh-tw': {
         'fallback': ['zh-hant'],
-        'bidi': False,
-        'code': 'zh-tw',
-        'name': 'Traditional Chinese',
-        'name_local': '繁體中文',
     },
 }

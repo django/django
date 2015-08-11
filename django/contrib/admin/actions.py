@@ -2,14 +2,14 @@
 Built-in, globally-available admin actions.
 """
 
-from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.admin.utils import get_deleted_objects, model_ngettext
+from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.template.response import TemplateResponse
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy, ugettext as _
+from django.utils.translation import ugettext as _, ugettext_lazy
 
 
 def delete_selected(modeladmin, request, queryset):
@@ -63,23 +63,26 @@ def delete_selected(modeladmin, request, queryset):
     else:
         title = _("Are you sure?")
 
-    context = {
-        "title": title,
-        "objects_name": objects_name,
-        "deletable_objects": [deletable_objects],
-        "model_count": dict(model_count),
-        'queryset': queryset,
-        "perms_lacking": perms_needed,
-        "protected": protected,
-        "opts": opts,
-        'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-    }
+    context = dict(
+        modeladmin.admin_site.each_context(request),
+        title=title,
+        objects_name=objects_name,
+        deletable_objects=[deletable_objects],
+        model_count=dict(model_count).items(),
+        queryset=queryset,
+        perms_lacking=perms_needed,
+        protected=protected,
+        opts=opts,
+        action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
+    )
+
+    request.current_app = modeladmin.admin_site.name
 
     # Display the confirmation page
     return TemplateResponse(request, modeladmin.delete_selected_confirmation_template or [
         "admin/%s/%s/delete_selected_confirmation.html" % (app_label, opts.model_name),
         "admin/%s/delete_selected_confirmation.html" % app_label,
         "admin/delete_selected_confirmation.html"
-    ], context, current_app=modeladmin.admin_site.name)
+    ], context)
 
 delete_selected.short_description = ugettext_lazy("Delete selected %(verbose_name_plural)s")

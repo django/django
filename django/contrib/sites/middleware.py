@@ -1,4 +1,4 @@
-from .models import Site
+from .shortcuts import get_current_site
 
 
 class CurrentSiteMiddleware(object):
@@ -7,4 +7,4 @@ class CurrentSiteMiddleware(object):
     """
 
     def process_request(self, request):
-        request.site = Site.objects.get_current()
+        request.site = get_current_site(request)

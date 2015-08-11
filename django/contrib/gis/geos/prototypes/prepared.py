@@ -1,33 +1,30 @@
 from ctypes import c_char
-from django.contrib.gis.geos.libgeos import GEOM_PTR, PREPGEOM_PTR, geos_version_info
+
+from django.contrib.gis.geos.libgeos import (
+    GEOM_PTR, PREPGEOM_PTR, GEOSFuncFactory,
+)
 from django.contrib.gis.geos.prototypes.errcheck import check_predicate
-from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
 
 # Prepared geometry constructor and destructors.
-geos_prepare = GEOSFunc('GEOSPrepare')
-geos_prepare.argtypes = [GEOM_PTR]
-geos_prepare.restype = PREPGEOM_PTR
-
-prepared_destroy = GEOSFunc('GEOSPreparedGeom_destroy')
-prepared_destroy.argtpes = [PREPGEOM_PTR]
-prepared_destroy.restype = None
+geos_prepare = GEOSFuncFactory('GEOSPrepare', argtypes=[GEOM_PTR], restype=PREPGEOM_PTR)
+prepared_destroy = GEOSFuncFactory('GEOSPreparedGeom_destroy', argtpes=[PREPGEOM_PTR])
 
 
 # Prepared geometry binary predicate support.
-def prepared_predicate(func):
-    func.argtypes = [PREPGEOM_PTR, GEOM_PTR]
-    func.restype = c_char
-    func.errcheck = check_predicate
-    return func
+class PreparedPredicate(GEOSFuncFactory):
+    argtypes = [PREPGEOM_PTR, GEOM_PTR]
+    restype = c_char
+    errcheck = staticmethod(check_predicate)
 
-prepared_contains = prepared_predicate(GEOSFunc('GEOSPreparedContains'))
-prepared_contains_properly = prepared_predicate(GEOSFunc('GEOSPreparedContainsProperly'))
-prepared_covers = prepared_predicate(GEOSFunc('GEOSPreparedCovers'))
-prepared_intersects = prepared_predicate(GEOSFunc('GEOSPreparedIntersects'))
 
-if geos_version_info()['version'] > '3.3.0':
-    prepared_crosses = prepared_predicate(GEOSFunc('GEOSPreparedCrosses'))
-    prepared_disjoint = prepared_predicate(GEOSFunc('GEOSPreparedDisjoint'))
-    prepared_overlaps = prepared_predicate(GEOSFunc('GEOSPreparedOverlaps'))
-    prepared_touches = prepared_predicate(GEOSFunc('GEOSPreparedTouches'))
-    prepared_within = prepared_predicate(GEOSFunc('GEOSPreparedWithin'))
+prepared_contains = PreparedPredicate('GEOSPreparedContains')
+prepared_contains_properly = PreparedPredicate('GEOSPreparedContainsProperly')
+prepared_covers = PreparedPredicate('GEOSPreparedCovers')
+prepared_intersects = PreparedPredicate('GEOSPreparedIntersects')
+
+# Functions added in GEOS 3.3
+prepared_crosses = PreparedPredicate('GEOSPreparedCrosses')
+prepared_disjoint = PreparedPredicate('GEOSPreparedDisjoint')
+prepared_overlaps = PreparedPredicate('GEOSPreparedOverlaps')
+prepared_touches = PreparedPredicate('GEOSPreparedTouches')
+prepared_within = PreparedPredicate('GEOSPreparedWithin')

@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 import os
-from unittest import TestCase
-import warnings
+from datetime import datetime
 
-from django.utils import html, safestring
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils import html, safestring, six
 from django.utils._os import upath
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 
 
-class TestUtilsHtml(TestCase):
+class TestUtilsHtml(SimpleTestCase):
 
     def check_output(self, function, value, output=None):
         """
@@ -43,7 +43,7 @@ class TestUtilsHtml(TestCase):
 
     def test_format_html(self):
         self.assertEqual(
-            html.format_html("{0} {1} {third} {fourth}",
+            html.format_html("{} {} {third} {fourth}",
                              "< Dangerous >",
                              html.mark_safe("<b>safe</b>"),
                              third="< dangerous again",
@@ -81,6 +81,9 @@ class TestUtilsHtml(TestCase):
             ('a<p a >b</p>c', 'abc'),
             ('d<a:b c:d>e</p>f', 'def'),
             ('<strong>foo</strong><a href="http://example.com">bar</a>', 'foobar'),
+            # caused infinite loop on Pythons not patched with
+            # http://bugs.python.org/issue20288
+            ('&gotcha&#;<>', '&gotcha&#;<>'),
         )
         for value, output in items:
             self.check_output(f, value, output)
@@ -120,14 +123,13 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_strip_entities(self):
         f = html.strip_entities
         # Strings that should come out untouched.
         values = ("&", "&a", "&a", "a&#a")
         for value in values:
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.check_output(f, value)
+            self.check_output(f, value)
         # Valid entities that should be stripped from the patterns.
         entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
         patterns = (
@@ -138,9 +140,7 @@ class TestUtilsHtml(TestCase):
         )
         for entity in entities:
             for in_pattern, output in patterns:
-                with warnings.catch_warnings(record=True):
-                    warnings.simplefilter("always")
-                    self.check_output(f, in_pattern % {'entity': entity}, output)
+                self.check_output(f, in_pattern % {'entity': entity}, output)
 
     def test_escapejs(self):
         f = html.escapejs
@@ -154,6 +154,7 @@ class TestUtilsHtml(TestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_remove_tags(self):
         f = html.remove_tags
         items = (
@@ -161,9 +162,7 @@ class TestUtilsHtml(TestCase):
             ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
         )
         for value, tags, output in items:
-            with warnings.catch_warnings(record=True):
-                warnings.simplefilter("always")
-                self.assertEqual(f(value, tags), output)
+            self.assertEqual(f(value, tags), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote
@@ -185,3 +184,67 @@ class TestUtilsHtml(TestCase):
         self.assertEqual(html.conditional_escape(s),
                          '&lt;h1&gt;interop&lt;/h1&gt;')
         self.assertEqual(html.conditional_escape(safestring.mark_safe(s)), s)
+
+    def test_html_safe(self):
+        @html.html_safe
+        class HtmlClass(object):
+            if six.PY2:
+                def __unicode__(self):
+                    return "<h1>I'm a html class!</h1>"
+            else:
+                def __str__(self):
+                    return "<h1>I'm a html class!</h1>"
+
+        html_obj = HtmlClass()
+        self.assertTrue(hasattr(HtmlClass, '__html__'))
+        self.assertTrue(hasattr(html_obj, '__html__'))
+        self.assertEqual(force_text(html_obj), html_obj.__html__())
+
+    def test_html_safe_subclass(self):
+        if six.PY2:
+            class BaseClass(object):
+                def __html__(self):
+                    # defines __html__ on its own
+                    return 'some html content'
+
+                def __unicode__(self):
+                    return 'some non html content'
+
+            @html.html_safe
+            class Subclass(BaseClass):
+                def __unicode__(self):
+                    # overrides __unicode__ and is marked as html_safe
+                    return 'some html safe content'
+        else:
+            class BaseClass(object):
+                def __html__(self):
+                    # defines __html__ on its own
+                    return 'some html content'
+
+                def __str__(self):
+                    return 'some non html content'
+
+            @html.html_safe
+            class Subclass(BaseClass):
+                def __str__(self):
+                    # overrides __str__ and is marked as html_safe
+                    return 'some html safe content'
+
+        subclass_obj = Subclass()
+        self.assertEqual(force_text(subclass_obj), subclass_obj.__html__())
+
+    def test_html_safe_defines_html_error(self):
+        msg = "can't apply @html_safe to HtmlClass because it defines __html__()."
+        with self.assertRaisesMessage(ValueError, msg):
+            @html.html_safe
+            class HtmlClass(object):
+                def __html__(self):
+                    return "<h1>I'm a html class!</h1>"
+
+    def test_html_safe_doesnt_define_str(self):
+        method_name = '__unicode__()' if six.PY2 else '__str__()'
+        msg = "can't apply @html_safe to HtmlClass because it doesn't define %s." % method_name
+        with self.assertRaisesMessage(ValueError, msg):
+            @html.html_safe
+            class HtmlClass(object):
+                pass

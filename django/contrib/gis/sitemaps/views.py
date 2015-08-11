@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
-from django.http import Http404
 from django.contrib.gis.db.models.fields import GeometryField
+from django.contrib.gis.db.models.functions import AsKML, Transform
 from django.contrib.gis.shortcuts import render_to_kml, render_to_kmz
-from django.db import connections, DEFAULT_DB_ALIAS
-from django.db.models.fields import FieldDoesNotExist
+from django.core.exceptions import FieldDoesNotExist
+from django.db import DEFAULT_DB_ALIAS, connections
+from django.http import Http404
 
 
 def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB_ALIAS):
@@ -23,7 +24,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     if field_name:
         try:
-            field, _, _, _ = klass._meta.get_field_by_name(field_name)
+            field = klass._meta.get_field(field_name)
             if not isinstance(field, GeometryField):
                 raise FieldDoesNotExist
         except FieldDoesNotExist:
@@ -31,15 +32,17 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
 
     connection = connections[using]
 
-    if connection.ops.postgis:
-        # PostGIS will take care of transformation.
-        placemarks = klass._default_manager.using(using).kml(field_name=field_name)
+    if connection.features.has_AsKML_function:
+        # Database will take care of transformation.
+        placemarks = klass._default_manager.using(using).annotate(kml=AsKML(field_name))
     else:
-        # There's no KML method on Oracle or MySQL, so we use the `kml`
+        # If the database offers no KML method, we use the `kml`
         # attribute of the lazy geometry instead.
         placemarks = []
-        if connection.ops.oracle:
-            qs = klass._default_manager.using(using).transform(4326, field_name=field_name)
+        if connection.features.has_Transform_function:
+            qs = klass._default_manager.using(using).annotate(
+                **{'%s_4326' % field_name: Transform(field_name, 4326)})
+            field_name += '_4326'
         else:
             qs = klass._default_manager.using(using).all()
         for mod in qs:

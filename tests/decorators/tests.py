@@ -1,17 +1,25 @@
-from functools import wraps, update_wrapper
+from functools import update_wrapper, wraps
 from unittest import TestCase
-import warnings
 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.http import HttpResponse, HttpRequest, HttpResponseNotAllowed
+from django.contrib.auth.decorators import (
+    login_required, permission_required, user_passes_test,
+)
+from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
+from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
-from django.utils.functional import allow_lazy, lazy, memoize
-from django.views.decorators.cache import cache_page, never_cache, cache_control
-from django.views.decorators.clickjacking import xframe_options_deny, xframe_options_sameorigin, xframe_options_exempt
-from django.views.decorators.http import require_http_methods, require_GET, require_POST, require_safe, condition
-from django.views.decorators.vary import vary_on_headers, vary_on_cookie
+from django.utils.functional import allow_lazy, lazy
+from django.views.decorators.cache import (
+    cache_control, cache_page, never_cache,
+)
+from django.views.decorators.clickjacking import (
+    xframe_options_deny, xframe_options_exempt, xframe_options_sameorigin,
+)
+from django.views.decorators.http import (
+    condition, require_GET, require_http_methods, require_POST, require_safe,
+)
+from django.views.decorators.vary import vary_on_cookie, vary_on_headers
 
 
 def fully_decorated(request):
@@ -62,10 +70,6 @@ full_decorator = compose(
     allow_lazy,
     lazy,
 )
-
-# suppress the deprecation warning of memoize
-with warnings.catch_warnings(record=True):
-    fully_decorated = memoize(fully_decorated, {}, 1)
 
 fully_decorated = full_decorator(fully_decorated)
 
@@ -186,7 +190,7 @@ class ClsDec(object):
         return update_wrapper(wrapped, f)
 
 
-class MethodDecoratorTests(TestCase):
+class MethodDecoratorTests(SimpleTestCase):
     """
     Tests for method_decorator
     """
@@ -271,6 +275,54 @@ class MethodDecoratorTests(TestCase):
 
         self.assertEqual(Test().method(1), 1)
 
+    def test_class_decoration(self):
+        """
+        @method_decorator can be used to decorate a class and its methods.
+        """
+        def deco(func):
+            def _wrapper(*args, **kwargs):
+                return True
+            return _wrapper
+
+        @method_decorator(deco, name="method")
+        class Test(object):
+            def method(self):
+                return False
+
+        self.assertTrue(Test().method())
+
+    def test_invalid_non_callable_attribute_decoration(self):
+        """
+        @method_decorator on a non-callable attribute raises an error.
+        """
+        msg = (
+            "Cannot decorate 'prop' as it isn't a callable attribute of "
+            "<class 'Test'> (1)"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            @method_decorator(lambda: None, name="prop")
+            class Test(object):
+                prop = 1
+
+                @classmethod
+                def __module__(cls):
+                    return "tests"
+
+    def test_invalid_method_name_to_decorate(self):
+        """
+        @method_decorator on a nonexistent method raises an error.
+        """
+        msg = (
+            "The keyword argument `name` must be the name of a method of the "
+            "decorated class: <class 'Test'>. Got 'non_existing_method' instead"
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            @method_decorator(lambda: None, name="non_existing_method")
+            class Test(object):
+                @classmethod
+                def __module__(cls):
+                    return "tests"
+
 
 class XFrameOptionsDecoratorsTests(TestCase):
     """
@@ -314,3 +366,15 @@ class XFrameOptionsDecoratorsTests(TestCase):
         # the middleware's functionality, let's make sure it actually works...
         r = XFrameOptionsMiddleware().process_response(req, resp)
         self.assertEqual(r.get('X-Frame-Options', None), None)
+
+
+class NeverCacheDecoratorTest(TestCase):
+    def test_never_cache_decorator(self):
+        @never_cache
+        def a_view(request):
+            return HttpResponse()
+        r = a_view(HttpRequest())
+        self.assertEqual(
+            set(r['Cache-Control'].split(', ')),
+            {'max-age=0', 'no-cache', 'no-store', 'must-revalidate'},
+        )

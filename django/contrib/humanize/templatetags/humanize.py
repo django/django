@@ -11,8 +11,8 @@ from django.template import defaultfilters
 from django.utils.encoding import force_text
 from django.utils.formats import number_format
 from django.utils.safestring import mark_safe
-from django.utils.translation import pgettext, ungettext, ugettext as _
 from django.utils.timezone import is_aware, utc
+from django.utils.translation import pgettext, ugettext as _, ungettext
 
 register = template.Library()
 

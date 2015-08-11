@@ -1,8 +1,8 @@
 from django.http import HttpResponse
-from django.template import Template, Context
+from django.template import engines
 from django.template.response import TemplateResponse
-from django.test import TestCase, RequestFactory
-from django.utils.decorators import decorator_from_middleware
+from django.test import RequestFactory, SimpleTestCase
+from django.utils.decorators import classproperty, decorator_from_middleware
 
 
 class ProcessViewMiddleware(object):
@@ -28,7 +28,7 @@ class FullMiddleware(object):
     def process_request(self, request):
         request.process_request_reached = True
 
-    def process_view(sef, request, view_func, view_args, view_kwargs):
+    def process_view(self, request, view_func, view_args, view_kwargs):
         request.process_view_reached = True
 
     def process_template_response(self, request, response):
@@ -44,7 +44,7 @@ class FullMiddleware(object):
 full_dec = decorator_from_middleware(FullMiddleware)
 
 
-class DecoratorFromMiddlewareTests(TestCase):
+class DecoratorFromMiddlewareTests(SimpleTestCase):
     """
     Tests for view decorators created using
     ``django.utils.decorators.decorator_from_middleware``.
@@ -70,8 +70,8 @@ class DecoratorFromMiddlewareTests(TestCase):
 
         @full_dec
         def normal_view(request):
-            t = Template("Hello world")
-            return HttpResponse(t.render(Context({})))
+            template = engines['django'].from_string("Hello world")
+            return HttpResponse(template.render())
 
         request = self.rf.get('/')
         normal_view(request)
@@ -89,8 +89,8 @@ class DecoratorFromMiddlewareTests(TestCase):
 
         @full_dec
         def template_response_view(request):
-            t = Template("Hello world")
-            return TemplateResponse(request, t, {})
+            template = engines['django'].from_string("Hello world")
+            return TemplateResponse(request, template)
 
         request = self.rf.get('/')
         response = template_response_view(request)
@@ -107,3 +107,41 @@ class DecoratorFromMiddlewareTests(TestCase):
         self.assertTrue(getattr(request, 'process_response_reached', False))
         # Check that process_response saw the rendered content
         self.assertEqual(request.process_response_content, b"Hello world")
+
+
+class ClassPropertyTest(SimpleTestCase):
+    def test_getter(self):
+        class Foo(object):
+            foo_attr = 123
+
+            def __init__(self):
+                self.foo_attr = 456
+
+            @classproperty
+            def foo(cls):
+                return cls.foo_attr
+
+        class Bar(object):
+            bar = classproperty()
+
+            @bar.getter
+            def bar(cls):
+                return 123
+
+        self.assertEqual(Foo.foo, 123)
+        self.assertEqual(Foo().foo, 123)
+        self.assertEqual(Bar.bar, 123)
+        self.assertEqual(Bar().bar, 123)
+
+    def test_override_getter(self):
+        class Foo(object):
+            @classproperty
+            def foo(cls):
+                return 123
+
+            @foo.getter
+            def foo(cls):
+                return 456
+
+        self.assertEqual(Foo.foo, 456)
+        self.assertEqual(Foo().foo, 456)

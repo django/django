@@ -4,11 +4,12 @@ import os
 
 from django.core.management import call_command
 from django.test import TestCase, TransactionTestCase
-from django.test.utils import override_system_checks, extend_sys_path
+from django.test.utils import extend_sys_path
 from django.utils._os import upath
 
-from .models import (ConcreteModel, ConcreteModelSubclass,
-    ConcreteModelSubclassProxy)
+from .models import (
+    ConcreteModel, ConcreteModelSubclass, ConcreteModelSubclassProxy,
+)
 
 
 class ProxyModelInheritanceTests(TransactionTestCase):
@@ -19,13 +20,10 @@ class ProxyModelInheritanceTests(TransactionTestCase):
     """
     available_apps = []
 
-    # `auth` app is imported, but not installed in this test, so we need to
-    # exclude checks registered by this app.
-    @override_system_checks([])
     def test_table_exists(self):
         with extend_sys_path(os.path.dirname(os.path.abspath(upath(__file__)))):
             with self.modify_settings(INSTALLED_APPS={'append': ['app1', 'app2']}):
-                call_command('migrate', verbosity=0)
+                call_command('migrate', verbosity=0, run_syncdb=True)
                 from app1.models import ProxyModel
                 from app2.models import NiceModel
                 self.assertEqual(NiceModel.objects.all().count(), 0)

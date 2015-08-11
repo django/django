@@ -51,6 +51,7 @@ class InspectDBTestCase(TestCase):
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
             assertFieldType('char_field', "models.CharField(max_length=10)")
+            assertFieldType('null_char_field', "models.CharField(max_length=10, blank=True, null=True)")
             assertFieldType('comma_separated_int_field', "models.CharField(max_length=99)")
         assertFieldType('date_field', "models.DateField()")
         assertFieldType('date_time_field', "models.DateTimeField()")
@@ -60,11 +61,9 @@ class InspectDBTestCase(TestCase):
             assertFieldType('file_field', "models.CharField(max_length=100)")
             assertFieldType('file_path_field', "models.CharField(max_length=100)")
         if connection.features.can_introspect_ip_address_field:
-            assertFieldType('ip_address_field', "models.GenericIPAddressField()")
             assertFieldType('gen_ip_adress_field', "models.GenericIPAddressField()")
         elif (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
-            assertFieldType('ip_address_field', "models.CharField(max_length=15)")
             assertFieldType('gen_ip_adress_field', "models.CharField(max_length=39)")
         if (connection.features.can_introspect_max_length and
                 not connection.features.interprets_empty_strings_as_nulls):
@@ -145,15 +144,25 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
         # Recursive foreign keys should be set to 'self'
-        self.assertIn("parent = models.ForeignKey('self')", output)
-        self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", output, msg=error_message)
+        self.assertIn("parent = models.ForeignKey('self', models.DO_NOTHING)", output)
+        self.assertNotIn(
+            "from = models.ForeignKey(InspectdbPeople, models.DO_NOTHING)",
+            output,
+            msg=error_message,
+        )
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
-        self.assertIn("from_field = models.ForeignKey('InspectdbPeople', db_column='from_id')",
-                      output)
-        self.assertIn("people_pk = models.ForeignKey(InspectdbPeople, primary_key=True)",
-                      output)
-        self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
-                      output)
+        self.assertIn(
+            "from_field = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, db_column='from_id')",
+            output,
+        )
+        self.assertIn(
+            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            output,
+        )
+        self.assertIn(
+            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            output,
+        )
 
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""

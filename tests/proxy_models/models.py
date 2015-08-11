@@ -7,6 +7,7 @@ providing a modified interface to the data from the base class.
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 # A couple of managers for testing managing overriding in proxy model cases.
 
 
@@ -123,7 +124,7 @@ class Country(models.Model):
 @python_2_unicode_compatible
 class State(models.Model):
     name = models.CharField(max_length=50)
-    country = models.ForeignKey(Country)
+    country = models.ForeignKey(Country, models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -157,7 +158,7 @@ class ProxyTrackerUser(TrackerUser):
 @python_2_unicode_compatible
 class Issue(models.Model):
     summary = models.CharField(max_length=255)
-    assignee = models.ForeignKey(TrackerUser)
+    assignee = models.ForeignKey(ProxyTrackerUser, models.CASCADE)
 
     def __str__(self):
         return ':'.join((self.__class__.__name__, self.summary,))
@@ -165,7 +166,7 @@ class Issue(models.Model):
 
 class Bug(Issue):
     version = models.CharField(max_length=50)
-    reporter = models.ForeignKey(BaseUser)
+    reporter = models.ForeignKey(BaseUser, models.CASCADE)
 
 
 class ProxyBug(Bug):
@@ -190,8 +191,8 @@ class Improvement(Issue):
     or to a proxy of proxy model
     """
     version = models.CharField(max_length=50)
-    reporter = models.ForeignKey(ProxyTrackerUser)
-    associated_bug = models.ForeignKey(ProxyProxyBug)
+    reporter = models.ForeignKey(ProxyTrackerUser, models.CASCADE)
+    associated_bug = models.ForeignKey(ProxyProxyBug, models.CASCADE)
 
 
 class ProxyImprovement(Improvement):

@@ -3,6 +3,7 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lauris <lauris@runbox.com>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 # Nikolajus Krauklis <nikolajus@gmail.com>, 2013
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012-2013
 # sirex <sirexas@gmail.com>, 2011
@@ -10,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 17:04+0000\n"
-"Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-12 12:02+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -22,68 +23,51 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Sėkmingai ištrinta %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Ištrinti %(name)s negalima"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Ar esate tikras?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Ištrinti pasirinktus %(verbose_name_plural)s "
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
-msgstr ""
+msgstr "Administravimas"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Visi"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Taip"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Ne"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Nežinomas"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Betkokia data"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Šiandien"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Paskutinės 7 dienos"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Šį mėnesį"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Šiais metais"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -92,98 +76,83 @@ msgstr ""
 "Prašome įvesti tinkamą personalo paskyros %(username)s ir slaptažodį. "
 "Atminkite, kad abu laukeliai yra jautrūs raidžių dydžiui."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Veiksmas:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "veiksmo laikas"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "objekto id"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "objekto repr"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "veiksmo žymė"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "pakeisti žinutę"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "log įrašas"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "log įrašai"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "„%(object)s“ pridėti."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Pakeisti „%(object)s“ - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "„%(object)s“ ištrinti."
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry objektas"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "None"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Nuspauskite \"Control\", arba \"Command\" Mac kompiuteriuose, kad pasirinkti "
+"daugiau nei vieną."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Pakeistas %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "ir"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Įrašyta %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Pakeistas %(list)s šiam %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Pašalinta %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Nei vienas laukas nepakeistas"
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr ""
-"%(name)s \"%(obj)s\" pridėtas sėkmingai. Gali taisytį jį dar kartą žemiau."
+"%(name)s \"%(obj)s\" pridėtas sėkmingai. Jūs galite jį taisytį dar kartą "
+"žemiau."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -192,12 +161,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" buvo sėkmingai pridėtas. Jūs galite pridėti naują "
 "%(name)s žemiau."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" pridėtas sėkmingai."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -206,7 +173,6 @@ msgstr ""
 "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas.  Jūs galite jį koreguoti "
 "žemiau."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -215,12 +181,10 @@ msgstr ""
 "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas. Jūs galite pridėti naują "
 "%(name)s žemiau."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -228,35 +192,28 @@ msgstr ""
 "Įrašai turi būti pasirinkti, kad būtų galima atlikti veiksmus. Įrašai "
 "pakeisti nebuvo."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Veiksmai atlikti nebuvo."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" sėkmingai ištrintas."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "Įrašas %(name)s su pirminiu raktu %(key)r neegzistuoja."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Pridėti %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Pakeisti %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Duomenų bazės klaida"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
@@ -264,7 +221,6 @@ msgstr[0] "%(count)s %(name)s sėkmingai pakeistas."
 msgstr[1] "%(count)s %(name)s sėkmingai pakeisti."
 msgstr[2] "%(count)s %(name)s "
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
@@ -272,95 +228,62 @@ msgstr[0] "%(total_count)s pasirinktas"
 msgstr[1] "%(total_count)s pasirinkti"
 msgstr[2] "Visi %(total_count)s pasirinkti"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "0 iš %(cnt)s pasirinkta"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
-msgstr "Pakeisti istoriją: %s"
+msgstr "Pakeitimų istorija: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"%(class_name)s %(instance)s šalinimas reikalautų pašalinti apsaugotus "
+"susijusius objektus: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
-msgstr "Django saito administravimas"
+msgstr "Django tinklalapio administravimas"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Django administravimas"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
-msgstr "Saito administravimas"
+msgstr "Tinklalapio administravimas"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Prisijungti"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "%(app)s administravimas"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Puslapis nerastas"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Atsiprašome, bet prašytas puslapis nerastas."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Pradinis"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Serverio klaida"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Serverio klaida (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Serverio klaida <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -368,28 +291,22 @@ msgstr ""
 "Netikėta klaida. Apie ją buvo pranešta administratoriams el. paštu ir ji "
 "turėtų būti greitai sutvarkyta. Dėkui už kantrybę."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Vykdyti pasirinktus veiksmus"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Vykdyti"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Spauskite čia norėdami pasirinkti visus įrašus"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Pasirinkti visus %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Atstatyti į pradinę būseną"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -397,112 +314,63 @@ msgstr ""
 "Pirmiausia įveskite naudotojo vardą ir slaptažodį. Tada galėsite keisti "
 "daugiau naudotojo nustatymų."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Įveskite naudotojo vardą ir slaptažodį."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Keisti slaptažodį"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Ištaisykite žemiau esancias klaidas."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Ištaisykite žemiau esančias klaidas."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Įveskite naują slaptažodį naudotojui <strong>%(username)s</strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Slaptažodis"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Slaptažodis (dar kartą)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Patikrinimui įvesk tokį patį slaptažodį, kaip viršuje."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Sveiki,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "Peržiūrėti tinklalapį"
+
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Atsijungti"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Pridėti"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Istorija"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
-msgstr "Matyti saite"
+msgstr "Matyti tinklalapyje"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Naujas %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Filtras"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Pašalinti iš rikiavimo"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Rikiavimo prioritetas: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Perjungti rikiavimą"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Ištrinti"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -512,7 +380,6 @@ msgstr ""
 "Trinant %(object_name)s '%(escaped_object)s' turi būti ištrinti ir susiję "
 "objektai, bet tavo vartotojas neturi teisių ištrinti šių objektų:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -521,25 +388,26 @@ msgstr ""
 "Ištrinant %(object_name)s '%(escaped_object)s' būtų ištrinti šie apsaugoti "
 "ir susiję objektai:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Ar tu esi tikras, kad nori ištrinti %(object_name)s \"%(escaped_object)s\"? "
+"Ar este tikri, kad norite ištrinti %(object_name)s \"%(escaped_object)s\"? "
 "Visi susiję objektai bus ištrinti:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "Objektai"
+
 msgid "Yes, I'm sure"
 msgstr "Taip, esu tikras"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr "Ne, grįžti atgal"
+
 msgid "Delete multiple objects"
 msgstr "Ištrinti kelis objektus"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -549,7 +417,6 @@ msgstr ""
 "Ištrinant pasirinktą %(objects_name)s būtų ištrinti susiję objektai, tačiau "
 "jūsų vartotojas neturi reikalingų teisių ištrinti šiuos objektų tipus:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -558,7 +425,6 @@ msgstr ""
 "Ištrinant pasirinktus %(objects_name)s būtų ištrinti šie apsaugoti ir susiję "
 "objektai:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -567,56 +433,45 @@ msgstr ""
 "Ar esate tikri, kad norite ištrinti pasirinktus %(objects_name)s? Sekantys "
 "pasirinkti bei susiję objektai bus ištrinti:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Pakeisti"
+
 msgid "Remove"
 msgstr "Pašalinti"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Pridėti dar viena %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Ištrinti?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " Pagal %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "Santrauka"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s aplikacijos modeliai"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Pakeisti"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Neturite teisių ką nors keistis."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Paskutiniai Veiksmai"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Mano Veiksmai"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Nėra prieinamų"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Nežinomas turinys"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -626,48 +481,46 @@ msgstr ""
 "reikalingos lentelės sukurtos ir vartotojas turi teises skaityti duomenų "
 "bazę."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Slaptažodis:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Pamiršote slaptažodį ar vartotojo vardą?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Data/laikas"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Naudotojas"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Veiksmas"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
 msgstr ""
 "Šis objektas neturi pakeitimų istorijos. Tikriausiai jis buvo pridėtas ne "
-"per admin puslapį."
+"per administravimo puslapį."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Rodyti visus"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Išsaugoti"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Keisti pasirinktus %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Pridėti dar vieną %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Pašalinti pasirinktus %(model)s"
+
 msgid "Search"
 msgstr "Ieškoti"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
@@ -675,76 +528,50 @@ msgstr[0] "%(counter)s rezultatas"
 msgstr[1] "%(counter)s rezultatai"
 msgstr[2] "%(counter)s rezultatai"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s iš viso"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Išsaugoti kaip naują"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Išsaugoti ir pridėti naują"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Išsaugoti ir tęsti redagavimą"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Dėkui už praleistą laiką šiandien."
+msgstr "Dėkui už šiandien tinklalapyje turiningai praleistą laiką."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Prisijungti dar kartą"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Slaptažodžio keitimas"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Jūsų slaptažodis buvo pakeistas."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"Saugumo sumetimais įvesk seną slaptažodį ir tada du kartus naują, kad "
-"įsitikinti, jog nesuklydai rašydamas"
+"Saugumo sumetimais įveskite seną slaptažodį ir tada du kartus naują, kad "
+"įsitikinti, jog nesuklydote rašydamas"
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Senas slaptažodis"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Naujas "
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Keisti mano slaptažodį"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Slaptažodžio atstatymas"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "Jūsų slaptažodis buvo išsaugotas. Dabas galite prisijungti."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Slaptažodžio atstatymo patvirtinimas"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -752,31 +579,27 @@ msgstr ""
 "Įveskite naująjį slaptažodį du kartus, taip užtikrinant, jog nesuklydote "
 "rašydami."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Naujasis slaptažodis:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Slaptažodžio patvirtinimas:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Slaptažodžio atstatymo nuoroda buvo negaliojanti, nes ja tikriausiai jau "
+"Slaptažodžio atstatymo nuoroda buvo negaliojanti, nes ji tikriausiai jau "
 "buvo panaudota. Prašykite naujo slaptažodžio pakeitimo."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Instrukcijos kaip nustatyti slaptažodį buvo išsiųstos jūsų nurodytų el. "
-"pašto adresu. Instrukcijas turėtumėte gauti netrukus."
+"Jei egzistuoja vartotojas su jūsų įvestu elektroninio pašto adresu, "
+"išsiųsime jums slaptažodžio nustatymo instrukcijas . Instrukcijas turėtumėte "
+"gauti netrukus."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -784,7 +607,6 @@ msgstr ""
 "Jei el. laiško negavote, prašome įsitikinti ar įvedėte tą el. pašto adresą "
 "kuriuo registravotės ir patikrinkite savo šlamšto aplanką."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -793,24 +615,19 @@ msgstr ""
 "Jūs gaunate šį laišką nes prašėte paskyros slaptažodžio atkūrimo "
 "%(site_name)s svetainėje."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "Prašome eiti į šį puslapį ir pasirinkti naują slaptažodį:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "Jūsų naudotojo vardas, jei netyčia jį užmiršote:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
-msgstr "Dėkui, kad naudojatės mūsų saitu!"
+msgstr "Dėkui, kad naudojatės mūsų tinklalapiu!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s komanda"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -818,52 +635,37 @@ msgstr ""
 "Pamiršote slaptažodį? Įveskite savo el. pašto adresą ir mes išsiųsime laišką "
 "su instrukcijomis kaip nustatyti naują slaptažodį."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "El. pašto adresas:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Atstatyti slaptažodį"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Visos datos"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "()"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Pasirinkti %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Pasirinkite %s kurį norite keisti"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Data:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Laikas:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Paieška"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Pridėti dar viena"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Šiuo metu:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Pakeisti:"

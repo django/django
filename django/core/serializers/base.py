@@ -1,11 +1,8 @@
 """
 Module for abstract serializer/unserializer base classes.
 """
-import warnings
-
 from django.db import models
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
 
 class SerializerDoesNotExist(KeyError):
@@ -20,7 +17,37 @@ class SerializationError(Exception):
 
 class DeserializationError(Exception):
     """Something bad happened during deserialization."""
-    pass
+
+    @classmethod
+    def WithData(cls, original_exc, model, fk, field_value):
+        """
+        Factory method for creating a deserialization error which has a more
+        explanatory messsage.
+        """
+        return cls("%s: (%s:pk=%s) field_value was '%s'" % (original_exc, model, fk, field_value))
+
+
+class ProgressBar(object):
+    progress_width = 75
+
+    def __init__(self, output, total_count):
+        self.output = output
+        self.total_count = total_count
+        self.prev_done = 0
+
+    def update(self, count):
+        if not self.output:
+            return
+        perc = count * 100 // self.total_count
+        done = perc * self.progress_width // 100
+        if self.prev_done >= done:
+            return
+        self.prev_done = done
+        cr = '' if self.total_count == 1 else '\r'
+        self.output.write(cr + '[' + '.' * done + ' ' * (self.progress_width - done) + ']')
+        if done == self.progress_width:
+            self.output.write('\n')
+        self.output.flush()
 
 
 class Serializer(object):
@@ -31,6 +58,7 @@ class Serializer(object):
     # Indicates if the implemented serializer is only available for
     # internal Django use.
     internal_use_only = False
+    progress_class = ProgressBar
 
     def serialize(self, queryset, **options):
         """
@@ -40,23 +68,22 @@ class Serializer(object):
 
         self.stream = options.pop("stream", six.StringIO())
         self.selected_fields = options.pop("fields", None)
-        self.use_natural_keys = options.pop("use_natural_keys", False)
-        if self.use_natural_keys:
-            warnings.warn("``use_natural_keys`` is deprecated; use ``use_natural_foreign_keys`` instead.",
-                RemovedInDjango19Warning)
-        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False) or self.use_natural_keys
+        self.use_natural_foreign_keys = options.pop('use_natural_foreign_keys', False)
         self.use_natural_primary_keys = options.pop('use_natural_primary_keys', False)
+        progress_bar = self.progress_class(
+            options.pop('progress_output', None), options.pop('object_count', 0)
+        )
 
         self.start_serialization()
         self.first = True
-        for obj in queryset:
+        for count, obj in enumerate(queryset, start=1):
             self.start_object(obj)
             # Use the concrete parent class' _meta instead of the object's _meta
             # This is to avoid local_fields problems for proxy models. Refs #17717.
             concrete_model = obj._meta.concrete_model
             for field in concrete_model._meta.local_fields:
                 if field.serialize:
-                    if field.rel is None:
+                    if field.remote_field is None:
                         if self.selected_fields is None or field.attname in self.selected_fields:
                             self.handle_field(obj, field)
                     else:
@@ -67,6 +94,7 @@ class Serializer(object):
                     if self.selected_fields is None or field.attname in self.selected_fields:
                         self.handle_m2m_field(obj, field)
             self.end_object(obj)
+            progress_bar.update(count)
             if self.first:
                 self.first = False
         self.end_serialization()
@@ -163,14 +191,14 @@ class DeserializedObject(object):
         self.m2m_data = m2m_data
 
     def __repr__(self):
-        return "<DeserializedObject: %s.%s(pk=%s)>" % (
-            self.object._meta.app_label, self.object._meta.object_name, self.object.pk)
+        return "<DeserializedObject: %s(pk=%s)>" % (
+            self.object._meta.label, self.object.pk)
 
-    def save(self, save_m2m=True, using=None):
+    def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any
         # model-defined save. The save is also forced to be raw.
         # raw=True is passed to any pre/post_save signals.
-        models.Model.save_base(self.object, using=using, raw=True)
+        models.Model.save_base(self.object, using=using, raw=True, **kwargs)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
                 setattr(self.object, accessor_name, object_list)

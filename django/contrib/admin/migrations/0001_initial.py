@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import models, migrations
+import django.contrib.admin.models
 from django.conf import settings
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -22,8 +23,18 @@ class Migration(migrations.Migration):
                 ('object_repr', models.CharField(max_length=200, verbose_name='object repr')),
                 ('action_flag', models.PositiveSmallIntegerField(verbose_name='action flag')),
                 ('change_message', models.TextField(verbose_name='change message', blank=True)),
-                ('content_type', models.ForeignKey(to_field='id', blank=True, to='contenttypes.ContentType', null=True)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('content_type', models.ForeignKey(
+                    to_field='id',
+                    on_delete=models.SET_NULL,
+                    blank=True, null=True,
+                    to='contenttypes.ContentType',
+                    verbose_name='content type',
+                )),
+                ('user', models.ForeignKey(
+                    to=settings.AUTH_USER_MODEL,
+                    on_delete=models.CASCADE,
+                    verbose_name='user',
+                )),
             ],
             options={
                 'ordering': ('-action_time',),
@@ -32,5 +43,8 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'log entries',
             },
             bases=(models.Model,),
+            managers=[
+                ('objects', django.contrib.admin.models.LogEntryManager()),
+            ],
         ),
     ]

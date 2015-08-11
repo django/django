@@ -4,9 +4,9 @@ from django.contrib import admin
 from django.contrib.admin.decorators import register
 from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-from .models import Person, Place, Location, Traveler
+from .models import Location, Person, Place, Traveler
 
 
 class NameAdmin(admin.ModelAdmin):
@@ -18,7 +18,7 @@ class CustomSite(admin.AdminSite):
     pass
 
 
-class TestRegistration(TestCase):
+class TestRegistration(SimpleTestCase):
     def setUp(self):
         self.site = admin.AdminSite()
 
@@ -80,7 +80,7 @@ class TestRegistration(TestCase):
         self.assertFalse(self.site.is_registered(Person))
 
 
-class TestRegistrationDecorator(TestCase):
+class TestRegistrationDecorator(SimpleTestCase):
     """
     Tests the register decorator in admin.decorators
 
@@ -104,6 +104,7 @@ class TestRegistrationDecorator(TestCase):
             isinstance(self.default_site._registry[Person],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Person)
 
     def test_custom_site_registration(self):
         register(Person, site=self.custom_site)(NameAdmin)
@@ -118,10 +119,12 @@ class TestRegistrationDecorator(TestCase):
             isinstance(self.default_site._registry[Traveler],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Traveler)
         self.assertTrue(
             isinstance(self.default_site._registry[Place],
                        admin.options.ModelAdmin)
         )
+        self.default_site.unregister(Place)
 
     def test_wrapped_class_not_a_model_admin(self):
         self.assertRaisesMessage(ValueError, 'Wrapped class must subclass ModelAdmin.',

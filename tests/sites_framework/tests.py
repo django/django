@@ -6,8 +6,9 @@ from django.core import checks
 from django.db import models
 from django.test import TestCase
 
-from .models import (SyndicatedArticle, ExclusiveArticle, CustomArticle,
-    AbstractArticle)
+from .models import (
+    AbstractArticle, CustomArticle, ExclusiveArticle, SyndicatedArticle,
+)
 
 
 class SitesFrameworkTestCase(TestCase):
@@ -41,7 +42,7 @@ class SitesFrameworkTestCase(TestCase):
     def test_invalid_name(self):
 
         class InvalidArticle(AbstractArticle):
-            site = models.ForeignKey(Site)
+            site = models.ForeignKey(Site, models.CASCADE)
 
             objects = models.Manager()
             on_site = CurrentSiteManager("places_this_article_should_appear")

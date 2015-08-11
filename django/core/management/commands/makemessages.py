@@ -6,21 +6,25 @@ import io
 import os
 import re
 import sys
+from functools import total_ordering
 from itertools import dropwhile
 
 import django
 from django.conf import settings
-from django.core.management.base import CommandError, BaseCommand
-from django.core.management.utils import (handle_extensions, find_command,
-    popen_wrapper)
-from django.utils.encoding import force_str
-from django.utils.functional import total_ordering
+from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import (
+    find_command, handle_extensions, popen_wrapper,
+)
 from django.utils import six
-from django.utils.text import get_text_list
+from django.utils._os import upath
+from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
+from django.utils.functional import cached_property
 from django.utils.jslex import prepare_js_for_gettext
+from django.utils.text import get_text_list
 
 plural_forms_re = re.compile(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', re.MULTILINE | re.DOTALL)
 STATUS_OK = 0
+NO_LOCALE_DIR = object()
 
 
 def check_programs(*programs):
@@ -28,6 +32,26 @@ def check_programs(*programs):
         if find_command(program) is None:
             raise CommandError("Can't find %s. Make sure you have GNU "
                     "gettext tools 0.15 or newer installed." % program)
+
+
+def gettext_popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding="utf-8"):
+    """
+    Makes sure text obtained from stdout of gettext utilities is Unicode.
+    """
+    # This both decodes utf-8 and cleans line endings. Simply using
+    # popen_wrapper(universal_newlines=True) doesn't properly handle the
+    # encoding. This goes back to popen's flaky support for encoding:
+    # https://bugs.python.org/issue6135. This is a solution for #23271, #21928.
+    # No need to do anything on Python 2 because it's already a byte-string there.
+    manual_io_wrapper = six.PY3 and stdout_encoding != DEFAULT_LOCALE_ENCODING
+
+    stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type,
+                                                universal_newlines=not manual_io_wrapper)
+    if manual_io_wrapper:
+        stdout = io.TextIOWrapper(io.BytesIO(stdout), encoding=stdout_encoding).read()
+    if six.PY2:
+        stdout = stdout.decode(stdout_encoding)
+    return stdout, stderr, status_code
 
 
 @total_ordering
@@ -61,21 +85,22 @@ class TranslatableFile(object):
 
         if command.verbosity > 1:
             command.stdout.write('processing file %s in %s\n' % (self.file, self.dirpath))
-        _, file_ext = os.path.splitext(self.file)
-        if domain == 'djangojs' and file_ext in command.extensions:
-            is_templatized = True
+        file_ext = os.path.splitext(self.file)[1]
+        if domain == 'djangojs':
             orig_file = os.path.join(self.dirpath, self.file)
-            with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
-                src_data = fp.read()
-            src_data = prepare_js_for_gettext(src_data)
-            thefile = '%s.c' % self.file
-            work_file = os.path.join(self.dirpath, thefile)
-            with io.open(work_file, "w", encoding='utf-8') as fp:
-                fp.write(src_data)
+            work_file = orig_file
+            is_templatized = command.gettext_version < (0, 18, 3)
+            if is_templatized:
+                with io.open(orig_file, 'r', encoding=settings.FILE_CHARSET) as fp:
+                    src_data = fp.read()
+                src_data = prepare_js_for_gettext(src_data)
+                work_file = os.path.join(self.dirpath, '%s.c' % self.file)
+                with io.open(work_file, "w", encoding='utf-8') as fp:
+                    fp.write(src_data)
             args = [
                 'xgettext',
                 '-d', domain,
-                '--language=C',
+                '--language=%s' % ('C' if is_templatized else 'JavaScript',),
                 '--keyword=gettext_noop',
                 '--keyword=gettext_lazy',
                 '--keyword=ngettext_lazy:1,2',
@@ -84,18 +109,17 @@ class TranslatableFile(object):
                 '--output=-'
             ] + command.xgettext_options
             args.append(work_file)
-        elif domain == 'django' and (file_ext == '.py' or file_ext in command.extensions):
-            thefile = self.file
+        elif domain == 'django':
             orig_file = os.path.join(self.dirpath, self.file)
-            is_templatized = file_ext in command.extensions
+            work_file = orig_file
+            is_templatized = file_ext != '.py'
             if is_templatized:
-                with io.open(orig_file, 'r', encoding=settings.FILE_CHARSET) as fp:
+                with io.open(orig_file, encoding=settings.FILE_CHARSET) as fp:
                     src_data = fp.read()
-                thefile = '%s.py' % self.file
                 content = templatize(src_data, orig_file[2:])
-                with io.open(os.path.join(self.dirpath, thefile), "w", encoding='utf-8') as fp:
+                work_file = os.path.join(self.dirpath, '%s.py' % self.file)
+                with io.open(work_file, "w", encoding='utf-8') as fp:
                     fp.write(content)
-            work_file = os.path.join(self.dirpath, thefile)
             args = [
                 'xgettext',
                 '-d', domain,
@@ -115,7 +139,7 @@ class TranslatableFile(object):
             args.append(work_file)
         else:
             return
-        msgs, errors, status = popen_wrapper(args)
+        msgs, errors, status = gettext_popen_wrapper(args)
         if errors:
             if status != STATUS_OK:
                 if is_templatized:
@@ -127,9 +151,11 @@ class TranslatableFile(object):
                 # Print warnings
                 command.stdout.write(errors)
         if msgs:
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
             # Write/append messages to pot file
+            if self.locale_dir is NO_LOCALE_DIR:
+                file_path = os.path.normpath(os.path.join(self.dirpath, self.file))
+                raise CommandError(
+                    "Unable to find a locale path to store translations for file %s" % file_path)
             potfile = os.path.join(self.locale_dir, '%s.pot' % str(domain))
             if is_templatized:
                 # Remove '.py' suffix
@@ -187,7 +213,7 @@ class Command(BaseCommand):
         parser.add_argument('--all', '-a', action='store_true', dest='all',
             default=False, help='Updates the message files for all existing locales.')
         parser.add_argument('--extension', '-e', dest='extensions',
-            help='The file extension(s) to examine (default: "html,txt", or "js" '
+            help='The file extension(s) to examine (default: "html,txt,py", or "js" '
                  'if the domain is "djangojs"). Separate multiple extensions with '
                  'commas, or use -e multiple times.',
             action='append')
@@ -227,10 +253,6 @@ class Command(BaseCommand):
         ignore_patterns = options.get('ignore_patterns')
         if options.get('use_default_ignore_patterns'):
             ignore_patterns += ['CVS', '.*', '*~', '*.pyc']
-        base_path = os.path.abspath('.')
-        for path in (settings.MEDIA_ROOT, settings.STATIC_ROOT):
-            if path and path.startswith(base_path):
-                ignore_patterns.append('%s*' % path[len(base_path) + 1:])
         self.ignore_patterns = list(set(ignore_patterns))
 
         # Avoid messing with mutable class variables
@@ -254,7 +276,7 @@ class Command(BaseCommand):
         if self.domain == 'djangojs':
             exts = extensions if extensions else ['js']
         else:
-            exts = extensions if extensions else ['html', 'txt']
+            exts = extensions if extensions else ['html', 'txt', 'py']
         self.extensions = handle_extensions(exts)
 
         if (locale is None and not exclude and not process_all) or self.domain is None:
@@ -273,7 +295,7 @@ class Command(BaseCommand):
             self.default_locale_path = self.locale_paths[0]
             self.invoked_for_django = True
         else:
-            self.locale_paths.extend(list(settings.LOCALE_PATHS))
+            self.locale_paths.extend(settings.LOCALE_PATHS)
             # Allow to run makemessages inside an app dir
             if os.path.isdir('locale'):
                 self.locale_paths.append(os.path.abspath('locale'))
@@ -311,6 +333,20 @@ class Command(BaseCommand):
             if not self.keep_pot:
                 self.remove_potfiles()
 
+    @cached_property
+    def gettext_version(self):
+        # Gettext tools will output system-encoded bytestrings instead of UTF-8,
+        # when looking up the version. It's especially a problem on Windows.
+        out, err, status = gettext_popen_wrapper(
+            ['xgettext', '--version'],
+            stdout_encoding=DEFAULT_LOCALE_ENCODING,
+        )
+        m = re.search(r'(\d+)\.(\d+)\.?(\d+)?', out)
+        if m:
+            return tuple(int(d) for d in m.groups() if d is not None)
+        else:
+            raise CommandError("Unable to get gettext version. Is it installed?")
+
     def build_potfiles(self):
         """
         Build pot files and apply msguniq to them.
@@ -320,8 +356,14 @@ class Command(BaseCommand):
         for f in file_list:
             try:
                 f.process(self, self.domain)
-            except UnicodeDecodeError:
-                self.stdout.write("UnicodeDecodeError: skipped file %s in %s" % (f.file, f.dirpath))
+            except UnicodeDecodeError as e:
+                self.stdout.write(
+                    "UnicodeDecodeError: skipped file %s in %s (reason: %s)" % (
+                        f.file,
+                        f.dirpath,
+                        e,
+                    )
+                )
 
         potfiles = []
         for path in self.locale_paths:
@@ -329,9 +371,7 @@ class Command(BaseCommand):
             if not os.path.exists(potfile):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
-            msgs, errors, status = popen_wrapper(args)
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
+            msgs, errors, status = gettext_popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -376,9 +416,11 @@ class Command(BaseCommand):
                 norm_patterns.append(p)
 
         all_files = []
+        ignored_roots = [os.path.normpath(p) for p in (settings.MEDIA_ROOT, settings.STATIC_ROOT) if p]
         for dirpath, dirnames, filenames in os.walk(root, topdown=True, followlinks=self.symlinks):
             for dirname in dirnames[:]:
-                if is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns):
+                if (is_ignored(os.path.normpath(os.path.join(dirpath, dirname)), norm_patterns) or
+                        os.path.join(os.path.abspath(dirpath), dirname) in ignored_roots):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
                         self.stdout.write('ignoring directory %s\n' % dirname)
@@ -387,7 +429,8 @@ class Command(BaseCommand):
                     self.locale_paths.insert(0, os.path.join(os.path.abspath(dirpath), dirname))
             for filename in filenames:
                 file_path = os.path.normpath(os.path.join(dirpath, filename))
-                if is_ignored(file_path, self.ignore_patterns):
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext not in self.extensions or is_ignored(file_path, self.ignore_patterns):
                     if self.verbosity > 1:
                         self.stdout.write('ignoring file %s in %s\n' % (filename, dirpath))
                 else:
@@ -399,8 +442,7 @@ class Command(BaseCommand):
                     if not locale_dir:
                         locale_dir = self.default_locale_path
                     if not locale_dir:
-                        raise CommandError(
-                            "Unable to find a locale path to store translations for file %s" % file_path)
+                        locale_dir = NO_LOCALE_DIR
                     all_files.append(TranslatableFile(dirpath, filename, locale_dir))
         return sorted(all_files)
 
@@ -418,9 +460,7 @@ class Command(BaseCommand):
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
-            msgs, errors, status = popen_wrapper(args)
-            if six.PY2:
-                msgs = msgs.decode('utf-8')
+            msgs, errors, status = gettext_popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -439,7 +479,7 @@ class Command(BaseCommand):
 
         if self.no_obsolete:
             args = ['msgattrib'] + self.msgattrib_options + ['-o', pofile, pofile]
-            msgs, errors, status = popen_wrapper(args)
+            msgs, errors, status = gettext_popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -453,7 +493,7 @@ class Command(BaseCommand):
         the msgs string, inserting it at the right place. msgs should be the
         contents of a newly created .po file.
         """
-        django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
+        django_dir = os.path.normpath(os.path.join(os.path.dirname(upath(django.__file__))))
         if self.domain == 'djangojs':
             domains = ('djangojs', 'django')
         else:

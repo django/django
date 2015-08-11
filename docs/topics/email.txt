@@ -74,10 +74,6 @@ are required.
 The return value will be the number of successfully delivered messages (which
 can be ``0`` or ``1`` since it can only send one message).
 
-.. versionadded:: 1.7
-
-    The ``html_message`` parameter was added.
-
 send_mass_mail()
 ================
 
@@ -188,6 +184,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
 "/contact/thanks/" when it's done::
 
     from django.core.mail import send_mail, BadHeaderError
+    from django.http import HttpResponse, HttpResponseRedirect
 
     def send_email(request):
         subject = request.POST.get('subject', '')
@@ -277,11 +274,18 @@ All parameters are optional and can be set at any time prior to calling the
 * ``cc``: A list or tuple of recipient addresses used in the "Cc" header
   when sending the email.
 
+* ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
+  header when sending the email.
+
+.. versionchanged:: 1.8
+
+    The ``reply_to`` parameter was added.
+
 For example::
 
     email = EmailMessage('Hello', 'Body goes here', 'from@example.com',
                 ['to1@example.com', 'to2@example.com'], ['bcc@example.com'],
-                headers = {'Reply-To': 'another@example.com'})
+                reply_to=['another@example.com'], headers={'Message-ID': 'foo'})
 
 The class has the following methods:
 
@@ -325,17 +329,15 @@ The class has the following methods:
 
        message.attach('design.png', img_data, 'image/png')
 
-    .. versionchanged:: 1.7
+    If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
+    :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
 
-      If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-      :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+    In addition, ``message/rfc822`` attachments will no longer be
+    base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
+    issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
-      In addition, ``message/rfc822`` attachments will no longer be
-      base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
-      issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
-
-      __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
-      __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
+    __ https://bugzilla.gnome.org/show_bug.cgi?id=651197
+    __ https://bugzilla.mozilla.org/show_bug.cgi?id=333880
 
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
@@ -445,27 +447,30 @@ can :ref:`write your own email backend <topic-custom-email-backend>`.
 SMTP backend
 ~~~~~~~~~~~~
 
-.. class:: backends.smtp.EmailBackend([host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs])
+.. class:: backends.smtp.EmailBackend(host=None, port=None, username=None, password=None, use_tls=None, fail_silently=False, use_ssl=None, timeout=None, ssl_keyfile=None, ssl_certfile=None, **kwargs)
 
     This is the default backend. Email will be sent through a SMTP server.
-    The server address and authentication credentials are set in the
-    :setting:`EMAIL_HOST`, :setting:`EMAIL_PORT`, :setting:`EMAIL_HOST_USER`,
-    :setting:`EMAIL_HOST_PASSWORD`, :setting:`EMAIL_USE_TLS`,
-    :setting:`EMAIL_USE_SSL`, :setting:`EMAIL_TIMEOUT`,
-    :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE` settings
-    in your settings file.
+
+    The value for each argument is retrieved from the matching setting if the
+    argument is ``None``:
+
+    * ``host``: :setting:`EMAIL_HOST`
+    * ``port``: :setting:`EMAIL_PORT`
+    * ``username``: :setting:`EMAIL_HOST_USER`
+    * ``password``: :setting:`EMAIL_HOST_PASSWORD`
+    * ``use_tls``: :setting:`EMAIL_USE_TLS`
+    * ``use_ssl``: :setting:`EMAIL_USE_SSL`
+    * ``timeout``: :setting:`EMAIL_TIMEOUT`
+    * ``ssl_keyfile``: :setting:`EMAIL_SSL_KEYFILE`
+    * ``ssl_certfile``: :setting:`EMAIL_SSL_CERTFILE`
 
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-    .. versionadded:: 1.7
-
-        The ``timeout`` parameter was added. If unspecified, the default
-        ``timeout`` will be the one provided by
-        :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no
-        timeout).
+    If unspecified, the default ``timeout`` will be the one provided by
+    :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
 
     .. versionchanged:: 1.8
 

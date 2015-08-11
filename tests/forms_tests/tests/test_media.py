@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.forms import Media, TextInput, CharField, Form, MultiWidget
-from django.template import Template, Context
-from django.test import TestCase, override_settings
+from django.forms import CharField, Form, Media, MultiWidget, TextInput
+from django.template import Context, Template
+from django.test import SimpleTestCase, override_settings
+from django.utils.encoding import force_text
 
 
 @override_settings(
     STATIC_URL=None,
     MEDIA_URL='http://media.example.com/media/',
 )
-class FormsMediaTestCase(TestCase):
+class FormsMediaTestCase(SimpleTestCase):
     """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):
@@ -455,12 +456,17 @@ class FormsMediaTestCase(TestCase):
 <link href="/path/to/css3" type="text/css" media="all" rel="stylesheet" />
 <link href="/some/form/css" type="text/css" media="all" rel="stylesheet" />""")
 
+    def test_html_safe(self):
+        media = Media(css={'all': ['/path/to/css']}, js=['/path/to/js'])
+        self.assertTrue(hasattr(Media, '__html__'))
+        self.assertEqual(force_text(media), media.__html__())
+
 
 @override_settings(
     STATIC_URL='http://media.example.com/static/',
     MEDIA_URL='http://media.example.com/media/',
 )
-class StaticFormsMediaTestCase(TestCase):
+class StaticFormsMediaTestCase(SimpleTestCase):
     """Tests for the media handling on widgets and forms"""
 
     def test_construction(self):

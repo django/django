@@ -1,19 +1,21 @@
-from django.db import transaction
 from django.conf import settings
 from django.conf.urls import url
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
+from django.contrib.admin.utils import unquote
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import (UserCreationForm, UserChangeForm,
-    AdminPasswordChangeForm)
-from django.contrib.auth.models import User, Group
-from django.contrib import messages
+from django.contrib.auth.forms import (
+    AdminPasswordChangeForm, UserChangeForm, UserCreationForm,
+)
+from django.contrib.auth.models import Group, User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect, Http404
-from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
+from django.db import transaction
+from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.utils.html import escape
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_text
+from django.utils.html import escape
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
@@ -29,7 +31,7 @@ class GroupAdmin(admin.ModelAdmin):
 
     def formfield_for_manytomany(self, db_field, request=None, **kwargs):
         if db_field.name == 'permissions':
-            qs = kwargs.get('queryset', db_field.rel.to.objects)
+            qs = kwargs.get('queryset', db_field.remote_field.model.objects)
             # Avoid a major performance hit resolving permission names which
             # triggers a content_type load:
             kwargs['queryset'] = qs.select_related('content_type')
@@ -79,7 +81,7 @@ class UserAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         return [
-            url(r'^(\d+)/password/$', self.admin_site.admin_view(self.user_change_password)),
+            url(r'^(.+)/password/$', self.admin_site.admin_view(self.user_change_password), name='auth_user_password_change'),
         ] + super(UserAdmin, self).get_urls()
 
     def lookup_allowed(self, lookup, value):
@@ -123,7 +125,12 @@ class UserAdmin(admin.ModelAdmin):
     def user_change_password(self, request, id, form_url=''):
         if not self.has_change_permission(request):
             raise PermissionDenied
-        user = get_object_or_404(self.get_queryset(request), pk=id)
+        user = self.get_object(request, unquote(id))
+        if user is None:
+            raise Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
+                'name': force_text(self.model._meta.verbose_name),
+                'key': escape(id),
+            })
         if request.method == 'POST':
             form = self.change_password_form(user, request.POST)
             if form.is_valid():
@@ -133,7 +140,15 @@ class UserAdmin(admin.ModelAdmin):
                 msg = ugettext('Password changed successfully.')
                 messages.success(request, msg)
                 update_session_auth_hash(request, form.user)
-                return HttpResponseRedirect('..')
+                return HttpResponseRedirect(
+                    reverse(
+                        '%s:auth_%s_change' % (
+                            self.admin_site.name,
+                            user._meta.model_name,
+                        ),
+                        args=(user.pk,),
+                    )
+                )
         else:
             form = self.change_password_form(user)
 
@@ -157,11 +172,14 @@ class UserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
         }
-        context.update(admin.site.each_context())
+        context.update(admin.site.each_context(request))
+
+        request.current_app = self.admin_site.name
+
         return TemplateResponse(request,
             self.change_user_password_template or
             'admin/auth/user/change_password.html',
-            context, current_app=self.admin_site.name)
+            context)
 
     def response_add(self, request, obj, post_url_continue=None):
         """

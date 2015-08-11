@@ -3,13 +3,14 @@
 # Translators:
 # Andreas Pelme <andreas@pelme.se>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-11-15 12:42+0000\n"
+"Last-Translator: Jonathan Lindén\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +19,26 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Innehållstyper"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "klassnamn för Python-modell"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "innehålls typ"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "innehållstyper"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Innehållstypens %(ct_id)s har ingen associerad modell."
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Innehållstypens %(ct_id)s objekt %(obj_id)s finns inte"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s objekt har inte en get_absolute_url()-metod"

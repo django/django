@@ -87,7 +87,7 @@ returns a list of all ``OpinionPoll`` objects, each with an extra
         objects = PollManager()
 
     class Response(models.Model):
-        poll = models.ForeignKey(OpinionPoll)
+        poll = models.ForeignKey(OpinionPoll, on_delete=models.CASCADE)
         person_name = models.CharField(max_length=50)
         response = models.TextField()
 
@@ -169,6 +169,11 @@ For example::
 This example allows you to request ``Person.authors.all()``, ``Person.editors.all()``,
 and ``Person.people.all()``, yielding predictable results.
 
+.. _default-managers:
+
+Default managers
+~~~~~~~~~~~~~~~~
+
 If you use custom ``Manager`` objects, take note that the first ``Manager``
 Django encounters (in the order in which they're defined in the model) has a
 special status. Django interprets the first ``Manager`` defined in a class as
@@ -237,8 +242,6 @@ the manager ``Person.people``.
 Creating ``Manager`` with ``QuerySet`` methods
 ----------------------------------------------
 
-.. versionadded:: 1.7
-
 In lieu of the above approach which requires duplicating methods on both the
 ``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
 <django.db.models.query.QuerySet.as_manager>` can be used to create an instance
@@ -290,7 +293,7 @@ from_queryset
 
 .. classmethod:: from_queryset(queryset_class)
 
-For advance usage you might want both a custom ``Manager`` and a custom
+For advanced usage you might want both a custom ``Manager`` and a custom
 ``QuerySet``. You can do that by calling ``Manager.from_queryset()`` which
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::

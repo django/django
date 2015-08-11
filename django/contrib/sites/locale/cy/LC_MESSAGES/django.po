@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2013
+# Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:43+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-01 19:15+0000\n"
+"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
-msgstr ""
+msgstr "Safleoedd"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Ni all yr enw parth gynnwys bylchau neu dabiau."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "enw parth"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "enw arddangos"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "safle"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "safleoedd"

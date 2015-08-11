@@ -1,8 +1,7 @@
-from django.conf.urls import include, url
+from django.conf.urls import url
 
 from . import widgetadmin
 
-
 urlpatterns = [
-    url(r'^', include(widgetadmin.site.urls)),
+    url(r'^', widgetadmin.site.urls),
 ]

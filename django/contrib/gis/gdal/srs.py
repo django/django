@@ -1,5 +1,5 @@
 """
-  The Spatial Reference class, represensents OGR Spatial Reference objects.
+  The Spatial Reference class, represents OGR Spatial Reference objects.
 
   Example:
   >>> from django.contrib.gis.gdal import SpatialReference
@@ -28,16 +28,13 @@
 """
 from ctypes import byref, c_char_p, c_int
 
-# Getting the error checking routine and exceptions
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
 from django.contrib.gis.gdal.prototypes import srs as capi
-
 from django.utils import six
-from django.utils.encoding import force_bytes
+from django.utils.encoding import force_bytes, force_text
 
 
-#### Spatial Reference class. ####
 class SpatialReference(GDALBase):
     """
     A wrapper for the OGRSpatialReference object.  According to the GDAL Web site,
@@ -45,17 +42,19 @@ class SpatialReference(GDALBase):
     systems (projections and datums) and to transform between them."
     """
 
-    #### Python 'magic' routines ####
-    def __init__(self, srs_input=''):
+    def __init__(self, srs_input='', srs_type='user'):
         """
         Creates a GDAL OSR Spatial Reference object from the given input.
         The input may be string of OGC Well Known Text (WKT), an integer
         EPSG code, a PROJ.4 string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        srs_type = 'user'
 
-        if isinstance(srs_input, six.string_types):
+        if srs_type == 'wkt':
+            self.ptr = capi.new_srs(c_char_p(b''))
+            self.import_wkt(srs_input)
+            return
+        elif isinstance(srs_input, six.string_types):
             # Encoding to ASCII if unicode passed in.
             if isinstance(srs_input, six.text_type):
                 srs_input = srs_input.encode('ascii')
@@ -132,7 +131,7 @@ class SpatialReference(GDALBase):
         "The string representation uses 'pretty' WKT."
         return self.pretty_wkt
 
-    #### SpatialReference Methods ####
+    # #### SpatialReference Methods ####
     def attr_value(self, target, index=0):
         """
         The attribute value for the given target node (e.g. 'PROJCS'). The index
@@ -173,7 +172,7 @@ class SpatialReference(GDALBase):
         "Checks to see if the given spatial reference is valid."
         capi.srs_validate(self.ptr)
 
-    #### Name & SRID properties ####
+    # #### Name & SRID properties ####
     @property
     def name(self):
         "Returns the name of this Spatial Reference."
@@ -194,7 +193,7 @@ class SpatialReference(GDALBase):
         except (TypeError, ValueError):
             return None
 
-    #### Unit Properties ####
+    # #### Unit Properties ####
     @property
     def linear_name(self):
         "Returns the name of the linear units."
@@ -232,10 +231,10 @@ class SpatialReference(GDALBase):
         elif self.geographic:
             units, name = capi.angular_units(self.ptr, byref(c_char_p()))
         if name is not None:
-            name.decode()
+            name = force_text(name)
         return (units, name)
 
-    #### Spheroid/Ellipsoid Properties ####
+    # #### Spheroid/Ellipsoid Properties ####
     @property
     def ellipsoid(self):
         """
@@ -259,7 +258,7 @@ class SpatialReference(GDALBase):
         "Returns the Inverse Flattening for this Spatial Reference."
         return capi.invflattening(self.ptr, byref(c_int()))
 
-    #### Boolean Properties ####
+    # #### Boolean Properties ####
     @property
     def geographic(self):
         """
@@ -281,7 +280,7 @@ class SpatialReference(GDALBase):
         """
         return bool(capi.isprojected(self.ptr))
 
-    #### Import Routines #####
+    # #### Import Routines #####
     def import_epsg(self, epsg):
         "Imports the Spatial Reference from the EPSG code (an integer)."
         capi.from_epsg(self.ptr, epsg)
@@ -302,7 +301,7 @@ class SpatialReference(GDALBase):
         "Imports the Spatial Reference from an XML string."
         capi.from_xml(self.ptr, xml)
 
-    #### Export Properties ####
+    # #### Export Properties ####
     @property
     def wkt(self):
         "Returns the WKT representation of this Spatial Reference."

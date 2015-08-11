@@ -10,3 +10,5 @@ dummy2 = _("This is another translatable string.")
 # shouldn't create a .po file with duplicate `Plural-Forms` headers
 number = 3
 dummuy3 = ungettext("%(number)s Foo", "%(number)s Foos", number) % {'number': number}
+
+dummy4 = _('Size')

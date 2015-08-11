@@ -18,18 +18,28 @@ The sites framework is mainly based on a simple model:
 .. class:: models.Site
 
     A model for storing the ``domain`` and ``name`` attributes of a Web site.
-    The :setting:`SITE_ID` setting specifies the database ID of the
-    :class:`~django.contrib.sites.models.Site` object (accessible using
-    the automatically added ``id`` attribute) associated with that
-    particular settings file.
 
     .. attribute:: domain
 
-        The domain name associated with the Web site.
+        The fully qualified domain name associated with the Web site.
+        For example, ``www.example.com``.
+
+        .. versionchanged:: 1.9
+
+            The ``domain`` field was set to be
+            :attr:`~django.db.models.Field.unique`.
 
     .. attribute:: name
 
         A human-readable "verbose" name for the Web site.
+
+The :setting:`SITE_ID` setting specifies the database ID of the
+:class:`~django.contrib.sites.models.Site` object associated with that
+particular settings file. If the setting is omitted, the
+:func:`~django.contrib.sites.shortcuts.get_current_site` function will
+try to get the current site by comparing the
+:attr:`~django.contrib.sites.models.Site.domain` with the host name from
+the :meth:`request.get_host() <django.http.HttpRequest.get_host>` method.
 
 How you use this is up to you, but Django uses it in a couple of ways
 automatically via simple conventions.
@@ -84,7 +94,7 @@ This accomplishes several things quite nicely:
           try:
               a = Article.objects.get(id=article_id, sites__id=get_current_site(request).id)
           except Article.DoesNotExist:
-              raise Http404
+              raise Http404("Article does not exist on this site")
           # ...
 
 .. _ljworld.com: http://www.ljworld.com/
@@ -107,7 +117,7 @@ like this::
     class Article(models.Model):
         headline = models.CharField(max_length=200)
         # ...
-        site = models.ForeignKey(Site)
+        site = models.ForeignKey(Site, on_delete=models.CASCADE)
 
 This has the same benefits as described in the last section.
 
@@ -205,8 +215,8 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
-different template directories (:setting:`TEMPLATE_DIRS`), you could simply
-farm out to the template system like so::
+different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
+simply farm out to the template system like so::
 
     from django.core.mail import send_mail
     from django.template import loader, Context
@@ -308,6 +318,11 @@ model(s). It's a model :doc:`manager </topics/db/managers>` that
 automatically filters its queries to include only objects associated
 with the current :class:`~django.contrib.sites.models.Site`.
 
+.. admonition:: Mandatory :setting:`SITE_ID`
+
+    The ``CurrentSiteManager`` is only usable when the :setting:`SITE_ID`
+    setting is defined in your settings.
+
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
 your model explicitly. For example::
 
@@ -319,7 +334,7 @@ your model explicitly. For example::
         photo = models.FileField(upload_to='/home/photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
-        site = models.ForeignKey(Site)
+        site = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
         on_site = CurrentSiteManager()
 
@@ -356,7 +371,7 @@ demonstrates this::
         photo = models.FileField(upload_to='/home/photos')
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
-        publish_on = models.ForeignKey(Site)
+        publish_on = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
         on_site = CurrentSiteManager('publish_on')
 
@@ -379,8 +394,6 @@ define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 
 Site middleware
 ===============
-
-.. versionadded:: 1.7
 
 If you often use this pattern::
 
@@ -463,10 +476,6 @@ a fallback when the database-backed sites framework is not available.
         Sets the ``name`` and ``domain`` attributes to the value of
         :meth:`~django.http.HttpRequest.get_host`.
 
-    .. versionchanged:: 1.7
-
-      This class used to be defined in ``django.contrib.sites.models``.
-
 A :class:`~django.contrib.sites.requests.RequestSite` object has a similar
 interface to a normal :class:`~django.contrib.sites.models.Site` object,
 except its :meth:`~django.contrib.sites.requests.RequestSite.__init__()`
@@ -487,8 +496,23 @@ Finally, to avoid repetitive fallback code, the framework provides a
     A function that checks if ``django.contrib.sites`` is installed and
     returns either the current :class:`~django.contrib.sites.models.Site`
     object or a :class:`~django.contrib.sites.requests.RequestSite` object
-    based on the request.
+    based on the request. It looks up the current site based on
+    :meth:`request.get_host() <django.http.HttpRequest.get_host>` if the
+    :setting:`SITE_ID` setting is not defined.
 
-    .. versionchanged:: 1.7
+    Both a domain and a port may be returned by :meth:`request.get_host()
+    <django.http.HttpRequest.get_host>` when the Host header has a port
+    explicitly specified, e.g. ``example.com:80``. In such cases, if the
+    lookup fails because the host does not match a record in the database,
+    the port is stripped and the lookup is retried with the domain part
+    only. This does not apply to
+    :class:`~django.contrib.sites.requests.RequestSite` which will always
+    use the unmodified host.
 
-      This function used to be defined in ``django.contrib.sites.models``.
+    .. versionchanged:: 1.8
+
+        Looking up the current site based on ``request.get_host()`` was added.
+
+    .. versionchanged:: 1.9
+
+        Retrying the lookup with the port stripped was added.

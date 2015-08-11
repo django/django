@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
+from .models import Artist, Author, Book, BookSigning, Page
 from .test_forms import AuthorForm, ContactForm
-from .models import Artist, Author, Book, Page, BookSigning
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -172,9 +172,7 @@ class SpecializedAuthorDelete(generic.DeleteView):
     queryset = Author.objects.all()
     template_name = 'generic_views/confirm_delete.html'
     context_object_name = 'thingy'
-
-    def get_success_url(self):
-        return reverse('authors_list')
+    success_url = reverse_lazy('authors_list')
 
 
 class BookConfig(object):
@@ -220,7 +218,7 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
         return super(BookDetailGetObjectCustomQueryset, self).get_object(
-            queryset=Book.objects.filter(pk=2))
+            queryset=Book.objects.filter(pk=self.kwargs['pk']))
 
 
 class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):

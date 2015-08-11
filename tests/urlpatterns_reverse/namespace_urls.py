@@ -1,20 +1,7 @@
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 
 from . import views
-
-
-class URLObject(object):
-    def __init__(self, app_name, namespace):
-        self.app_name = app_name
-        self.namespace = namespace
-
-    def urls(self):
-        return ([
-            url(r'^inner/$', views.empty_view, name='urlobject-view'),
-            url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
-            url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
-        ], self.app_name, self.namespace)
-    urls = property(urls)
+from .tests import URLObject
 
 testobj1 = URLObject('testapp', 'test-ns1')
 testobj2 = URLObject('testapp', 'test-ns2')
@@ -22,6 +9,8 @@ default_testobj = URLObject('testapp', 'testapp')
 
 otherobj1 = URLObject('nodefault', 'other-ns1')
 otherobj2 = URLObject('nodefault', 'other-ns2')
+
+newappobj1 = URLObject('newapp')
 
 urlpatterns = [
     url(r'^normal/$', views.empty_view, name='normal-view'),
@@ -45,11 +34,20 @@ urlpatterns = [
     url(r'^other1/', include(otherobj1.urls)),
     url(r'^other[246]/', include(otherobj2.urls)),
 
+    url(r'^newapp1/', include(newappobj1.app_urls, 'new-ns1')),
+    url(r'^new-default/', include(newappobj1.app_urls)),
+
+    url(r'^app-included[135]/', include('urlpatterns_reverse.included_app_urls', namespace='app-ns1')),
+    url(r'^app-included2/', include('urlpatterns_reverse.included_app_urls', namespace='app-ns2')),
+
     url(r'^ns-included[135]/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns1')),
     url(r'^ns-included2/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-ns2')),
 
+    url(r'^app-included/', include('urlpatterns_reverse.included_namespace_urls', 'inc-app', 'inc-app')),
+
     url(r'^included/', include('urlpatterns_reverse.included_namespace_urls')),
     url(r'^inc(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls', namespace='inc-ns5')),
+    url(r'^included/([0-9]+)/', include('urlpatterns_reverse.included_namespace_urls')),
 
     url(r'^ns-outer/(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
 

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-11-19 18:33+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
 "MIME-Version: 1.0\n"
@@ -18,35 +18,28 @@ msgstr ""
 "Language: ne\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
-msgstr ""
+msgstr "बाटो फेर्ने"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "बाटो फेर्ने फरम"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "यो डोमेन नाम छोडेर, पूर्ण बाटो हुनुपर्छ । उदाहरण : '/events/search'"
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "बाटो फेर्नेको लागि"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
 "यो कि (माथीको जस्तै )पूर्ण  बाटो हुनुपर्छ  वा 'http://' बाट  सुरुभएको पुरा हुनुपर्छ । "
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "बाटो फेर्ने"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "बाटो फेर्ने"

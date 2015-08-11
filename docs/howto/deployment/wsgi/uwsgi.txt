@@ -24,7 +24,7 @@ The uWSGI wiki describes several `installation procedures`_. Using pip, the
 Python package manager, you can install any uWSGI version with a single
 command. For example:
 
-.. code-block:: bash
+.. code-block:: console
 
     # Install current stable version.
     $ pip install uwsgi
@@ -56,7 +56,7 @@ Configuring and starting the uWSGI server for Django
 ----------------------------------------------------
 
 uWSGI supports multiple ways to configure the process. See uWSGI's
-`configuration documentation`_ and `examples`_
+`configuration documentation`_ and `examples`_.
 
 .. _configuration documentation: https://uwsgi.readthedocs.org/en/latest/Configuration.html
 .. _examples: http://projects.unbit.it/uwsgi/wiki/Example

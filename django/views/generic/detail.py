@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.utils.translation import ugettext as _
-from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
+from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 
 class SingleObjectMixin(ContextMixin):
@@ -17,6 +17,7 @@ class SingleObjectMixin(ContextMixin):
     context_object_name = None
     slug_url_kwarg = 'slug'
     pk_url_kwarg = 'pk'
+    query_pk_and_slug = False
 
     def get_object(self, queryset=None):
         """
@@ -31,18 +32,18 @@ class SingleObjectMixin(ContextMixin):
             queryset = self.get_queryset()
 
         # Next, try looking up by primary key.
-        pk = self.kwargs.get(self.pk_url_kwarg, None)
-        slug = self.kwargs.get(self.slug_url_kwarg, None)
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        slug = self.kwargs.get(self.slug_url_kwarg)
         if pk is not None:
             queryset = queryset.filter(pk=pk)
 
         # Next, try looking up by slug.
-        elif slug is not None:
+        if slug is not None and (pk is None or self.query_pk_and_slug):
             slug_field = self.get_slug_field()
             queryset = queryset.filter(**{slug_field: slug})
 
         # If none of those are defined, it's an error.
-        else:
+        if pk is None and slug is None:
             raise AttributeError("Generic detail view %s must be called with "
                                  "either an object pk or a slug."
                                  % self.__class__.__name__)
@@ -88,6 +89,8 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
+            if self.object._deferred:
+                obj = obj._meta.proxy_for_model
             return obj._meta.model_name
         else:
             return None
@@ -148,9 +151,12 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # The least-specific option is the default <app>/<model>_detail.html;
             # only use this if the object in question is a model.
             if isinstance(self.object, models.Model):
+                object_meta = self.object._meta
+                if self.object._deferred:
+                    object_meta = self.object._meta.proxy_for_model._meta
                 names.append("%s/%s%s.html" % (
-                    self.object._meta.app_label,
-                    self.object._meta.model_name,
+                    object_meta.app_label,
+                    object_meta.model_name,
                     self.template_name_suffix
                 ))
             elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):

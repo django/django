@@ -5,11 +5,10 @@ Comparing two html documents.
 from __future__ import unicode_literals
 
 import re
-from django.utils.encoding import force_text
-from django.utils.html_parser import HTMLParser, HTMLParseError
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
 
+from django.utils import six
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html_parser import HTMLParseError, HTMLParser
 
 WHITESPACE = re.compile('\s+')
 

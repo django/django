@@ -37,8 +37,8 @@ and Geoff Biggs' PhD work on dimensioned units for robotics.
 """
 __all__ = ['A', 'Area', 'D', 'Distance']
 from decimal import Decimal
+from functools import total_ordering
 
-from django.utils.functional import total_ordering
 from django.utils import six
 
 NUMERIC_TYPES = six.integer_types + (float, Decimal)
@@ -295,7 +295,7 @@ class Distance(MeasureBase):
         'Yard (Indian)': 'indian_yd',
         'Yard (Sears)': 'sears_yd'
     }
-    LALIAS = dict((k.lower(), v) for k, v in ALIAS.items())
+    LALIAS = {k.lower(): v for k, v in ALIAS.items()}
 
     def __mul__(self, other):
         if isinstance(other, self.__class__):
@@ -313,9 +313,9 @@ class Distance(MeasureBase):
 class Area(MeasureBase):
     STANDARD_UNIT = AREA_PREFIX + Distance.STANDARD_UNIT
     # Getting the square units values and the alias dictionary.
-    UNITS = dict(('%s%s' % (AREA_PREFIX, k), v ** 2) for k, v in Distance.UNITS.items())
-    ALIAS = dict((k, '%s%s' % (AREA_PREFIX, v)) for k, v in Distance.ALIAS.items())
-    LALIAS = dict((k.lower(), v) for k, v in ALIAS.items())
+    UNITS = {'%s%s' % (AREA_PREFIX, k): v ** 2 for k, v in Distance.UNITS.items()}
+    ALIAS = {k: '%s%s' % (AREA_PREFIX, v) for k, v in Distance.ALIAS.items()}
+    LALIAS = {k.lower(): v for k, v in ALIAS.items()}
 
     def __truediv__(self, other):
         if isinstance(other, NUMERIC_TYPES):

@@ -1,12 +1,55 @@
-from importlib import import_module
+import logging
 import os
 import unittest
+from importlib import import_module
 from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
+from django.utils.datastructures import OrderedSet
+from django.utils.six import StringIO
+
+
+class DebugSQLTextTestResult(unittest.TextTestResult):
+    def __init__(self, stream, descriptions, verbosity):
+        self.logger = logging.getLogger('django.db.backends')
+        self.logger.setLevel(logging.DEBUG)
+        super(DebugSQLTextTestResult, self).__init__(stream, descriptions, verbosity)
+
+    def startTest(self, test):
+        self.debug_sql_stream = StringIO()
+        self.handler = logging.StreamHandler(self.debug_sql_stream)
+        self.logger.addHandler(self.handler)
+        super(DebugSQLTextTestResult, self).startTest(test)
+
+    def stopTest(self, test):
+        super(DebugSQLTextTestResult, self).stopTest(test)
+        self.logger.removeHandler(self.handler)
+        if self.showAll:
+            self.debug_sql_stream.seek(0)
+            self.stream.write(self.debug_sql_stream.read())
+            self.stream.writeln(self.separator2)
+
+    def addError(self, test, err):
+        super(DebugSQLTextTestResult, self).addError(test, err)
+        self.debug_sql_stream.seek(0)
+        self.errors[-1] = self.errors[-1] + (self.debug_sql_stream.read(),)
+
+    def addFailure(self, test, err):
+        super(DebugSQLTextTestResult, self).addFailure(test, err)
+        self.debug_sql_stream.seek(0)
+        self.failures[-1] = self.failures[-1] + (self.debug_sql_stream.read(),)
+
+    def printErrorList(self, flavour, errors):
+        for test, err, sql_debug in errors:
+            self.stream.writeln(self.separator1)
+            self.stream.writeln("%s: %s" % (flavour, self.getDescription(test)))
+            self.stream.writeln(self.separator2)
+            self.stream.writeln("%s" % err)
+            self.stream.writeln(self.separator2)
+            self.stream.writeln("%s" % sql_debug)
 
 
 class DiscoverRunner(object):
@@ -19,9 +62,9 @@ class DiscoverRunner(object):
     test_loader = defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
 
-    def __init__(self, pattern=None, top_level=None,
-                 verbosity=1, interactive=True, failfast=False, keepdb=False,
-                 **kwargs):
+    def __init__(self, pattern=None, top_level=None, verbosity=1,
+                 interactive=True, failfast=False, keepdb=False,
+                 reverse=False, debug_sql=False, **kwargs):
 
         self.pattern = pattern
         self.top_level = top_level
@@ -30,6 +73,8 @@ class DiscoverRunner(object):
         self.interactive = interactive
         self.failfast = failfast
         self.keepdb = keepdb
+        self.reverse = reverse
+        self.debug_sql = debug_sql
 
     @classmethod
     def add_arguments(cls, parser):
@@ -41,7 +86,13 @@ class DiscoverRunner(object):
             help='The test matching pattern. Defaults to test*.py.')
         parser.add_argument('-k', '--keepdb', action='store_true', dest='keepdb',
             default=False,
-            help='Preserve the test DB between runs. Defaults to False')
+            help='Preserves the test DB between runs.')
+        parser.add_argument('-r', '--reverse', action='store_true', dest='reverse',
+            default=False,
+            help='Reverses test cases order.')
+        parser.add_argument('-d', '--debug-sql', action='store_true', dest='debug_sql',
+            default=False,
+            help='Prints logged SQL queries on failure.')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
@@ -107,15 +158,23 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
-        return reorder_suite(suite, self.reorder_by)
+        return reorder_suite(suite, self.reorder_by, self.reverse)
 
     def setup_databases(self, **kwargs):
-        return setup_databases(self.verbosity, self.interactive, self.keepdb, **kwargs)
+        return setup_databases(
+            self.verbosity, self.interactive, self.keepdb, self.debug_sql,
+            **kwargs
+        )
+
+    def get_resultclass(self):
+        return DebugSQLTextTestResult if self.debug_sql else None
 
     def run_suite(self, suite, **kwargs):
+        resultclass = self.get_resultclass()
         return self.test_runner(
             verbosity=self.verbosity,
             failfast=self.failfast,
+            resultclass=resultclass,
         ).run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
@@ -213,7 +272,7 @@ def dependency_ordered(test_databases, dependencies):
     return ordered_test_databases
 
 
-def reorder_suite(suite, classes):
+def reorder_suite(suite, classes, reverse=False):
     """
     Reorders a test suite by test type.
 
@@ -221,40 +280,47 @@ def reorder_suite(suite, classes):
 
     All tests of type classes[0] are placed first, then tests of type
     classes[1], etc. Tests with no match in classes are placed last.
+
+    If `reverse` is True, tests within classes are sorted in opposite order,
+    but test classes are not reversed.
     """
     class_count = len(classes)
     suite_class = type(suite)
-    bins = [suite_class() for i in range(class_count + 1)]
-    partition_suite(suite, classes, bins)
-    for i in range(class_count):
-        bins[0].addTests(bins[i + 1])
-    return bins[0]
+    bins = [OrderedSet() for i in range(class_count + 1)]
+    partition_suite(suite, classes, bins, reverse=reverse)
+    reordered_suite = suite_class()
+    for i in range(class_count + 1):
+        reordered_suite.addTests(bins[i])
+    return reordered_suite
 
 
-def partition_suite(suite, classes, bins):
+def partition_suite(suite, classes, bins, reverse=False):
     """
-    Partitions a test suite by test type.
+    Partitions a test suite by test type. Also prevents duplicated tests.
 
     classes is a sequence of types
     bins is a sequence of TestSuites, one more than classes
+    reverse changes the ordering of tests within bins
 
     Tests of type classes[i] are added to bins[i],
     tests with no match found in classes are place in bins[-1]
     """
     suite_class = type(suite)
+    if reverse:
+        suite = reversed(tuple(suite))
     for test in suite:
         if isinstance(test, suite_class):
-            partition_suite(test, classes, bins)
+            partition_suite(test, classes, bins, reverse=reverse)
         else:
             for i in range(len(classes)):
                 if isinstance(test, classes[i]):
-                    bins[i].addTest(test)
+                    bins[i].add(test)
                     break
             else:
-                bins[-1].addTest(test)
+                bins[-1].add(test)
 
 
-def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
     from django.db import connections, DEFAULT_DB_ALIAS
 
     # First pass -- work out which databases actually need to be created,
@@ -311,7 +377,10 @@ def setup_databases(verbosity, interactive, keepdb=False, **kwargs):
 
     for alias, mirror_alias in mirrored_aliases.items():
         mirrors.append((alias, connections[alias].settings_dict['NAME']))
-        connections[alias].settings_dict['NAME'] = (
-            connections[mirror_alias].settings_dict['NAME'])
+        connections[alias].creation.set_as_test_mirror(
+            connections[mirror_alias].settings_dict)
 
+    if debug_sql:
+        for alias in connections:
+            connections[alias].force_debug_cursor = True
     return old_names, mirrors

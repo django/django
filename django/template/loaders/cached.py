@@ -4,42 +4,98 @@ to load templates from them in order, caching the result.
 """
 
 import hashlib
-from django.template.base import TemplateDoesNotExist
-from django.template.loader import BaseLoader, get_template_from_string, find_template_loader, make_origin
+import warnings
+
+from django.template import Origin, Template, TemplateDoesNotExist
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
+from django.utils.inspect import func_supports_parameter
+
+from .base import Loader as BaseLoader
 
 
 class Loader(BaseLoader):
-    is_usable = True
 
-    def __init__(self, loaders):
+    def __init__(self, engine, loaders):
         self.template_cache = {}
-        self.find_template_cache = {}
-        self._loaders = loaders
-        self._cached_loaders = []
+        self.find_template_cache = {}  # RemovedInDjango20Warning
+        self.get_template_cache = {}
+        self.loaders = engine.get_template_loaders(loaders)
+        super(Loader, self).__init__(engine)
+
+    def get_contents(self, origin):
+        return origin.loader.get_contents(origin)
+
+    def get_template(self, template_name, template_dirs=None, skip=None):
+        key = self.cache_key(template_name, template_dirs, skip)
+        cached = self.get_template_cache.get(key)
+        if cached:
+            if isinstance(cached, TemplateDoesNotExist):
+                raise cached
+            return cached
+
+        try:
+            template = super(Loader, self).get_template(
+                template_name, template_dirs, skip,
+            )
+        except TemplateDoesNotExist as e:
+            self.get_template_cache[key] = e
+            raise
+        else:
+            self.get_template_cache[key] = template
+
+        return template
+
+    def get_template_sources(self, template_name, template_dirs=None):
+        for loader in self.loaders:
+            args = [template_name]
+            # RemovedInDjango20Warning: Add template_dirs for compatibility
+            # with old loaders
+            if func_supports_parameter(loader.get_template_sources, 'template_dirs'):
+                args.append(template_dirs)
+            for origin in loader.get_template_sources(*args):
+                yield origin
+
+    def cache_key(self, template_name, template_dirs, skip=None):
+        """
+        Generate a cache key for the template name, dirs, and skip.
+
+        If skip is provided, only origins that match template_name are included
+        in the cache key. This ensures each template is only parsed and cached
+        once if contained in different extend chains like:
+
+            x -> a -> a
+            y -> a -> a
+            z -> a -> a
+        """
+        dirs_prefix = ''
+        skip_prefix = ''
+
+        if skip:
+            matching = [origin.name for origin in skip if origin.template_name == template_name]
+            if matching:
+                skip_prefix = self.generate_hash(matching)
+
+        if template_dirs:
+            dirs_prefix = self.generate_hash(template_dirs)
+
+        return ("%s-%s-%s" % (template_name, skip_prefix, dirs_prefix)).strip('-')
+
+    def generate_hash(self, values):
+        return hashlib.sha1(force_bytes('|'.join(values))).hexdigest()
 
     @property
-    def loaders(self):
-        # Resolve loaders on demand to avoid circular imports
-        if not self._cached_loaders:
-            # Set self._cached_loaders atomically. Otherwise, another thread
-            # could see an incomplete list. See #17303.
-            cached_loaders = []
-            for loader in self._loaders:
-                cached_loaders.append(find_template_loader(loader))
-            self._cached_loaders = cached_loaders
-        return self._cached_loaders
-
-    def cache_key(self, template_name, template_dirs):
-        if template_dirs:
-            # If template directories were specified, use a hash to differentiate
-            return '-'.join([template_name, hashlib.sha1(force_bytes('|'.join(template_dirs))).hexdigest()])
-        else:
-            return template_name
+    def supports_recursion(self):
+        """
+        RemovedInDjango20Warning: This is an internal property used by the
+        ExtendsNode during the deprecation of non-recursive loaders.
+        """
+        return all(hasattr(loader, 'get_contents') for loader in self.loaders)
 
     def find_template(self, name, dirs=None):
         """
-        Helper method. Lookup the template :param name: in all the configured loaders
+        RemovedInDjango20Warning: An internal method to lookup the template
+        name in all the configured loaders.
         """
         key = self.cache_key(name, dirs)
         try:
@@ -52,7 +108,12 @@ class Loader(BaseLoader):
                 except TemplateDoesNotExist:
                     pass
                 else:
-                    result = (template, make_origin(display_name, loader, name, dirs))
+                    origin = Origin(
+                        name=display_name,
+                        template_name=name,
+                        loader=loader,
+                    )
+                    result = template, origin
                     break
         self.find_template_cache[key] = result
         if result:
@@ -62,6 +123,10 @@ class Loader(BaseLoader):
             raise TemplateDoesNotExist(name)
 
     def load_template(self, template_name, template_dirs=None):
+        warnings.warn(
+            'The load_template() method is deprecated. Use get_template() '
+            'instead.', RemovedInDjango20Warning,
+        )
         key = self.cache_key(template_name, template_dirs)
         template_tuple = self.template_cache.get(key)
         # A cached previous failure:
@@ -71,7 +136,7 @@ class Loader(BaseLoader):
             template, origin = self.find_template(template_name, template_dirs)
             if not hasattr(template, 'render'):
                 try:
-                    template = get_template_from_string(template, origin, template_name)
+                    template = Template(template, origin, template_name, self.engine)
                 except TemplateDoesNotExist:
                     # If compiling the template we found raises TemplateDoesNotExist,
                     # back off to returning the source and display name for the template
@@ -84,4 +149,5 @@ class Loader(BaseLoader):
     def reset(self):
         "Empty the template cache."
         self.template_cache.clear()
-        self.find_template_cache.clear()
+        self.find_template_cache.clear()  # RemovedInDjango20Warning
+        self.get_template_cache.clear()

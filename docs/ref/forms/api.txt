@@ -125,8 +125,6 @@ if validation has side effects, those side effects will only be triggered once.
 
 .. method:: Form.errors.as_data()
 
-.. versionadded:: 1.7
-
 Returns a ``dict`` that maps fields to their original ``ValidationError``
 instances.
 
@@ -150,8 +148,6 @@ messages in ``Form.errors``.
 
 .. method:: Form.errors.as_json(escape_html=False)
 
-.. versionadded:: 1.7
-
 Returns the errors serialized as JSON.
 
     >>> f.errors.as_json()
@@ -170,8 +166,6 @@ set ``escape_html=True`` and error messages will be escaped so you can use them
 directly in HTML.
 
 .. method:: Form.add_error(field, error)
-
-.. versionadded:: 1.7
 
 This method allows adding errors to specific fields from within the
 ``Form.clean()`` method, or from outside the form altogether; for instance
@@ -256,8 +250,8 @@ precedence::
     <tr><th>Url:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
-Checking if form data has changed
----------------------------------
+Checking which form data has changed
+------------------------------------
 
 .. method:: Form.has_changed()
 
@@ -268,7 +262,7 @@ form data has been changed from the initial data.
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
     ...         'cc_myself': True}
-    >>> f = ContactForm(initial=data)
+    >>> f = ContactForm(data, initial=data)
     >>> f.has_changed()
     False
 
@@ -282,6 +276,16 @@ so that the comparison can be done:
 from what was provided in :attr:`~Form.initial` or ``False`` otherwise. The
 result is computed by calling :meth:`Field.has_changed` for each field in the
 form.
+
+.. attribute:: Form.changed_data
+
+The ``changed_data`` attribute returns a list of the names of the fields whose
+values in the form's bound data (usually ``request.POST``) differ from what was
+provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
+
+    >>> f = ContactForm(request.POST, initial=data)
+    >>> if f.has_changed():
+    ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
 
 Accessing the fields from the form
 ----------------------------------
@@ -706,6 +710,31 @@ example, in the ``ContactForm`` example, the fields are defined in the order
 ``subject``, ``message``, ``sender``, ``cc_myself``. To reorder the HTML
 output, just change the order in which those fields are listed in the class.
 
+There are several other ways to customize the order:
+
+.. attribute:: Form.field_order
+
+.. versionadded:: 1.9
+
+By default ``Form.field_order=None``, which retains the order in which you
+define the fields in your form class. If ``field_order`` is a list of field
+names, the fields are ordered as specified by the list and remaining fields are
+appended according to the default order. Unknown field names in the list are
+ignored. This makes it possible to disable a field in a subclass by setting it
+to ``None`` without having to redefine ordering.
+
+You can also use the ``Form.field_order`` argument to a :class:`Form` to
+override the field order. If a :class:`~django.forms.Form` defines
+:attr:`~Form.field_order` *and* you include ``field_order`` when instantiating
+the ``Form``, then the latter ``field_order`` will have precedence.
+
+.. method:: Form.order_fields(field_order)
+
+.. versionadded:: 1.9
+
+You may rearrange the fields any time using ``order_fields()`` with a list of
+field names as in :attr:`~django.forms.Form.field_order`.
+
 How errors are displayed
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -761,10 +790,6 @@ Python 2)::
     <div class="errorlist"><div class="error">Enter a valid email address.</div></div>
     <p>Sender: <input type="email" name="sender" value="invalid email address" /></p>
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
-
-.. versionchanged:: 1.7
-
-    ``django.forms.util`` was renamed to ``django.forms.utils``.
 
 More granular output
 ~~~~~~~~~~~~~~~~~~~~
@@ -1017,10 +1042,8 @@ classes::
     <li>Instrument: <input type="text" name="instrument" /></li>
     <li>Haircut type: <input type="text" name="haircut_type" /></li>
 
-.. versionadded:: 1.7
-
-* It's possible to declaratively remove a ``Field`` inherited from a parent
-  class by setting the name to be ``None`` on the subclass. For example::
+It's possible to declaratively remove a ``Field`` inherited from a parent class
+by setting the name to be ``None`` on the subclass. For example::
 
     >>> from django import forms
 
@@ -1052,3 +1075,13 @@ You can put several Django forms inside one ``<form>`` tag. To give each
     >>> print(father.as_ul())
     <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" /></li>
     <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" /></li>
+
+The prefix can also be specified on the form class::
+
+    >>> class PersonForm(forms.Form):
+    ...     ...
+    ...     prefix = 'person'
+
+.. versionadded:: 1.9
+
+    The ability to specify ``prefix`` on the form class was added.

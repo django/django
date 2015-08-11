@@ -1,13 +1,24 @@
 """
 Tests for Django's bundled context processors.
 """
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 
-@override_settings(ROOT_URLCONF='context_processors.urls')
-class RequestContextProcessorTests(TestCase):
+@override_settings(
+    ROOT_URLCONF='context_processors.urls',
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+            ],
+        },
+    }],
+)
+class RequestContextProcessorTests(SimpleTestCase):
     """
-    Tests for the ``django.core.context_processors.request`` processor.
+    Tests for the ``django.template.context_processors.request`` processor.
     """
 
     def test_request_attributes(self):
@@ -35,10 +46,23 @@ class RequestContextProcessorTests(TestCase):
         self.assertContains(response, url)
 
 
-@override_settings(ROOT_URLCONF='context_processors.urls', DEBUG=True, INTERNAL_IPS=('127.0.0.1',))
+@override_settings(
+    DEBUG=True,
+    INTERNAL_IPS=['127.0.0.1'],
+    ROOT_URLCONF='context_processors.urls',
+    TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+            ],
+        },
+    }],
+)
 class DebugContextProcessorTests(TestCase):
     """
-    Tests for the ``django.core.context_processors.debug`` processor.
+    Tests for the ``django.template.context_processors.debug`` processor.
     """
 
     def test_debug(self):

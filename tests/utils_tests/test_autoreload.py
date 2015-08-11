@@ -1,17 +1,18 @@
-from importlib import import_module
 import os
 import tempfile
+from importlib import import_module
 
 from django import conf
 from django.contrib import admin
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import extend_sys_path
+from django.utils._os import npath, upath
 from django.utils.autoreload import gen_filenames
-from django.utils._os import upath
 
 LOCALE_PATH = os.path.join(os.path.dirname(__file__), 'locale')
 
 
-class TestFilenameGenerator(TestCase):
+class TestFilenameGenerator(SimpleTestCase):
     def setUp(self):
         # Empty cached variables
         from django.utils import autoreload
@@ -27,7 +28,7 @@ class TestFilenameGenerator(TestCase):
                                    'nl', 'LC_MESSAGES', 'django.mo'),
                       filenames)
 
-    @override_settings(LOCALE_PATHS=(LOCALE_PATH,))
+    @override_settings(LOCALE_PATHS=[LOCALE_PATH])
     def test_locale_paths_setting(self):
         """
         Test that gen_filenames also yields from LOCALE_PATHS locales.
@@ -58,9 +59,10 @@ class TestFilenameGenerator(TestCase):
         Test that gen_filenames also yields from locale dirs in installed apps.
         """
         filenames = list(gen_filenames())
-        self.assertIn(os.path.join(os.path.dirname(admin.__file__), 'locale',
-                                   'nl', 'LC_MESSAGES', 'django.mo'),
-                      filenames)
+        self.assertIn(
+            os.path.join(os.path.dirname(upath(admin.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            filenames
+        )
 
     @override_settings(USE_I18N=False)
     def test_no_i18n(self):
@@ -70,9 +72,9 @@ class TestFilenameGenerator(TestCase):
         """
         filenames = list(gen_filenames())
         self.assertNotIn(
-            os.path.join(os.path.dirname(conf.__file__), 'locale', 'nl',
-                         'LC_MESSAGES', 'django.mo'),
-            filenames)
+            os.path.join(os.path.dirname(upath(conf.__file__)), 'locale', 'nl', 'LC_MESSAGES', 'django.mo'),
+            filenames
+        )
 
     def test_only_new_files(self):
         """
@@ -87,12 +89,12 @@ class TestFilenameGenerator(TestCase):
         self.assertFalse(any(f.endswith('.pyc') for f in gen_filenames()))
 
     def test_deleted_removed(self):
-        fd, filepath = tempfile.mkstemp(dir=os.path.dirname(upath(__file__)), suffix='.py')
-        try:
-            _, filename = os.path.split(filepath)
-            import_module('.%s' % filename.replace('.py', ''), package='utils_tests')
-            self.assertIn(filepath, gen_filenames())
-        finally:
-            os.close(fd)
-            os.remove(filepath)
-        self.assertNotIn(filepath, gen_filenames())
+        dirname = tempfile.mkdtemp()
+        filename = os.path.join(dirname, 'test_deleted_removed_module.py')
+        with open(filename, 'w'):
+            pass
+        with extend_sys_path(dirname):
+            import_module('test_deleted_removed_module')
+        self.assertIn(npath(filename), gen_filenames())
+        os.unlink(filename)
+        self.assertNotIn(filename, gen_filenames())

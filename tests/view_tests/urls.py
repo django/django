@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
+from functools import partial
 from os import path
 
-from django.conf.urls import url, include
+from django.conf.urls import include, url
+from django.conf.urls.i18n import i18n_patterns
 from django.utils._os import upath
+from django.utils.translation import ugettext_lazy as _
 from django.views import defaults, i18n, static
 
 from . import views
-
 
 base_dir = path.dirname(path.abspath(upath(__file__)))
 media_dir = path.join(base_dir, 'media')
@@ -37,6 +39,16 @@ js_info_dict_admin = {
     'packages': ('django.contrib.admin', 'view_tests'),
 }
 
+js_info_dict_app1 = {
+    'domain': 'djangojs',
+    'packages': ('view_tests.app1',),
+}
+
+js_info_dict_app2 = {
+    'domain': 'djangojs',
+    'packages': ('view_tests.app2',),
+}
+
 js_info_dict_app5 = {
     'domain': 'djangojs',
     'packages': ('view_tests.app5',),
@@ -46,7 +58,7 @@ urlpatterns = [
     url(r'^$', views.index_page),
 
     # Default views
-    url(r'^non_existing_url/', defaults.page_not_found),
+    url(r'^non_existing_url/', partial(defaults.page_not_found, exception=None)),
     url(r'^server_error/', defaults.server_error),
 
     # a view that raises an exception for the debug view
@@ -63,16 +75,24 @@ urlpatterns = [
     # i18n views
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^jsi18n/$', i18n.javascript_catalog, js_info_dict),
+    url(r'^jsi18n/app1/$', i18n.javascript_catalog, js_info_dict_app1),
+    url(r'^jsi18n/app2/$', i18n.javascript_catalog, js_info_dict_app2),
     url(r'^jsi18n/app5/$', i18n.javascript_catalog, js_info_dict_app5),
     url(r'^jsi18n_english_translation/$', i18n.javascript_catalog, js_info_dict_english_translation),
     url(r'^jsi18n_multi_packages1/$', i18n.javascript_catalog, js_info_dict_multi_packages1),
     url(r'^jsi18n_multi_packages2/$', i18n.javascript_catalog, js_info_dict_multi_packages2),
     url(r'^jsi18n_admin/$', i18n.javascript_catalog, js_info_dict_admin),
     url(r'^jsi18n_template/$', views.jsi18n),
+    url(r'^jsi18n_multi_catalogs/$', views.jsi18n_multi_catalogs),
+    url(r'^jsoni18n/$', i18n.json_catalog, js_info_dict),
 
     # Static views
     url(r'^site_media/(?P<path>.*)$', static.serve, {'document_root': media_dir}),
 ]
+
+urlpatterns += i18n_patterns(
+    url(_(r'^translated/$'), views.index_page, name='i18n_prefixed'),
+)
 
 urlpatterns += [
     url(r'view_exception/(?P<n>[0-9]+)/$', views.view_exception, name='view_exception'),

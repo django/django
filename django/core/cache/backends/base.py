@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 import time
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured, DjangoRuntimeWarning
+from django.core.exceptions import DjangoRuntimeWarning, ImproperlyConfigured
 from django.utils.module_loading import import_string
 
 
@@ -74,7 +74,7 @@ class BaseCache(object):
 
         self.key_prefix = params.get('KEY_PREFIX', '')
         self.version = params.get('VERSION', 1)
-        self.key_func = get_key_func(params.get('KEY_FUNCTION', None))
+        self.key_func = get_key_func(params.get('KEY_FUNCTION'))
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -146,6 +146,27 @@ class BaseCache(object):
             if val is not None:
                 d[k] = val
         return d
+
+    def get_or_set(self, key, default=None, timeout=DEFAULT_TIMEOUT, version=None):
+        """
+        Fetch a given key from the cache. If the key does not exist,
+        the key is added and set to the default value. The default value can
+        also be any callable. If timeout is given, that timeout will be used
+        for the key; otherwise the default cache timeout will be used.
+
+        Returns the value of the key stored or retrieved on success,
+        False on error.
+        """
+        if default is None:
+            raise ValueError('You need to specify a value.')
+        val = self.get(key, version=version)
+        if val is None:
+            if callable(default):
+                default = default()
+            val = self.add(key, default, timeout=timeout, version=version)
+            if val:
+                return self.get(key, version=version)
+        return val
 
     def has_key(self, key, version=None):
         """

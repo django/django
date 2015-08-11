@@ -1,7 +1,5 @@
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
-from django.db.models import signals
-from django.utils.encoding import smart_text
 from django.utils import six
 from django.utils.six.moves import input
 
@@ -19,25 +17,25 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     except LookupError:
         return
 
-    if not router.allow_migrate(using, ContentType):
+    if not router.allow_migrate_model(using, ContentType):
         return
 
     ContentType.objects.clear_cache()
 
     app_label = app_config.label
 
-    app_models = dict(
-        (model._meta.model_name, model)
-        for model in app_config.get_models())
+    app_models = {
+        model._meta.model_name: model
+        for model in app_config.get_models()}
 
     if not app_models:
         return
 
     # Get all the content types
-    content_types = dict(
-        (ct.model, ct)
+    content_types = {
+        ct.model: ct
         for ct in ContentType.objects.using(using).filter(app_label=app_label)
-    )
+    }
     to_remove = [
         ct
         for (model_name, ct) in six.iteritems(content_types)
@@ -46,7 +44,6 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
 
     cts = [
         ContentType(
-            name=smart_text(model._meta.verbose_name_raw),
             app_label=app_label,
             model=model_name,
         )
@@ -85,15 +82,3 @@ If you're unsure, answer 'no'.
         else:
             if verbosity >= 2:
                 print("Stale content types remain.")
-
-
-def update_all_contenttypes(**kwargs):
-    for app_config in apps.get_app_configs():
-        update_contenttypes(app_config, **kwargs)
-
-
-signals.post_migrate.connect(update_contenttypes)
-
-
-if __name__ == "__main__":
-    update_all_contenttypes()

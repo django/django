@@ -1,15 +1,18 @@
 import datetime
 import os
+import warnings
 
 from django import forms
-from django.db.models.fields import Field
 from django.core import checks
 from django.core.files.base import File
-from django.core.files.storage import default_storage
 from django.core.files.images import ImageFile
+from django.core.files.storage import default_storage
 from django.db.models import signals
-from django.utils.encoding import force_str, force_text
+from django.db.models.fields import Field
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.encoding import force_str, force_text
+from django.utils.inspect import func_supports_parameter
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -85,7 +88,18 @@ class FieldFile(File):
 
     def save(self, name, content, save=True):
         name = self.field.generate_filename(self.instance, name)
-        self.name = self.storage.save(name, content)
+
+        if func_supports_parameter(self.storage.save, 'max_length'):
+            self.name = self.storage.save(name, content, max_length=self.field.max_length)
+        else:
+            warnings.warn(
+                'Backwards compatibility for storage backends without '
+                'support for the `max_length` argument in '
+                'Storage.save() will be removed in Django 1.10.',
+                RemovedInDjango110Warning, stacklevel=2
+            )
+            self.name = self.storage.save(name, content)
+
         setattr(self.instance, self.field.name, self.name)
 
         # Update the filesize cache
@@ -188,7 +202,7 @@ class FileDescriptor(object):
             instance.__dict__[self.field.name] = attr
 
         # Other types of files may be assigned as well, but they need to have
-        # the FieldFile interface added to the. Thus, we wrap any other type of
+        # the FieldFile interface added to them. Thus, we wrap any other type of
         # File inside a FieldFile (well, the field's attr_class, which is
         # usually FieldFile).
         elif isinstance(file, File) and not isinstance(file, FieldFile):
@@ -229,8 +243,6 @@ class FileField(Field):
 
         self.storage = storage or default_storage
         self.upload_to = upload_to
-        if callable(upload_to):
-            self.generate_filename = upload_to
 
         kwargs['max_length'] = kwargs.get('max_length', 100)
         super(FileField, self).__init__(verbose_name, name, **kwargs)
@@ -269,7 +281,7 @@ class FileField(Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(FileField, self).deconstruct()
-        if kwargs.get("max_length", None) == 100:
+        if kwargs.get("max_length") == 100:
             del kwargs["max_length"]
         kwargs['upload_to'] = self.upload_to
         if self.storage is not default_storage:
@@ -311,6 +323,13 @@ class FileField(Field):
         return os.path.normpath(self.storage.get_valid_name(os.path.basename(filename)))
 
     def generate_filename(self, instance, filename):
+        # If upload_to is a callable, make sure that the path it returns is
+        # passed through get_valid_name() of the underlying storage.
+        if callable(self.upload_to):
+            directory_name, filename = os.path.split(self.upload_to(instance, filename))
+            filename = self.storage.get_valid_name(filename)
+            return os.path.normpath(os.path.join(directory_name, filename))
+
         return os.path.join(self.get_directory_name(), self.get_filename(filename))
 
     def save_form_data(self, instance, data):
@@ -391,7 +410,7 @@ class ImageField(FileField):
                 checks.Error(
                     'Cannot use ImageField because Pillow is not installed.',
                     hint=('Get Pillow at https://pypi.python.org/pypi/Pillow '
-                          'or run command "pip install pillow".'),
+                          'or run command "pip install Pillow".'),
                     obj=self,
                     id='fields.E210',
                 )

@@ -1,17 +1,16 @@
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
-
-import decimal
 import datetime
-from importlib import import_module
+import decimal
 import unicodedata
+from importlib import import_module
 
 from django.conf import settings
-from django.utils import dateformat, numberformat, datetime_safe
+from django.utils import dateformat, datetime_safe, numberformat, six
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.translation import get_language, to_locale, check_for_language
+from django.utils.translation import (
+    check_for_language, get_language, to_locale,
+)
 
 # format_cache is a mapping from (format_type, lang) to the format string.
 # By using the cache, it is possible to avoid running get_format_modules
@@ -20,14 +19,14 @@ _format_cache = {}
 _format_modules_cache = {}
 
 ISO_INPUT_FORMATS = {
-    'DATE_INPUT_FORMATS': ('%Y-%m-%d',),
-    'TIME_INPUT_FORMATS': ('%H:%M:%S', '%H:%M:%S.%f', '%H:%M'),
-    'DATETIME_INPUT_FORMATS': (
+    'DATE_INPUT_FORMATS': ['%Y-%m-%d'],
+    'TIME_INPUT_FORMATS': ['%H:%M:%S', '%H:%M:%S.%f', '%H:%M'],
+    'DATETIME_INPUT_FORMATS': [
         '%Y-%m-%d %H:%M:%S',
         '%Y-%m-%d %H:%M:%S.%f',
         '%Y-%m-%d %H:%M',
         '%Y-%m-%d'
-    ),
+    ],
 }
 
 

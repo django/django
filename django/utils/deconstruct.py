@@ -1,5 +1,6 @@
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
 from importlib import import_module
+
+from django.utils.version import get_docs_version
 
 
 def deconstructible(*args, **kwargs):
@@ -38,8 +39,8 @@ def deconstructible(*args, **kwargs):
                     "classes. Please move the object into the main module "
                     "body to use migrations.\n"
                     "For more information, see "
-                    "https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values"
-                    % (name, module_name))
+                    "https://docs.djangoproject.com/en/%s/topics/migrations/#serializing-values"
+                    % (name, module_name, get_docs_version()))
             return (
                 path or '%s.%s' % (obj.__class__.__module__, name),
                 obj._constructor_args[0],

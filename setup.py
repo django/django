@@ -1,8 +1,8 @@
 import os
 import sys
-
-from setuptools import setup, find_packages
 from distutils.sysconfig import get_python_lib
+
+from setuptools import find_packages, setup
 
 # Warn if we are installing over top of an existing installation. This can
 # cause issues where files that were deleted from a more recent Django are
@@ -52,7 +52,7 @@ setup(
     },
     zip_safe=False,
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 2 - Pre-Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',
@@ -62,7 +62,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Topic :: Internet :: WWW/HTTP',

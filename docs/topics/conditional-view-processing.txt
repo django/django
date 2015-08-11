@@ -15,17 +15,28 @@ or you can rely on the :class:`~django.middleware.common.CommonMiddleware`
 middleware to set the ``ETag`` header.
 
 When the client next requests the same resource, it might send along a header
-such as `If-modified-since`_, containing the date of the last modification
-time it was sent, or `If-none-match`_, containing the ``ETag`` it was sent.
+such as either `If-modified-since`_ or `If-unmodified-since`_, containing the
+date of the last modification time it was sent, or either `If-match`_ or
+`If-none-match`_, containing the last ``ETag`` it was sent.
 If the current version of the page matches the ``ETag`` sent by the client, or
 if the resource has not been modified, a 304 status code can be sent back,
 instead of a full response, telling the client that nothing has changed.
+Depending on the header, if the page has been modified or does not match the
+``ETag`` sent by the client, a 412 status code (Precondition Failed) may be
+returned.
 
+.. _If-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.24
 .. _If-none-match: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
 .. _If-modified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
+.. _If-unmodified-since: http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.28
 
 When you need more fine-grained control you may use per-view conditional
 processing functions.
+
+.. versionchanged:: 1.8
+
+    Support for the ``If-unmodified-since`` header was added to conditional
+    view processing.
 
 .. _conditional-decorators:
 
@@ -194,4 +205,3 @@ view takes a while to generate the content, you should consider using the
 fairly quickly, stick to using the middleware and the amount of network
 traffic sent back to the clients will still be reduced if the view hasn't
 changed.
-

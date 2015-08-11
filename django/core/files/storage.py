@@ -1,20 +1,22 @@
-import os
 import errno
+import os
+import warnings
 from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
-from django.core.files import locks, File
+from django.core.files import File, locks
 from django.core.files.move import file_move_safe
+from django.utils._os import abspathu, safe_join
 from django.utils.crypto import get_random_string
-from django.utils.encoding import force_text, filepath_to_uri
+from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.encoding import filepath_to_uri, force_text
 from django.utils.functional import LazyObject
+from django.utils.inspect import func_supports_parameter
 from django.utils.module_loading import import_string
 from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.text import get_valid_filename
-from django.utils._os import safe_join, abspathu
-from django.utils.deconstruct import deconstructible
-
 
 __all__ = ('Storage', 'FileSystemStorage', 'DefaultStorage', 'default_storage')
 
@@ -34,7 +36,7 @@ class Storage(object):
         """
         return self._open(name, mode)
 
-    def save(self, name, content):
+    def save(self, name, content, max_length=None):
         """
         Saves new content to the file specified by name. The content should be
         a proper File object or any python file-like object, ready to be read
@@ -47,7 +49,17 @@ class Storage(object):
         if not hasattr(content, 'chunks'):
             content = File(content)
 
-        name = self.get_available_name(name)
+        if func_supports_parameter(self.get_available_name, 'max_length'):
+            name = self.get_available_name(name, max_length=max_length)
+        else:
+            warnings.warn(
+                'Backwards compatibility for storage backends without '
+                'support for the `max_length` argument in '
+                'Storage.get_available_name() will be removed in Django 1.10.',
+                RemovedInDjango110Warning, stacklevel=2
+            )
+            name = self.get_available_name(name)
+
         name = self._save(name, content)
 
         # Store filenames with forward slashes, even on Windows
@@ -62,7 +74,7 @@ class Storage(object):
         """
         return get_valid_filename(name)
 
-    def get_available_name(self, name):
+    def get_available_name(self, name, max_length=None):
         """
         Returns a filename that's free on the target storage system, and
         available for new content to be written to.
@@ -72,10 +84,25 @@ class Storage(object):
         # If the filename already exists, add an underscore and a random 7
         # character alphanumeric string (before the file extension, if one
         # exists) to the filename until the generated filename doesn't exist.
-        while self.exists(name):
+        # Truncate original name if required, so the new filename does not
+        # exceed the max_length.
+        while self.exists(name) or (max_length and len(name) > max_length):
             # file_ext includes the dot.
             name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
-
+            if max_length is None:
+                continue
+            # Truncate file_root if max_length exceeded.
+            truncation = len(name) - max_length
+            if truncation > 0:
+                file_root = file_root[:-truncation]
+                # Entire file_root was truncated in attempt to find an available filename.
+                if not file_root:
+                    raise SuspiciousFileOperation(
+                        'Storage can not find an available filename for "%s". '
+                        'Please make sure that the corresponding file field '
+                        'allows sufficient "max_length".' % name
+                    )
+                name = os.path.join(dir_name, "%s_%s%s" % (file_root, get_random_string(7), file_ext))
         return name
 
     def path(self, name):
@@ -277,11 +304,7 @@ class FileSystemStorage(Storage):
         return directories, files
 
     def path(self, name):
-        try:
-            path = safe_join(self.location, name)
-        except ValueError:
-            raise SuspiciousFileOperation("Attempted access to '%s' denied." % name)
-        return os.path.normpath(path)
+        return safe_join(self.location, name)
 
     def size(self, name):
         return os.path.getsize(self.path(name))

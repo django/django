@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Prefetch
 from django.db.models.query import get_prefetcher
@@ -9,10 +9,12 @@ from django.test import TestCase, override_settings
 from django.utils import six
 from django.utils.encoding import force_text
 
-from .models import (Author, Bio, Book, Reader, Qualification, Teacher, Department,
-    TaggedItem, Bookmark, AuthorAddress, FavoriteAuthors, AuthorWithAge,
-    BookWithYear, BookReview, Person, House, Room, Employee, Comment,
-    LessonEntry, WordEntry, Author2)
+from .models import (
+    Author, Author2, AuthorAddress, AuthorWithAge, Bio, Book, Bookmark,
+    BookReview, BookWithYear, Comment, Department, Employee, FavoriteAuthors,
+    House, LessonEntry, Person, Qualification, Reader, Room, TaggedItem,
+    Teacher, WordEntry,
+)
 
 
 class PrefetchRelatedTests(TestCase):
@@ -113,7 +115,7 @@ class PrefetchRelatedTests(TestCase):
         70679243d1786e03557c28929f9762a119e3ac14.
         """
         qs = Book.objects.prefetch_related('first_time_authors')
-        self.assertTrue(qs[0] in qs)
+        self.assertIn(qs[0], qs)
 
     def test_clear(self):
         """
@@ -211,15 +213,15 @@ class PrefetchRelatedTests(TestCase):
         with self.assertRaises(AttributeError) as cm:
             list(qs)
 
-        self.assertTrue('prefetch_related' in str(cm.exception))
+        self.assertIn('prefetch_related', str(cm.exception))
 
     def test_invalid_final_lookup(self):
         qs = Book.objects.prefetch_related('authors__name')
         with self.assertRaises(ValueError) as cm:
             list(qs)
 
-        self.assertTrue('prefetch_related' in str(cm.exception))
-        self.assertTrue("name" in str(cm.exception))
+        self.assertIn('prefetch_related', str(cm.exception))
+        self.assertIn("name", str(cm.exception))
 
 
 class CustomPrefetchTests(TestCase):
@@ -624,6 +626,17 @@ class CustomPrefetchTests(TestCase):
         room = Room.objects.filter(main_room_of__isnull=False).prefetch_related(Prefetch('main_room_of', queryset=houses.filter(address='DoesNotExist'), to_attr='main_room_of_attr')).first()
         self.assertIsNone(room.main_room_of_attr)
 
+    def test_nested_prefetch_related_are_not_overwritten(self):
+        # Regression test for #24873
+        houses_2 = House.objects.prefetch_related(Prefetch('rooms'))
+        persons = Person.objects.prefetch_related(Prefetch('houses', queryset=houses_2))
+        houses = House.objects.prefetch_related(Prefetch('occupants', queryset=persons))
+        list(houses)  # queryset must be evaluated once to reproduce the bug.
+        self.assertEqual(
+            houses.all()[0].occupants.all()[0].houses.all()[1].rooms.all()[0],
+            self.room2_1
+        )
+
 
 class DefaultManagerTests(TestCase):
 
@@ -653,9 +666,9 @@ class DefaultManagerTests(TestCase):
             # the default manager on teachers to immediately get all the related
             # qualifications, since this will do one query per teacher.
             qs = Department.objects.prefetch_related('teachers')
-            depts = "".join(["%s department: %s\n" %
-                             (dept.name, ", ".join(six.text_type(t) for t in dept.teachers.all()))
-                             for dept in qs])
+            depts = "".join("%s department: %s\n" %
+                            (dept.name, ", ".join(six.text_type(t) for t in dept.teachers.all()))
+                            for dept in qs)
 
             self.assertEqual(depts,
                              "English department: Mr Cleese (BA, BSci, MA, PhD), Mr Idle (BA)\n"
@@ -720,7 +733,7 @@ class GenericRelationTests(TestCase):
             # attributes, so the following makes sense:
             qs = TaggedItem.objects.filter(content_type=ct, tag='awesome').prefetch_related('content_object__read_by')
             readers_of_awesome_books = {r.name for tag in qs
-                                            for r in tag.content_object.read_by.all()}
+                                        for r in tag.content_object.read_by.all()}
             self.assertEqual(readers_of_awesome_books, {"me", "you", "someone"})
 
     def test_nullable_GFK(self):
@@ -990,9 +1003,9 @@ class MultiDbTests(TestCase):
         # Forward
         qs1 = B.prefetch_related('authors')
         with self.assertNumQueries(2, using='other'):
-            books = "".join(["%s (%s)\n" %
-                             (book.title, ", ".join(a.name for a in book.authors.all()))
-                             for book in qs1])
+            books = "".join("%s (%s)\n" %
+                            (book.title, ", ".join(a.name for a in book.authors.all()))
+                            for book in qs1)
         self.assertEqual(books,
                          "Poems (Charlotte, Anne, Emily)\n"
                          "Jane Eyre (Charlotte)\n"
@@ -1002,9 +1015,9 @@ class MultiDbTests(TestCase):
         # Reverse
         qs2 = A.prefetch_related('books')
         with self.assertNumQueries(2, using='other'):
-            authors = "".join(["%s: %s\n" %
-                               (author.name, ", ".join(b.title for b in author.books.all()))
-                               for author in qs2])
+            authors = "".join("%s: %s\n" %
+                              (author.name, ", ".join(b.title for b in author.books.all()))
+                              for author in qs2)
         self.assertEqual(authors,
                          "Charlotte: Poems, Jane Eyre\n"
                          "Anne: Poems\n"

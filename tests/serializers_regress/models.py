@@ -4,13 +4,12 @@ A test spanning all the capabilities of all the serializers.
 This class sets up a model for each model field type
 (except for image types, because of the Pillow dependency).
 """
-import warnings
-
-from django.db import models
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+
 
 # The following classes are for testing basic data
 # marshalling, including NULL values, where allowed.
@@ -67,12 +66,6 @@ class BigIntegerData(models.Model):
 #    data = models.ImageField(null=True)
 
 
-class IPAddressData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(null=True)
-
-
 class GenericIPAddressData(models.Model):
     data = models.GenericIPAddressField(null=True)
 
@@ -108,7 +101,7 @@ class TimeData(models.Model):
 class Tag(models.Model):
     """A tag on an item."""
     data = models.SlugField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
 
     content_object = GenericForeignKey()
@@ -160,11 +153,11 @@ class UniqueAnchor(models.Model):
 
 
 class FKData(models.Model):
-    data = models.ForeignKey(Anchor, null=True)
+    data = models.ForeignKey(Anchor, models.SET_NULL, null=True)
 
 
 class FKDataNaturalKey(models.Model):
-    data = models.ForeignKey(NaturalKeyAnchor, null=True)
+    data = models.ForeignKey(NaturalKeyAnchor, models.SET_NULL, null=True)
 
 
 class M2MData(models.Model):
@@ -173,11 +166,11 @@ class M2MData(models.Model):
 
 class O2OData(models.Model):
     # One to one field can't be null here, since it is a PK.
-    data = models.OneToOneField(Anchor, primary_key=True)
+    data = models.OneToOneField(Anchor, models.CASCADE, primary_key=True)
 
 
 class FKSelfData(models.Model):
-    data = models.ForeignKey('self', null=True)
+    data = models.ForeignKey('self', models.CASCADE, null=True)
 
 
 class M2MSelfData(models.Model):
@@ -185,11 +178,11 @@ class M2MSelfData(models.Model):
 
 
 class FKDataToField(models.Model):
-    data = models.ForeignKey(UniqueAnchor, null=True, to_field='data')
+    data = models.ForeignKey(UniqueAnchor, models.SET_NULL, null=True, to_field='data')
 
 
 class FKDataToO2O(models.Model):
-    data = models.ForeignKey(O2OData, null=True)
+    data = models.ForeignKey(O2OData, models.SET_NULL, null=True)
 
 
 class M2MIntermediateData(models.Model):
@@ -197,8 +190,8 @@ class M2MIntermediateData(models.Model):
 
 
 class Intermediate(models.Model):
-    left = models.ForeignKey(M2MIntermediateData)
-    right = models.ForeignKey(Anchor)
+    left = models.ForeignKey(M2MIntermediateData, models.CASCADE)
+    right = models.ForeignKey(Anchor, models.CASCADE)
     extra = models.CharField(max_length=30, blank=True, default="doesn't matter")
 
 # The following test classes are for validating the
@@ -249,12 +242,6 @@ class IntegerPKData(models.Model):
 #    data = models.ImageField(primary_key=True)
 
 
-class IPAddressPKData(models.Model):
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-        data = models.IPAddressField(primary_key=True)
-
-
 class GenericIPAddressPKData(models.Model):
     data = models.GenericIPAddressField(primary_key=True)
 
@@ -283,6 +270,14 @@ class SmallPKData(models.Model):
 
 # class TimePKData(models.Model):
 #    data = models.TimeField(primary_key=True)
+
+
+class UUIDData(models.Model):
+    data = models.UUIDField(primary_key=True)
+
+
+class FKToUUID(models.Model):
+    data = models.ForeignKey(UUIDData, models.CASCADE)
 
 
 class ComplexModel(models.Model):
@@ -334,7 +329,7 @@ class InheritBaseModel(BaseModel):
 
 
 class ExplicitInheritBaseModel(BaseModel):
-    parent = models.OneToOneField(BaseModel)
+    parent = models.OneToOneField(BaseModel, models.CASCADE)
     child_data = models.IntegerField()
 
 

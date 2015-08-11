@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Since the test database doesn't have tablespaces, it's impossible for Django
 # to create the tables for models where db_tablespace is set. To avoid this
 # problem, we mark the models as unmanaged, and temporarily revert them to
@@ -41,8 +42,8 @@ class Article(models.Model):
 
 # Also set the tables for automatically created models
 
-Authors = Article._meta.get_field('authors').rel.through
+Authors = Article._meta.get_field('authors').remote_field.through
 Authors._meta.db_table = 'model_options_articleref_authors'
 
-Reviewers = Article._meta.get_field('reviewers').rel.through
+Reviewers = Article._meta.get_field('reviewers').remote_field.through
 Reviewers._meta.db_table = 'model_options_articleref_reviewers'

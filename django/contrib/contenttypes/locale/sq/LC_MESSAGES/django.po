@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-12-16 14:12+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -17,34 +17,27 @@ msgstr ""
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Lloje Lënde"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "emër klase modeli python"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "lloj lënde"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "lloje lënde"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Objekti %(ct_id)s për lloj lënde nuk ka model të përshoqëruar"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr ""
 "Objekti %(obj_id)s për lloj lënde %(ct_id)s nuk ka model të përshoqëruar"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Objektet %(ct_name)s nuk përmbajnë ndonjë metodë get_absolute_url()"

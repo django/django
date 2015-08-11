@@ -1,12 +1,16 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import fromstr, Point, LineString, LinearRing, Polygon
-from django.utils.functional import total_ordering
-from django.utils.safestring import mark_safe
+from functools import total_ordering
+
+from django.contrib.gis.geos import (
+    LinearRing, LineString, Point, Polygon, fromstr,
+)
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.html import html_safe
 
 
+@html_safe
 @python_2_unicode_compatible
 class GEvent(object):
     """
@@ -54,9 +58,10 @@ class GEvent(object):
 
     def __str__(self):
         "Returns the parameter part of a GEvent."
-        return mark_safe('"%s", %s' % (self.event, self.action))
+        return '"%s", %s' % (self.event, self.action)
 
 
+@html_safe
 @python_2_unicode_compatible
 class GOverlayBase(object):
     def __init__(self):
@@ -72,7 +77,7 @@ class GOverlayBase(object):
 
     def __str__(self):
         "The string representation is the JavaScript API call."
-        return mark_safe('%s(%s)' % (self.__class__.__name__, self.js_params))
+        return '%s(%s)' % (self.__class__.__name__, self.js_params)
 
 
 class GPolygon(GOverlayBase):

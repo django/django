@@ -37,7 +37,7 @@ Glossary
         `Model-view-controller`__; a software pattern. Django :ref:`follows MVC
         to some extent <faq-mtv>`.
 
-        __ http://en.wikipedia.org/wiki/Model-view-controller
+        __ https://en.wikipedia.org/wiki/Model-view-controller
 
     project
         A Python package -- i.e. a directory of code -- that contains all the
@@ -50,7 +50,7 @@ Glossary
         version 2.2. This is a neat way to implement attributes whose usage
         resembles attribute access, but whose implementation uses method calls.
 
-        See :func:`property`.
+        See :class:`property`.
 
     queryset
         An object representing some set of rows to be fetched from the database.

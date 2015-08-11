@@ -2,33 +2,24 @@ from __future__ import unicode_literals
 
 import base64
 import binascii
-from collections import OrderedDict
 import hashlib
 import importlib
+from collections import OrderedDict
 
-from django.dispatch import receiver
 from django.conf import settings
-from django.test.signals import setting_changed
-from django.utils.encoding import force_bytes, force_str, force_text
 from django.core.exceptions import ImproperlyConfigured
+from django.core.signals import setting_changed
+from django.dispatch import receiver
+from django.utils import lru_cache
 from django.utils.crypto import (
-    pbkdf2, constant_time_compare, get_random_string)
+    constant_time_compare, get_random_string, pbkdf2,
+)
+from django.utils.encoding import force_bytes, force_str, force_text
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_noop as _
 
-
 UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
 UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
-HASHERS = None  # lazily loaded from PASSWORD_HASHERS
-PREFERRED_HASHER = None  # defaults to first item in PASSWORD_HASHERS
-
-
-@receiver(setting_changed)
-def reset_hashers(**kwargs):
-    if kwargs['setting'] == 'PASSWORD_HASHERS':
-        global HASHERS, PREFERRED_HASHER
-        HASHERS = None
-        PREFERRED_HASHER = None
 
 
 def is_password_usable(encoded):
@@ -85,20 +76,29 @@ def make_password(password, salt=None, hasher='default'):
     return hasher.encode(password, salt)
 
 
-def load_hashers(password_hashers=None):
-    global HASHERS
-    global PREFERRED_HASHER
+@lru_cache.lru_cache()
+def get_hashers():
     hashers = []
-    if not password_hashers:
-        password_hashers = settings.PASSWORD_HASHERS
-    for backend in password_hashers:
-        hasher = import_string(backend)()
+    for hasher_path in settings.PASSWORD_HASHERS:
+        hasher_cls = import_string(hasher_path)
+        hasher = hasher_cls()
         if not getattr(hasher, 'algorithm'):
             raise ImproperlyConfigured("hasher doesn't specify an "
-                                       "algorithm name: %s" % backend)
+                                       "algorithm name: %s" % hasher_path)
         hashers.append(hasher)
-    HASHERS = dict((hasher.algorithm, hasher) for hasher in hashers)
-    PREFERRED_HASHER = hashers[0]
+    return hashers
+
+
+@lru_cache.lru_cache()
+def get_hashers_by_algorithm():
+    return {hasher.algorithm: hasher for hasher in get_hashers()}
+
+
+@receiver(setting_changed)
+def reset_hashers(**kwargs):
+    if kwargs['setting'] == 'PASSWORD_HASHERS':
+        get_hashers.cache_clear()
+        get_hashers_by_algorithm.cache_clear()
 
 
 def get_hasher(algorithm='default'):
@@ -113,17 +113,16 @@ def get_hasher(algorithm='default'):
         return algorithm
 
     elif algorithm == 'default':
-        if PREFERRED_HASHER is None:
-            load_hashers()
-        return PREFERRED_HASHER
+        return get_hashers()[0]
+
     else:
-        if HASHERS is None:
-            load_hashers()
-        if algorithm not in HASHERS:
+        hashers = get_hashers_by_algorithm()
+        try:
+            return hashers[algorithm]
+        except KeyError:
             raise ValueError("Unknown password hashing algorithm '%s'. "
                              "Did you specify it in the PASSWORD_HASHERS "
                              "setting?" % algorithm)
-        return HASHERS[algorithm]
 
 
 def identify_hasher(encoded):
@@ -222,12 +221,12 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the PBKDF2 algorithm (recommended)
 
-    Configured to use PBKDF2 + HMAC + SHA256 with 20000 iterations.
+    Configured to use PBKDF2 + HMAC + SHA256.
     The result is a 64 byte binary string.  Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
     algorithm = "pbkdf2_sha256"
-    iterations = 20000
+    iterations = 24000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
@@ -287,7 +286,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
 
     def salt(self):
         bcrypt = self._load_library()
-        return bcrypt.gensalt(self.rounds)
+        return bcrypt.gensalt(rounds=self.rounds)
 
     def encode(self, password, salt):
         bcrypt = self._load_library()
@@ -337,6 +336,10 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             (_('salt'), mask_hash(salt)),
             (_('checksum'), mask_hash(checksum)),
         ])
+
+    def must_update(self, encoded):
+        algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
+        return int(rounds) != self.rounds
 
 
 class BCryptPasswordHasher(BCryptSHA256PasswordHasher):

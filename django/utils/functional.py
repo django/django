@@ -1,11 +1,8 @@
 import copy
 import operator
-from functools import wraps
-import sys
-import warnings
+from functools import total_ordering, wraps
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 from django.utils.six.moves import copyreg
 
 
@@ -18,29 +15,6 @@ def curry(_curried_func, *args, **kwargs):
     return _curried
 
 
-def memoize(func, cache, num_args):
-    """
-    Wrap a function so that results for any argument tuple are stored in
-    'cache'. Note that the args to the function must be usable as dictionary
-    keys.
-
-    Only the first num_args are considered when creating the key.
-    """
-    warnings.warn("memoize wrapper is deprecated and will be removed in "
-                  "Django 1.9. Use django.utils.lru_cache instead.",
-                  RemovedInDjango19Warning, stacklevel=2)
-
-    @wraps(func)
-    def wrapper(*args):
-        mem_args = args[:num_args]
-        if mem_args in cache:
-            return cache[mem_args]
-        result = func(*args)
-        cache[mem_args] = result
-        return result
-    return wrapper
-
-
 class cached_property(object):
     """
     Decorator that converts a method with a single self argument into a
@@ -51,6 +25,7 @@ class cached_property(object):
     """
     def __init__(self, func, name=None):
         self.func = func
+        self.__doc__ = getattr(func, '__doc__')
         self.name = name or func.__name__
 
     def __get__(self, instance, type=None):
@@ -84,13 +59,14 @@ def lazy(func, *resultclasses):
         called on the result of that function. The function is not evaluated
         until one of the methods on the result is called.
         """
-        __dispatch = None
+        __prepared = False
 
         def __init__(self, args, kw):
             self.__args = args
             self.__kw = kw
-            if self.__dispatch is None:
+            if not self.__prepared:
                 self.__prepare_class__()
+            self.__prepared = True
 
         def __reduce__(self):
             return (
@@ -100,18 +76,15 @@ def lazy(func, *resultclasses):
 
         @classmethod
         def __prepare_class__(cls):
-            cls.__dispatch = {}
             for resultclass in resultclasses:
-                cls.__dispatch[resultclass] = {}
-                for type_ in reversed(resultclass.mro()):
-                    for (k, v) in type_.__dict__.items():
-                        # All __promise__ return the same wrapper method, but
-                        # they also do setup, inserting the method into the
-                        # dispatch dict.
-                        meth = cls.__promise__(resultclass, k, v)
-                        if hasattr(cls, k):
+                for type_ in resultclass.mro():
+                    for method_name in type_.__dict__.keys():
+                        # All __promise__ return the same wrapper method, they
+                        # look up the correct implementation when called.
+                        if hasattr(cls, method_name):
                             continue
-                        setattr(cls, k, meth)
+                        meth = cls.__promise__(method_name)
+                        setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = six.text_type in resultclasses
             assert not (cls._delegate_bytes and cls._delegate_text), (
@@ -121,6 +94,7 @@ def lazy(func, *resultclasses):
                     cls.__str__ = cls.__text_cast
                 else:
                     cls.__unicode__ = cls.__text_cast
+                    cls.__str__ = cls.__bytes_cast_encoded
             elif cls._delegate_bytes:
                 if six.PY3:
                     cls.__bytes__ = cls.__bytes_cast
@@ -128,21 +102,13 @@ def lazy(func, *resultclasses):
                     cls.__str__ = cls.__bytes_cast
 
         @classmethod
-        def __promise__(cls, klass, funcname, method):
-            # Builds a wrapper around some magic method and registers that
-            # magic method for the given type and method name.
+        def __promise__(cls, method_name):
+            # Builds a wrapper around some magic method
             def __wrapper__(self, *args, **kw):
                 # Automatically triggers the evaluation of a lazy value and
                 # applies the given magic method of the result type.
                 res = func(*self.__args, **self.__kw)
-                for t in type(res).mro():
-                    if t in self.__dispatch:
-                        return self.__dispatch[t][funcname](res, *args, **kw)
-                raise TypeError("Lazy object returned unexpected type.")
-
-            if klass not in cls.__dispatch:
-                cls.__dispatch[klass] = {}
-            cls.__dispatch[klass][funcname] = method
+                return getattr(res, method_name)(*args, **kw)
             return __wrapper__
 
         def __text_cast(self):
@@ -151,6 +117,9 @@ def lazy(func, *resultclasses):
         def __bytes_cast(self):
             return bytes(func(*self.__args, **self.__kw))
 
+        def __bytes_cast_encoded(self):
+            return func(*self.__args, **self.__kw).encode('utf-8')
+
         def __cast(self):
             if self._delegate_bytes:
                 return self.__bytes_cast()
@@ -158,6 +127,11 @@ def lazy(func, *resultclasses):
                 return self.__text_cast()
             else:
                 return func(*self.__args, **self.__kw)
+
+        def __str__(self):
+            # object defines __str__(), so __prepare_class__() won't overload
+            # a __str__() method from the proxied class.
+            return str(self.__cast())
 
         def __ne__(self, other):
             if isinstance(other, Promise):
@@ -210,14 +184,16 @@ def allow_lazy(func, *resultclasses):
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
+    lazy_func = lazy(func, *resultclasses)
+
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for arg in list(args) + list(six.itervalues(kwargs)):
+        for arg in list(args) + list(kwargs.values()):
             if isinstance(arg, Promise):
                 break
         else:
             return func(*args, **kwargs)
-        return lazy(func, *resultclasses)(*args, **kwargs)
+        return lazy_func(*args, **kwargs)
     return wrapper
 
 empty = object()
@@ -280,7 +256,7 @@ class LazyObject(object):
             self._setup()
         return self._wrapped.__dict__
 
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # Python 3 will call __reduce__ when pickling; this method is needed
     # to serialize and deserialize correctly.
     @classmethod
     def __newobj__(cls, *args):
@@ -313,7 +289,7 @@ class LazyObject(object):
         __bool__ = new_method_proxy(bool)
     else:
         __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
+        __unicode__ = new_method_proxy(unicode)  # NOQA: unicode undefined on PY3
         __nonzero__ = new_method_proxy(bool)
 
     # Introspection support
@@ -326,11 +302,11 @@ class LazyObject(object):
     __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
 
-    # Dictionary methods support
+    # List/Tuple/Dictionary methods support
     __getitem__ = new_method_proxy(operator.getitem)
     __setitem__ = new_method_proxy(operator.setitem)
     __delitem__ = new_method_proxy(operator.delitem)
-
+    __iter__ = new_method_proxy(iter)
     __len__ = new_method_proxy(len)
     __contains__ = new_method_proxy(operator.contains)
 
@@ -413,36 +389,3 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
-
-if sys.version_info >= (2, 7, 2):
-    from functools import total_ordering
-else:
-    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
-    # See http://bugs.python.org/issue10042 for details. For these versions use
-    # code borrowed from Python 2.7.3.
-    def total_ordering(cls):
-        """Class decorator that fills in missing ordering methods"""
-        convert = {
-            '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
-                       ('__le__', lambda self, other: self < other or self == other),
-                       ('__ge__', lambda self, other: not self < other)],
-            '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
-                       ('__lt__', lambda self, other: self <= other and not self == other),
-                       ('__gt__', lambda self, other: not self <= other)],
-            '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
-                       ('__ge__', lambda self, other: self > other or self == other),
-                       ('__le__', lambda self, other: not self > other)],
-            '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
-                       ('__gt__', lambda self, other: self >= other and not self == other),
-                       ('__lt__', lambda self, other: not self >= other)]
-        }
-        roots = set(dir(cls)) & set(convert)
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
-        for opname, opfunc in convert[root]:
-            if opname not in roots:
-                opfunc.__name__ = opname
-                opfunc.__doc__ = getattr(int, opname).__doc__
-                setattr(cls, opname, opfunc)
-        return cls

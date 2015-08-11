@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-11-19 18:33+0000\n"
+"Last-Translator: Sagar Chalise <chalisesagar@gmail.com>\n"
 "Language-Team: Nepali (http://www.transifex.com/projects/p/django/language/"
 "ne/)\n"
 "MIME-Version: 1.0\n"
@@ -18,26 +18,20 @@ msgstr ""
 "Language: ne\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sessions/apps.py:8
 msgid "Sessions"
-msgstr ""
+msgstr "अवधिहरु"
 
-#: contrib/sessions/models.py:38
 msgid "session key"
 msgstr "अवधि साँचो"
 
-#: contrib/sessions/models.py:40
 msgid "session data"
 msgstr "अवधि विवरण"
 
-#: contrib/sessions/models.py:41
 msgid "expire date"
 msgstr "खारेज मिति"
 
-#: contrib/sessions/models.py:46
 msgid "session"
 msgstr "अवधि"
 
-#: contrib/sessions/models.py:47
 msgid "sessions"
 msgstr "अवधिहरु"

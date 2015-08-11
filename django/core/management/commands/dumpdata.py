@@ -1,12 +1,9 @@
-import warnings
-
 from collections import OrderedDict
 
 from django.apps import apps
-from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
-from django.db import router, DEFAULT_DB_ALIAS
-from django.utils.deprecation import RemovedInDjango19Warning
+from django.core.management.base import BaseCommand, CommandError
+from django.db import DEFAULT_DB_ALIAS, router
 
 
 class Command(BaseCommand):
@@ -28,8 +25,6 @@ class Command(BaseCommand):
         parser.add_argument('-e', '--exclude', dest='exclude', action='append', default=[],
             help='An app_label or app_label.ModelName to exclude '
                  '(use multiple --exclude to exclude multiple apps/models).')
-        parser.add_argument('-n', '--natural', action='store_true', dest='use_natural_keys', default=False,
-            help='Use natural keys if they are available (deprecated: use --natural-foreign instead).')
         parser.add_argument('--natural-foreign', action='store_true', dest='use_natural_foreign_keys', default=False,
             help='Use natural foreign keys if they are available.')
         parser.add_argument('--natural-primary', action='store_true', dest='use_natural_primary_keys', default=False,
@@ -51,11 +46,7 @@ class Command(BaseCommand):
         excludes = options.get('exclude')
         output = options.get('output')
         show_traceback = options.get('traceback')
-        use_natural_keys = options.get('use_natural_keys')
-        if use_natural_keys:
-            warnings.warn("``--natural`` is deprecated; use ``--natural-foreign`` instead.",
-                RemovedInDjango19Warning)
-        use_natural_foreign_keys = options.get('use_natural_foreign_keys') or use_natural_keys
+        use_natural_foreign_keys = options.get('use_natural_foreign_keys')
         use_natural_primary_keys = options.get('use_natural_primary_keys')
         use_base_manager = options.get('use_base_manager')
         pks = options.get('primary_keys')
@@ -77,8 +68,8 @@ class Command(BaseCommand):
             else:
                 try:
                     app_config = apps.get_app_config(exclude)
-                except LookupError:
-                    raise CommandError('Unknown app in excludes: %s' % exclude)
+                except LookupError as e:
+                    raise CommandError(str(e))
                 excluded_apps.add(app_config)
 
         if len(app_labels) == 0:
@@ -96,8 +87,8 @@ class Command(BaseCommand):
                     app_label, model_label = label.split('.')
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     try:
@@ -120,8 +111,8 @@ class Command(BaseCommand):
                     app_label = label
                     try:
                         app_config = apps.get_app_config(app_label)
-                    except LookupError:
-                        raise CommandError("Unknown application: %s" % app_label)
+                    except LookupError as e:
+                        raise CommandError(str(e))
                     if app_config.models_module is None or app_config in excluded_apps:
                         continue
                     app_list[app_config] = None
@@ -136,12 +127,15 @@ class Command(BaseCommand):
 
             raise CommandError("Unknown serialization format: %s" % format)
 
-        def get_objects():
-            # Collate the objects to be serialized.
-            for model in sort_dependencies(app_list.items()):
+        def get_objects(count_only=False):
+            """
+            Collate the objects to be serialized. If count_only is True, just
+            count the number of objects to be serialized.
+            """
+            for model in serializers.sort_dependencies(app_list.items()):
                 if model in excluded_models:
                     continue
-                if not model._meta.proxy and router.allow_migrate(using, model):
+                if not model._meta.proxy and router.allow_migrate_model(using, model):
                     if use_base_manager:
                         objects = model._base_manager
                     else:
@@ -150,17 +144,27 @@ class Command(BaseCommand):
                     queryset = objects.using(using).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
-                    for obj in queryset.iterator():
-                        yield obj
+                    if count_only:
+                        yield queryset.order_by().count()
+                    else:
+                        for obj in queryset.iterator():
+                            yield obj
 
         try:
             self.stdout.ending = None
+            progress_output = None
+            object_count = 0
+            # If dumpdata is outputting to stdout, there is no way to display progress
+            if (output and self.stdout.isatty() and options['verbosity'] > 0):
+                progress_output = self.stdout
+                object_count = sum(get_objects(count_only=True))
             stream = open(output, 'w') if output else None
             try:
                 serializers.serialize(format, get_objects(), indent=indent,
                         use_natural_foreign_keys=use_natural_foreign_keys,
                         use_natural_primary_keys=use_natural_primary_keys,
-                        stream=stream or self.stdout)
+                        stream=stream or self.stdout, progress_output=progress_output,
+                        object_count=object_count)
             finally:
                 if stream:
                     stream.close()
@@ -168,82 +172,3 @@ class Command(BaseCommand):
             if show_traceback:
                 raise
             raise CommandError("Unable to serialize database: %s" % e)
-
-
-def sort_dependencies(app_list):
-    """Sort a list of (app_config, models) pairs into a single list of models.
-
-    The single list of models is sorted so that any model with a natural key
-    is serialized before a normal model, and any model with a natural key
-    dependency has it's dependencies serialized first.
-    """
-    # Process the list of models, and get the list of dependencies
-    model_dependencies = []
-    models = set()
-    for app_config, model_list in app_list:
-        if model_list is None:
-            model_list = app_config.get_models()
-
-        for model in model_list:
-            models.add(model)
-            # Add any explicitly defined dependencies
-            if hasattr(model, 'natural_key'):
-                deps = getattr(model.natural_key, 'dependencies', [])
-                if deps:
-                    deps = [apps.get_model(dep) for dep in deps]
-            else:
-                deps = []
-
-            # Now add a dependency for any FK relation with a model that
-            # defines a natural key
-            for field in model._meta.fields:
-                if hasattr(field.rel, 'to'):
-                    rel_model = field.rel.to
-                    if hasattr(rel_model, 'natural_key') and rel_model != model:
-                        deps.append(rel_model)
-            # Also add a dependency for any simple M2M relation with a model
-            # that defines a natural key.  M2M relations with explicit through
-            # models don't count as dependencies.
-            for field in model._meta.many_to_many:
-                if field.rel.through._meta.auto_created:
-                    rel_model = field.rel.to
-                    if hasattr(rel_model, 'natural_key') and rel_model != model:
-                        deps.append(rel_model)
-            model_dependencies.append((model, deps))
-
-    model_dependencies.reverse()
-    # Now sort the models to ensure that dependencies are met. This
-    # is done by repeatedly iterating over the input list of models.
-    # If all the dependencies of a given model are in the final list,
-    # that model is promoted to the end of the final list. This process
-    # continues until the input list is empty, or we do a full iteration
-    # over the input models without promoting a model to the final list.
-    # If we do a full iteration without a promotion, that means there are
-    # circular dependencies in the list.
-    model_list = []
-    while model_dependencies:
-        skipped = []
-        changed = False
-        while model_dependencies:
-            model, deps = model_dependencies.pop()
-
-            # If all of the models in the dependency list are either already
-            # on the final model list, or not on the original serialization list,
-            # then we've found another model with all it's dependencies satisfied.
-            found = True
-            for candidate in ((d not in models or d in model_list) for d in deps):
-                if not candidate:
-                    found = False
-            if found:
-                model_list.append(model)
-                changed = True
-            else:
-                skipped.append((model, deps))
-        if not changed:
-            raise CommandError("Can't resolve dependencies for %s in serialized app list." %
-                ', '.join('%s.%s' % (model._meta.app_label, model._meta.object_name)
-                for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__))
-            )
-        model_dependencies = skipped
-
-    return model_list

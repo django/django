@@ -1,35 +1,39 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta
+import io
+import os
 import re
 import types
+from datetime import datetime, timedelta
 from unittest import TestCase
 
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     BaseValidator, EmailValidator, MaxLengthValidator, MaxValueValidator,
     MinLengthValidator, MinValueValidator, RegexValidator, URLValidator,
-    validate_comma_separated_integer_list, validate_email, validate_integer,
-    validate_ipv46_address, validate_ipv4_address, validate_ipv6_address,
-    validate_slug,
+    int_list_validator, validate_comma_separated_integer_list, validate_email,
+    validate_integer, validate_ipv4_address, validate_ipv6_address,
+    validate_ipv46_address, validate_slug, validate_unicode_slug,
 )
 from django.test import SimpleTestCase
 from django.test.utils import str_prefix
-
+from django.utils._os import upath
 
 NOW = datetime.now()
 EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file']
 
-TEST_DATA = (
+TEST_DATA = [
     # (validator, value, expected),
     (validate_integer, '42', None),
     (validate_integer, '-42', None),
     (validate_integer, -42, None),
-    (validate_integer, -42.5, None),
 
+    (validate_integer, -42.5, ValidationError),
     (validate_integer, None, ValidationError),
     (validate_integer, 'a', ValidationError),
+    (validate_integer, '\n42', ValidationError),
+    (validate_integer, '42\n', ValidationError),
 
     (validate_email, 'email@here.com', None),
     (validate_email, 'weirder-email@here.and.there.com', None),
@@ -43,7 +47,12 @@ TEST_DATA = (
     (validate_email, 'email@localhost', None),
     (EmailValidator(whitelist=['localdomain']), 'email@localdomain', None),
     (validate_email, '"test@test"@example.com', None),
+    (validate_email, 'example@atm.%s' % ('a' * 63), None),
+    (validate_email, 'example@%s.atm' % ('a' * 63), None),
+    (validate_email, 'example@%s.%s.atm' % ('a' * 63, 'b' * 10), None),
 
+    (validate_email, 'example@atm.%s' % ('a' * 64), ValidationError),
+    (validate_email, 'example@%s.atm.%s' % ('b' * 64, 'a' * 63), ValidationError),
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
@@ -67,21 +76,48 @@ TEST_DATA = (
     (validate_email, '"\\\011"@here.com', None),
     (validate_email, '"\\\012"@here.com', ValidationError),
     (validate_email, 'trailingdot@shouldfail.com.', ValidationError),
-    # Max length of domain name in email is 249 (see validator for calculation)
-    (validate_email, 'a@%s.us' % ('a' * 249), None),
-    (validate_email, 'a@%s.us' % ('a' * 250), ValidationError),
+    # Max length of domain name labels is 63 characters per RFC 1034.
+    (validate_email, 'a@%s.us' % ('a' * 63), None),
+    (validate_email, 'a@%s.us' % ('a' * 64), ValidationError),
+    # Trailing newlines in username or domain not allowed
+    (validate_email, 'a@b.com\n', ValidationError),
+    (validate_email, 'a\n@b.com', ValidationError),
+    (validate_email, '"test@test"\n@example.com', ValidationError),
+    (validate_email, 'a@[127.0.0.1]\n', ValidationError),
 
     (validate_slug, 'slug-ok', None),
     (validate_slug, 'longer-slug-still-ok', None),
     (validate_slug, '--------', None),
     (validate_slug, 'nohyphensoranything', None),
+    (validate_slug, 'a', None),
+    (validate_slug, '1', None),
+    (validate_slug, 'a1', None),
 
     (validate_slug, '', ValidationError),
     (validate_slug, ' text ', ValidationError),
     (validate_slug, ' ', ValidationError),
     (validate_slug, 'some@mail.com', ValidationError),
     (validate_slug, '你好', ValidationError),
+    (validate_slug, '你 好', ValidationError),
     (validate_slug, '\n', ValidationError),
+    (validate_slug, 'trailing-newline\n', ValidationError),
+
+    (validate_unicode_slug, 'slug-ok', None),
+    (validate_unicode_slug, 'longer-slug-still-ok', None),
+    (validate_unicode_slug, '--------', None),
+    (validate_unicode_slug, 'nohyphensoranything', None),
+    (validate_unicode_slug, 'a', None),
+    (validate_unicode_slug, '1', None),
+    (validate_unicode_slug, 'a1', None),
+    (validate_unicode_slug, '你好', None),
+
+    (validate_unicode_slug, '', ValidationError),
+    (validate_unicode_slug, ' text ', ValidationError),
+    (validate_unicode_slug, ' ', ValidationError),
+    (validate_unicode_slug, 'some@mail.com', ValidationError),
+    (validate_unicode_slug, '\n', ValidationError),
+    (validate_unicode_slug, '你 好', ValidationError),
+    (validate_unicode_slug, 'trailing-newline\n', ValidationError),
 
     (validate_ipv4_address, '1.1.1.1', None),
     (validate_ipv4_address, '255.0.0.0', None),
@@ -91,6 +127,7 @@ TEST_DATA = (
     (validate_ipv4_address, '25.1.1.', ValidationError),
     (validate_ipv4_address, '25,1,1,1', ValidationError),
     (validate_ipv4_address, '25.1 .1.1', ValidationError),
+    (validate_ipv4_address, '1.1.1.1\n', ValidationError),
 
     # validate_ipv6_address uses django.utils.ipv6, which
     # is tested in much greater detail in its own testcase
@@ -118,12 +155,24 @@ TEST_DATA = (
     (validate_ipv46_address, '12345::', ValidationError),
 
     (validate_comma_separated_integer_list, '1', None),
+    (validate_comma_separated_integer_list, '12', None),
+    (validate_comma_separated_integer_list, '1,2', None),
     (validate_comma_separated_integer_list, '1,2,3', None),
-    (validate_comma_separated_integer_list, '1,2,3,', None),
+    (validate_comma_separated_integer_list, '10,32', None),
 
     (validate_comma_separated_integer_list, '', ValidationError),
+    (validate_comma_separated_integer_list, 'a', ValidationError),
     (validate_comma_separated_integer_list, 'a,b,c', ValidationError),
     (validate_comma_separated_integer_list, '1, 2, 3', ValidationError),
+    (validate_comma_separated_integer_list, ',', ValidationError),
+    (validate_comma_separated_integer_list, '1,2,3,', ValidationError),
+    (validate_comma_separated_integer_list, '1,2,', ValidationError),
+    (validate_comma_separated_integer_list, ',1', ValidationError),
+    (validate_comma_separated_integer_list, '1,,2', ValidationError),
+
+    (int_list_validator(sep='.'), '1.2.3', None),
+    (int_list_validator(sep='.'), '1,2,3', ValidationError),
+    (int_list_validator(sep='.'), '1.2.3\n', ValidationError),
 
     (MaxValueValidator(10), 10, None),
     (MaxValueValidator(10), -10, None),
@@ -153,38 +202,16 @@ TEST_DATA = (
 
     (MinLengthValidator(10), '', ValidationError),
 
-    (URLValidator(), 'http://www.djangoproject.com/', None),
-    (URLValidator(), 'HTTP://WWW.DJANGOPROJECT.COM/', None),
-    (URLValidator(), 'http://localhost/', None),
-    (URLValidator(), 'http://example.com/', None),
-    (URLValidator(), 'http://www.example.com/', None),
-    (URLValidator(), 'http://www.example.com:8000/test', None),
-    (URLValidator(), 'http://valid-with-hyphens.com/', None),
-    (URLValidator(), 'http://subdomain.example.com/', None),
-    (URLValidator(), 'http://200.8.9.10/', None),
-    (URLValidator(), 'http://200.8.9.10:8000/test', None),
-    (URLValidator(), 'http://valid-----hyphens.com/', None),
-    (URLValidator(), 'http://example.com?something=value', None),
-    (URLValidator(), 'http://example.com/index.php?something=value&another=value2', None),
-    (URLValidator(), 'https://example.com/', None),
-    (URLValidator(), 'ftp://example.com/', None),
-    (URLValidator(), 'ftps://example.com/', None),
     (URLValidator(EXTENDED_SCHEMES), 'file://localhost/path', None),
     (URLValidator(EXTENDED_SCHEMES), 'git://example.com/', None),
 
-    (URLValidator(), 'foo', ValidationError),
-    (URLValidator(), 'http://', ValidationError),
-    (URLValidator(), 'http://example', ValidationError),
-    (URLValidator(), 'http://example.', ValidationError),
-    (URLValidator(), 'http://.com', ValidationError),
-    (URLValidator(), 'http://invalid-.com', ValidationError),
-    (URLValidator(), 'http://-invalid.com', ValidationError),
-    (URLValidator(), 'http://invalid.com-', ValidationError),
-    (URLValidator(), 'http://inv-.alid-.com', ValidationError),
-    (URLValidator(), 'http://inv-.-alid.com', ValidationError),
-    (URLValidator(), 'file://localhost/path', ValidationError),
-    (URLValidator(), 'git://example.com/', ValidationError),
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
+    # Trailing newlines not accepted
+    (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
+    (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),
+    # Trailing junk does not take forever to reject
+    (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br ', ValidationError),
+    (URLValidator(), 'http://www.asdasdasdasdsadfm.com.br z', ValidationError),
 
     (BaseValidator(True), True, None),
     (BaseValidator(True), False, ValidationError),
@@ -208,7 +235,20 @@ TEST_DATA = (
     (RegexValidator('x', flags=re.IGNORECASE), 'y', ValidationError),
     (RegexValidator('a'), 'A', ValidationError),
     (RegexValidator('a', flags=re.IGNORECASE), 'A', None),
-)
+]
+
+
+def create_path(filename):
+    return os.path.abspath(os.path.join(os.path.dirname(upath(__file__)), filename))
+
+# Add valid and invalid URL tests.
+# This only tests the validator without extended schemes.
+with io.open(create_path('valid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), None))
+with io.open(create_path('invalid_urls.txt'), encoding='utf8') as f:
+    for url in f:
+        TEST_DATA.append((URLValidator(), url.strip(), ValidationError))
 
 
 def create_simple_test_method(validator, expected, value, num):

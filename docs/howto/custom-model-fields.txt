@@ -48,7 +48,7 @@ something like this::
 
         # ... (other possibly useful methods omitted) ...
 
-.. _Bridge: http://en.wikipedia.org/wiki/Contract_bridge
+.. _Bridge: https://en.wikipedia.org/wiki/Contract_bridge
 
 This is just an ordinary Python class, with nothing Django-specific about it.
 We'd like to be able to do things like this in our models (we assume the
@@ -217,9 +217,9 @@ The ``Field.__init__()`` method takes the following parameters:
 * :attr:`~django.db.models.Field.db_tablespace`: Only for index creation, if the
   backend supports :doc:`tablespaces </topics/db/tablespaces>`. You can usually
   ignore this option.
-* ``auto_created``: ``True`` if the field was automatically created, as for the
-  :class:`~django.db.models.OneToOneField` used by model inheritance. For
-  advanced use only.
+* :attr:`~django.db.models.Field.auto_created`: ``True`` if the field was
+  automatically created, as for the :class:`~django.db.models.OneToOneField`
+  used by model inheritance. For advanced use only.
 
 All of the options without an explanation in the above list have the same
 meaning they do for normal Django fields. See the :doc:`field documentation
@@ -230,12 +230,6 @@ meaning they do for normal Django fields. See the :doc:`field documentation
 Field deconstruction
 --------------------
 
-.. versionadded:: 1.7
-
-    ``deconstruct()`` is part of the migrations framework in Django 1.7 and
-    above. If you have custom fields from previous versions they will
-    need this method added before you can use them with migrations.
-
 The counterpoint to writing your ``__init__()`` method is writing the
 ``deconstruct()`` method. This method tells Django how to take an instance
 of your new field and reduce it to a serialized form - in particular, what
@@ -243,7 +237,7 @@ arguments to pass to ``__init__()`` to re-create it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
-you're, changing the arguments passed in ``__init__()`` (like we are in
+you're changing the arguments passed in ``__init__()`` (like we are in
 ``HandField``), you'll need to supplement the values being passed.
 
 The contract of ``deconstruct()`` is simple; it returns a tuple of four items:
@@ -339,10 +333,10 @@ incorporate arguments of the field. For example, the description for
 Useful methods
 --------------
 
-Once you've created your :class:`~django.db.models.Field` subclass and set up
-the ``__metaclass__``, you might consider overriding a few standard methods,
-depending on your field's behavior. The list of methods below is in
-approximately decreasing order of importance, so start from the top.
+Once you've created your :class:`~django.db.models.Field` subclass, you might
+consider overriding a few standard methods, depending on your field's behavior.
+The list of methods below is in approximately decreasing order of importance,
+so start from the top.
 
 .. _custom-database-types:
 
@@ -483,7 +477,7 @@ instances::
     class HandField(models.Field):
         # ...
 
-        def from_db_value(self, value, connection):
+        def from_db_value(self, value, expression, connection, context):
             if value is None:
                 return value
             return parse_hand(value)
@@ -590,11 +584,8 @@ valid Django filter lookups: ``exact``, ``iexact``, ``contains``, ``icontains``,
 ``endswith``, ``iendswith``, ``range``, ``year``, ``month``, ``day``,
 ``isnull``, ``search``, ``regex``, and ``iregex``.
 
-.. versionadded:: 1.7
-
-    If you are using :doc:`Custom lookups </howto/custom-lookups>` the
-    ``lookup_type`` can be any ``lookup_name`` used by the project's custom
-    lookups.
+If you are using :doc:`custom lookups </howto/custom-lookups>`, the
+``lookup_type`` can be any ``lookup_name`` used by the project's custom lookups.
 
 Your method must be prepared to handle all of these ``lookup_type`` values and
 should raise either a ``ValueError`` if the ``value`` is of the wrong sort (a
@@ -701,12 +692,12 @@ storing a string.
 
 If :meth:`.get_internal_type` returns a string that is not known to Django for
 the database backend you are using -- that is, it doesn't appear in
-``django.db.backends.<db_name>.creation.data_types`` -- the string will still be
-used by the serializer, but the default :meth:`~Field.db_type` method will
-return ``None``. See the documentation of :meth:`~Field.db_type` for reasons why
-this might be useful. Putting a descriptive string in as the type of the field
-for the serializer is a useful idea if you're ever going to be using the
-serializer output in some other place, outside of Django.
+``django.db.backends.<db_name>.base.DatabaseWrapper.data_types`` -- the string
+will still be used by the serializer, but the default :meth:`~Field.db_type`
+method will return ``None``. See the documentation of :meth:`~Field.db_type`
+for reasons why this might be useful. Putting a descriptive string in as the
+type of the field for the serializer is a useful idea if you're ever going to
+be using the serializer output in some other place, outside of Django.
 
 .. _converting-model-field-to-serialization:
 
@@ -714,15 +705,16 @@ Converting field data for serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To customize how the values are serialized by a serializer, you can override
-:meth:`~Field.value_to_string`. Calling ``Field._get_val_from_obj(obj)`` is the
-best way to get the value serialized. For example, since our ``HandField`` uses
-strings for its data storage anyway, we can reuse some existing conversion code::
+:meth:`~Field.value_to_string`. Using ``value_from_object()`` is the best way
+to get the field's value prior to serialization. For example, since our
+``HandField`` uses strings for its data storage anyway, we can reuse some
+existing conversion code::
 
     class HandField(models.Field):
         # ...
 
         def value_to_string(self, obj):
-            value = self._get_val_from_obj(obj)
+            value = self.value_from_object(obj)
             return self.get_prep_value(value)
 
 Some general advice

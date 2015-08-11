@@ -1,15 +1,18 @@
 from __future__ import unicode_literals
 
 from django import forms
-from django.forms.formsets import BaseFormSet, DELETION_FIELD_NAME
+from django.forms.formsets import DELETION_FIELD_NAME, BaseFormSet
+from django.forms.models import (
+    BaseModelFormSet, inlineformset_factory, modelform_factory,
+    modelformset_factory,
+)
 from django.forms.utils import ErrorDict, ErrorList
-from django.forms.models import modelform_factory, inlineformset_factory, modelformset_factory, BaseModelFormSet
 from django.test import TestCase
 from django.utils import six
 
 from .models import (
-    User, UserSite, UserProfile, ProfileNetwork, Restaurant, Manager, Network,
-    Host,
+    Host, Manager, Network, ProfileNetwork, Restaurant, User, UserProfile,
+    UserSite,
 )
 
 
@@ -203,7 +206,7 @@ class InlineFormsetTests(TestCase):
         UserFormSet = modelformset_factory(User, fields=())
         formset = UserFormSet()
         for form in formset.forms:
-            self.assertTrue('id' in form.fields)
+            self.assertIn('id', form.fields)
             self.assertEqual(len(form.fields), 1)
 
     def test_save_as_new_with_new_inlines(self):
@@ -247,7 +250,7 @@ class InlineFormsetTests(TestCase):
         formset = FormSet(instance=user, initial=[{'data': 41}, {'data': 42}])
         self.assertEqual(formset.forms[0].initial['data'], 7)
         self.assertEqual(formset.extra_forms[0].initial['data'], 41)
-        self.assertTrue('value="42"' in formset.extra_forms[1].as_p())
+        self.assertIn('value="42"', formset.extra_forms[1].as_p())
 
 
 class FormsetTests(TestCase):
@@ -282,7 +285,7 @@ class FormsetTests(TestCase):
         formset = Formset(initial=[{'username': 'apollo11'}, {'username': 'apollo12'}])
         self.assertEqual(formset.forms[0].initial['username'], "bibi")
         self.assertEqual(formset.extra_forms[0].initial['username'], "apollo11")
-        self.assertTrue('value="apollo12"' in formset.extra_forms[1].as_p())
+        self.assertIn('value="apollo12"', formset.extra_forms[1].as_p())
 
     def test_extraneous_query_is_not_run(self):
         Formset = modelformset_factory(Network, fields="__all__")
@@ -438,10 +441,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # pass standard data dict & see none updated
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         formset = self.NormalFormset(data, queryset=User.objects.all())
         self.assertTrue(formset.is_valid())
         self.assertEqual(len(formset.save()), 0)
@@ -455,10 +458,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # create data dict with all fields marked for deletion
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         data.update(self.delete_all_ids)
         formset = self.NormalFormset(data, queryset=User.objects.all())
         self.assertTrue(formset.is_valid())
@@ -474,10 +477,10 @@ class FormfieldShouldDeleteFormTests(TestCase):
         # create data dict with all fields marked for deletion
         data = dict(self.data)
         data['form-INITIAL_FORMS'] = 4
-        data.update(dict(
-            ('form-%d-id' % i, user.pk)
+        data.update({
+            'form-%d-id' % i: user.pk
             for i, user in enumerate(User.objects.all())
-        ))
+        })
         data.update(self.delete_all_ids)
         formset = self.DeleteFormset(data, queryset=User.objects.all())
 

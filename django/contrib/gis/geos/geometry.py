@@ -4,32 +4,21 @@
 """
 from __future__ import unicode_literals
 
-# Python, ctypes and types dependencies.
+import json
 from ctypes import addressof, byref, c_double
 
-# super-class for mutable list behavior
-from django.contrib.gis.geos.mutable_list import ListMixin
-
-from django.contrib.gis.gdal.error import SRSException
-
-# GEOS-related dependencies.
-from django.contrib.gis.geos.base import GEOSBase, gdal
+from django.contrib.gis import gdal
+from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
+from django.contrib.gis.geos import prototypes as capi
+from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
 from django.contrib.gis.geos.libgeos import GEOM_PTR
-
-# All other functions in this module come from the ctypes
-# prototypes module -- which handles all interaction with
-# the underlying GEOS library.
-from django.contrib.gis.geos import prototypes as capi
-
-# These functions provide access to a thread-local instance
-# of their corresponding GEOS I/O class.
-from django.contrib.gis.geos.prototypes.io import wkt_r, wkt_w, wkb_r, wkb_w, ewkb_w
-
-# For recognizing geometry input.
-from django.contrib.gis.geometry.regex import hex_regex, wkt_regex, json_regex
-
+from django.contrib.gis.geos.mutable_list import ListMixin
+from django.contrib.gis.geos.prepared import PreparedGeometry
+from django.contrib.gis.geos.prototypes.io import (
+    ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
+)
 from django.utils import six
 from django.utils.encoding import force_bytes, force_text
 
@@ -40,10 +29,11 @@ class GEOSGeometry(GEOSBase, ListMixin):
     # Raise GEOSIndexError instead of plain IndexError
     # (see ticket #4740 and GEOSIndexError docstring)
     _IndexError = GEOSIndexError
+    _GEOS_CLASSES = None
 
     ptr_type = GEOM_PTR
+    has_cs = False  # Only Point, LineString, LinearRing have coordinate sequences
 
-    #### Python 'magic' routines ####
     def __init__(self, geo_input, srid=None):
         """
         The base constructor for GEOS geometry objects, and may take the
@@ -71,8 +61,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
             elif hex_regex.match(geo_input):
                 # Handling HEXEWKB input.
                 g = wkb_r().read(force_bytes(geo_input))
-            elif gdal.HAS_GDAL and json_regex.match(geo_input):
+            elif json_regex.match(geo_input):
                 # Handling GeoJSON input.
+                if not gdal.HAS_GDAL:
+                    raise ValueError('Initializing geometry from JSON input requires GDAL.')
                 g = wkb_r().read(gdal.OGRGeometry(geo_input).wkb)
             else:
                 raise ValueError('String or unicode input unrecognized as WKT EWKT, and HEXEWKB.')
@@ -104,7 +96,24 @@ class GEOSGeometry(GEOSBase, ListMixin):
             self.srid = srid
 
         # Setting the class type (e.g., Point, Polygon, etc.)
-        self.__class__ = GEOS_CLASSES[self.geom_typeid]
+        if GEOSGeometry._GEOS_CLASSES is None:
+            # Lazy-loaded variable to avoid import conflicts with GEOSGeometry.
+            from .linestring import LineString, LinearRing
+            from .point import Point
+            from .polygon import Polygon
+            from .collections import (
+                GeometryCollection, MultiPoint, MultiLineString, MultiPolygon)
+            GEOSGeometry._GEOS_CLASSES = {
+                0: Point,
+                1: LineString,
+                2: LinearRing,
+                3: Polygon,
+                4: MultiPoint,
+                5: MultiLineString,
+                6: MultiPolygon,
+                7: GeometryCollection,
+            }
+        self.__class__ = GEOSGeometry._GEOS_CLASSES[self.geom_typeid]
 
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
@@ -134,8 +143,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return self.clone()
 
     def __str__(self):
-        "WKT is used for the string representation."
-        return self.wkt
+        "EWKT is used for the string representation."
+        return self.ewkt
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
@@ -173,7 +182,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "The not equals operator."
         return not (self == other)
 
-    ### Geometry set-like operations ###
+    # ### Geometry set-like operations ###
     # Thanks to Sean Gillies for inspiration:
     #  http://lists.gispython.org/pipermail/community/2007-July/001034.html
     # g = g1 | g2
@@ -196,16 +205,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Return the symmetric difference of this Geometry and the other."
         return self.sym_difference(other)
 
-    #### Coordinate Sequence Routines ####
-    @property
-    def has_cs(self):
-        "Returns True if this Geometry has a coordinate sequence, False if not."
-        # Only these geometries are allowed to have coordinate sequences.
-        if isinstance(self, (Point, LineString, LinearRing)):
-            return True
-        else:
-            return False
-
+    # #### Coordinate Sequence Routines ####
     def _set_cs(self):
         "Sets the coordinate sequence for this Geometry."
         if self.has_cs:
@@ -219,7 +219,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.has_cs:
             return self._cs.clone()
 
-    #### Geometry Info ####
+    # #### Geometry Info ####
     @property
     def geom_type(self):
         "Returns a string representing the Geometry type, e.g. 'Polygon'"
@@ -254,7 +254,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Converts this Geometry to normal form (or canonical form)."
         return capi.geos_normalize(self.ptr)
 
-    #### Unary predicates ####
+    # #### Unary predicates ####
     @property
     def empty(self):
         """
@@ -290,7 +290,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return capi.geos_isvalidreason(self.ptr).decode()
 
-    #### Binary predicates. ####
+    # #### Binary predicates. ####
     def contains(self, other):
         "Returns true if other.within(this) returns true."
         return capi.geos_contains(self.ptr, other.ptr)
@@ -358,7 +358,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return capi.geos_within(self.ptr, other.ptr)
 
-    #### SRID Routines ####
+    # #### SRID Routines ####
     def get_srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = capi.geos_get_srid(self.ptr)
@@ -372,13 +372,12 @@ class GEOSGeometry(GEOSBase, ListMixin):
         capi.geos_set_srid(self.ptr, srid)
     srid = property(get_srid, set_srid)
 
-    #### Output Routines ####
+    # #### Output Routines ####
     @property
     def ewkt(self):
         """
-        Returns the EWKT (WKT + SRID) of the Geometry.  Note that Z values
-        are *not* included in this representation because GEOS does not yet
-        support serializing them.
+        Returns the EWKT (SRID + WKT) of the Geometry. Note that Z values
+        are only included in this representation if GEOS >= 3.3.0.
         """
         if self.get_srid():
             return 'SRID=%s;%s' % (self.srid, self.wkt)
@@ -413,12 +412,9 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def json(self):
         """
-        Returns GeoJSON representation of this Geometry if GDAL is installed.
+        Returns GeoJSON representation of this Geometry.
         """
-        if gdal.HAS_GDAL:
-            return self.ogr.json
-        else:
-            raise GEOSException('GeoJSON output only supported when GDAL is installed.')
+        return json.dumps({'type': self.__class__.__name__, 'coordinates': self.coords})
     geojson = json
 
     @property
@@ -453,7 +449,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return PreparedGeometry(self)
 
-    #### GDAL-specific output routines ####
+    # #### GDAL-specific output routines ####
     @property
     def ogr(self):
         "Returns the OGR Geometry for this Geometry."
@@ -462,7 +458,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.srid:
             try:
                 return gdal.OGRGeometry(self.wkb, self.srid)
-            except SRSException:
+            except gdal.SRSException:
                 pass
         return gdal.OGRGeometry(self.wkb)
 
@@ -474,7 +470,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         if self.srid:
             try:
                 return gdal.SpatialReference(self.srid)
-            except SRSException:
+            except gdal.SRSException:
                 pass
         return None
 
@@ -524,7 +520,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         else:
             raise GEOSException('Transformed WKB was invalid.')
 
-    #### Topology Routines ####
+    # #### Topology Routines ####
     def _topology(self, gptr):
         "Helper routine to return Geometry from the given pointer."
         return GEOSGeometry(gptr, srid=self.srid)
@@ -573,16 +569,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Return the envelope for this geometry (a polygon)."
         return self._topology(capi.geos_envelope(self.ptr))
 
-    def interpolate(self, distance):
-        if not isinstance(self, (LineString, MultiLineString)):
-            raise TypeError('interpolate only works on LineString and MultiLineString geometries')
-        return self._topology(capi.geos_interpolate(self.ptr, distance))
-
-    def interpolate_normalized(self, distance):
-        if not isinstance(self, (LineString, MultiLineString)):
-            raise TypeError('interpolate only works on LineString and MultiLineString geometries')
-        return self._topology(capi.geos_interpolate_normalized(self.ptr, distance))
-
     def intersection(self, other):
         "Returns a Geometry representing the points shared by this Geometry and other."
         return self._topology(capi.geos_intersection(self.ptr, other.ptr))
@@ -591,20 +577,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
     def point_on_surface(self):
         "Computes an interior point of this Geometry."
         return self._topology(capi.geos_pointonsurface(self.ptr))
-
-    def project(self, point):
-        if not isinstance(point, Point):
-            raise TypeError('locate_point argument must be a Point')
-        if not isinstance(self, (LineString, MultiLineString)):
-            raise TypeError('locate_point only works on LineString and MultiLineString geometries')
-        return capi.geos_project(self.ptr, point.ptr)
-
-    def project_normalized(self, point):
-        if not isinstance(point, Point):
-            raise TypeError('locate_point argument must be a Point')
-        if not isinstance(self, (LineString, MultiLineString)):
-            raise TypeError('locate_point only works on LineString and MultiLineString geometries')
-        return capi.geos_project_normalized(self.ptr, point.ptr)
 
     def relate(self, other):
         "Returns the DE-9IM intersection matrix for this Geometry and the other."
@@ -638,7 +610,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Returns a Geometry representing all the points in this Geometry and other."
         return self._topology(capi.geos_union(self.ptr, other.ptr))
 
-    #### Other Routines ####
+    # #### Other Routines ####
     @property
     def area(self):
         "Returns the area of the Geometry."
@@ -660,6 +632,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Returns the extent of this geometry as a 4-tuple, consisting of
         (xmin, ymin, xmax, ymax).
         """
+        from .point import Point
         env = self.envelope
         if isinstance(env, Point):
             xmin, ymin = env.tuple
@@ -681,20 +654,25 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Clones this Geometry."
         return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
 
-# Class mapping dictionary.  Has to be at the end to avoid import
-# conflicts with GEOSGeometry.
-from django.contrib.gis.geos.linestring import LineString, LinearRing
-from django.contrib.gis.geos.point import Point
-from django.contrib.gis.geos.polygon import Polygon
-from django.contrib.gis.geos.collections import GeometryCollection, MultiPoint, MultiLineString, MultiPolygon
-from django.contrib.gis.geos.prepared import PreparedGeometry
-GEOS_CLASSES = {
-    0: Point,
-    1: LineString,
-    2: LinearRing,
-    3: Polygon,
-    4: MultiPoint,
-    5: MultiLineString,
-    6: MultiPolygon,
-    7: GeometryCollection,
-}
+
+class ProjectInterpolateMixin(object):
+    """
+    Used for LineString and MultiLineString.
+    """
+    def interpolate(self, distance):
+        return self._topology(capi.geos_interpolate(self.ptr, distance))
+
+    def interpolate_normalized(self, distance):
+        return self._topology(capi.geos_interpolate_normalized(self.ptr, distance))
+
+    def project(self, point):
+        from .point import Point
+        if not isinstance(point, Point):
+            raise TypeError('locate_point argument must be a Point')
+        return capi.geos_project(self.ptr, point.ptr)
+
+    def project_normalized(self, point):
+        from .point import Point
+        if not isinstance(point, Point):
+            raise TypeError('locate_point argument must be a Point')
+        return capi.geos_project_normalized(self.ptr, point.ptr)

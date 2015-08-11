@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-04-12 14:20+0000\n"
+"Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -17,35 +18,28 @@ msgstr ""
 "Language: fa\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
-msgstr ""
+msgstr "باز-ارسال‌ها"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "فرم ارسال به نشانی جدید"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
 msgstr "می‌بایست یک مسیر مطلق و بدون نام دامنه باشد. مانند: '/events/search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "ارسال به نشانی"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
 "می‌تواند یک مسیر مطلق (همانند بالا) و یا یک آدرس کامل با 'http://‎' باشد."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "باز-ارسال"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "باز-ارسال‌ها"

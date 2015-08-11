@@ -1,5 +1,4 @@
-from django.contrib.gis.gdal.error import OGRException
-
+from django.contrib.gis.gdal.error import GDALException
 from django.utils import six
 
 
@@ -28,7 +27,7 @@ class OGRGeomType(object):
               7 + wkb25bit: 'GeometryCollection25D',
               }
     # Reverse type dictionary, keyed by lower-case of the name.
-    _str_types = dict((v.lower(), k) for k, v in _types.items())
+    _str_types = {v.lower(): k for k, v in _types.items()}
 
     def __init__(self, type_input):
         "Figures out the correct OGR Type based upon the input."
@@ -38,12 +37,12 @@ class OGRGeomType(object):
             type_input = type_input.lower()
             if type_input == 'geometry':
                 type_input = 'unknown'
-            num = self._str_types.get(type_input, None)
+            num = self._str_types.get(type_input)
             if num is None:
-                raise OGRException('Invalid OGR String Type "%s"' % type_input)
+                raise GDALException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
             if type_input not in self._types:
-                raise OGRException('Invalid OGR Integer Type: %d' % type_input)
+                raise GDALException('Invalid OGR Integer Type: %d' % type_input)
             num = type_input
         else:
             raise TypeError('Invalid OGR input type given.')
@@ -86,3 +85,11 @@ class OGRGeomType(object):
         elif s == 'Unknown':
             s = 'Geometry'
         return s + 'Field'
+
+    def to_multi(self):
+        """
+        Transform Point, LineString, Polygon, and their 25D equivalents
+        to their Multi... counterpart.
+        """
+        if self.name.startswith(('Point', 'LineString', 'Polygon')):
+            self.num += 3

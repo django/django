@@ -38,7 +38,7 @@ class ItalianRestaurant(Restaurant):
 @python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
     capacity = models.IntegerField()
 
     def __str__(self):
@@ -48,18 +48,18 @@ class ParkingLot(Place):
 class ParkingLot2(Place):
     # In lieu of any other connector, an existing OneToOneField will be
     # promoted to the primary key.
-    parent = models.OneToOneField(Place)
+    parent = models.OneToOneField(Place, models.CASCADE)
 
 
 class ParkingLot3(Place):
     # The parent_link connector need not be the pk on the model.
     primary_key = models.AutoField(primary_key=True)
-    parent = models.OneToOneField(Place, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, parent_link=True)
 
 
 class ParkingLot4(models.Model):
     # Test parent_link connector can be discovered in abstract classes.
-    parent = models.OneToOneField(Place, parent_link=True)
+    parent = models.OneToOneField(Place, models.CASCADE, parent_link=True)
 
     class Meta:
         abstract = True
@@ -76,14 +76,14 @@ class ParkingLot4B(Place, ParkingLot4):
 @python_2_unicode_compatible
 class Supplier(models.Model):
     name = models.CharField(max_length=50)
-    restaurant = models.ForeignKey(Restaurant)
+    restaurant = models.ForeignKey(Restaurant, models.CASCADE)
 
     def __str__(self):
         return self.name
 
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier, related_name='wholesale_supplier')
+    retailer = models.ForeignKey(Supplier, models.CASCADE, related_name='wholesale_supplier')
 
 
 class Parent(models.Model):
@@ -96,7 +96,7 @@ class Child(Parent):
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
-    self_data = models.ForeignKey('self', null=True)
+    self_data = models.ForeignKey('self', models.SET_NULL, null=True)
 
 
 class SelfRefChild(SelfRefParent):

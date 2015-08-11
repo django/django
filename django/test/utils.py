@@ -1,27 +1,31 @@
-from contextlib import contextmanager
 import logging
 import re
 import sys
 import time
-from unittest import skipUnless
 import warnings
+from contextlib import contextmanager
 from functools import wraps
-from xml.dom.minidom import parseString, Node
+from unittest import skipIf, skipUnless
+from xml.dom.minidom import Node, parseString
 
 from django.apps import apps
-from django.conf import settings, UserSettingsHolder
+from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
+from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
 from django.http import request
-from django.template import Template, loader, TemplateDoesNotExist
-from django.template.loaders import cached
-from django.test.signals import template_rendered, setting_changed
+from django.template import Template
+from django.test.signals import setting_changed, template_rendered
 from django.utils import six
 from django.utils.decorators import ContextDecorator
-from django.utils.deprecation import RemovedInDjango19Warning, RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
+
+try:
+    import jinja2
+except ImportError:
+    jinja2 = None
 
 
 __all__ = (
@@ -31,7 +35,6 @@ __all__ = (
     'setup_test_environment', 'teardown_test_environment',
 )
 
-RESTORE_LOADERS_ATTR = '_original_template_source_loaders'
 TZ_SUPPORT = hasattr(time, 'tzset')
 
 
@@ -147,102 +150,6 @@ def get_runner(settings, test_runner_class=None):
     return test_runner
 
 
-class override_template_loaders(ContextDecorator):
-    """
-    Acts as a function decorator, context manager or start/end manager and
-    override the template loaders. It could be used in the following ways:
-
-    @override_template_loaders(SomeLoader())
-    def test_function(self):
-        ...
-
-    with override_template_loaders(SomeLoader(), OtherLoader()) as loaders:
-        ...
-
-    loaders = override_template_loaders.override(SomeLoader())
-    ...
-    override_template_loaders.restore()
-    """
-    def __init__(self, *loaders):
-        self.loaders = loaders
-        self.old_loaders = []
-
-    def __enter__(self):
-        self.old_loaders = loader.template_source_loaders
-        loader.template_source_loaders = self.loaders
-        return self.loaders
-
-    def __exit__(self, type, value, traceback):
-        loader.template_source_loaders = self.old_loaders
-
-    @classmethod
-    def override(cls, *loaders):
-        if hasattr(loader, RESTORE_LOADERS_ATTR):
-            raise Exception("loader.%s already exists" % RESTORE_LOADERS_ATTR)
-        setattr(loader, RESTORE_LOADERS_ATTR, loader.template_source_loaders)
-        loader.template_source_loaders = loaders
-        return loaders
-
-    @classmethod
-    def restore(cls):
-        loader.template_source_loaders = getattr(loader, RESTORE_LOADERS_ATTR)
-        delattr(loader, RESTORE_LOADERS_ATTR)
-
-
-class TestTemplateLoader(loader.BaseLoader):
-    "A custom template loader that loads templates from a dictionary."
-    is_usable = True
-
-    def __init__(self, templates_dict):
-        self.templates_dict = templates_dict
-
-    def load_template_source(self, template_name, template_dirs=None,
-                             skip_template=None):
-        try:
-            return (self.templates_dict[template_name],
-                    "test:%s" % template_name)
-        except KeyError:
-            raise TemplateDoesNotExist(template_name)
-
-
-class override_with_test_loader(override_template_loaders):
-    """
-    Acts as a function decorator, context manager or start/end manager and
-    override the template loaders with the test loader. It could be used in the
-    following ways:
-
-    @override_with_test_loader(templates_dict, use_cached_loader=True)
-    def test_function(self):
-        ...
-
-    with override_with_test_loader(templates_dict) as test_loader:
-        ...
-
-    test_loader = override_with_test_loader.override(templates_dict)
-    ...
-    override_with_test_loader.restore()
-    """
-
-    def __init__(self, templates_dict, use_cached_loader=False):
-        self.loader = self._get_loader(templates_dict, use_cached_loader)
-        super(override_with_test_loader, self).__init__(self.loader)
-
-    def __enter__(self):
-        return super(override_with_test_loader, self).__enter__()[0]
-
-    @classmethod
-    def override(cls, templates_dict, use_cached_loader=False):
-        loader = cls._get_loader(templates_dict, use_cached_loader)
-        return super(override_with_test_loader, cls).override(loader)[0]
-
-    @classmethod
-    def _get_loader(cls, templates_dict, use_cached_loader=False):
-        if use_cached_loader:
-            loader = cached.Loader(('TestTemplateLoader',))
-            loader._cached_loaders = TestTemplateLoader(templates_dict)
-        return TestTemplateLoader(templates_dict)
-
-
 class override_settings(object):
     """
     Acts as either a decorator, or a context manager. If it's a decorator it
@@ -319,7 +226,7 @@ class modify_settings(override_settings):
     """
     def __init__(self, *args, **kwargs):
         if args:
-            # Hack used when instantiating from SimpleTestCase._pre_setup.
+            # Hack used when instantiating from SimpleTestCase.setUpClass.
             assert not kwargs
             self.operations = args[0]
         else:
@@ -338,7 +245,7 @@ class modify_settings(override_settings):
         self.options = {}
         for name, operations in self.operations:
             try:
-                # When called from SimpleTestCase._pre_setup, values may be
+                # When called from SimpleTestCase.setUpClass, values may be
                 # overridden several times; cumulate changes.
                 value = self.options[name]
             except KeyError:
@@ -397,8 +304,8 @@ def compare_xml(want, got):
         return _norm_whitespace_re.sub(' ', v)
 
     def child_text(element):
-        return ''.join([c.data for c in element.childNodes
-                        if c.nodeType == Node.TEXT_NODE])
+        return ''.join(c.data for c in element.childNodes
+                       if c.nodeType == Node.TEXT_NODE)
 
     def children(element):
         return [c for c in element.childNodes
@@ -520,27 +427,40 @@ class CaptureQueriesContext(object):
         self.final_queries = len(self.connection.queries_log)
 
 
-class IgnoreDeprecationWarningsMixin(object):
-    warning_classes = [RemovedInDjango19Warning]
+class ignore_warnings(object):
+    def __init__(self, **kwargs):
+        self.ignore_kwargs = kwargs
+        if 'message' in self.ignore_kwargs or 'module' in self.ignore_kwargs:
+            self.filter_func = warnings.filterwarnings
+        else:
+            self.filter_func = warnings.simplefilter
 
-    def setUp(self):
-        super(IgnoreDeprecationWarningsMixin, self).setUp()
-        self.catch_warnings = warnings.catch_warnings()
-        self.catch_warnings.__enter__()
-        for warning_class in self.warning_classes:
-            warnings.filterwarnings("ignore", category=warning_class)
+    def __call__(self, decorated):
+        if isinstance(decorated, type):
+            # A class is decorated
+            saved_setUp = decorated.setUp
+            saved_tearDown = decorated.tearDown
 
-    def tearDown(self):
-        self.catch_warnings.__exit__(*sys.exc_info())
-        super(IgnoreDeprecationWarningsMixin, self).tearDown()
+            def setUp(inner_self):
+                self.catch_warnings = warnings.catch_warnings()
+                self.catch_warnings.__enter__()
+                self.filter_func('ignore', **self.ignore_kwargs)
+                saved_setUp(inner_self)
 
+            def tearDown(inner_self):
+                saved_tearDown(inner_self)
+                self.catch_warnings.__exit__(*sys.exc_info())
 
-class IgnorePendingDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango20Warning]
-
-
-class IgnoreAllDeprecationWarningsMixin(IgnoreDeprecationWarningsMixin):
-        warning_classes = [RemovedInDjango20Warning, RemovedInDjango19Warning]
+            decorated.setUp = setUp
+            decorated.tearDown = tearDown
+            return decorated
+        else:
+            @wraps(decorated)
+            def inner(*args, **kwargs):
+                with warnings.catch_warnings():
+                    self.filter_func('ignore', **self.ignore_kwargs)
+                    return decorated(*args, **kwargs)
+            return inner
 
 
 @contextmanager
@@ -581,3 +501,133 @@ def extend_sys_path(*paths):
         yield
     finally:
         sys.path = _orig_sys_path
+
+
+@contextmanager
+def captured_output(stream_name):
+    """Return a context manager used by captured_stdout/stdin/stderr
+    that temporarily replaces the sys stream *stream_name* with a StringIO.
+
+    Note: This function and the following ``captured_std*`` are copied
+          from CPython's ``test.support`` module."""
+    orig_stdout = getattr(sys, stream_name)
+    setattr(sys, stream_name, six.StringIO())
+    try:
+        yield getattr(sys, stream_name)
+    finally:
+        setattr(sys, stream_name, orig_stdout)
+
+
+def captured_stdout():
+    """Capture the output of sys.stdout:
+
+       with captured_stdout() as stdout:
+           print("hello")
+       self.assertEqual(stdout.getvalue(), "hello\n")
+    """
+    return captured_output("stdout")
+
+
+def captured_stderr():
+    """Capture the output of sys.stderr:
+
+       with captured_stderr() as stderr:
+           print("hello", file=sys.stderr)
+       self.assertEqual(stderr.getvalue(), "hello\n")
+    """
+    return captured_output("stderr")
+
+
+def captured_stdin():
+    """Capture the input to sys.stdin:
+
+       with captured_stdin() as stdin:
+           stdin.write('hello\n')
+           stdin.seek(0)
+           # call test code that consumes from sys.stdin
+           captured = input()
+       self.assertEqual(captured, "hello")
+    """
+    return captured_output("stdin")
+
+
+def reset_warning_registry():
+    """
+    Clear warning registry for all modules. This is required in some tests
+    because of a bug in Python that prevents warnings.simplefilter("always")
+    from always making warnings appear: http://bugs.python.org/issue4180
+
+    The bug was fixed in Python 3.4.2.
+    """
+    key = "__warningregistry__"
+    for mod in sys.modules.values():
+        if hasattr(mod, key):
+            getattr(mod, key).clear()
+
+
+@contextmanager
+def freeze_time(t):
+    """
+    Context manager to temporarily freeze time.time(). This temporarily
+    modifies the time function of the time module. Modules which import the
+    time function directly (e.g. `from time import time`) won't be affected
+    This isn't meant as a public API, but helps reduce some repetitive code in
+    Django's test suite.
+    """
+    _real_time = time.time
+    time.time = lambda: t
+    try:
+        yield
+    finally:
+        time.time = _real_time
+
+
+def require_jinja2(test_func):
+    """
+    Decorator to enable a Jinja2 template engine in addition to the regular
+    Django template engine for a test or skip it if Jinja2 isn't available.
+    """
+    test_func = skipIf(jinja2 is None, "this test requires jinja2")(test_func)
+    test_func = override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+    }, {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'APP_DIRS': True,
+        'OPTIONS': {'keep_trailing_newline': True},
+    }])(test_func)
+    return test_func
+
+
+class ScriptPrefix(ContextDecorator):
+    def __enter__(self):
+        set_script_prefix(self.prefix)
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        set_script_prefix(self.old_prefix)
+
+    def __init__(self, prefix):
+        self.prefix = prefix
+        self.old_prefix = get_script_prefix()
+
+
+def override_script_prefix(prefix):
+    """
+    Decorator or context manager to temporary override the script prefix.
+    """
+    return ScriptPrefix(prefix)
+
+
+class LoggingCaptureMixin(object):
+    """
+    Capture the output from the 'django' logger and store it on the class's
+    logger_output attribute.
+    """
+    def setUp(self):
+        self.logger = logging.getLogger('django')
+        self.old_stream = self.logger.handlers[0].stream
+        self.logger_output = six.StringIO()
+        self.logger.handlers[0].stream = self.logger_output
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream

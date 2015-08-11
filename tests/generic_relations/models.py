@@ -12,7 +12,7 @@ from complete).
 from __future__ import unicode_literals
 
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -23,13 +23,13 @@ from django.utils.encoding import python_2_unicode_compatible
 class TaggedItem(models.Model):
     """A tag on an item."""
     tag = models.SlugField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
 
     content_object = GenericForeignKey()
 
     class Meta:
-        ordering = ["tag", "content_type__name"]
+        ordering = ["tag", "content_type__model"]
 
     def __str__(self):
         return self.tag
@@ -42,7 +42,7 @@ class ValuableTaggedItem(TaggedItem):
 class AbstractComparison(models.Model):
     comparative = models.CharField(max_length=50)
 
-    content_type1 = models.ForeignKey(ContentType, related_name="comparative1_set")
+    content_type1 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative1_set")
     object_id1 = models.PositiveIntegerField()
 
     first_obj = GenericForeignKey(ct_field="content_type1", fk_field="object_id1")
@@ -54,7 +54,7 @@ class Comparison(AbstractComparison):
     A model that tests having multiple GenericForeignKeys. One is defined
     through an inherited abstract model and one defined directly on this class.
     """
-    content_type2 = models.ForeignKey(ContentType, related_name="comparative2_set")
+    content_type2 = models.ForeignKey(ContentType, models.CASCADE, related_name="comparative2_set")
     object_id2 = models.PositiveIntegerField()
 
     other_obj = GenericForeignKey(ct_field="content_type2", fk_field="object_id2")
@@ -120,14 +120,14 @@ class ManualPK(models.Model):
 
 
 class ForProxyModelModel(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     obj = GenericForeignKey(for_concrete_model=False)
     title = models.CharField(max_length=255, null=True)
 
 
 class ForConcreteModelModel(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     obj = GenericForeignKey()
 
@@ -143,6 +143,6 @@ class ProxyRelatedModel(ConcreteRelatedModel):
 
 # To test fix for #7551
 class AllowsNullGFK(models.Model):
-    content_type = models.ForeignKey(ContentType, null=True)
+    content_type = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey()

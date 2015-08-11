@@ -1,9 +1,10 @@
 from __future__ import unicode_literals
 
-from django.contrib.gis.geos import GEOSGeometry, LinearRing, Polygon, Point
+from math import atan, exp, log, pi, sin
+
+from django.contrib.gis.geos import GEOSGeometry, LinearRing, Point, Polygon
 from django.contrib.gis.maps.google.gmap import GoogleMapException
-from django.utils.six.moves import xrange
-from math import pi, sin, log, exp, atan
+from django.utils.six.moves import range
 
 # Constants used for degree to radian conversion, and vice-versa.
 DTOR = pi / 180.
@@ -41,7 +42,7 @@ class GoogleZoom(object):
 
         # Incrementing through the zoom levels and populating the parameter arrays.
         z = tilesize  # The number of pixels per zoom level.
-        for i in xrange(num_zoom):
+        for i in range(num_zoom):
             # Getting the degrees and radians per pixel, and the 1/2 the number of
             # for every zoom level.
             self._degpp.append(z / 360.)  # degrees per pixel
@@ -136,7 +137,7 @@ class GoogleZoom(object):
         env_w, env_h = self.get_width_height(env.extent)
         center = env.centroid
 
-        for z in xrange(self._nzoom):
+        for z in range(self._nzoom):
             # Getting the tile at the zoom level.
             tile_w, tile_h = self.get_width_height(self.tile(center, z).extent)
 

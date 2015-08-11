@@ -2,7 +2,6 @@ from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.crypto import constant_time_compare
 from django.utils.functional import SimpleLazyObject
 
 
@@ -25,20 +24,15 @@ class AuthenticationMiddleware(object):
 
 class SessionAuthenticationMiddleware(object):
     """
-    Middleware for invalidating a user's sessions that don't correspond to the
-    user's current session authentication hash (generated based on the user's
-    password for AbstractUser).
+    Formerly, a middleware for invalidating a user's sessions that don't
+    correspond to the user's current session authentication hash. However, it
+    caused the "Vary: Cookie" header on all responses.
+
+    Now a backwards compatibility shim that enables session verification in
+    auth.get_user() if this middleware is in MIDDLEWARE_CLASSES.
     """
     def process_request(self, request):
-        user = request.user
-        if user and hasattr(user, 'get_session_auth_hash'):
-            session_hash = request.session.get(auth.HASH_SESSION_KEY)
-            session_hash_verified = session_hash and constant_time_compare(
-                session_hash,
-                user.get_session_auth_hash()
-            )
-            if not session_hash_verified:
-                auth.logout(request)
+        pass
 
 
 class RemoteUserMiddleware(object):
@@ -59,6 +53,7 @@ class RemoteUserMiddleware(object):
     # used in the request.META dictionary, i.e. the normalization of headers to
     # all uppercase and the addition of "HTTP_" prefix apply.
     header = "REMOTE_USER"
+    force_logout_if_no_header = True
 
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
@@ -75,7 +70,7 @@ class RemoteUserMiddleware(object):
             # If specified header doesn't exist then remove any existing
             # authenticated remote-user, or return (leaving request.user set to
             # AnonymousUser by the AuthenticationMiddleware).
-            if request.user.is_authenticated():
+            if self.force_logout_if_no_header and request.user.is_authenticated():
                 self._remove_invalid_user(request)
             return
         # If the user is already authenticated and that user is the user we are
@@ -124,3 +119,16 @@ class RemoteUserMiddleware(object):
         else:
             if isinstance(stored_backend, RemoteUserBackend):
                 auth.logout(request)
+
+
+class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
+    """
+    Middleware for Web-server provided authentication on logon pages.
+
+    Like RemoteUserMiddleware but keeps the user authenticated even if
+    the header (``REMOTE_USER``) is not found in the request. Useful
+    for setups when the external authentication via ``REMOTE_USER``
+    is only expected to happen on some "logon" URL and the rest of
+    the application wants to use Django's authentication mechanism.
+    """
+    force_logout_if_no_header = False

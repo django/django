@@ -5,10 +5,10 @@ from functools import update_wrapper
 
 from django import http
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.template.response import TemplateResponse
-from django.utils.decorators import classonlymethod
 from django.utils import six
+from django.utils.decorators import classonlymethod
 
 logger = logging.getLogger('django.request')
 
@@ -48,7 +48,6 @@ class View(object):
         """
         Main entry point for a request-response process.
         """
-        # sanitize keyword arguments
         for key in initkwargs:
             if key in cls.http_method_names:
                 raise TypeError("You tried to pass in the %s method name as a "
@@ -67,6 +66,8 @@ class View(object):
             self.args = args
             self.kwargs = kwargs
             return self.dispatch(request, *args, **kwargs)
+        view.view_class = cls
+        view.view_initkwargs = initkwargs
 
         # take name and docstring from class
         update_wrapper(view, cls, updated=())
@@ -113,6 +114,7 @@ class TemplateResponseMixin(object):
     A mixin that can be used to render a template.
     """
     template_name = None
+    template_engine = None
     response_class = TemplateResponse
     content_type = None
 
@@ -129,6 +131,7 @@ class TemplateResponseMixin(object):
             request=self.request,
             template=self.get_template_names(),
             context=context,
+            using=self.template_engine,
             **response_kwargs
         )
 
@@ -159,7 +162,7 @@ class RedirectView(View):
     """
     A view that provides a redirect on any GET request.
     """
-    permanent = True
+    permanent = False
     url = None
     pattern_name = None
     query_string = False

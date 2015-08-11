@@ -7,18 +7,8 @@ from django.test import TestCase, override_settings
 from django.utils.encoding import force_text
 
 from .models import (
-    Child1,
-    Child2,
-    Child3,
-    Child4,
-    Child5,
-    Child6,
-    Child7,
-    AbstractBase1,
-    AbstractBase2,
-    AbstractBase3,
-    RelatedModel,
-    RelationModel,
+    AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
+    Child4, Child5, Child6, Child7, RelatedModel, RelationModel,
 )
 
 
@@ -76,35 +66,29 @@ class ManagersRegressionTests(TestCase):
     def test_abstract_manager(self):
         # Accessing the manager on an abstract model should
         # raise an attribute error with an appropriate message.
-        try:
+        # This error message isn't ideal, but if the model is abstract and
+        # a lot of the class instantiation logic isn't invoked; if the
+        # manager is implied, then we don't get a hook to install the
+        # error-raising manager.
+        msg = "type object 'AbstractBase3' has no attribute 'objects'"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase3.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            # This error message isn't ideal, but if the model is abstract and
-            # a lot of the class instantiation logic isn't invoked; if the
-            # manager is implied, then we don't get a hook to install the
-            # error-raising manager.
-            self.assertEqual(str(e), "type object 'AbstractBase3' has no attribute 'objects'")
 
     def test_custom_abstract_manager(self):
         # Accessing the manager on an abstract model with an custom
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase2 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase2.restricted.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase2 is abstract")
 
     def test_explicit_abstract_manager(self):
         # Accessing the manager on an abstract model with an explicit
         # manager should raise an attribute error with an appropriate
         # message.
-        try:
+        msg = "Manager isn't available; AbstractBase1 is abstract"
+        with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase1.objects.all()
-            self.fail('Should raise an AttributeError')
-        except AttributeError as e:
-            self.assertEqual(str(e), "Manager isn't available; AbstractBase1 is abstract")
 
     @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
     def test_swappable_manager(self):
@@ -119,12 +103,12 @@ class ManagersRegressionTests(TestCase):
 
             # Accessing the manager on a swappable model should
             # raise an attribute error with a helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
@@ -138,7 +122,6 @@ class ManagersRegressionTests(TestCase):
 
         try:
             class SwappableModel(models.Model):
-
                 stuff = models.Manager()
 
                 class Meta:
@@ -147,12 +130,12 @@ class ManagersRegressionTests(TestCase):
             # Accessing the manager on a swappable model with an
             # explicit manager should raise an attribute error with a
             # helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.stuff.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
@@ -166,7 +149,6 @@ class ManagersRegressionTests(TestCase):
 
         try:
             class SwappableModel(models.Model):
-
                 objects = models.Manager()
 
                 class Meta:
@@ -175,12 +157,12 @@ class ManagersRegressionTests(TestCase):
             # Accessing the manager on a swappable model with an
             # explicit manager should raise an attribute error with a
             # helpful message
-            try:
+            msg = (
+                "Manager isn't available; 'managers_regress.SwappableModel' "
+                "has been swapped for 'managers_regress.Parent'"
+            )
+            with self.assertRaisesMessage(AttributeError, msg):
                 SwappableModel.objects.all()
-                self.fail('Should raise an AttributeError')
-            except AttributeError as e:
-                self.assertEqual(str(e), "Manager isn't available; SwappableModel has been swapped for 'managers_regress.Parent'")
-
         finally:
             apps.app_configs['managers_regress'].models = _old_models
             apps.all_models['managers_regress'] = _old_models
@@ -201,3 +183,11 @@ class ManagersRegressionTests(TestCase):
             t.render(Context({'related': related})),
             ''.join([force_text(relation.pk)] * 3),
         )
+
+    def test_field_can_be_called_exact(self):
+        # Make sure related managers core filters don't include an
+        # explicit `__exact` lookup that could be interpreted as a
+        # reference to a foreign `exact` field. refs #23940.
+        related = RelatedModel.objects.create(exact=False)
+        relation = related.test_fk.create()
+        self.assertEqual(related.test_fk.get(), relation)

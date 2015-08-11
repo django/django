@@ -1,10 +1,9 @@
-from importlib import import_module
 import os
+from importlib import import_module
 
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
-from django.utils.module_loading import module_has_submodule
 from django.utils._os import upath
-
+from django.utils.module_loading import module_has_submodule
 
 MODELS_MODULE_NAME = 'models'
 
@@ -56,7 +55,7 @@ class AppConfig(object):
         """Attempt to determine app's filesystem path from its module."""
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
-        # Convert paths to list because Python 3.3 _NamespacePath does not
+        # Convert paths to list because Python 3's _NamespacePath does not
         # support indexing.
         paths = list(getattr(module, '__path__', []))
         if len(paths) != 1:
@@ -110,9 +109,6 @@ class AppConfig(object):
 
         # If we're reaching this point, we must attempt to load the app config
         # class located at <mod_path>.<cls_name>
-
-        # Avoid django.utils.module_loading.import_by_path because it
-        # masks errors -- it reraises ImportError as ImproperlyConfigured.
         mod = import_module(mod_path)
         try:
             cls = getattr(mod, cls_name)

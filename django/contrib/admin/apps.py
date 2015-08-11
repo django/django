@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from django.core import checks
 from django.contrib.admin.checks import check_admin_app
+from django.core import checks
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -11,7 +11,7 @@ class SimpleAdminConfig(AppConfig):
     verbose_name = _("Administration")
 
     def ready(self):
-        checks.register(checks.Tags.admin)(check_admin_app)
+        checks.register(check_admin_app, checks.Tags.admin)
 
 
 class AdminConfig(SimpleAdminConfig):

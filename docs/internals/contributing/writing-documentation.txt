@@ -192,7 +192,7 @@ __ http://sphinx-doc.org/markup/
 
   To link, use ``:djadminopt:`--traceback```.
 
-* Links to Trac tickets (typically reserved for minor release notes)::
+* Links to Trac tickets (typically reserved for patch release notes)::
 
         :ticket:`12345`
 
@@ -210,11 +210,51 @@ Our policy for new features is:
 
 Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional content (indented).
+blank line and an optional description (indented).
 
 General improvements, or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
+
+These ``versionadded`` and ``versionchanged`` blocks should be "self-contained."
+In other words, since we only keep these annotations around for two releases,
+it's nice to be able to remove the annotation and its contents without having
+to reflow, reindent, or edit the surrounding text. For example, instead of
+putting the entire description of a new or changed feature in a block, do
+something like this::
+
+    .. class:: Author(first_name, last_name, middle_name=None)
+
+        A person who writes books.
+
+        ``first_name`` is ...
+
+        ...
+
+        ``middle_name`` is ...
+
+        .. versionchanged:: A.B
+
+            The ``middle_name`` argument was added.
+
+Put the changed annotation notes at the bottom of a section, not the top.
+
+Also, avoid referring to a specific version of Django outside a
+``versionadded`` or ``versionchanged`` block. Even inside a block, it's often
+redundant to do so as these annotations render as "New in Django A.B:" and
+"Changed in Django A.B", respectively.
+
+If a function, attribute, etc. is added, it's also okay to use a
+``versionadded`` annotation like this::
+
+    .. attribute:: Author.middle_name
+
+        .. versionadded:: A.B
+
+        An author's middle name.
+
+We can simply remove the ``.. versionadded:: A.B`` annotation without any
+indentation changes when the time comes.
 
 An example
 ----------
@@ -272,14 +312,14 @@ example:
     ADMINS
     ------
 
-    Default: ``()`` (Empty tuple)
+    Default: ``[]`` (Empty list)
 
-    A tuple that lists people who get code error notifications. When
+    A list of all the people who get code error notifications. When
     ``DEBUG=False`` and a view raises an exception, Django will email these people
-    with the full exception information. Each member of the tuple should be a tuple
+    with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
-        (('John', 'john@example.com'), ('Mary', 'mary@example.com'))
+        [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
 
     Note that Django will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
@@ -314,14 +354,6 @@ look better:
         .. method:: File.close()
 
   That is, use metadata instead of titles.
-
-* Add more links -- nearly everything that's an inline code literal
-  right now can probably be turned into a xref.
-
-  See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
-  to help do this work.
-
-  This will probably be a continuing, never-ending project.
 
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
@@ -380,3 +412,19 @@ Translating documentation
 
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
+
+.. _django-admin-manpage:
+
+``django-admin`` man page
+-------------------------
+
+Sphinx can generate a manual page for the
+:doc:`django-admin </ref/django-admin>` command. This is configured in
+``docs/conf.py``. Unlike other documentation output, this man page should be
+included in the Django repository and the releases as
+``docs/man/django-admin.1``. There isn't a need to update this file when
+updating the documentation, as it's updated once as part of the release process.
+
+To generate an updated version of the man page, run ``make man`` in the
+``docs`` directory. The new man page will be written in
+``docs/_build/man/django-admin.1``.

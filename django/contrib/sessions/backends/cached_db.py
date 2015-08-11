@@ -29,7 +29,7 @@ class SessionStore(DBStore):
 
     def load(self):
         try:
-            data = self._cache.get(self.cache_key, None)
+            data = self._cache.get(self.cache_key)
         except Exception:
             # Some backends (e.g. memcache) raise an exception on invalid
             # cache keys. If this happens, reset the session. See #17810.
@@ -51,12 +51,12 @@ class SessionStore(DBStore):
                     logger = logging.getLogger('django.security.%s' %
                             e.__class__.__name__)
                     logger.warning(force_text(e))
-                self.create()
+                self._session_key = None
                 data = {}
         return data
 
     def exists(self, session_key):
-        if (KEY_PREFIX + session_key) in self._cache:
+        if session_key and (KEY_PREFIX + session_key) in self._cache:
             return True
         return super(SessionStore, self).exists(session_key)
 
@@ -79,8 +79,8 @@ class SessionStore(DBStore):
         """
         self.clear()
         self.delete(self.session_key)
-        self._session_key = ''
+        self._session_key = None
 
 
 # At bottom to avoid circular import
-from django.contrib.sessions.models import Session
+from django.contrib.sessions.models import Session  # isort:skip

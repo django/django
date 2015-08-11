@@ -12,7 +12,7 @@ collection of objects. This topic guide describes the ways that aggregate values
 can be generated and returned using Django queries.
 
 Throughout this guide, we'll refer to the following models. These models are
-used to track the inventory for a series of online bookstores::
+used to track the inventory for a series of online bookstores:
 
 .. _queryset-model-example:
 
@@ -66,6 +66,11 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     >>> from django.db.models import Max
     >>> Book.objects.all().aggregate(Max('price'))
     {'price__max': Decimal('81.20')}
+
+    # Cost per page
+    >>> Book.objects.all().aggregate(
+    ...    price_per_page=Sum(F('price')/F('pages'), output_field=FloatField()))
+    {'price_per_page': 0.4470664529184653}
 
     # All the following queries involve traversing the Book<->Publisher
     # many-to-many relationship backward
@@ -178,6 +183,39 @@ Unlike ``aggregate()``, ``annotate()`` is *not* a terminal clause. The output
 of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
 ``order_by()``, or even additional calls to ``annotate()``.
+
+Combining multiple aggregations
+-------------------------------
+
+Combining multiple aggregations with ``annotate()`` will `yield the wrong
+results <https://code.djangoproject.com/ticket/10060>`_, as multiple tables are
+cross joined. Due to the use of ``LEFT OUTER JOIN``, duplicate records will be
+generated if some of the joined tables contain more records than the others:
+
+    >>> Book.objects.first().authors.count()
+    2
+    >>> Book.objects.first().chapters.count()
+    3
+    >>> q = Book.objects.annotate(Count('authors'), Count('chapters'))
+    >>> q[0].authors__count
+    6
+    >>> q[0].chapters__count
+    6
+
+For most aggregates, there is no way to avoid this problem, however, the
+:class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
+may help:
+
+    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('chapters', distinct=True))
+    >>> q[0].authors__count
+    2
+    >>> q[0].chapters__count
+    3
+
+.. admonition:: If in doubt, inspect the SQL query!
+
+    In order to understand what happens in your query, consider inspecting the
+    ``query`` property of your ``QuerySet``.
 
 Joins and aggregates
 ====================

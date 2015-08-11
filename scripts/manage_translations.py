@@ -18,12 +18,11 @@
 #
 #  $ python scripts/manage_translations.py lang_stats --language=es --resources=admin
 
-from argparse import ArgumentParser
 import os
-from subprocess import call, Popen, PIPE
+from argparse import ArgumentParser
+from subprocess import PIPE, Popen, call
 
 from django.core.management import call_command
-
 
 HAVE_JS = ['admin']
 
@@ -139,21 +138,22 @@ def fetch(resources=None, languages=None):
         # Transifex pull
         if languages is None:
             call('tx pull -r %(res)s -a -f  --minimum-perc=5' % {'res': _tx_resource_for_name(name)}, shell=True)
-            languages = sorted([d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en'])
+            target_langs = sorted([d for d in os.listdir(dir_) if not d.startswith('_') and d != 'en'])
         else:
             for lang in languages:
                 call('tx pull -r %(res)s -f -l %(lang)s' % {
                     'res': _tx_resource_for_name(name), 'lang': lang}, shell=True)
+            target_langs = languages
 
         # msgcat to wrap lines and msgfmt for compilation of .mo file
-        for lang in languages:
+        for lang in target_langs:
             po_path = '%(path)s/%(lang)s/LC_MESSAGES/django%(ext)s.po' % {
                 'path': dir_, 'lang': lang, 'ext': 'js' if name.endswith('-js') else ''}
             if not os.path.exists(po_path):
                 print("No %(lang)s translation for resource %(name)s" % {
                     'lang': lang, 'name': name})
                 continue
-            call('msgcat -o %s %s' % (po_path, po_path), shell=True)
+            call('msgcat --no-location -o %s %s' % (po_path, po_path), shell=True)
             res = call('msgfmt -c -o %s.mo %s' % (po_path[:-3], po_path), shell=True)
             if res != 0:
                 errors.append((name, lang))

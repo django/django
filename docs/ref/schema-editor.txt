@@ -2,7 +2,7 @@
 ``SchemaEditor``
 ================
 
-.. module:: django.db.backends.schema
+.. module:: django.db.backends.base.schema
 
 .. class:: BaseDatabaseSchemaEditor
 
@@ -149,3 +149,20 @@ If the database has the ``supports_combined_alters``, Django will try and
 do as many of these in a single database call as possible; otherwise, it will
 issue a separate ALTER statement for each change, but will not issue ALTERs
 where no change is required (as South often did).
+
+Attributes
+==========
+
+All attributes should be considered read-only unless stated otherwise.
+
+connection
+----------
+
+.. attribute:: SchemaEditor.connection
+
+A connection object to the database. A useful attribute of the connection is
+``alias`` which can be used to determine the name of the database being
+accessed.
+
+This is useful when doing data migrations for :ref:`migrations with multiple
+databases <data-migrations-and-multiple-databases>`.

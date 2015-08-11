@@ -2,21 +2,16 @@
 Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
-from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db import connections
 from django.db.models.query_utils import Q
-from django.db.models.constants import LOOKUP_SEP
-from django.db.models.fields import DateField, DateTimeField, FieldDoesNotExist
-from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE, NO_RESULTS, SelectInfo
-from django.db.models.sql.datastructures import Date, DateTime
+from django.db.models.sql.constants import (
+    CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
+)
 from django.db.models.sql.query import Query
 from django.utils import six
-from django.utils import timezone
 
-
-__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'DateQuery',
-        'DateTimeQuery', 'AggregateQuery']
+__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
 
 
 class DeleteQuery(Query):
@@ -30,7 +25,8 @@ class DeleteQuery(Query):
     def do_query(self, table, where, using):
         self.tables = [table]
         self.where = where
-        self.get_compiler(using).execute_sql(NO_RESULTS)
+        cursor = self.get_compiler(using).execute_sql(CURSOR)
+        return cursor.rowcount if cursor else 0
 
     def delete_batch(self, pk_list, using, field=None):
         """
@@ -39,13 +35,16 @@ class DeleteQuery(Query):
         More than one physical query may be executed if there are a
         lot of values in pk_list.
         """
+        # number of objects deleted
+        num_deleted = 0
         if not field:
             field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
             self.where = self.where_class()
             self.add_q(Q(
                 **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
-            self.do_query(self.get_meta().db_table, self.where, using=using)
+            num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
+        return num_deleted
 
     def delete_qs(self, query, using):
         """
@@ -60,10 +59,8 @@ class DeleteQuery(Query):
         self.get_initial_alias()
         innerq_used_tables = [t for t in innerq.tables
                               if innerq.alias_refcount[t]]
-        if ((not innerq_used_tables or innerq_used_tables == self.tables)
-                and not len(innerq.having)):
-            # There is only the base table in use in the query, and there is
-            # no aggregate filtering going on.
+        if not innerq_used_tables or innerq_used_tables == self.tables:
+            # There is only the base table in use in the query.
             self.where = innerq.where
         else:
             pk = query.model._meta.pk
@@ -72,17 +69,17 @@ class DeleteQuery(Query):
                 values = list(query.values_list('pk', flat=True))
                 if not values:
                     return
-                self.delete_batch(values, using)
-                return
+                return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()
                 innerq.select = [
-                    SelectInfo((self.get_initial_alias(), pk.column), None)
+                    pk.get_col(self.get_initial_alias())
                 ]
                 values = innerq
             self.where = self.where_class()
             self.add_q(Q(pk__in=values))
-        self.get_compiler(using).execute_sql(NO_RESULTS)
+        cursor = self.get_compiler(using).execute_sql(CURSOR)
+        return cursor.rowcount if cursor else 0
 
 
 class UpdateQuery(Query):
@@ -126,13 +123,15 @@ class UpdateQuery(Query):
         """
         values_seq = []
         for name, val in six.iteritems(values):
-            field, model, direct, m2m = self.get_meta().get_field_by_name(name)
-            if not direct or m2m:
+            field = self.get_meta().get_field(name)
+            direct = not (field.auto_created and not field.concrete) or not field.concrete
+            model = field.model._meta.concrete_model
+            if not direct or (field.is_relation and field.many_to_many):
                 raise FieldError(
                     'Cannot update model field %r (only non-relations and '
                     'foreign keys permitted).' % field
                 )
-            if model:
+            if model is not self.get_meta().model:
                 self.add_related_update(model, field, val)
                 continue
             values_seq.append((field, model, val))
@@ -204,77 +203,6 @@ class InsertQuery(Query):
         self.raw = raw
 
 
-class DateQuery(Query):
-    """
-    A DateQuery is a normal query, except that it specifically selects a single
-    date field. This requires some special handling when converting the results
-    back to Python objects, so we put it in a separate class.
-    """
-
-    compiler = 'SQLDateCompiler'
-
-    def add_select(self, field_name, lookup_type, order='ASC'):
-        """
-        Converts the query into an extraction query.
-        """
-        try:
-            field, _, _, joins, _ = self.setup_joins(
-                field_name.split(LOOKUP_SEP),
-                self.get_meta(),
-                self.get_initial_alias(),
-            )
-        except FieldError:
-            raise FieldDoesNotExist("%s has no field named '%s'" % (
-                self.get_meta().object_name, field_name
-            ))
-        self._check_field(field)                # overridden in DateTimeQuery
-        alias = joins[-1]
-        select = self._get_select((alias, field.column), lookup_type)
-        self.clear_select_clause()
-        self.select = [SelectInfo(select, None)]
-        self.distinct = True
-        self.order_by = [1] if order == 'ASC' else [-1]
-
-        if field.null:
-            self.add_filter(("%s__isnull" % field_name, False))
-
-    def _check_field(self, field):
-        assert isinstance(field, DateField), \
-            "%r isn't a DateField." % field.name
-        if settings.USE_TZ:
-            assert not isinstance(field, DateTimeField), \
-                "%r is a DateTimeField, not a DateField." % field.name
-
-    def _get_select(self, col, lookup_type):
-        return Date(col, lookup_type)
-
-
-class DateTimeQuery(DateQuery):
-    """
-    A DateTimeQuery is like a DateQuery but for a datetime field. If time zone
-    support is active, the tzinfo attribute contains the time zone to use for
-    converting the values before truncating them. Otherwise it's set to None.
-    """
-
-    compiler = 'SQLDateTimeCompiler'
-
-    def clone(self, klass=None, memo=None, **kwargs):
-        if 'tzinfo' not in kwargs and hasattr(self, 'tzinfo'):
-            kwargs['tzinfo'] = self.tzinfo
-        return super(DateTimeQuery, self).clone(klass, memo, **kwargs)
-
-    def _check_field(self, field):
-        assert isinstance(field, DateTimeField), \
-            "%r isn't a DateTimeField." % field.name
-
-    def _get_select(self, col, lookup_type):
-        if self.tzinfo is None:
-            tzname = None
-        else:
-            tzname = timezone._get_timezone_name(self.tzinfo)
-        return DateTime(col, lookup_type, tzname)
-
-
 class AggregateQuery(Query):
     """
     An AggregateQuery takes another query as a parameter to the FROM
@@ -284,4 +212,7 @@ class AggregateQuery(Query):
     compiler = 'SQLAggregateCompiler'
 
     def add_subquery(self, query, using):
-        self.subquery, self.sub_params = query.get_compiler(using).as_sql(with_col_aliases=True)
+        self.subquery, self.sub_params = query.get_compiler(using).as_sql(
+            with_col_aliases=True,
+            subquery=True,
+        )

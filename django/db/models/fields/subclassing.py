@@ -9,7 +9,7 @@ seamlessly.
 
 import warnings
 
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 
 class SubfieldBase(type):
@@ -19,7 +19,7 @@ class SubfieldBase(type):
     """
     def __new__(cls, name, bases, attrs):
         warnings.warn("SubfieldBase has been deprecated. Use Field.from_db_value instead.",
-                  RemovedInDjango20Warning)
+                  RemovedInDjango110Warning)
 
         new_class = super(SubfieldBase, cls).__new__(cls, name, bases, attrs)
         new_class.contribute_to_class = make_contrib(

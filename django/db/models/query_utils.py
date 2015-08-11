@@ -7,10 +7,18 @@ circular import difficulties.
 """
 from __future__ import unicode_literals
 
+from collections import namedtuple
+
 from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
 from django.db.backends import utils
-from django.utils import six
+from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+
+# PathInfo is used when converting lookups (fk__somecol). The contents
+# describe the relation in Model terms (model Options and Fields for both
+# sides of the relation. The join_field is the field backing the relation.
+PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct')
 
 
 class InvalidQuery(Exception):
@@ -25,10 +33,12 @@ class QueryWrapper(object):
     A type that indicates the contents are an SQL fragment and the associate
     parameters. Can be used to pass opaque data to a where-clause, for example.
     """
+    contains_aggregate = False
+
     def __init__(self, sql, params):
         self.data = sql, list(params)
 
-    def as_sql(self, qn=None, connection=None):
+    def as_sql(self, compiler=None, connection=None):
         return self.data
 
 
@@ -43,7 +53,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        super(Q, self).__init__(children=list(args) + list(kwargs.items()))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -76,6 +86,32 @@ class Q(tree.Node):
                 clone.children.append(child)
         return clone
 
+    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+        # We must promote any new joins to left outer joins so that when Q is
+        # used as an expression, rows aren't filtered due to joins.
+        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
+        query.promote_joins(joins)
+        return clause
+
+    @classmethod
+    def _refs_aggregate(cls, obj, existing_aggregates):
+        if not isinstance(obj, tree.Node):
+            aggregate, aggregate_lookups = refs_aggregate(obj[0].split(LOOKUP_SEP), existing_aggregates)
+            if not aggregate and hasattr(obj[1], 'refs_aggregate'):
+                return obj[1].refs_aggregate(existing_aggregates)
+            return aggregate, aggregate_lookups
+        for c in obj.children:
+            aggregate, aggregate_lookups = cls._refs_aggregate(c, existing_aggregates)
+            if aggregate:
+                return aggregate, aggregate_lookups
+        return False, ()
+
+    def refs_aggregate(self, existing_aggregates):
+        if not existing_aggregates:
+            return False
+
+        return self._refs_aggregate(self, existing_aggregates)
+
 
 class DeferredAttribute(object):
     """
@@ -90,7 +126,6 @@ class DeferredAttribute(object):
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.
         """
-        from django.db.models.fields import FieldDoesNotExist
         non_deferred_model = instance._meta.proxy_for_model
         opts = non_deferred_model._meta
 
@@ -100,7 +135,7 @@ class DeferredAttribute(object):
             # self.field_name is the attname of the field, but only() takes the
             # actual name, so we need to translate it here.
             try:
-                f = opts.get_field_by_name(self.field_name)[0]
+                f = opts.get_field(self.field_name)
             except FieldDoesNotExist:
                 f = [f for f in opts.fields if f.attname == self.field_name][0]
             name = f.name
@@ -108,14 +143,8 @@ class DeferredAttribute(object):
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance, name)
             if val is None:
-                # We use only() instead of values() here because we want the
-                # various data coercion methods (to_python(), etc.) to be
-                # called here.
-                val = getattr(
-                    non_deferred_model._base_manager.only(name).using(
-                        instance._state.db).get(pk=instance.pk),
-                    self.field_name
-                )
+                instance.refresh_from_db(fields=[self.field_name])
+                val = getattr(instance, self.field_name)
             data[self.field_name] = val
         return data[self.field_name]
 
@@ -133,7 +162,7 @@ class DeferredAttribute(object):
         field is a primary key field.
         """
         opts = instance._meta
-        f = opts.get_field_by_name(name)[0]
+        f = opts.get_field(name)
         link_field = opts.get_ancestor_link(f.model)
         if f.primary_key and f != link_field:
             return getattr(instance, link_field.attname)
@@ -155,9 +184,9 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
      * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
-    if not field.rel:
+    if not field.remote_field:
         return False
-    if field.rel.parent_link and not reverse:
+    if field.remote_field.parent_link and not reverse:
         return False
     if restricted:
         if reverse and field.related_query_name() not in requested:
@@ -167,7 +196,7 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
     if not restricted and field.null:
         return False
     if load_fields:
-        if field.name not in load_fields:
+        if field.attname not in load_fields:
             if restricted and field.name in requested:
                 raise InvalidQuery("Field %s.%s cannot be both deferred"
                                    " and traversed using select_related"
@@ -198,7 +227,7 @@ def deferred_class_factory(model, attrs):
     # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
+    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(attrs)))
     name = utils.truncate_name(name, 80, 32)
 
     try:
@@ -210,7 +239,7 @@ def deferred_class_factory(model, attrs):
             proxy = True
             app_label = model._meta.app_label
 
-        overrides = dict((attr, DeferredAttribute(attr, model)) for attr in attrs)
+        overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
         overrides["Meta"] = Meta
         overrides["__module__"] = model.__module__
         overrides["_deferred"] = True
@@ -220,3 +249,59 @@ def deferred_class_factory(model, attrs):
 # The above function is also used to unpickle model instances with deferred
 # fields.
 deferred_class_factory.__safe_for_unpickling__ = True
+
+
+def refs_aggregate(lookup_parts, aggregates):
+    """
+    A helper method to check if the lookup_parts contains references
+    to the given aggregates set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
+            return aggregates[level_n_lookup], lookup_parts[n:]
+    return False, ()
+
+
+def refs_expression(lookup_parts, annotations):
+    """
+    A helper method to check if the lookup_parts contains references
+    to the given annotations set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in annotations and annotations[level_n_lookup]:
+            return annotations[level_n_lookup], lookup_parts[n:]
+    return False, ()
+
+
+def check_rel_lookup_compatibility(model, target_opts, field):
+    """
+    Check that self.model is compatible with target_opts. Compatibility
+    is OK if:
+      1) model and opts match (where proxy inheritance is removed)
+      2) model is parent of opts' model or the other way around
+    """
+    def check(opts):
+        return (
+            model._meta.concrete_model == opts.concrete_model or
+            opts.concrete_model in model._meta.get_parent_list() or
+            model in opts.get_parent_list()
+        )
+    # If the field is a primary key, then doing a query against the field's
+    # model is ok, too. Consider the case:
+    # class Restaurant(models.Model):
+    #     place = OnetoOneField(Place, primary_key=True):
+    # Restaurant.objects.filter(pk__in=Restaurant.objects.all()).
+    # If we didn't have the primary key check, then pk__in (== place__in) would
+    # give Place's opts as the target opts, but Restaurant isn't compatible
+    # with that. This logic applies only to primary keys, as when doing __in=qs,
+    # we are going to turn this into __in=qs.values('pk') later on.
+    return (
+        check(target_opts) or
+        (getattr(field, 'primary_key', False) and check(field.model._meta))
+    )

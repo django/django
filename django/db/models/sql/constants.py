@@ -2,7 +2,6 @@
 Constants specific to the SQL storage portion of the ORM.
 """
 
-from collections import namedtuple
 import re
 
 # Valid query types (a set is used for speedy lookups). These are (currently)
@@ -21,15 +20,6 @@ GET_ITERATOR_CHUNK_SIZE = 100
 
 # Namedtuples for sql.* internal use.
 
-# Join lists (indexes into the tuples that are values in the alias_map
-# dictionary in the Query class).
-JoinInfo = namedtuple('JoinInfo',
-                      'table_name rhs_alias join_type lhs_alias '
-                      'join_cols nullable join_field')
-
-# Pairs of column clauses to select, and (possibly None) field for the clause.
-SelectInfo = namedtuple('SelectInfo', 'col field')
-
 # How many results to expect from a cursor.execute call
 MULTI = 'multi'
 SINGLE = 'single'
@@ -41,3 +31,7 @@ ORDER_DIR = {
     'ASC': ('ASC', 'DESC'),
     'DESC': ('DESC', 'ASC'),
 }
+
+# SQL join types.
+INNER = 'INNER JOIN'
+LOUTER = 'LEFT OUTER JOIN'

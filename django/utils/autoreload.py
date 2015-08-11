@@ -28,8 +28,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import absolute_import  # Avoid importing `importlib` from this package.
-
 import os
 import signal
 import sys
@@ -39,10 +37,7 @@ import traceback
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
-try:
-    from django.utils.six.moves import _thread as thread
-except ImportError:
-    from django.utils.six.moves import _dummy_thread as thread
+from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
 # in the threading module. See http://code.djangoproject.com/ticket/2330 .
@@ -180,7 +175,9 @@ def inotify_code_changed():
             pyinotify.IN_ATTRIB |
             pyinotify.IN_MOVED_FROM |
             pyinotify.IN_MOVED_TO |
-            pyinotify.IN_CREATE
+            pyinotify.IN_CREATE |
+            pyinotify.IN_DELETE_SELF |
+            pyinotify.IN_MOVE_SELF
         )
         for path in gen_filenames(only_new=True):
             wm.add_watch(path, mask)

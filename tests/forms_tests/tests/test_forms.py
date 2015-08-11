@@ -4,28 +4,29 @@ from __future__ import unicode_literals
 import copy
 import datetime
 import json
-import warnings
+import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import RegexValidator
 from django.forms import (
     BooleanField, CharField, CheckboxSelectMultiple, ChoiceField, DateField,
-    DateTimeField, EmailField, FileField, FloatField, Form, forms, HiddenInput,
-    IntegerField, MultipleChoiceField, MultipleHiddenInput, MultiValueField,
-    NullBooleanField, PasswordInput, RadioSelect, Select, SplitDateTimeField,
-    Textarea, TextInput, TimeField, ValidationError, widgets
+    DateTimeField, EmailField, FileField, FloatField, Form, HiddenInput,
+    ImageField, IntegerField, MultipleChoiceField, MultipleHiddenInput,
+    MultiValueField, NullBooleanField, PasswordInput, RadioSelect, Select,
+    SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
+    TimeField, ValidationError, forms,
 )
 from django.forms.utils import ErrorList
 from django.http import QueryDict
-from django.template import Template, Context
-from django.test import TestCase
+from django.template import Context, Template
+from django.test import SimpleTestCase
 from django.test.utils import str_prefix
-from django.utils.datastructures import MultiValueDict, MergeDict
-from django.utils.encoding import force_text
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe, SafeData
 from django.utils import six
+from django.utils.datastructures import MultiValueDict
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.html import format_html
+from django.utils.safestring import SafeData, mark_safe
 
 
 class Person(Form):
@@ -40,7 +41,7 @@ class PersonNew(Form):
     birthday = DateField()
 
 
-class FormsTestCase(TestCase):
+class FormsTestCase(SimpleTestCase):
     # A Form is a collection of Fields. It knows how to validate a set of data and it
     # knows how to render itself in a couple of default ways (e.g., an HTML table).
     # You can pass it data in __init__(), as a dictionary.
@@ -445,6 +446,13 @@ class FormsTestCase(TestCase):
 <li><label for="id_language_1"><input type="radio" id="id_language_1" value="J" name="language" /> Java</label></li>
 </ul></p>""")
 
+        # Test iterating on individual radios in a template
+        t = Template('{% for radio in form.language %}<div class="myradio">{{ radio }}</div>{% endfor %}')
+        self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="myradio"><label for="id_language_0">
+<input id="id_language_0" name="language" type="radio" value="P" /> Python</label></div>
+<div class="myradio"><label for="id_language_1">
+<input id="id_language_1" name="language" type="radio" value="J" /> Java</label></div>""")
+
     def test_form_with_iterable_boundfield(self):
         class BeatleForm(Form):
             name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')], widget=RadioSelect)
@@ -493,6 +501,37 @@ class FormsTestCase(TestCase):
 <option value="P" selected="selected">Paul McCartney</option>
 </select>""")
 
+    def test_form_with_disabled_fields(self):
+        class PersonForm(Form):
+            name = CharField()
+            birthday = DateField(disabled=True)
+
+        class PersonFormFieldInitial(Form):
+            name = CharField()
+            birthday = DateField(disabled=True, initial=datetime.date(1974, 8, 16))
+
+        # Disabled fields are generally not transmitted by user agents.
+        # The value from the form's initial data is used.
+        f1 = PersonForm({'name': 'John Doe'}, initial={'birthday': datetime.date(1974, 8, 16)})
+        f2 = PersonFormFieldInitial({'name': 'John Doe'})
+        for form in (f1, f2):
+            self.assertTrue(form.is_valid())
+            self.assertEqual(
+                form.cleaned_data,
+                {'birthday': datetime.date(1974, 8, 16), 'name': 'John Doe'}
+            )
+
+        # Values provided in the form's data are ignored.
+        data = {'name': 'John Doe', 'birthday': '1984-11-10'}
+        f1 = PersonForm(data, initial={'birthday': datetime.date(1974, 8, 16)})
+        f2 = PersonFormFieldInitial(data)
+        for form in (f1, f2):
+            self.assertTrue(form.is_valid())
+            self.assertEqual(
+                form.cleaned_data,
+                {'birthday': datetime.date(1974, 8, 16), 'name': 'John Doe'}
+            )
+
     def test_hidden_data(self):
         class SongForm(Form):
             name = CharField()
@@ -537,6 +576,12 @@ class FormsTestCase(TestCase):
 <li><label><input checked="checked" type="checkbox" name="composers" value="J" /> John Lennon</label></li>
 <li><label><input checked="checked" type="checkbox" name="composers" value="P" /> Paul McCartney</label></li>
 </ul>""")
+        # Test iterating on individual checkboxes in a template
+        t = Template('{% for checkbox in form.composers %}<div class="mycheckbox">{{ checkbox }}</div>{% endfor %}')
+        self.assertHTMLEqual(t.render(Context({'form': f})), """<div class="mycheckbox"><label>
+<input checked="checked" name="composers" type="checkbox" value="J" /> John Lennon</label></div>
+<div class="mycheckbox"><label>
+<input checked="checked" name="composers" type="checkbox" value="P" /> Paul McCartney</label></div>""")
 
     def test_checkbox_auto_id(self):
         # Regarding auto_id, CheckboxSelectMultiple is a special case. Each checkbox
@@ -553,9 +598,8 @@ class FormsTestCase(TestCase):
 </ul>""")
 
     def test_multiple_choice_list_data(self):
-        # Data for a MultipleChoiceField should be a list. QueryDict, MultiValueDict and
-        # MergeDict (when created as a merge of MultiValueDicts) conveniently work with
-        # this.
+        # Data for a MultipleChoiceField should be a list. QueryDict and
+        # MultiValueDict conveniently work with this.
         class SongForm(Form):
             name = CharField()
             composers = MultipleChoiceField(choices=[('J', 'John Lennon'), ('P', 'Paul McCartney')], widget=CheckboxSelectMultiple)
@@ -571,13 +615,6 @@ class FormsTestCase(TestCase):
         data = MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P']))
         f = SongForm(data)
         self.assertEqual(f.errors, {})
-
-        # MergeDict is deprecated, but is supported until removed.
-        with warnings.catch_warnings(record=True):
-            warnings.simplefilter("always")
-            data = MergeDict(MultiValueDict(dict(name=['Yesterday'], composers=['J', 'P'])))
-            f = SongForm(data)
-            self.assertEqual(f.errors, {})
 
     def test_multiple_hidden(self):
         class SongForm(Form):
@@ -782,7 +819,7 @@ class FormsTestCase(TestCase):
         self.assertFalse(form.is_valid())
 
         # Check that update_error_dict didn't lose track of the ErrorDict type.
-        self.assertTrue(isinstance(form._errors, forms.ErrorDict))
+        self.assertIsInstance(form._errors, forms.ErrorDict)
 
         self.assertEqual(dict(form.errors), {
             'code': ['Code error 1.', 'Code error 2.', 'Code error 3.'],
@@ -955,7 +992,7 @@ class FormsTestCase(TestCase):
         f2 = MyForm()
 
         f1.fields['myfield'].validators[0] = MaxValueValidator(12)
-        self.assertFalse(f1.fields['myfield'].validators[0] == f2.fields['myfield'].validators[0])
+        self.assertNotEqual(f1.fields['myfield'].validators[0], f2.fields['myfield'].validators[0])
 
     def test_hidden_widget(self):
         # HiddenInput widgets are displayed differently in the as_table(), as_ul())
@@ -1052,6 +1089,49 @@ class FormsTestCase(TestCase):
 <tr><th>Field12:</th><td><input type="text" name="field12" /></td></tr>
 <tr><th>Field13:</th><td><input type="text" name="field13" /></td></tr>
 <tr><th>Field14:</th><td><input type="text" name="field14" /></td></tr>""")
+
+    def test_explicit_field_order(self):
+        class TestFormParent(Form):
+            field1 = CharField()
+            field2 = CharField()
+            field4 = CharField()
+            field5 = CharField()
+            field6 = CharField()
+            field_order = ['field6', 'field5', 'field4', 'field2', 'field1']
+
+        class TestForm(TestFormParent):
+            field3 = CharField()
+            field_order = ['field2', 'field4', 'field3', 'field5', 'field6']
+
+        class TestFormRemove(TestForm):
+            field1 = None
+
+        class TestFormMissing(TestForm):
+            field_order = ['field2', 'field4', 'field3', 'field5', 'field6', 'field1']
+            field1 = None
+
+        class TestFormInit(TestFormParent):
+            field3 = CharField()
+            field_order = None
+
+            def __init__(self, **kwargs):
+                super(TestFormInit, self).__init__(**kwargs)
+                self.order_fields(field_order=TestForm.field_order)
+
+        p = TestFormParent()
+        self.assertEqual(list(p.fields.keys()), TestFormParent.field_order)
+        p = TestFormRemove()
+        self.assertEqual(list(p.fields.keys()), TestForm.field_order)
+        p = TestFormMissing()
+        self.assertEqual(list(p.fields.keys()), TestForm.field_order)
+        p = TestForm()
+        self.assertEqual(list(p.fields.keys()), TestFormMissing.field_order)
+        p = TestFormInit()
+        order = list(TestForm.field_order) + ['field1']
+        self.assertEqual(list(p.fields.keys()), order)
+        TestForm.field_order = ['unknown']
+        p = TestForm()
+        self.assertEqual(list(p.fields.keys()), ['field1', 'field2', 'field4', 'field5', 'field6', 'field3'])
 
     def test_form_html_attributes(self):
         # Some Field classes have an effect on the HTML attributes of their associated
@@ -1377,6 +1457,20 @@ class FormsTestCase(TestCase):
         self.assertEqual(bound['password'].value(), 'foo')
         self.assertEqual(unbound['password'].value(), None)
 
+    def test_boundfield_initial_called_once(self):
+        """
+        Multiple calls to BoundField().value() in an unbound form should return
+        the same result each time (#24391).
+        """
+        class MyForm(Form):
+            name = CharField(max_length=10, initial=uuid.uuid4)
+
+        form = MyForm()
+        name = form['name']
+        self.assertEqual(name.value(), name.value())
+        # BoundField is also cached
+        self.assertIs(form['name'], name)
+
     def test_boundfield_rendering(self):
         """
         Python 2 issue: Test that rendering a BoundField with bytestring content
@@ -1384,7 +1478,7 @@ class FormsTestCase(TestCase):
         """
         class CustomWidget(TextInput):
             def render(self, name, value, attrs=None):
-                return format_html(str('<input{0} />'), ' id=custom')
+                return format_html(str('<input{} />'), ' id=custom')
 
         class SampleForm(Form):
             name = CharField(widget=CustomWidget)
@@ -1405,15 +1499,27 @@ class FormsTestCase(TestCase):
         def delayed_now_time():
             return now.time()
 
+        class HiddenInputWithoutMicrosec(HiddenInput):
+            supports_microseconds = False
+
+        class TextInputWithoutMicrosec(TextInput):
+            supports_microseconds = False
+
         class DateTimeForm(Form):
             auto_timestamp = DateTimeField(initial=delayed_now)
             auto_time_only = TimeField(initial=delayed_now_time)
             supports_microseconds = DateTimeField(initial=delayed_now, widget=TextInput)
+            hi_default_microsec = DateTimeField(initial=delayed_now, widget=HiddenInput)
+            hi_without_microsec = DateTimeField(initial=delayed_now, widget=HiddenInputWithoutMicrosec)
+            ti_without_microsec = DateTimeField(initial=delayed_now, widget=TextInputWithoutMicrosec)
 
         unbound = DateTimeForm()
         self.assertEqual(unbound['auto_timestamp'].value(), now_no_ms)
         self.assertEqual(unbound['auto_time_only'].value(), now_no_ms.time())
         self.assertEqual(unbound['supports_microseconds'].value(), now)
+        self.assertEqual(unbound['hi_default_microsec'].value(), now)
+        self.assertEqual(unbound['hi_without_microsec'].value(), now_no_ms)
+        self.assertEqual(unbound['ti_without_microsec'].value(), now_no_ms)
 
     def test_help_text(self):
         # You can specify descriptive text for a field by using the 'help_text' argument)
@@ -1595,6 +1701,18 @@ class FormsTestCase(TestCase):
         self.assertEqual(p.cleaned_data['first_name'], 'John')
         self.assertEqual(p.cleaned_data['last_name'], 'Lennon')
         self.assertEqual(p.cleaned_data['birthday'], datetime.date(1940, 10, 9))
+
+    def test_class_prefix(self):
+        # Prefix can be also specified at the class level.
+        class Person(Form):
+            first_name = CharField()
+            prefix = 'foo'
+
+        p = Person()
+        self.assertEqual(p.prefix, 'foo')
+
+        p = Person(prefix='bar')
+        self.assertEqual(p.prefix, 'bar')
 
     def test_forms_with_null_boolean(self):
         # NullBooleanField is a bit of a special case because its presentation (widget)
@@ -1954,7 +2072,7 @@ class FormsTestCase(TestCase):
 
     def test_label_split_datetime_not_displayed(self):
         class EventForm(Form):
-            happened_at = SplitDateTimeField(widget=widgets.SplitHiddenDateTimeWidget)
+            happened_at = SplitDateTimeField(widget=SplitHiddenDateTimeWidget)
 
         form = EventForm()
         self.assertHTMLEqual(form.as_ul(), '<input type="hidden" name="happened_at_0" id="id_happened_at_0" /><input type="hidden" name="happened_at_1" id="id_happened_at_1" />')
@@ -2003,9 +2121,24 @@ class FormsTestCase(TestCase):
         field = ChoicesField()
         field2 = copy.deepcopy(field)
         self.assertIsInstance(field2, ChoicesField)
-        self.assertFalse(id(field2.fields) == id(field.fields))
-        self.assertFalse(id(field2.fields[0].choices) ==
-                         id(field.fields[0].choices))
+        self.assertIsNot(field2.fields, field.fields)
+        self.assertIsNot(field2.fields[0].choices, field.fields[0].choices)
+
+    def test_multivalue_initial_data(self):
+        """
+        #23674 -- invalid initial data should not break form.changed_data()
+        """
+        class DateAgeField(MultiValueField):
+            def __init__(self, fields=(), *args, **kwargs):
+                fields = (DateField(label="Date"), IntegerField(label="Age"))
+                super(DateAgeField, self).__init__(fields=fields, *args, **kwargs)
+
+        class DateAgeForm(Form):
+            date_age = DateAgeField()
+
+        data = {"date_age": ["1998-12-06", 16]}
+        form = DateAgeForm(data, initial={"date_age": ["200-10-10", 14]})
+        self.assertTrue(form.has_changed())
 
     def test_multivalue_optional_subfields(self):
         class PhoneField(MultiValueField):
@@ -2039,9 +2172,9 @@ class FormsTestCase(TestCase):
         # Empty values for fields will NOT raise a `required` error on an
         # optional `MultiValueField`
         f = PhoneField(required=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
-        self.assertEqual(None, f.clean([]))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
+        self.assertIsNone(f.clean([]))
         self.assertEqual('+61. ext.  (label: )', f.clean(['+61']))
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         self.assertEqual('+61.287654321 ext. 123 (label: Home)', f.clean(['+61', '287654321', '123', 'Home']))
@@ -2066,9 +2199,9 @@ class FormsTestCase(TestCase):
         # For an optional `MultiValueField` with `require_all_fields=False`, we
         # don't get any `required` error but we still get `incomplete` errors.
         f = PhoneField(required=False, require_all_fields=False)
-        self.assertEqual(None, f.clean(''))
-        self.assertEqual(None, f.clean(None))
-        self.assertEqual(None, f.clean([]))
+        self.assertIsNone(f.clean(''))
+        self.assertIsNone(f.clean(None))
+        self.assertIsNone(f.clean([]))
         self.assertRaisesMessage(ValidationError, "'Enter a complete value.'", f.clean, ['+61'])
         self.assertEqual('+61.287654321 ext. 123 (label: )', f.clean(['+61', '287654321', '123']))
         six.assertRaisesRegex(self, ValidationError,
@@ -2172,10 +2305,110 @@ class FormsTestCase(TestCase):
             some_field = CharField()
 
             def as_p(self):
-                return self._html_output('<p id="p_%(field_name)s"></p>', '%s', '</p>', ' %s', True)
+                return self._html_output(
+                    normal_row='<p id="p_%(field_name)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
 
         form = SomeForm()
         self.assertHTMLEqual(form.as_p(), '<p id="p_some_field"></p>')
+
+    def test_field_without_css_classes(self):
+        """
+        `css_classes` may be used as a key in _html_output() (empty classes).
+        """
+        class SomeForm(Form):
+            some_field = CharField()
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p class="%(css_classes)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p class=""></p>')
+
+    def test_field_with_css_class(self):
+        """
+        `css_classes` may be used as a key in _html_output() (class comes
+        from required_css_class in this case).
+        """
+        class SomeForm(Form):
+            some_field = CharField()
+            required_css_class = 'foo'
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p class="%(css_classes)s"></p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(form.as_p(), '<p class="foo"></p>')
+
+    def test_field_name_with_hidden_input(self):
+        """
+        BaseForm._html_output() should merge all the hidden input fields and
+        put them in the last row.
+        """
+        class SomeForm(Form):
+            hidden1 = CharField(widget=HiddenInput)
+            custom = CharField()
+            hidden2 = CharField(widget=HiddenInput)
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
+                    error_row='%s',
+                    row_ender='</p>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True,
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(
+            form.as_p(),
+            '<p><input id="id_custom" name="custom" type="text" /> custom'
+            '<input id="id_hidden1" name="hidden1" type="hidden" />'
+            '<input id="id_hidden2" name="hidden2" type="hidden" /></p>'
+        )
+
+    def test_field_name_with_hidden_input_and_non_matching_row_ender(self):
+        """
+        BaseForm._html_output() should merge all the hidden input fields and
+        put them in the last row ended with the specific row ender.
+        """
+        class SomeForm(Form):
+            hidden1 = CharField(widget=HiddenInput)
+            custom = CharField()
+            hidden2 = CharField(widget=HiddenInput)
+
+            def as_p(self):
+                return self._html_output(
+                    normal_row='<p%(html_class_attr)s>%(field)s %(field_name)s</p>',
+                    error_row='%s',
+                    row_ender='<hr/><hr/>',
+                    help_text_html=' %s',
+                    errors_on_separate_row=True
+                )
+
+        form = SomeForm()
+        self.assertHTMLEqual(
+            form.as_p(),
+            '<p><input id="id_custom" name="custom" type="text" /> custom</p>\n'
+            '<input id="id_hidden1" name="hidden1" type="hidden" />'
+            '<input id="id_hidden2" name="hidden2" type="hidden" /><hr/><hr/>'
+        )
 
     def test_error_dict(self):
         class MyForm(Form):
@@ -2339,6 +2572,31 @@ class FormsTestCase(TestCase):
 <tr><th><label for="id_last_name">Last name:</label></th><td><input id="id_last_name" name="last_name" type="text" value="Lennon" /></td></tr>"""
         )
 
+    def test_errorlist_override(self):
+        @python_2_unicode_compatible
+        class DivErrorList(ErrorList):
+            def __str__(self):
+                return self.as_divs()
+
+            def as_divs(self):
+                if not self:
+                    return ''
+                return '<div class="errorlist">%s</div>' % ''.join(
+                    '<div class="error">%s</div>' % force_text(e) for e in self)
+
+        class CommentForm(Form):
+            name = CharField(max_length=50, required=False)
+            email = EmailField()
+            comment = CharField()
+
+        data = dict(email='invalid')
+        f = CommentForm(data, auto_id=False, error_class=DivErrorList)
+        self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50" /></p>
+<div class="errorlist"><div class="error">Enter a valid email address.</div></div>
+<p>Email: <input type="email" name="email" value="invalid" /></p>
+<div class="errorlist"><div class="error">This field is required.</div></div>
+<p>Comment: <input type="text" name="comment" /></p>""")
+
     def test_baseform_repr(self):
         """
         BaseForm.__repr__() should contain some basic information about the
@@ -2363,3 +2621,76 @@ class FormsTestCase(TestCase):
         self.assertRaises(AttributeError, lambda: p.cleaned_data)
         self.assertFalse(p.is_valid())
         self.assertEqual(p.cleaned_data, {'first_name': 'John', 'last_name': 'Lennon'})
+
+    def test_accessing_clean(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                data = self.cleaned_data
+
+                if not self.errors:
+                    data['username'] = data['username'].lower()
+
+                return data
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_changing_cleaned_data_nothing_returned(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                self.cleaned_data['username'] = self.cleaned_data['username'].lower()
+                # don't return anything
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_changing_cleaned_data_in_clean(self):
+        class UserForm(Form):
+            username = CharField(max_length=10)
+            password = CharField(widget=PasswordInput)
+
+            def clean(self):
+                data = self.cleaned_data
+
+                # Return a different dict. We have not changed self.cleaned_data.
+                return {
+                    'username': data['username'].lower(),
+                    'password': 'this_is_not_a_secret',
+                }
+
+        f = UserForm({'username': 'SirRobin', 'password': 'blue'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data['username'], 'sirrobin')
+
+    def test_multipart_encoded_form(self):
+        class FormWithoutFile(Form):
+            username = CharField()
+
+        class FormWithFile(Form):
+            username = CharField()
+            file = FileField()
+
+        class FormWithImage(Form):
+            image = ImageField()
+
+        self.assertFalse(FormWithoutFile().is_multipart())
+        self.assertTrue(FormWithFile().is_multipart())
+        self.assertTrue(FormWithImage().is_multipart())
+
+    def test_html_safe(self):
+        class SimpleForm(Form):
+            username = CharField()
+
+        form = SimpleForm()
+        self.assertTrue(hasattr(SimpleForm, '__html__'))
+        self.assertEqual(force_text(form), form.__html__())
+        self.assertTrue(hasattr(form['username'], '__html__'))
+        self.assertEqual(force_text(form['username']), form['username'].__html__())

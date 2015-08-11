@@ -1,20 +1,19 @@
 from __future__ import unicode_literals
 
 import base64
-from datetime import datetime, timedelta
 import logging
 import string
+from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.contrib.sessions.exceptions import SuspiciousSession
 from django.core.exceptions import SuspiciousOperation
-from django.utils.crypto import constant_time_compare
-from django.utils.crypto import get_random_string
-from django.utils.crypto import salted_hmac
 from django.utils import timezone
+from django.utils.crypto import (
+    constant_time_compare, get_random_string, salted_hmac,
+)
 from django.utils.encoding import force_bytes, force_text
 from django.utils.module_loading import import_string
-
-from django.contrib.sessions.exceptions import SuspiciousSession
 
 # session_key should not be case sensitive because some backends can store it
 # on case insensitive file systems.
@@ -59,9 +58,9 @@ class SessionBase(object):
     def get(self, key, default=None):
         return self._session.get(key, default)
 
-    def pop(self, key, *args):
+    def pop(self, key, default=None):
         self.modified = self.modified or key in self._session
-        return self._session.pop(key, *args)
+        return self._session.pop(key, default)
 
     def setdefault(self, key, value):
         if key in self._session:
@@ -162,10 +161,27 @@ class SessionBase(object):
             self._session_key = self._get_new_session_key()
         return self._session_key
 
+    def _validate_session_key(self, key):
+        """
+        Key must be truthy and at least 8 characters long. 8 characters is an
+        arbitrary lower bound for some minimal key security.
+        """
+        return key and len(key) >= 8
+
     def _get_session_key(self):
-        return self._session_key
+        return self.__session_key
+
+    def _set_session_key(self, value):
+        """
+        Validate session key on assignment. Invalid values will set to None.
+        """
+        if self._validate_session_key(value):
+            self.__session_key = value
+        else:
+            self.__session_key = None
 
     session_key = property(_get_session_key)
+    _session_key = property(_get_session_key, _set_session_key)
 
     def _get_session(self, no_load=False):
         """

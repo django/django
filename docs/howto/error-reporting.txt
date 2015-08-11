@@ -44,9 +44,9 @@ To activate this behavior, put the email addresses of the recipients in the
 
 .. seealso::
 
-   Server error emails are sent using the logging framework, so you can
-   customize this behavior by :doc:`customizing your logging configuration
-   </topics/logging>`.
+    Server error emails are sent using the logging framework, so you can
+    customize this behavior by :doc:`customizing your logging configuration
+    </topics/logging>`.
 
 404 errors
 ~~~~~~~~~~
@@ -73,14 +73,14 @@ those are usually just people typing in broken URLs or broken Web 'bots).
     Put it towards the top of your :setting:`MIDDLEWARE_CLASSES` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
-:setting:`IGNORABLE_404_URLS` setting. It should be a tuple of compiled
+:setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
 regular expression objects. For example::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'\.(php|cgi)$'),
         re.compile(r'^/phpmyadmin/'),
-    )
+    ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
@@ -89,11 +89,11 @@ The following example shows how to exclude some conventional URLs that browsers 
 crawlers often request::
 
     import re
-    IGNORABLE_404_URLS = (
+    IGNORABLE_404_URLS = [
         re.compile(r'^/apple-touch-icon.*\.png$'),
         re.compile(r'^/favicon\.ico$'),
         re.compile(r'^/robots\.txt$'),
-    )
+    ]
 
 (Note that these are regular expressions, so we put a backslash in front of
 periods to escape them.)
@@ -105,14 +105,22 @@ and override its methods.
 
 .. seealso::
 
-   404 errors are logged using the logging framework. By default, these log
-   records are ignored, but you can use them for error reporting by writing a
-   handler and :doc:`configuring logging </topics/logging>` appropriately.
+    404 errors are logged using the logging framework. By default, these log
+    records are ignored, but you can use them for error reporting by writing a
+    handler and :doc:`configuring logging </topics/logging>` appropriately.
 
 .. _filtering-error-reports:
 
 Filtering error reports
 -----------------------
+
+.. warning::
+
+    Filtering sensitive data is a hard problem, and it's nearly impossible to
+    guarantee that sensitive won't leak into an error report. Therefore, error
+    reports should only be available to trusted team members and you should
+    avoid transmitting error reports unencrypted over the Internet (such as
+    through email).
 
 Filtering sensitive information
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,8 +140,8 @@ control which information should be filtered out of error reports in a
 production environment (that is, where :setting:`DEBUG` is set to ``False``):
 :func:`sensitive_variables` and :func:`sensitive_post_parameters`.
 
-.. _`full traceback`: http://en.wikipedia.org/wiki/Stack_trace
-.. _`traceback frame`: http://en.wikipedia.org/wiki/Stack_frame
+.. _`full traceback`: https://en.wikipedia.org/wiki/Stack_trace
+.. _`traceback frame`: https://en.wikipedia.org/wiki/Stack_frame
 
 .. function:: sensitive_variables(*variables)
 
@@ -254,13 +262,6 @@ following methods:
 
     Returns ``True`` to activate the filtering operated in the other methods.
     By default the filter is active if :setting:`DEBUG` is ``False``.
-
-.. method:: SafeExceptionReporterFilter.get_request_repr(request)
-
-    Returns the representation string of the request object, that is, the
-    value that would be returned by ``repr(request)``, except it uses the
-    filtered dictionary of POST parameters as determined by
-    :meth:`SafeExceptionReporterFilter.get_post_parameters`.
 
 .. method:: SafeExceptionReporterFilter.get_post_parameters(request)
 

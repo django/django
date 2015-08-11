@@ -1,10 +1,12 @@
 import copy
 
-from django.contrib.postgres.validators import ArrayMinLengthValidator, ArrayMaxLengthValidator
-from django.core.exceptions import ValidationError
 from django import forms
-from django.utils.safestring import mark_safe
+from django.contrib.postgres.validators import (
+    ArrayMaxLengthValidator, ArrayMinLengthValidator,
+)
+from django.core.exceptions import ValidationError
 from django.utils import six
+from django.utils.safestring import mark_safe
 from django.utils.translation import string_concat, ugettext_lazy as _
 
 
@@ -26,7 +28,7 @@ class SimpleArrayField(forms.CharField):
 
     def prepare_value(self, value):
         if isinstance(value, list):
-            return self.delimiter.join([six.text_type(self.base_field.prepare_value(v)) for v in value])
+            return self.delimiter.join(six.text_type(self.base_field.prepare_value(v)) for v in value)
         return value
 
     def to_python(self, value):
@@ -110,7 +112,7 @@ class SplitArrayWidget(forms.Widget):
         value = value or []
         output = []
         final_attrs = self.build_attrs(attrs)
-        id_ = final_attrs.get('id', None)
+        id_ = final_attrs.get('id')
         for i in range(max(len(value), self.size)):
             try:
                 widget_value = value[i]

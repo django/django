@@ -4,9 +4,10 @@ import re
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.middleware.csrf import rotate_token
+from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
 from django.utils.translation import LANGUAGE_SESSION_KEY
-from django.middleware.csrf import rotate_token
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
@@ -20,16 +21,21 @@ def load_backend(path):
     return import_string(path)()
 
 
-def get_backends():
+def _get_backends(return_tuples=False):
     backends = []
     for backend_path in settings.AUTHENTICATION_BACKENDS:
-        backends.append(load_backend(backend_path))
+        backend = load_backend(backend_path)
+        backends.append((backend, backend_path) if return_tuples else backend)
     if not backends:
         raise ImproperlyConfigured(
             'No authentication backends have been defined. Does '
             'AUTHENTICATION_BACKENDS contain anything?'
         )
     return backends
+
+
+def get_backends():
+    return _get_backends(return_tuples=False)
 
 
 def _clean_credentials(credentials):
@@ -47,11 +53,17 @@ def _clean_credentials(credentials):
     return credentials
 
 
+def _get_user_session_key(request):
+    # This value in the session is always serialized to a string, so we need
+    # to convert it back to Python whenever we access it.
+    return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
+
+
 def authenticate(**credentials):
     """
     If the given credentials are valid, return a User object.
     """
-    for backend in get_backends():
+    for backend, backend_path in _get_backends(return_tuples=True):
         try:
             inspect.getcallargs(backend.authenticate, **credentials)
         except TypeError:
@@ -66,7 +78,7 @@ def authenticate(**credentials):
         if user is None:
             continue
         # Annotate the user object with the path of the backend.
-        user.backend = "%s.%s" % (backend.__module__, backend.__class__.__name__)
+        user.backend = backend_path
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
@@ -87,7 +99,7 @@ def login(request, user):
         session_auth_hash = user.get_session_auth_hash()
 
     if SESSION_KEY in request.session:
-        if request.session[SESSION_KEY] != user.pk or (
+        if _get_user_session_key(request) != user.pk or (
                 session_auth_hash and
                 request.session.get(HASH_SESSION_KEY) != session_auth_hash):
             # To avoid reusing another user's session, create a new, empty
@@ -96,7 +108,7 @@ def login(request, user):
             request.session.flush()
     else:
         request.session.cycle_key()
-    request.session[SESSION_KEY] = user.pk
+    request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = user.backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
     if hasattr(request, 'user'):
@@ -152,7 +164,7 @@ def get_user(request):
     from .models import AnonymousUser
     user = None
     try:
-        user_id = request.session[SESSION_KEY]
+        user_id = _get_user_session_key(request)
         backend_path = request.session[BACKEND_SESSION_KEY]
     except KeyError:
         pass
@@ -160,6 +172,18 @@ def get_user(request):
         if backend_path in settings.AUTHENTICATION_BACKENDS:
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
+            # Verify the session
+            if ('django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+                    in settings.MIDDLEWARE_CLASSES and hasattr(user, 'get_session_auth_hash')):
+                session_hash = request.session.get(HASH_SESSION_KEY)
+                session_hash_verified = session_hash and constant_time_compare(
+                    session_hash,
+                    user.get_session_auth_hash()
+                )
+                if not session_hash_verified:
+                    request.session.flush()
+                    user = None
+
     return user or AnonymousUser()
 
 

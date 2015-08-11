@@ -12,9 +12,14 @@ docstrings of models, views, template tags, and template filters for any app in
 :setting:`INSTALLED_APPS` and makes that documentation available from the
 :mod:`Django admin <django.contrib.admin>`.
 
-In addition to providing offline documentation for all template tags and
-template filters that ship with Django, you may utilize admindocs to quickly
-document your own code.
+You may, to some extent, utilize :mod:`~django.contrib.admindocs` to quickly
+document your own code. This has limited usage, however, as the app is
+primarily intended for documenting templates, template tags, and filters.
+For example, model methods that require arguments are purposefully omitted
+from the documentation because they can't be invoked from templates. The app
+can still be useful since it doesn't require you to write any extra
+documentation (besides docstrings) and is conveniently available from the
+:mod:`Django admin <django.contrib.admin>`.
 
 Overview
 ========
@@ -69,8 +74,12 @@ A model with useful documentation might look like this::
 
         """
         slug = models.SlugField(help_text="A short label, generally used in URLs.")
-        author = models.ForeignKey(User)
-        blog = models.ForeignKey(Blog)
+        author = models.ForeignKey(
+            User,
+            models.SET_NULL,
+            blank=True, null=True,
+        )
+        blog = models.ForeignKey(Blog, models.CASCADE)
         ...
 
         def publish(self):
@@ -90,6 +99,8 @@ you can document in your view function docstrings include:
 
 For example::
 
+    from django.shortcuts import render
+
     from myapp.models import MyModel
 
     def my_view(request, slug):
@@ -97,8 +108,6 @@ For example::
         Display an individual :model:`myapp.MyModel`.
 
         **Context**
-
-        ``RequestContext``
 
         ``mymodel``
             An instance of :model:`myapp.MyModel`.
@@ -108,10 +117,8 @@ For example::
         :template:`myapp/my_template.html`
 
         """
-        return render_to_response('myapp/my_template.html', {
-            'mymodel': MyModel.objects.get(slug=slug)
-        }, context_instance=RequestContext(request))
-
+        context = {'mymodel': MyModel.objects.get(slug=slug)}
+        return render(request, 'myapp/my_template.html', context)
 
 Template tags and filters reference
 ===================================
@@ -138,22 +145,13 @@ template is stored.
 Included Bookmarklets
 =====================
 
-Several useful bookmarklets are available from the ``admindocs`` page:
+One bookmarklet is available from the ``admindocs`` page:
 
 Documentation for this page
     Jumps you from any page to the documentation for the view that generates
     that page.
 
-Show object ID
-    Shows the content-type and unique ID for pages that represent a single
-    object.
-
-Edit this object
-    Jumps to the admin page for pages that represent a single object.
-
-Using these bookmarklets requires that you are either logged into the
-:mod:`Django admin <django.contrib.admin>` as a
+Using this bookmarklet requires that ``XViewMiddleware`` is installed and that
+you are logged into the :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``, or that the
-``XViewMiddleware`` is installed and you are accessing the site from an IP
-address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``.

@@ -4,7 +4,7 @@ from django.db import transaction
 from django.test import TestCase
 from django.utils import six
 
-from .models import Article, Publication
+from .models import Article, InheritedArticleA, InheritedArticleB, Publication
 
 
 class ManyToManyTests(TestCase):
@@ -332,6 +332,45 @@ class ManyToManyTests(TestCase):
             ])
         self.assertQuerysetEqual(self.a3.publications.all(), [])
 
+    def test_set(self):
+        self.p2.article_set.set([self.a4, self.a3])
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+            [
+                '<Article: NASA finds intelligent life on Earth>',
+                '<Article: Oxygen-free diet works wonders>',
+            ])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science News>'])
+        self.a4.publications.set([self.p3.id])
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+                                 ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science Weekly>'])
+
+        self.p2.article_set.set([])
+        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.a4.publications.set([])
+        self.assertQuerysetEqual(self.a4.publications.all(), [])
+
+        self.p2.article_set.set([self.a4, self.a3], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+            [
+                '<Article: NASA finds intelligent life on Earth>',
+                '<Article: Oxygen-free diet works wonders>',
+            ])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science News>'])
+        self.a4.publications.set([self.p3.id], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(),
+                                 ['<Article: NASA finds intelligent life on Earth>'])
+        self.assertQuerysetEqual(self.a4.publications.all(),
+                                 ['<Publication: Science Weekly>'])
+
+        self.p2.article_set.set([], clear=True)
+        self.assertQuerysetEqual(self.p2.article_set.all(), [])
+        self.a4.publications.set([], clear=True)
+        self.assertQuerysetEqual(self.a4.publications.all(), [])
+
     def test_assign(self):
         # Relation sets can be assigned. Assignment clears any existing set members
         self.p2.article_set = [self.a4, self.a3]
@@ -385,7 +424,7 @@ class ManyToManyTests(TestCase):
     def test_reverse_assign_with_queryset(self):
         # Ensure that querysets used in M2M assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ReverseManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
         self.p1.article_set = [self.a1, self.a2]
 
         qs = self.p1.article_set.filter(headline='Django lets you build Web apps easily')
@@ -415,3 +454,28 @@ class ManyToManyTests(TestCase):
         self.assertQuerysetEqual(self.a4.publications.all(), [])
         self.assertQuerysetEqual(self.p2.article_set.all(),
                                  ['<Article: NASA finds intelligent life on Earth>'])
+
+    def test_inherited_models_selects(self):
+        """
+        #24156 - Objects from child models where the parent's m2m field uses
+        related_name='+' should be retrieved correctly.
+        """
+        a = InheritedArticleA.objects.create()
+        b = InheritedArticleB.objects.create()
+        a.publications.add(self.p1, self.p2)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(), [])
+        b.publications.add(self.p3)
+        self.assertQuerysetEqual(a.publications.all(),
+            [
+                '<Publication: Science News>',
+                '<Publication: The Python Journal>',
+            ])
+        self.assertQuerysetEqual(b.publications.all(),
+            [
+                '<Publication: Science Weekly>',
+            ])

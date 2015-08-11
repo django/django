@@ -7,7 +7,7 @@ Roles
 Technical board
 ===============
 
-The technical board for the 1.8 release cycle is:
+The technical board for the 1.9 release cycle is:
 
 * Aymeric Augustin
 * Andrew Godwin
@@ -57,6 +57,7 @@ The current releasers are:
 
 - James Bennett
 - Jacob Kaplan-Moss
+- Tim Graham
 
 Ops team
 ========

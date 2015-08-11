@@ -14,9 +14,33 @@ from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 
 
+class CategoryMetaDataManager(models.Manager):
+
+    def get_by_natural_key(self, kind, name):
+        return self.get(kind=kind, name=name)
+
+
+@python_2_unicode_compatible
+class CategoryMetaData(models.Model):
+    kind = models.CharField(max_length=10)
+    name = models.CharField(max_length=10)
+    value = models.CharField(max_length=10)
+    objects = CategoryMetaDataManager()
+
+    class Meta:
+        unique_together = (('kind', 'name'),)
+
+    def __str__(self):
+        return '[%s:%s]=%s' % (self.kind, self.name, self.value)
+
+    def natural_key(self):
+        return (self.kind, self.name)
+
+
 @python_2_unicode_compatible
 class Category(models.Model):
     name = models.CharField(max_length=20)
+    meta_data = models.ForeignKey(CategoryMetaData, models.SET_NULL, null=True, default=None)
 
     class Meta:
         ordering = ('name',)
@@ -38,10 +62,11 @@ class Author(models.Model):
 
 @python_2_unicode_compatible
 class Article(models.Model):
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     headline = models.CharField(max_length=50)
     pub_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
+    meta_data = models.ManyToManyField(CategoryMetaData)
 
     class Meta:
         ordering = ('pub_date',)
@@ -52,7 +77,7 @@ class Article(models.Model):
 
 @python_2_unicode_compatible
 class AuthorProfile(models.Model):
-    author = models.OneToOneField(Author, primary_key=True)
+    author = models.OneToOneField(Author, models.CASCADE, primary_key=True)
     date_of_birth = models.DateField()
 
     def __str__(self):
@@ -72,7 +97,7 @@ class Actor(models.Model):
 
 @python_2_unicode_compatible
 class Movie(models.Model):
-    actor = models.ForeignKey(Actor)
+    actor = models.ForeignKey(Actor, models.CASCADE)
     title = models.CharField(max_length=50)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
 
@@ -112,11 +137,11 @@ class TeamField(models.CharField):
             return value
         return Team(value)
 
-    def from_db_value(self, value, connection):
+    def from_db_value(self, value, expression, connection, context):
         return Team(value)
 
     def value_to_string(self, obj):
-        return self._get_val_from_obj(obj).to_string()
+        return self.value_from_object(obj).to_string()
 
     def deconstruct(self):
         name, path, args, kwargs = super(TeamField, self).deconstruct()

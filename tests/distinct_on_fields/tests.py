@@ -4,7 +4,7 @@ from django.db.models import Max
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import str_prefix
 
-from .models import Tag, Celebrity, Fan, Staff, StaffTag
+from .models import Celebrity, Fan, Staff, StaffTag, Tag
 
 
 @skipUnlessDBFeature('can_distinct_on_fields')
@@ -129,3 +129,11 @@ class DistinctOnTests(TestCase):
             qs, [self.p1_o2, self.p2_o1, self.p3_o1],
             lambda x: x
         )
+
+    def test_distinct_on_get_ordering_preserved(self):
+        """
+        Ordering shouldn't be cleared when distinct on fields are specified.
+        refs #25081
+        """
+        staff = Staff.objects.distinct('name').order_by('name', '-organisation').get(name='p1')
+        self.assertEqual(staff.organisation, 'o2')

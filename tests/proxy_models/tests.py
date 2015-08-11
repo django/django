@@ -1,20 +1,24 @@
 from __future__ import unicode_literals
 
+import datetime
+
 from django.apps import apps
 from django.contrib import admin
+from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
-from django.core import management
-from django.core import checks
-from django.db import models, DEFAULT_DB_ALIAS
+from django.core import checks, exceptions, management
+from django.core.urlresolvers import reverse
+from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
 from django.test import TestCase, override_settings
 
-
-from .models import (MyPerson, Person, StatusPerson, LowerStatusPerson,
-    MyPersonProxy, Abstract, OtherPerson, User, UserProxy, UserProxyProxy,
-    Country, State, StateProxy, TrackerUser, BaseUser, Bug, ProxyTrackerUser,
-    Improvement, ProxyProxyBug, ProxyBug, ProxyImprovement, Issue)
 from .admin import admin as force_admin_model_registration  # NOQA
+from .models import (
+    Abstract, BaseUser, Bug, Country, Improvement, Issue, LowerStatusPerson,
+    MyPerson, MyPersonProxy, OtherPerson, Person, ProxyBug, ProxyImprovement,
+    ProxyProxyBug, ProxyTrackerUser, State, StateProxy, StatusPerson,
+    TrackerUser, User, UserProxy, UserProxyProxy,
+)
 
 
 class ProxyModelTests(TestCase):
@@ -272,7 +276,7 @@ class ProxyModelTests(TestCase):
 
     def test_content_type(self):
         ctype = ContentType.objects.get_for_model
-        self.assertTrue(ctype(Person) is ctype(OtherPerson))
+        self.assertIs(ctype(Person), ctype(OtherPerson))
 
     def test_user_userproxy_userproxyproxy(self):
         User.objects.create(name='Bruce')
@@ -327,8 +331,18 @@ class ProxyModelTests(TestCase):
         resp = StateProxy.objects.select_related().get(name='New South Wales')
         self.assertEqual(resp.name, 'New South Wales')
 
+    def test_filter_proxy_relation_reverse(self):
+        tu = TrackerUser.objects.create(
+            name='Contributor', status='contrib')
+        with self.assertRaises(exceptions.FieldError):
+            TrackerUser.objects.filter(issue=None),
+        self.assertQuerysetEqual(
+            ProxyTrackerUser.objects.filter(issue=None),
+            [tu], lambda x: x
+        )
+
     def test_proxy_bug(self):
-        contributor = TrackerUser.objects.create(name='Contributor',
+        contributor = ProxyTrackerUser.objects.create(name='Contributor',
             status='contrib')
         someone = BaseUser.objects.create(name='Someone')
         Bug.objects.create(summary='fix this', version='1.1beta',
@@ -380,10 +394,20 @@ class ProxyModelTests(TestCase):
         self.assertEqual(MyPerson(id=100), Person(id=100))
 
 
-@override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
                    ROOT_URLCONF='proxy_models.urls',)
 class ProxyModelAdminTests(TestCase):
-    fixtures = ['myhorses']
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.u1 = AuthUser.objects.create(
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
+            first_name='Super', last_name='User', email='super@example.com', is_staff=True, is_active=True,
+            date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.tu1 = ProxyTrackerUser.objects.create(name='Django Pony', status='emperor')
+        cls.i1 = Issue.objects.create(summary="Pony's Issue", assignee=cls.tu1)
 
     def test_cascade_delete_proxy_model_admin_warning(self):
         """
@@ -396,9 +420,9 @@ class ProxyModelAdminTests(TestCase):
         with self.assertNumQueries(7):
             collector = admin.utils.NestedObjects('default')
             collector.collect(ProxyTrackerUser.objects.all())
-        self.assertTrue(tracker_user in collector.edges.get(None, ()))
-        self.assertTrue(base_user in collector.edges.get(None, ()))
-        self.assertTrue(issue in collector.edges.get(tracker_user, ()))
+        self.assertIn(tracker_user, collector.edges.get(None, ()))
+        self.assertIn(base_user, collector.edges.get(None, ()))
+        self.assertIn(issue, collector.edges.get(tracker_user, ()))
 
     def test_delete_str_in_model_admin(self):
         """
@@ -408,17 +432,18 @@ class ProxyModelAdminTests(TestCase):
         user = TrackerUser.objects.get(name='Django Pony')
         proxy = ProxyTrackerUser.objects.get(name='Django Pony')
 
-        user_str = (
-            'Tracker user: <a href="/admin/proxy_models/trackeruser/%s/">%s</a>' % (user.pk, user))
-        proxy_str = (
-            'Proxy tracker user: <a href="/admin/proxy_models/proxytrackeruser/%s/">%s</a>' %
-            (proxy.pk, proxy))
+        user_str = 'Tracker user: <a href="%s">%s</a>' % (
+            reverse('admin_proxy:proxy_models_trackeruser_change', args=(user.pk,)), user
+        )
+        proxy_str = 'Proxy tracker user: <a href="%s">%s</a>' % (
+            reverse('admin_proxy:proxy_models_proxytrackeruser_change', args=(proxy.pk,)), proxy
+        )
 
         self.client.login(username='super', password='secret')
-        response = self.client.get('/admin/proxy_models/trackeruser/%s/delete/' % (user.pk,))
+        response = self.client.get(reverse('admin_proxy:proxy_models_trackeruser_delete', args=(user.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, user_str)
-        response = self.client.get('/admin/proxy_models/proxytrackeruser/%s/delete/' % (proxy.pk,))
+        response = self.client.get(reverse('admin_proxy:proxy_models_proxytrackeruser_delete', args=(proxy.pk,)))
         delete_str = response.context['deleted_objects'][0]
         self.assertEqual(delete_str, proxy_str)
         self.client.logout()

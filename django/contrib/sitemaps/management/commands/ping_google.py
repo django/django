@@ -1,5 +1,5 @@
-from django.core.management.base import BaseCommand
 from django.contrib.sitemaps import ping_google
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
@@ -8,5 +8,5 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('sitemap_url', nargs='?', default=None)
 
-    def execute(self, *args, **options):
+    def handle(self, *args, **options):
         ping_google(sitemap_url=options['sitemap_url'])

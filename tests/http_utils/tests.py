@@ -1,11 +1,11 @@
 from __future__ import unicode_literals
 
-import io
 import gzip
+import io
 
-from django.http import HttpRequest, HttpResponse, HttpResponseRedirect, StreamingHttpResponse
-from django.http.utils import conditional_content_removal, fix_location_header
-from django.test import TestCase
+from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
+from django.http.utils import conditional_content_removal
+from django.test import SimpleTestCase
 
 
 # based on Python 3.3's gzip.compress
@@ -19,7 +19,7 @@ def gzip_compress(data):
     return buf.getvalue()
 
 
-class HttpUtilTests(TestCase):
+class HttpUtilTests(SimpleTestCase):
 
     def test_conditional_content_removal(self):
         """
@@ -69,15 +69,3 @@ class HttpUtilTests(TestCase):
         res = StreamingHttpResponse(['abc'])
         conditional_content_removal(req, res)
         self.assertEqual(b''.join(res), b'')
-
-    def test_fix_location_without_get_host(self):
-        """
-        Tests that you can return an absolute redirect when the request
-        host is not in ALLOWED_HOSTS. Issue #20472
-        """
-        request = HttpRequest()
-
-        def bomb():
-            self.assertTrue(False)
-        request.get_host = bomb
-        fix_location_header(request, HttpResponseRedirect('http://example.com'))

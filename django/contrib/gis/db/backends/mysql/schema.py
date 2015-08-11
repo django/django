@@ -1,8 +1,8 @@
 import logging
 
 from django.contrib.gis.db.models.fields import GeometryField
-from django.db.utils import OperationalError
 from django.db.backends.mysql.schema import DatabaseSchemaEditor
+from django.db.utils import OperationalError
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -14,6 +14,13 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
     def __init__(self, *args, **kwargs):
         super(MySQLGISSchemaEditor, self).__init__(*args, **kwargs)
         self.geometry_sql = []
+
+    def skip_default(self, field):
+        return (
+            super(MySQLGISSchemaEditor, self).skip_default(field) or
+            # Geometry fields are stored as BLOB/TEXT and can't have defaults.
+            isinstance(field, GeometryField)
+        )
 
     def column_sql(self, model, field, include_default=False):
         column_sql = super(MySQLGISSchemaEditor, self).column_sql(model, field, include_default)

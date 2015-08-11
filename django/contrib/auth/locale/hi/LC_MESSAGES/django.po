@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
 "hi/)\n"
@@ -20,77 +20,47 @@ msgstr ""
 "Language: hi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "व्यक्तिगत सूचना"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "अनुमतियाँ"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "महत्त्वपूर्ण तिथियाँ"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "शब्दकूट बदली कामयाब"
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "शब्दकूट बदलें: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr ""
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "कोई कूटशब्द नहीं।"
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "अवैध कूटशब्द प्रारूप या अज्ञात द्रुतान्वेषण कलन विधि"
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "इस नाम के साथ प्रवोक्ता अस्तित्व है"
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "यह दो शब्दकूट क्षेत्रों का मेल नहीं होता "
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "प्रवोक्ता नाम"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "जरूरी है | 30 या कम | केवल वर्णों, अक्षर, अंक और @/./+/-/_ |"
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "यह मूल्य केवल अक्षर, संख्या और @/./+/-/_ हो सकते हैं |"
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "कूटशब्द"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "कूटशब्द पुष्टि"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "सत्याप्ती के लिए ऊपर दर्ज किए शब्दकूट को फिर से प्रवेश करें"
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -100,109 +70,78 @@ msgstr ""
 "तरीका नहीं है, लेकिन आप <a href=\"password/\"> इस प्रपत्र</a> का उपयोग करते हुए "
 "कूटशब्द बदल सकते हैं."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr "कृपया सही %(username)s व कूटशब्द भरें। भरते समय लघु और दीर्घ अक्षरों का ध्यान रखें।"
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "यस खाता सुस्त है"
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "डाक पता"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "नया शब्दकूट"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "नया शब्दकूट पुष्टि"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "आपने पुराना शब्दकूट गलत दर्ज किया है । कृपया फिर से दर्ज करें"
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "पुराना शब्दकूट"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "शब्दकूट (दुबारा)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "अलगोरिथम"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "पुनरूक्तियाँ"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "साल्ट"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "हैश"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "कार्य फ़ैक्टर"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "चेकसम"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "नाम"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "कोडनेम"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "अनुमति"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "अनुमतियाँ"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "वर्ग"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "वर्गों"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "शब्दकूट"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "पिछला लॉगिन"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "सर्वोच्च प्रयोक्ता स्थिति"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -210,55 +149,49 @@ msgstr ""
 "निर्दिष्ट करता है कि जो इस उपयोगकर्ता के पास सभी अनुमतियाँ उन्हें बिना बताए स्पष्ट रूप से "
 "निर्धारित है."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"समूह के अंतर्गत यह उपयोगकर्ता आता है. उपयोगकर्ता उसकी / उसके समूह के प्रत्येक के लिए दी गई "
-"अनुमति प्राप्त होगा."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "प्रयोक्ता अनुमतियाँ"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr ""
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "प्रयोक्ता नाम"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "वैध प्रयोक्ता नाम भरें"
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "जरूरी है | 30 या कम | केवल वर्णों, अक्षर, अंक और @/./+/-/_ |"
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "इस नाम के साथ प्रवोक्ता अस्तित्व है"
+
 msgid "first name"
 msgstr "पहला नाम"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "आखिरी नाम"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "डाक पता"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "कर्मचारी स्थिति"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "तय करता हैं की उपयोगकर्ता इस साईट प्रशासन में प्रवेश कर सकता हैं या नहीं |"
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "सक्रिय"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -266,55 +199,39 @@ msgstr ""
 "निर्दिष्ट करता है कि क्या इस उपयोगकर्ता को सक्रिय माना जाना चाहिए.खातों को हटाने की  "
 "बजाय इस अचयनित करे."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "तिथि भरती"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "उपभोक्ता"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "उपभोक्ताऐं"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s पर कूटशब्द को पुनःठीक करे"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "वैध प्रयोक्ता नाम भरें"
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "लाग्ड आउट "
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr ""
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
+msgid "Password reset sent"
 msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr ""
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr ""
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr ""
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr ""
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr ""

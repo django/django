@@ -18,9 +18,13 @@ class Author(models.Model):
 
 class Book(models.Model):
     title = models.CharField(max_length=255)
-    author = models.ForeignKey(Author)
+    author = models.ForeignKey(Author, models.CASCADE)
     paperback = models.BooleanField(default=False)
     opening_line = models.TextField()
+
+
+class BookFkAsPk(models.Model):
+    book = models.ForeignKey(Book, models.CASCADE, primary_key=True, db_column="not_the_default")
 
 
 class Coffee(models.Model):

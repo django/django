@@ -1,6 +1,6 @@
 from django.db import (
-    connections, DEFAULT_DB_ALIAS,
-    DatabaseError, Error, ProgrammingError)
+    DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
+)
 from django.utils.decorators import ContextDecorator
 
 
@@ -103,6 +103,14 @@ def set_rollback(rollback, using=None):
     return get_connection(using).set_rollback(rollback)
 
 
+def on_commit(func, using=None):
+    """
+    Register `func` to be called when the current transaction is committed.
+    If the current transaction is rolled back, `func` will not be called.
+    """
+    get_connection(using).on_commit(func)
+
+
 #################################
 # Decorators / context managers #
 #################################
@@ -180,17 +188,7 @@ class Atomic(ContextDecorator):
             else:
                 connection.savepoint_ids.append(None)
         else:
-            # We aren't in a transaction yet; create one.
-            # The usual way to start a transaction is to turn autocommit off.
-            # However, some database adapters (namely sqlite3) don't handle
-            # transactions and savepoints properly when autocommit is off.
-            # In such cases, start an explicit transaction instead, which has
-            # the side-effect of disabling autocommit.
-            if connection.features.autocommits_when_autocommit_is_off:
-                connection._start_transaction_under_autocommit()
-                connection.autocommit = False
-            else:
-                connection.set_autocommit(False)
+            connection.set_autocommit(False, force_begin_transaction_with_broken_autocommit=True)
             connection.in_atomic_block = True
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -272,8 +270,6 @@ class Atomic(ContextDecorator):
             if not connection.in_atomic_block:
                 if connection.closed_in_transaction:
                     connection.connection = None
-                elif connection.features.autocommits_when_autocommit_is_off:
-                    connection.autocommit = True
                 else:
                     connection.set_autocommit(True)
             # Outermost block exit when autocommit was disabled.

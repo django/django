@@ -1,76 +1,107 @@
 from __future__ import unicode_literals
 
-from django.core import management
 from django.contrib.auth.models import User
+from django.core import management
 from django.test import TestCase
 from django.utils.six import StringIO
 
-from .models import (Person, Group, Membership, UserMembership, Car, Driver,
-    CarDriver)
+from .models import (
+    Car, CarDriver, Driver, Group, Membership, Person, UserMembership,
+)
 
 
 class M2MThroughTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name="Bob")
+        cls.jim = Person.objects.create(name="Jim")
 
-    def test_everything(self):
-        bob = Person.objects.create(name="Bob")
-        jim = Person.objects.create(name="Jim")
+        cls.rock = Group.objects.create(name="Rock")
+        cls.roll = Group.objects.create(name="Roll")
 
-        rock = Group.objects.create(name="Rock")
-        roll = Group.objects.create(name="Roll")
+        cls.frank = User.objects.create_user("frank", "frank@example.com", "password")
+        cls.jane = User.objects.create_user("jane", "jane@example.com", "password")
 
-        frank = User.objects.create_user("frank", "frank@example.com", "password")
-        jane = User.objects.create_user("jane", "jane@example.com", "password")
+        # normal intermediate model
+        cls.bob_rock = Membership.objects.create(person=cls.bob, group=cls.rock)
+        cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll, price=50)
+        cls.jim_rock = Membership.objects.create(person=cls.jim, group=cls.rock, price=50)
 
-        Membership.objects.create(person=bob, group=rock)
-        Membership.objects.create(person=bob, group=roll)
-        Membership.objects.create(person=jim, group=rock)
+        # intermediate model with custom id column
+        cls.frank_rock = UserMembership.objects.create(user=cls.frank, group=cls.rock)
+        cls.frank_roll = UserMembership.objects.create(user=cls.frank, group=cls.roll)
+        cls.jane_rock = UserMembership.objects.create(user=cls.jane, group=cls.rock)
 
+    def test_retrieve_reverse_m2m_items(self):
         self.assertQuerysetEqual(
-            bob.group_set.all(), [
+            self.bob.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
             ],
             ordered=False
         )
 
+    def test_retrieve_forward_m2m_items(self):
         self.assertQuerysetEqual(
-            roll.members.all(), [
+            self.roll.members.all(), [
                 "<Person: Bob>",
             ]
         )
 
-        self.assertRaises(AttributeError, setattr, bob, "group_set", [])
-        self.assertRaises(AttributeError, setattr, roll, "members", [])
+    def test_cannot_use_setattr_on_reverse_m2m_with_intermediary_model(self):
+        self.assertRaises(AttributeError, setattr, self.bob, "group_set", [])
 
-        self.assertRaises(AttributeError, rock.members.create, name="Anne")
-        self.assertRaises(AttributeError, bob.group_set.create, name="Funk")
+    def test_cannot_use_setattr_on_forward_m2m_with_intermediary_model(self):
+        self.assertRaises(AttributeError, setattr, self.roll, "members", [])
 
-        UserMembership.objects.create(user=frank, group=rock)
-        UserMembership.objects.create(user=frank, group=roll)
-        UserMembership.objects.create(user=jane, group=rock)
+    def test_cannot_use_create_on_m2m_with_intermediary_model(self):
+        self.assertRaises(AttributeError, self.rock.members.create, name="Anne")
 
+    def test_cannot_use_create_on_reverse_m2m_with_intermediary_model(self):
+        self.assertRaises(AttributeError, self.bob.group_set.create, name="Funk")
+
+    def test_retrieve_reverse_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
-            frank.group_set.all(), [
+            self.frank.group_set.all(), [
                 "<Group: Rock>",
                 "<Group: Roll>",
             ],
             ordered=False
         )
 
+    def test_retrieve_forward_m2m_items_via_custom_id_intermediary(self):
         self.assertQuerysetEqual(
-            roll.user_members.all(), [
+            self.roll.user_members.all(), [
                 "<User: frank>",
             ]
         )
 
+    def test_join_trimming_forwards(self):
+        "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
+        self.assertQuerysetEqual(
+            self.rock.members.filter(membership__price=50), [
+                "<Person: Jim>",
+            ]
+        )
+
+    def test_join_trimming_reverse(self):
+        self.assertQuerysetEqual(
+            self.bob.group_set.filter(membership__price=50), [
+                "<Group: Roll>",
+            ]
+        )
+
+
+class M2MThroughSerializationTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name="Bob")
+        cls.roll = Group.objects.create(name="Roll")
+        cls.bob_roll = Membership.objects.create(person=cls.bob, group=cls.roll)
+
     def test_serialization(self):
         "m2m-through models aren't serialized as m2m fields. Refs #8134"
-
-        p = Person.objects.create(name="Bob")
-        g = Group.objects.create(name="Roll")
-        m = Membership.objects.create(person=p, group=g)
-
-        pks = {"p_pk": p.pk, "g_pk": g.pk, "m_pk": m.pk}
+        pks = {"p_pk": self.bob.pk, "g_pk": self.roll.pk, "m_pk": self.bob_roll.pk}
 
         out = StringIO()
         management.call_command("dumpdata", "m2m_through_regress", format="json", stdout=out)
@@ -95,30 +126,6 @@ class M2MThroughTestCase(TestCase):
   </object>
 </django-objects>
         """.strip() % pks)
-
-    def test_join_trimming(self):
-        "Check that we don't involve too many copies of the intermediate table when doing a join. Refs #8046, #8254"
-        bob = Person.objects.create(name="Bob")
-        jim = Person.objects.create(name="Jim")
-
-        rock = Group.objects.create(name="Rock")
-        roll = Group.objects.create(name="Roll")
-
-        Membership.objects.create(person=bob, group=rock)
-        Membership.objects.create(person=jim, group=rock, price=50)
-        Membership.objects.create(person=bob, group=roll, price=50)
-
-        self.assertQuerysetEqual(
-            rock.members.filter(membership__price=50), [
-                "<Person: Jim>",
-            ]
-        )
-
-        self.assertQuerysetEqual(
-            bob.group_set.filter(membership__price=50), [
-                "<Group: Roll>",
-            ]
-        )
 
 
 class ToFieldThroughTests(TestCase):

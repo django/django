@@ -1,10 +1,13 @@
-from ctypes import c_char_p, c_int, c_void_p, POINTER
+from ctypes import POINTER, c_char_p, c_int, c_void_p
+
 from django.contrib.gis.gdal.libgdal import lgdal, std_call
-from django.contrib.gis.gdal.prototypes.generation import (const_string_output,
-    double_output, int_output, srs_output, string_output, void_output)
+from django.contrib.gis.gdal.prototypes.generation import (
+    const_string_output, double_output, int_output, srs_output, string_output,
+    void_output,
+)
 
 
-## Shortcut generation for routines with known parameters.
+# Shortcut generation for routines with known parameters.
 def srs_double(f):
     """
     Creates a function prototype for the OSR routines that take

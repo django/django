@@ -1,6 +1,5 @@
 from .base import GEOSBase
 from .error import GEOSException
-from .geometry import GEOSGeometry
 from .libgeos import geos_version_info
 from .prototypes import prepared as capi
 
@@ -18,6 +17,7 @@ class PreparedGeometry(GEOSBase):
         # from being garbage collected which could then crash the prepared one
         # See #21662
         self._base_geom = geom
+        from .geometry import GEOSGeometry
         if not isinstance(geom, GEOSGeometry):
             raise TypeError
         self.ptr = capi.geos_prepare(geom.ptr)

@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .views import empty_view, LazyRedirectView, login_required_view
+from .views import LazyRedirectView, empty_view, login_required_view
 
 urlpatterns = [
     url(r'^redirected_to/$', empty_view, name='named-lazy-url-redirected-to'),

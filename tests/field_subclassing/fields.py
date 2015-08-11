@@ -4,20 +4,20 @@ import json
 import warnings
 
 from django.db import models
-from django.utils.encoding import force_text
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.deconstruct import deconstructible
+from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
-
-# Catch warning about subfieldbase  -- remove in Django 2.0
+# Catch warning about subfieldbase  -- remove in Django 1.10
 warnings.filterwarnings(
     'ignore',
     'SubfieldBase has been deprecated. Use Field.from_db_value instead.',
-    RemovedInDjango20Warning
+    RemovedInDjango110Warning
 )
 
 
+@deconstructible
 @python_2_unicode_compatible
 class Small(object):
     """

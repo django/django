@@ -9,9 +9,9 @@ this behavior by explicitly adding ``primary_key=True`` to a field.
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from .fields import MyAutoField
-from django.utils.encoding import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
@@ -48,4 +48,4 @@ class Bar(models.Model):
 
 
 class Foo(models.Model):
-    bar = models.ForeignKey(Bar)
+    bar = models.ForeignKey(Bar, models.CASCADE)

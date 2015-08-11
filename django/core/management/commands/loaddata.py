@@ -5,20 +5,23 @@ import gzip
 import os
 import warnings
 import zipfile
+from itertools import product
 
 from django.apps import apps
 from django.conf import settings
 from django.core import serializers
+from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
-from django.db import (connections, router, transaction, DEFAULT_DB_ALIAS,
-      IntegrityError, DatabaseError)
+from django.db import (
+    DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
+    transaction,
+)
 from django.utils import lru_cache
+from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango19Warning
-from itertools import product
+from django.utils.glob import glob_escape
 
 try:
     import bz2
@@ -120,6 +123,7 @@ class Command(BaseCommand):
         """
         Loads fixtures files for a given label.
         """
+        show_progress = self.verbosity >= 3
         for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
             _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
             open_method, mode = self.compression_formats[cmp_fmt]
@@ -137,11 +141,16 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
-                    if router.allow_migrate(self.using, obj.object.__class__):
+                    if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
                         try:
                             obj.save(using=self.using)
+                            if show_progress:
+                                self.stdout.write(
+                                    '\rProcessed %i object(s).' % loaded_objects_in_fixture,
+                                    ending=''
+                                )
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
@@ -150,7 +159,8 @@ class Command(BaseCommand):
                                 'error_msg': force_text(e)
                             },)
                             raise
-
+                if objects and show_progress:
+                    self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
                 self.fixture_object_count += objects_in_fixture
             except Exception as e:
@@ -186,7 +196,7 @@ class Command(BaseCommand):
             fixture_name = os.path.basename(fixture_name)
         else:
             fixture_dirs = self.fixture_dirs
-            if os.path.sep in fixture_name:
+            if os.path.sep in os.path.normpath(fixture_name):
                 fixture_dirs = [os.path.join(dir_, os.path.dirname(fixture_name))
                                 for dir_ in fixture_dirs]
                 fixture_name = os.path.basename(fixture_name)
@@ -200,7 +210,8 @@ class Command(BaseCommand):
             if self.verbosity >= 2:
                 self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
             fixture_files_in_dir = []
-            for candidate in glob.iglob(os.path.join(fixture_dir, fixture_name + '*')):
+            path = os.path.join(fixture_dir, fixture_name)
+            for candidate in glob.iglob(glob_escape(path) + '*'):
                 if os.path.basename(candidate) in targets:
                     # Save the fixture_dir and fixture_name for future error messages.
                     fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))
@@ -217,14 +228,9 @@ class Command(BaseCommand):
                     (fixture_name, humanize(fixture_dir)))
             fixture_files.extend(fixture_files_in_dir)
 
-        if fixture_name != 'initial_data' and not fixture_files:
+        if not fixture_files:
             # Warning kept for backwards-compatibility; why not an exception?
             warnings.warn("No fixture named '%s' found." % fixture_name)
-        elif fixture_name == 'initial_data' and fixture_files:
-            warnings.warn(
-                'initial_data fixtures are deprecated. Use data migrations instead.',
-                RemovedInDjango19Warning
-            )
 
         return fixture_files
 
@@ -238,13 +244,23 @@ class Command(BaseCommand):
         current directory.
         """
         dirs = []
+        fixture_dirs = settings.FIXTURE_DIRS
+        if len(fixture_dirs) != len(set(fixture_dirs)):
+            raise ImproperlyConfigured("settings.FIXTURE_DIRS contains duplicates.")
         for app_config in apps.get_app_configs():
-            if self.app_label and app_config.label != self.app_label:
-                continue
+            app_label = app_config.label
             app_dir = os.path.join(app_config.path, 'fixtures')
+            if app_dir in fixture_dirs:
+                raise ImproperlyConfigured(
+                    "'%s' is a default fixture directory for the '%s' app "
+                    "and cannot be listed in settings.FIXTURE_DIRS." % (app_dir, app_label)
+                )
+
+            if self.app_label and app_label != self.app_label:
+                continue
             if os.path.isdir(app_dir):
                 dirs.append(app_dir)
-        dirs.extend(list(settings.FIXTURE_DIRS))
+        dirs.extend(list(fixture_dirs))
         dirs.append('')
         dirs = [upath(os.path.abspath(os.path.realpath(d))) for d in dirs]
         return dirs

@@ -1,5 +1,3 @@
-.. _ref-geos:
-
 ========
 GEOS API
 ========
@@ -140,7 +138,7 @@ Geometry Objects
 ``GEOSGeometry``
 ----------------
 
-.. class:: GEOSGeometry(geo_input[, srid=None])
+.. class:: GEOSGeometry(geo_input, srid=None)
 
   :param geo_input: Geometry input value (string or buffer)
   :param srid: spatial reference identifier
@@ -482,7 +480,8 @@ the geometry.
 .. attribute:: GEOSGeometry.envelope
 
 Returns a :class:`Polygon` that represents the bounding envelope of
-this geometry.
+this geometry. Note that it can also return a :class:`Point` if the input
+geometry is a point.
 
 .. attribute:: GEOSGeometry.point_on_surface
 
@@ -550,16 +549,8 @@ is returned instead.
 
 .. note::
 
-    Requires GDAL.
-
-.. note::
-
-   Prior to 1.3, this method would silently no-op if GDAL was not available.
-   Now, a :class:`~django.contrib.gis.geos.GEOSException` is raised as
-   application code relying on this behavior is in error. In addition,
-   use of this method when the SRID is ``None`` or less than 0 now also generates
-   a :class:`~django.contrib.gis.geos.GEOSException`.
-
+    Requires GDAL. Raises :class:`~django.contrib.gis.geos.GEOSException` if
+    GDAL is not available or if the SRID is ``None`` or less than 0.
 
 ``Point``
 ---------
@@ -747,15 +738,11 @@ For example::
 
   .. method:: crosses(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: disjoint(other)
-
-    .. versionadded:: 1.7
 
     .. note::
 
@@ -765,23 +752,17 @@ For example::
 
   .. method:: overlaps(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: touches(other)
 
-    .. versionadded:: 1.7
-
     .. note::
 
        GEOS 3.3 is *required* to use this predicate.
 
   .. method:: within(other)
-
-    .. versionadded:: 1.7
 
     .. note::
 
@@ -801,7 +782,7 @@ Example::
     >>> from django.contrib.gis.geos import fromfile
     >>> g = fromfile('/home/bob/geom.wkt')
 
-.. function:: fromstr(string, [,srid=None])
+.. function:: fromstr(string, srid=None)
 
    :param string: string that contains spatial data
    :type string: string
@@ -953,7 +934,7 @@ Returns the WKT of the given geometry. Example::
 
 
 .. rubric:: Footnotes
-.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.refractions.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
+.. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.
 .. [#fncascadedunion] For more information, read Paul Ramsey's blog post about `(Much) Faster Unions in PostGIS 1.4 <http://blog.cleverelephant.ca/2009/01/must-faster-unions-in-postgis-14.html>`_ and Martin Davis' blog post on `Fast polygon merging in JTS using Cascaded Union <http://lin-ear-th-inking.blogspot.com/2007/11/fast-polygon-merging-in-jts-using.html>`_.
 
 Settings

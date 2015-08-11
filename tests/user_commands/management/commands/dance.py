@@ -15,5 +15,6 @@ class Command(BaseCommand):
         example = options["example"]
         if example == "raise":
             raise CommandError()
-        self.stdout.write("I don't feel like dancing %s." % options["style"])
-        self.stdout.write(','.join(options.keys()))
+        if options['verbosity'] > 0:
+            self.stdout.write("I don't feel like dancing %s." % options["style"])
+            self.stdout.write(','.join(options.keys()))

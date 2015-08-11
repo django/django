@@ -44,9 +44,11 @@ More details about how the caching works:
 """
 
 from django.conf import settings
-from django.core.cache import caches, DEFAULT_CACHE_ALIAS
-from django.utils.cache import (get_cache_key, get_max_age, has_vary_header,
-    learn_cache_key, patch_response_headers)
+from django.core.cache import DEFAULT_CACHE_ALIAS, caches
+from django.utils.cache import (
+    get_cache_key, get_max_age, has_vary_header, learn_cache_key,
+    patch_response_headers,
+)
 
 
 class UpdateCacheMiddleware(object):
@@ -63,12 +65,6 @@ class UpdateCacheMiddleware(object):
         self.key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
         self.cache_alias = settings.CACHE_MIDDLEWARE_ALIAS
         self.cache = caches[self.cache_alias]
-
-    def _session_accessed(self, request):
-        try:
-            return request.session.accessed
-        except AttributeError:
-            return False
 
     def _should_update_cache(self, request, response):
         return hasattr(request, '_cache_update_cache') and request._cache_update_cache
@@ -135,11 +131,11 @@ class FetchFromCacheMiddleware(object):
         if cache_key is None:
             request._cache_update_cache = True
             return None  # No cache information available, need to rebuild.
-        response = self.cache.get(cache_key, None)
+        response = self.cache.get(cache_key)
         # if it wasn't found and we are looking for a HEAD, try looking just for that
         if response is None and request.method == 'HEAD':
             cache_key = get_cache_key(request, self.key_prefix, 'HEAD', cache=self.cache)
-            response = self.cache.get(cache_key, None)
+            response = self.cache.get(cache_key)
 
         if response is None:
             request._cache_update_cache = True

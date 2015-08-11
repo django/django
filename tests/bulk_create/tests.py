@@ -3,10 +3,14 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from django.db import connection
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test import override_settings
+from django.test import (
+    TestCase, override_settings, skipIfDBFeature, skipUnlessDBFeature,
+)
 
-from .models import Country, Restaurant, Pizzeria, State, TwoFields
+from .models import (
+    Country, Pizzeria, ProxyCountry, ProxyMultiCountry, ProxyMultiProxyCountry,
+    ProxyProxyCountry, Restaurant, State, TwoFields,
+)
 
 
 class BulkCreateTests(TestCase):
@@ -34,21 +38,36 @@ class BulkCreateTests(TestCase):
         with self.assertNumQueries(1):
             Country.objects.bulk_create(self.data)
 
-    def test_inheritance(self):
-        Restaurant.objects.bulk_create([
-            Restaurant(name="Nicholas's")
-        ])
-        self.assertQuerysetEqual(Restaurant.objects.all(), [
-            "Nicholas's",
-        ], attrgetter("name"))
-        with self.assertRaises(ValueError):
+    def test_multi_table_inheritance_unsupported(self):
+        expected_message = "Can't bulk create a multi-table inherited model"
+        with self.assertRaisesMessage(ValueError, expected_message):
             Pizzeria.objects.bulk_create([
-                Pizzeria(name="The Art of Pizza")
+                Pizzeria(name="The Art of Pizza"),
             ])
-        self.assertQuerysetEqual(Pizzeria.objects.all(), [])
-        self.assertQuerysetEqual(Restaurant.objects.all(), [
-            "Nicholas's",
-        ], attrgetter("name"))
+        with self.assertRaisesMessage(ValueError, expected_message):
+            ProxyMultiCountry.objects.bulk_create([
+                ProxyMultiCountry(name="Fillory", iso_two_letter="FL"),
+            ])
+        with self.assertRaisesMessage(ValueError, expected_message):
+            ProxyMultiProxyCountry.objects.bulk_create([
+                ProxyMultiProxyCountry(name="Fillory", iso_two_letter="FL"),
+            ])
+
+    def test_proxy_inheritance_supported(self):
+        ProxyCountry.objects.bulk_create([
+            ProxyCountry(name="Qwghlm", iso_two_letter="QW"),
+            Country(name="Tortall", iso_two_letter="TA"),
+        ])
+        self.assertQuerysetEqual(ProxyCountry.objects.all(), {
+            "Qwghlm", "Tortall"
+        }, attrgetter("name"), ordered=False)
+
+        ProxyProxyCountry.objects.bulk_create([
+            ProxyProxyCountry(name="Neitherlands", iso_two_letter="NT"),
+        ])
+        self.assertQuerysetEqual(ProxyProxyCountry.objects.all(), {
+            "Qwghlm", "Tortall", "Neitherlands",
+        }, attrgetter("name"), ordered=False)
 
     def test_non_auto_increment_pk(self):
         State.objects.bulk_create([
@@ -116,7 +135,7 @@ class BulkCreateTests(TestCase):
             TwoFields.objects.bulk_create([
                 TwoFields(f1=i, f2=i + 1) for i in range(0, 1001)
             ])
-            self.assertTrue(len(connection.queries) < 10)
+            self.assertLess(len(connection.queries), 10)
 
     def test_large_batch_mixed(self):
         """
@@ -146,7 +165,7 @@ class BulkCreateTests(TestCase):
             TwoFields.objects.bulk_create([
                 TwoFields(id=i if i % 2 == 0 else None, f1=i, f2=i + 1)
                 for i in range(100000, 101000)])
-            self.assertTrue(len(connection.queries) < 10)
+            self.assertLess(len(connection.queries), 10)
 
     def test_explicit_batch_size(self):
         objs = [TwoFields(f1=i, f2=i) for i in range(0, 4)]

@@ -2,8 +2,11 @@ from __future__ import unicode_literals
 
 from django.apps.registry import Apps
 from django.db import models
+from django.db.utils import DatabaseError
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
+
+from .exceptions import MigrationSchemaMissing
 
 
 class MigrationRecorder(object):
@@ -11,7 +14,7 @@ class MigrationRecorder(object):
     Deals with storing migration records in the database.
 
     Because this table is actually itself used for dealing with model
-    creation, it's the one thing we can't do normally via syncdb or migrations.
+    creation, it's the one thing we can't do normally via migrations.
     We manually handle table creation/schema updating (using schema backend)
     and then have a floating model to do queries with.
 
@@ -49,8 +52,11 @@ class MigrationRecorder(object):
         if self.Migration._meta.db_table in self.connection.introspection.table_names(self.connection.cursor()):
             return
         # Make the table
-        with self.connection.schema_editor() as editor:
-            editor.create_model(self.Migration)
+        try:
+            with self.connection.schema_editor() as editor:
+                editor.create_model(self.Migration)
+        except DatabaseError as exc:
+            raise MigrationSchemaMissing("Unable to create the django_migrations table (%s)" % exc)
 
     def applied_migrations(self):
         """

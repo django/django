@@ -8,12 +8,13 @@ a list of all possible variables.
 
 import importlib
 import os
-import time     # Needed for Windows
+import time
+import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import LazyObject, empty
-from django.utils import six
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
@@ -74,9 +75,6 @@ class BaseSettings(object):
     def __setattr__(self, name, value):
         if name in ("MEDIA_URL", "STATIC_URL") and value and not value.endswith('/'):
             raise ImproperlyConfigured("If set, %s must end with a slash" % name)
-        elif name == "ALLOWED_INCLUDE_ROOTS" and isinstance(value, six.string_types):
-            raise ValueError("The ALLOWED_INCLUDE_ROOTS setting must be set "
-                "to a tuple, not a string.")
         object.__setattr__(self, name, value)
 
 
@@ -92,21 +90,36 @@ class Settings(BaseSettings):
 
         mod = importlib.import_module(self.SETTINGS_MODULE)
 
-        tuple_settings = ("INSTALLED_APPS", "TEMPLATE_DIRS", "LOCALE_PATHS")
+        tuple_settings = (
+            "ALLOWED_INCLUDE_ROOTS",
+            "INSTALLED_APPS",
+            "TEMPLATE_DIRS",
+            "LOCALE_PATHS",
+        )
         self._explicit_settings = set()
         for setting in dir(mod):
             if setting.isupper():
                 setting_value = getattr(mod, setting)
 
                 if (setting in tuple_settings and
-                        isinstance(setting_value, six.string_types)):
-                    raise ImproperlyConfigured("The %s setting must be a tuple. "
+                        not isinstance(setting_value, (list, tuple))):
+                    raise ImproperlyConfigured("The %s setting must be a list or a tuple. "
                             "Please fix your settings." % setting)
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
         if not self.SECRET_KEY:
             raise ImproperlyConfigured("The SECRET_KEY setting must not be empty.")
+
+        if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
+                'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):
+            warnings.warn(
+                "Session verification will become mandatory in Django 1.10. "
+                "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
+                "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
+                "reading the upgrade considerations in the 1.8 release notes.",
+                RemovedInDjango110Warning
+            )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find

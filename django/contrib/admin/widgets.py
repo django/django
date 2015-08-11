@@ -8,14 +8,18 @@ import copy
 from django import forms
 from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
-from django.forms.widgets import RadioFieldRenderer
+from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
-from django.utils.html import escape, format_html, format_html_join, smart_urlquote
+from django.forms.widgets import RadioFieldRenderer
+from django.template.loader import render_to_string
+from django.utils import six
+from django.utils.encoding import force_text
+from django.utils.html import (
+    escape, escapejs, format_html, format_html_join, smart_urlquote,
+)
+from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
-from django.utils.safestring import mark_safe
-from django.utils.encoding import force_text
-from django.utils import six
 
 
 class FilteredSelectMultiple(forms.SelectMultiple):
@@ -45,8 +49,8 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         output.append('<script type="text/javascript">addEvent(window, "load", function(e) {')
         # TODO: "id_" is hard-coded here. This should instead use the correct
         # API to determine the ID dynamically.
-        output.append('SelectFilter.init("id_%s", "%s", %s, "%s"); });</script>\n'
-            % (name, self.verbose_name.replace('"', '\\"'), int(self.is_stacked), static('admin/')))
+        output.append('SelectFilter.init("id_%s", "%s", %s); });</script>\n'
+            % (name, escapejs(self.verbose_name), int(self.is_stacked)))
         return mark_safe(''.join(output))
 
 
@@ -87,7 +91,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
         forms.MultiWidget.__init__(self, widgets, attrs)
 
     def format_output(self, rendered_widgets):
-        return format_html('<p class="datetime">{0} {1}<br />{2} {3}</p>',
+        return format_html('<p class="datetime">{} {}<br />{} {}</p>',
                            _('Date:'), rendered_widgets[0],
                            _('Time:'), rendered_widgets[1])
 
@@ -95,9 +99,9 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
 class AdminRadioFieldRenderer(RadioFieldRenderer):
     def render(self):
         """Outputs a <ul> for this set of radio fields."""
-        return format_html('<ul{0}>\n{1}\n</ul>',
+        return format_html('<ul{}>\n{}\n</ul>',
                            flatatt(self.attrs),
-                           format_html_join('\n', '<li>{0}</li>',
+                           format_html_join('\n', '<li>{}</li>',
                                             ((force_text(w),) for w in self)))
 
 
@@ -147,7 +151,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
         super(ForeignKeyRawIdWidget, self).__init__(attrs)
 
     def render(self, name, value, attrs=None):
-        rel_to = self.rel.to
+        rel_to = self.rel.model
         if attrs is None:
             attrs = {}
         extra = []
@@ -192,9 +196,9 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def label_for_value(self, value):
         key = self.rel.get_related_field().name
         try:
-            obj = self.rel.to._default_manager.using(self.db).get(**{key: value})
+            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
             return '&nbsp;<strong>%s</strong>' % escape(Truncator(obj).words(14, truncate='...'))
-        except (ValueError, self.rel.to.DoesNotExist):
+        except (ValueError, self.rel.model.DoesNotExist):
             return ''
 
 
@@ -206,7 +210,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
     def render(self, name, value, attrs=None):
         if attrs is None:
             attrs = {}
-        if self.rel.to in self.admin_site._registry:
+        if self.rel.model in self.admin_site._registry:
             # The related object is registered with the same AdminSite
             attrs['class'] = 'vManyToManyRawIdAdminField'
         if value:
@@ -232,7 +236,10 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     This class is a wrapper to a given widget to add the add icon for the
     admin interface.
     """
-    def __init__(self, widget, rel, admin_site, can_add_related=None):
+    template = 'admin/related_widget_wrapper.html'
+
+    def __init__(self, widget, rel, admin_site, can_add_related=None,
+                 can_change_related=False, can_delete_related=False):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
         self.choices = widget.choices
@@ -241,8 +248,14 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel.to in admin_site._registry
+            can_add_related = rel.model in admin_site._registry
         self.can_add_related = can_add_related
+        # XXX: The UX does not support multiple selected values.
+        multiple = getattr(widget, 'allow_multiple_selected', False)
+        self.can_change_related = not multiple and can_change_related
+        # XXX: The deletion UX can be confusing when dealing with cascading deletion.
+        cascade = getattr(rel, 'on_delete', None) is CASCADE
+        self.can_delete_related = not multiple and not cascade and can_delete_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
@@ -261,20 +274,44 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def media(self):
         return self.widget.media
 
+    def get_related_url(self, info, action, *args):
+        return reverse("admin:%s_%s_%s" % (info + (action,)),
+                       current_app=self.admin_site.name, args=args)
+
     def render(self, name, value, *args, **kwargs):
-        from django.contrib.admin.views.main import TO_FIELD_VAR
+        from django.contrib.admin.views.main import IS_POPUP_VAR, TO_FIELD_VAR
+        rel_opts = self.rel.model._meta
+        info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
-        output = [self.widget.render(name, value, *args, **kwargs)]
+        url_params = '&'.join("%s=%s" % param for param in [
+            (TO_FIELD_VAR, self.rel.get_related_field().name),
+            (IS_POPUP_VAR, 1),
+        ])
+        context = {
+            'widget': self.widget.render(name, value, *args, **kwargs),
+            'name': name,
+            'url_params': url_params,
+            'model': rel_opts.verbose_name,
+        }
+        if self.can_change_related:
+            change_related_template_url = self.get_related_url(info, 'change', '__fk__')
+            context.update(
+                can_change_related=True,
+                change_related_template_url=change_related_template_url,
+            )
         if self.can_add_related:
-            rel_to = self.rel.to
-            info = (rel_to._meta.app_label, rel_to._meta.model_name)
-            related_url = reverse('admin:%s_%s_add' % info, current_app=self.admin_site.name)
-            url_params = '?%s=%s' % (TO_FIELD_VAR, self.rel.get_related_field().name)
-            # TODO: "add_id_" is hard-coded here. This should instead use the
-            # correct API to determine the ID dynamically.
-            output.append('<a href="%s%s" class="add-another" id="add_id_%s" title="%s"></a>'
-                          % (related_url, url_params, name, _('Add Another')))
-        return mark_safe(''.join(output))
+            add_related_url = self.get_related_url(info, 'add')
+            context.update(
+                can_add_related=True,
+                add_related_url=add_related_url,
+            )
+        if self.can_delete_related:
+            delete_related_template_url = self.get_related_url(info, 'delete', '__fk__')
+            context.update(
+                can_delete_related=True,
+                delete_related_template_url=delete_related_template_url,
+            )
+        return mark_safe(render_to_string(self.template, context))
 
     def build_attrs(self, extra_attrs=None, **kwargs):
         "Helper function for building an attribute dictionary."
@@ -325,7 +362,7 @@ class AdminURLFieldWidget(forms.URLInput):
             value = force_text(self._format_value(value))
             final_attrs = {'href': smart_urlquote(value)}
             html = format_html(
-                '<p class="url">{0} <a{1}>{2}</a><br />{3} {4}</p>',
+                '<p class="url">{} <a{}>{}</a><br />{} {}</p>',
                 _('Currently:'), flatatt(final_attrs), value,
                 _('Change:'), html
             )

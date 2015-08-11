@@ -41,8 +41,8 @@ class ManyToManyRel(models.Model):
 
 
 class FKRel(models.Model):
-    thing1 = models.ForeignKey(ThingWithIterableChoices, related_name='+')
-    thing2 = models.ForeignKey(ThingWithIterableChoices, related_name='+')
+    thing1 = models.ForeignKey(ThingWithIterableChoices, models.CASCADE, related_name='+')
+    thing2 = models.ForeignKey(ThingWithIterableChoices, models.CASCADE, related_name='+')
 
     class Meta:
         # Models created as unmanaged as these aren't ever queried

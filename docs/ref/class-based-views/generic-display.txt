@@ -59,7 +59,7 @@ DetailView
         from article.views import ArticleDetailView
 
         urlpatterns = [
-            url(r'^(?P<slug>[-_\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
+            url(r'^(?P<slug>[-\w]+)/$', ArticleDetailView.as_view(), name='article-detail'),
         ]
 
     **Example myapp/article_detail.html**:

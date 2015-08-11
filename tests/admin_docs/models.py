@@ -18,10 +18,28 @@ class Family(models.Model):
 
 
 class Person(models.Model):
+    """
+    Stores information about a person, related to :model:`myapp.Company`.
+
+    **Notes**
+
+    Use ``save_changes()`` when saving this object.
+
+    ``company``
+        Field storing :model:`myapp.Company` where the person works.
+
+    (DESCRIPTION)
+
+    .. raw:: html
+        :file: admin_docs/evilfile.txt
+
+    .. include:: admin_docs/evilfile.txt
+
+    """
     first_name = models.CharField(max_length=200, help_text="The person's first name")
     last_name = models.CharField(max_length=200, help_text="The person's last name")
-    company = models.ForeignKey(Company, help_text="place of work")
-    family = models.ForeignKey(Family, related_name='+', null=True)
+    company = models.ForeignKey(Company, models.CASCADE, help_text="place of work")
+    family = models.ForeignKey(Family, models.SET_NULL, related_name='+', null=True)
     groups = models.ManyToManyField(Group, help_text="has membership")
 
     def _get_full_name(self):

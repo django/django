@@ -12,6 +12,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class Employee(models.Model):
     firstname = models.CharField(max_length=50)
     lastname = models.CharField(max_length=50)
+    salary = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return '%s %s' % (self.firstname, self.lastname)
@@ -24,9 +25,11 @@ class Company(models.Model):
     num_chairs = models.PositiveIntegerField()
     ceo = models.ForeignKey(
         Employee,
+        models.CASCADE,
         related_name='company_ceo_set')
     point_of_contact = models.ForeignKey(
         Employee,
+        models.SET_NULL,
         related_name='company_point_of_contact_set',
         null=True)
 
@@ -47,6 +50,7 @@ class Experiment(models.Model):
     name = models.CharField(max_length=24)
     assigned = models.DateField()
     completed = models.DateField()
+    estimated_time = models.DurationField()
     start = models.DateTimeField()
     end = models.DateTimeField()
 
@@ -55,3 +59,19 @@ class Experiment(models.Model):
 
     def duration(self):
         return self.end - self.start
+
+
+@python_2_unicode_compatible
+class Time(models.Model):
+    time = models.TimeField(null=True)
+
+    def __str__(self):
+        return "%s" % self.time
+
+
+@python_2_unicode_compatible
+class UUID(models.Model):
+    uuid = models.UUIDField(null=True)
+
+    def __str__(self):
+        return "%s" % self.uuid

@@ -3,15 +3,7 @@ Providing initial data for models
 =================================
 
 It's sometimes useful to pre-populate your database with hard-coded data when
-you're first setting up an app. There's a couple of ways you can have Django
-automatically create this data: you can provide `initial data via fixtures`_, or
-you can provide `initial data as SQL`_.
-
-In general, using a fixture is a cleaner method since it's database-agnostic,
-but initial SQL is also quite a bit more flexible.
-
-.. _initial data as sql: `providing initial sql data`_
-.. _initial data via fixtures: `providing initial data with fixtures`_
+you're first setting up an app. You can provide initial data via fixtures.
 
 .. _initial-data-via-fixtures:
 
@@ -76,21 +68,6 @@ from the fixture and re-loaded into the database. Note this means that if you
 change one of the rows created by a fixture and then run :djadmin:`loaddata`
 again, you'll wipe out any changes you've made.
 
-Automatically loading initial data fixtures
--------------------------------------------
-
-.. deprecated:: 1.7
-
-    If an application uses migrations, there is no automatic loading of
-    fixtures. Since migrations will be required for applications in Django 2.0,
-    this behavior is considered deprecated. If you want to load initial data
-    for an app, consider doing it in a :ref:`data migration <data-migrations>`.
-
-If you create a fixture named ``initial_data.[xml/yaml/json]``, that fixture will
-be loaded every time you run :djadmin:`migrate`. This is extremely convenient,
-but be careful: remember that the data will be refreshed *every time* you run
-:djadmin:`migrate`. So don't use ``initial_data`` for data you'll want to edit.
-
 Where Django finds fixture files
 --------------------------------
 
@@ -106,77 +83,3 @@ directories.
 
     Fixtures are also used by the :ref:`testing framework
     <topics-testing-fixtures>` to help set up a consistent test environment.
-
-.. _initial-sql:
-
-Providing initial SQL data
-==========================
-
-.. deprecated:: 1.7
-
-    If an application uses migrations, there is no loading of initial SQL data
-    (including backend-specific SQL data). Since migrations will be required
-    for applications in Django 2.0, this behavior is considered deprecated.
-    If you want to use initial SQL for an app, consider doing it in a
-    :ref:`data migration <data-migrations>`.
-
-Django provides a hook for passing the database arbitrary SQL that's executed
-just after the CREATE TABLE statements when you run :djadmin:`migrate`. You can
-use this hook to populate default records, or you could also create SQL
-functions, views, triggers, etc.
-
-The hook is simple: Django just looks for a file called ``sql/<modelname>.sql``,
-in your app directory, where ``<modelname>`` is the model's name in lowercase.
-
-So, if you had a ``Person`` model in an app called ``myapp``, you could add
-arbitrary SQL to the file ``sql/person.sql`` inside your ``myapp`` directory.
-Here's an example of what the file might contain:
-
-.. code-block:: sql
-
-    INSERT INTO myapp_person (first_name, last_name) VALUES ('John', 'Lennon');
-    INSERT INTO myapp_person (first_name, last_name) VALUES ('Paul', 'McCartney');
-
-Each SQL file, if given, is expected to contain valid SQL statements
-which will insert the desired data (e.g., properly-formatted
-``INSERT`` statements separated by semicolons).
-
-The SQL files are read by the :djadmin:`sqlcustom` and :djadmin:`sqlall`
-commands in :doc:`manage.py </ref/django-admin>`. Refer to the :doc:`manage.py
-documentation </ref/django-admin>` for more information.
-
-Note that if you have multiple SQL data files, there's no guarantee of
-the order in which they're executed. The only thing you can assume is
-that, by the time your custom data files are executed, all the
-database tables already will have been created.
-
-.. admonition:: Initial SQL data and testing
-
-    This technique *cannot* be used to provide initial data for
-    testing purposes. Django's test framework flushes the contents of
-    the test database after each test; as a result, any data added
-    using the custom SQL hook will be lost.
-
-    If you require data for a test case, you should add it using
-    either a :ref:`test fixture <topics-testing-fixtures>`, or
-    programmatically add it during the ``setUp()`` of your test case.
-
-Database-backend-specific SQL data
-----------------------------------
-
-There's also a hook for backend-specific SQL data. For example, you
-can have separate initial-data files for PostgreSQL and SQLite. For
-each app, Django looks for a file called
-``<app_label>/sql/<modelname>.<backend>.sql``, where ``<app_label>`` is
-your app directory, ``<modelname>`` is the model's name in lowercase
-and ``<backend>`` is the last part of the module name provided for the
-:setting:`ENGINE <DATABASE-ENGINE>` in your settings file (e.g., if you have
-defined a database with an :setting:`ENGINE <DATABASE-ENGINE>` value of
-``django.db.backends.sqlite3``, Django will look for
-``<app_label>/sql/<modelname>.sqlite3.sql``).
-
-Backend-specific SQL data is executed before non-backend-specific SQL
-data. For example, if your app contains the files ``sql/person.sql``
-and ``sql/person.sqlite3.sql`` and you're installing the app on
-SQLite, Django will execute the contents of
-``sql/person.sqlite3.sql`` first, then ``sql/person.sql``.

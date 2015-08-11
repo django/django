@@ -9,7 +9,7 @@
     <span class="small quiet">{% blocktrans count counter=cl.result_count %}{{ counter }} result{% plural %}{{ counter }} results{% endblocktrans %} (<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% if cl.show_full_result_count %}{% blocktrans with full_result_count=cl.full_result_count %}{{ full_result_count }} total{% endblocktrans %}{% else %}{% trans "Show all" %}{% endif %}</a>)</span>
 {% endif %}
 {% for pair in cl.params.items %}
-    {% ifnotequal pair.0 search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endifnotequal %}
+    {% if pair.0 != search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endif %}
 {% endfor %}
 </div>
 </form></div>

@@ -5,6 +5,11 @@ Advice for new contributors
 New contributor and not sure what to do? Want to help but just don't know how
 to get started? This is the section for you.
 
+.. admonition:: Basic tools and workflow
+
+    If you are new to contributing to Django, the :doc:`/intro/contributing`
+    tutorial will give you an introduction to the tools and the workflow.
+
 First steps
 -----------
 
@@ -31,9 +36,10 @@ Start with these easy tasks to discover Django's development process.
 
   Mark the appropriate flags if a patch needs docs or tests. Look through the
   changes a patch makes, and keep an eye out for syntax that is incompatible
-  with older but still supported versions of Python. Run the tests and make
-  sure they pass on your system.  Where possible and relevant, try them out on
-  a database other than SQLite. Leave comments and feedback!
+  with older but still supported versions of Python. :doc:`Run the tests
+  </internals/contributing/writing-code/unit-tests>` and make sure they pass.
+  Where possible and relevant, try them out on a database other than SQLite.
+  Leave comments and feedback!
 
 * **Keep old patches up to date**
 

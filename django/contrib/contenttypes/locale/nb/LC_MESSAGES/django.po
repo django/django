@@ -3,15 +3,15 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jonklo@gmail.com>, 2012
+# Jon <jon@funkbit.no>, 2012
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-30 14:15+0000\n"
-"Last-Translator: jensadne <jensadne@pvv.ntnu.no>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -20,33 +20,26 @@ msgstr ""
 "Language: nb\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "Innholdstyper"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "python-modellklassenavn"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "innholdstype"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "innholdstyper"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Innholdstype %(ct_id)s objekt har ingen assosiert model"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Innholdstype %(ct_id)s objekt %(obj_id)s finnes ikke"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s-objekter har ikke get_absolute_url()-metode"

@@ -66,6 +66,14 @@ Adds a few conveniences for perfectionists:
   for each request by MD5-hashing the page content, and it'll take care of
   sending ``Not Modified`` responses, if appropriate.
 
+.. attribute:: CommonMiddleware.response_redirect_class
+
+.. versionadded:: 1.8
+
+Defaults to :class:`~django.http.HttpResponsePermanentRedirect`. Subclass
+``CommonMiddleware`` and override the attribute to customize the redirects
+issued by the middleware.
+
 .. class:: BrokenLinkEmailsMiddleware
 
 * Sends broken link notification emails to :setting:`MANAGERS` (see
@@ -231,7 +239,7 @@ be vulnerable via an insecure connection to a subdomain.
     it may be because Django doesn't realize that it's on a secure connection;
     you may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _"Strict-Transport-Security" header: http://en.wikipedia.org/wiki/Strict_Transport_Security
+.. _"Strict-Transport-Security" header: https://en.wikipedia.org/wiki/Strict_Transport_Security
 
 .. _x-content-type-options:
 
@@ -244,7 +252,7 @@ sites with improperly configured servers, it can also pose a security
 risk.
 
 If your site serves user-uploaded files, a malicious user could upload a
-specially-crafted file that would be interpreted as HTML or Javascript by
+specially-crafted file that would be interpreted as HTML or JavaScript by
 the browser when you expected it to be something harmless.
 
 To learn more about this header and how the browser treats it, you can
@@ -272,8 +280,8 @@ setting will be useful.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for Javascript content in the GET or POST
-parameters of a page. If the Javascript is replayed in the server's response,
+attack`_. They work by looking for JavaScript content in the GET or POST
+parameters of a page. If the JavaScript is replayed in the server's response,
 the page is blocked from rendering and an error page is shown instead.
 
 The `X-XSS-Protection header`_ is used to control the operation of the
@@ -290,7 +298,7 @@ header. ``SecurityMiddleware`` will do this for all responses if the
     browsers support the header. Ensure you are still :ref:`validating and
     sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
 
-.. _XSS attack: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
 .. _X-XSS-Protection header: http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-iv-the-xss-filter.aspx
 
 .. _ssl-redirect:
@@ -346,8 +354,6 @@ Site middleware
 
 .. class:: CurrentSiteMiddleware
 
-.. versionadded:: 1.7
-
 Adds the ``site`` attribute representing the current site to every incoming
 ``HttpRequest`` object. See the :ref:`sites documentation <site-middleware>`.
 
@@ -368,9 +374,15 @@ every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
 Middleware for utilizing Web server provided authentication. See
 :doc:`/howto/auth-remote-user` for usage details.
 
-.. class:: SessionAuthenticationMiddleware
+.. class:: PersistentRemoteUserMiddleware
 
-.. versionadded:: 1.7
+.. versionadded:: 1.9
+
+Middleware for utilizing Web server provided authentication when enabled only
+on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
+details.
+
+.. class:: SessionAuthenticationMiddleware
 
 Allows a user's sessions to be invalidated when their password changes. See
 :ref:`session-invalidation-on-password-change` for details. This middleware must
@@ -388,7 +400,7 @@ CSRF protection middleware
 
 Adds protection against Cross Site Request Forgeries by adding hidden form
 fields to POST forms and checking requests for the correct value. See the
-:doc:`Cross Site Request Forgery protection documentation </ref/contrib/csrf>`.
+:doc:`Cross Site Request Forgery protection documentation </ref/csrf>`.
 
 X-Frame-Options middleware
 --------------------------
@@ -406,6 +418,12 @@ Middleware ordering
 ===================
 
 Here are some hints about the ordering of various Django middleware classes:
+
+#. :class:`~django.middleware.security.SecurityMiddleware`
+
+   It should go near the top of the list if you're going to turn on the SSL
+   redirect as that avoids running through a bunch of other unnecessary
+   middleware.
 
 #. :class:`~django.middleware.cache.UpdateCacheMiddleware`
 
@@ -430,7 +448,7 @@ Here are some hints about the ordering of various Django middleware classes:
 #. :class:`~django.middleware.locale.LocaleMiddleware`
 
    One of the topmost, after ``SessionMiddleware`` (uses session data) and
-   ``CacheMiddleware`` (modifies ``Vary`` header).
+   ``UpdateCacheMiddleware`` (modifies ``Vary`` header).
 
 #. :class:`~django.middleware.common.CommonMiddleware`
 

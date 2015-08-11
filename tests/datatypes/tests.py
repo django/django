@@ -14,7 +14,7 @@ class DataTypesTestCase(TestCase):
     def test_boolean_type(self):
         d = Donut(name='Apple Fritter')
         self.assertFalse(d.is_frosted)
-        self.assertTrue(d.has_sprinkles is None)
+        self.assertIsNone(d.has_sprinkles)
         d.has_sprinkles = True
         self.assertTrue(d.has_sprinkles)
 
@@ -93,4 +93,5 @@ class DataTypesTestCase(TestCase):
         self.assertIsInstance(b.baked_timestamp, datetime.datetime)
         # We need to test this way because datetime.datetime inherits
         # from datetime.date:
-        self.assertIsInstance(b.baked_date, datetime.date) and not isinstance(b.baked_date, datetime.datetime)
+        self.assertIsInstance(b.baked_date, datetime.date)
+        self.assertNotIsInstance(b.baked_date, datetime.datetime)

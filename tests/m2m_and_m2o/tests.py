@@ -1,10 +1,16 @@
 from django.db.models import Q
 from django.test import TestCase
 
-from .models import Issue, User, UnicodeReferenceModel
+from .models import Issue, UnicodeReferenceModel, User
 
 
 class RelatedObjectTests(TestCase):
+
+    def test_related_objects_have_name_attribute(self):
+        for field_name in ('test_issue_client', 'test_issue_cc'):
+            obj = User._meta.get_field(field_name)
+            self.assertEqual(field_name, obj.field.related_query_name())
+
     def test_m2m_and_m2o(self):
         r = User.objects.create(username="russell")
         g = User.objects.create(username="gustav")

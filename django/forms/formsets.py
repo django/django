@@ -2,16 +2,16 @@ from __future__ import unicode_literals
 
 from django.core.exceptions import ValidationError
 from django.forms import Form
-from django.forms.fields import IntegerField, BooleanField
+from django.forms.fields import BooleanField, IntegerField
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
+from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import cached_property
+from django.utils.html import html_safe
 from django.utils.safestring import mark_safe
-from django.utils import six
-from django.utils.six.moves import xrange
-from django.utils.translation import ungettext, ugettext as _
-
+from django.utils.six.moves import range
+from django.utils.translation import ugettext as _, ungettext
 
 __all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
 
@@ -47,19 +47,21 @@ class ManagementForm(Form):
         super(ManagementForm, self).__init__(*args, **kwargs)
 
 
+@html_safe
 @python_2_unicode_compatible
 class BaseFormSet(object):
     """
     A collection of instances of the same Form class.
     """
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
-                 initial=None, error_class=ErrorList):
+                 initial=None, error_class=ErrorList, form_kwargs=None):
         self.is_bound = data is not None or files is not None
         self.prefix = prefix or self.get_default_prefix()
         self.auto_id = auto_id
         self.data = data or {}
         self.files = files or {}
         self.initial = initial
+        self.form_kwargs = form_kwargs or {}
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
@@ -138,8 +140,18 @@ class BaseFormSet(object):
         Instantiate forms at first property access.
         """
         # DoS protection is included in total_form_count()
-        forms = [self._construct_form(i) for i in xrange(self.total_form_count())]
+        forms = [self._construct_form(i, **self.get_form_kwargs(i))
+                 for i in range(self.total_form_count())]
         return forms
+
+    def get_form_kwargs(self, index):
+        """
+        Return additional keyword arguments for each individual formset form.
+
+        index will be None if the form being constructed is a new empty
+        form.
+        """
+        return self.form_kwargs.copy()
 
     def _construct_form(self, i, **kwargs):
         """
@@ -183,6 +195,7 @@ class BaseFormSet(object):
             auto_id=self.auto_id,
             prefix=self.add_prefix('__prefix__'),
             empty_permitted=True,
+            **self.get_form_kwargs(None)
         )
         self.add_fields(form, None)
         return form

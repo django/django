@@ -1,16 +1,18 @@
 import os
 import re
+import warnings
 from ctypes import c_char_p
 
-from django.core.validators import ipv4_re
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
 from django.contrib.gis.geoip.prototypes import (
-    GeoIP_open, GeoIP_delete, GeoIP_database_info,
-    GeoIP_lib_version, GeoIP_record_by_addr, GeoIP_record_by_name,
     GeoIP_country_code_by_addr, GeoIP_country_code_by_name,
-    GeoIP_country_name_by_addr, GeoIP_country_name_by_name)
-
+    GeoIP_country_name_by_addr, GeoIP_country_name_by_name,
+    GeoIP_database_info, GeoIP_delete, GeoIP_lib_version, GeoIP_open,
+    GeoIP_record_by_addr, GeoIP_record_by_name,
+)
+from django.core.validators import ipv4_re
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 
 # Regular expressions for recognizing the GeoIP free database editions.
@@ -18,7 +20,6 @@ free_regex = re.compile(r'^GEO-\d{3}FREE')
 lite_regex = re.compile(r'^GEO-\d{3}LITE')
 
 
-#### GeoIP classes ####
 class GeoIPException(Exception):
     pass
 
@@ -48,7 +49,7 @@ class GeoIP(object):
     GEOIP_CHECK_CACHE = 2
     GEOIP_INDEX_CACHE = 4
     GEOIP_MMAP_CACHE = 8
-    cache_options = dict((opt, None) for opt in (0, 1, 2, 4, 8))
+    cache_options = {opt: None for opt in (0, 1, 2, 4, 8)}
 
     # Paths to the city & country binary databases.
     _city_file = ''
@@ -82,6 +83,13 @@ class GeoIP(object):
         * city: The name of the GeoIP city data file.  Defaults to
             'GeoLiteCity.dat'; overrides the GEOIP_CITY settings attribute.
         """
+
+        warnings.warn(
+            "django.contrib.gis.geoip is deprecated in favor of "
+            "django.contrib.gis.geoip2 and the MaxMind GeoLite2 database "
+            "format.", RemovedInDjango20Warning, 2
+        )
+
         # Checking the given cache option.
         if cache in self.cache_options:
             self._cache = cache
@@ -90,7 +98,7 @@ class GeoIP(object):
 
         # Getting the GeoIP data path.
         if not path:
-            path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
+            path = GEOIP_SETTINGS.get('GEOIP_PATH')
             if not path:
                 raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, six.string_types):
@@ -201,7 +209,7 @@ class GeoIP(object):
                 'country_name': self.country_name(query),
                 }
 
-    #### Coordinate retrieval routines ####
+    # #### Coordinate retrieval routines ####
     def coords(self, query, ordering=('longitude', 'latitude')):
         cdict = self.city(query)
         if cdict is None:
@@ -226,7 +234,7 @@ class GeoIP(object):
         else:
             return None
 
-    #### GeoIP Database Information Routines ####
+    # #### GeoIP Database Information Routines ####
     @property
     def country_info(self):
         "Returns information about the GeoIP country database."
@@ -238,7 +246,7 @@ class GeoIP(object):
 
     @property
     def city_info(self):
-        "Retuns information about the GeoIP city database."
+        "Returns information about the GeoIP city database."
         if self._city is None:
             ci = 'No GeoIP City data in "%s"' % self._city_file
         else:
@@ -253,7 +261,7 @@ class GeoIP(object):
             info += 'GeoIP Library:\n\t%s\n' % GeoIP_lib_version()
         return info + 'Country:\n\t%s\nCity:\n\t%s' % (self.country_info, self.city_info)
 
-    #### Methods for compatibility w/the GeoIP-Python API. ####
+    # #### Methods for compatibility w/the GeoIP-Python API. ####
     @classmethod
     def open(cls, full_path, cache):
         return GeoIP(full_path, cache)

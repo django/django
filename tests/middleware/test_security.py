@@ -1,9 +1,9 @@
 from django.http import HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 from django.test.utils import override_settings
 
 
-class SecurityMiddlewareTest(TestCase):
+class SecurityMiddlewareTest(SimpleTestCase):
     @property
     def middleware(self):
         from django.middleware.security import SecurityMiddleware
@@ -152,7 +152,7 @@ class SecurityMiddlewareTest(TestCase):
         With BROWSER_XSS_FILTER set to False, the middleware does not add an
         "x-xss-protection" header to the response.
         """
-        self.assertFalse("x-xss-protection" in self.process_response())
+        self.assertNotIn("x-xss-protection", self.process_response())
 
     @override_settings(SECURE_SSL_REDIRECT=True)
     def test_ssl_redirect_on(self):

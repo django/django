@@ -1,18 +1,11 @@
-from django.db.backends.creation import NO_DB_ALIAS
-from django.db.backends.postgresql_psycopg2.base import (
-    DatabaseWrapper as Psycopg2DatabaseWrapper,
-    DatabaseFeatures as Psycopg2DatabaseFeatures
-)
-from django.contrib.gis.db.backends.base import BaseSpatialFeatures
-from django.contrib.gis.db.backends.postgis.creation import PostGISCreation
-from django.contrib.gis.db.backends.postgis.introspection import PostGISIntrospection
-from django.contrib.gis.db.backends.postgis.operations import PostGISOperations
-from django.contrib.gis.db.backends.postgis.schema import PostGISSchemaEditor
+from django.db.backends.base.base import NO_DB_ALIAS
+from django.db.backends.postgresql.base import \
+    DatabaseWrapper as Psycopg2DatabaseWrapper
 
-
-class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
-    supports_3d_functions = True
-    supports_left_right_lookups = True
+from .features import DatabaseFeatures
+from .introspection import PostGISIntrospection
+from .operations import PostGISOperations
+from .schema import PostGISSchemaEditor
 
 
 class DatabaseWrapper(Psycopg2DatabaseWrapper):
@@ -22,6 +15,11 @@ class DatabaseWrapper(Psycopg2DatabaseWrapper):
         super(DatabaseWrapper, self).__init__(*args, **kwargs)
         if kwargs.get('alias', '') != NO_DB_ALIAS:
             self.features = DatabaseFeatures(self)
-            self.creation = PostGISCreation(self)
             self.ops = PostGISOperations(self)
             self.introspection = PostGISIntrospection(self)
+
+    def prepare_database(self):
+        super(DatabaseWrapper, self).prepare_database()
+        # Check that postgis extension is installed.
+        with self.cursor() as cursor:
+            cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")

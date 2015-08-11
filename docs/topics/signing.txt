@@ -114,6 +114,7 @@ Verifying timestamped values
 timestamp to the value. This allows you to confirm that a signed value was
 created within a specified period of time::
 
+    >>> from datetime import timedelta
     >>> from django.core.signing import TimestampSigner
     >>> signer = TimestampSigner()
     >>> value = signer.sign('hello')
@@ -126,6 +127,8 @@ created within a specified period of time::
     SignatureExpired: Signature age 15.5289158821 > 10 seconds
     >>> signer.unsign(value, max_age=20)
     'hello'
+    >>> signer.unsign(value, max_age=timedelta(seconds=20))
+    'hello'
 
 .. class:: TimestampSigner(key=None, sep=':', salt=None)
 
@@ -136,7 +139,12 @@ created within a specified period of time::
     .. method:: unsign(value, max_age=None)
 
         Checks if ``value`` was signed less than ``max_age`` seconds ago,
-        otherwise raises ``SignatureExpired``.
+        otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
+        accept an integer or a :py:class:`datetime.timedelta` object.
+
+        .. versionchanged:: 1.8
+
+            Previously, the ``max_age`` parameter only accepted an integer.
 
 Protecting complex data structures
 ----------------------------------

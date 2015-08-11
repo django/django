@@ -32,7 +32,7 @@ class Command(BaseCommand):
         else:
             app_configs = None
 
-        tags = options.get('tags', None)
+        tags = options.get('tags')
         if tags:
             try:
                 invalid_tag = next(

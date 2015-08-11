@@ -7,10 +7,7 @@ Synchronization primitives:
 """
 
 import contextlib
-try:
-    import threading
-except ImportError:
-    import dummy_threading as threading
+import threading
 
 
 class RWLock(object):

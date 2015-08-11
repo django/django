@@ -1,19 +1,13 @@
-from django.db import models
 from django.contrib.auth.models import (
-    BaseUserManager,
-    AbstractBaseUser,
-    AbstractUser,
-    UserManager,
-    PermissionsMixin,
-    Group,
-    Permission,
+    AbstractBaseUser, AbstractUser, BaseUserManager, Group, Permission,
+    PermissionsMixin, UserManager,
 )
+from django.db import models
 
 
 # The custom User uses email as the unique identifier, and requires
 # that every user provide a date of birth. This lets us test
 # changes in username datatype, and non-text required fields.
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, date_of_birth, password=None):
         """
@@ -36,18 +30,6 @@ class CustomUserManager(BaseUserManager):
         u.is_admin = True
         u.save(using=self._db)
         return u
-
-
-class CustomUserWithFKManager(BaseUserManager):
-    def create_superuser(self, username, email, group, password):
-        user = self.model(username_id=username, email_id=email, group_id=group)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-
-class Email(models.Model):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
 
 
 class CustomUser(AbstractBaseUser):
@@ -95,132 +77,37 @@ class CustomUser(AbstractBaseUser):
         return self.is_admin
 
 
-class CustomUserWithFK(AbstractBaseUser):
-    username = models.ForeignKey(Email, related_name='primary')
-    email = models.ForeignKey(Email, to_field='email', related_name='secondary')
-    group = models.ForeignKey(Group)
+class RemoveGroupsAndPermissions(object):
+    """
+    A context manager to temporarily remove the groups and user_permissions M2M
+    fields from the AbstractUser class, so they don't clash with the
+    related_name sets.
+    """
+    def __enter__(self):
+        self._old_au_local_m2m = AbstractUser._meta.local_many_to_many
+        self._old_pm_local_m2m = PermissionsMixin._meta.local_many_to_many
+        groups = models.ManyToManyField(Group, blank=True)
+        groups.contribute_to_class(PermissionsMixin, "groups")
+        user_permissions = models.ManyToManyField(Permission, blank=True)
+        user_permissions.contribute_to_class(PermissionsMixin, "user_permissions")
+        PermissionsMixin._meta.local_many_to_many = [groups, user_permissions]
+        AbstractUser._meta.local_many_to_many = [groups, user_permissions]
 
-    custom_objects = CustomUserWithFKManager()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', 'group']
-
-    class Meta:
-        app_label = 'auth'
-
-
-# At this point, temporarily remove the groups and user_permissions M2M
-# fields from the AbstractUser class, so they don't clash with the related_name
-# that sets.
-
-old_au_local_m2m = AbstractUser._meta.local_many_to_many
-old_pm_local_m2m = PermissionsMixin._meta.local_many_to_many
-groups = models.ManyToManyField(Group, blank=True)
-groups.contribute_to_class(PermissionsMixin, "groups")
-user_permissions = models.ManyToManyField(Permission, blank=True)
-user_permissions.contribute_to_class(PermissionsMixin, "user_permissions")
-PermissionsMixin._meta.local_many_to_many = [groups, user_permissions]
-AbstractUser._meta.local_many_to_many = [groups, user_permissions]
+    def __exit__(self, exc_type, exc_value, traceback):
+        AbstractUser._meta.local_many_to_many = self._old_au_local_m2m
+        PermissionsMixin._meta.local_many_to_many = self._old_pm_local_m2m
 
 
 # The extension user is a simple extension of the built-in user class,
 # adding a required date_of_birth field. This allows us to check for
 # any hard references to the name "User" in forms/handlers etc.
+with RemoveGroupsAndPermissions():
+    class ExtensionUser(AbstractUser):
+        date_of_birth = models.DateField()
 
-class ExtensionUser(AbstractUser):
-    date_of_birth = models.DateField()
+        custom_objects = UserManager()
 
-    custom_objects = UserManager()
+        REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
 
-    REQUIRED_FIELDS = AbstractUser.REQUIRED_FIELDS + ['date_of_birth']
-
-    class Meta:
-        app_label = 'auth'
-
-
-# The CustomPermissionsUser users email as the identifier, but uses the normal
-# Django permissions model. This allows us to check that the PermissionsMixin
-# includes everything that is needed to interact with the ModelBackend.
-
-class CustomPermissionsUserManager(CustomUserManager):
-    def create_superuser(self, email, password, date_of_birth):
-        u = self.create_user(email, password=password, date_of_birth=date_of_birth)
-        u.is_superuser = True
-        u.save(using=self._db)
-        return u
-
-
-class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
-    date_of_birth = models.DateField()
-
-    custom_objects = CustomPermissionsUserManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['date_of_birth']
-
-    class Meta:
-        app_label = 'auth'
-
-    def get_full_name(self):
-        return self.email
-
-    def get_short_name(self):
-        return self.email
-
-    def __unicode__(self):
-        return self.email
-
-
-class IsActiveTestUser1(AbstractBaseUser):
-    """
-    This test user class and derivatives test the default is_active behavior
-    """
-    username = models.CharField(max_length=30, unique=True)
-
-    custom_objects = BaseUserManager()
-
-    USERNAME_FIELD = 'username'
-
-    class Meta:
-        app_label = 'auth'
-
-    # the is_active attr is provided by AbstractBaseUser
-
-
-class CustomUserNonUniqueUsername(AbstractBaseUser):
-    "A user with a non-unique username"
-    username = models.CharField(max_length=30)
-
-    USERNAME_FIELD = 'username'
-
-    class Meta:
-        app_label = 'auth'
-
-
-class CustomUserNonListRequiredFields(AbstractBaseUser):
-    "A user with a non-list REQUIRED_FIELDS"
-    username = models.CharField(max_length=30, unique=True)
-    date_of_birth = models.DateField()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = 'date_of_birth'
-
-    class Meta:
-        app_label = 'auth'
-
-
-class CustomUserBadRequiredFields(AbstractBaseUser):
-    "A user with a non-unique username"
-    username = models.CharField(max_length=30, unique=True)
-    date_of_birth = models.DateField()
-
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['username', 'date_of_birth']
-
-    class Meta:
-        app_label = 'auth'
-
-# Undo swap hack
-AbstractUser._meta.local_many_to_many = old_au_local_m2m
-PermissionsMixin._meta.local_many_to_many = old_pm_local_m2m
+        class Meta:
+            app_label = 'auth'

@@ -1,16 +1,17 @@
-from collections import OrderedDict
 import os
+from collections import OrderedDict
 
 from django.apps import apps
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.core.files.storage import default_storage, Storage, FileSystemStorage
-from django.utils.functional import empty, LazyObject
-from django.utils.module_loading import import_string
-from django.utils._os import safe_join
-from django.utils import six, lru_cache
-
 from django.contrib.staticfiles import utils
+from django.core.exceptions import ImproperlyConfigured
+from django.core.files.storage import (
+    FileSystemStorage, Storage, default_storage,
+)
+from django.utils import lru_cache, six
+from django.utils._os import safe_join
+from django.utils.functional import LazyObject, empty
+from django.utils.module_loading import import_string
 
 # To keep track on which directories the finder has searched the static files.
 searched_locations = []
@@ -167,7 +168,7 @@ class AppDirectoriesFinder(BaseFinder):
         """
         Find a requested static file in an app's static locations.
         """
-        storage = self.storages.get(app, None)
+        storage = self.storages.get(app)
         if storage:
             # only try to find a file if the source dir actually exists
             if storage.exists(path):

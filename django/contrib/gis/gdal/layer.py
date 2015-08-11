@@ -1,22 +1,21 @@
-# Needed ctypes routines
-from ctypes import c_double, byref
+from ctypes import byref, c_double
 
-# Other GDAL imports.
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.envelope import Envelope, OGREnvelope
-from django.contrib.gis.gdal.error import OGRException, OGRIndexError, SRSException
+from django.contrib.gis.gdal.error import (
+    GDALException, OGRIndexError, SRSException,
+)
 from django.contrib.gis.gdal.feature import Feature
 from django.contrib.gis.gdal.field import OGRFieldTypes
-from django.contrib.gis.gdal.geomtype import OGRGeomType
 from django.contrib.gis.gdal.geometries import OGRGeometry
+from django.contrib.gis.gdal.geomtype import OGRGeomType
+from django.contrib.gis.gdal.prototypes import (
+    ds as capi, geom as geom_api, srs as srs_api,
+)
 from django.contrib.gis.gdal.srs import SpatialReference
-
-# GDAL ctypes function prototypes.
-from django.contrib.gis.gdal.prototypes import ds as capi, geom as geom_api, srs as srs_api
-
-from django.utils.encoding import force_bytes, force_text
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.encoding import force_bytes, force_text
+from django.utils.six.moves import range
 
 
 # For more information, see the OGR C API source code:
@@ -26,7 +25,6 @@ from django.utils.six.moves import xrange
 class Layer(GDALBase):
     "A class that wraps an OGR Layer, needs to be instantiated from a DataSource object."
 
-    #### Python 'magic' routines ####
     def __init__(self, layer_ptr, ds):
         """
         Initializes on an OGR C pointer to the Layer and the `DataSource` object
@@ -35,7 +33,7 @@ class Layer(GDALBase):
         collection of the `DataSource` while this Layer is still active.
         """
         if not layer_ptr:
-            raise OGRException('Cannot create Layer, invalid pointer given')
+            raise GDALException('Cannot create Layer, invalid pointer given')
         self.ptr = layer_ptr
         self._ds = ds
         self._ldefn = capi.get_layer_defn(self._ptr)
@@ -54,7 +52,7 @@ class Layer(GDALBase):
         elif isinstance(index, slice):
             # A slice was given
             start, stop, stride = index.indices(self.num_feat)
-            return [self._make_feature(fid) for fid in xrange(start, stop, stride)]
+            return [self._make_feature(fid) for fid in range(start, stop, stride)]
         else:
             raise TypeError('Integers and slices may only be used when indexing OGR Layers.')
 
@@ -62,7 +60,7 @@ class Layer(GDALBase):
         "Iterates over each Feature in the Layer."
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
-        for i in xrange(self.num_feat):
+        for i in range(self.num_feat):
             yield Feature(capi.get_next_feature(self._ptr), self)
 
     def __len__(self):
@@ -84,7 +82,7 @@ class Layer(GDALBase):
             # If the Layer supports random reading, return.
             try:
                 return Feature(capi.get_feature(self.ptr, feat_id), self)
-            except OGRException:
+            except GDALException:
                 pass
         else:
             # Random access isn't supported, have to increment through
@@ -95,7 +93,7 @@ class Layer(GDALBase):
         # Should have returned a Feature, raise an OGRIndexError.
         raise OGRIndexError('Invalid feature id: %s.' % feat_id)
 
-    #### Layer properties ####
+    # #### Layer properties ####
     @property
     def extent(self):
         "Returns the extent (an Envelope) of this layer."
@@ -141,7 +139,7 @@ class Layer(GDALBase):
         """
         return [force_text(capi.get_field_name(capi.get_field_defn(self._ldefn, i)),
                            self._ds.encoding, strings_only=True)
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     @property
     def field_types(self):
@@ -152,24 +150,24 @@ class Layer(GDALBase):
         fields.
         """
         return [OGRFieldTypes[capi.get_field_type(capi.get_field_defn(self._ldefn, i))]
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     @property
     def field_widths(self):
         "Returns a list of the maximum field widths for the features."
         return [capi.get_field_width(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     @property
     def field_precisions(self):
         "Returns the field precisions for the features."
         return [capi.get_field_precision(capi.get_field_defn(self._ldefn, i))
-                for i in xrange(self.num_fields)]
+                for i in range(self.num_fields)]
 
     def _get_spatial_filter(self):
         try:
             return OGRGeometry(geom_api.clone_geom(capi.get_spatial_filter(self.ptr)))
-        except OGRException:
+        except GDALException:
             return None
 
     def _set_spatial_filter(self, filter):
@@ -189,14 +187,14 @@ class Layer(GDALBase):
 
     spatial_filter = property(_get_spatial_filter, _set_spatial_filter)
 
-    #### Layer Methods ####
+    # #### Layer Methods ####
     def get_fields(self, field_name):
         """
         Returns a list containing the given field name for every Feature
         in the Layer.
         """
         if field_name not in self.fields:
-            raise OGRException('invalid field name: %s' % field_name)
+            raise GDALException('invalid field name: %s' % field_name)
         return [feat.get(field_name) for feat in self]
 
     def get_geoms(self, geos=False):

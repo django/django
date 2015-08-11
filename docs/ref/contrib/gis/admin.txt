@@ -1,12 +1,9 @@
-.. _ref-gis-admin:
-
 ======================
 GeoDjango's admin site
 ======================
 
 .. module:: django.contrib.gis.admin
    :synopsis: GeoDjango's extensions to the admin site.
-
 
 ``GeoModelAdmin``
 =================
@@ -45,7 +42,7 @@ GeoDjango's admin site
    .. attribute:: openlayers_url
 
    Link to the URL of the OpenLayers JavaScript.  Defaults to
-   ``'http://openlayers.org/api/2.11/OpenLayers.js'``.
+   ``'http://openlayers.org/api/2.13/OpenLayers.js'``.
 
 
    .. attribute:: modifiable

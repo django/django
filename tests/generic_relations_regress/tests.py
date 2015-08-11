@@ -1,14 +1,13 @@
 from django.db.models import Q, Sum
-from django.db.utils import IntegrityError
-from django.test import TestCase, skipIfDBFeature
-from django.forms.models import modelform_factory
 from django.db.models.deletion import ProtectedError
+from django.db.utils import IntegrityError
+from django.forms.models import modelform_factory
+from django.test import TestCase, skipIfDBFeature
 
 from .models import (
-    Address, Place, Restaurant, Link, CharLink, TextLink,
-    Person, Contact, Note, Organization, OddRelation1, OddRelation2, Company,
-    Developer, Team, Guild, Tag, Board, HasLinkThing, A, B, C, D,
-    Related, Content, Node,
+    A, B, C, D, Address, Board, CharLink, Company, Contact, Content, Developer,
+    Guild, HasLinkThing, Link, Node, Note, OddRelation1, OddRelation2,
+    Organization, Person, Place, Related, Restaurant, Tag, Team, TextLink,
 )
 
 
@@ -72,12 +71,12 @@ class GenericRelationTests(TestCase):
         # search with a non-matching note and a matching org name
         qs = Contact.objects.filter(Q(notes__note__icontains=r'other note') |
                                     Q(organizations__name__icontains=r'org name'))
-        self.assertTrue(org_contact in qs)
+        self.assertIn(org_contact, qs)
         # search again, with the same query parameters, in reverse order
         qs = Contact.objects.filter(
             Q(organizations__name__icontains=r'org name') |
             Q(notes__note__icontains=r'other note'))
-        self.assertTrue(org_contact in qs)
+        self.assertIn(org_contact, qs)
 
     def test_join_reuse(self):
         qs = Person.objects.filter(
@@ -145,22 +144,26 @@ class GenericRelationTests(TestCase):
         tag.save()
 
     def test_ticket_20378(self):
+        # Create a couple of extra HasLinkThing so that the autopk value
+        # isn't the same for Link and HasLinkThing.
         hs1 = HasLinkThing.objects.create()
         hs2 = HasLinkThing.objects.create()
-        l1 = Link.objects.create(content_object=hs1)
-        l2 = Link.objects.create(content_object=hs2)
+        hs3 = HasLinkThing.objects.create()
+        hs4 = HasLinkThing.objects.create()
+        l1 = Link.objects.create(content_object=hs3)
+        l2 = Link.objects.create(content_object=hs4)
         self.assertQuerysetEqual(
             HasLinkThing.objects.filter(links=l1),
-            [hs1], lambda x: x)
+            [hs3], lambda x: x)
         self.assertQuerysetEqual(
             HasLinkThing.objects.filter(links=l2),
-            [hs2], lambda x: x)
+            [hs4], lambda x: x)
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l2),
-            [hs1], lambda x: x)
+            [hs1, hs2, hs3], lambda x: x, ordered=False)
         self.assertQuerysetEqual(
             HasLinkThing.objects.exclude(links=l1),
-            [hs2], lambda x: x)
+            [hs1, hs2, hs4], lambda x: x, ordered=False)
 
     def test_ticket_20564(self):
         b1 = B.objects.create()
@@ -220,10 +223,13 @@ class GenericRelationTests(TestCase):
 
     def test_annotate(self):
         hs1 = HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        HasLinkThing.objects.create()
         b = Board.objects.create(name=str(hs1.pk))
+        Link.objects.create(content_object=hs2)
         l = Link.objects.create(content_object=hs1)
         Link.objects.create(content_object=b)
-        qs = HasLinkThing.objects.annotate(Sum('links'))
+        qs = HasLinkThing.objects.annotate(Sum('links')).filter(pk=hs1.pk)
         # If content_type restriction isn't in the query's join condition,
         # then wrong results are produced here as the link to b will also match
         # (b and hs1 have equal pks).
@@ -241,6 +247,15 @@ class GenericRelationTests(TestCase):
         self.assertEqual(qs.filter(links__sum__isnull=True).count(), 1)
         self.assertEqual(qs.filter(links__sum__isnull=False).count(), 0)
 
+    def test_filter_targets_related_pk(self):
+        HasLinkThing.objects.create()
+        hs2 = HasLinkThing.objects.create()
+        l = Link.objects.create(content_object=hs2)
+        self.assertNotEqual(l.object_id, l.pk)
+        self.assertQuerysetEqual(
+            HasLinkThing.objects.filter(links=l.pk),
+            [hs2], lambda x: x)
+
     def test_editable_generic_rel(self):
         GenericRelationForm = modelform_factory(HasLinkThing, fields='__all__')
         form = GenericRelationForm()
@@ -248,7 +263,7 @@ class GenericRelationTests(TestCase):
         form = GenericRelationForm({'links': None})
         self.assertTrue(form.is_valid())
         form.save()
-        links = HasLinkThing._meta.get_field_by_name('links')[0]
+        links = HasLinkThing._meta.get_field('links')
         self.assertEqual(links.save_form_data_calls, 1)
 
     def test_ticket_22998(self):

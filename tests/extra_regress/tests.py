@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import datetime
+from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from .models import TestObject, Order, RevisionableModel
+from .models import Order, RevisionableModel, TestObject
 
 
 class ExtraRegressTests(TestCase):

@@ -4,8 +4,8 @@ import datetime
 import unittest
 
 from django.test.utils import requires_tz_support
-from django.utils.timesince import timesince, timeuntil
 from django.utils import timezone
+from django.utils.timesince import timesince, timeuntil
 
 
 class TimesinceTests(unittest.TestCase):
@@ -131,3 +131,7 @@ class TimesinceTests(unittest.TestCase):
         self.assertEqual(timesince(future), '0\xa0minutes')
         past = datetime.datetime(1980, 1, 1, tzinfo=naive())
         self.assertEqual(timeuntil(past), '0\xa0minutes')
+
+    def test_thousand_years_ago(self):
+        t = datetime.datetime(1007, 8, 14, 13, 46, 0)
+        self.assertEqual(timesince(t, self.t), '1000\xa0years')

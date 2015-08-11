@@ -4,7 +4,7 @@ from django.core.exceptions import FieldError
 from django.test import TestCase
 from django.utils import six
 
-from .models import Author, Article
+from .models import Article, Author
 
 
 class CustomColumnsTests(TestCase):
@@ -92,7 +92,7 @@ class CustomColumnsTests(TestCase):
     def test_author_get(self):
         self.assertEqual(self.a1, Author.objects.get(first_name__exact='John'))
 
-    def test_filter_on_nonexistant_field(self):
+    def test_filter_on_nonexistent_field(self):
         self.assertRaisesMessage(
             FieldError,
             "Cannot resolve keyword 'firstname' into field. Choices are: Author_ID, article, first_name, last_name, primary_set",

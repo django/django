@@ -3,14 +3,15 @@
 # Translators:
 # Kostas <tamosiunas@gmail.com>, 2011
 # lauris <lauris@runbox.com>, 2011
+# Matas Dailyda <matas@dailyda.com>, 2015
 # Simonas Kazlauskas <simonas@kazlauskas.me>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 16:35+0000\n"
+"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/projects/p/django/"
 "language/lt/)\n"
 "MIME-Version: 1.0\n"
@@ -20,80 +21,65 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
-msgstr ""
+msgstr "GIS"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "Bazinis GIS laukas - atvaizduoja OpenGIS Specification Geometry tipą"
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "Taškas"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "Atkarpa"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "Daugiakampis"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "Taškų aibė"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "Atkarpų aibė"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "Daugiakampių aibė"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "Geometrinė kolekcija"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "Išplėsti agregato lauką"
+
 msgid "No geometry value provided."
 msgstr "Nenurodyta geometrinė reikšmė"
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "Netinkama geometrinė reikšmė"
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "Netinkamas geometrinis tipas"
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
 msgstr "Įvyko klaida pertvarkant geometrijos lauko SRID geometriją."
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "Nėra %r skyriaus svetainės medžio"
+msgid "Delete all Features"
+msgstr "Pašalinti visas ypatybes"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "Puslapis %s tuščias"
+msgid "WKT debugging window:"
+msgstr "WKT derinimo langas:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "Nėra '%s' puslapio"
+msgid "Google Maps via GeoDjango"
+msgstr "Google Maps per GeoDjango"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "Derinimo langas (serijomis išdėstytos reikšmės)"
+
 msgid "No feeds are registered."
 msgstr "Nėra užregistruotų srautų."
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "Adresas %r neregistruotas."

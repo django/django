@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 13:18+0000\n"
-"Last-Translator: Bashar Al-Abdulhadi\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Arabic (http://www.transifex.com/projects/p/django/language/"
 "ar/)\n"
 "MIME-Version: 1.0\n"
@@ -20,26 +20,20 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "المواقع"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "اسم النطاق يجب أن لا يحتوي على فراغات أو فراغات طويلة tabs."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "اسم النطاق"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "اسم العرض"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "موقع"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "المواقع"

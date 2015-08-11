@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from django.http import HttpResponse
+from django.http import FileResponse, HttpResponse
 
 
 def helloworld(request):
@@ -7,4 +7,5 @@ def helloworld(request):
 
 urlpatterns = [
     url("^$", helloworld),
+    url(r'^file/$', lambda x: FileResponse(open(__file__, 'rb'))),
 ]

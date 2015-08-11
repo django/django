@@ -1,10 +1,9 @@
 from functools import partial, update_wrapper
 
+from django.contrib.auth.decorators import user_passes_test
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.views.generic import RedirectView
-from django.core.urlresolvers import reverse_lazy
-
-from django.contrib.auth.decorators import user_passes_test
 
 
 def empty_view(request, *args, **kwargs):
@@ -36,7 +35,7 @@ def pass_resolver_match_view(request, *args, **kwargs):
     response.resolver_match = request.resolver_match
     return response
 
-uncallable = "Can I be a view? Pleeeease?"
+uncallable = None  # neither a callable nor a string
 
 
 class ViewClass(object):

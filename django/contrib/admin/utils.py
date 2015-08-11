@@ -1,32 +1,42 @@
 from __future__ import unicode_literals
 
-from collections import defaultdict
 import datetime
 import decimal
+from collections import defaultdict
 
 from django.contrib.auth import get_permission_codename
+from django.core.exceptions import FieldDoesNotExist
+from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
+from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.forms import pretty_name
-from django.utils import formats
+from django.utils import formats, six, timezone
+from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.html import format_html
 from django.utils.text import capfirst
-from django.utils import timezone
-from django.utils.encoding import force_str, force_text, smart_text
-from django.utils import six
 from django.utils.translation import ungettext
-from django.core.urlresolvers import reverse, NoReverseMatch
 
 
 def lookup_needs_distinct(opts, lookup_path):
     """
     Returns True if 'distinct()' should be used to query the given lookup path.
     """
-    field_name = lookup_path.split('__', 1)[0]
-    field = opts.get_field_by_name(field_name)[0]
-    if hasattr(field, 'get_path_info') and any(path.m2m for path in field.get_path_info()):
-        return True
+    lookup_fields = lookup_path.split('__')
+    # Remove the last item of the lookup path if it is a query term
+    if lookup_fields[-1] in QUERY_TERMS:
+        lookup_fields = lookup_fields[:-1]
+    # Now go through the fields (following all relations) and look for an m2m
+    for field_name in lookup_fields:
+        field = opts.get_field(field_name)
+        if hasattr(field, 'get_path_info'):
+            # This field is a relation, update opts to follow the relation
+            path_info = field.get_path_info()
+            opts = path_info[-1].to_opts
+            if any(path.m2m for path in path_info):
+                # This field is a m2m relation so we know we need to call distinct
+                return True
     return False
 
 
@@ -58,7 +68,7 @@ def quote(s):
     res = list(s)
     for i in range(len(res)):
         c = res[i]
-        if c in """:/_#?;@&=+$,"[]<>%\\""":
+        if c in """:/_#?;@&=+$,"[]<>%\n\\""":
             res[i] = '_%02X' % ord(c)
     return ''.join(res)
 
@@ -142,7 +152,7 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
             if not user.has_perm(p):
                 perms_needed.add(opts.verbose_name)
             # Display a link to the admin page.
-            return format_html('{0}: <a href="{1}">{2}</a>',
+            return format_html('{}: <a href="{}">{}</a>',
                                capfirst(opts.verbose_name),
                                admin_url,
                                obj)
@@ -264,8 +274,8 @@ def model_ngettext(obj, n=None):
 def lookup_field(name, obj, model_admin=None):
     opts = obj._meta
     try:
-        f = opts.get_field(name)
-    except models.FieldDoesNotExist:
+        f = _get_non_gfk_field(opts, name)
+    except FieldDoesNotExist:
         # For non-field values, the value is either a method, property or
         # returned via a callable.
         if callable(name):
@@ -290,6 +300,17 @@ def lookup_field(name, obj, model_admin=None):
     return f, attr, value
 
 
+def _get_non_gfk_field(opts, name):
+    """
+    For historical reasons, the admin app relies on GenericForeignKeys as being
+    "not found" by get_field(). This could likely be cleaned up.
+    """
+    field = opts.get_field(name)
+    if field.is_relation and field.many_to_one and not field.related_model:
+        raise FieldDoesNotExist()
+    return field
+
+
 def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     Returns a sensible label for a field name. The name can be a callable,
@@ -300,13 +321,13 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
     """
     attr = None
     try:
-        field = model._meta.get_field_by_name(name)[0]
+        field = _get_non_gfk_field(model._meta, name)
         try:
             label = field.verbose_name
         except AttributeError:
-            # field is likely a RelatedObject
-            label = field.opts.verbose_name
-    except models.FieldDoesNotExist:
+            # field is likely a ForeignObjectRel
+            label = field.related_model._meta.verbose_name
+    except FieldDoesNotExist:
         if name == "__unicode__":
             label = force_text(model._meta.verbose_name)
             attr = six.text_type
@@ -348,48 +369,47 @@ def label_for_field(name, model, model_admin=None, return_attr=False):
 def help_text_for_field(name, model):
     help_text = ""
     try:
-        field_data = model._meta.get_field_by_name(name)
-    except models.FieldDoesNotExist:
+        field = _get_non_gfk_field(model._meta, name)
+    except FieldDoesNotExist:
         pass
     else:
-        field = field_data[0]
         if hasattr(field, 'help_text'):
             help_text = field.help_text
     return smart_text(help_text)
 
 
-def display_for_field(value, field):
+def display_for_field(value, field, empty_value_display):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
     if field.flatchoices:
-        return dict(field.flatchoices).get(value, EMPTY_CHANGELIST_VALUE)
+        return dict(field.flatchoices).get(value, empty_value_display)
     # NullBooleanField needs special-case null-handling, so it comes
     # before the general null test.
     elif isinstance(field, models.BooleanField) or isinstance(field, models.NullBooleanField):
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return empty_value_display
     elif isinstance(field, models.DateTimeField):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(field, (models.DateField, models.TimeField)):
         return formats.localize(value)
     elif isinstance(field, models.DecimalField):
         return formats.number_format(value, field.decimal_places)
-    elif isinstance(field, models.FloatField):
+    elif isinstance(field, (models.IntegerField, models.FloatField)):
         return formats.number_format(value)
+    elif isinstance(field, models.FileField) and value:
+        return format_html('<a href="{}">{}</a>', value.url, value)
     else:
         return smart_text(value)
 
 
-def display_for_value(value, boolean=False):
+def display_for_value(value, empty_value_display, boolean=False):
     from django.contrib.admin.templatetags.admin_list import _boolean_icon
-    from django.contrib.admin.views.main import EMPTY_CHANGELIST_VALUE
 
     if boolean:
         return _boolean_icon(value)
     elif value is None:
-        return EMPTY_CHANGELIST_VALUE
+        return empty_value_display
     elif isinstance(value, datetime.datetime):
         return formats.localize(timezone.template_localtime(value))
     elif isinstance(value, (datetime.date, datetime.time)):
@@ -424,19 +444,21 @@ def reverse_field_path(model, path):
     parent = model
     pieces = path.split(LOOKUP_SEP)
     for piece in pieces:
-        field, model, direct, m2m = parent._meta.get_field_by_name(piece)
+        field = parent._meta.get_field(piece)
         # skip trailing data field if extant:
         if len(reversed_path) == len(pieces) - 1:  # final iteration
             try:
                 get_model_from_relation(field)
             except NotRelationField:
                 break
-        if direct:
+
+        # Field should point to another model
+        if field.is_relation and not (field.auto_created and not field.concrete):
             related_name = field.related_query_name()
-            parent = field.rel.to
+            parent = field.remote_field.model
         else:
             related_name = field.field.name
-            parent = field.model
+            parent = field.related_model
         reversed_path.insert(0, related_name)
     return (parent, LOOKUP_SEP.join(reversed_path))
 
@@ -457,7 +479,7 @@ def get_fields_from_path(model, path):
             parent = get_model_from_relation(fields[-1])
         else:
             parent = model
-        fields.append(parent._meta.get_field_by_name(piece)[0])
+        fields.append(parent._meta.get_field(piece))
     return fields
 
 
@@ -468,23 +490,3 @@ def remove_trailing_data_field(fields):
     except NotRelationField:
         fields = fields[:-1]
     return fields
-
-
-def get_limit_choices_to_from_path(model, path):
-    """ Return Q object for limiting choices if applicable.
-
-    If final model in path is linked via a ForeignKey or ManyToManyField which
-    has a ``limit_choices_to`` attribute, return it as a Q object.
-    """
-    fields = get_fields_from_path(model, path)
-    fields = remove_trailing_data_field(fields)
-    get_limit_choices_to = (
-        fields and hasattr(fields[-1], 'rel') and
-        getattr(fields[-1].rel, 'get_limit_choices_to', None))
-    if not get_limit_choices_to:
-        return models.Q()  # empty Q
-    limit_choices_to = get_limit_choices_to()
-    if isinstance(limit_choices_to, models.Q):
-        return limit_choices_to  # already a Q
-    else:
-        return models.Q(**limit_choices_to)  # convert dict to Q

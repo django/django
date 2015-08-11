@@ -70,11 +70,11 @@ For example, if the models for your application live in the module
 application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         #...
         'myapp',
         #...
-    )
+    ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
 :djadmin:`manage.py migrate <migrate>`, optionally making migrations
@@ -99,7 +99,7 @@ Example::
         instrument = models.CharField(max_length=100)
 
     class Album(models.Model):
-        artist = models.ForeignKey(Musician)
+        artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
         name = models.CharField(max_length=100)
         release_date = models.DateField()
         num_stars = models.IntegerField()
@@ -213,6 +213,23 @@ ones:
     unless you want to override the default primary-key behavior. For more,
     see :ref:`automatic-primary-key-fields`.
 
+    The primary key field is read-only. If you change the value of the primary
+    key on an existing object and then save it, a new object will be created
+    alongside the old one. For example::
+
+        from django.db import models
+
+        class Fruit(models.Model):
+            name = models.CharField(max_length=100, primary_key=True)
+
+    .. code-block:: pycon
+
+        >>> fruit = Fruit.objects.create(name='Apple')
+        >>> fruit.name = 'Pear'
+        >>> fruit.save()
+        >>> Fruit.objects.values_list('name', flat=True)
+        ['Apple', 'Pear']
+
 :attr:`~Field.unique`
     If ``True``, this field must be unique throughout the table.
 
@@ -264,9 +281,17 @@ In this example, the verbose name is ``"first name"``::
 :class:`~django.db.models.OneToOneField` require the first argument to be a
 model class, so use the :attr:`~Field.verbose_name` keyword argument::
 
-    poll = models.ForeignKey(Poll, verbose_name="the related poll")
+    poll = models.ForeignKey(
+        Poll,
+        on_delete=models.CASCADE,
+        verbose_name="the related poll",
+    )
     sites = models.ManyToManyField(Site, verbose_name="list of sites")
-    place = models.OneToOneField(Place, verbose_name="related place")
+    place = models.OneToOneField(
+        Place,
+        on_delete=models.CASCADE,
+        verbose_name="related place",
+    )
 
 The convention is not to capitalize the first letter of the
 :attr:`~Field.verbose_name`. Django will automatically capitalize the first
@@ -300,7 +325,7 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
         pass
 
     class Car(models.Model):
-        manufacturer = models.ForeignKey(Manufacturer)
+        manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
         # ...
 
 You can also create :ref:`recursive relationships <recursive-relationships>` (an
@@ -314,7 +339,10 @@ above) be the name of the model, lowercase. You can, of course, call the field
 whatever you want. For example::
 
     class Car(models.Model):
-        company_that_makes_it = models.ForeignKey(Manufacturer)
+        company_that_makes_it = models.ForeignKey(
+            Manufacturer,
+            on_delete=models.CASCADE,
+        )
         # ...
 
 .. seealso::
@@ -428,8 +456,8 @@ something like this::
             return self.name
 
     class Membership(models.Model):
-        person = models.ForeignKey(Person)
-        group = models.ForeignKey(Group)
+        person = models.ForeignKey(Person, on_delete=models.CASCADE)
+        group = models.ForeignKey(Group, on_delete=models.CASCADE)
         date_joined = models.DateField()
         invite_reason = models.CharField(max_length=64)
 
@@ -459,12 +487,6 @@ There are a few restrictions on the intermediate model:
   itself, using an intermediary model, you *must* use
   :attr:`symmetrical=False <ManyToManyField.symmetrical>` (see
   :ref:`the model field reference <manytomany-arguments>`).
-
-.. versionchanged:: 1.7
-
-    In Django 1.6 and earlier, intermediate models containing more than one
-    foreign key to any of the models involved in the many-to-many relationship
-    used to be prohibited.
 
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
@@ -610,7 +632,12 @@ just refer to the other model class wherever needed. For example::
 
     class Restaurant(models.Model):
         # ...
-        zip_code = models.ForeignKey(ZipCode)
+        zip_code = models.ForeignKey(
+            ZipCode,
+            on_delete=models.SET_NULL,
+            blank=True,
+            null=True,
+        )
 
 Field name restrictions
 -----------------------
@@ -1178,9 +1205,6 @@ provide any connection between the rows in the different database tables. A
 proxy model can inherit from any number of abstract model classes, providing
 they do *not* define any model fields.
 
-Proxy models inherit any ``Meta`` options that they don't define from their
-non-abstract model parent (the model they are proxying for).
-
 Proxy model managers
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1286,41 +1310,9 @@ inheritance hierarchies as simple and straightforward as possible so that you
 won't have to struggle to work out where a particular piece of information is
 coming from.
 
-.. versionchanged:: 1.7
-
-Before Django 1.7, inheriting from multiple models that had an ``id`` primary
-key field did not raise an error, but could result in data loss. For example,
-consider these models (which no longer validate due to the clashing ``id``
-fields)::
-
-    class Article(models.Model):
-        headline = models.CharField(max_length=50)
-        body = models.TextField()
-
-    class Book(models.Model):
-        title = models.CharField(max_length=50)
-
-    class BookReview(Book, Article):
-        pass
-
-This snippet demonstrates how creating a child object overwrote the value of a
-previously created parent object::
-
-    >>> article = Article.objects.create(headline='Some piece of news.')
-    >>> review = BookReview.objects.create(
-    ...     headline='Review of Little Red Riding Hood.',
-    ...     title='Little Red Riding Hood')
-    >>>
-    >>> assert Article.objects.get(pk=article.pk).headline == article.headline
-    Traceback (most recent call last):
-      File "<console>", line 1, in <module>
-    AssertionError
-    >>> # the "Some piece of news." headline has been overwritten.
-    >>> Article.objects.get(pk=article.pk).headline
-    'Review of Little Red Riding Hood.'
-
-To properly use multiple inheritance, you can use an explicit
-:class:`~django.db.models.AutoField` in the base models::
+Note that inheriting from multiple models that have a common ``id`` primary
+key field will raise an error. To properly use multiple inheritance, you can
+use an explicit :class:`~django.db.models.AutoField` in the base models::
 
     class Article(models.Model):
         article_id = models.AutoField(primary_key=True)
@@ -1374,3 +1366,9 @@ different database tables).
 
 Django will raise a :exc:`~django.core.exceptions.FieldError` if you override
 any model field in any ancestor model.
+
+.. seealso::
+
+    :doc:`The Models Reference </ref/models/index>`
+        Covers all the model related APIs including model fields, related
+        objects, and ``QuerySet``.

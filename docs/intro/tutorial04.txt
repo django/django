@@ -73,7 +73,7 @@ create a real version. Add the following to ``polls/views.py``:
     from django.http import HttpResponseRedirect, HttpResponse
     from django.core.urlresolvers import reverse
 
-    from polls.models import Choice, Question
+    from .models import Choice, Question
     # ...
     def vote(request, question_id):
         p = get_object_or_404(Question, pk=question_id)
@@ -129,18 +129,19 @@ This code includes a few things we haven't covered yet in this tutorial:
   This function helps avoid having to hardcode a URL in the view function.
   It is given the name of the view that we want to pass control to and the
   variable portion of the URL pattern that points to that view. In this
-  case, using the URLconf we set up in Tutorial 3, this
-  :func:`~django.core.urlresolvers.reverse` call will return a string like
+  case, using the URLconf we set up in :doc:`Tutorial 3 </intro/tutorial03>`,
+  this :func:`~django.core.urlresolvers.reverse` call will return a string like
   ::
 
     '/polls/3/results/'
 
-  ... where the ``3`` is the value of ``p.id``. This redirected URL will
+  where the ``3`` is the value of ``p.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
 
-As mentioned in Tutorial 3, ``request`` is a :class:`~django.http.HttpRequest`
-object. For more on :class:`~django.http.HttpRequest` objects, see the
-:doc:`request and response documentation </ref/request-response>`.
+As mentioned in :doc:`Tutorial 3 </intro/tutorial03>`, ``request`` is an
+:class:`~django.http.HttpRequest` object. For more on
+:class:`~django.http.HttpRequest` objects, see the :doc:`request and
+response documentation </ref/request-response>`.
 
 After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
@@ -178,12 +179,25 @@ Now, go to ``/polls/1/`` in your browser and vote in the question. You should se
 results page that gets updated each time you vote. If you submit the form
 without having chosen a choice, you should see the error message.
 
+.. note::
+    The code for our ``vote()`` view does have a small problem. It first gets
+    the ``selected_choice`` object from the database, then computes the new
+    value of ``votes``, and then saves it back to the database. If two users of
+    your Web site try to vote at *exactly the same time*, this might go wrong:
+    The same value, let's say 42, will be retrieved for ``votes``. Then, for
+    both users the new value of 43 is computed and saved, but 44 would be the
+    expected value.
+
+    This is called a *race condition*. If you are interested, you can read
+    :ref:`avoiding-race-conditions-using-f` to learn how you can solve this
+    issue.
+
 Use generic views: Less code is better
 ======================================
 
 The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
 views are very simple -- and, as mentioned above, redundant. The ``index()``
-view (also from Tutorial 3), which displays a list of polls, is similar.
+view, which displays a list of polls, is similar.
 
 These views represent a common case of basic Web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
@@ -225,7 +239,7 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     from django.conf.urls import url
 
-    from polls import views
+    from . import views
 
     urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
@@ -236,8 +250,6 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
 Note that the name of the matched pattern in the regexes of the second and third
 patterns has changed from ``<question_id>`` to ``<pk>``.
-
-.. _tutorial04-amend-views:
 
 Amend views
 -----------
@@ -254,7 +266,7 @@ views and use Django's generic views instead. To do so, open the
     from django.core.urlresolvers import reverse
     from django.views import generic
 
-    from polls.models import Choice, Question
+    from .models import Choice, Question
 
 
     class IndexView(generic.ListView):

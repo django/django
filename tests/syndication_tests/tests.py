@@ -3,34 +3,49 @@ from __future__ import unicode_literals
 import datetime
 from xml.dom import minidom
 
+from django.contrib.sites.models import Site
+from django.contrib.syndication import views
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase, override_settings
+from django.test.utils import requires_tz_support
+from django.utils import timezone
+from django.utils.feedgenerator import rfc2822_date, rfc3339_date
+
+from .models import Article, Entry
+
 try:
     import pytz
 except ImportError:
     pytz = None
 
-from django.contrib.syndication import views
-from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, override_settings
-from django.test.utils import requires_tz_support
-from django.utils.feedgenerator import rfc2822_date, rfc3339_date
-from django.utils import timezone
-
-from .models import Entry
-
-
 TZ = timezone.get_default_timezone()
 
 
 class FeedTestCase(TestCase):
-    fixtures = ['feeddata.json']
 
-    def setUp(self):
-        # Django cannot deal with very old dates when pytz isn't installed.
-        if pytz is None:
-            old_entry = Entry.objects.get(pk=1)
-            old_entry.updated = datetime.datetime(1980, 1, 1, 12, 30)
-            old_entry.published = datetime.datetime(1986, 9, 25, 20, 15, 00)
-            old_entry.save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.e1 = Entry.objects.create(
+            title='My first entry', updated=datetime.datetime(1980, 1, 1, 12, 30),
+            published=datetime.datetime(1986, 9, 25, 20, 15, 00)
+        )
+        cls.e2 = Entry.objects.create(
+            title='My second entry', updated=datetime.datetime(2008, 1, 2, 12, 30),
+            published=datetime.datetime(2006, 3, 17, 18, 0)
+        )
+        cls.e3 = Entry.objects.create(
+            title='My third entry', updated=datetime.datetime(2008, 1, 2, 13, 30),
+            published=datetime.datetime(2005, 6, 14, 10, 45)
+        )
+        cls.e4 = Entry.objects.create(
+            title='A & B < C > D', updated=datetime.datetime(2008, 1, 3, 13, 30),
+            published=datetime.datetime(2005, 11, 25, 12, 11, 23)
+        )
+        cls.e5 = Entry.objects.create(
+            title='My last entry', updated=datetime.datetime(2013, 1, 20, 0, 0),
+            published=datetime.datetime(2013, 3, 25, 20, 0)
+        )
+        cls.a1 = Article.objects.create(title='My first article', entry=cls.e1)
 
     def assertChildNodes(self, elem, expected):
         actual = set(n.nodeName for n in elem.childNodes)
@@ -55,6 +70,12 @@ class SyndicationFeedTest(FeedTestCase):
     """
     Tests for the high-level syndication feed framework.
     """
+    @classmethod
+    def setUpClass(cls):
+        super(SyndicationFeedTest, cls).setUpClass()
+        # This cleanup is necessary because contrib.sites cache
+        # makes tests interfere with each other, see #11505
+        Site.objects.clear_cache()
 
     def test_rss2_feed(self):
         """
@@ -87,7 +108,6 @@ class SyndicationFeedTest(FeedTestCase):
             'link': 'http://example.com/blog/',
             'language': 'en',
             'lastBuildDate': last_build_date,
-            #'atom:link': '',
             'ttl': '600',
             'copyright': 'Copyright (c) 2007, Sally Smith',
         })

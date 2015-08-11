@@ -1,10 +1,11 @@
-from ctypes import c_uint, byref
-from django.contrib.gis.geos.geometry import GEOSGeometry
-from django.contrib.gis.geos.libgeos import get_pointer_arr, GEOM_PTR
-from django.contrib.gis.geos.linestring import LinearRing
+from ctypes import byref, c_uint
+
 from django.contrib.gis.geos import prototypes as capi
+from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.libgeos import GEOM_PTR, get_pointer_arr
+from django.contrib.gis.geos.linestring import LinearRing
 from django.utils import six
-from django.utils.six.moves import xrange
+from django.utils.six.moves import range
 
 
 class Polygon(GEOSGeometry):
@@ -49,7 +50,7 @@ class Polygon(GEOSGeometry):
 
     def __iter__(self):
         "Iterates over each ring in the polygon."
-        for i in xrange(len(self)):
+        for i in range(len(self)):
             yield self[i]
 
     def __len__(self):
@@ -66,7 +67,7 @@ class Polygon(GEOSGeometry):
                                     (x0, y0, x0, y1, x1, y1, x1, y0, x0, y0))
         return Polygon(((x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)))
 
-    ### These routines are needed for list-like operation w/ListMixin ###
+    # ### These routines are needed for list-like operation w/ListMixin ###
     def _create_polygon(self, length, items):
         # Instantiate LinearRing objects if necessary, but don't clone them yet
         # _construct_ring will throw a TypeError if a parameter isn't a valid ring
@@ -143,7 +144,7 @@ class Polygon(GEOSGeometry):
     _set_single = GEOSGeometry._set_single_rebuild
     _assign_extended_slice = GEOSGeometry._assign_extended_slice_rebuild
 
-    #### Polygon Properties ####
+    # #### Polygon Properties ####
     @property
     def num_interior_rings(self):
         "Returns the number of interior rings."
@@ -165,12 +166,12 @@ class Polygon(GEOSGeometry):
     @property
     def tuple(self):
         "Gets the tuple for each ring in this Polygon."
-        return tuple(self[i].tuple for i in xrange(len(self)))
+        return tuple(self[i].tuple for i in range(len(self)))
     coords = tuple
 
     @property
     def kml(self):
         "Returns the KML representation of this Polygon."
         inner_kml = ''.join("<innerBoundaryIs>%s</innerBoundaryIs>" % self[i + 1].kml
-            for i in xrange(self.num_interior_rings))
+            for i in range(self.num_interior_rings))
         return "<Polygon><outerBoundaryIs>%s</outerBoundaryIs>%s</Polygon>" % (self[0].kml, inner_kml)

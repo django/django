@@ -5,7 +5,6 @@ from django.db import connection
 
 class Command(BaseCommand):
     help = 'Runs a development server with data from the given fixture(s).'
-    args = '[fixture ...]'
 
     requires_system_checks = False
 

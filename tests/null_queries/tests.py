@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
 from django.core.exceptions import FieldError
+from django.test import TestCase
 
-from .models import Poll, Choice, OuterA, Inner, OuterB
+from .models import Choice, Inner, OuterA, OuterB, Poll
 
 
 class NullQueriesTests(TestCase):

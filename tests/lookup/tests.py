@@ -8,7 +8,7 @@ from django.core.exceptions import FieldError
 from django.db import connection
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
-from .models import Author, Article, Tag, Game, Season, Player, MyISAMArticle
+from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
 
 class LookupTests(TestCase):
@@ -712,6 +712,34 @@ class LookupTests(TestCase):
         self.assertEqual(Player.objects.filter(games__season__gt=333).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__year__gt=2010).distinct().count(), 2)
         self.assertEqual(Player.objects.filter(games__season__gt__gt=222).distinct().count(), 2)
+
+    def test_chain_date_time_lookups(self):
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__month__gt=7),
+            ['<Article: Article 5>', '<Article: Article 6>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__day__gte=27),
+            ['<Article: Article 2>', '<Article: Article 3>',
+             '<Article: Article 4>', '<Article: Article 7>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__hour__lt=8),
+            ['<Article: Article 1>', '<Article: Article 2>',
+             '<Article: Article 3>', '<Article: Article 4>',
+             '<Article: Article 7>'],
+            ordered=False
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(pub_date__minute__lte=0),
+            ['<Article: Article 1>', '<Article: Article 2>',
+             '<Article: Article 3>', '<Article: Article 4>',
+             '<Article: Article 5>', '<Article: Article 6>',
+             '<Article: Article 7>'],
+            ordered=False
+        )
 
 
 class LookupTransactionTests(TransactionTestCase):

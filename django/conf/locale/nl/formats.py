@@ -16,22 +16,22 @@ FIRST_DAY_OF_WEEK = 1                   # Monday (in Dutch 'maandag')
 
 # The *_INPUT_FORMATS strings use the Python strftime format syntax,
 # see http://docs.python.org/library/datetime.html#strftime-strptime-behavior
-DATE_INPUT_FORMATS = (
+DATE_INPUT_FORMATS = [
     '%d-%m-%Y', '%d-%m-%y',             # '20-01-2009', '20-01-09'
     '%d/%m/%Y', '%d/%m/%y',             # '20/01/2009', '20/01/09'
     # '%d %b %Y', '%d %b %y',           # '20 jan 2009', '20 jan 09'
     # '%d %B %Y', '%d %B %y',           # '20 januari 2009', '20 januari 09'
-)
+]
 # Kept ISO formats as one is in first position
-TIME_INPUT_FORMATS = (
+TIME_INPUT_FORMATS = [
     '%H:%M:%S',                         # '15:23:35'
     '%H:%M:%S.%f',                      # '15:23:35.000200'
     '%H.%M:%S',                         # '15.23:35'
     '%H.%M:%S.%f',                      # '15.23:35.000200'
     '%H.%M',                            # '15.23'
     '%H:%M',                            # '15:23'
-)
-DATETIME_INPUT_FORMATS = (
+]
+DATETIME_INPUT_FORMATS = [
     # With time in %H:%M:%S :
     '%d-%m-%Y %H:%M:%S', '%d-%m-%y %H:%M:%S', '%Y-%m-%d %H:%M:%S',
     # '20-01-2009 15:23:35', '20-01-09 15:23:35', '2009-01-20 15:23:35'
@@ -67,7 +67,7 @@ DATETIME_INPUT_FORMATS = (
     '%d/%m/%Y', '%d/%m/%y', '%Y/%m/%d',         # '20/01/2009', '20/01/09', '2009/01/20'
     # '%d %b %Y', '%d %b %y',                     # '20 jan 2009', '20 jan 09'
     # '%d %B %Y', '%d %B %y',                     # '20 januari 2009', '20 januari 2009'
-)
+]
 DECIMAL_SEPARATOR = ','
 THOUSAND_SEPARATOR = '.'
 NUMBER_GROUPING = 3

@@ -47,6 +47,8 @@ This is useful if you want to serialize data directly to a file-like object
     :ref:`format <serialization-formats>` will raise a
     ``django.core.serializers.SerializerDoesNotExist`` exception.
 
+.. _subset-of-fields:
+
 Subset of fields
 ~~~~~~~~~~~~~~~~
 
@@ -211,6 +213,16 @@ the auth.User model has such a relation to the auth.Permission model::
 
 This example links the given user with the permission models with PKs 46 and 47.
 
+.. admonition:: Control characters
+
+    .. versionchanged:: 1.9
+
+    If the content to be serialized contains control characters that are not
+    accepted in the XML 1.0 standard, the serialization will fail with a
+    :exc:`ValueError` exception. Read also the W3C's explanation of `HTML,
+    XHTML, XML and Control Codes
+    <http://www.w3.org/International/questions/qa-controls>`_.
+
 .. _serialization-formats-json:
 
 JSON
@@ -247,7 +259,6 @@ Be aware that not all Django output can be passed unmodified to :mod:`json`.
 In particular, :ref:`lazy translation objects <lazy-translations>` need a
 `special encoder`_ written for them. Something like this will work::
 
-    import json
     from django.utils.functional import Promise
     from django.utils.encoding import force_text
     from django.core.serializers.json import DjangoJSONEncoder
@@ -258,7 +269,10 @@ In particular, :ref:`lazy translation objects <lazy-translations>` need a
                 return force_text(obj)
             return super(LazyEncoder, self).default(obj)
 
-.. _special encoder: http://docs.python.org/library/json.html#encoders-and-decoders
+Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
+</ref/contrib/gis/serializers>`.
+
+.. _special encoder: https://docs.python.org/library/json.html#encoders-and-decoders
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
@@ -330,7 +344,7 @@ Consider the following two models::
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
 Ordinarily, serialized data for ``Book`` would use an integer to refer to
 the author. For example, in JSON, a Book might be serialized as::
@@ -400,8 +414,6 @@ into the primary key of an actual ``Person`` object.
     enforced at the database level. If you are certain that a set of
     fields will be effectively unique, you can still use those fields
     as a natural key.
-
-.. versionadded:: 1.7
 
 Deserialization of objects with no primary key will always check whether the
 model's manager has a ``get_by_natural_key()`` method and if so, use it to
@@ -475,19 +487,6 @@ line flags to generate natural keys.
     natural keys during serialization, but *not* be able to load those
     key values, just don't define the ``get_by_natural_key()`` method.
 
-.. versionchanged:: 1.7
-
-Previously there was only a ``use_natural_keys`` argument for
-``serializers.serialize()`` and the `-n` or `--natural` command line flags.
-These have been deprecated in favor of the ``use_natural_foreign_keys`` and
-``use_natural_primary_keys`` arguments and the corresponding
-:djadminopt:`--natural-foreign` and :djadminopt:`--natural-primary` options
-for :djadmin:`dumpdata`.
-
-The original argument and command line flags remain for backwards
-compatibility and map to the new ``use_natural_foreign_keys`` argument and
-`--natural-foreign` command line flag. They'll be removed in Django 1.9.
-
 Dependencies during serialization
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -515,7 +514,7 @@ example above::
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
-        author = models.ForeignKey(Person)
+        author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
         def natural_key(self):
             return (self.name,) + self.author.natural_key()

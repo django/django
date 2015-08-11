@@ -1,5 +1,7 @@
 from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.sqlite3.introspection import DatabaseIntrospection, FlexibleFieldLookupDict
+from django.db.backends.sqlite3.introspection import (
+    DatabaseIntrospection, FlexibleFieldLookupDict,
+)
 from django.utils import six
 
 
@@ -39,7 +41,13 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
 
             # OGRGeomType does not require GDAL and makes it easy to convert
             # from OGC geom type name to Django field.
-            field_type = OGRGeomType(row[2]).django
+            ogr_type = row[2]
+            if isinstance(ogr_type, six.integer_types) and ogr_type > 1000:
+                # Spatialite versions >= 4 use the new SFSQL 1.2 offsets
+                # 1000 (Z), 2000 (M), and 3000 (ZM) to indicate the presence of
+                # higher dimensional coordinates (M not yet supported by Django).
+                ogr_type = ogr_type % 1000 + OGRGeomType.wkb25bit
+            field_type = OGRGeomType(ogr_type).django
 
             # Getting any GeometryField keyword arguments that are not the default.
             dim = row[0]
@@ -47,7 +55,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             field_params = {}
             if srid != 4326:
                 field_params['srid'] = srid
-            if isinstance(dim, six.string_types) and 'Z' in dim:
+            if (isinstance(dim, six.string_types) and 'Z' in dim) or dim == 3:
                 field_params['dim'] = 3
         finally:
             cursor.close()

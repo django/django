@@ -4,6 +4,8 @@
 # Alexander Nordlund <deep.alexander@gmail.com>, 2012
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonathan Lindén, 2015
+# Jonathan Lindén, 2014
 # nip3o <n@niclasolofsson.se>, 2014
 # Samuel Linde <samuel@linde.im>, 2011
 # Thomas Lundqvist <thomas@biljettshop.se>, 2013
@@ -11,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 12:59+0000\n"
+"Last-Translator: Jonathan Lindén\n"
 "Language-Team: Swedish (http://www.transifex.com/projects/p/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -22,79 +24,47 @@ msgstr ""
 "Language: sv\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Personlig information"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Rättigheter"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Viktiga datum"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
+
 msgid "Password changed successfully."
 msgstr "Lösenordet ändrades."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Ändra lösenord: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Autentisering och auktorisering"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Inget lösenord angivet."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "En användare med det användarnamnet finns redan."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "De två lösenordsfälten stämde inte överens."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Användarnamn"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Obligatoriskt. 30 tecken eller färre. Endast bokstäver, siffror och @/./+/-/"
-"_."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Detta värde får endast innehålla bokstäver, siffror och @/./+/-/_."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Lösenord"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Lösenordsbekräftelse"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Fyll i samma lösenord som ovan för verifiering."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -104,7 +74,6 @@ msgstr ""
 "lösenord, men du kan ändra lösenordet med <a href=\"password/\">detta "
 "formulär</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -113,102 +82,72 @@ msgstr ""
 "Ange ett korrekt %(username)s och lösenord. Observera att båda fälten är "
 "skiftlägeskänsliga."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Detta konto är inaktivt."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-postadress"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Nytt lösenord"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Bekräfta nytt lösenord"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Ditt gamla lösenord var felaktigt ifyllt. Var vänlig fyll i det igen."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Gammalt lösenord"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Lösenord (igen)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritm"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iterationer"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "arbetsfaktor"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "kontrollsumma"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "namn"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kodnamn"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "rättighet"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "rättigheter"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grupp"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grupper"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "lösenord"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "senaste inloggning"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "superanvändare"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -216,55 +155,55 @@ msgstr ""
 "Anger att denna användare har alla rättigheter utan att uttryckligen "
 "tilldela dem."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"De grupper som användaren är medlem i. En användare får tillgång till alla "
-"rättigheter som hans/hennes grupper har."
+"De grupper som användaren är medlem i. Användare får tillgång till alla "
+"rättigheter som deras grupper har."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "användarättigheter"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Specifika rättigheter för denna användare."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "användarnamn"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Ange ett giltigt användarnamn."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Obligatoriskt. 30 tecken eller färre. Endast bokstäver, siffror och @/./+/-/"
+"_."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Fyll i ett giltigt användarnamn. Detta värde får endast innehålla bokstäver, "
+"siffror och @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "En användare med det användarnamnet finns redan."
+
 msgid "first name"
 msgstr "förnamn"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "efternamn"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-postadress"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "personalstatus"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Avgör om användaren kan logga in på denna adminsida."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "aktiv"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -272,55 +211,39 @@ msgstr ""
 "Anger om användaren skall betraktas som aktiv. Avmarkera detta istället för "
 "att ta bort konton."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "registreringsdatum"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "användare"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "användare"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
-msgstr "Lösenord återställt på %(site_name)s"
+msgstr "Lösenord nollställt på %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Fyll i en giltig e-postadress."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Utloggad"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Nollställ lösenord"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr ""
+msgid "Password reset sent"
+msgstr "Lösenordsnollställning skickad"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Nytt lösenord"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Lösenordsnollställning misslyckad"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Nollställning av lösenord klar"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Ändra lösenord"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Lösenordet ändrades"

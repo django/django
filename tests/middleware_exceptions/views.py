@@ -1,6 +1,6 @@
 from django import http
 from django.core.exceptions import PermissionDenied
-from django.template import Template
+from django.template import engines
 from django.template.response import TemplateResponse
 
 
@@ -9,11 +9,13 @@ def normal_view(request):
 
 
 def template_response(request):
-    return TemplateResponse(request, Template('OK'))
+    template = engines['django'].from_string('OK')
+    return TemplateResponse(request, template)
 
 
 def template_response_error(request):
-    return TemplateResponse(request, Template('{%'))
+    template = engines['django'].from_string('{%')
+    return TemplateResponse(request, template)
 
 
 def not_found(request):
@@ -30,3 +32,11 @@ def null_view(request):
 
 def permission_denied(request):
     raise PermissionDenied()
+
+
+def exception_in_render(request):
+    class CustomHttpResponse(http.HttpResponse):
+        def render(self):
+            raise Exception('Exception in HttpResponse.render()')
+
+    return CustomHttpResponse('Error')

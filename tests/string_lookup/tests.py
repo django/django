@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from .models import Foo, Whiz, Bar, Article, Base, Child
+
+from .models import Article, Bar, Base, Child, Foo, Whiz
 
 
 class StringLookupTests(TestCase):

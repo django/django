@@ -5,8 +5,8 @@ import threading
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.utils import DNS_NAME
 from django.core.mail.message import sanitize_address
+from django.core.mail.utils import DNS_NAME
 
 
 class EmailBackend(BaseEmailBackend):
@@ -120,7 +120,7 @@ class EmailBackend(BaseEmailBackend):
                       for addr in email_message.recipients()]
         message = email_message.message()
         try:
-            self.connection.sendmail(from_email, recipients, message.as_bytes())
+            self.connection.sendmail(from_email, recipients, message.as_bytes(linesep='\r\n'))
         except smtplib.SMTPException:
             if not self.fail_silently:
                 raise

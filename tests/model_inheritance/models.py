@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
+
 #
 # Abstract base classes
 #
@@ -55,7 +56,7 @@ class Post(models.Model):
 
 @python_2_unicode_compatible
 class Attachment(models.Model):
-    post = models.ForeignKey(Post, related_name='attached_%(class)s_set')
+    post = models.ForeignKey(Post, models.CASCADE, related_name='attached_%(class)s_set')
     content = models.TextField()
 
     class Meta:
@@ -106,7 +107,7 @@ class Rating(models.Model):
 class Restaurant(Place, Rating):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
-    chef = models.ForeignKey(Chef, null=True, blank=True)
+    chef = models.ForeignKey(Chef, models.SET_NULL, null=True, blank=True)
 
     class Meta(Rating.Meta):
         db_table = 'my_restaurant'
@@ -134,8 +135,8 @@ class Supplier(Place):
 @python_2_unicode_compatible
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, primary_key=True, parent_link=True)
-    main_site = models.ForeignKey(Place, related_name='lot')
+    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
+    main_site = models.ForeignKey(Place, models.CASCADE, related_name='lot')
 
     def __str__(self):
         return "%s the parking lot" % self.name
@@ -155,7 +156,7 @@ class Title(models.Model):
 
 
 class NamedURL(models.Model):
-    title = models.ForeignKey(Title, related_name='attached_%(app_label)s_%(class)s_set')
+    title = models.ForeignKey(Title, models.CASCADE, related_name='attached_%(app_label)s_%(class)s_set')
     url = models.URLField()
 
     class Meta:
@@ -186,3 +187,24 @@ class Base(models.Model):
 
 class SubBase(Base):
     sub_id = models.IntegerField(primary_key=True)
+
+
+class GrandParent(models.Model):
+    first_name = models.CharField(max_length=80)
+    last_name = models.CharField(max_length=80)
+    email = models.EmailField(unique=True)
+
+    class Meta:
+        unique_together = ('first_name', 'last_name')
+
+
+class Parent(GrandParent):
+    pass
+
+
+class Child(Parent):
+    pass
+
+
+class GrandChild(Child):
+    pass

@@ -165,11 +165,22 @@ class LazyObjectTestCase(TestCase):
             del obj_dict['f']
 
     def test_iter(self):
-        # LazyObjects don't actually implements __iter__ but you can still
-        # iterate over them because they implement __getitem__
-        obj = self.lazy_wrap([1, 2, 3])
-        for expected, actual in zip([1, 2, 3], obj):
-            self.assertEqual(expected, actual)
+        # Tests whether an object's custom `__iter__` method is being
+        # used when iterating over it.
+
+        class IterObject(object):
+
+            def __init__(self, values):
+                self.values = values
+
+            def __iter__(self):
+                return iter(self.values)
+
+        original_list = ['test', '123']
+        self.assertEqual(
+            list(self.lazy_wrap(IterObject(original_list))),
+            original_list
+        )
 
     def test_pickle(self):
         # See ticket #16563
@@ -257,8 +268,8 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
         self.assertEqual(lazydict['one'], 1)
         lazydict['one'] = -1
         self.assertEqual(lazydict['one'], -1)
-        self.assertTrue('one' in lazydict)
-        self.assertFalse('two' in lazydict)
+        self.assertIn('one', lazydict)
+        self.assertNotIn('two', lazydict)
         self.assertEqual(len(lazydict), 1)
         del lazydict['one']
         with self.assertRaises(KeyError):
@@ -267,9 +278,9 @@ class SimpleLazyObjectTestCase(LazyObjectTestCase):
     def test_list_set(self):
         lazy_list = SimpleLazyObject(lambda: [1, 2, 3, 4, 5])
         lazy_set = SimpleLazyObject(lambda: {1, 2, 3, 4})
-        self.assertTrue(1 in lazy_list)
-        self.assertTrue(1 in lazy_set)
-        self.assertFalse(6 in lazy_list)
-        self.assertFalse(6 in lazy_set)
+        self.assertIn(1, lazy_list)
+        self.assertIn(1, lazy_set)
+        self.assertNotIn(6, lazy_list)
+        self.assertNotIn(6, lazy_set)
         self.assertEqual(len(lazy_list), 5)
         self.assertEqual(len(lazy_set), 4)

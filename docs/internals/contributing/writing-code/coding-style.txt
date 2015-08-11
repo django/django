@@ -7,6 +7,11 @@ Please follow these coding standards when writing code for inclusion in Django.
 Python style
 ------------
 
+* Please conform to the indentation style dictated in the ``.editorconfig``
+  file. We recommend using a text editor with `EditorConfig`_ support to avoid
+  indentation and whitespace issues. The Python files use 4 spaces for
+  indentation and the HTML files use 2 spaces.
+
 * Unless otherwise specified, follow :pep:`8`.
 
   Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
@@ -32,29 +37,92 @@ Python style
 * Use ``InitialCaps`` for class names (or for factory functions that
   return classes).
 
-* Use convenience imports whenever available. For example, do this::
-
-      from django.views.generic import View
-
-  Don't do this::
-
-      from django.views.generic.base import View
-
-* In docstrings, use "action words" such as::
-
-      def foo():
-          """
-          Calculates something and returns the result.
-          """
-          pass
-
-  Here's an example of what not to do::
+* In docstrings, follow :pep:`257`. For example::
 
       def foo():
           """
           Calculate something and return the result.
           """
-          pass
+          ...
+
+Imports
+-------
+
+* Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
+  import sorting using the guidelines below.
+
+  Quick start:
+
+  .. code-block:: console
+
+      $ pip install isort
+      $ isort -rc .
+
+  This runs ``isort`` recursively from your current directory, modifying any
+  files that don't conform to the guidelines. If you need to have imports out
+  of order (to avoid a circular import, for example) use a comment like this::
+
+      import module  # isort:skip
+
+* Put imports in these groups: future, standard library, third-party libraries,
+  other Django components, local Django component, try/excepts. Sort lines in
+  each group alphabetically by the full module name. Place all ``import module``
+  statements before ``from module import objects`` in each section.
+
+* On each line, alphabetize the items with the upper case items grouped before
+  the lower case items.
+
+* Break long lines using parentheses and indent continuation lines by 4 spaces.
+  Include a trailing comma after the last import and put the closing
+  parenthesis on its own line.
+
+  Use a single blank line between the last import and any module level code,
+  and use two blank lines above the first function or class.
+
+  For example (comments are for explanatory purposes only):
+
+  .. snippet::
+      :filename: django/contrib/admin/example.py
+
+      # future
+      from __future__ import unicode_literals
+
+      # standard library
+      import json
+      from itertools import chain
+
+      # third-party
+      import bcrypt
+
+      # Django
+      from django.http import Http404
+      from django.http.response import (
+          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          cookie,
+      )
+
+      # local Django
+      from .models import LogEntry
+
+      # try/except
+      try:
+          import pytz
+      except ImportError:
+          pytz = None
+
+      CONSTANT = 'foo'
+
+
+      class Example(object):
+          # ...
+
+* Use convenience imports whenever available. For example, do this::
+
+      from django.views.generic import View
+
+  instead of::
+
+      from django.views.generic.base import View
 
 Template style
 --------------
@@ -223,4 +291,11 @@ Miscellaneous
   change to the ``AUTHORS`` file in your patch if you make more than a
   single trivial change.
 
+JavaScript style
+----------------
+
+For details about the JavaScript code style used by Django, see
+:doc:`javascript`.
+
+.. _editorconfig: http://editorconfig.org/
 .. _flake8: https://pypi.python.org/pypi/flake8

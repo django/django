@@ -3,11 +3,14 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.forms import (CharField, DateField, FileField, Form, IntegerField,
-    SplitDateTimeField, ValidationError, formsets)
+from django.forms import (
+    CharField, DateField, FileField, Form, IntegerField, SplitDateTimeField,
+    ValidationError, formsets,
+)
 from django.forms.formsets import BaseFormSet, formset_factory
 from django.forms.utils import ErrorList
-from django.test import TestCase
+from django.test import SimpleTestCase
+from django.utils.encoding import force_text
 
 
 class Choice(Form):
@@ -54,7 +57,13 @@ class SplitDateTimeForm(Form):
 SplitDateTimeFormSet = formset_factory(SplitDateTimeForm)
 
 
-class FormsFormsetTestCase(TestCase):
+class CustomKwargForm(Form):
+    def __init__(self, *args, **kwargs):
+        self.custom_kwarg = kwargs.pop('custom_kwarg')
+        super(CustomKwargForm, self).__init__(*args, **kwargs)
+
+
+class FormsFormsetTestCase(SimpleTestCase):
 
     def make_choiceformset(self, formset_data=None, formset_class=ChoiceFormSet,
             total_forms=None, initial_forms=0, max_num_forms=0, min_num_forms=0, **kwargs):
@@ -110,6 +119,37 @@ class FormsFormsetTestCase(TestCase):
         formset = self.make_choiceformset()
         self.assertFalse(formset.is_valid())
         self.assertFalse(formset.has_changed())
+
+    def test_form_kwargs_formset(self):
+        """
+        Test that custom kwargs set on the formset instance are passed to the
+        underlying forms.
+        """
+        FormSet = formset_factory(CustomKwargForm, extra=2)
+        formset = FormSet(form_kwargs={'custom_kwarg': 1})
+        for form in formset:
+            self.assertTrue(hasattr(form, 'custom_kwarg'))
+            self.assertEqual(form.custom_kwarg, 1)
+
+    def test_form_kwargs_formset_dynamic(self):
+        """
+        Test that form kwargs can be passed dynamically in a formset.
+        """
+        class DynamicBaseFormSet(BaseFormSet):
+            def get_form_kwargs(self, index):
+                return {'custom_kwarg': index}
+
+        DynamicFormSet = formset_factory(CustomKwargForm, formset=DynamicBaseFormSet, extra=2)
+        formset = DynamicFormSet(form_kwargs={'custom_kwarg': 'ignored'})
+        for i, form in enumerate(formset):
+            self.assertTrue(hasattr(form, 'custom_kwarg'))
+            self.assertEqual(form.custom_kwarg, i)
+
+    def test_form_kwargs_empty_form(self):
+        FormSet = formset_factory(CustomKwargForm)
+        formset = FormSet(form_kwargs={'custom_kwarg': 1})
+        self.assertTrue(hasattr(formset.empty_form, 'custom_kwarg'))
+        self.assertEqual(formset.empty_form.custom_kwarg, 1)
 
     def test_formset_validation(self):
         # FormSet instances can also have an error attribute if validation failed for
@@ -893,7 +933,7 @@ class FormsFormsetTestCase(TestCase):
         except IndexError:
             pass
 
-        # Formets can override the default iteration order
+        # Formsets can override the default iteration order
         class BaseReverseFormSet(BaseFormSet):
             def __iter__(self):
                 return reversed(self.forms)
@@ -1091,6 +1131,11 @@ class FormsFormsetTestCase(TestCase):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertEqual(formset.total_error_count(), 2)
 
+    def test_html_safe(self):
+        formset = self.make_choiceformset()
+        self.assertTrue(hasattr(formset, '__html__'))
+        self.assertEqual(force_text(formset), formset.__html__())
+
 
 data = {
     'choices-TOTAL_FORMS': '1',  # the number of forms rendered
@@ -1109,7 +1154,7 @@ class Choice(Form):
 ChoiceFormSet = formset_factory(Choice)
 
 
-class FormsetAsFooTests(TestCase):
+class FormsetAsFooTests(SimpleTestCase):
     def test_as_table(self):
         formset = ChoiceFormSet(data, auto_id=False, prefix='choices')
         self.assertHTMLEqual(formset.as_table(), """<input type="hidden" name="choices-TOTAL_FORMS" value="1" /><input type="hidden" name="choices-INITIAL_FORMS" value="0" /><input type="hidden" name="choices-MIN_NUM_FORMS" value="0" /><input type="hidden" name="choices-MAX_NUM_FORMS" value="0" />
@@ -1137,7 +1182,7 @@ class ArticleForm(Form):
 ArticleFormSet = formset_factory(ArticleForm)
 
 
-class TestIsBoundBehavior(TestCase):
+class TestIsBoundBehavior(SimpleTestCase):
     def test_no_data_raises_validation_error(self):
         with self.assertRaises(ValidationError):
             ArticleFormSet({}).is_valid()
@@ -1192,7 +1237,7 @@ class TestIsBoundBehavior(TestCase):
         self.assertHTMLEqual(empty_forms[0].as_p(), empty_forms[1].as_p())
 
 
-class TestEmptyFormSet(TestCase):
+class TestEmptyFormSet(SimpleTestCase):
     def test_empty_formset_is_valid(self):
         """Test that an empty formset still calls clean()"""
         EmptyFsetWontValidateFormset = formset_factory(FavoriteDrinkForm, extra=0, formset=EmptyFsetWontValidate)

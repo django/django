@@ -1,0 +1,16 @@
+===========================
+Django 1.4.19 release notes
+===========================
+
+*January 27, 2015*
+
+Django 1.4.19 fixes a regression in the 1.4.18 security release.
+
+Bugfixes
+========
+
+* ``GZipMiddleware`` now supports streaming responses. As part of the 1.4.18
+  security release, the ``django.views.static.serve()`` function was altered
+  to stream the files it serves. Unfortunately, the ``GZipMiddleware`` consumed
+  the stream prematurely and prevented files from being served properly
+  (`#24158 <http://code.djangoproject.com/ticket/24158>`_).

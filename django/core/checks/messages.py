@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.utils.encoding import python_2_unicode_compatible, force_str
-
+from django.utils.encoding import force_str, python_2_unicode_compatible
 
 # Levels
 DEBUG = 10
@@ -38,9 +37,7 @@ class CheckMessage(object):
         elif isinstance(self.obj, models.base.ModelBase):
             # We need to hardcode ModelBase and Field cases because its __str__
             # method doesn't return "applabel.modellabel" and cannot be changed.
-            model = self.obj
-            app = model._meta.app_label
-            obj = '%s.%s' % (app, model._meta.object_name)
+            obj = self.obj._meta.label
         else:
             obj = force_str(self.obj)
         id = "(%s) " % self.id if self.id else ""
@@ -61,24 +58,24 @@ class CheckMessage(object):
 
 class Debug(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Debug, self).__init__(DEBUG, *args, **kwargs)
+        super(Debug, self).__init__(DEBUG, *args, **kwargs)
 
 
 class Info(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Info, self).__init__(INFO, *args, **kwargs)
+        super(Info, self).__init__(INFO, *args, **kwargs)
 
 
 class Warning(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Warning, self).__init__(WARNING, *args, **kwargs)
+        super(Warning, self).__init__(WARNING, *args, **kwargs)
 
 
 class Error(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Error, self).__init__(ERROR, *args, **kwargs)
+        super(Error, self).__init__(ERROR, *args, **kwargs)
 
 
 class Critical(CheckMessage):
     def __init__(self, *args, **kwargs):
-        return super(Critical, self).__init__(CRITICAL, *args, **kwargs)
+        super(Critical, self).__init__(CRITICAL, *args, **kwargs)

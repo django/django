@@ -1,25 +1,23 @@
 from __future__ import unicode_literals
 
 from datetime import date
-import warnings
 
 from django import forms
-from django.contrib.admin.options import (ModelAdmin, TabularInline,
-     HORIZONTAL, VERTICAL)
+from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
+from django.contrib.admin.options import (
+    HORIZONTAL, VERTICAL, ModelAdmin, TabularInline,
+)
 from django.contrib.admin.sites import AdminSite
 from django.contrib.admin.widgets import AdminDateWidget, AdminRadioSelect
-from django.contrib.admin.validation import ModelAdminValidator
-from django.contrib.admin import (SimpleListFilter,
-     BooleanFieldListFilter)
 from django.core.checks import Error
-from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import BaseModelFormSet
 from django.forms.widgets import Select
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango19Warning
 
-from .models import Band, Concert, ValidationTestModel, ValidationTestInlineModel
+from .models import (
+    Band, Concert, ValidationTestInlineModel, ValidationTestModel,
+)
 
 
 class MockRequest(object):
@@ -223,6 +221,37 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ['main_band', 'opening_band', 'id', 'DELETE'])
 
+    def test_custom_formfield_override_readonly(self):
+        class AdminBandForm(forms.ModelForm):
+            name = forms.CharField()
+
+            class Meta:
+                exclude = tuple()
+                model = Band
+
+        class BandAdmin(ModelAdmin):
+            form = AdminBandForm
+            readonly_fields = ['name']
+
+        ma = BandAdmin(Band, self.site)
+
+        # `name` shouldn't appear in base_fields because it's part of
+        # readonly_fields.
+        self.assertEqual(
+            list(ma.get_form(request).base_fields),
+            ['bio', 'sign_date']
+        )
+        # But it should appear in get_fields()/fieldsets() so it can be
+        # displayed as read-only.
+        self.assertEqual(
+            list(ma.get_fields(request)),
+            ['bio', 'sign_date', 'name']
+        )
+        self.assertEqual(
+            list(ma.get_fieldsets(request)),
+            [(None, {'fields': ['bio', 'sign_date', 'name']})]
+        )
+
     def test_custom_form_meta_exclude(self):
         """
         Ensure that the custom ModelForm's `Meta.exclude` is overridden if
@@ -356,30 +385,30 @@ class ModelAdminTests(TestCase):
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Beatles</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % (band2.id, self.band.id))
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Beatles</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % (band2.id, self.band.id))
 
         class AdminConcertForm(forms.ModelForm):
-            pass
-
             def __init__(self, *args, **kwargs):
                 super(AdminConcertForm, self).__init__(*args, **kwargs)
                 self.fields["main_band"].queryset = Band.objects.filter(name='The Doors')
 
-        class ConcertAdmin(ModelAdmin):
+        class ConcertAdminWithForm(ModelAdmin):
             form = AdminConcertForm
 
-        ma = ConcertAdmin(Concert, self.site)
+        ma = ConcertAdminWithForm(Concert, self.site)
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(str(form["main_band"]),
-            '<select name="main_band" id="id_main_band">\n'
-            '<option value="" selected="selected">---------</option>\n'
-            '<option value="%d">The Doors</option>\n'
-            '</select>' % self.band.id)
+            '<div class="related-widget-wrapper">'
+            '<select name="main_band" id="id_main_band">'
+            '<option value="" selected="selected">---------</option>'
+            '<option value="%d">The Doors</option>'
+            '</select></div>' % self.band.id)
 
     def test_regression_for_ticket_15820(self):
         """
@@ -538,7 +567,7 @@ class ModelAdminTests(TestCase):
             ['extra', 'transport', 'id', 'DELETE', 'main_band'])
 
 
-class CheckTestCase(TestCase):
+class CheckTestCase(SimpleTestCase):
 
     def assertIsInvalid(self, model_admin, model, msg,
             id=None, hint=None, invalid_obj=None):
@@ -1504,22 +1533,6 @@ class FormsetCheckTests(CheckTestCase):
         self.assertIsValid(ValidationTestModelAdmin, ValidationTestModel)
 
 
-class CustomModelAdminTests(CheckTestCase):
-    def test_deprecation(self):
-        "Deprecated Custom Validator definitions still work with the check framework."
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore", category=RemovedInDjango19Warning)
-
-            class CustomValidator(ModelAdminValidator):
-                def validate_me(self, model_admin, model):
-                    raise ImproperlyConfigured('error!')
-
-            class CustomModelAdmin(ModelAdmin):
-                validator_class = CustomValidator
-
-            self.assertIsInvalid(CustomModelAdmin, ValidationTestModel, 'error!')
-
-
 class ListDisplayEditableTests(CheckTestCase):
     def test_list_display_links_is_none(self):
         """
@@ -1544,7 +1557,7 @@ class ListDisplayEditableTests(CheckTestCase):
         self.assertIsValid(ProductAdmin, ValidationTestModel)
 
 
-class ModelAdminPermissionTests(TestCase):
+class ModelAdminPermissionTests(SimpleTestCase):
 
     class MockUser(object):
         def has_module_perms(self, app_label):
@@ -1625,10 +1638,15 @@ class ModelAdminPermissionTests(TestCase):
         self.assertTrue(ma.has_module_permission(request))
         request.user = self.MockDeleteUser()
         self.assertTrue(ma.has_module_permission(request))
-        ma.opts.app_label = "anotherapp"
-        request.user = self.MockAddUser()
-        self.assertFalse(ma.has_module_permission(request))
-        request.user = self.MockChangeUser()
-        self.assertFalse(ma.has_module_permission(request))
-        request.user = self.MockDeleteUser()
-        self.assertFalse(ma.has_module_permission(request))
+
+        original_app_label = ma.opts.app_label
+        ma.opts.app_label = 'anotherapp'
+        try:
+            request.user = self.MockAddUser()
+            self.assertFalse(ma.has_module_permission(request))
+            request.user = self.MockChangeUser()
+            self.assertFalse(ma.has_module_permission(request))
+            request.user = self.MockDeleteUser()
+            self.assertFalse(ma.has_module_permission(request))
+        finally:
+            ma.opts.app_label = original_app_label

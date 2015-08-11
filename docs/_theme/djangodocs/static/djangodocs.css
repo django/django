@@ -96,7 +96,7 @@ table.docutils { border-collapse:collapse; }
 dt > tt.literal { white-space: normal; }
 #sidebar .literal { color:white; background:transparent; font-size:11px; }
 h4 .literal { color: #234f32; font-size: 13px; }
-pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-width:1px 0; margin: 1em 0; padding: .3em .4em; overflow: hidden; line-height: 1.3em;}
+pre { font-size:small; background:#E0FFB8; border:1px solid #94da3a; border-width:1px 0; margin: 1em 0; padding: .3em .4em; overflow: hidden; line-height: 1.3em; white-space: pre-wrap;}
 dt .literal, table .literal { background:none; }
 #bd a.reference { text-decoration: none; }
 #bd a.reference tt.literal { border-bottom: 1px #234f32 dotted; }

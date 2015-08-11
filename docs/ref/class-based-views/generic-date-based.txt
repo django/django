@@ -256,7 +256,6 @@ MonthArchiveView
         class ArticleMonthArchiveView(MonthArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -349,7 +348,6 @@ WeekArchiveView
         class ArticleWeekArchiveView(WeekArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             week_format = "%W"
             allow_future = True
 
@@ -464,7 +462,6 @@ DayArchiveView
         class ArticleDayArchiveView(DayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -538,7 +535,6 @@ TodayArchiveView
         class ArticleTodayArchiveView(TodayArchiveView):
             queryset = Article.objects.all()
             date_field = "pub_date"
-            make_object_list = True
             allow_future = True
 
     **Example myapp/urls.py**::
@@ -597,7 +593,7 @@ DateDetailView
         from django.views.generic.dates import DateDetailView
 
         urlpatterns = [
-            url(r'^(?P<year>[0-9]+)/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
+            url(r'^(?P<year>[0-9]{4})/(?P<month>[-\w]+)/(?P<day>[0-9]+)/(?P<pk>[0-9]+)/$',
                 DateDetailView.as_view(model=Article, date_field="pub_date"),
                 name="archive_date_detail"),
         ]

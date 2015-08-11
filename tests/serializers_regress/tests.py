@@ -10,13 +10,8 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import uuid
 from unittest import skipUnless
-import warnings
-
-try:
-    import yaml
-except ImportError:
-    yaml = None
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
@@ -24,24 +19,30 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import skipUnlessDBFeature, TestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.functional import curry
 
-from .models import (BinaryData, BooleanData, CharData, DateData, DateTimeData, EmailData,
-    FileData, FilePathData, DecimalData, FloatData, IntegerData, IPAddressData,
-    GenericIPAddressData, NullBooleanData, PositiveIntegerData,
-    PositiveSmallIntegerData, SlugData, SmallData, TextData, TimeData,
-    GenericData, Anchor, UniqueAnchor, FKData, M2MData, O2OData,
-    FKSelfData, M2MSelfData, FKDataToField, FKDataToO2O, M2MIntermediateData,
-    Intermediate, BooleanPKData, CharPKData, EmailPKData, FilePathPKData,
-    DecimalPKData, FloatPKData, IntegerPKData, IPAddressPKData,
-    GenericIPAddressPKData, PositiveIntegerPKData,
-    PositiveSmallIntegerPKData, SlugPKData, SmallPKData,
-    AutoNowDateTimeData, ModifyingSaveData, InheritAbstractModel, BaseModel,
-    ExplicitInheritBaseModel, InheritBaseModel, ProxyBaseModel,
-    ProxyProxyBaseModel, BigIntegerData, LengthModel, Tag, ComplexModel,
-    NaturalKeyAnchor, FKDataNaturalKey)
+from .models import (
+    Anchor, AutoNowDateTimeData, BaseModel, BigIntegerData, BinaryData,
+    BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
+    DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
+    ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
+    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
+    FloatData, FloatPKData, GenericData, GenericIPAddressData,
+    GenericIPAddressPKData, InheritAbstractModel, InheritBaseModel,
+    IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
+    M2MIntermediateData, M2MSelfData, ModifyingSaveData, NaturalKeyAnchor,
+    NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
+    PositiveSmallIntegerData, PositiveSmallIntegerPKData, ProxyBaseModel,
+    ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
+    TextData, TimeData, UniqueAnchor, UUIDData,
+)
+
+try:
+    import yaml
+except ImportError:
+    yaml = None
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -200,6 +201,7 @@ im_obj = (im_create, im_compare)
 o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
 inherited_obj = (inherited_create, inherited_compare)
+uuid_obj = uuid.uuid4()
 
 test_data = [
     # Format: (data type, PK value, Model Class, data)
@@ -241,9 +243,7 @@ test_data = [
     (data_obj, 81, IntegerData, -123456789),
     (data_obj, 82, IntegerData, 0),
     (data_obj, 83, IntegerData, None),
-    #(XX, ImageData
-    (data_obj, 90, IPAddressData, "127.0.0.1"),
-    (data_obj, 91, IPAddressData, None),
+    # (XX, ImageData
     (data_obj, 95, GenericIPAddressData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     (data_obj, 96, GenericIPAddressData, None),
     (data_obj, 100, NullBooleanData, True),
@@ -342,7 +342,6 @@ The end."""),
     (pk_obj, 681, IntegerPKData, -123456789),
     (pk_obj, 682, IntegerPKData, 0),
     # (XX, ImagePKData
-    (pk_obj, 690, IPAddressPKData, "127.0.0.1"),
     (pk_obj, 695, GenericIPAddressPKData, "fe80:1424:2223:6cff:fe8a:2e8a:2151:abcd"),
     # (pk_obj, 700, NullBooleanPKData, True),
     # (pk_obj, 701, NullBooleanPKData, False),
@@ -358,6 +357,8 @@ The end."""),
     # The end."""),
     # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
+    (pk_obj, 791, UUIDData, uuid_obj),
+    (fk_obj, 792, FKToUUID, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
@@ -419,11 +420,11 @@ class SerializerTests(TestCase):
             serializers.get_serializer("nonsense")
         self.assertEqual(cm.exception.args, ("nonsense",))
 
-    def test_unregister_unkown_serializer(self):
+    def test_unregister_unknown_serializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.unregister_serializer("nonsense")
 
-    def test_get_unkown_deserializer(self):
+    def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.get_deserializer("nonsense")
 
@@ -450,7 +451,6 @@ class SerializerTests(TestCase):
         self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
 
 
-@skipUnlessDBFeature('supports_binary_field')
 def serializerTest(format, self):
 
     # Create all the objects defined in the test data
@@ -496,12 +496,9 @@ def naturalKeySerializerTest(format, self):
     for klass in instance_count:
         instance_count[klass] = klass.objects.count()
 
-    # use_natural_keys is deprecated and to be removed in Django 1.9
-    with warnings.catch_warnings(record=True):
-        warnings.simplefilter("always")
-        # Serialize the test database
-        serialized_data = serializers.serialize(format, objects, indent=2,
-            use_natural_keys=True)
+    # Serialize the test database
+    serialized_data = serializers.serialize(format, objects, indent=2,
+        use_natural_foreign_keys=True)
 
     for obj in serializers.deserialize(format, serialized_data):
         obj.save()
@@ -578,7 +575,7 @@ def naturalKeyTest(format, self):
 
 
 for format in [f for f in serializers.get_serializer_formats()
-               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer)]:
+               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
@@ -587,7 +584,7 @@ for format in [f for f in serializers.get_serializer_formats()
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 
 
-class XmlDeserializerSecurityTests(TestCase):
+class XmlDeserializerSecurityTests(SimpleTestCase):
 
     def test_no_dtd(self):
         """

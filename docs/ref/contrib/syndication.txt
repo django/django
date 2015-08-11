@@ -118,7 +118,7 @@ into those elements.
   both.
 
   If you want to do any special formatting for either the title or
-  description, :doc:`Django templates </topics/templates>` can be used
+  description, :doc:`Django templates </ref/templates/language>` can be used
   instead. Their paths can be specified with the ``title_template`` and
   ``description_template`` attributes on the
   :class:`~django.contrib.syndication.views.Feed` class. The templates are
@@ -224,7 +224,7 @@ method along with the request object.
 
 Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication.views import FeedDoesNotExist
+    from django.contrib.syndication.views import Feed
     from django.shortcuts import get_object_or_404
 
     class BeatFeed(Feed):
@@ -919,7 +919,10 @@ They share this interface:
     ``self.feed`` for use with `custom feed generators`_.
 
     All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects.
+    should be a sequence of Unicode objects. Beware that some control characters
+    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    in XML documents. If your content has some of them, you might encounter a
+    :exc:`ValueError` when producing the feed.
 
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.
@@ -953,10 +956,6 @@ They share this interface:
     * ``enclosure`` should be an instance of
       :class:`django.utils.feedgenerator.Enclosure`.
     * ``categories`` should be a sequence of Unicode objects.
-
-    .. versionadded:: 1.7
-
-        The optional ``updateddate`` argument was added.
 
 :meth:`.SyndicationFeed.write`
     Outputs the feed in the given encoding to outfile, which is a file-like object.

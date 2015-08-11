@@ -1,5 +1,3 @@
-.. _ref-gis-install:
-
 ======================
 GeoDjango Installation
 ======================
@@ -12,7 +10,7 @@ In general, GeoDjango installation requires:
 
 1. :ref:`Python and Django <django>`
 2. :ref:`spatial_database`
-3. :ref:`geospatial_libs`
+3. :doc:`geolibs`
 
 Details for each of the requirements and installation instructions
 are provided in the sections below. In addition, platform-specific
@@ -41,7 +39,6 @@ Because GeoDjango is included with Django, please refer to Django's
 :ref:`installation instructions <installing-official-release>` for details on
 how to install.
 
-
 .. _spatial_database:
 
 Spatial database
@@ -61,7 +58,7 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, PROJ.4, PostGIS           9.0+                Requires PostGIS.
+PostgreSQL          GEOS, PROJ.4, PostGIS           9.1+                Requires PostGIS.
 MySQL               GEOS                            5.5+                Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS                            11.1+               XE not supported.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
@@ -237,15 +234,12 @@ Foundation, however, this is not required.
 Python
 ^^^^^^
 
-Although OS X comes with Python installed, users can use framework
-installers (`2.7`__, `3.2`__ and `3.3`__ are available) provided by
-the Python Software Foundation.  An advantage to using the installer is
-that OS X's Python will remain "pristine" for internal operating system
-use.
+Although OS X comes with Python installed, users can use `framework
+installers`__ provided by the Python Software Foundation.  An advantage to
+using the installer is that OS X's Python will remain "pristine" for internal
+operating system use.
 
-__ http://python.org/ftp/python/2.7.5/
-__ http://python.org/ftp/python/3.2.5/
-__ http://python.org/ftp/python/3.3.2/
+__ https://www.python.org/ftp/python/
 
 .. note::
 
@@ -339,15 +333,12 @@ Fink
 ^^^^
 
 `Kurt Schwehr`__ has been gracious enough to create GeoDjango packages for users
-of the `Fink`__ package system.  The following packages are available, depending
-on which version of Python you want to use:
-
-* ``django-gis-py26``
-* ``django-gis-py25``
-* ``django-gis-py24``
+of the `Fink`__ package system. `Different packages are available`__ (starting
+with "django-gis"), depending on which version of Python you want to use.
 
 __ http://schwehr.org/blog/
 __ http://www.finkproject.org/
+__ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 
 .. _macports:
 
@@ -410,7 +401,7 @@ Next, run the installer and keep the defaults -- for example, keep
     products sometimes install a copy there.  *You should still install a
     fresh version of Python 2.7.*
 
-__ http://python.org/download/
+__ https://python.org/download/
 
 PostgreSQL
 ^^^^^^^^^^
@@ -451,7 +442,7 @@ From within the Application Stack Builder (to run outside of the installer,
 :menuselection:`Start --> Programs --> PostgreSQL 9.x`), select
 :menuselection:`PostgreSQL Database Server 9.x on port 5432` from the drop down
 menu.  Next, expand the :menuselection:`Categories --> Spatial Extensions` menu
-tree and select :menuselection:`PostGIS 1.5 for PostgreSQL 9.x`.
+tree and select :menuselection:`PostGIS X.Y for PostgreSQL 9.x`.
 
 After clicking next, you will be prompted to select your mirror, PostGIS
 will be downloaded, and the PostGIS installer will begin.  Select only the

@@ -1,5 +1,5 @@
 from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation
+    GenericForeignKey, GenericRelation,
 )
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -8,12 +8,12 @@ from django.db import models
 class Award(models.Model):
     name = models.CharField(max_length=25)
     object_id = models.PositiveIntegerField()
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
     content_object = GenericForeignKey()
 
 
 class AwardNote(models.Model):
-    award = models.ForeignKey(Award)
+    award = models.ForeignKey(Award, models.CASCADE)
     note = models.CharField(max_length=100)
 
 
@@ -36,13 +36,13 @@ class Child(models.Model):
 
 
 class PlayedWith(models.Model):
-    child = models.ForeignKey(Child)
-    toy = models.ForeignKey(Toy)
+    child = models.ForeignKey(Child, models.CASCADE)
+    toy = models.ForeignKey(Toy, models.CASCADE)
     date = models.DateField(db_column='date_col')
 
 
 class PlayedWithNote(models.Model):
-    played = models.ForeignKey(PlayedWith)
+    played = models.ForeignKey(PlayedWith, models.CASCADE)
     note = models.TextField()
 
 
@@ -63,7 +63,7 @@ class Food(models.Model):
 
 
 class Eaten(models.Model):
-    food = models.ForeignKey(Food, to_field="name")
+    food = models.ForeignKey(Food, models.CASCADE, to_field="name")
     meal = models.CharField(max_length=20)
 
 
@@ -75,16 +75,16 @@ class Policy(models.Model):
 
 
 class Version(models.Model):
-    policy = models.ForeignKey(Policy)
+    policy = models.ForeignKey(Policy, models.CASCADE)
 
 
 class Location(models.Model):
-    version = models.ForeignKey(Version, blank=True, null=True)
+    version = models.ForeignKey(Version, models.SET_NULL, blank=True, null=True)
 
 
 class Item(models.Model):
-    version = models.ForeignKey(Version)
-    location = models.ForeignKey(Location, blank=True, null=True)
+    version = models.ForeignKey(Version, models.CASCADE)
+    location = models.ForeignKey(Location, models.SET_NULL, blank=True, null=True)
 
 # Models for #16128
 
@@ -104,15 +104,15 @@ class Photo(Image):
 
 
 class FooImage(models.Model):
-    my_image = models.ForeignKey(Image)
+    my_image = models.ForeignKey(Image, models.CASCADE)
 
 
 class FooFile(models.Model):
-    my_file = models.ForeignKey(File)
+    my_file = models.ForeignKey(File, models.CASCADE)
 
 
 class FooPhoto(models.Model):
-    my_photo = models.ForeignKey(Photo)
+    my_photo = models.ForeignKey(Photo, models.CASCADE)
 
 
 class FooFileProxy(FooFile):
@@ -126,7 +126,7 @@ class OrgUnit(models.Model):
 
 class Login(models.Model):
     description = models.CharField(max_length=32)
-    orgunit = models.ForeignKey(OrgUnit)
+    orgunit = models.ForeignKey(OrgUnit, models.CASCADE)
 
 
 class House(models.Model):
@@ -135,7 +135,7 @@ class House(models.Model):
 
 class OrderedPerson(models.Model):
     name = models.CharField(max_length=32)
-    lives_in = models.ForeignKey(House)
+    lives_in = models.ForeignKey(House, models.CASCADE)
 
     class Meta:
         ordering = ['name']

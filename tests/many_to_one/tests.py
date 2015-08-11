@@ -1,14 +1,16 @@
-from copy import deepcopy
 import datetime
+from copy import deepcopy
 
-from django.core.exceptions import MultipleObjectsReturned, FieldError
+from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
 from django.utils.translation import ugettext_lazy
 
-from .models import (Article, Reporter, First, Third, Parent, Child,
-    ToFieldChild, Category, Record, Relation, School, Student)
+from .models import (
+    Article, Category, Child, First, Parent, Record, Relation, Reporter,
+    School, Student, Third, ToFieldChild,
+)
 
 
 class ManyToOneTests(TestCase):
@@ -55,7 +57,11 @@ class ManyToOneTests(TestCase):
 
         # Create a new article, and add it to the article set.
         new_article2 = Article(headline="Paul's story", pub_date=datetime.date(2006, 1, 17))
-        self.r.article_set.add(new_article2)
+        msg = "<Article: Paul's story> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.r.article_set.add(new_article2)
+
+        self.r.article_set.add(new_article2, bulk=False)
         self.assertEqual(new_article2.reporter.id, self.r.id)
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
@@ -80,11 +86,49 @@ class ManyToOneTests(TestCase):
                 "<Article: This is a test>",
             ])
 
+    def test_set(self):
+        new_article = self.r.article_set.create(headline="John's second story",
+                                                pub_date=datetime.date(2005, 7, 29))
+        new_article2 = self.r2.article_set.create(headline="Paul's story",
+                                                  pub_date=datetime.date(2006, 1, 17))
+
+        # Assign the article to the reporter.
+        new_article2.reporter = self.r
+        new_article2.save()
+        self.assertEqual(repr(new_article2.reporter), "<Reporter: John Smith>")
+        self.assertEqual(new_article2.reporter.id, self.r.id)
+        self.assertQuerysetEqual(self.r.article_set.all(), [
+            "<Article: John's second story>",
+            "<Article: Paul's story>",
+            "<Article: This is a test>",
+        ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
+        # Set the article back again.
+        self.r2.article_set.set([new_article, new_article2])
+        self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
+        self.assertQuerysetEqual(self.r2.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: Paul's story>",
+            ])
+
+        # Funny case - because the ForeignKey cannot be null,
+        # existing members of the set must remain.
+        self.r.article_set.set([new_article])
+        self.assertQuerysetEqual(self.r.article_set.all(),
+            [
+                "<Article: John's second story>",
+                "<Article: This is a test>",
+            ])
+        self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
         new_article2 = self.r2.article_set.create(headline="Paul's story",
                                                   pub_date=datetime.date(2006, 1, 17))
+
         # Assign the article to the reporter directly using the descriptor.
         new_article2.reporter = self.r
         new_article2.save()
@@ -96,6 +140,7 @@ class ManyToOneTests(TestCase):
             "<Article: This is a test>",
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
+
         # Set the article back again using set descriptor.
         self.r2.article_set = [new_article, new_article2]
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
@@ -417,10 +462,10 @@ class ManyToOneTests(TestCase):
         r2 = Reporter.objects.create(first_name='John')
 
         # Same twice
-        self.assertTrue(r1.article_set.__class__ is r1.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r1.article_set.__class__)
 
         # Same as each other
-        self.assertTrue(r1.article_set.__class__ is r2.article_set.__class__)
+        self.assertIs(r1.article_set.__class__, r2.article_set.__class__)
 
     def test_create_relation_with_ugettext_lazy(self):
         reporter = Reporter.objects.create(first_name='John',
@@ -437,11 +482,11 @@ class ManyToOneTests(TestCase):
         expected_message = "Cannot resolve keyword 'notafield' into field. Choices are: %s"
 
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(Reporter._meta.get_all_field_names()),
+                                 expected_message % ', '.join(sorted(f.name for f in Reporter._meta.get_fields())),
                                  Article.objects.values_list,
                                  'reporter__notafield')
         self.assertRaisesMessage(FieldError,
-                                 expected_message % ', '.join(['EXTRA'] + Article._meta.get_all_field_names()),
+                                 expected_message % ', '.join(['EXTRA'] + sorted(f.name for f in Article._meta.get_fields())),
                                  Article.objects.extra(select={'EXTRA': 'EXTRA_SELECT'}).values_list,
                                  'notafield')
 
@@ -456,28 +501,28 @@ class ManyToOneTests(TestCase):
         p = c.parent
 
         # Accessing the related object again returns the exactly same object.
-        self.assertTrue(c.parent is p)
+        self.assertIs(c.parent, p)
 
         # But if we kill the cache, we get a new object.
         del c._parent_cache
-        self.assertFalse(c.parent is p)
+        self.assertIsNot(c.parent, p)
 
         # Assigning a new object results in that object getting cached immediately.
         p2 = Parent.objects.create(name="Parent 2")
         c.parent = p2
-        self.assertTrue(c.parent is p2)
+        self.assertIs(c.parent, p2)
 
         # Assigning None succeeds if field is null=True.
         p.bestchild = None
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # bestchild should still be None after saving.
         p.save()
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # bestchild should still be None after fetching the object again.
         p = Parent.objects.get(name="Parent")
-        self.assertTrue(p.bestchild is None)
+        self.assertIsNone(p.bestchild)
 
         # Assigning None fails: Child.parent is null=False.
         self.assertRaises(ValueError, setattr, c, "parent", None)
@@ -493,25 +538,23 @@ class ManyToOneTests(TestCase):
         # Creation using keyword argument should cache the related object.
         p = Parent.objects.get(name="Parent")
         c = Child(parent=p)
-        self.assertTrue(c.parent is p)
+        self.assertIs(c.parent, p)
 
         # Creation using keyword argument and unsaved related instance (#8070).
         p = Parent()
-        with self.assertRaisesMessage(ValueError,
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
-            Child(parent=p)
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
+        with self.assertRaisesMessage(ValueError, msg):
+            Child.objects.create(parent=p)
 
-        with self.assertRaisesMessage(ValueError,
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                % (p, Child.parent.field.rel.to._meta.object_name)):
-            ToFieldChild(parent=p)
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'parent'."
+        with self.assertRaisesMessage(ValueError, msg):
+            ToFieldChild.objects.create(parent=p)
 
         # Creation using attname keyword argument and an id will cause the
         # related object to be fetched.
         p = Parent.objects.get(name="Parent")
         c = Child(parent_id=p.id)
-        self.assertFalse(c.parent is p)
+        self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
     def test_multiple_foreignkeys(self):
@@ -543,8 +586,8 @@ class ManyToOneTests(TestCase):
     def test_fk_instantiation_outside_model(self):
         # Regression for #12190 -- Should be able to instantiate a FK outside
         # of a model, and interrogate its related field.
-        cat = models.ForeignKey(Category)
-        self.assertEqual('id', cat.rel.get_related_field().name)
+        cat = models.ForeignKey(Category, models.CASCADE)
+        self.assertEqual('id', cat.remote_field.get_related_field().name)
 
     def test_relation_unsaved(self):
         # Test that the <field>_set manager does not join on Null value fields (#17541)
