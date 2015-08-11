@@ -220,6 +220,8 @@ MySQL       ``MBRDisjoint(poly, geom)``
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
 
+.. fieldlookup:: equals
+
 equals
 ------
 
@@ -633,9 +635,6 @@ Oracle      ``SDO_WITHIN_DISTANCE(poly, geom, 5)``
 .. note::
 
     This lookup is not available on SpatiaLite.
-
-.. fieldlookup:: equals
-
 
 ``GeoQuerySet`` Methods
 =======================
