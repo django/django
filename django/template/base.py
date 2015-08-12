@@ -824,11 +824,17 @@ class Variable(object):
         else:
             # We're dealing with a literal, so it's already been "resolved"
             value = self.literal
+
         if self.translate:
+            is_safe = isinstance(value, SafeData)
+            msgid = value.replace('%', '%%')
+            msgid = mark_safe(msgid) if is_safe else msgid
+
             if self.message_context:
-                return pgettext_lazy(self.message_context, value)
+                return pgettext_lazy(self.message_context, msgid)
             else:
-                return ugettext_lazy(value)
+                return ugettext_lazy(msgid)
+
         return value
 
     def __repr__(self):

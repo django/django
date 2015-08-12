@@ -511,3 +511,13 @@ class I18nTagTests(SimpleTestCase):
         msg = "The 'noop' option was specified more than once."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "%s" %}'})
+    def test_trans_tag_using_a_string_that_looks_like_str_fmt(self):
+        output = self.engine.render_to_string('template')
+        self.assertEqual(output, '%s')
+
+    @setup({'template': '{% load i18n %}{% blocktrans %}%s{% endblocktrans %}'})
+    def test_blocktrans_tag_using_a_string_that_looks_like_str_fmt(self):
+        output = self.engine.render_to_string('template')
+        self.assertEqual(output, '%s')
