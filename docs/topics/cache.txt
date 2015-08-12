@@ -79,8 +79,8 @@ After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
 two most common are `python-memcached`_ and `pylibmc`_.
 
-.. _`python-memcached`: ftp://ftp.tummy.com/pub/python-memcached/
-.. _`pylibmc`: http://sendapatch.se/projects/pylibmc/
+.. _`python-memcached`: https://pypi.python.org/pypi/python-memcached
+.. _`pylibmc`: https://pypi.python.org/pypi/pylibmc
 
 To use Memcached with Django:
 
