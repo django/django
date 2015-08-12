@@ -22,7 +22,9 @@ logger = logging.getLogger('django.request')
 
 def require_http_methods(request_method_list):
     """
-    Decorator to make a view only accept particular request methods.  Usage::
+    Decorator to make a view only accept particular request methods.
+
+    Usage::
 
         @require_http_methods(["GET", "POST"])
         def my_view(request):

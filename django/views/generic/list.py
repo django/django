@@ -10,9 +10,9 @@ from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 
 
 class MultipleObjectMixin(ContextMixin):
-    """
-    A mixin for views manipulating multiple objects.
-    """
+
+    """A mixin for views manipulating multiple objects."""
+
     allow_empty = True
     queryset = None
     model = None
@@ -53,15 +53,11 @@ class MultipleObjectMixin(ContextMixin):
         return queryset
 
     def get_ordering(self):
-        """
-        Return the field or fields to use for ordering the queryset.
-        """
+        """Return the field or fields to use for ordering the queryset."""
         return self.ordering
 
     def paginate_queryset(self, queryset, page_size):
-        """
-        Paginate the queryset, if needed.
-        """
+        """Paginate the queryset, if needed."""
         paginator = self.get_paginator(
             queryset, page_size, orphans=self.get_paginate_orphans(),
             allow_empty_first_page=self.get_allow_empty())
@@ -91,31 +87,29 @@ class MultipleObjectMixin(ContextMixin):
 
     def get_paginator(self, queryset, per_page, orphans=0,
                       allow_empty_first_page=True, **kwargs):
-        """
-        Return an instance of the paginator for this view.
-        """
+        """Return an instance of the paginator for this view."""
         return self.paginator_class(
             queryset, per_page, orphans=orphans,
             allow_empty_first_page=allow_empty_first_page, **kwargs)
 
     def get_paginate_orphans(self):
         """
-        Returns the maximum number of orphans extend the last page by when
+        Return the maximum number of orphans extend the last page by when
         paginating.
         """
         return self.paginate_orphans
 
     def get_allow_empty(self):
         """
-        Returns ``True`` if the view should display empty lists, and ``False``
-        if a 404 should be raised instead.
+        Should the view display empty lists.
+
+        Returns ``True`` if the view should display empty lists,
+        and ``False`` if a 404 should be raised instead.
         """
         return self.allow_empty
 
     def get_context_object_name(self, object_list):
-        """
-        Get the name of the item to be used in the context.
-        """
+        """Get the name of the item to be used in the context."""
         if self.context_object_name:
             return self.context_object_name
         elif hasattr(object_list, 'model'):
@@ -124,9 +118,7 @@ class MultipleObjectMixin(ContextMixin):
             return None
 
     def get_context_data(self, **kwargs):
-        """
-        Get the context for this view.
-        """
+        """Get the context for this view."""
         queryset = kwargs.pop('object_list', self.object_list)
         page_size = self.get_paginate_by(queryset)
         context_object_name = self.get_context_object_name(queryset)
@@ -152,9 +144,9 @@ class MultipleObjectMixin(ContextMixin):
 
 
 class BaseListView(MultipleObjectMixin, View):
-    """
-    A base view for displaying a list of objects.
-    """
+
+    """A base view for displaying a list of objects."""
+
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         allow_empty = self.get_allow_empty()
@@ -176,15 +168,17 @@ class BaseListView(MultipleObjectMixin, View):
 
 
 class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
-    """
-    Mixin for responding with a template and list of objects.
-    """
+
+    """Mixin for responding with a template and list of objects."""
+
     template_name_suffix = '_list'
 
     def get_template_names(self):
         """
-        Return a list of template names to be used for the request. Must return
-        a list. May not be called if render_to_response is overridden.
+        Return a list of template names to be used for the request.
+
+        Must return a list.
+        May not be called if render_to_response is overridden.
         """
         try:
             names = super(MultipleObjectTemplateResponseMixin, self).get_template_names()
@@ -205,7 +199,9 @@ class MultipleObjectTemplateResponseMixin(TemplateResponseMixin):
 
 
 class ListView(MultipleObjectTemplateResponseMixin, BaseListView):
+
     """
     Render some list of objects, set by `self.model` or `self.queryset`.
+
     `self.queryset` can actually be any iterable of items, not just a queryset.
     """

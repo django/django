@@ -23,9 +23,11 @@ LANGUAGE_QUERY_PARAMETER = 'language'
 
 def set_language(request):
     """
-    Redirect to a given url while setting the chosen language in the
-    session or cookie. The url and the language code need to be
-    specified in the request parameters.
+    Redirect to a url, setting the chosen language in the session or cookie.
+
+    Redirect to a given url while setting the chosen language in the session or
+    cookie. The url and the language code need to be specified in the request
+    parameters.
 
     Since this view changes how the user will see the rest of the site, it must
     only be accessed as a POST request. If called as a GET request, it will
@@ -55,9 +57,7 @@ def set_language(request):
 
 
 def get_formats():
-    """
-    Returns all formats strings required for i18n to work
-    """
+    """Returns all formats strings required for i18n to work."""
     FORMAT_SETTINGS = (
         'DATE_FORMAT', 'DATETIME_FORMAT', 'TIME_FORMAT',
         'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'SHORT_DATE_FORMAT',
@@ -304,8 +304,9 @@ def _parse_packages(packages):
 
 def null_javascript_catalog(request, domain=None, packages=None):
     """
-    Returns "identity" versions of the JavaScript i18n functions -- i.e.,
-    versions that don't actually do anything.
+    Returns "identity" versions of the JavaScript i18n functions.
+
+    That is to say, versions that don't actually do anything.
     """
     return render_javascript_catalog()
 

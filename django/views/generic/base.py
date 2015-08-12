@@ -14,6 +14,7 @@ logger = logging.getLogger('django.request')
 
 
 class ContextMixin(object):
+
     """
     A default context mixin that passes the keyword arguments received by
     get_context_data as the template context.
@@ -26,6 +27,7 @@ class ContextMixin(object):
 
 
 class View(object):
+
     """
     Intentionally simple parent class for all views. Only implements
     dispatch-by-method and simple sanity checking.
@@ -45,9 +47,7 @@ class View(object):
 
     @classonlymethod
     def as_view(cls, **initkwargs):
-        """
-        Main entry point for a request-response process.
-        """
+        """Main entry point for a request-response process."""
         for key in initkwargs:
             if key in cls.http_method_names:
                 raise TypeError("You tried to pass in the %s method name as a "
@@ -97,9 +97,7 @@ class View(object):
         return http.HttpResponseNotAllowed(self._allowed_methods())
 
     def options(self, request, *args, **kwargs):
-        """
-        Handles responding to requests for the OPTIONS HTTP verb.
-        """
+        """Handle responding to requests for the OPTIONS HTTP verb."""
         response = http.HttpResponse()
         response['Allow'] = ', '.join(self._allowed_methods())
         response['Content-Length'] = '0'
@@ -110,9 +108,9 @@ class View(object):
 
 
 class TemplateResponseMixin(object):
-    """
-    A mixin that can be used to render a template.
-    """
+
+    """A mixin that can be used to render a template."""
+
     template_name = None
     template_engine = None
     response_class = TemplateResponse
@@ -120,7 +118,7 @@ class TemplateResponseMixin(object):
 
     def render_to_response(self, context, **response_kwargs):
         """
-        Returns a response, using the `response_class` for this
+        Return a response, using the `response_class` for this
         view, with a template rendered with the given context.
 
         If any keyword arguments are provided, they will be
@@ -137,8 +135,10 @@ class TemplateResponseMixin(object):
 
     def get_template_names(self):
         """
-        Returns a list of template names to be used for the request. Must return
-        a list. May not be called if render_to_response is overridden.
+        Returns a list of template names to be used for the request.
+
+        Must return a list.
+        May not be called if render_to_response is overridden.
         """
         if self.template_name is None:
             raise ImproperlyConfigured(
@@ -150,7 +150,9 @@ class TemplateResponseMixin(object):
 
 class TemplateView(TemplateResponseMixin, ContextMixin, View):
     """
-    A view that renders a template.  This view will also pass into the context
+    A view that renders a template.
+
+    This view will also pass into the context
     any keyword arguments passed by the url conf.
     """
     def get(self, request, *args, **kwargs):
@@ -159,9 +161,9 @@ class TemplateView(TemplateResponseMixin, ContextMixin, View):
 
 
 class RedirectView(View):
-    """
-    A view that provides a redirect on any GET request.
-    """
+
+    """A view that provides a redirect on any GET request."""
+
     permanent = False
     url = None
     pattern_name = None
@@ -196,11 +198,12 @@ class RedirectView(View):
             else:
                 return http.HttpResponseRedirect(url)
         else:
-            logger.warning('Gone: %s', request.path,
-                        extra={
-                            'status_code': 410,
-                            'request': request
-                        })
+            logger.warning(
+                'Gone: %s', request.path,
+                extra={
+                    'status_code': 410,
+                    'request': request
+                })
             return http.HttpResponseGone()
 
     def head(self, request, *args, **kwargs):

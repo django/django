@@ -27,8 +27,9 @@ def vary_on_headers(*headers):
 
 def vary_on_cookie(func):
     """
-    A view decorator that adds "Cookie" to the Vary header of a response. This
-    indicates that a page's contents depends on cookies. Usage:
+    A view decorator that adds "Cookie" to the Vary header of a response.
+
+    This indicates that a page's contents depends on cookies. Usage:
 
         @vary_on_cookie
         def index(request):
