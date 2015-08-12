@@ -428,13 +428,6 @@ get out of the way.
 Converting values to Python objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionchanged:: 1.8
-
-    Historically, Django provided a metaclass called ``SubfieldBase`` which
-    always called :meth:`~Field.to_python` on assignment. This did not play
-    nicely with custom database transformations, aggregation, or values
-    queries, so it has been replaced with :meth:`~Field.from_db_value`.
-
 If your custom :class:`~Field` class deals with data structures that are more
 complex than strings, dates, integers, or floats, then you may need to override
 :meth:`~Field.from_db_value` and :meth:`~Field.to_python`.
