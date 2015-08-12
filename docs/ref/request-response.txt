@@ -914,7 +914,7 @@ JsonResponse objects
 
 .. class:: JsonResponse
 
-.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, json_dumps_params=None, **kwargs)
 
    An :class:`HttpResponse` subclass that helps to create a JSON-encoded
    response. It inherits most behavior from its superclass with a couple
@@ -935,6 +935,13 @@ JsonResponse objects
    any object can be passed for serialization (otherwise only ``dict`` instances
    are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
    the first argument, a :exc:`TypeError` will be raised.
+
+   The ``json_dumps_params`` is a dictionary used to pass keyword arguments to the
+   ``json.dumps()`` call used to generate the response.
+
+   .. versionchanged:: 1.9
+
+       The ``json_dumps_params`` argument was added.
 
 Usage
 -----
