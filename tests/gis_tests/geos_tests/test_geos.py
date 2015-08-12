@@ -11,12 +11,14 @@ from unittest import skipUnless
 from django.contrib.gis import gdal
 from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import (
-    HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, GEOSIndexError,
-    LinearRing, LineString, MultiLineString, MultiPoint, MultiPolygon, Point,
-    Polygon, fromfile, fromstr, geos_version_info,
+    HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, LinearRing,
+    LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
+    fromfile, fromstr, geos_version_info,
 )
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
+from django.template import Context
+from django.template.engine import Engine
 from django.test import mock
 from django.utils import six
 from django.utils.encoding import force_bytes
@@ -283,7 +285,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertAlmostEqual(mp.centroid[0], mpnt.centroid.tuple[0], 9)
             self.assertAlmostEqual(mp.centroid[1], mpnt.centroid.tuple[1], 9)
 
-            self.assertRaises(GEOSIndexError, mpnt.__getitem__, len(mpnt))
+            self.assertRaises(IndexError, mpnt.__getitem__, len(mpnt))
             self.assertEqual(mp.centroid, mpnt.centroid.tuple)
             self.assertEqual(mp.coords, tuple(m.tuple for m in mpnt))
             for p in mpnt:
@@ -308,7 +310,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             self.assertEqual(ls, fromstr(l.wkt))
             self.assertEqual(False, ls == prev)  # Use assertEqual to test __eq__
-            self.assertRaises(GEOSIndexError, ls.__getitem__, len(ls))
+            self.assertRaises(IndexError, ls.__getitem__, len(ls))
             prev = ls
 
             # Creating a LineString from a tuple, list, and numpy array
@@ -340,7 +342,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(ls.geom_typeid, 1)
                 self.assertEqual(ls.empty, False)
 
-            self.assertRaises(GEOSIndexError, ml.__getitem__, len(ml))
+            self.assertRaises(IndexError, ml.__getitem__, len(ml))
             self.assertEqual(ml.wkt, MultiLineString(*tuple(s.clone() for s in ml)).wkt)
             self.assertEqual(ml, MultiLineString(*tuple(LineString(s.tuple) for s in ml)))
 
@@ -409,9 +411,9 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(p.ext_ring_cs, poly[0].tuple)  # Testing __getitem__
 
             # Testing __getitem__ and __setitem__ on invalid indices
-            self.assertRaises(GEOSIndexError, poly.__getitem__, len(poly))
-            self.assertRaises(GEOSIndexError, poly.__setitem__, len(poly), False)
-            self.assertRaises(GEOSIndexError, poly.__getitem__, -1 * len(poly) - 1)
+            self.assertRaises(IndexError, poly.__getitem__, len(poly))
+            self.assertRaises(IndexError, poly.__setitem__, len(poly), False)
+            self.assertRaises(IndexError, poly.__getitem__, -1 * len(poly) - 1)
 
             # Testing __iter__
             for r in poly:
@@ -433,6 +435,14 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             # Constructing with tuples of LinearRings.
             self.assertEqual(poly.wkt, Polygon(*tuple(r for r in poly)).wkt)
             self.assertEqual(poly.wkt, Polygon(*tuple(LinearRing(r.tuple) for r in poly)).wkt)
+
+    def test_polygons_templates(self):
+        # Accessing Polygon attributes in templates should work.
+        engine = Engine()
+        template = engine.from_string('{{ polygons.0.wkt }}')
+        polygons = [fromstr(p.wkt) for p in self.geometries.multipolygons[:2]]
+        content = template.render(Context({'polygons': polygons}))
+        self.assertIn('MULTIPOLYGON (((100', content)
 
     def test_polygon_comparison(self):
         p1 = Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
@@ -458,7 +468,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertEqual(mp.num_geom, mpoly.num_geom)
                 self.assertEqual(mp.n_p, mpoly.num_coords)
                 self.assertEqual(mp.num_geom, len(mpoly))
-                self.assertRaises(GEOSIndexError, mpoly.__getitem__, len(mpoly))
+                self.assertRaises(IndexError, mpoly.__getitem__, len(mpoly))
                 for p in mpoly:
                     self.assertEqual(p.geom_type, 'Polygon')
                     self.assertEqual(p.geom_typeid, 3)
@@ -806,15 +816,15 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                self.assertRaises(GEOSIndexError, g.get_x)
+                self.assertRaises(IndexError, g.get_x)
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
                 self.assertEqual(0, len(lr))
                 self.assertEqual(True, lr.empty)
-                self.assertRaises(GEOSIndexError, lr.__getitem__, 0)
+                self.assertRaises(IndexError, lr.__getitem__, 0)
             else:
-                self.assertRaises(GEOSIndexError, g.__getitem__, 0)
+                self.assertRaises(IndexError, g.__getitem__, 0)
 
     def test_collections_of_collections(self):
         "Testing GeometryCollection handling of other collections."
