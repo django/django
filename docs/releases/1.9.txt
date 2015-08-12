@@ -545,6 +545,10 @@ Requests and Responses
 * Added :meth:`HttpRequest.get_port() <django.http.HttpRequest.get_port>` to
   fetch the originating port of the request.
 
+* Added the ``json_dumps_params`` parameter to
+  :class:`~django.http.JsonResponse` to allow passing keyword arguments to the
+  ``json.dumps()`` call used to generate the response.
+
 Tests
 ^^^^^
 

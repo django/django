@@ -504,6 +504,10 @@ class JsonResponseTests(SimpleTestCase):
         response = JsonResponse({}, encoder=CustomDjangoJSONEncoder)
         self.assertEqual(json.loads(response.content.decode()), {'foo': 'bar'})
 
+    def test_json_response_passing_arguments_to_json_dumps(self):
+        response = JsonResponse({'foo': 'bar'}, json_dumps_params={'indent': 2})
+        self.assertEqual(response.content.decode(), '{\n  "foo": "bar"\n}')
+
 
 class StreamingHttpResponseTests(SimpleTestCase):
     def test_streaming_response(self):
