@@ -912,29 +912,27 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 JsonResponse objects
 ====================
 
-.. class:: JsonResponse
+.. class:: JsonResponse(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
 
-.. method:: JsonResponse.__init__(data, encoder=DjangoJSONEncoder, safe=True, **kwargs)
+    An :class:`HttpResponse` subclass that helps to create a JSON-encoded
+    response. It inherits most behavior from its superclass with a couple
+    differences:
 
-   An :class:`HttpResponse` subclass that helps to create a JSON-encoded
-   response. It inherits most behavior from its superclass with a couple
-   differences:
+    Its default ``Content-Type`` header is set to ``application/json``.
 
-   Its default ``Content-Type`` header is set to ``application/json``.
+    The first parameter, ``data``, should be a ``dict`` instance. If the
+    ``safe`` parameter is set to ``False`` (see below) it can be any
+    JSON-serializable object.
 
-   The first parameter, ``data``, should be a ``dict`` instance. If the ``safe``
-   parameter is set to ``False`` (see below) it can be any JSON-serializable
-   object.
+    The ``encoder``, which defaults to
+    ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
+    serialize the data. See :ref:`JSON serialization
+    <serialization-formats-json>` for more details about this serializer.
 
-   The ``encoder``, which defaults to
-   ``django.core.serializers.json.DjangoJSONEncoder``, will be used to
-   serialize the data. See :ref:`JSON serialization
-   <serialization-formats-json>` for more details about this serializer.
-
-   The ``safe`` boolean parameter defaults to ``True``. If it's set to ``False``,
-   any object can be passed for serialization (otherwise only ``dict`` instances
-   are allowed). If ``safe`` is ``True`` and a non-``dict`` object is passed as
-   the first argument, a :exc:`TypeError` will be raised.
+    The ``safe`` boolean parameter defaults to ``True``. If it's set to
+    ``False``, any object can be passed for serialization (otherwise only
+    ``dict`` instances are allowed). If ``safe`` is ``True`` and a non-``dict``
+    object is passed as the first argument, a :exc:`TypeError` will be raised.
 
 Usage
 -----
