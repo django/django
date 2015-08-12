@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import datetime
 import pickle
-import warnings
 from operator import attrgetter
 
 from django.contrib.auth.models import User
@@ -12,7 +11,6 @@ from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
 from django.test import SimpleTestCase, TestCase, override_settings
-from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
@@ -1061,36 +1059,6 @@ class RouterTestCase(TestCase):
 
             self.assertTrue(router.allow_migrate_model('other', User))
             self.assertTrue(router.allow_migrate_model('other', Book))
-
-    def test_migrate_legacy_router(self):
-        class LegacyRouter(object):
-            def allow_migrate(self, db, model):
-                """
-                Deprecated allow_migrate signature should trigger
-                RemovedInDjango110Warning.
-                """
-                assert db == 'default'
-                assert model is User
-                return True
-
-        with override_settings(DATABASE_ROUTERS=[LegacyRouter()]):
-            with warnings.catch_warnings(record=True) as recorded:
-                warnings.filterwarnings('always')
-
-                msg = (
-                    "The signature of allow_migrate has changed from "
-                    "allow_migrate(self, db, model) to "
-                    "allow_migrate(self, db, app_label, model_name=None, **hints). "
-                    "Support for the old signature will be removed in Django 1.10."
-                )
-
-                self.assertTrue(router.allow_migrate_model('default', User))
-                self.assertEqual(force_text(recorded.pop().message), msg)
-
-                self.assertEqual(recorded, [])
-
-                self.assertTrue(router.allow_migrate('default', 'app_label'))
-                self.assertEqual(force_text(recorded.pop().message), msg)
 
     def test_partial_router(self):
         "A router can choose to implement a subset of methods"

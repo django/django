@@ -182,12 +182,6 @@ A database Router is a class that provides up to four methods:
     keys, extra tables, or missing tables if you change it once you have
     applied some migrations.
 
-    .. versionchanged:: 1.8
-
-        The signature of ``allow_migrate`` has changed significantly from previous
-        versions. See the :ref:`deprecation notes
-        <deprecated-signature-of-allow-migrate>` for more details.
-
 A router doesn't have to provide *all* these methods -- it may omit one
 or more of them. If one of the methods is omitted, Django will skip
 that router when performing the relevant check.
