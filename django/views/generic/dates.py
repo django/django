@@ -20,9 +20,7 @@ from django.views.generic.list import (
 
 
 class YearMixin(object):
-    """
-    Mixin for views manipulating year-based data.
-    """
+    """Mixin for views manipulating year-based data."""
     year_format = '%Y'
     year = None
 
@@ -34,9 +32,7 @@ class YearMixin(object):
         return self.year_format
 
     def get_year(self):
-        """
-        Return the year for which this view should display data.
-        """
+        """Return the year for which this view should display data."""
         year = self.year
         if year is None:
             try:
@@ -49,15 +45,11 @@ class YearMixin(object):
         return year
 
     def get_next_year(self, date):
-        """
-        Get the next valid year.
-        """
+        """Get the next valid year."""
         return _get_next_prev(self, date, is_previous=False, period='year')
 
     def get_previous_year(self, date):
-        """
-        Get the previous valid year.
-        """
+        """Get the previous valid year."""
         return _get_next_prev(self, date, is_previous=True, period='year')
 
     def _get_next_year(self, date):
@@ -69,16 +61,12 @@ class YearMixin(object):
         return date.replace(year=date.year + 1, month=1, day=1)
 
     def _get_current_year(self, date):
-        """
-        Return the start date of the current interval.
-        """
+        """Return the start date of the current interval."""
         return date.replace(month=1, day=1)
 
 
 class MonthMixin(object):
-    """
-    Mixin for views manipulating month-based data.
-    """
+    """Mixin for views manipulating month-based data."""
     month_format = '%b'
     month = None
 
@@ -90,9 +78,7 @@ class MonthMixin(object):
         return self.month_format
 
     def get_month(self):
-        """
-        Return the month for which this view should display data.
-        """
+        """Return the month for which this view should display data."""
         month = self.month
         if month is None:
             try:
@@ -105,15 +91,11 @@ class MonthMixin(object):
         return month
 
     def get_next_month(self, date):
-        """
-        Get the next valid month.
-        """
+        """Get the next valid month."""
         return _get_next_prev(self, date, is_previous=False, period='month')
 
     def get_previous_month(self, date):
-        """
-        Get the previous valid month.
-        """
+        """Get the previous valid month."""
         return _get_next_prev(self, date, is_previous=True, period='month')
 
     def _get_next_month(self, date):
@@ -135,9 +117,7 @@ class MonthMixin(object):
 
 
 class DayMixin(object):
-    """
-    Mixin for views manipulating day-based data.
-    """
+    """Mixin for views manipulating day-based data."""
     day_format = '%d'
     day = None
 
@@ -149,9 +129,7 @@ class DayMixin(object):
         return self.day_format
 
     def get_day(self):
-        """
-        Return the day for which this view should display data.
-        """
+        """Return the day for which this view should display data."""
         day = self.day
         if day is None:
             try:
@@ -164,15 +142,11 @@ class DayMixin(object):
         return day
 
     def get_next_day(self, date):
-        """
-        Get the next valid day.
-        """
+        """Get the next valid day."""
         return _get_next_prev(self, date, is_previous=False, period='day')
 
     def get_previous_day(self, date):
-        """
-        Get the previous valid day.
-        """
+        """Get the previous valid day."""
         return _get_next_prev(self, date, is_previous=True, period='day')
 
     def _get_next_day(self, date):
@@ -184,16 +158,12 @@ class DayMixin(object):
         return date + datetime.timedelta(days=1)
 
     def _get_current_day(self, date):
-        """
-        Return the start date of the current interval.
-        """
+        """Return the start date of the current interval."""
         return date
 
 
 class WeekMixin(object):
-    """
-    Mixin for views manipulating week-based data.
-    """
+    """Mixin for views manipulating week-based data."""
     week_format = '%U'
     week = None
 
@@ -205,9 +175,7 @@ class WeekMixin(object):
         return self.week_format
 
     def get_week(self):
-        """
-        Return the week for which this view should display data
-        """
+        """Return the week for which this view should display data."""
         week = self.week
         if week is None:
             try:
@@ -220,15 +188,11 @@ class WeekMixin(object):
         return week
 
     def get_next_week(self, date):
-        """
-        Get the next valid week.
-        """
+        """Get the next valid week."""
         return _get_next_prev(self, date, is_previous=False, period='week')
 
     def get_previous_week(self, date):
-        """
-        Get the previous valid week.
-        """
+        """Get the previous valid week."""
         return _get_next_prev(self, date, is_previous=True, period='week')
 
     def _get_next_week(self, date):
@@ -240,9 +204,7 @@ class WeekMixin(object):
         return date + datetime.timedelta(days=7 - self._get_weekday(date))
 
     def _get_current_week(self, date):
-        """
-        Return the start date of the current interval.
-        """
+        """Return the start date of the current interval."""
         return date - datetime.timedelta(self._get_weekday(date))
 
     def _get_weekday(self, date):
@@ -261,16 +223,12 @@ class WeekMixin(object):
 
 
 class DateMixin(object):
-    """
-    Mixin class for views manipulating date-based data.
-    """
+    """Mixin class for views manipulating date-based data."""
     date_field = None
     allow_future = False
 
     def get_date_field(self):
-        """
-        Get the name of the date field to be used to filter by.
-        """
+        """Get the name of the date field to be used to filter by."""
         if self.date_field is None:
             raise ImproperlyConfigured("%s.date_field is required." % self.__class__.__name__)
         return self.date_field
@@ -329,9 +287,11 @@ class DateMixin(object):
 
 
 class BaseDateListView(MultipleObjectMixin, DateMixin, View):
+
     """
     Abstract base class for date-based views displaying a list of objects.
     """
+
     allow_empty = False
     date_list_period = 'year'
 
@@ -343,9 +303,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         return self.render_to_response(context)
 
     def get_dated_items(self):
-        """
-        Obtain the list of dates and items.
-        """
+        """Obtain the list of dates and items."""
         raise NotImplementedError('A DateView must provide an implementation of get_dated_items()')
 
     def get_ordering(self):
@@ -410,17 +368,17 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
 
 
 class BaseArchiveIndexView(BaseDateListView):
+
     """
     Base class for archives of date-based items.
 
     Requires a response mixin.
     """
+
     context_object_name = 'latest'
 
     def get_dated_items(self):
-        """
-        Return (date_list, items, extra_context) for this request.
-        """
+        """Return (date_list, items, extra_context) for this request."""
         qs = self.get_dated_queryset()
         date_list = self.get_date_list(qs, ordering='DESC')
 
@@ -431,23 +389,21 @@ class BaseArchiveIndexView(BaseDateListView):
 
 
 class ArchiveIndexView(MultipleObjectTemplateResponseMixin, BaseArchiveIndexView):
-    """
-    Top-level archive of date-based items.
-    """
+
+    """Top-level archive of date-based items."""
+
     template_name_suffix = '_archive'
 
 
 class BaseYearArchiveView(YearMixin, BaseDateListView):
-    """
-    List of objects published in a given year.
-    """
+
+    """List of objects published in a given year."""
+
     date_list_period = 'month'
     make_object_list = False
 
     def get_dated_items(self):
-        """
-        Return (date_list, items, extra_context) for this request.
-        """
+        """Return (date_list, items, extra_context) for this request."""
         year = self.get_year()
 
         date_field = self.get_date_field()
@@ -483,22 +439,20 @@ class BaseYearArchiveView(YearMixin, BaseDateListView):
 
 
 class YearArchiveView(MultipleObjectTemplateResponseMixin, BaseYearArchiveView):
-    """
-    List of objects published in a given year.
-    """
+
+    """List of objects published in a given year."""
+
     template_name_suffix = '_archive_year'
 
 
 class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
-    """
-    List of objects published in a given month.
-    """
+
+    """List of objects published in a given month."""
+
     date_list_period = 'day'
 
     def get_dated_items(self):
-        """
-        Return (date_list, items, extra_context) for this request.
-        """
+        """Return (date_list, items, extra_context) for this request."""
         year = self.get_year()
         month = self.get_month()
 
@@ -524,16 +478,15 @@ class BaseMonthArchiveView(YearMixin, MonthMixin, BaseDateListView):
 
 
 class MonthArchiveView(MultipleObjectTemplateResponseMixin, BaseMonthArchiveView):
-    """
-    List of objects published in a given month.
-    """
+
+    """List of objects published in a given month."""
+
     template_name_suffix = '_archive_month'
 
 
 class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
-    """
-    List of objects published in a given week.
-    """
+
+    """List of objects published in a given week."""
 
     def get_dated_items(self):
         """
@@ -569,20 +522,18 @@ class BaseWeekArchiveView(YearMixin, WeekMixin, BaseDateListView):
 
 
 class WeekArchiveView(MultipleObjectTemplateResponseMixin, BaseWeekArchiveView):
-    """
-    List of objects published in a given week.
-    """
+
+    """List of objects published in a given week."""
+
     template_name_suffix = '_archive_week'
 
 
 class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
-    """
-    List of objects published on a given day.
-    """
+
+    """List of objects published on a given day."""
+
     def get_dated_items(self):
-        """
-        Return (date_list, items, extra_context) for this request.
-        """
+        """Return (date_list, items, extra_context) for this request."""
         year = self.get_year()
         month = self.get_month()
         day = self.get_day()
@@ -611,16 +562,15 @@ class BaseDayArchiveView(YearMixin, MonthMixin, DayMixin, BaseDateListView):
 
 
 class DayArchiveView(MultipleObjectTemplateResponseMixin, BaseDayArchiveView):
-    """
-    List of objects published on a given day.
-    """
+
+    """List of objects published on a given day."""
+
     template_name_suffix = "_archive_day"
 
 
 class BaseTodayArchiveView(BaseDayArchiveView):
-    """
-    List of objects published today.
-    """
+
+    """List of objects published today."""
 
     def get_dated_items(self):
         """
@@ -630,9 +580,9 @@ class BaseTodayArchiveView(BaseDayArchiveView):
 
 
 class TodayArchiveView(MultipleObjectTemplateResponseMixin, BaseTodayArchiveView):
-    """
-    List of objects published today.
-    """
+
+    """List of objects published today."""
+
     template_name_suffix = "_archive_day"
 
 
@@ -642,9 +592,7 @@ class BaseDateDetailView(YearMixin, MonthMixin, DayMixin, DateMixin, BaseDetailV
     standard DetailView by accepting a year/month/day in the URL.
     """
     def get_object(self, queryset=None):
-        """
-        Get the object this request displays.
-        """
+        """Get the object this request displays."""
         year = self.get_year()
         month = self.get_month()
         day = self.get_day()
@@ -789,9 +737,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
 
 
 def timezone_today():
-    """
-    Return the current date in the current time zone.
-    """
+    """Return the current date in the current time zone."""
     if settings.USE_TZ:
         return timezone.localtime(timezone.now()).date()
     else:

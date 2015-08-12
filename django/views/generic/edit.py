@@ -38,6 +38,7 @@ class FormMixinBase(type):
 
 
 class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
+
     """
     A mixin that provides a way to show and handle a form in a request.
     """
@@ -48,35 +49,25 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
     prefix = None
 
     def get_initial(self):
-        """
-        Returns the initial data to use for forms on this view.
-        """
+        """Return the initial data to use for forms on this view."""
         return self.initial.copy()
 
     def get_prefix(self):
-        """
-        Returns the prefix to use for forms on this view
-        """
+        """Return the prefix to use for forms on this view."""
         return self.prefix
 
     def get_form_class(self):
-        """
-        Returns the form class to use in this view
-        """
+        """Return the form class to use in this view."""
         return self.form_class
 
     def get_form(self, form_class=None):
-        """
-        Returns an instance of the form to be used in this view.
-        """
+        """Return an instance of the form to be used in this view."""
         if form_class is None:
             form_class = self.get_form_class()
         return form_class(**self.get_form_kwargs())
 
     def get_form_kwargs(self):
-        """
-        Returns the keyword arguments for instantiating the form.
-        """
+        """Return the keyword arguments for instantiating the form."""
         kwargs = {
             'initial': self.get_initial(),
             'prefix': self.get_prefix(),
@@ -90,9 +81,7 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
         return kwargs
 
     def get_success_url(self):
-        """
-        Returns the supplied success URL.
-        """
+        """Return the supplied success URL."""
         if self.success_url:
             # Forcing possible reverse_lazy evaluation
             url = force_text(self.success_url)
@@ -102,13 +91,13 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
         return url
 
     def form_valid(self, form):
-        """
-        If the form is valid, redirect to the supplied URL.
-        """
+        """If the form is valid, redirect to the supplied URL."""
         return HttpResponseRedirect(self.get_success_url())
 
     def form_invalid(self, form):
         """
+        Handler for if the form is invalid.
+
         If the form is invalid, re-render the context data with the
         data-filled form and errors.
         """
@@ -123,15 +112,15 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
 
 
 class ModelFormMixin(FormMixin, SingleObjectMixin):
+
     """
     A mixin that provides a way to show and handle a modelform in a request.
     """
+
     fields = None
 
     def get_form_class(self):
-        """
-        Returns the form class to use in this view.
-        """
+        """Return the form class to use in this view."""
         if self.fields is not None and self.form_class:
             raise ImproperlyConfigured(
                 "Specifying both 'fields' and 'form_class' is not permitted."
@@ -160,18 +149,14 @@ class ModelFormMixin(FormMixin, SingleObjectMixin):
             return model_forms.modelform_factory(model, fields=self.fields)
 
     def get_form_kwargs(self):
-        """
-        Returns the keyword arguments for instantiating the form.
-        """
+        """Return the keyword arguments for instantiating the form."""
         kwargs = super(ModelFormMixin, self).get_form_kwargs()
         if hasattr(self, 'object'):
             kwargs.update({'instance': self.object})
         return kwargs
 
     def get_success_url(self):
-        """
-        Returns the supplied URL.
-        """
+        """Return the supplied URL."""
         if self.success_url:
             # force_text can be removed with deprecation warning
             self.success_url = force_text(self.success_url)
@@ -229,23 +214,27 @@ class ProcessFormView(View):
 
 
 class BaseFormView(FormMixin, ProcessFormView):
+
     """
     A base view for displaying a form
     """
 
 
 class FormView(TemplateResponseMixin, BaseFormView):
+
     """
     A view for displaying a form, and rendering a template response.
     """
 
 
 class BaseCreateView(ModelFormMixin, ProcessFormView):
+
     """
     Base view for creating an new object instance.
 
     Using this base class requires subclassing to provide a response mixin.
     """
+
     def get(self, request, *args, **kwargs):
         self.object = None
         return super(BaseCreateView, self).get(request, *args, **kwargs)
@@ -256,19 +245,23 @@ class BaseCreateView(ModelFormMixin, ProcessFormView):
 
 
 class CreateView(SingleObjectTemplateResponseMixin, BaseCreateView):
+
     """
     View for creating a new object instance,
     with a response rendered by template.
     """
+
     template_name_suffix = '_form'
 
 
 class BaseUpdateView(ModelFormMixin, ProcessFormView):
+
     """
     Base view for updating an existing object.
 
     Using this base class requires subclassing to provide a response mixin.
     """
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         return super(BaseUpdateView, self).get(request, *args, **kwargs)
@@ -279,22 +272,21 @@ class BaseUpdateView(ModelFormMixin, ProcessFormView):
 
 
 class UpdateView(SingleObjectTemplateResponseMixin, BaseUpdateView):
-    """
-    View for updating an object,
-    with a response rendered by template.
-    """
+
+    """View for updating an object, with a response rendered by template. """
+
     template_name_suffix = '_form'
 
 
 class DeletionMixin(object):
-    """
-    A mixin providing the ability to delete objects
-    """
+
+    """A mixin providing the ability to delete objects."""
+
     success_url = None
 
     def delete(self, request, *args, **kwargs):
         """
-        Calls the delete() method on the fetched object and then
+        Call the delete() method on the fetched object and then
         redirects to the success URL.
         """
         self.object = self.get_object()
@@ -325,6 +317,7 @@ class DeletionMixin(object):
 
 
 class BaseDeleteView(DeletionMixin, BaseDetailView):
+
     """
     Base view for deleting an object.
 
@@ -333,8 +326,10 @@ class BaseDeleteView(DeletionMixin, BaseDetailView):
 
 
 class DeleteView(SingleObjectTemplateResponseMixin, BaseDeleteView):
+
     """
     View for deleting an object retrieved with `self.get_object()`,
     with a response rendered by template.
     """
+
     template_name_suffix = '_confirm_delete'
