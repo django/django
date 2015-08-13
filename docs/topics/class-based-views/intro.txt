@@ -308,7 +308,7 @@ i.e. in the example ``login_required()`` will work on request before ``never_cac
 
 .. versionchanged:: 1.9
 
-    Polymorphic behaviour added to ``method_decorator()``.
+    Polymorphic behavior added to ``method_decorator()``.
 
 In this example, every instance of ``ProtectedView`` will have login protection.
 
