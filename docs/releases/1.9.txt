@@ -341,6 +341,10 @@ Generic Views
 * :func:`~django.utils.decorators.method_decorator` can now be used to
   :ref:`decorate classes instead of methods <decorating-class-based-views>`.
 
+* :func:`~django.utils.decorators.method_decorator` can now be used with
+  iterable of decorators (i.e. a list or a tuple) or with a decorator function
+  :ref:`decorate classes instead of methods <decorating-class-based-views>`.
+
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
 
