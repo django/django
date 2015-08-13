@@ -776,7 +776,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
             if field_name not in cls.list_display:
                 return [
                     checks.Error(
-                        "The value of '%s' refers to %s but it is not defined in 'list_display'." % (
+                        "The value of '%s' refers to '%s' which is not contained in 'list_display'." % (
                             label, field_name
                         ),
                         hint=None,

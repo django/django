@@ -77,7 +77,7 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                "The value of 'list_editable[0]' refers to 'original_release but it is not defined in 'list_display'",
+                "The value of 'list_editable[0]' refers to 'original_release' which is not contained in 'list_display'",
                 hint=None,
                 obj=SongAdmin,
                 id='admin.E122',
