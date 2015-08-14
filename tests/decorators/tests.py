@@ -295,17 +295,26 @@ class MethodDecoratorTests(SimpleTestCase):
         """
         @method_decorator can accept an iterable of decorators.
         """
-        def deco_2(func):
+        def add_question_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "?"
             return _wrapper
 
-        def deco_1(func):
+        def add_exclamation_mark(func):
             def _wrapper(*args, **kwargs):
                 return func(*args, **kwargs) + "!"
             return _wrapper
 
-        decorators = (deco_1, deco_2)
+        # the order should be coherent with the
+        # classical criterion of decorators application
+        # >>> @add_exclamation_mark
+        # >>> @add_question_mark
+        # >>> def func():
+        # ...    return ""
+        decorators = (
+            add_exclamation_mark,
+            add_question_mark
+        )
 
         @method_decorator(decorators, name="method")
         class TestFirst(object):
@@ -317,8 +326,8 @@ class MethodDecoratorTests(SimpleTestCase):
             def method(self):
                 return "hello world"
 
-        self.assertTrue(TestFirst().method() == "hello world!?")
-        self.assertTrue(TestSecond().method() == "hello world!?")
+        self.assertTrue(TestFirst().method() == "hello world?!")
+        self.assertTrue(TestSecond().method() == "hello world?!")
 
     def test_invalid_non_callable_attribute_decoration(self):
         """

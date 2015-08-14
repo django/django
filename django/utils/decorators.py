@@ -45,9 +45,12 @@ def method_decorator(decorator, name=''):
         else:
             func = obj
 
+        # helper function to manage the iterable decorator case
         def decorate(function):
             if hasattr(decorator, "__iter__"):
-                for dec in decorator:
+                # at this point we don't know if decorator respects
+                # the sequence protocol so we generate a tuple out of it
+                for dec in reversed(tuple(decorator)):
                     function = dec(function)
                 return function
             return decorator(function)

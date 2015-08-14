@@ -338,11 +338,8 @@ Generic Views
 * Class based views generated using ``as_view()`` now have ``view_class``
   and ``view_initkwargs`` attributes.
 
-* :func:`~django.utils.decorators.method_decorator` can now be used to
-  :ref:`decorate classes instead of methods <decorating-class-based-views>`.
-
-* :func:`~django.utils.decorators.method_decorator` can now be used with
-  iterable of decorators (i.e. a list or a tuple) or with a decorator function
+* :func:`~django.utils.decorators.method_decorator` can now be used with an iterable
+  of decorators and to
   :ref:`decorate classes instead of methods <decorating-class-based-views>`.
 
 Internationalization
