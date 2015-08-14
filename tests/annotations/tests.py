@@ -8,7 +8,8 @@ from django.db.models import (
     F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
     IntegerField, Sum, Value,
 )
-from django.test import TestCase
+from django.db.models.functions import Lower
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from .models import (
@@ -159,6 +160,40 @@ class NonAggregateAnnotationTestCase(TestCase):
         agg = Author.objects.annotate(other_age=F('age')).aggregate(otherage_sum=Sum('other_age'))
         other_agg = Author.objects.aggregate(age_sum=Sum('age'))
         self.assertEqual(agg['otherage_sum'], other_agg['age_sum'])
+
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_distinct_on_with_annotation(self):
+        store = Store.objects.create(
+            name='test store',
+            original_opening=datetime.datetime.now(),
+            friday_night_closing=datetime.time(21, 00, 00),
+        )
+        names = [
+            'Theodore Roosevelt',
+            'Eleanor Roosevelt',
+            'Franklin Roosevelt',
+            'Ned Stark',
+            'Catelyn Stark',
+        ]
+        for name in names:
+            Employee.objects.create(
+                store=store,
+                first_name=name.split()[0],
+                last_name=name.split()[1],
+                age=30, salary=2000,
+            )
+
+        people = Employee.objects.annotate(
+            name_lower=Lower('last_name'),
+        ).distinct('name_lower')
+
+        self.assertEqual(set(p.last_name for p in people), {'Stark', 'Roosevelt'})
+        self.assertEqual(len(people), 2)
+
+        people2 = Employee.objects.annotate(
+            test_alias=F('store__name'),
+        ).distinct('test_alias')
+        self.assertEqual(len(people2), 1)
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
