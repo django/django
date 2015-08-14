@@ -1007,7 +1007,7 @@ fields are ordered first::
     <li>Cc myself: <input type="checkbox" name="cc_myself" /></li>
     <li>Priority: <input type="text" name="priority" /></li>
 
-It's possible to subclass multiple forms, treating forms as "mix-ins." In this
+It's possible to subclass multiple forms, treating forms as mixins. In this
 example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
 (in that order), and its field list includes the fields from the parent
 classes::
@@ -1029,8 +1029,8 @@ classes::
 
 .. versionadded:: 1.7
 
-* It's possible to declaratively remove a ``Field`` inherited from a parent
-  class by setting the name to be ``None`` on the subclass. For example::
+It's possible to declaratively remove a ``Field`` inherited from a parent class
+by setting the name of the field to ``None`` on the subclass. For example::
 
     >>> from django import forms
 
