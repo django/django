@@ -25,7 +25,8 @@ How it works
 ============
 
 ``manage.py migrate`` creates a ``django_redirect`` table in your database. This
-is a simple lookup table with ``site_id``, ``old_path`` and ``new_path`` fields.
+is a simple lookup table with ``site_id``, ``old_path``, ``new_path`` and
+``is_active`` fields.
 
 The :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
 does all of the work. Each time any Django application raises a 404
@@ -34,8 +35,9 @@ URL as a last resort. Specifically, it checks for a redirect with the
 given ``old_path`` with a site ID that corresponds to the
 :setting:`SITE_ID` setting.
 
-* If it finds a match, and ``new_path`` is not empty, it redirects to
-  ``new_path`` using a 301 ("Moved Permanently") redirect. You can subclass
+* If it finds a match, and ``new_path`` is not empty and ``is_active`` is
+  ``True``, it redirects to ``new_path`` using a 301 ("Moved Permanently")
+  redirect. You can subclass
   :class:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware`
   and set
   :attr:`~django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class`
@@ -74,6 +76,12 @@ Via the Python API
     Redirects are represented by a standard :doc:`Django model </topics/db/models>`,
     which lives in `django/contrib/redirects/models.py`_. You can access redirect
     objects via the :doc:`Django database API </topics/db/queries>`.
+
+    .. attribute:: is_active
+
+        .. versionadded:: 1.9
+
+        Defaults to ``True``.
 
 .. _django/contrib/redirects/models.py: https://github.com/django/django/blob/master/django/contrib/redirects/models.py
 

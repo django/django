@@ -56,6 +56,20 @@ class RedirectTests(TestCase):
         with self.assertRaises(ImproperlyConfigured):
             RedirectFallbackMiddleware()
 
+    def test_is_active(self):
+        Redirect.objects.create(
+            site=self.site, old_path='/initial', new_path='/new_target'
+        )
+        response = self.client.get('/initial')
+        self.assertRedirects(
+            response, '/new_target', status_code=301, target_status_code=404
+        )
+        Redirect.objects.filter(
+            site=self.site, old_path='/initial'
+        ).update(is_active=False)
+        response = self.client.get('/initial')
+        self.assertEqual(response.status_code, 404)
+
 
 class OverriddenRedirectFallbackMiddleware(RedirectFallbackMiddleware):
     # Use HTTP responses different from the defaults

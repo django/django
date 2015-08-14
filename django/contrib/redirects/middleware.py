@@ -31,7 +31,9 @@ class RedirectFallbackMiddleware(object):
 
         r = None
         try:
-            r = Redirect.objects.get(site=current_site, old_path=full_path)
+            r = Redirect.objects.get(
+                site=current_site, old_path=full_path, is_active=True
+            )
         except Redirect.DoesNotExist:
             pass
         if r is None and settings.APPEND_SLASH and not request.path.endswith('/'):
@@ -39,6 +41,7 @@ class RedirectFallbackMiddleware(object):
                 r = Redirect.objects.get(
                     site=current_site,
                     old_path=request.get_full_path(force_append_slash=True),
+                    is_active=True,
                 )
             except Redirect.DoesNotExist:
                 pass
