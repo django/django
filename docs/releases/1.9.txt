@@ -462,6 +462,8 @@ Models
   :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
   characters in slugs.
 
+* Added support for referencing annotations in ``QuerySet.distinct()``.
+
 CSRF
 ^^^^
 

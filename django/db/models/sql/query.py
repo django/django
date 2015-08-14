@@ -1292,9 +1292,15 @@ class Query(object):
             cur_names_with_path = (name, [])
             if name == 'pk':
                 name = opts.pk.name
+
+            field = None
             try:
                 field = opts.get_field(name)
+            except FieldDoesNotExist:
+                if name in self.annotation_select:
+                    field = self.annotation_select[name].output_field
 
+            if field is not None:
                 # Fields that contain one-to-many relations with a generic
                 # model (like a GenericForeignKey) cannot generate reverse
                 # relations and therefore cannot be used for reverse querying.
@@ -1305,8 +1311,11 @@ class Query(object):
                         "querying. If it is a GenericForeignKey, consider "
                         "adding a GenericRelation." % name
                     )
-                model = field.model._meta.concrete_model
-            except FieldDoesNotExist:
+                try:
+                    model = field.model._meta.concrete_model
+                except AttributeError:
+                    model = None
+            else:
                 # We didn't find the current field, so move position back
                 # one step.
                 pos -= 1

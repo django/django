@@ -548,7 +548,10 @@ class SQLCompiler(object):
             _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
-                result.append("%s.%s" % (qn(alias), qn2(target.column)))
+                if name in self.query.annotation_select:
+                    result.append(name)
+                else:
+                    result.append("%s.%s" % (qn(alias), qn2(target.column)))
         return result
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
