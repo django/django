@@ -242,7 +242,8 @@ Minor features
 :mod:`django.contrib.redirects`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :class:`~django.contrib.redirects.models.Redirect` now has a ``is_active``
+  field to allow disabling redirects.
 
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -11,6 +11,7 @@ class Redirect(models.Model):
         help_text=_("This should be an absolute path, excluding the domain name. Example: '/events/search/'."))
     new_path = models.CharField(_('redirect to'), max_length=200, blank=True,
         help_text=_("This can be either an absolute path (as above) or a full URL starting with 'http://'."))
+    is_active = models.BooleanField(_('Active?'), default=True)
 
     class Meta:
         verbose_name = _('redirect')
