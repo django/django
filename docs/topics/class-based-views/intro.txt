@@ -299,16 +299,20 @@ an iterable of decorators, i.e. a tuple or a list, and use this instead of invok
     class ProtectedView(TemplateView):
         template_name = 'secret.html'
 
-Remember that the ``request`` object is managed using a last-in-first-out basis,
-i.e. in the example ``login_required()`` will work on request before ``never_cache()``.
+
+    # equals to
+    @method_decorator(never_cache, name='dispatch')
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+Remember that the ``request`` object is managed using a fist-in-first-out basis,
+i.e. in the example ``never_cache()`` will work on the request before ``login_required()``.
 
 .. versionchanged:: 1.9
 
     The ability to use ``method_decorator()`` on a class was added.
-
-.. versionchanged:: 1.9
-
-    Polymorphic behavior added to ``method_decorator()``.
+    ``method_decorator()`` can now accept a iterable of decorators.
 
 In this example, every instance of ``ProtectedView`` will have login protection.
 
