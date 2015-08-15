@@ -312,6 +312,9 @@ Models
   app label and class interpolation using the ``'%(app_label)s'`` and
   ``'%(class)s'`` strings.
 
+* The :func:`~django.db.models.prefetch_related_objects` function is now a
+  public API.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

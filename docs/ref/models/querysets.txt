@@ -920,6 +920,10 @@ results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
 
+If you have an iterable of model instances, you can prefetch related attributes
+on those instances using the :func:`~django.db.models.prefetch_related_objects`
+function.
+
 Note that the result cache of the primary ``QuerySet`` and all specified related
 objects will then be fully loaded into memory. This changes the typical
 behavior of ``QuerySets``, which normally try to avoid loading all objects into
@@ -2998,8 +3002,8 @@ by the aggregate.
 
 .. _SQLite documentation: https://www.sqlite.org/contrib
 
-Query-related classes
-=====================
+Query-related tools
+===================
 
 This section provides reference material for query-related tools not documented
 elsewhere.
@@ -3064,3 +3068,21 @@ attribute:
     provide a significant speed improvement over traditional
     ``prefetch_related`` calls which store the cached result within a
     ``QuerySet`` instance.
+
+``prefetch_related_objects()``
+------------------------------
+
+.. function:: prefetch_related_objects(model_instances, *related_lookups)
+
+.. versionadded:: 1.10
+
+Prefetches the given lookups on an iterable of model instances. This is useful
+in code that receives a list of model instances as opposed to a ``QuerySet``;
+for example, when fetching models from a cache or instantiating them manually.
+
+Pass an iterable of model instances (must all be of the same class) and the
+lookups or :class:`Prefetch` objects you want to prefetch for. For example::
+
+    >>> from django.db.models import prefetch_related_objects
+    >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
+    >>> prefetch_related_objects(restaurants, 'pizzas__toppings')

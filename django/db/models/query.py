@@ -654,7 +654,7 @@ class QuerySet(object):
 
     def _prefetch_related_objects(self):
         # This method can only be called once the result cache has been filled.
-        prefetch_related_objects(self._result_cache, self._prefetch_related_lookups)
+        prefetch_related_objects(self._result_cache, *self._prefetch_related_lookups)
         self._prefetch_done = True
 
     ##################################################
@@ -1368,15 +1368,12 @@ def normalize_prefetch_lookups(lookups, prefix=None):
     return ret
 
 
-def prefetch_related_objects(result_cache, related_lookups):
+def prefetch_related_objects(model_instances, *related_lookups):
     """
-    Helper function for prefetch_related functionality
-
-    Populates prefetched objects caches for a list of results
-    from a QuerySet
+    Populate prefetched object caches for a list of model instances based on
+    the lookups/Prefetch instances given.
     """
-
-    if len(result_cache) == 0:
+    if len(model_instances) == 0:
         return  # nothing to do
 
     related_lookups = normalize_prefetch_lookups(related_lookups)
@@ -1401,7 +1398,7 @@ def prefetch_related_objects(result_cache, related_lookups):
 
         # Top level, the list of objects to decorate is the result cache
         # from the primary QuerySet. It won't be for deeper levels.
-        obj_list = result_cache
+        obj_list = model_instances
 
         through_attrs = lookup.prefetch_through.split(LOOKUP_SEP)
         for level, through_attr in enumerate(through_attrs):
