@@ -463,8 +463,8 @@ body.popup .submit-row {
 .inline-group ul.tools a.add,
 .inline-group div.add-row a,
 .inline-group .tabular tr.add-row td a {
-    background: url(../img/icon_addlink.gif) 0 50% no-repeat;
-    padding-left: 14px;
+    background: url(../img/svg/icon-addlink.svg) 0 1px no-repeat;
+    padding-left: 16px;
     font-size: 12px;
     outline: 0; /* Remove dotted border around link */
 }
@@ -478,22 +478,21 @@ body.popup .submit-row {
 .add-another, .related-lookup {
     margin-left: 5px;
     display: inline-block;
+    vertical-align: middle;
+    background-repeat: no-repeat;
+    background-size: 14px;
 }
 
 .add-another {
-    width: 10px;
-    height: 10px;
-    background-image: url(../img/icon_addlink.gif);
+    width: 16px;
+    height: 16px;
+    background-image: url(../img/svg/icon-addlink.svg);
 }
 
 .related-lookup {
     width: 16px;
     height: 16px;
-    background-image: url(../img/selector-search.gif);
-    background-repeat: no-repeat;
-    background-position: 0 3px;
-    vertical-align: middle;
-    margin-top: -4px;
+    background-image: url(../img/svg/search.svg);
 }
 
 form .related-widget-wrapper ul {

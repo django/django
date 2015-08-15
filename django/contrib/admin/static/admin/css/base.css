@@ -192,7 +192,7 @@ p.mini {
     color: #999;
 }
 
-img.help-tooltip {
+.help-tooltip {
     cursor: help;
 }
 
@@ -352,7 +352,7 @@ table thead th.sorted:hover a.sortremove {
 
 table thead th.sorted .sortoptions {
     display: block;
-    padding: 10px 5px 0 5px;
+    padding: 9px 5px 0 5px;
     float: right;
     text-align: right;
 }
@@ -361,37 +361,57 @@ table thead th.sorted .sortpriority {
     font-size: .8em;
     min-width: 12px;
     text-align: center;
-    vertical-align: top;
+    vertical-align: 3px;
+    margin-left: 2px;
+    margin-right: 2px;
 }
 
 table thead th.sorted .sortoptions a {
+    position: relative;
     width: 14px;
-    height: 12px;
+    height: 14px;
     display: inline-block;
+    background: url(../img/svg/sorting-icons.svg) 0 0 no-repeat;
+    background-size: 14px auto;
 }
 
 table thead th.sorted .sortoptions a.sortremove {
-    background: url(../img/sorting-icons.gif) -4px -5px no-repeat;
+    background-position: 0 0;
+}
+
+table thead th.sorted .sortoptions a.sortremove:after {
+    content: '\\';
+    position: absolute;
+    top: -6px;
+    left: 3px;
+    font-weight: 200;
+    font-size: 18px;
+    color: #999;
+}
+
+table thead th.sorted .sortoptions a.sortremove:hover:after {
+    color: #447e9b;
 }
 
 table thead th.sorted .sortoptions a.sortremove:hover {
-    background: url(../img/sorting-icons.gif) -4px -27px no-repeat;
+    background-position: 0 -14px;
 }
 
 table thead th.sorted .sortoptions a.ascending {
-    background: url(../img/sorting-icons.gif) -5px -50px no-repeat;
+    background-position: 0 -28px;
 }
 
 table thead th.sorted .sortoptions a.ascending:hover {
-    background: url(../img/sorting-icons.gif) -5px -72px no-repeat;
+    background-position: 0 -42px;
 }
 
 table thead th.sorted .sortoptions a.descending {
-    background: url(../img/sorting-icons.gif) -5px -94px no-repeat;
+    top: 1px;
+    background-position: 0 -56px;
 }
 
 table thead th.sorted .sortoptions a.descending:hover {
-    background: url(../img/sorting-icons.gif) -5px -115px no-repeat;
+    background-position: 0 -70px;
 }
 
 /* ORDERABLE TABLES */
@@ -551,16 +571,19 @@ ul.messagelist li {
     font-size: 13px;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: #dfd url(../img/icon_success.gif) 40px 12px no-repeat;
+    background: #dfd url(../img/svg/icon-yes.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
     color: #333;
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/icon_alert.gif) 40px 10px no-repeat;
+    background: #ffc url(../img/svg/icon-alert.svg) 40px 14px no-repeat;
+    background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/icon_error.gif) 40px 11px no-repeat;
+    background: #ffefef url(../img/svg/icon-no.svg) 40px 12px no-repeat;
+    background-size: 16px auto;
 }
 
 .errornote {
@@ -633,7 +656,7 @@ div.system-message p.system-message-title {
     padding: 4px 5px 4px 25px;
     margin: 0;
     color: #c11;
-    background: #ffefef url(../img/icon_error.gif) 5px .3em no-repeat;
+    background: #ffefef url(../img/svg/icon-no.svg) 5px 5px no-repeat;
 }
 
 .description {
@@ -663,18 +686,18 @@ div.breadcrumbs a:hover {
 /* ACTION ICONS */
 
 .addlink {
-    padding-left: 14px;
-    background: url(../img/icon_addlink.gif) 0 .2em no-repeat;
+    padding-left: 16px;
+    background: url(../img/svg/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
-    padding-left: 14px;
-    background: url(../img/icon_changelink.gif) 0 .2em no-repeat;
+    padding-left: 16px;
+    background: url(../img/svg/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
-    padding-left: 14px;
-    background: url(../img/icon_deletelink.gif) 0 .25em no-repeat;
+    padding-left: 16px;
+    background: url(../img/svg/icon-deletelink.svg) 0 1px no-repeat;
 }
 
 a.deletelink:link, a.deletelink:visited {
@@ -732,12 +755,12 @@ a.deletelink:hover {
 }
 
 .object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/tooltag-arrowright.png) 95% center no-repeat;
+    background: #999 url(../img/svg/tooltag-arrowright.svg) 93% center no-repeat;
     padding-right: 26px;
 }
 
 .object-tools a.addlink {
-    background: #999 url(../img/tooltag-add.png) 95% center no-repeat;
+    background: #999 url(../img/svg/tooltag-add.svg) 93% center no-repeat;
     padding-right: 26px;
 }
 
