@@ -1734,7 +1734,7 @@ Loading ``ssi`` and ``url`` template tags from ``future`` library
 
 Django 1.3 introduced ``{% load ssi from future %}`` and
 ``{% load url from future %}`` syntax for forward compatibility of the
-:ttag:`ssi` and :ttag:`url` template tags. This syntax is now deprecated and
+``ssi`` and :ttag:`url` template tags. This syntax is now deprecated and
 will be removed in Django 1.9. You can simply remove the
 ``{% load ... from future %}`` tags.
 

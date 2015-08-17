@@ -85,7 +85,6 @@ def reset_template_engines(**kwargs):
     if kwargs['setting'] in {
         'TEMPLATES',
         'TEMPLATE_DIRS',
-        'ALLOWED_INCLUDE_ROOTS',
         'TEMPLATE_CONTEXT_PROCESSORS',
         'TEMPLATE_DEBUG',
         'TEMPLATE_LOADERS',

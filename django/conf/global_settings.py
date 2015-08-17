@@ -260,10 +260,6 @@ DISALLOWED_USER_AGENTS = []
 
 ABSOLUTE_URL_OVERRIDES = {}
 
-# List of strings representing allowed prefixes for the {% ssi %} tag.
-# Example: ['/home/html', '/var/www']
-ALLOWED_INCLUDE_ROOTS = []
-
 # List of compiled regular expression objects representing URLs that need not
 # be reported by BrokenLinkEmailsMiddleware. Here are a few examples:
 #    import re

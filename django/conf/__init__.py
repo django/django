@@ -99,7 +99,6 @@ class Settings(BaseSettings):
         mod = importlib.import_module(self.SETTINGS_MODULE)
 
         tuple_settings = (
-            "ALLOWED_INCLUDE_ROOTS",
             "INSTALLED_APPS",
             "TEMPLATE_DIRS",
             "LOCALE_PATHS",

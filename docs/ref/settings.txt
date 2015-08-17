@@ -99,32 +99,6 @@ This validation only applies via :meth:`~django.http.HttpRequest.get_host()`;
 if your code accesses the ``Host`` header directly from ``request.META`` you
 are bypassing this security protection.
 
-.. setting:: ALLOWED_INCLUDE_ROOTS
-
-ALLOWED_INCLUDE_ROOTS
----------------------
-
-Default: ``[]`` (Empty list)
-
-.. deprecated:: 1.8
-
-    This setting, along with the :ttag:`ssi` template tag, is deprecated and
-    will be removed in Django 1.10.
-
-.. versionchanged:: 1.8
-
-    You can also set the ``'allowed_include_roots'`` option in the
-    :setting:`OPTIONS <TEMPLATES-OPTIONS>` of a ``DjangoTemplates`` backend
-    instead.
-
-A list of strings representing allowed prefixes for the ``{% ssi %}`` template
-tag. This is a security measure, so that template authors can't access files
-that they shouldn't be accessing.
-
-For example, if :setting:`ALLOWED_INCLUDE_ROOTS` is ``['/home/html', '/var/www']``,
-then ``{% ssi /home/html/foo.txt %}`` would work, but ``{% ssi /etc/passwd %}``
-wouldn't.
-
 .. setting:: APPEND_SLASH
 
 APPEND_SLASH
@@ -3433,7 +3407,6 @@ Serialization
 
 Templates
 ---------
-* :setting:`ALLOWED_INCLUDE_ROOTS`
 * :setting:`TEMPLATES`
 * :setting:`TEMPLATE_CONTEXT_PROCESSORS`
 * :setting:`TEMPLATE_DEBUG`

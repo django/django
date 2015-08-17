@@ -958,45 +958,6 @@ this example, the space around ``Hello`` won't be stripped::
         </strong>
     {% endspaceless %}
 
-.. templatetag:: ssi
-
-ssi
-^^^
-
-.. deprecated:: 1.8
-
-    This tag has been deprecated and will be removed in Django 1.10. Use the
-    :ttag:`include` tag instead.
-
-Outputs the contents of a given file into the page.
-
-Like a simple :ttag:`include` tag, ``{% ssi %}`` includes the contents of
-another file -- which must be specified using an absolute path -- in the
-current page::
-
-    {% ssi '/home/html/ljworld.com/includes/right_generic.html' %}
-
-The first parameter of ``ssi`` can be a quoted literal or any other context
-variable.
-
-If the optional ``parsed`` parameter is given, the contents of the included
-file are evaluated as template code, within the current context::
-
-    {% ssi '/home/html/ljworld.com/includes/right_generic.html' parsed %}
-
-Note that if you use ``{% ssi %}``, you'll need to define
-``'allowed_include_roots'`` in the :setting:`OPTIONS <TEMPLATES-OPTIONS>` of
-your template engine, as a security measure.
-
-.. note::
-    With the :ttag:`ssi` tag and the ``parsed`` parameter
-    there is no shared state between files -- each include is a completely
-    independent rendering process. This means it's not possible for example to
-    define blocks or alter the context in the current page using the included
-    file.
-
-See also: :ttag:`{% include %}<include>`.
-
 .. templatetag:: templatetag
 
 templatetag
