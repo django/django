@@ -23,14 +23,11 @@ class Engine(object):
         'django.template.loader_tags',
     ]
 
-    def __init__(self, dirs=None, app_dirs=False,
-                 allowed_include_roots=None, context_processors=None,
+    def __init__(self, dirs=None, app_dirs=False, context_processors=None,
                  debug=False, loaders=None, string_if_invalid='',
                  file_charset='utf-8', libraries=None, builtins=None):
         if dirs is None:
             dirs = []
-        if allowed_include_roots is None:
-            allowed_include_roots = []
         if context_processors is None:
             context_processors = []
         if loaders is None:
@@ -46,13 +43,8 @@ class Engine(object):
         if builtins is None:
             builtins = []
 
-        if isinstance(allowed_include_roots, six.string_types):
-            raise ImproperlyConfigured(
-                "allowed_include_roots must be a tuple, not a string.")
-
         self.dirs = dirs
         self.app_dirs = app_dirs
-        self.allowed_include_roots = allowed_include_roots
         self.context_processors = context_processors
         self.debug = debug
         self.loaders = loaders

@@ -252,9 +252,9 @@ that might occur as a result of a version upgrade.
 * **1_8.W001**: The standalone ``TEMPLATE_*`` settings were deprecated in
   Django 1.8 and the :setting:`TEMPLATES` dictionary takes precedence. You must
   put the values of the following settings into your defaults ``TEMPLATES``
-  dict: :setting:`TEMPLATE_DIRS`, :setting:`ALLOWED_INCLUDE_ROOTS`,
-  :setting:`TEMPLATE_CONTEXT_PROCESSORS`, :setting:`TEMPLATE_DEBUG`,
-  :setting:`TEMPLATE_LOADERS`, :setting:`TEMPLATE_STRING_IF_INVALID`.
+  dict: :setting:`TEMPLATE_DIRS`, :setting:`TEMPLATE_CONTEXT_PROCESSORS`,
+  :setting:`TEMPLATE_DEBUG`, :setting:`TEMPLATE_LOADERS`,
+  :setting:`TEMPLATE_STRING_IF_INVALID`.
 
 Admin
 -----

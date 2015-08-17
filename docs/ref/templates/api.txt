@@ -48,7 +48,7 @@ probably isn't the documentation you're looking for. An instance of the
 of that backend and any attribute defaults mentioned below are overridden by
 what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. class:: Engine(dirs=None, app_dirs=False, allowed_include_roots=None, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
 
     .. versionadded:: 1.8
 
@@ -64,21 +64,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     * ``app_dirs`` only affects the default value of ``loaders``. See below.
 
       It defaults to ``False``.
-
-    * ``allowed_include_roots`` is a list of strings representing allowed
-      prefixes for the ``{% ssi %}`` template tag. This is a security measure,
-      so that template authors can't access files that they shouldn't be
-      accessing.
-
-      For example, if ``'allowed_include_roots'`` is ``['/home/html',
-      '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-      ssi /etc/passwd %}`` wouldn't.
-
-      It defaults to an empty list.
-
-      .. deprecated:: 1.8
-
-          ``allowed_include_roots`` is deprecated.
 
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a

@@ -1654,7 +1654,7 @@ Django 1.10.
 ``ssi`` template tag
 ~~~~~~~~~~~~~~~~~~~~
 
-The :ttag:`ssi` template tag allows files to be included in a template by
+The ``ssi`` template tag allows files to be included in a template by
 absolute path. This is of limited use in most deployment situations, and
 the :ttag:`include` tag often makes more sense. This tag is now deprecated and
 will be removed in Django 1.10.

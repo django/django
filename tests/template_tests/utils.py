@@ -55,7 +55,6 @@ def setup(templates, *args, **kwargs):
             libraries = getattr(self, 'libraries', {})
 
             self.engine = Engine(
-                allowed_include_roots=[ROOT],
                 libraries=libraries,
                 loaders=loaders,
             )
@@ -65,7 +64,6 @@ def setup(templates, *args, **kwargs):
             func(self)
 
             self.engine = Engine(
-                allowed_include_roots=[ROOT],
                 libraries=libraries,
                 loaders=loaders,
                 string_if_invalid='INVALID',
@@ -74,7 +72,6 @@ def setup(templates, *args, **kwargs):
             func(self)
 
             self.engine = Engine(
-                allowed_include_roots=[ROOT],
                 debug=True,
                 libraries=libraries,
                 loaders=loaders,

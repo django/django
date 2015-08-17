@@ -348,21 +348,6 @@ applications. This generic name was kept for backwards-compatibility.
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
-* ``'allowed_include_roots'``: a list of strings representing allowed prefixes
-  for the ``{% ssi %}`` template tag. This is a security measure, so that
-  template authors can't access files that they shouldn't be accessing.
-
-  For example, if ``'allowed_include_roots'`` is ``['/home/html',
-  '/var/www']``, then ``{% ssi /home/html/foo.txt %}`` would work, but ``{%
-  ssi /etc/passwd %}`` wouldn't.
-
-  It defaults to an empty list.
-
-  .. deprecated:: 1.8
-
-      ``allowed_include_roots`` is deprecated because the {% ssi %} tag is
-      deprecated.
-
 * ``'context_processors'``: a list of dotted Python paths to callables that
   are used to populate the context when a template is rendered with a request.
   These callables take a request object as their argument and return a

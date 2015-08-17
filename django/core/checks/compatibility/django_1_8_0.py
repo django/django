@@ -10,7 +10,6 @@ def check_duplicate_template_settings(app_configs, **kwargs):
     if settings.TEMPLATES:
         values = [
             'TEMPLATE_DIRS',
-            'ALLOWED_INCLUDE_ROOTS',
             'TEMPLATE_CONTEXT_PROCESSORS',
             'TEMPLATE_DEBUG',
             'TEMPLATE_LOADERS',

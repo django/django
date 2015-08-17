@@ -472,7 +472,6 @@ class TestListSettings(unittest.TestCase):
     ImproperlyConfigured if they are set to a string instead of a list or tuple.
     """
     list_or_tuple_settings = (
-        "ALLOWED_INCLUDE_ROOTS",
         "INSTALLED_APPS",
         "TEMPLATE_DIRS",
         "LOCALE_PATHS",
