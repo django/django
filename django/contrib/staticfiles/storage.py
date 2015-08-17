@@ -166,6 +166,8 @@ class HashedFilesMixin(object):
             name_parts = name.split(os.sep)
             # Using posix normpath here to remove duplicates
             url = posixpath.normpath(url)
+            # Avoid errors in the edge case that the URLs is like ../fonts/foo.svg#../fonts/foo
+            url, fragment = urldefrag(url)
             url_parts = url.split('/')
             parent_level, sub_level = url.count('..'), url.count('/')
             if url.startswith('/'):
