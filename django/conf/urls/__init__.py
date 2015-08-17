@@ -6,9 +6,7 @@ from django.core.urlresolvers import (
     LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
 )
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 __all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'url']
 
@@ -76,21 +74,10 @@ def include(arg, namespace=None, app_name=None):
     return (urlconf_module, app_name, namespace)
 
 
-def url(regex, view, kwargs=None, name=None, prefix=''):
+def url(regex, view, kwargs=None, name=None):
     if isinstance(view, (list, tuple)):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
         return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
     else:
-        if isinstance(view, six.string_types):
-            warnings.warn(
-                'Support for string view arguments to url() is deprecated and '
-                'will be removed in Django 1.10 (got %s). Pass the callable '
-                'instead.' % view,
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            if not view:
-                raise ImproperlyConfigured('Empty URL pattern view name not permitted (for pattern %r)' % regex)
-            if prefix:
-                view = prefix + '.' + view
         return RegexURLPattern(regex, view, kwargs, name)
