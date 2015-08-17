@@ -1,5 +1,4 @@
 import re
-import warnings
 from itertools import chain
 
 from django.core.exceptions import FieldError
@@ -13,7 +12,6 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.six.moves import zip
 
 
@@ -329,17 +327,6 @@ class SQLCompiler(object):
                 if not is_ref and (without_ordering, params) not in select_sql:
                     extra_select.append((expr, (without_ordering, params), None))
         return extra_select
-
-    def __call__(self, name):
-        """
-        Backwards-compatibility shim so that calling a SQLCompiler is equivalent to
-        calling its quote_name_unless_alias method.
-        """
-        warnings.warn(
-            "Calling a SQLCompiler directly is deprecated. "
-            "Call compiler.quote_name_unless_alias instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        return self.quote_name_unless_alias(name)
 
     def quote_name_unless_alias(self, name):
         """
