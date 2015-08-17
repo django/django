@@ -3515,7 +3515,8 @@ class RelatedLookupTypeTests(TestCase):
         # parent objects
         self.assertQuerysetEqual(ObjectC.objects.exclude(childobjecta=self.oa), out_c)
 
-        # Test for #23226
+        # QuerySet related object type checking shouldn't issue queries
+        # (the querysets aren't evaluated here, hence zero queries) (#23266).
         with self.assertNumQueries(0):
             ObjectB.objects.filter(objecta__in=ObjectA.objects.all())
 
