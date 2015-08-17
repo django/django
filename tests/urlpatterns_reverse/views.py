@@ -10,10 +10,6 @@ def empty_view(request, *args, **kwargs):
     return HttpResponse('')
 
 
-def kwargs_view(request, arg1=1, arg2=2):
-    return HttpResponse('')
-
-
 def absolute_kwargs_view(request, arg1=1, arg2=2):
     return HttpResponse('')
 

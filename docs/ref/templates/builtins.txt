@@ -1051,13 +1051,6 @@ This will follow the normal :ref:`namespaced URL resolution strategy
 <topics-http-reversing-url-namespaces>`, including using any hints provided
 by the context as to the current application.
 
-.. deprecated:: 1.8
-
-    You can also pass a dotted Python path to a view function, but this syntax
-    is deprecated and will be removed in Django 1.10::
-
-        {% url 'path.to.some_view' v1 v2 %}
-
 .. warning::
 
     Don't forget to put quotes around the :func:`~django.conf.urls.url`
