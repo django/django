@@ -223,14 +223,6 @@ class RegexURLPattern(LocaleRegexProvider):
     def __repr__(self):
         return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
 
-    def add_prefix(self, prefix):
-        """
-        Adds the prefix string to a string-based callback.
-        """
-        if not prefix or not hasattr(self, '_callback_str'):
-            return
-        self._callback_str = prefix + '.' + self._callback_str
-
     def resolve(self, path):
         match = self.regex.search(path)
         if match:

@@ -1233,7 +1233,7 @@ disable this backward-compatibility shim and deprecation warning.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Until Django 1.3, the functions :func:`~django.conf.urls.include`,
-:func:`~django.conf.urls.patterns` and :func:`~django.conf.urls.url` plus
+``patterns()`` and :func:`~django.conf.urls.url` plus
 :data:`~django.conf.urls.handler404`, :data:`~django.conf.urls.handler500`
 were located in a ``django.conf.urls.defaults`` module.
 

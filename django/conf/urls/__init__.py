@@ -10,7 +10,7 @@ from django.utils.deprecation import (
     RemovedInDjango20Warning, RemovedInDjango110Warning,
 )
 
-__all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'patterns', 'url']
+__all__ = ['handler400', 'handler403', 'handler404', 'handler500', 'include', 'url']
 
 handler400 = 'django.views.defaults.bad_request'
 handler403 = 'django.views.defaults.permission_denied'
@@ -74,23 +74,6 @@ def include(arg, namespace=None, app_name=None):
                     'Using i18n_patterns in an included URLconf is not allowed.')
 
     return (urlconf_module, app_name, namespace)
-
-
-def patterns(prefix, *args):
-    warnings.warn(
-        'django.conf.urls.patterns() is deprecated and will be removed in '
-        'Django 1.10. Update your urlpatterns to be a list of '
-        'django.conf.urls.url() instances instead.',
-        RemovedInDjango110Warning, stacklevel=2
-    )
-    pattern_list = []
-    for t in args:
-        if isinstance(t, (list, tuple)):
-            t = url(prefix=prefix, *t)
-        elif isinstance(t, RegexURLPattern):
-            t.add_prefix(prefix)
-        pattern_list.append(t)
-    return pattern_list
 
 
 def url(regex, view, kwargs=None, name=None, prefix=''):
