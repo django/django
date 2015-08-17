@@ -1332,13 +1332,7 @@ Django provides two mechanisms to internationalize URL patterns:
 Language prefix in URL patterns
 -------------------------------
 
-.. function:: i18n_patterns(prefix, pattern_description, ...)
-
-.. deprecated:: 1.8
-
-    The ``prefix`` argument to ``i18n_patterns()`` has been deprecated and will
-    not be supported in Django 1.10. Simply pass a list of
-    :func:`django.conf.urls.url` instances instead.
+.. function:: i18n_patterns(*pattern_list)
 
 This function can be used in your root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within

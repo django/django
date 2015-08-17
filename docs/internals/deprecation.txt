@@ -626,7 +626,7 @@ details on these changes.
   :mod:`django.contrib.gis.utils` will be removed.
 
 * ``django.conf.urls.defaults`` will be removed. The functions
-  :func:`~django.conf.urls.include`, :func:`~django.conf.urls.patterns` and
+  :func:`~django.conf.urls.include`, ``patterns()`` and
   :func:`~django.conf.urls.url` plus :data:`~django.conf.urls.handler404`,
   :data:`~django.conf.urls.handler500`, are now available through
   :mod:`django.conf.urls` .
