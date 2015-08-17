@@ -185,18 +185,6 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
     {% cycle 'row1' 'row2' as rowcolors silent %}
     {% cycle rowcolors %}
 
-.. deprecated:: 1.9
-
-    The ``{% cycle %}`` tag supports the much inferior old syntax from previous
-    Django versions. You shouldn't use this in any new projects, but for the
-    sake of the people who are still using it, here's what it looks like::
-
-        {% cycle row1,row2,row3 %}
-
-    In this syntax, each value gets interpreted as a literal string, and there's
-    no way to specify variable values, literal commas, or spaces. Support for
-    this syntax will be removed in Django 1.10.
-
 .. templatetag:: debug
 
 debug
