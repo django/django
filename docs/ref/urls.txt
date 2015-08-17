@@ -26,7 +26,7 @@ Helper function to return a URL pattern for serving files in debug mode::
 url()
 -----
 
-.. function:: url(regex, view, kwargs=None, name=None, prefix='')
+.. function:: url(regex, view, kwargs=None, name=None)
 
 ``urlpatterns`` should be a list of ``url()`` instances. For example::
 
@@ -35,24 +35,11 @@ url()
         ...
     ]
 
-This function takes five arguments, most of which are optional::
-
-    url(regex, view, kwargs=None, name=None, prefix='')
-
 The ``kwargs`` parameter allows you to pass additional arguments to the view
 function or method. See :ref:`views-extra-options` for an example.
 
 See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
-
-.. deprecated:: 1.8
-
-    Support for string ``view`` arguments is deprecated and will be removed in
-    Django 1.10. Pass the callable  instead.
-
-    The ``prefix`` parameter has the same meaning as the first argument to
-    ``patterns()`` and is only relevant when you're passing a string as the
-    ``view`` parameter.
 
 include()
 ---------
