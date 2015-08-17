@@ -6,7 +6,6 @@ from ..utils import setup
 
 
 class CycleTagTests(SimpleTestCase):
-    libraries = {'future': 'django.templatetags.future'}
 
     @setup({'cycle01': '{% cycle a %}'})
     def test_cycle01(self):
@@ -146,21 +145,17 @@ class CycleTagTests(SimpleTestCase):
         output = self.engine.render_to_string('cycle25', {'a': '<'})
         self.assertEqual(output, '&lt;')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @setup({'cycle26': '{% load cycle from future %}{% cycle a b as ab %}{% cycle ab %}'})
+    @setup({'cycle26': '{% cycle a b as ab %}{% cycle ab %}'})
     def test_cycle26(self):
         output = self.engine.render_to_string('cycle26', {'a': '<', 'b': '>'})
         self.assertEqual(output, '&lt;&gt;')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @setup({'cycle27': '{% load cycle from future %}'
-                       '{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}'})
+    @setup({'cycle27': '{% autoescape off %}{% cycle a b as ab %}{% cycle ab %}{% endautoescape %}'})
     def test_cycle27(self):
         output = self.engine.render_to_string('cycle27', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<>')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @setup({'cycle28': '{% load cycle from future %}{% cycle a|safe b as ab %}{% cycle ab %}'})
+    @setup({'cycle28': '{% cycle a|safe b as ab %}{% cycle ab %}'})
     def test_cycle28(self):
         output = self.engine.render_to_string('cycle28', {'a': '<', 'b': '>'})
         self.assertEqual(output, '<&gt;')
