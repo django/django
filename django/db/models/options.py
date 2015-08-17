@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import warnings
 from bisect import bisect
 from collections import OrderedDict, defaultdict
 from itertools import chain
@@ -11,15 +10,12 @@ from django.core.exceptions import FieldDoesNotExist
 from django.db import connections
 from django.db.models.fields import AutoField
 from django.db.models.fields.proxy import OrderWrt
-from django.db.models.fields.related import ManyToManyField
 from django.utils import six
 from django.utils.datastructures import ImmutableList, OrderedSet
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
 from django.utils.functional import cached_property
-from django.utils.lru_cache import lru_cache
 from django.utils.text import camel_case_to_spaces
 from django.utils.translation import override, string_concat
 
@@ -39,24 +35,6 @@ DEFAULT_NAMES = ('verbose_name', 'verbose_name_plural', 'db_table', 'ordering',
                  'index_together', 'apps', 'default_permissions',
                  'select_on_save', 'default_related_name',
                  'required_db_features', 'required_db_vendor')
-
-
-class raise_deprecation(object):
-    def __init__(self, suggested_alternative):
-        self.suggested_alternative = suggested_alternative
-
-    def __call__(self, fn):
-        def wrapper(*args, **kwargs):
-            warnings.warn(
-                "'%s is an unofficial API that has been deprecated. "
-                "You may be able to replace it with '%s'" % (
-                    fn.__name__,
-                    self.suggested_alternative,
-                ),
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            return fn(*args, **kwargs)
-        return wrapper
 
 
 def normalize_together(option_together):
@@ -150,31 +128,6 @@ class Options(object):
         self.apps = apps
 
         self.default_related_name = None
-
-    @lru_cache(maxsize=None)
-    def _map_model(self, link):
-        # This helper function is used to allow backwards compatibility with
-        # the previous API. No future methods should use this function.
-        # It maps a field to (field, model or related_model,) depending on the
-        # field type.
-        model = link.model._meta.concrete_model
-        if model is self.model:
-            model = None
-        return link, model
-
-    @lru_cache(maxsize=None)
-    def _map_model_details(self, link):
-        # This helper function is used to allow backwards compatibility with
-        # the previous API. No future methods should use this function.
-        # This function maps a field to a tuple of:
-        #  (field, model or related_model, direct, is_m2m) depending on the
-        # field type.
-        direct = not link.auto_created or link.concrete
-        model = link.model._meta.concrete_model
-        if model is self.model:
-            model = None
-        m2m = link.is_relation and link.many_to_many
-        return link, model, direct, m2m
 
     @property
     def label(self):
@@ -455,14 +408,6 @@ class Options(object):
             "local_concrete_fields", (f for f in self.local_fields if f.concrete)
         )
 
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_fields_with_model(self):
-        return [self._map_model(f) for f in self.get_fields()]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_concrete_fields_with_model(self):
-        return [self._map_model(f) for f in self.concrete_fields]
-
     @cached_property
     def many_to_many(self):
         """
@@ -496,10 +441,6 @@ class Options(object):
             if not obj.hidden or obj.field.many_to_many)
         )
 
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_m2m_with_model(self):
-        return [self._map_model(f) for f in self.many_to_many]
-
     @cached_property
     def _forward_fields_map(self):
         res = {}
@@ -530,36 +471,14 @@ class Options(object):
                 pass
         return res
 
-    def get_field(self, field_name, many_to_many=None):
+    def get_field(self, field_name):
         """
-        Returns a field instance given a field name. The field can be either a
-        forward or reverse field, unless many_to_many is specified; if it is,
-        only forward fields will be returned.
-
-        The many_to_many argument exists for backwards compatibility reasons;
-        it has been deprecated and will be removed in Django 1.10.
+        Return a field instance given the name of a forward or reverse field.
         """
-        m2m_in_kwargs = many_to_many is not None
-        if m2m_in_kwargs:
-            # Always throw a warning if many_to_many is used regardless of
-            # whether it alters the return type or not.
-            warnings.warn(
-                "The 'many_to_many' argument on get_field() is deprecated; "
-                "use a filter on field.many_to_many instead.",
-                RemovedInDjango110Warning
-            )
-
         try:
             # In order to avoid premature loading of the relation tree
             # (expensive) we prefer checking if the field is a forward field.
-            field = self._forward_fields_map[field_name]
-
-            if many_to_many is False and field.many_to_many:
-                raise FieldDoesNotExist(
-                    '%s has no field named %r' % (self.object_name, field_name)
-                )
-
-            return field
+            return self._forward_fields_map[field_name]
         except KeyError:
             # If the app registry is not ready, reverse fields are
             # unavailable, therefore we throw a FieldDoesNotExist exception.
@@ -571,83 +490,11 @@ class Options(object):
                 )
 
         try:
-            if m2m_in_kwargs:
-                # Previous API does not allow searching reverse fields.
-                raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-
             # Retrieve field instance by name from cached or just-computed
             # field map.
             return self.fields_map[field_name]
         except KeyError:
             raise FieldDoesNotExist('%s has no field named %r' % (self.object_name, field_name))
-
-    @raise_deprecation(suggested_alternative="get_field()")
-    def get_field_by_name(self, name):
-        return self._map_model_details(self.get_field(name))
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_field_names(self):
-        names = set()
-        fields = self.get_fields()
-        for field in fields:
-            # For backwards compatibility GenericForeignKey should not be
-            # included in the results.
-            if field.is_relation and field.many_to_one and field.related_model is None:
-                continue
-            # Relations to child proxy models should not be included.
-            if (field.model != self.model and
-                    field.model._meta.concrete_model == self.concrete_model):
-                continue
-
-            names.add(field.name)
-            if hasattr(field, 'attname'):
-                names.add(field.attname)
-        return list(names)
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_objects(self, local_only=False, include_hidden=False,
-                                include_proxy_eq=False):
-
-        include_parents = True if local_only is False else PROXY_PARENTS
-        fields = self._get_fields(
-            forward=False, reverse=True,
-            include_parents=include_parents,
-            include_hidden=include_hidden,
-        )
-        fields = (obj for obj in fields if not isinstance(obj.field, ManyToManyField))
-        if include_proxy_eq:
-            children = chain.from_iterable(c._relation_tree
-                                           for c in self.concrete_model._meta.proxied_children
-                                           if c is not self)
-            relations = (f.remote_field for f in children
-                         if include_hidden or not f.remote_field.field.remote_field.is_hidden())
-            fields = chain(fields, relations)
-        return list(fields)
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_objects_with_model(self, local_only=False, include_hidden=False,
-                                           include_proxy_eq=False):
-        return [
-            self._map_model(f) for f in self.get_all_related_objects(
-                local_only=local_only,
-                include_hidden=include_hidden,
-                include_proxy_eq=include_proxy_eq,
-            )
-        ]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_many_to_many_objects(self, local_only=False):
-        include_parents = True if local_only is not True else PROXY_PARENTS
-        fields = self._get_fields(
-            forward=False, reverse=True,
-            include_parents=include_parents, include_hidden=True
-        )
-        return [obj for obj in fields if isinstance(obj.field, ManyToManyField)]
-
-    @raise_deprecation(suggested_alternative="get_fields()")
-    def get_all_related_m2m_objects_with_model(self):
-        fields = self._get_fields(forward=False, reverse=True, include_hidden=True)
-        return [self._map_model(obj) for obj in fields if isinstance(obj.field, ManyToManyField)]
 
     def get_base_chain(self, model):
         """
