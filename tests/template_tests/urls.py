@@ -7,10 +7,10 @@ from . import views
 
 ns_patterns = [
     # Test urls for testing reverse lookups
-    url(r'^$', views.index),
-    url(r'^client/([0-9,]+)/$', views.client),
-    url(r'^client/(?P<id>[0-9]+)/(?P<action>[^/]+)/$', views.client_action),
-    url(r'^client/(?P<client_id>[0-9]+)/(?P<action>[^/]+)/$', views.client_action),
+    url(r'^$', views.index, name='index'),
+    url(r'^client/([0-9,]+)/$', views.client, name='client'),
+    url(r'^client/(?P<id>[0-9]+)/(?P<action>[^/]+)/$', views.client_action, name='client_action'),
+    url(r'^client/(?P<client_id>[0-9]+)/(?P<action>[^/]+)/$', views.client_action, name='client_action'),
     url(r'^named-client/([0-9]+)/$', views.client2, name="named.client"),
 ]
 

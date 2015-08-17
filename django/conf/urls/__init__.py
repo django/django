@@ -79,5 +79,7 @@ def url(regex, view, kwargs=None, name=None):
         # For include(...) processing.
         urlconf_module, app_name, namespace = view
         return RegexURLResolver(regex, urlconf_module, kwargs, app_name=app_name, namespace=namespace)
-    else:
+    elif callable(view):
         return RegexURLPattern(regex, view, kwargs, name)
+    else:
+        raise TypeError('view must be a callable or a list/tuple in the case of include().')

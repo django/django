@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 
 from .views import (
     absolute_kwargs_view, defaults_view, empty_view, empty_view_partial,
-    empty_view_wrapped, kwargs_view, nested_view,
+    empty_view_wrapped, nested_view,
 )
 
 other_patterns = [
@@ -67,10 +67,6 @@ urlpatterns = [
     # This is non-reversible, but we shouldn't blow up when parsing it.
     url(r'^(?:foo|bar)(\w+)/$', empty_view, name="disjunction"),
 
-    # Regression views for #9038. See tests for more details
-    url(r'arg_view/$', kwargs_view),
-    url(r'arg_view/(?P<arg1>[0-9]+)/$', kwargs_view),
-    url(r'absolute_arg_view/(?P<arg1>[0-9]+)/$', absolute_kwargs_view),
     url(r'absolute_arg_view/$', absolute_kwargs_view),
 
     # Tests for #13154. Mixed syntax to test both ways of defining URLs.

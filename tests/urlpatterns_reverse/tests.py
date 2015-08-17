@@ -26,9 +26,7 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import middleware, urlconf_outer, views
 from .views import empty_view
@@ -231,13 +229,6 @@ test_data = (
     ('nested-namedcapture', NoReverseMatch, [], {'outer': 'opt/', 'inner': 'opt'}),
     ('nested-namedcapture', NoReverseMatch, [], {'inner': 'opt'}),
 
-    # Regression for #9038
-    # These views are resolved by method name. Each method is deployed twice -
-    # once with an explicit argument, and once using the default value on
-    # the method. This is potentially ambiguous, as you have to pick the
-    # correct view for the arguments provided.
-    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/', [], {}),
-    ('urlpatterns_reverse.views.absolute_kwargs_view', '/absolute_arg_view/10/', [], {'arg1': 10}),
     ('non_path_include', '/includes/non_path_include/', [], {}),
 
     # Tests for #13154
@@ -292,7 +283,6 @@ class NoURLPatternsTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
 class URLPatternReverse(SimpleTestCase):
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_urlpattern_reverse(self):
         for name, expected, args, kwargs in test_data:
             try:
@@ -544,11 +534,10 @@ class ReverseShortcutTests(SimpleTestCase):
         redirect("urlpatterns_reverse.nonimported_module.view")
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_reverse_by_path_nested(self):
-        # Views that are added to urlpatterns using include() should be
-        # reversible by dotted path.
-        self.assertEqual(reverse('urlpatterns_reverse.views.nested_view'), '/includes/nested_path/')
+        # Views added to urlpatterns using include() should be reversible.
+        from .views import nested_view
+        self.assertEqual(reverse(nested_view), '/includes/nested_path/')
 
     def test_redirect_view_object(self):
         from .views import absolute_kwargs_view
@@ -982,24 +971,16 @@ class ResolverMatchTests(SimpleTestCase):
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.erroneous_urls')
 class ErroneousViewTests(SimpleTestCase):
 
-    def test_erroneous_resolve(self):
-        self.assertRaises(ImportError, self.client.get, '/erroneous_inner/')
-        self.assertRaises(ImportError, self.client.get, '/erroneous_outer/')
-        self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_inner/')
-        self.assertRaises(ViewDoesNotExist, self.client.get, '/missing_outer/')
-        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable-dotted/')
-        self.assertRaises(ViewDoesNotExist, self.client.get, '/uncallable-object/')
+    def test_noncallable_view(self):
+        # View is not a callable (explicit import; arbitrary Python object)
+        with self.assertRaisesMessage(TypeError, 'view must be a callable'):
+            url(r'uncallable-object/$', views.uncallable)
 
-        # Regression test for #21157
-        self.assertRaises(ImportError, self.client.get, '/erroneous_unqualified/')
-
-    def test_erroneous_reverse(self):
-        """
-        Ensure that a useful exception is raised when a regex is invalid in the
-        URLConf (#6170).
-        """
-        # The regex error will be hit before NoReverseMatch can be raised
-        self.assertRaises(ImproperlyConfigured, reverse, 'whatever blah blah')
+    def test_invalid_regex(self):
+        # Regex contains an error (refs #6170)
+        msg = '(regex_error/$" is not a valid regular expression'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            reverse(views.empty_view)
 
 
 class ViewLoadingTests(SimpleTestCase):

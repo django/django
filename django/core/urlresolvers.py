@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 import functools
 import re
-import warnings
 from importlib import import_module
 from threading import local
 
@@ -17,7 +16,6 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str, force_text, iri_to_uri
 from django.utils.functional import cached_property, lazy
 from django.utils.http import RFC3986_SUBDELIMS, urlquote
@@ -80,67 +78,50 @@ class NoReverseMatch(Exception):
 
 
 @lru_cache.lru_cache(maxsize=None)
-def get_callable(lookup_view, can_fail=False):
+def get_callable(lookup_view):
     """
-    Return a callable corresponding to lookup_view. This function is used
-    by both resolve() and reverse(), so can_fail allows the caller to choose
-    between returning the input as is and raising an exception when the input
-    string can't be interpreted as an import path.
+    Return a callable corresponding to lookup_view.
 
-    If lookup_view is already a callable, return it.
-    If lookup_view is a string import path that can be resolved to a callable,
-      import that callable and return it.
-    If lookup_view is some other kind of string and can_fail is True, the string
-      is returned as is. If can_fail is False, an exception is raised (either
-      ImportError or ViewDoesNotExist).
+    * If lookup_view is already a callable, return it.
+    * If lookup_view is a string import path that can be resolved to a callable,
+      import that callable and return it, otherwise raise an exception
+      (ImportError or ViewDoesNotExist).
     """
     if callable(lookup_view):
         return lookup_view
 
     if not isinstance(lookup_view, six.string_types):
-        raise ViewDoesNotExist(
-            "'%s' is not a callable or a dot-notation path" % lookup_view
-        )
+        raise ViewDoesNotExist("'%s' is not a callable or a dot-notation path" % lookup_view)
 
     mod_name, func_name = get_mod_func(lookup_view)
     if not func_name:  # No '.' in lookup_view
-        if can_fail:
-            return lookup_view
-        else:
-            raise ImportError(
-                "Could not import '%s'. The path must be fully qualified." %
-                lookup_view)
+        raise ImportError("Could not import '%s'. The path must be fully qualified." % lookup_view)
 
     try:
         mod = import_module(mod_name)
     except ImportError:
-        if can_fail:
-            return lookup_view
+        parentmod, submod = get_mod_func(mod_name)
+        if submod and not module_has_submodule(import_module(parentmod), submod):
+            raise ViewDoesNotExist(
+                "Could not import '%s'. Parent module %s does not exist." %
+                (lookup_view, mod_name)
+            )
         else:
-            parentmod, submod = get_mod_func(mod_name)
-            if submod and not module_has_submodule(import_module(parentmod), submod):
-                raise ViewDoesNotExist(
-                    "Could not import '%s'. Parent module %s does not exist." %
-                    (lookup_view, mod_name))
-            else:
-                raise
+            raise
     else:
         try:
             view_func = getattr(mod, func_name)
         except AttributeError:
-            if can_fail:
-                return lookup_view
-            else:
-                raise ViewDoesNotExist(
-                    "Could not import '%s'. View does not exist in module %s." %
-                    (lookup_view, mod_name))
+            raise ViewDoesNotExist(
+                "Could not import '%s'. View does not exist in module %s." %
+                (lookup_view, mod_name)
+            )
         else:
             if not callable(view_func):
-                # For backwards compatibility this is raised regardless of can_fail
                 raise ViewDoesNotExist(
                     "Could not import '%s.%s'. View is not callable." %
-                    (mod_name, func_name))
-
+                    (mod_name, func_name)
+                )
             return view_func
 
 
@@ -209,14 +190,7 @@ class LocaleRegexProvider(object):
 class RegexURLPattern(LocaleRegexProvider):
     def __init__(self, regex, callback, default_args=None, name=None):
         LocaleRegexProvider.__init__(self, regex)
-        # callback is either a string like 'foo.views.news.stories.story_detail'
-        # which represents the path to a module and a view function name, or a
-        # callable object (view).
-        if callable(callback):
-            self._callback = callback
-        else:
-            self._callback = None
-            self._callback_str = callback
+        self.callback = callback  # the view
         self.default_args = default_args or {}
         self.name = name
 
@@ -239,13 +213,19 @@ class RegexURLPattern(LocaleRegexProvider):
 
             return ResolverMatch(self.callback, args, kwargs, self.name)
 
-    @property
-    def callback(self):
-        if self._callback is not None:
-            return self._callback
-
-        self._callback = get_callable(self._callback_str)
-        return self._callback
+    @cached_property
+    def lookup_str(self):
+        """
+        A string that identifies the view (e.g. 'path.to.view_function' or
+        'path.to.ClassBasedView').
+        """
+        callback = self.callback
+        if isinstance(callback, functools.partial):
+            callback = callback.func
+        if not hasattr(callback, '__name__'):
+            return callback.__module__ + "." + callback.__class__.__name__
+        else:
+            return callback.__module__ + "." + callback.__name__
 
 
 class RegexURLResolver(LocaleRegexProvider):
@@ -283,18 +263,8 @@ class RegexURLResolver(LocaleRegexProvider):
         apps = {}
         language_code = get_language()
         for pattern in reversed(self.url_patterns):
-            if hasattr(pattern, '_callback_str'):
-                self._callback_strs.add(pattern._callback_str)
-            elif hasattr(pattern, '_callback'):
-                callback = pattern._callback
-                if isinstance(callback, functools.partial):
-                    callback = callback.func
-
-                if not hasattr(callback, '__name__'):
-                    lookup_str = callback.__module__ + "." + callback.__class__.__name__
-                else:
-                    lookup_str = callback.__module__ + "." + callback.__name__
-                self._callback_strs.add(lookup_str)
+            if isinstance(pattern, RegexURLPattern):
+                self._callback_strs.add(pattern.lookup_str)
             p_pattern = pattern.regex.pattern
             if p_pattern.startswith('^'):
                 p_pattern = p_pattern[1:]
@@ -427,9 +397,6 @@ class RegexURLResolver(LocaleRegexProvider):
             callback = getattr(urls, 'handler%s' % view_type)
         return get_callable(callback), {}
 
-    def reverse(self, lookup_view, *args, **kwargs):
-        return self._reverse_with_prefix(lookup_view, '', *args, **kwargs)
-
     def _reverse_with_prefix(self, lookup_view, _prefix, *args, **kwargs):
         if args and kwargs:
             raise ValueError("Don't mix *args and **kwargs in call to reverse()!")
@@ -439,18 +406,6 @@ class RegexURLResolver(LocaleRegexProvider):
         if not self._populated:
             self._populate()
 
-        original_lookup = lookup_view
-        try:
-            if self._is_callback(lookup_view):
-                lookup_view = get_callable(lookup_view, True)
-        except (ImportError, AttributeError) as e:
-            raise NoReverseMatch("Error importing '%s': %s." % (lookup_view, e))
-        else:
-            if not callable(original_lookup) and callable(lookup_view):
-                warnings.warn(
-                    'Reversing by dotted path is deprecated (%s).' % original_lookup,
-                    RemovedInDjango110Warning, stacklevel=3
-                )
         possibilities = self.reverse_dict.getlist(lookup_view)
 
         for possibility, pattern, defaults in possibilities:
@@ -484,9 +439,8 @@ class RegexURLResolver(LocaleRegexProvider):
                     if url.startswith('//'):
                         url = '/%%2F%s' % url[2:]
                     return url
-        # lookup_view can be URL label, or dotted path, or callable, Any of
-        # these can be passed in at the top, but callables are not friendly in
-        # error messages.
+        # lookup_view can be URL name or callable, but callables are not
+        # friendly in error messages.
         m = getattr(lookup_view, '__module__', None)
         n = getattr(lookup_view, '__name__', None)
         if m is not None and n is not None:
