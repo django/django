@@ -171,11 +171,6 @@ def setup(verbosity, test_labels, parallel):
 
     warnings.filterwarnings(
         'ignore',
-        'django.contrib.webdesign will be removed in Django 1.10.',
-        RemovedInDjango110Warning
-    )
-    warnings.filterwarnings(
-        'ignore',
         'The GeoManager class is deprecated.',
         RemovedInDjango20Warning
     )

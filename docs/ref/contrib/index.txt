@@ -35,7 +35,6 @@ those packages have.
    sites
    staticfiles
    syndication
-   webdesign
 
 admin
 =====
@@ -136,14 +135,6 @@ syndication
 A framework for generating syndication feeds, in RSS and Atom, quite easily.
 
 See the :doc:`syndication documentation </ref/contrib/syndication>`.
-
-webdesign
-=========
-
-Helpers and utilities targeted primarily at Web *designers* rather than
-Web *developers*.
-
-See the :doc:`Web design helpers documentation </ref/contrib/webdesign>`.
 
 Other add-ons
 =============

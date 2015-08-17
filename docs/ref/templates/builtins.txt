@@ -721,10 +721,6 @@ more information.
 lorem
 ^^^^^
 
-.. versionadded:: 1.8
-
-    The tag was previously located in :mod:`django.contrib.webdesign`.
-
 Displays random "lorem ipsum" Latin text. This is useful for providing sample
 data in templates.
 

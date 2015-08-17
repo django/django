@@ -118,7 +118,7 @@ class AppsTests(SimpleTestCase):
         self.assertEqual(app_config.name, 'django.contrib.staticfiles')
 
         with self.assertRaises(LookupError):
-            apps.get_app_config('webdesign')
+            apps.get_app_config('admindocs')
 
         msg = "No installed app with label 'django.contrib.auth'. Did you mean 'myauth'"
         with self.assertRaisesMessage(LookupError, msg):
@@ -132,7 +132,7 @@ class AppsTests(SimpleTestCase):
         self.assertTrue(apps.is_installed('django.contrib.admin'))
         self.assertTrue(apps.is_installed('django.contrib.auth'))
         self.assertTrue(apps.is_installed('django.contrib.staticfiles'))
-        self.assertFalse(apps.is_installed('django.contrib.webdesign'))
+        self.assertFalse(apps.is_installed('django.contrib.admindocs'))
 
     @override_settings(INSTALLED_APPS=SOME_INSTALLED_APPS)
     def test_get_model(self):
