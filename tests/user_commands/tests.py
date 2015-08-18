@@ -5,11 +5,10 @@ from django.core import management
 from django.core.management import BaseCommand, CommandError, find_commands
 from django.core.management.utils import find_command, popen_wrapper
 from django.db import connection
-from django.test import SimpleTestCase, ignore_warnings, override_settings
-from django.test.utils import captured_stderr, captured_stdout, extend_sys_path
+from django.test import SimpleTestCase, override_settings
+from django.test.utils import captured_stderr, extend_sys_path
 from django.utils import translation
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.six import StringIO
 
 
@@ -103,20 +102,6 @@ class CommandTests(SimpleTestCase):
         self.assertIn("option3", out.getvalue())
         self.assertNotIn("opt_3", out.getvalue())
         self.assertNotIn("opt-3", out.getvalue())
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_optparse_compatibility(self):
-        """
-        optparse should be supported during Django 1.8/1.9 releases.
-        """
-        out = StringIO()
-        management.call_command('optparse_cmd', stdout=out)
-        self.assertEqual(out.getvalue(), "All right, let's dance Rock'n'Roll.\n")
-
-        # Simulate command line execution
-        with captured_stdout() as stdout, captured_stderr():
-            management.execute_from_command_line(['django-admin', 'optparse_cmd'])
-        self.assertEqual(stdout.getvalue(), "All right, let's dance Rock'n'Roll.\n")
 
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()
