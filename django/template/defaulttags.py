@@ -9,7 +9,6 @@ from itertools import cycle as itertools_cycle, groupby
 
 from django.conf import settings
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.lorem_ipsum import paragraphs, words
@@ -200,11 +199,10 @@ class ForNode(Node):
                         len_item = len(item)
                     # Check loop variable count before unpacking
                     if num_loopvars != len_item:
-                        warnings.warn(
+                        raise ValueError(
                             "Need {} values to unpack in for loop; got {}. "
-                            "This will raise an exception in Django 1.10."
                             .format(num_loopvars, len_item),
-                            RemovedInDjango110Warning)
+                        )
                     try:
                         unpacked_vars = dict(zip(self.loopvars, item))
                     except TypeError:
