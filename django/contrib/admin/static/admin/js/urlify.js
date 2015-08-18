@@ -142,7 +142,7 @@
 
 
     function URLify(s, num_chars, allowUnicode) {
-        // changes, e.g., "Petty theft" to "petty_theft"
+        // changes, e.g., "Petty theft" to "petty-theft"
         // remove all these words from the string before urlifying
         if (!allowUnicode) {
             s = downcode(s);
