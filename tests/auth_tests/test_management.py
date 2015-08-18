@@ -498,6 +498,72 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
         test(self)
 
+    def test_validation_mismatched_passwords(self):
+        """
+        Creation should fail if the user enters mismatched passwords.
+        """
+        new_io = six.StringIO()
+
+        # The first two passwords do not match, but the second two do match and
+        # are valid.
+        entered_passwords = ["password", "not password", "password2", "password2"]
+
+        def mismatched_passwords_then_matched():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({
+            'password': mismatched_passwords_then_matched,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: Your passwords didn't match.\n"
+                "Superuser created successfully."
+            )
+
+        test(self)
+
+    def test_validation_blank_password_entered(self):
+        """
+        Creation should fail if the user enters blank passwords.
+        """
+        new_io = six.StringIO()
+
+        # The first two passwords are empty strings, but the second two are
+        # valid.
+        entered_passwords = ["", "", "password2", "password2"]
+
+        def blank_passwords_then_valid():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({
+            'password': blank_passwords_then_valid,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: Blank passwords aren't allowed.\n"
+                "Superuser created successfully."
+            )
+
+        test(self)
+
 
 class CustomUserModelValidationTestCase(SimpleTestCase):
     @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
