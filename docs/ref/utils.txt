@@ -156,7 +156,7 @@ The functions defined in this module share the following properties:
     Converts a function decorator into a method decorator. It can be used to
     decorate methods or classes; in the latter case, ``name`` is the name
     of the method to be decorated and is required. See :ref:`decorating
-    class based views<decorating-class-based-views>` for example usage.
+    class-based views<decorating-class-based-views>` for example usage.
 
     .. versionchanged:: 1.9
 
