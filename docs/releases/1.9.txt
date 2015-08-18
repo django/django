@@ -912,11 +912,31 @@ resulting in SQL like ``"related_id IN (SELECT id FROM ...)"``.
 This implicit ``__in`` no longer happens so the "IN" SQL is now "=", and if the
 subquery returns multiple results, at least some databases will throw an error.
 
+.. _admin-browser-support-19:
+
+``contrib.admin`` browser support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The admin no longer supports Internet Explorer 8 and below, as these browsers
+have reached end-of-life.
+
+CSS and images to support Internet Explorer 6 and 7 have been removed. PNG and
+GIF icons have been replaced with SVG icons, which are not supported by
+Internet Explorer 8 and earlier.
+
+The jQuery library embedded in the admin has been upgraded from version 1.11.2
+to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
+Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
+file size. If you need to support IE8 and must also use the latest version of
+Django, you can override the admin's copy of jQuery with your own by creating
+a Django application with this structure::
+
+    app/static/admin/js/vendor/
+        jquery.js
+        jquery.min.js
+
 Miscellaneous
 ~~~~~~~~~~~~~
-
-* CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
-  been removed as these browsers have reached end-of-life.
 
 * The jQuery static files in ``contrib.admin`` have been moved into a
   ``vendor/jquery`` subdirectory.
