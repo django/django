@@ -1,14 +1,11 @@
 from __future__ import unicode_literals
 
-import os
-import unittest
 import warnings
 
 from django.test import SimpleTestCase
 from django.test.utils import reset_warning_registry
 from django.utils import six
 from django.utils.deprecation import RenameMethodsBase
-from django.utils.encoding import force_text
 
 
 class RenameManagerMethods(RenameMethodsBase):
@@ -173,27 +170,3 @@ class RenameMethodsTests(SimpleTestCase):
                 '`DeprecatedMixin.old` is deprecated, use `new` instead.',
                 '`RenamedMixin.old` is deprecated, use `new` instead.',
             ])
-
-
-class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
-
-    def test_deprecation(self):
-        """
-        Ensure the correct warning is raised when SimpleTestCase.urls is used.
-        """
-        class TempTestCase(SimpleTestCase):
-            urls = 'tests.urls'
-
-            def test(self):
-                pass
-
-        with warnings.catch_warnings(record=True) as recorded:
-            warnings.filterwarnings('always')
-            suite = unittest.TestLoader().loadTestsFromTestCase(TempTestCase)
-            with open(os.devnull, 'w') as devnull:
-                unittest.TextTestRunner(stream=devnull, verbosity=2).run(suite)
-                msg = force_text(recorded.pop().message)
-                self.assertEqual(msg,
-                    "SimpleTestCase.urls is deprecated and will be removed in "
-                    "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
-                    "in TempTestCase instead.")
