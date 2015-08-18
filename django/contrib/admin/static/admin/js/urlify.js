@@ -162,10 +162,10 @@
         } else {
             s = s.replace(/[^-\w\s]/g, '');  // remove unneeded chars
         }
-        s = s.replace(/^\s+|\s+$/g, ''); // trim leading/trailing spaces
-        s = s.replace(/[-\s]+/g, '-');   // convert spaces to hyphens
-        s = s.toLowerCase();             // convert to lowercase
-        return s.substring(0, num_chars);// trim to first num_chars chars
+        s = s.replace(/^\s+|\s+$/g, '');   // trim leading/trailing spaces
+        s = s.replace(/[-\s]+/g, '-');     // convert spaces to hyphens
+        s = s.toLowerCase();               // convert to lowercase
+        return s.substring(0, num_chars);  // trim to first num_chars chars
     }
     window.URLify = URLify;
 })();
