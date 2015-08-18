@@ -417,10 +417,6 @@ execute and tear down the test suite.
 
     .. versionchanged:: 1.8
 
-        Previously, you had to provide an ``option_list`` attribute to a
-        subclassed test runner to add options to the list of command-line
-        options that the :djadmin:`test` command could use.
-
         The ``keepdb``, ``reverse``, and ``debug_sql`` arguments were added.
 
 Attributes
@@ -447,18 +443,6 @@ Attributes
     otherwise and bundles them into test suites for the runner to execute.
     By default it is set to ``unittest.defaultTestLoader``. You can override
     this attribute if your tests are going to be loaded in unusual ways.
-
-.. attribute:: DiscoverRunner.option_list
-
-    This is the tuple of ``optparse`` options which will be fed into the
-    management command's ``OptionParser`` for parsing arguments. See the
-    documentation for Python's ``optparse`` module for more details.
-
-    .. deprecated:: 1.8
-
-        You should now override the :meth:`~DiscoverRunner.add_arguments` class
-        method to add custom arguments accepted by the :djadmin:`test`
-        management command.
 
 Methods
 ~~~~~~~

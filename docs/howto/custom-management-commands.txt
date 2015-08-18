@@ -69,16 +69,6 @@ look like this::
 
                 self.stdout.write('Successfully closed poll "%s"' % poll_id)
 
-.. versionchanged:: 1.8
-
-    Before Django 1.8, management commands were based on the :py:mod:`optparse`
-    module, and positional arguments were passed in ``*args`` while optional
-    arguments were passed in ``**options``. Now that management commands use
-    :py:mod:`argparse` for argument parsing, all arguments are passed in
-    ``**options`` by default, unless you name your positional arguments to
-    ``args`` (compatibility mode). You are encouraged to exclusively use
-    ``**options`` for new commands.
-
 .. _management-commands-output:
 
 .. note::
@@ -127,12 +117,6 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
             if options['delete']:
                 poll.delete()
             # ...
-
-.. versionchanged:: 1.8
-
-    Previously, only the standard :py:mod:`optparse` library was supported and
-    you would have to extend the command ``option_list`` variable with
-    ``optparse.make_option()``.
 
 The option (``delete`` in our example) is available in the options dict
 parameter of the handle method. See the :py:mod:`argparse` Python documentation
@@ -227,19 +211,6 @@ Attributes
 All attributes can be set in your derived class and can be used in
 :class:`BaseCommand`’s :ref:`subclasses<ref-basecommand-subclasses>`.
 
-.. attribute:: BaseCommand.args
-
-    A string listing the arguments accepted by the command,
-    suitable for use in help messages; e.g., a command which takes
-    a list of application names might set this to '<app_label
-    app_label ...>'.
-
-    .. deprecated:: 1.8
-
-        This should be done now in the :meth:`~BaseCommand.add_arguments()`
-        method, by calling the ``parser.add_argument()`` method. See the
-        ``closepoll`` example above.
-
 .. attribute:: BaseCommand.can_import_settings
 
     A boolean indicating whether the command needs to be able to
@@ -260,17 +231,6 @@ All attributes can be set in your derived class and can be used in
     If your command defines mandatory positional arguments, you can customize
     the message error returned in the case of missing arguments. The default is
     output by :py:mod:`argparse` ("too few arguments").
-
-.. attribute:: BaseCommand.option_list
-
-    This is the list of ``optparse`` options which will be fed
-    into the command's ``OptionParser`` for parsing arguments.
-
-    .. deprecated:: 1.8
-
-        You should now override the :meth:`~BaseCommand.add_arguments` method
-        to add custom arguments accepted by your command. See :ref:`the example
-        above <custom-commands-options>`.
 
 .. attribute:: BaseCommand.output_transaction
 

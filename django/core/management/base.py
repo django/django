@@ -9,7 +9,6 @@ import os
 import sys
 import warnings
 from argparse import ArgumentParser
-from optparse import OptionParser
 
 import django
 from django.core import checks
@@ -152,12 +151,6 @@ class BaseCommand(object):
 
     Several attributes affect behavior at various steps along the way:
 
-    ``args``
-        A string listing the arguments accepted by the command,
-        suitable for use in help messages; e.g., a command which takes
-        a list of application names might set this to '<app_label
-        app_label ...>'.
-
     ``can_import_settings``
         A boolean indicating whether the command needs to be able to
         import Django settings; if ``True``, ``execute()`` will verify
@@ -167,12 +160,6 @@ class BaseCommand(object):
     ``help``
         A short description of the command, which will be printed in
         help messages.
-
-    ``option_list``
-        This is the list of ``optparse`` options which will be fed
-        into the command's ``OptionParser`` for parsing arguments.
-        Deprecated and will be removed in Django 1.10.
-        Use ``add_arguments`` instead.
 
     ``output_transaction``
         A boolean indicating whether the command outputs SQL
@@ -207,9 +194,7 @@ class BaseCommand(object):
         to settings. This condition will generate a CommandError.
     """
     # Metadata about this command.
-    option_list = ()
     help = ''
-    args = ''
 
     # Configuration shortcuts that alter various logic.
     _called_from_command_line = False
@@ -226,10 +211,6 @@ class BaseCommand(object):
         else:
             self.style = color_style()
             self.stderr.style_func = self.style.ERROR
-
-    @property
-    def use_argparse(self):
-        return not bool(self.option_list)
 
     def get_version(self):
         """
@@ -255,59 +236,26 @@ class BaseCommand(object):
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
         """
-        if not self.use_argparse:
-            def store_as_int(option, opt_str, value, parser):
-                setattr(parser.values, option.dest, int(value))
-
-            # Backwards compatibility: use deprecated optparse module
-            warnings.warn("OptionParser usage for Django management commands "
-                          "is deprecated, use ArgumentParser instead",
-                          RemovedInDjango110Warning)
-            parser = OptionParser(prog=prog_name,
-                                usage=self.usage(subcommand),
-                                version=self.get_version())
-            parser.add_option('-v', '--verbosity', action='callback', dest='verbosity', default=1,
-                type='choice', choices=['0', '1', '2', '3'], callback=store_as_int,
-                help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
-            parser.add_option('--settings',
-                help=(
-                    'The Python path to a settings module, e.g. '
-                    '"myproject.settings.main". If this isn\'t provided, the '
-                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
-                ),
-            )
-            parser.add_option('--pythonpath',
-                help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".'),
-            parser.add_option('--traceback', action='store_true',
-                help='Raise on CommandError exceptions')
-            parser.add_option('--no-color', action='store_true', dest='no_color', default=False,
-                help="Don't colorize the command output.")
-            for opt in self.option_list:
-                parser.add_option(opt)
-        else:
-            parser = CommandParser(self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
-                description=self.help or None)
-            parser.add_argument('--version', action='version', version=self.get_version())
-            parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
-                type=int, choices=[0, 1, 2, 3],
-                help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
-            parser.add_argument('--settings',
-                help=(
-                    'The Python path to a settings module, e.g. '
-                    '"myproject.settings.main". If this isn\'t provided, the '
-                    'DJANGO_SETTINGS_MODULE environment variable will be used.'
-                ),
-            )
-            parser.add_argument('--pythonpath',
-                help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
-            parser.add_argument('--traceback', action='store_true',
-                help='Raise on CommandError exceptions')
-            parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
-                help="Don't colorize the command output.")
-            if self.args:
-                # Keep compatibility and always accept positional arguments, like optparse when args is set
-                parser.add_argument('args', nargs='*')
-            self.add_arguments(parser)
+        parser = CommandParser(self, prog="%s %s" % (os.path.basename(prog_name), subcommand),
+            description=self.help or None)
+        parser.add_argument('--version', action='version', version=self.get_version())
+        parser.add_argument('-v', '--verbosity', action='store', dest='verbosity', default='1',
+            type=int, choices=[0, 1, 2, 3],
+            help='Verbosity level; 0=minimal output, 1=normal output, 2=verbose output, 3=very verbose output')
+        parser.add_argument('--settings',
+            help=(
+                'The Python path to a settings module, e.g. '
+                '"myproject.settings.main". If this isn\'t provided, the '
+                'DJANGO_SETTINGS_MODULE environment variable will be used.'
+            ),
+        )
+        parser.add_argument('--pythonpath',
+            help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
+        parser.add_argument('--traceback', action='store_true',
+            help='Raise on CommandError exceptions')
+        parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
+            help="Don't colorize the command output.")
+        self.add_arguments(parser)
         return parser
 
     def add_arguments(self, parser):
@@ -335,14 +283,10 @@ class BaseCommand(object):
         self._called_from_command_line = True
         parser = self.create_parser(argv[0], argv[1])
 
-        if self.use_argparse:
-            options = parser.parse_args(argv[2:])
-            cmd_options = vars(options)
-            # Move positional args out of options to mimic legacy optparse
-            args = cmd_options.pop('args', ())
-        else:
-            options, args = parser.parse_args(argv[2:])
-            cmd_options = vars(options)
+        options = parser.parse_args(argv[2:])
+        cmd_options = vars(options)
+        # Move positional args out of options to mimic legacy optparse
+        args = cmd_options.pop('args', ())
         handle_default_options(options)
         try:
             self.execute(*args, **cmd_options)

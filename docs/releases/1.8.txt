@@ -738,15 +738,14 @@ Management commands that only accept positional arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have written a custom management command that only accepts positional
-arguments and you didn't specify the
-:attr:`~django.core.management.BaseCommand.args` command variable, you might
-get an error like ``Error: unrecognized arguments: ...``, as variable parsing
-is now based on :py:mod:`argparse` which doesn't implicitly accept positional
+arguments and you didn't specify the ``args`` command variable, you might get
+an error like ``Error: unrecognized arguments: ...``, as variable parsing is
+now based on :py:mod:`argparse` which doesn't implicitly accept positional
 arguments. You can make your command backwards compatible by simply setting the
-:attr:`~django.core.management.BaseCommand.args` class variable. However, if
-you don't have to keep compatibility with older Django versions, it's better to
-implement the new :meth:`~django.core.management.BaseCommand.add_arguments`
-method as described in :doc:`/howto/custom-management-commands`.
+``args`` class variable. However, if you don't have to keep compatibility with
+older Django versions, it's better to implement the new
+:meth:`~django.core.management.BaseCommand.add_arguments` method as described
+in :doc:`/howto/custom-management-commands`.
 
 Custom test management command arguments through test runner
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
