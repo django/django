@@ -61,9 +61,6 @@ from .base import (                                                     # NOQA i
     Context, Node, NodeList, Origin, RequestContext, Template, Variable,
 )
 
-# Deprecated in Django 1.8, will be removed in Django 1.10.
-from .base import resolve_variable                                      # NOQA isort:skip
-
 # Library management
 from .library import Library                                            # NOQA isort:skip
 

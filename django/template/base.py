@@ -54,13 +54,11 @@ from __future__ import unicode_literals
 import inspect
 import logging
 import re
-import warnings
 
 from django.template.context import (  # NOQA: imported for backwards compatibility
     BaseContext, Context, ContextPopException, RequestContext,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import (
     force_str, force_text, python_2_unicode_compatible,
 )
@@ -745,19 +743,6 @@ class FilterExpression(object):
 
     def __str__(self):
         return self.token
-
-
-def resolve_variable(path, context):
-    """
-    Returns the resolved variable, which may contain attribute syntax, within
-    the given context.
-
-    Deprecated; use the Variable class instead.
-    """
-    warnings.warn("resolve_variable() is deprecated. Use django.template."
-                  "Variable(path).resolve(context) instead",
-                  RemovedInDjango110Warning, stacklevel=2)
-    return Variable(path).resolve(context)
 
 
 class Variable(object):
