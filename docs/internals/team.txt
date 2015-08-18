@@ -376,9 +376,9 @@ Donald Stufft
 
 Marc Tamlyn
     Marc started life on the web using Django 1.2 back in 2010, and has never
-    looked back. He was involved with rewriting the class based view
+    looked back. He was involved with rewriting the class-based view
     documentation at DjangoCon EU 2012, and also helped to develop `CCBV`_, an
-    additional class based view reference tool.
+    additional class-based view reference tool.
 
     Marc is currently a full-time parent, part-time developer, and lives in
     Oxford, UK.

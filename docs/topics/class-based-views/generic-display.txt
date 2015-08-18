@@ -1,7 +1,7 @@
 .. _Generic views:
 
 ==================================
-Built-in Class-based generic views
+Built-in class-based generic views
 ==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns

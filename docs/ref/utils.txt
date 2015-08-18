@@ -176,7 +176,7 @@ The functions defined in this module share the following properties:
 .. function:: method_decorator(decorator)
 
     Converts a function decorator into a method decorator. See :ref:`decorating
-    class based views<decorating-class-based-views>` for example usage.
+    class-based views<decorating-class-based-views>` for example usage.
 
 .. function:: decorator_from_middleware(middleware_class)
 

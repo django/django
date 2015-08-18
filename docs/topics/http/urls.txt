@@ -52,7 +52,7 @@ algorithm the system follows to determine which Python code to execute:
    one that matches the requested URL.
 
 4. Once one of the regexes matches, Django imports and calls the given view,
-   which is a simple Python function (or a :doc:`class based view
+   which is a simple Python function (or a :doc:`class-based view
    </topics/class-based-views/index>`). The view gets passed the following
    arguments:
 

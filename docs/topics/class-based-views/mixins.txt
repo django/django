@@ -204,10 +204,9 @@ the box.
     understandable to someone else coming to it later, and with fewer
     interactions to worry about you will save yourself some thinking. (Of
     course, you can always dip into Django's implementation of the generic
-    class based views for inspiration on how to tackle problems.)
+    class-based views for inspiration on how to tackle problems.)
 
 .. _method resolution order: https://www.python.org/download/releases/2.3/mro/
-
 
 Using SingleObjectMixin with View
 ---------------------------------
@@ -593,7 +592,7 @@ views as separate as possible.
 More than just HTML
 ===================
 
-Where class based views shine is when you want to do the same thing many times.
+Where class-based views shine is when you want to do the same thing many times.
 Suppose you're writing an API, and every view should return JSON instead of
 rendered HTML.
 
