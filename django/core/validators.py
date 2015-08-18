@@ -57,9 +57,16 @@ class URLValidator(RegexValidator):
             # Trivial case failed. Try for possible IDN domain
             if value:
                 value = force_text(value)
-                scheme, netloc, path, query, fragment = urlsplit(value)
+                parsed = urlsplit(value)
+                if not parsed.hostname:
+                    raise  # really invalid url
+                
+                scheme, netloc, path, query, fragment = parsed
                 try:
-                    netloc = netloc.encode('idna').decode('ascii')  # IDN -> ACE
+                    hostname = parsed.hostname.encode('idna').decode('ascii')  # IDN -> ACE
+                    credentials = ':'.join(filter(None, (parsed.username, parsed.password)))
+                    hostport = ':'.join(map(unicode, filter(None, (hostname, parsed.port))))
+                    netloc = '@'.join(filter(len, (credentials, hostport)))
                 except UnicodeError:  # invalid domain part
                     raise e
                 url = urlunsplit((scheme, netloc, path, query, fragment))
