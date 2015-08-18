@@ -1,5 +1,5 @@
 =================================
-Introduction to Class-based views
+Introduction to class-based views
 =================================
 
 Class-based views provide an alternative way to implement views as Python
