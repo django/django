@@ -178,7 +178,9 @@ class ManagementUtility(object):
             app_name = commands[subcommand]
         except KeyError:
             # This might trigger ImproperlyConfigured (masked in get_commands)
-            settings.INSTALLED_APPS
+            # Ignore test in django-admin.py, where project might not exist yet
+            if self.prog_name != "django-admin.py":
+                settings.INSTALLED_APPS
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
                 (subcommand, self.prog_name))
             sys.exit(1)
