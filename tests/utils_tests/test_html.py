@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 import os
 from datetime import datetime
 
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils import html, safestring, six
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 
 
@@ -123,25 +122,6 @@ class TestUtilsHtml(SimpleTestCase):
         for value, output in items:
             self.check_output(f, value, output)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_strip_entities(self):
-        f = html.strip_entities
-        # Strings that should come out untouched.
-        values = ("&", "&a", "&a", "a&#a")
-        for value in values:
-            self.check_output(f, value)
-        # Valid entities that should be stripped from the patterns.
-        entities = ("&#1;", "&#12;", "&a;", "&fdasdfasdfasdf;")
-        patterns = (
-            ("asdf %(entity)s ", "asdf  "),
-            ("%(entity)s%(entity)s", ""),
-            ("&%(entity)s%(entity)s", "&"),
-            ("%(entity)s3", "3"),
-        )
-        for entity in entities:
-            for in_pattern, output in patterns:
-                self.check_output(f, in_pattern % {'entity': entity}, output)
-
     def test_escapejs(self):
         f = html.escapejs
         items = (
@@ -159,16 +139,6 @@ class TestUtilsHtml(SimpleTestCase):
         )
         for value, output in items:
             self.check_output(f, value, output)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_remove_tags(self):
-        f = html.remove_tags
-        items = (
-            ("<b><i>Yes</i></b>", "b i", "Yes"),
-            ("<a>x</a> <p><b>y</b></p>", "a b", "x <p>y</p>"),
-        )
-        for value, tags, output in items:
-            self.assertEqual(f(value, tags), output)
 
     def test_smart_urlquote(self):
         quote = html.smart_urlquote

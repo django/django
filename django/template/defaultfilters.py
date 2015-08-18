@@ -13,7 +13,7 @@ from django.utils.dateformat import format, time_format
 from django.utils.encoding import force_text, iri_to_uri
 from django.utils.html import (
     avoid_wrapping, conditional_escape, escape, escapejs, linebreaks,
-    remove_tags, strip_tags, urlize as _urlize,
+    strip_tags, urlize as _urlize,
 )
 from django.utils.http import urlquote
 from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
@@ -498,13 +498,6 @@ def safeseq(value):
     with the results.
     """
     return [mark_safe(force_text(obj)) for obj in value]
-
-
-@register.filter(is_safe=True)
-@stringfilter
-def removetags(value, tags):
-    """Removes a space separated list of [X]HTML tags from the output."""
-    return remove_tags(value, tags)
 
 
 @register.filter(is_safe=True)
