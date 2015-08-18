@@ -877,6 +877,22 @@ returned a list, but an iterator is more efficient.
 Existing code that depends on ``list`` specific features, such as indexing,
 can be ported by converting the iterator into a ``list`` using ``list()``.
 
+Implicit ``QuerySet`` ``__in`` lookup removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In earlier versions, queries such as::
+
+    Model.objects.filter(related_id=RelatedModel.objects.all())
+
+would implicitly convert to::
+
+    Model.objects.filter(related_id__in=RelatedModel.objects.all())
+
+resulting in SQL like ``"related_id IN (SELECT id FROM ...)"``.
+
+This implicit ``__in`` no longer happens so the "IN" SQL is now "=", and if the
+subquery returns multiple results, at least some databases will throw an error.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
