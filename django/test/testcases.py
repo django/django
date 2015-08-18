@@ -26,7 +26,6 @@ from django.core.management import call_command
 from django.core.management.color import no_style
 from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import WSGIRequestHandler, WSGIServer
-from django.core.urlresolvers import clear_url_caches, set_urlconf
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
@@ -39,9 +38,7 @@ from django.test.utils import (
 )
 from django.utils import six
 from django.utils.decorators import classproperty
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import (
     unquote, urlparse, urlsplit, urlunsplit,
@@ -227,33 +224,11 @@ class SimpleTestCase(unittest.TestCase):
         * Clearing the mail test outbox.
         """
         self.client = self.client_class()
-        self._urlconf_setup()
         mail.outbox = []
 
-    def _urlconf_setup(self):
-        if hasattr(self, 'urls'):
-            warnings.warn(
-                "SimpleTestCase.urls is deprecated and will be removed in "
-                "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
-                "in %s instead." % self.__class__.__name__,
-                RemovedInDjango110Warning, stacklevel=2)
-            set_urlconf(None)
-            self._old_root_urlconf = settings.ROOT_URLCONF
-            settings.ROOT_URLCONF = self.urls
-            clear_url_caches()
-
     def _post_teardown(self):
-        """Performs any post-test things. This includes:
-
-        * Putting back the original ROOT_URLCONF if it was changed.
-        """
-        self._urlconf_teardown()
-
-    def _urlconf_teardown(self):
-        if hasattr(self, '_old_root_urlconf'):
-            set_urlconf(None)
-            settings.ROOT_URLCONF = self._old_root_urlconf
-            clear_url_caches()
+        """Perform any post-test things."""
+        pass
 
     def settings(self, **kwargs):
         """

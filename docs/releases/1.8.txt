@@ -1307,10 +1307,10 @@ Built-in template context processors have been moved to
 ``django.test.SimpleTestCase.urls``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The attribute :attr:`SimpleTestCase.urls <django.test.SimpleTestCase.urls>`
-for specifying URLconf configuration in tests has been deprecated and will be
-removed in Django 1.10. Use :func:`@override_settings(ROOT_URLCONF=...)
-<django.test.override_settings>` instead.
+The attribute ``SimpleTestCase.urls`` for specifying URLconf configuration in
+tests has been deprecated and will be removed in Django 1.10. Use
+:func:`@override_settings(ROOT_URLCONF=...) <django.test.override_settings>`
+instead.
 
 ``prefix`` argument to :func:`~django.conf.urls.i18n.i18n_patterns`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
