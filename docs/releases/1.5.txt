@@ -671,7 +671,7 @@ Miscellaneous
 
 * The ``slugify`` template filter is now available as a standard python
   function at :func:`django.utils.text.slugify`. Similarly, ``remove_tags`` is
-  available at :func:`django.utils.html.remove_tags`.
+  available at ``django.utils.html.remove_tags()``.
 
 * Uploaded files are no longer created as executable by default. If you need
   them to be executable change :setting:`FILE_UPLOAD_PERMISSIONS` to your
