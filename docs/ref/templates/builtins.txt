@@ -195,7 +195,7 @@ call to ``{% cycle %}`` doesn't specify ``silent``::
 
     In this syntax, each value gets interpreted as a literal string, and there's
     no way to specify variable values, literal commas, or spaces. Support for
-    this syntax will be removed in Django 2.0.
+    this syntax will be removed in Django 1.10.
 
 .. templatetag:: debug
 

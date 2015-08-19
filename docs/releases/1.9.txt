@@ -982,7 +982,7 @@ versions:
     {% cycle row1,row2,row3 %}
 
 Its parsing caused bugs with the current syntax, so support for the old syntax
-will be removed in Django 2.0 following an accelerated deprecation.
+will be removed in Django 1.10 following an accelerated deprecation.
 
 ``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
