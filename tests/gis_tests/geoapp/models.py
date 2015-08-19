@@ -63,7 +63,7 @@ class MultiFields(NamedModel):
 
     class Meta:
         unique_together = ('city', 'point')
-        required_db_features = ['gis_enabled']
+        required_db_features = ['gis_enabled', 'supports_geometry_field_unique_index']
 
 
 class Truth(models.Model):
