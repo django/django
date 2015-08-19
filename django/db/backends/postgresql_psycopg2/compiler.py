@@ -1,5 +1,10 @@
 from django.db.models.sql import compiler
 
+SQLCompiler = compiler.SQLCompiler
+SQLDeleteCompiler = compiler.SQLDeleteCompiler
+SQLUpdateCompiler = compiler.SQLUpdateCompiler
+SQLAggregateCompiler = compiler.SQLAggregateCompiler
+
 
 class SQLInsertCompiler(compiler.SQLInsertCompiler):
     def as_sql(self):
@@ -48,8 +53,3 @@ class SQLInsertCompiler(compiler.SQLInsertCompiler):
 
         else:
             return super(SQLInsertCompiler, self).as_sql()
-
-SQLCompiler = compiler.SQLCompiler
-SQLDeleteCompiler = compiler.SQLDeleteCompiler
-SQLUpdateCompiler = compiler.SQLUpdateCompiler
-SQLAggregateCompiler = compiler.SQLAggregateCompiler
