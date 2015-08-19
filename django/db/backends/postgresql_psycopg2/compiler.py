@@ -43,7 +43,13 @@ class SQLInsertCompiler(compiler.SQLInsertCompiler):
                 params = [[]]
                 fields = [None]
 
-            result.append(self.connection.ops.bulk_insert_sql(fields, len(values)))
+            placeholders = [
+                [self.placeholder(field, v) for field, v in zip(fields, val)]
+                for val in values
+            ]
+
+            result.append(self.connection.ops.bulk_insert_sql(fields, len(values), placeholders=placeholders))
+
             r_fmt, r_params = self.connection.ops.return_insert_id()
             if r_fmt:
                 col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))

@@ -231,9 +231,16 @@ class DatabaseOperations(BaseDatabaseOperations):
     def return_insert_id(self):
         return "RETURNING %s", ()
 
-    def bulk_insert_sql(self, fields, num_values):
-        items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
-        return "VALUES " + ", ".join([items_sql] * num_values)
+    def bulk_insert_sql(self, fields, num_values, placeholders=None):
+        # This allows non-`%s` placeholders; for example the placeholder DEFAULT
+        if placeholders:
+            items_sql = []
+            for placeholders_for_value in placeholders:
+                items_sql.append("(%s)" % ", ".join(placeholders_for_value))
+            return "VALUES " + ", ".join(items_sql)
+        else:
+            items_sql = "(%s)" % ", ".join(["%s"] * len(fields))
+            return "VALUES " + ", ".join([items_sql] * num_values)
 
     def value_to_db_date(self, value):
         return value
