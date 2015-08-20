@@ -9,7 +9,6 @@ import tempfile
 import threading
 import time
 import unittest
-import warnings
 from datetime import datetime, timedelta
 
 from django.core.cache import cache
@@ -554,31 +553,6 @@ class FileFieldStorageTests(TestCase):
         self.assertEqual(obj.extended_length.name, 'tests/%s.txt' % filename)
         self.assertEqual(obj.extended_length.read(), b'Same Content')
         obj.extended_length.close()
-
-    def test_old_style_storage(self):
-        # Testing backward-compatibility with old-style storage backends that
-        # don't take ``max_length`` parameter in ``get_available_name()``
-        # and save(). A deprecation warning should be raised.
-        obj = Storage()
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            obj.old_style.save('deprecated_storage_test.txt', ContentFile('Same Content'))
-        self.assertEqual(len(warns), 2)
-        self.assertEqual(
-            str(warns[0].message),
-            'Backwards compatibility for storage backends without support for '
-            'the `max_length` argument in Storage.save() will be removed in '
-            'Django 1.10.'
-        )
-        self.assertEqual(
-            str(warns[1].message),
-            'Backwards compatibility for storage backends without support for '
-            'the `max_length` argument in Storage.get_available_name() will '
-            'be removed in Django 1.10.'
-        )
-        self.assertEqual(obj.old_style.name, 'tests/deprecated_storage_test.txt')
-        self.assertEqual(obj.old_style.read(), b'Same Content')
-        obj.old_style.close()
 
     def test_filefield_default(self):
         # Default values allow an object to access a single file.
