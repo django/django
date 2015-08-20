@@ -45,6 +45,7 @@ class Tag(models.Model):
 class Note(models.Model):
     note = models.CharField(max_length=100)
     misc = models.CharField(max_length=10)
+    tag = models.ForeignKey(Tag, blank=True, null=True)
 
     class Meta:
         ordering = ['note']

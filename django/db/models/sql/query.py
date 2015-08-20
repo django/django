@@ -539,7 +539,8 @@ class Query(object):
             # distinct joins for the same connection in rhs query, then the
             # combined query must have two joins, too.
             reuse.discard(new_alias)
-            change_map[alias] = new_alias
+            if alias != new_alias:
+                change_map[alias] = new_alias
             if not rhs.alias_refcount[alias]:
                 # The alias was unused in the rhs query. Unref it so that it
                 # will be unused in the new query, too. We have to add and

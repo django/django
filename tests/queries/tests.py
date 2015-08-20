@@ -1177,6 +1177,15 @@ class Queries1Tests(BaseQuerysetTest):
             self.assertEqual(len(w), 1)
             self.assertTrue(issubclass(w[0].category, RemovedInDjango19Warning))
 
+    def test_lookup_constraint_fielderror(self):
+        msg = (
+            "Cannot resolve keyword 'unknown_field' into field. Choices are: "
+            "annotation, category, category_id, children, id, item, "
+            "managedmodel, name, note, parent, parent_id"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Tag.objects.filter(unknown_field__name='generic')
+
 
 class Queries2Tests(TestCase):
     @classmethod
@@ -1319,8 +1328,8 @@ class Queries4Tests(BaseQuerysetTest):
         generic = NamedCategory.objects.create(name="Generic")
         cls.t1 = Tag.objects.create(name='t1', category=generic)
 
-        n1 = Note.objects.create(note='n1', misc='foo', id=1)
-        n2 = Note.objects.create(note='n2', misc='bar', id=2)
+        n1 = Note.objects.create(note='n1', misc='foo')
+        n2 = Note.objects.create(note='n2', misc='bar')
 
         e1 = ExtraInfo.objects.create(info='e1', note=n1)
         e2 = ExtraInfo.objects.create(info='e2', note=n2)
@@ -1334,6 +1343,17 @@ class Queries4Tests(BaseQuerysetTest):
 
         Item.objects.create(name='i1', created=datetime.datetime.now(), note=n1, creator=cls.a1)
         Item.objects.create(name='i2', created=datetime.datetime.now(), note=n1, creator=cls.a3)
+
+    def test_ticket24525(self):
+        tag = Tag.objects.create()
+        anth100 = tag.note_set.create(note='ANTH', misc='100')
+        math101 = tag.note_set.create(note='MATH', misc='101')
+        s1 = tag.annotation_set.create(name='1')
+        s2 = tag.annotation_set.create(name='2')
+        s1.notes = [math101, anth100]
+        s2.notes = [math101]
+        result = math101.annotation_set.all() & tag.annotation_set.exclude(notes__in=[anth100])
+        self.assertEqual(list(result), [s2])
 
     def test_ticket11811(self):
         unsaved_category = NamedCategory(name="Other")
