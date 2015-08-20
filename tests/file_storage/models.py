@@ -12,19 +12,6 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 
-class OldStyleFSStorage(FileSystemStorage):
-    """
-    Storage backend without support for the ``max_length`` argument in
-    ``get_available_name()`` and ``save()``; for backward-compatibility and
-    deprecation testing.
-    """
-    def get_available_name(self, name):
-        return name
-
-    def save(self, name, content):
-        return super(OldStyleFSStorage, self).save(name, content)
-
-
 class CustomValidNameStorage(FileSystemStorage):
     def get_valid_name(self, name):
         # mark the name to show that this was called
@@ -55,7 +42,3 @@ class Storage(models.Model):
     empty = models.FileField(storage=temp_storage)
     limited_length = models.FileField(storage=temp_storage, upload_to='tests', max_length=20)
     extended_length = models.FileField(storage=temp_storage, upload_to='tests', max_length=300)
-    old_style = models.FileField(
-        storage=OldStyleFSStorage(location=temp_storage_location),
-        upload_to='tests',
-    )
