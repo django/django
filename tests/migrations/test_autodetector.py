@@ -875,7 +875,7 @@ class AutodetectorTests(TestCase):
         """
         # Explicitly testing for not specified, since this is the case after
         # a CreateModel operation w/o any definition on the original model
-        model_state_not_secified = ModelState("a", "model", [("id", models.AutoField(primary_key=True))])
+        model_state_not_specified = ModelState("a", "model", [("id", models.AutoField(primary_key=True))])
         # Explicitly testing for None, since this was the issue in #23452 after
         # a AlterFooTogether operation with e.g. () as value
         model_state_none = ModelState("a", "model", [
@@ -903,13 +903,13 @@ class AutodetectorTests(TestCase):
                 self.fail('Created operation(s) %s from %s' % (ops, msg))
 
         tests = (
-            (model_state_not_secified, model_state_not_secified, '"not specified" to "not specified"'),
-            (model_state_not_secified, model_state_none, '"not specified" to "None"'),
-            (model_state_not_secified, model_state_empty, '"not specified" to "empty"'),
-            (model_state_none, model_state_not_secified, '"None" to "not specified"'),
+            (model_state_not_specified, model_state_not_specified, '"not specified" to "not specified"'),
+            (model_state_not_specified, model_state_none, '"not specified" to "None"'),
+            (model_state_not_specified, model_state_empty, '"not specified" to "empty"'),
+            (model_state_none, model_state_not_specified, '"None" to "not specified"'),
             (model_state_none, model_state_none, '"None" to "None"'),
             (model_state_none, model_state_empty, '"None" to "empty"'),
-            (model_state_empty, model_state_not_secified, '"empty" to "not specified"'),
+            (model_state_empty, model_state_not_specified, '"empty" to "not specified"'),
             (model_state_empty, model_state_none, '"empty" to "None"'),
             (model_state_empty, model_state_empty, '"empty" to "empty"'),
         )
