@@ -766,13 +766,8 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
 
                 # Click on the calendar icon
                 self.selenium.find_element_by_id('calendarlink0').click()
-
-                # Get the calendar caption
-                calendar0 = self.selenium.find_element_by_id('calendarin0')
-                caption = calendar0.find_element_by_tag_name('caption')
-
                 # Make sure that the right month and year are displayed
-                self.assertEqual(caption.text, expected_caption)
+                self.wait_for_text('#calendarin0 caption', expected_caption)
 
 
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
@@ -1130,8 +1125,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_main_band')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
@@ -1142,8 +1137,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_main_band')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
@@ -1165,8 +1160,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_supporting_bands')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
@@ -1177,8 +1172,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_supporting_bands')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
@@ -1211,8 +1206,8 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
         self.selenium.find_element_by_id('add_id_user').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1228,8 +1223,8 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
 
         # Click the Change User button to change it
         self.selenium.find_element_by_id('change_id_user').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_page_loaded()
 
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
