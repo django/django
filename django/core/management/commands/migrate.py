@@ -94,7 +94,8 @@ class Command(BaseCommand):
                 for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting migrations detected (%s).\nTo fix them run "
+                "Conflicting migrations detected; multiple leaf nodes in the "
+                "migration graph: (%s).\nTo fix them run "
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
