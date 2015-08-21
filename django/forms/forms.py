@@ -297,15 +297,6 @@ class BaseForm(object):
         """
         return self.errors.get(NON_FIELD_ERRORS, self.error_class(error_class='nonfield'))
 
-    def _raw_value(self, fieldname):
-        """
-        Returns the raw_value for a particular field name. This is just a
-        convenient wrapper around widget.value_from_datadict.
-        """
-        field = self.fields[fieldname]
-        prefix = self.add_prefix(fieldname)
-        return field.widget.value_from_datadict(self.data, self.files, prefix)
-
     def add_error(self, field, error):
         """
         Update the content of `self._errors`.
