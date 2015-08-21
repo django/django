@@ -337,9 +337,6 @@ class ListMixinTest(unittest.TestCase):
         for i in (-self.limit - 1, self.limit):
             self.assertRaises(IndexError, ul._checkindex, i)
 
-        ul._IndexError = TypeError
-        self.assertRaises(TypeError, ul._checkindex, -self.limit - 1)
-
     def test_11_sorting(self):
         'Sorting'
         pl, ul = self.lists_of_len()

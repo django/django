@@ -8,7 +8,8 @@ from django.db.models import (
     F, BooleanField, CharField, Count, DateTimeField, ExpressionWrapper, Func,
     IntegerField, Sum, Value,
 )
-from django.test import TestCase
+from django.db.models.functions import Lower
+from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
 
 from .models import (
@@ -16,23 +17,16 @@ from .models import (
 )
 
 
-def cxOracle_513_py3_bug(func):
+def cxOracle_py3_bug(func):
     """
-    cx_Oracle versions up to and including 5.1.3 have a bug with respect to
-    string handling under Python3 (essentially, they treat Python3 strings
-    as Python2 strings rather than unicode). This makes some tests here
-    fail under Python 3 -- so we mark them as expected failures.
-
-    See  https://code.djangoproject.com/ticket/23843, in particular comment 6,
-    which points to https://bitbucket.org/anthony_tuininga/cx_oracle/issue/6/
+    There's a bug in Django/cx_Oracle with respect to string handling under
+    Python 3 (essentially, they treat Python 3 strings as Python 2 strings
+    rather than unicode). This makes some tests here fail under Python 3, so
+    we mark them as expected failures until someone fixes them in #23843.
     """
     from unittest import expectedFailure
     from django.db import connection
-
-    if connection.vendor == 'oracle' and six.PY3 and connection.Database.version <= '5.1.3':
-        return expectedFailure(func)
-    else:
-        return func
+    return expectedFailure(func) if connection.vendor == 'oracle' and six.PY3 else func
 
 
 class NonAggregateAnnotationTestCase(TestCase):
@@ -166,6 +160,40 @@ class NonAggregateAnnotationTestCase(TestCase):
         agg = Author.objects.annotate(other_age=F('age')).aggregate(otherage_sum=Sum('other_age'))
         other_agg = Author.objects.aggregate(age_sum=Sum('age'))
         self.assertEqual(agg['otherage_sum'], other_agg['age_sum'])
+
+    @skipUnlessDBFeature('can_distinct_on_fields')
+    def test_distinct_on_with_annotation(self):
+        store = Store.objects.create(
+            name='test store',
+            original_opening=datetime.datetime.now(),
+            friday_night_closing=datetime.time(21, 00, 00),
+        )
+        names = [
+            'Theodore Roosevelt',
+            'Eleanor Roosevelt',
+            'Franklin Roosevelt',
+            'Ned Stark',
+            'Catelyn Stark',
+        ]
+        for name in names:
+            Employee.objects.create(
+                store=store,
+                first_name=name.split()[0],
+                last_name=name.split()[1],
+                age=30, salary=2000,
+            )
+
+        people = Employee.objects.annotate(
+            name_lower=Lower('last_name'),
+        ).distinct('name_lower')
+
+        self.assertEqual(set(p.last_name for p in people), {'Stark', 'Roosevelt'})
+        self.assertEqual(len(people), 2)
+
+        people2 = Employee.objects.annotate(
+            test_alias=F('store__name'),
+        ).distinct('test_alias')
+        self.assertEqual(len(people2), 1)
 
     def test_filter_annotation(self):
         books = Book.objects.annotate(
@@ -387,7 +415,7 @@ class NonAggregateAnnotationTestCase(TestCase):
                 e.id, e.first_name, e.manager, e.random_value, e.last_name, e.age,
                 e.salary, e.store.name, e.annotated_value))
 
-    @cxOracle_513_py3_bug
+    @cxOracle_py3_bug
     def test_custom_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
         Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()
@@ -413,7 +441,7 @@ class NonAggregateAnnotationTestCase(TestCase):
             lambda c: (c.name, c.tagline)
         )
 
-    @cxOracle_513_py3_bug
+    @cxOracle_py3_bug
     def test_custom_functions_can_ref_other_functions(self):
         Company(name='Apple', motto=None, ticker_name='APPL', description='Beautiful Devices').save()
         Company(name='Django Software Foundation', motto=None, ticker_name=None, description=None).save()

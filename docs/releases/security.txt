@@ -663,3 +663,19 @@ Versions affected
 -----------------
 
 * Django 1.8 `(patch) <https://github.com/django/django/commit/8f9a4d3a2bc42f14bb437defd30c7315adbff22c>`__
+
+August 18, 2015 - CVE-2015-5963/CVE-2015-5964
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`CVE-2015-5963 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5963&cid=2>`_
+and
+`CVE-2015-5964 <https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2015-5964&cid=2>`_:
+Denial-of-service possibility in ``logout()`` view by filling session store.
+`Full description <https://www.djangoproject.com/weblog/2015/aug/18/security-releases/>`__
+
+Versions affected
+-----------------
+
+* Django 1.8 `(patch) <https://github.com/django/django/commit/2eb86b01d7b59be06076f6179a454d0fd0afaff6>`__
+* Django 1.7 `(patch) <https://github.com/django/django/commit/2f5485346ee6f84b4e52068c04e043092daf55f7>`__
+* Django 1.4 `(patch) <https://github.com/django/django/commit/575f59f9bc7c59a5e41a081d1f5f55fc859c5012>`__

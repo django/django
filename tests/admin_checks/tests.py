@@ -69,6 +69,22 @@ class SystemChecksTestCase(SimpleTestCase):
             custom_site.unregister(Song)
             admin.sites.system_check_errors = []
 
+    def test_field_name_not_in_list_display(self):
+        class SongAdmin(admin.ModelAdmin):
+            list_editable = ["original_release"]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "The value of 'list_editable[0]' refers to 'original_release', "
+                "which is not contained in 'list_display'.",
+                hint=None,
+                obj=SongAdmin,
+                id='admin.E122',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ["original_release"]

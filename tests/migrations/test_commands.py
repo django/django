@@ -510,6 +510,19 @@ class MakeMigrationsTests(MigrationTestBase):
                     self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
                     self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
+    def test_makemigrations_order(self):
+        """
+        makemigrations should recognize number-only migrations (0001.py).
+        """
+        module = 'migrations.test_migrations_order'
+        with self.temporary_migration_module(module=module) as migration_dir:
+            if hasattr(importlib, 'invalidate_caches'):
+                # Python 3 importlib caches os.listdir() on some platforms like
+                # Mac OS X (#23850).
+                importlib.invalidate_caches()
+            call_command('makemigrations', 'migrations', '--empty', '-n', 'a', '-v', '0')
+            self.assertTrue(os.path.exists(os.path.join(migration_dir, '0002_a.py')))
+
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280
         apps.register_model('migrations', UnserializableModel)
@@ -906,6 +919,39 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn("No conflicts detected to merge.", out.getvalue())
             except CommandError:
                 self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.conflicting_app_with_dependencies"])
+    def test_makemigrations_merge_dont_output_dependency_operations(self):
+        """
+        Makes sure that makemigrations --merge does not output any operations
+        from apps that don't belong to a given app.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+            out = six.StringIO()
+            with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+                call_command(
+                    "makemigrations", "conflicting_app_with_dependencies",
+                    merge=True, interactive=True, stdout=out
+                )
+            val = out.getvalue().lower()
+            self.assertIn('merging conflicting_app_with_dependencies\n', val)
+            self.assertIn(
+                '  branch 0002_conflicting_second\n'
+                '    - create model something\n',
+                val
+            )
+            self.assertIn(
+                '  branch 0002_second\n'
+                '    - delete model tribble\n'
+                '    - remove field silly_field from author\n'
+                '    - add field rating to author\n'
+                '    - create model book\n',
+                val
+            )
 
     def test_makemigrations_with_custom_name(self):
         """

@@ -335,7 +335,7 @@ Forms
 Generic Views
 ^^^^^^^^^^^^^
 
-* Class based views generated using ``as_view()`` now have ``view_class``
+* Class-based views generated using ``as_view()`` now have ``view_class``
   and ``view_initkwargs`` attributes.
 
 * :func:`~django.utils.decorators.method_decorator` can now be used with an iterable
@@ -463,6 +463,8 @@ Models
   :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
   characters in slugs.
 
+* Added support for referencing annotations in ``QuerySet.distinct()``.
+
 CSRF
 ^^^^
 
@@ -545,6 +547,10 @@ Requests and Responses
 
 * Added :meth:`HttpRequest.get_port() <django.http.HttpRequest.get_port>` to
   fetch the originating port of the request.
+
+* Added the ``json_dumps_params`` parameter to
+  :class:`~django.http.JsonResponse` to allow passing keyword arguments to the
+  ``json.dumps()`` call used to generate the response.
 
 Tests
 ^^^^^
@@ -941,6 +947,11 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* Template text that is translated and uses two or more consecutive percent
+  signs, e.g. ``"%%"``, may have a new `msgid` after ``makemessages`` is run
+  (most likely the translation will be marked fuzzy). The new ``msgid`` will be
+  marked ``"#, python-format"``.
+
 * If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
   nor :class:`Context.current_app <django.template.Context>` are set, the
   :ttag:`url` template tag will now use the namespace of the current request.
@@ -972,7 +983,7 @@ versions:
     {% cycle row1,row2,row3 %}
 
 Its parsing caused bugs with the current syntax, so support for the old syntax
-will be removed in Django 2.0 following an accelerated deprecation.
+will be removed in Django 1.10 following an accelerated deprecation.
 
 ``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

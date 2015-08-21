@@ -81,31 +81,6 @@ class PoFileContentsTests(MessageCompilationTests):
         self.assertTrue(os.path.exists(self.MO_FILE))
 
 
-class PercentRenderingTests(MessageCompilationTests):
-    # Ticket #11240 -- Testing rendering doesn't belong here but we are trying
-    # to keep tests for all the stack together
-
-    LOCALE = 'it'
-    MO_FILE = 'locale/%s/LC_MESSAGES/django.mo' % LOCALE
-
-    def setUp(self):
-        super(PercentRenderingTests, self).setUp()
-        self.addCleanup(os.unlink, os.path.join(self.test_dir, self.MO_FILE))
-
-    def test_percent_symbol_escaping(self):
-        with override_settings(LOCALE_PATHS=[os.path.join(self.test_dir, 'locale')]):
-            from django.template import Template, Context
-            call_command('compilemessages', locale=[self.LOCALE], stdout=StringIO())
-            with translation.override(self.LOCALE):
-                t = Template('{% load i18n %}{% trans "Looks like a str fmt spec %% o but shouldn\'t be interpreted as such" %}')
-                rendered = t.render(Context({}))
-                self.assertEqual(rendered, 'IT translation contains %% for the above string')
-
-                t = Template('{% load i18n %}{% trans "Completed 50%% of all the tasks" %}')
-                rendered = t.render(Context({}))
-                self.assertEqual(rendered, 'IT translation of Completed 50%% of all the tasks')
-
-
 class MultipleLocaleCompilationTests(MessageCompilationTests):
 
     MO_FILE_HR = None

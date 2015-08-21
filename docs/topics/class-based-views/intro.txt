@@ -1,5 +1,5 @@
 =================================
-Introduction to Class-based views
+Introduction to class-based views
 =================================
 
 Class-based views provide an alternative way to implement views as Python
@@ -43,7 +43,7 @@ The toolkit of base classes and mixins that Django uses to build class-based
 generic views are built for maximum flexibility, and as such have many hooks in
 the form of default method implementations and attributes that you are unlikely
 to be concerned with in the simplest use cases. For example, instead of
-limiting you to a class based attribute for ``form_class``, the implementation
+limiting you to a class-based attribute for ``form_class``, the implementation
 uses a ``get_form`` method, which calls a ``get_form_class`` method, which in
 its default implementation just returns the ``form_class`` attribute of the
 class. This gives you several options for specifying what form to use, from a
