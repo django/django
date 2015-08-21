@@ -1809,6 +1809,32 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get(reverse('admin:logout'))
 
+    def test_history_view_changed_fields_message(self):
+        """
+        Test the history_view change message contains indication of the
+        changed fields as their form label.
+        """
+        state = State.objects.create(name='My State Name')
+        city = City.objects.create(name='My City Name', state_id=state.pk)
+        change_dict = {
+            'name': 'My State Name 2',
+            'city_set-0-name': 'My City name 2',
+            'city_set-0-id': city.pk,
+            'city_set-TOTAL_FORMS': '3',
+            'city_set-INITIAL_FORMS': '1',
+            'city_set-MAX_NUM_FORMS': '0',
+        }
+
+        article_change_url = reverse('admin:admin_views_state_change', args=(state.pk,))
+        self.client.login(**self.super_login)
+        self.client.post(article_change_url, change_dict)
+
+        response = self.client.get(reverse('admin:admin_views_state_history', args=(state.pk,)))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'The State Name')
+        self.assertContains(response, 'City name')
+
     def test_history_view_bad_url(self):
         self.client.post(reverse('admin:login'), self.changeuser_login)
         response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
