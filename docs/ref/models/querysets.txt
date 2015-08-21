@@ -1794,12 +1794,18 @@ This has a number of caveats though:
   ``post_save`` signals will not be sent.
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField` it
-  does not retrieve and set the primary key attribute, as ``save()`` does.
+  does not retrieve and set the primary key attribute, as ``save()`` does,
+  unless the database backend supports it (currently PostgreSQL).
 * It does not work with many-to-many relationships.
 
 .. versionchanged:: 1.9
 
     Support for using ``bulk_create()`` with proxy models was added.
+
+.. versionchanged:: 1.0
+
+    Support for setting primary keys on objects created using ``bulk_create()``
+    when using PostgreSQL was added.
 
 The ``batch_size`` parameter controls how many objects are created in single
 query. The default is to create all objects in one batch, except for SQLite

@@ -203,6 +203,11 @@ Database backends
 
 * Temporal data subtraction was unified on all backends.
 
+* If the database supports it, backends can set
+  ``DatabaseFeatures.can_return_ids_from_bulk_insert=True`` and implement
+  ``DatabaseOperations.fetch_returned_insert_ids()`` to set primary keys
+  on objects created using ``QuerySet.bulk_create()``.
+
 Email
 ~~~~~
 
@@ -314,6 +319,9 @@ Models
 
 * The :func:`~django.db.models.prefetch_related_objects` function is now a
   public API.
+
+* :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
+  sets the primary key on objects when using PostgreSQL.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
