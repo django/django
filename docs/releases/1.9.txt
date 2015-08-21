@@ -303,7 +303,9 @@ Minor features
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Support for multiple enclosures per feed item has been added. If multiple
+  enclosures are defined on a RSS feed, an exception is raised as RSS feeds,
+  unlike Atom feeds, do not support multiple enclosures per feed item.
 
 Cache
 ^^^^^
@@ -1264,6 +1266,10 @@ Miscellaneous
   :func:`~django.utils.html.format_html_join`, or
   :func:`~django.utils.safestring.mark_safe` when constructing the method's
   return value instead.
+
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
+  deprecated. Use the new ``enclosures`` argument which accepts a list of
+  ``Enclosure`` objects instead of a single one.
 
 .. removed-features-1.9:
 

@@ -351,11 +351,18 @@ SyndicationFeed
         All parameters should be Unicode objects, except ``categories``, which
         should be a sequence of Unicode objects.
 
-    .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, **kwargs)
+    .. method:: add_item(title, link, description, author_email=None, author_name=None, author_link=None, pubdate=None, comments=None, unique_id=None, enclosure=None, categories=(), item_copyright=None, ttl=None, updateddate=None, enclosures=None, **kwargs)
 
         Adds an item to the feed. All args are expected to be Python ``unicode``
         objects except ``pubdate`` and ``updateddate``, which are ``datetime.datetime``
-        objects, and ``enclosure``, which is an instance of the ``Enclosure`` class.
+        objects, ``enclosure``, which is an ``Enclosure`` instance, and
+        ``enclosures``, which is a list of ``Enclosure`` instances.
+
+        .. deprecated:: 1.9
+
+            The ``enclosure`` keyword argument is deprecated in favor of the
+            new ``enclosures`` keyword argument which accepts a list of
+            ``Enclosure`` objects.
 
     .. method:: num_items()
 
