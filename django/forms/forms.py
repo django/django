@@ -556,7 +556,7 @@ class BoundField(object):
         """
         return self.form.errors.get(self.name, self.form.error_class())
 
-    def as_widget(self, widget=None, attrs=None, only_initial=False):
+    def as_widget(self, widget=None, only_initial=False):
         """
         Renders the field by rendering the passed widget, adding any HTML
         attributes passed as attrs.  If no widget is specified, then the
@@ -568,7 +568,7 @@ class BoundField(object):
         if self.field.localize:
             widget.is_localized = True
 
-        attrs = attrs or {}
+        attrs = {}
         if self.field.disabled:
             attrs['disabled'] = True
         auto_id = self.auto_id
@@ -584,21 +584,21 @@ class BoundField(object):
             name = self.html_initial_name
         return force_text(widget.render(name, self.value(), attrs=attrs))
 
-    def as_text(self, attrs=None, **kwargs):
+    def as_text(self, **kwargs):
         """
         Returns a string of HTML for representing this as an <input type="text">.
         """
-        return self.as_widget(TextInput(), attrs, **kwargs)
+        return self.as_widget(TextInput(), **kwargs)
 
-    def as_textarea(self, attrs=None, **kwargs):
+    def as_textarea(self, **kwargs):
         "Returns a string of HTML for representing this as a <textarea>."
-        return self.as_widget(Textarea(), attrs, **kwargs)
+        return self.as_widget(Textarea(), **kwargs)
 
-    def as_hidden(self, attrs=None, **kwargs):
+    def as_hidden(self, **kwargs):
         """
         Returns a string of HTML for representing this as an <input type="hidden">.
         """
-        return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
+        return self.as_widget(self.field.hidden_widget(), **kwargs)
 
     @property
     def data(self):
