@@ -2289,6 +2289,25 @@ class FormsTestCase(SimpleTestCase):
 
         self.assertHTMLEqual(boundfield.label_tag(), '<label for="id_field"></label>')
 
+    def test_boundfield_id_for_label(self):
+        class SomeForm(Form):
+            field = CharField(label='')
+
+        self.assertEqual(SomeForm()['field'].id_for_label, 'id_field')
+
+    def test_boundfield_id_for_label_override_by_attrs(self):
+        """
+        If an id is provided in `Widget.attrs`, it overrides the generated ID,
+        unless it is `None`.
+        """
+        class SomeForm(Form):
+            field = CharField(widget=forms.TextInput(attrs={'id': 'myCustomID'}))
+            field_none = CharField(widget=forms.TextInput(attrs={'id': None}))
+
+        form = SomeForm()
+        self.assertEqual(form['field'].id_for_label, 'myCustomID')
+        self.assertEqual(form['field_none'].id_for_label, 'id_field_none')
+
     def test_label_tag_override(self):
         """
         BoundField label_suffix (if provided) overrides Form label_suffix
