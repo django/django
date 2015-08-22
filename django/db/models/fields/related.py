@@ -314,17 +314,8 @@ class RelatedField(Field):
             if isinstance(self.remote_field.model, six.string_types):
                 to_string = self.remote_field.model
             else:
-                to_string = "%s.%s" % (
-                    self.remote_field.model._meta.app_label,
-                    self.remote_field.model._meta.object_name,
-                )
-            # See if anything swapped/swappable matches
-            for model in apps.get_models(include_swapped=True):
-                if model._meta.swapped:
-                    if model._meta.swapped == to_string:
-                        return model._meta.swappable
-                if ("%s.%s" % (model._meta.app_label, model._meta.object_name)) == to_string and model._meta.swappable:
-                    return model._meta.swappable
+                to_string = self.remote_field.model._meta.label
+            return apps.get_swappable_settings_name(to_string)
         return None
 
     def set_attributes_from_rel(self):

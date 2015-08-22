@@ -29,7 +29,7 @@ except ImportError:
 
 
 __all__ = (
-    'Approximate', 'ContextList', 'get_runner',
+    'Approximate', 'ContextList', 'isolate_lru_cache', 'get_runner',
     'modify_settings', 'override_settings',
     'requires_tz_support',
     'setup_test_environment', 'teardown_test_environment',
@@ -501,6 +501,16 @@ def extend_sys_path(*paths):
         yield
     finally:
         sys.path = _orig_sys_path
+
+
+@contextmanager
+def isolate_lru_cache(lru_cache_object):
+    """Clear the cache of an LRU cache object on entering and exiting."""
+    lru_cache_object.cache_clear()
+    try:
+        yield
+    finally:
+        lru_cache_object.cache_clear()
 
 
 @contextmanager

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
+from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase, override_settings
+from django.test.utils import isolate_lru_cache
 from django.utils import six
 
 
@@ -219,14 +221,15 @@ class FieldDeconstructionTests(SimpleTestCase):
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_foreign_key_swapped(self):
-        # It doesn't matter that we swapped out user for permission;
-        # there's no validation. We just want to check the setting stuff works.
-        field = models.ForeignKey("auth.Permission", models.CASCADE)
-        name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.ForeignKey")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
-        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # It doesn't matter that we swapped out user for permission;
+            # there's no validation. We just want to check the setting stuff works.
+            field = models.ForeignKey("auth.Permission", models.CASCADE)
+            name, path, args, kwargs = field.deconstruct()
+            self.assertEqual(path, "django.db.models.ForeignKey")
+            self.assertEqual(args, [])
+            self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+            self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")
@@ -297,14 +300,15 @@ class FieldDeconstructionTests(SimpleTestCase):
 
     @override_settings(AUTH_USER_MODEL="auth.Permission")
     def test_many_to_many_field_swapped(self):
-        # It doesn't matter that we swapped out user for permission;
-        # there's no validation. We just want to check the setting stuff works.
-        field = models.ManyToManyField("auth.Permission")
-        name, path, args, kwargs = field.deconstruct()
-        self.assertEqual(path, "django.db.models.ManyToManyField")
-        self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"to": "auth.Permission"})
-        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # It doesn't matter that we swapped out user for permission;
+            # there's no validation. We just want to check the setting stuff works.
+            field = models.ManyToManyField("auth.Permission")
+            name, path, args, kwargs = field.deconstruct()
+            self.assertEqual(path, "django.db.models.ManyToManyField")
+            self.assertEqual(args, [])
+            self.assertEqual(kwargs, {"to": "auth.Permission"})
+            self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_null_boolean_field(self):
         field = models.NullBooleanField()
