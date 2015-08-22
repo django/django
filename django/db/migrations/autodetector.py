@@ -11,6 +11,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import six
 
 from .topological_sort import stable_topological_sort
@@ -62,6 +63,8 @@ class MigrationAutodetector(object):
                 key: self.deep_deconstruct(value)
                 for key, value in obj.items()
             }
+        elif isinstance(obj, COMPILED_REGEX_TYPE):
+            return RegexObject(obj)
         elif isinstance(obj, type):
             # If this is a type that implements 'deconstruct' as an instance method,
             # avoid treating this as being deconstructible itself - see #22951

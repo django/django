@@ -14,6 +14,7 @@ from django.apps import apps
 from django.db import migrations, models
 from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.operations.base import Operation
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
@@ -22,8 +23,6 @@ from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import utc
 from django.utils.version import get_docs_version
-
-COMPILED_REGEX_TYPE = type(re.compile(''))
 
 
 class SettingsReference(str):
@@ -506,7 +505,7 @@ class MigrationWriter(object):
             format = "(%s)" if len(strings) != 1 else "(%s,)"
             return format % (", ".join(strings)), imports
         # Compiled regex
-        elif isinstance(value, COMPILED_REGEX_TYPE):
+        elif isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
             imports = {"import re"}
             regex_pattern, pattern_imports = cls.serialize(value.pattern)
             regex_flags, flag_imports = cls.serialize(value.flags)

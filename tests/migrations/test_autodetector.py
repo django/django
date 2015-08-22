@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+import re
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
+from django.core.validators import RegexValidator, validate_slug
 from django.db import connection, models
 from django.db.migrations.autodetector import MigrationAutodetector
 from django.db.migrations.graph import MigrationGraph
@@ -996,6 +999,46 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["RenameModel", "AlterModelTable"])
         self.assertOperationAttributes(changes, "testapp", 0, 0, old_name="Author", new_name="NewAuthor")
         self.assertOperationAttributes(changes, "testapp", 0, 1, name="newauthor", table="author_three")
+
+    def test_identical_regex_doesnt_alter(self):
+        from_state = ModelState(
+            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
+                RegexValidator(
+                    re.compile('^[-a-zA-Z0-9_]+\\Z'),
+                    "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                    'invalid'
+                )
+            ]))]
+        )
+        to_state = ModelState(
+            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[validate_slug]))]
+        )
+        before = self.make_project_state([from_state])
+        after = self.make_project_state([to_state])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number/type of migrations?
+        self.assertNumberMigrations(changes, "testapp", 0)
+
+    def test_different_regex_does_alter(self):
+        from_state = ModelState(
+            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[
+                RegexValidator(
+                    re.compile('^[a-z]+\\Z', 32),
+                    "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens.",
+                    'invalid'
+                )
+            ]))]
+        )
+        to_state = ModelState(
+            "testapp", "model", [("id", models.AutoField(primary_key=True, validators=[validate_slug]))]
+        )
+        before = self.make_project_state([from_state])
+        after = self.make_project_state([to_state])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
 
     def test_empty_foo_together(self):
         """
