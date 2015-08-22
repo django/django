@@ -67,7 +67,8 @@ Imports
 * Put imports in these groups: future, standard library, third-party libraries,
   other Django components, local Django component, try/excepts. Sort lines in
   each group alphabetically by the full module name. Place all ``import module``
-  statements before ``from module import objects`` in each section.
+  statements before ``from module import objects`` in each section. Use absolute
+  imports for other Django components and relative imports for local components.
 
 * On each line, alphabetize the items with the upper case items grouped before
   the lower case items.
