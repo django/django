@@ -210,6 +210,15 @@ class ModelBase(type):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
                 continue
+ 
+        # The super class has an attribute for each sub class with the same sub class but lower cased.
+        # Check for clashes between locally declared fields and sub class name in lower cased.
+            for field in field_names:
+                if field == name.lower():
+                   raise FieldError(
+                        'Local field %r in class %r clashes '
+                        'with subclass %r ' % (field, name, name)
+                    )
 
             parent_fields = base._meta.local_fields + base._meta.local_many_to_many
             # Check for clashes between locally declared fields and those
