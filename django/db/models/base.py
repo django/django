@@ -210,7 +210,6 @@ class ModelBase(type):
                 # Things without _meta aren't functional models, so they're
                 # uninteresting parents.
                 continue
-
             parent_fields = base._meta.local_fields + base._meta.local_many_to_many
             # Check for clashes between locally declared fields and those
             # on the base classes (we cannot handle shadowed fields at the
@@ -1332,6 +1331,11 @@ class Model(six.with_metaclass(ModelBase)):
                     )
                 used_fields[f.name] = f
                 used_fields[f.attname] = f
+ 
+        # Also include shadow fields of parent class
+        for parent in cls._meta.get_parent_list():
+            field = parent._meta.get_field("%s"%cls.__name__.lower())
+            used_fields[field.name]=field
 
         # Check that fields defined in the model don't clash with fields from
         # parents.
