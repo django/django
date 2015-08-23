@@ -822,7 +822,24 @@ class AccessorClashTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-
+    def test_field_name_clash_with_sub_class_name(self):
+        """ Ref #14217 """       
+        class Parent(models.Model):
+            pass
+        class Child(Parent):
+            child = models.CharField(max_length=100)
+ 
+        errors = Child.check() 
+        expected = [
+             Error(
+                "The field 'child' clashes with the field 'child' from model 'invalid_models_tests.parent'.",
+                hint=None,
+                obj=Child._meta.get_field('child'),
+                id='models.E006',
+             )
+        ]
+        self.assertEqual(errors,expected)
+        
 class ReverseQueryNameClashTests(IsolatedModelsTestCase):
 
     def test_fk_to_integer(self):
