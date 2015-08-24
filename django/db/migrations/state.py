@@ -549,11 +549,19 @@ class ModelState(object):
         body.update(self.construct_managers())
 
         # Then, make a Model object (apps.register_model is called in __new__)
-        return metaclassmaker()(
-            str(self.name),
-            bases,
-            body,
-        )
+        try:
+            return type(
+                str(self.name),
+                bases,
+                body,
+            )
+        except TypeError:
+            # Fallback to slower version of building classes with multiple metaclass inheritance.
+            return metaclassmaker()(
+                str(self.name),
+                bases,
+                body,
+            )
 
     def get_field_by_name(self, name):
         for fname, field in self.fields:
