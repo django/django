@@ -80,6 +80,9 @@ class ExtractorTests(SimpleTestCase):
     def assertMsgId(self, msgid, haystack, use_quotes=True):
         return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
 
+    def assertMsgIdPlural(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid_plural', msgid, haystack, use_quotes=use_quotes)
+
     def assertMsgStr(self, msgstr, haystack, use_quotes=True):
         return self._assertPoKeyword('msgstr', msgstr, haystack, use_quotes=use_quotes)
 
@@ -524,6 +527,21 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             po_contents = fp.read()
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))
+
+    def test_trans_and_plural_blocktrans_collision(self):
+        """
+        Ensures a correct workaround for the gettext bug when handling a literal
+        found inside a {% trans %} tag and also in another file inside a
+        {% blocktrans %} with a plural (#17375).
+        """
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=[LOCALE], extensions=['html', 'djtpl'], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
+            self.assertMsgId('First `trans`, then `blocktrans` with a plural', po_contents)
+            self.assertMsgIdPlural('Plural for a `trans` and `blocktrans` collision case', po_contents)
 
 
 class NoWrapExtractorTests(ExtractorTests):
