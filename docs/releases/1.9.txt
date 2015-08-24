@@ -551,6 +551,12 @@ Requests and Responses
   :class:`~django.http.JsonResponse` to allow passing keyword arguments to the
   ``json.dumps()`` call used to generate the response.
 
+* The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` now
+  ignores 404s where the referer is equal to the URL requested. To get around
+  the empty referer check (already implemented before), some web bots set the
+  referer to the URL requested. This could trigger a large amount of false
+  positive with malicious or broken bots that try a lot of URL.
+
 Tests
 ^^^^^
 

@@ -62,7 +62,14 @@ not found" errors). Django sends emails about 404 errors when:
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
 a referer. (It doesn't bother to email for 404s that don't have a referer --
-those are usually just people typing in broken URLs or broken Web 'bots).
+those are usually just people typing in broken URLs or broken Web bots. It also
+ignores 404s when the referer is equal to the URL requested, since this behavior
+is from broken Web bots too).
+
+.. versionchanged:: 1.9
+
+    In older versions of Django, the error was not ignored when the referer was
+    equal to the URL requested.
 
 .. note::
 

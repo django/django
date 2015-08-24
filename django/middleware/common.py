@@ -152,17 +152,24 @@ class BrokenLinkEmailsMiddleware(object):
 
     def is_internal_request(self, domain, referer):
         """
-        Returns True if the referring URL is the same domain as the current request.
+        Returns True if the referring URL is the same domain as the current
+        request.
         """
         # Different subdomains are treated as different domains.
         return bool(re.match("^https?://%s/" % re.escape(domain), referer))
 
     def is_ignorable_request(self, request, uri, domain, referer):
         """
-        Returns True if the given request *shouldn't* notify the site managers.
+        Returns True if the given request *shouldn't* notify the site managers
+        according to project settings or in three specific situations:
+         - empty referer
+         - '?' in referer is identified as search engine source
+         - referer equal to current URL, identified as malicious bot
         """
-        # '?' in referer is identified as search engine source
+        full_url = "%s://%s/%s" % (request.scheme, domain, uri.lstrip('/'))
         if (not referer or
-                (not self.is_internal_request(domain, referer) and '?' in referer)):
+                (not self.is_internal_request(domain, referer) and '?' in referer) or
+                (referer == uri or referer == full_url)):
             return True
+
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)
