@@ -365,6 +365,14 @@ class AppConfigTests(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             AppConfig('label', Stub(__path__=['a', 'b']))
 
+    def test_duplicate_dunder_path_no_dunder_file(self):
+        """
+        If the __path__ attr contains duplicate paths and there is no
+        __file__, they duplicates should be deduplicated (#25246).
+        """
+        ac = AppConfig('label', Stub(__path__=['a', 'a']))
+        self.assertEqual(ac.path, 'a')
+
 
 @skipUnless(six.PY3, "Namespace packages sans __init__.py were added in Python 3.3")
 class NamespacePackageAppTests(SimpleTestCase):
