@@ -13,5 +13,9 @@ Bugfixes
   field that is both a foreign and primary key (:ticket:`24951`).
 
 * Fixed a migrations crash with ``GenericForeignKey`` (:ticket:`25040`).
+
 * Made ``translation.override()`` clear the overridden language when a
   translation isn't initially active (:ticket:`25295`).
+
+* Fixed crash when using a value in ``ModelAdmin.list_display`` that clashed
+  with a reverse field on the model (:ticket:`25299`).

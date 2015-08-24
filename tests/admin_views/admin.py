@@ -169,7 +169,11 @@ class ThingAdmin(admin.ModelAdmin):
 
 
 class InquisitionAdmin(admin.ModelAdmin):
-    list_display = ('leader', 'country', 'expected')
+    list_display = ('leader', 'country', 'expected', 'sketch')
+
+    def sketch(self, obj):
+        # A method with the same name as a reverse accessor.
+        return 'list-display-sketch'
 
 
 class SketchAdmin(admin.ModelAdmin):
