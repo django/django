@@ -80,3 +80,9 @@ continued here.{% endcomment %}
   should be trimmed.
 {% endblocktrans %}
 {% trans "I'm on line 82" %}
+
+{% blocktrans trimmed count counter=mylist|length %}
+First `trans`, then `blocktrans` with a plural
+{% plural %}
+Plural for a `trans` and `blocktrans` collision case
+{% endblocktrans %}
