@@ -178,7 +178,7 @@ class PasswordResetTest(AuthViewsTestCase):
         """
         Testing that the extra_email_context works
         """
-        response = self.client.post('/password_reset/html_email_template/', {'email': 'staffmember@example.com', 'extra_email_context': 'Hello!'})
+        response = self.client.post('/password_reset_extra_email_context/', {'email': 'staffmember@example.com'})
         self.assertEqual(response.status_code, 302)
 
     def test_html_mail_template(self):
