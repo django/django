@@ -50,7 +50,7 @@ totally fine with GeoDjango. Your mileage may vary.
     independently of Django.  In other words, no database or settings file
     required -- just import them as normal from :mod:`django.contrib.gis`.
 
-.. _PROJ.4: http://trac.osgeo.org/proj/
+.. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
 __ http://postgis.net/
 __ http://www.gaia-gis.it/gaia-sins/
 
