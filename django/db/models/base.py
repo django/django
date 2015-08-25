@@ -1334,7 +1334,12 @@ class Model(six.with_metaclass(ModelBase)):
                 used_fields[f.attname] = f
 
         # Check that fields defined in the model don't clash with fields from
-        # parents.
+        # parents. Also include shadowed fields of parent class
+        for parent in cls._meta.get_parent_list():
+            for f in parent._meta.get_fields():
+                if f not in used_fields:
+                    used_fields[f.name] = f
+
         for f in cls._meta.local_fields:
             clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
             # Note that we may detect clash between user-defined non-unique
