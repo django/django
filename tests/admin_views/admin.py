@@ -808,8 +808,16 @@ class CityInlineAdmin(admin.TabularInline):
     view_on_site = False
 
 
+class StateAdminForm(forms.ModelForm):
+    class Meta:
+        model = State
+        fields = '__all__'
+        labels = {'name': 'The State Name'}
+
+
 class StateAdmin(admin.ModelAdmin):
     inlines = [CityInlineAdmin]
+    form = StateAdminForm
 
 
 class RestaurantInlineAdmin(admin.TabularInline):

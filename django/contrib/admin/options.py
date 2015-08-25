@@ -929,10 +929,17 @@ class ModelAdmin(BaseModelAdmin):
         Construct a change message from a changed object.
         """
         change_message = []
+        changed_fields_labels = [form.fields[f].label for f in form.changed_data if f != 'password']
+        if 'password' in form.changed_data:
+            # password field is a special case. Form fields are `password1` and `password2`
+            # while form.changed_data contain `password`.
+            # revise django.contrib.auth.forms.AdminPasswordChangeForm.changed_data()
+            changed_fields_labels.append(form.fields['password1'].label if 'password1' in form.fields
+                                         else 'password')
         if add:
             change_message.append(_('Added.'))
         elif form.changed_data:
-            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            change_message.append(_('Changed %s.') % get_text_list(changed_fields_labels, _('and')))
 
         if formsets:
             for formset in formsets:
@@ -941,8 +948,9 @@ class ModelAdmin(BaseModelAdmin):
                                           % {'name': force_text(added_object._meta.verbose_name),
                                              'object': force_text(added_object)})
                 for changed_object, changed_fields in formset.changed_objects:
+                    changed_fields_labels = [formset.forms[0].fields[f].label for f in changed_fields]
                     change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
-                                          % {'list': get_text_list(changed_fields, _('and')),
+                                          % {'list': get_text_list(changed_fields_labels, _('and')),
                                              'name': force_text(changed_object._meta.verbose_name),
                                              'object': force_text(changed_object)})
                 for deleted_object in formset.deleted_objects:
