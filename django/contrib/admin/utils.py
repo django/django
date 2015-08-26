@@ -185,7 +185,7 @@ class NestedObjects(Collector):
                     'class': source._meta.model_name,
                     'app_label': source._meta.app_label,
                 }
-                self.add_edge(getattr(obj, related_name), obj)
+                self.add_edge(None, obj)
             else:
                 self.add_edge(None, obj)
             self.model_count[obj._meta.verbose_name_plural] += 1
@@ -220,8 +220,7 @@ class NestedObjects(Collector):
         """
         seen = set()
         roots = []
-        for key in self.edges.keys():
-            for root in self.edges.get(key, ()):
+        for root in self.edges.get(None, ()):
                 roots.extend(self._nested(root, seen, format_callback))
         return roots
 
