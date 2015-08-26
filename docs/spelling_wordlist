@@ -629,6 +629,9 @@ subselect
 substr
 subtemplate
 subtemplates
+subtransactions
+subtree
+subtype
 subviews
 subwidgets
 symlink
