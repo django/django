@@ -82,6 +82,10 @@ Minor features
 * Added the optional ``backend`` argument to :func:`~django.contrib.auth.login`
   to allow using it without credentials.
 
+* The new :setting:`LOGOUT_REDIRECT_URL` setting controls the redirect of the
+  :func:`~django.contrib.auth.views.logout` view, if the view doesn't get a
+  ``next_page`` argument.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
