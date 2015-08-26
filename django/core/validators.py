@@ -6,12 +6,25 @@ from django.core.exceptions import ValidationError
 from django.utils import six
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
+from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
 
 # These values, if given to validate(), will trigger the self.required check.
 EMPTY_VALUES = (None, '', [], (), {})
+
+
+def _lazy_re_compile(regex, flags=0):
+    """Lazily compile a regex with flags."""
+    def _compile():
+        # Compile the regex if it was not passed pre-compiled.
+        if isinstance(regex, six.string_types):
+            return re.compile(regex, flags)
+        else:
+            assert not flags, "flags must be empty if regex is passed pre-compiled"
+            return regex
+    return SimpleLazyObject(_compile)
 
 
 @deconstructible
@@ -36,9 +49,7 @@ class RegexValidator(object):
         if self.flags and not isinstance(self.regex, six.string_types):
             raise TypeError("If the flags are set, regex must be a regular expression string.")
 
-        # Compile the regex if it was not passed pre-compiled.
-        if isinstance(self.regex, six.string_types):
-            self.regex = re.compile(self.regex, self.flags)
+        self.regex = _lazy_re_compile(self.regex, self.flags)
 
     def __call__(self, value):
         """
@@ -77,7 +88,7 @@ class URLValidator(RegexValidator):
     tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
-    regex = re.compile(
+    regex = _lazy_re_compile(
         r'^(?:[a-z0-9\.\-]*)://'  # scheme is validated separately
         r'(?:\S+(?::\S*)?@)?'  # user:pass authentication
         r'(?:' + ipv4_re + '|' + ipv6_re + '|' + host_re + ')'
@@ -126,7 +137,7 @@ class URLValidator(RegexValidator):
             url = value
 
 integer_validator = RegexValidator(
-    re.compile('^-?\d+\Z'),
+    _lazy_re_compile('^-?\d+\Z'),
     message=_('Enter a valid integer.'),
     code='invalid',
 )
@@ -140,15 +151,15 @@ def validate_integer(value):
 class EmailValidator(object):
     message = _('Enter a valid email address.')
     code = 'invalid'
-    user_regex = re.compile(
+    user_regex = _lazy_re_compile(
         r"(^[-!#$%&'*+/=?^_`{}|~0-9A-Z]+(\.[-!#$%&'*+/=?^_`{}|~0-9A-Z]+)*\Z"  # dot-atom
         r'|^"([\001-\010\013\014\016-\037!#-\[\]-\177]|\\[\001-\011\013\014\016-\177])*"\Z)',  # quoted-string
         re.IGNORECASE)
-    domain_regex = re.compile(
+    domain_regex = _lazy_re_compile(
         # max length for domain name labels is 63 characters per RFC 1034
         r'((?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+)(?:[A-Z0-9-]{2,63}(?<!-))\Z',
         re.IGNORECASE)
-    literal_regex = re.compile(
+    literal_regex = _lazy_re_compile(
         # literal form, ipv4 or ipv6 address (SMTP 4.1.3)
         r'\[([A-f0-9:\.]+)\]\Z',
         re.IGNORECASE)
@@ -208,21 +219,21 @@ class EmailValidator(object):
 
 validate_email = EmailValidator()
 
-slug_re = re.compile(r'^[-a-zA-Z0-9_]+\Z')
+slug_re = _lazy_re_compile(r'^[-a-zA-Z0-9_]+\Z')
 validate_slug = RegexValidator(
     slug_re,
     _("Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."),
     'invalid'
 )
 
-slug_unicode_re = re.compile(r'^[-\w]+\Z', re.U)
+slug_unicode_re = _lazy_re_compile(r'^[-\w]+\Z', re.U)
 validate_unicode_slug = RegexValidator(
     slug_unicode_re,
     _("Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or hyphens."),
     'invalid'
 )
 
-ipv4_re = re.compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\Z')
+ipv4_re = _lazy_re_compile(r'^(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\Z')
 validate_ipv4_address = RegexValidator(ipv4_re, _('Enter a valid IPv4 address.'), 'invalid')
 
 
@@ -265,7 +276,7 @@ def ip_address_validators(protocol, unpack_ipv4):
 
 
 def int_list_validator(sep=',', message=None, code='invalid'):
-    regexp = re.compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
+    regexp = _lazy_re_compile('^\d+(?:%s\d+)*\Z' % re.escape(sep))
     return RegexValidator(regexp, message=message, code=code)
 
 
