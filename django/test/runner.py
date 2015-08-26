@@ -6,6 +6,7 @@ from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db.migrations.utils import check_unmigrated_models
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
@@ -75,6 +76,7 @@ class DiscoverRunner(object):
         self.keepdb = keepdb
         self.reverse = reverse
         self.debug_sql = debug_sql
+        self.migration_notices = []
 
     @classmethod
     def add_arguments(cls, parser):
@@ -166,6 +168,13 @@ class DiscoverRunner(object):
             **kwargs
         )
 
+    def verify_migrations(self):
+        """
+        This hook exists as downstream test runners might choose to override
+        the implementation for performance reasons (migrations are slow).
+        """
+        self.migration_notices.extend(check_unmigrated_models())
+
     def get_resultclass(self):
         return DebugSQLTextTestResult if self.debug_sql else None
 
@@ -207,6 +216,7 @@ class DiscoverRunner(object):
         """
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
+        self.verify_migrations()
         old_config = self.setup_databases()
         result = self.run_suite(suite)
         self.teardown_databases(old_config)

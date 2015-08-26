@@ -11,11 +11,13 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
+from django.db.utils import OperationalError
 from django.test import (
     TestCase, TransactionTestCase, mock, skipUnlessDBFeature, testcases,
 )
 from django.test.runner import DiscoverRunner, dependency_ordered
 from django.test.testcases import connections_support_transactions
+from django.test.utils import captured_stdout
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -149,6 +151,35 @@ class ManageCommandTests(unittest.TestCase):
         with self.assertRaises(AttributeError):
             call_command('test', 'sites',
                 testrunner='test_runner.NonExistentRunner')
+
+
+class MigrateVerifyRunner(DiscoverRunner):
+
+    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+        self.verify_migrations()
+        raise OperationalError('no such table: ponies_pony')
+
+    def verify_migrations(self):
+        self.migration_notices.extend([
+            'A pony notice',
+            'A unicorn notice',
+        ])
+
+
+class UnmigratedTest(unittest.TestCase):
+    def test_unmigrated_tests(self):
+        expect0 = 'no such table: ponies_pony'
+        expect1 = 'A pony notice'
+        expect2 = 'A unicorn notice'
+        with self.assertRaises(OperationalError) as cm:
+            with captured_stdout() as stdout:
+                call_command(
+                    'test', 'sites',
+                    testrunner='test_runner.tests.MigrateVerifyRunner',
+                )
+        self.assertEqual(expect0, six.text_type(cm.exception))
+        self.assertIn(expect1, stdout.getvalue())
+        self.assertIn(expect2, stdout.getvalue())
 
 
 class CustomTestRunnerOptionsTests(AdminScriptTestCase):
