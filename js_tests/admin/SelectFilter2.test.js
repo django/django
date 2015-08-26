@@ -1,3 +1,7 @@
+/* global module, test, SelectFilter */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
 module('admin.SelectFilter2');
 
 test('init', function(assert) {

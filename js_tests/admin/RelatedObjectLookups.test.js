@@ -1,3 +1,8 @@
+/* global module, test, html_unescape, id_to_windowname,
+   windowname_to_id */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
 module('admin.RelatedObjectLookups');
 
 test('html_unescape', function(assert) {

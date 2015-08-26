@@ -1,3 +1,7 @@
+/* global module, test */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
 module('admin.inlines: tabular formsets', {
     beforeEach: function() {
         var $ = django.jQuery;
