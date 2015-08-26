@@ -1,3 +1,7 @@
+/* global module, test, DateTimeShortcuts */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
+
 module('admin.DateTimeShortcuts');
 
 test('init', function(assert) {
