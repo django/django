@@ -458,6 +458,21 @@ Migrations
 * When supplying ``None`` as a value in :setting:`MIGRATION_MODULES`, Django
   will consider the app an app without migrations.
 
+* When applying migrations, the "Rendering model states" step that's displayed
+  when running migrate with verbosity 2 or higher now computes only the states
+  for the migrations that have already been applied. The model states for
+  migrations being applied are generated on demand, drastically reducing the
+  amount of required memory.
+
+  However, this improvement is not available when unapplying migrations and
+  therefore still requires the precomputation and storage of the intermediate
+  migration states.
+
+  This improvement also requires that Django no longer supports mixed migration
+  plans. Mixed plans consist of a list of migrations where some are being
+  applied and others are being unapplied. This was never officially supported
+  and never had a public API that supports this behavior.
+
 Models
 ^^^^^^
 
@@ -1093,6 +1108,10 @@ Miscellaneous
 
 * The system checks for :class:`~django.contrib.admin.ModelAdmin` now check
   instances rather than classes.
+
+* The private API to apply mixed migration plans has been dropped for
+  performance reasons. Mixed plans consist of a list of migrations where some
+  are being applied and others are being unapplied.
 
 .. _deprecated-features-1.9:
 
