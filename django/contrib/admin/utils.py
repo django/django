@@ -220,8 +220,9 @@ class NestedObjects(Collector):
         """
         seen = set()
         roots = []
-        for root in self.edges.get(None, ()):
-            roots.extend(self._nested(root, seen, format_callback))
+        for key in self.edges.keys():
+            for root in self.edges.get(key, ()):
+                roots.extend(self._nested(root, seen, format_callback))
         return roots
 
     def can_fast_delete(self, *args, **kwargs):
