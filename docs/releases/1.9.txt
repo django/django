@@ -989,6 +989,10 @@ Miscellaneous
   Set ``request.current_app`` to ``None`` if you don't want to use a namespace
   hint.
 
+* The :setting:`SILENCED_SYSTEM_CHECKS` setting now silences messages of all
+  levels. Previously, messages of ``ERROR`` level or higher were printed to the
+  console.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
