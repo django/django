@@ -1,3 +1,6 @@
+/* global module, test, html_unescape, id_to_windowname,
+   windowname_to_id */
+
 module('admin.RelatedObjectLookups');
 
 test('html_unescape', function(assert) {

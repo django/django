@@ -1,3 +1,5 @@
+/* global module, test, SelectFilter */
+
 module('admin.SelectFilter2');
 
 test('init', function(assert) {

@@ -1,3 +1,5 @@
+/* global module, test, DateTimeShortcuts */
+
 module('admin.DateTimeShortcuts');
 
 test('init', function(assert) {

@@ -1,3 +1,5 @@
+/* global module, test */
+
 module('admin.core');
 
 test('Date.getTwelveHours', function(assert) {

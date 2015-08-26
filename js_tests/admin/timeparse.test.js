@@ -1,3 +1,5 @@
+/* global module, test, parseTimeString */
+
 module('admin.timeparse');
 
 test('parseTimeString', function(assert) {

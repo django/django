@@ -1,3 +1,5 @@
+/* global module, test */
+
 module('admin.inlines: tabular formsets', {
     beforeEach: function() {
         'use strict';

@@ -1,3 +1,5 @@
+/* global module, test, SelectBox */
+
 module('admin.SelectBox');
 
 test('init: no options', function(assert) {

@@ -1,3 +1,5 @@
+/* global module, test */
+
 module('admin.actions', {
     beforeEach: function() {
         'use strict';

@@ -3,15 +3,19 @@
 
     var django = globals.django || (globals.django = {});
 
-    django.pluralidx = function(count) { return (count == 1) ? 0 : 1; };
+    django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
 
     /* gettext identity library */
 
     django.gettext = function(msgid) { return msgid; };
-    django.ngettext = function(singular, plural, count) { return (count == 1) ? singular : plural; };
+    django.ngettext = function(singular, plural, count) {
+        return (count === 1) ? singular : plural;
+    };
     django.gettext_noop = function(msgid) { return msgid; };
     django.pgettext = function(context, msgid) { return msgid; };
-    django.npgettext = function(context, singular, plural, count) { return (count == 1) ? singular : plural; };
+    django.npgettext = function(context, singular, plural, count) {
+        return (count === 1) ? singular : plural;
+    };
 
     django.interpolate = function(fmt, obj, named) {
         if (named) {
@@ -67,7 +71,7 @@
 
     django.get_format = function(format_type) {
         var value = django.formats[format_type];
-        if (typeof(value) == 'undefined') {
+        if (typeof value === 'undefined') {
             return format_type;
         } else {
             return value;
