@@ -1,6 +1,7 @@
 module('admin.DateTimeShortcuts');
 
 test('init', function(assert) {
+    'use strict';
     var $ = django.jQuery;
 
     var dateField = $('<input type="text" class="vDateField" value="2015-03-16"><br>');

@@ -1,6 +1,7 @@
 module('admin.timeparse');
 
 test('parseTimeString', function(assert) {
+    'use strict';
     function time(then, expected) {
         assert.equal(parseTimeString(then), expected);
     }
