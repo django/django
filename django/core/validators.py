@@ -4,9 +4,9 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.utils import six
-from django.utils.functional import SimpleLazyObject
 from django.utils.deconstruct import deconstructible
 from django.utils.encoding import force_text
+from django.utils.functional import SimpleLazyObject
 from django.utils.ipv6 import is_valid_ipv6_address
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
