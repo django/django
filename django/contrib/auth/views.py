@@ -104,6 +104,8 @@ def logout(request, next_page=None,
 
     if next_page is not None:
         next_page = resolve_url(next_page)
+    elif settings.LOGOUT_REDIRECT_URL:
+        next_page = resolve_url(settings.LOGOUT_REDIRECT_URL)
 
     if (redirect_field_name in request.POST or
             redirect_field_name in request.GET):

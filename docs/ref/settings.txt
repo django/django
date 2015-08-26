@@ -2642,6 +2642,25 @@ This setting also accepts view function names and :ref:`named URL patterns
 <naming-url-patterns>` which can be used to reduce configuration duplication
 since you don't have to define the URL in two places (``settings`` and URLconf).
 
+.. setting:: LOGOUT_REDIRECT_URL
+
+``LOGOUT_REDIRECT_URL``
+-----------------------
+
+.. versionadded:: 1.10
+
+Default: ``None``
+
+LOGIN_REDIRECT_URL counterpart.  The URL where requests are redirected after
+logout when the ``contrib.auth.logout`` view gets no ``next`` parameter.
+
+If ``None``, no redirection will be performed and the logout view will be
+rendered.
+
+This setting also accepts view function names and :ref:`named URL patterns
+<naming-url-patterns>` which can be used to reduce configuration duplication
+since you don't have to define the URL in two places (``settings`` and URLconf).
+
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
 ``PASSWORD_RESET_TIMEOUT_DAYS``
