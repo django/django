@@ -143,10 +143,10 @@ class TestInline(TestDataMixin, TestCase):
         """
         response = self.client.get(reverse('admin:admin_inlines_holder4_add'))
         self.assertContains(response, '<p class="help">Awesome stacked help text is awesome.</p>', 4)
-        self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Awesome tabular help text is awesome.)" title="Awesome tabular help text is awesome." />', 1)
+        self.assertContains(response, '<img src="/static/admin/img/svg/icon-unknown.svg" class="help help-tooltip" width="10" height="10" alt="(Awesome tabular help text is awesome.)" title="Awesome tabular help text is awesome." />', 1)
         # ReadOnly fields
         response = self.client.get(reverse('admin:admin_inlines_capofamiglia_add'))
-        self.assertContains(response, '<img src="/static/admin/img/icon-unknown.gif" class="help help-tooltip" width="10" height="10" alt="(Help text for ReadOnlyInline)" title="Help text for ReadOnlyInline" />', 1)
+        self.assertContains(response, '<img src="/static/admin/img/svg/icon-unknown.svg" class="help help-tooltip" width="10" height="10" alt="(Help text for ReadOnlyInline)" title="Help text for ReadOnlyInline" />', 1)
 
     def test_inline_hidden_field_no_column(self):
         """#18263 -- Make sure hidden fields don't get a column in tabular inlines"""
