@@ -1,9 +1,8 @@
 /* global module, test */
+/* eslint strict: 0 */
 
 module('admin.inlines: tabular formsets', {
     beforeEach: function() {
-        'use strict';
-
         var $ = django.jQuery;
         var that = this;
         this.addText = 'Add another';
@@ -20,15 +19,11 @@ module('admin.inlines: tabular formsets', {
 });
 
 test('no forms', function(assert) {
-    'use strict';
-
     assert.ok(this.inlineRow.hasClass('dynamic-first'));
     assert.equal(this.table.find('.add-row a').text(), this.addText);
 });
 
 test('add form', function(assert) {
-    'use strict';
-
     var addButton = this.table.find('.add-row a');
     assert.equal(addButton.text(), this.addText);
     addButton.click();

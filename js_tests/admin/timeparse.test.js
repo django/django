@@ -1,9 +1,9 @@
 /* global module, test, parseTimeString */
+/* eslint strict: 0 */
 
 module('admin.timeparse');
 
 test('parseTimeString', function(assert) {
-    'use strict';
     function time(then, expected) {
         assert.equal(parseTimeString(then), expected);
     }

@@ -1,9 +1,9 @@
 /* global module, test, SelectBox */
+/* eslint strict: 0 */
 
 module('admin.SelectBox');
 
 test('init: no options', function(assert) {
-    'use strict';
     var $ = django.jQuery;
     $('<select id="id"></select>').appendTo('#qunit-fixture');
     SelectBox.init('id');
@@ -11,7 +11,6 @@ test('init: no options', function(assert) {
 });
 
 test('filter', function(assert) {
-    'use strict';
     var $ = django.jQuery;
     $('<select id="id"></select>').appendTo('#qunit-fixture');
     $('<option value="0">A</option>').appendTo('#id');

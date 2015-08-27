@@ -1,9 +1,9 @@
 /* global module, test, SelectFilter */
+/* eslint strict: 0 */
 
 module('admin.SelectFilter2');
 
 test('init', function(assert) {
-    'use strict';
     var $ = django.jQuery;
     $('<form><select id="id"></select></form>').appendTo('#qunit-fixture');
     $('<option value="0">A</option>').appendTo('#id');

@@ -1,8 +1,8 @@
 /* global module, test */
+/* eslint strict: 0 */
 
 module('admin.actions', {
     beforeEach: function() {
-        'use strict';
         // Number of results shown on page
         /* eslint-disable */
         window._actions_icnt = '100';
@@ -16,7 +16,6 @@ module('admin.actions', {
 });
 
 test('check', function(assert) {
-    'use strict';
     var $ = django.jQuery;
     assert.notOk($('.action-select').is(':checked'));
     $('#action-toggle').click();
