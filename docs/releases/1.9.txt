@@ -119,9 +119,9 @@ New styling for ``contrib.admin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The admin sports a modern, flat design with new SVG icons which look perfect
-on hi-dpi screens. It still provides a fully-functional experience to
-`YUI's A-grade`_ browsers. Older browser may experience varying levels of
-graceful degradation.
+on HiDPI screens. It still provides a fully-functional experience to `YUI's
+A-grade`_ browsers. Older browser may experience varying levels of graceful
+degradation.
 
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
