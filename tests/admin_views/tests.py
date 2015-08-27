@@ -43,21 +43,21 @@ from . import customadmin
 from .admin import CityAdmin, site, site2
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
-    AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Category,
-    Chapter, ChapterXtra1, ChapterXtra2, Character, Child, Choice, City,
-    Collector, Color, Color2, ComplexSortedPerson, CoverLetter, CustomArticle,
-    CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
-    Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
-    FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language,
-    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
-    ParentWithDependentChildren, Person, Persona, Picture, Pizza, Plot,
-    PlotDetails, PluggableSearchPerson, Podcast, Post, PrePopulatedPost, Promo,
-    Question, Recommendation, Recommender, RelatedPrepopulated, Report,
-    Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
-    ShortMessage, Simple, State, Story, Subscriber, SuperSecretHideout,
-    SuperVillain, Telegram, TitleTranslation, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
-    Worker, WorkHour,
+    AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Bookmark,
+    Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child, Choice,
+    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
+    CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
+    ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
+    FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
+    Inquisition, Language, MainPrepopulated, ModelWithStringPrimaryKey,
+    OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
+    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
+    PrePopulatedPost, Promo, Question, Recommendation, Recommender,
+    RelatedPrepopulated, Report, Restaurant, RowLevelChangePermissionModel,
+    SecretHideout, Section, ShortMessage, Simple, State, Story, Subscriber,
+    SuperSecretHideout, SuperVillain, Telegram, TitleTranslation, Topping,
+    UnchangeableObject, UndeletableObject, UnorderedObject, Villain, Vodcast,
+    Whatsit, Widget, Worker, WorkHour,
 )
 
 
@@ -2230,6 +2230,19 @@ class AdminViewDeletedObjectsTest(TestCase):
         should_contain = '<li>Funky tag: <a href="%s">hott' % reverse(
             'admin:admin_views_funkytag_change', args=(tag.id,))
         response = self.client.get(reverse('admin:admin_views_plot_delete', args=(plot.pk,)))
+        self.assertContains(response, should_contain)
+
+    def test_generic_relations_with_related_query_name(self):
+        """
+        If a deleted object has GenericForeignKey with
+        GenericRelation(related_query_name='...') pointing to it, those objects
+        should be listed for deletion.
+        """
+        bookmark = Bookmark.objects.create(name='djangoproject')
+        tag = FunkyTag.objects.create(content_object=bookmark, name='django')
+        tag_url = reverse('admin:admin_views_funkytag_change', args=(tag.id,))
+        should_contain = '<li>Funky tag: <a href="%s">django' % tag_url
+        response = self.client.get(reverse('admin:admin_views_bookmark_delete', args=(bookmark.pk,)))
         self.assertContains(response, should_contain)
 
 
