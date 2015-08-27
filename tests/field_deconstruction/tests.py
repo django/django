@@ -226,10 +226,11 @@ class FieldDeconstructionTests(SimpleTestCase):
             # there's no validation. We just want to check the setting stuff works.
             field = models.ForeignKey("auth.Permission", models.CASCADE)
             name, path, args, kwargs = field.deconstruct()
-            self.assertEqual(path, "django.db.models.ForeignKey")
-            self.assertEqual(args, [])
-            self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
-            self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+
+        self.assertEqual(path, "django.db.models.ForeignKey")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission", "on_delete": models.CASCADE})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_image_field(self):
         field = models.ImageField(upload_to="foo/barness", width_field="width", height_field="height")
@@ -305,10 +306,11 @@ class FieldDeconstructionTests(SimpleTestCase):
             # there's no validation. We just want to check the setting stuff works.
             field = models.ManyToManyField("auth.Permission")
             name, path, args, kwargs = field.deconstruct()
-            self.assertEqual(path, "django.db.models.ManyToManyField")
-            self.assertEqual(args, [])
-            self.assertEqual(kwargs, {"to": "auth.Permission"})
-            self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
+
+        self.assertEqual(path, "django.db.models.ManyToManyField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"to": "auth.Permission"})
+        self.assertEqual(kwargs['to'].setting_name, "AUTH_USER_MODEL")
 
     def test_null_boolean_field(self):
         field = models.NullBooleanField()

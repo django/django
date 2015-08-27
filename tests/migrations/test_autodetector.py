@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser
 from django.core.validators import RegexValidator, validate_slug
@@ -11,6 +12,7 @@ from django.db.migrations.loader import MigrationLoader
 from django.db.migrations.questioner import MigrationQuestioner
 from django.db.migrations.state import ModelState, ProjectState
 from django.test import TestCase, mock, override_settings
+from django.test.utils import isolate_lru_cache
 
 from .models import FoodManager, FoodQuerySet
 
@@ -1310,10 +1312,12 @@ class AutodetectorTests(TestCase):
 
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable(self):
-        before = self.make_project_state([self.custom_user])
-        after = self.make_project_state([self.custom_user, self.author_with_custom_user])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            before = self.make_project_state([self.custom_user])
+            after = self.make_project_state([self.custom_user, self.author_with_custom_user])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["CreateModel"])
@@ -1321,11 +1325,13 @@ class AutodetectorTests(TestCase):
         self.assertMigrationDependencies(changes, 'testapp', 0, [("__setting__", "AUTH_USER_MODEL")])
 
     def test_swappable_changed(self):
-        before = self.make_project_state([self.custom_user, self.author_with_user])
-        with override_settings(AUTH_USER_MODEL="thirdapp.CustomUser"):
-            after = self.make_project_state([self.custom_user, self.author_with_custom_user])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            before = self.make_project_state([self.custom_user, self.author_with_user])
+            with override_settings(AUTH_USER_MODEL="thirdapp.CustomUser"):
+                after = self.make_project_state([self.custom_user, self.author_with_custom_user])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'testapp', 1)
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
@@ -1815,11 +1821,13 @@ class AutodetectorTests(TestCase):
     @override_settings(AUTH_USER_MODEL="thirdapp.CustomUser")
     def test_swappable_first_setting(self):
         """Tests that swappable models get their CreateModel first."""
-        # Make state
-        before = self.make_project_state([])
-        after = self.make_project_state([self.custom_user_no_inherit, self.aardvark])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            # Make state
+            before = self.make_project_state([])
+            after = self.make_project_state([self.custom_user_no_inherit, self.aardvark])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'thirdapp', 1)
         self.assertOperationTypes(changes, 'thirdapp', 0, ["CreateModel", "CreateModel"])
@@ -1999,20 +2007,22 @@ class AutodetectorTests(TestCase):
         #23322 - Tests that the dependency resolver knows to explicitly resolve
         swappable models.
         """
-        tenant = ModelState("a", "Tenant", [
-            ("id", models.AutoField(primary_key=True)),
-            ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
-            bases=(AbstractBaseUser, )
-        )
-        address = ModelState("b", "Address", [
-            ("id", models.AutoField(primary_key=True)),
-            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
-        ])
-        # Make state
-        before = self.make_project_state([])
-        after = self.make_project_state([address, tenant])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            tenant = ModelState("a", "Tenant", [
+                ("id", models.AutoField(primary_key=True)),
+                ("primary_address", models.ForeignKey("b.Address", models.CASCADE))],
+                bases=(AbstractBaseUser, )
+            )
+            address = ModelState("b", "Address", [
+                ("id", models.AutoField(primary_key=True)),
+                ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
+            ])
+            # Make state
+            before = self.make_project_state([])
+            after = self.make_project_state([address, tenant])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'a', 2)
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
@@ -2031,20 +2041,22 @@ class AutodetectorTests(TestCase):
         swappable models but with the swappable not being the first migrated
         model.
         """
-        address = ModelState("a", "Address", [
-            ("id", models.AutoField(primary_key=True)),
-            ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
-        ])
-        tenant = ModelState("b", "Tenant", [
-            ("id", models.AutoField(primary_key=True)),
-            ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
-            bases=(AbstractBaseUser, )
-        )
-        # Make state
-        before = self.make_project_state([])
-        after = self.make_project_state([address, tenant])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            address = ModelState("a", "Address", [
+                ("id", models.AutoField(primary_key=True)),
+                ("tenant", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE)),
+            ])
+            tenant = ModelState("b", "Tenant", [
+                ("id", models.AutoField(primary_key=True)),
+                ("primary_address", models.ForeignKey("a.Address", models.CASCADE))],
+                bases=(AbstractBaseUser, )
+            )
+            # Make state
+            before = self.make_project_state([])
+            after = self.make_project_state([address, tenant])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'a', 2)
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
@@ -2062,15 +2074,17 @@ class AutodetectorTests(TestCase):
         #23322 - Tests that the dependency resolver knows to explicitly resolve
         swappable models.
         """
-        person = ModelState("a", "Person", [
-            ("id", models.AutoField(primary_key=True)),
-            ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='children'))
-        ])
-        # Make state
-        before = self.make_project_state([])
-        after = self.make_project_state([person])
-        autodetector = MigrationAutodetector(before, after)
-        changes = autodetector._detect_changes()
+        with isolate_lru_cache(apps.get_swappable_settings_name):
+            person = ModelState("a", "Person", [
+                ("id", models.AutoField(primary_key=True)),
+                ("parent1", models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='children'))
+            ])
+            # Make state
+            before = self.make_project_state([])
+            after = self.make_project_state([person])
+            autodetector = MigrationAutodetector(before, after)
+            changes = autodetector._detect_changes()
+
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, 'a', 1)
         self.assertOperationTypes(changes, 'a', 0, ["CreateModel"])
