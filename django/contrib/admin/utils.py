@@ -222,6 +222,11 @@ class NestedObjects(Collector):
         roots = []
         for root in self.edges.get(None, ()):
             roots.extend(self._nested(root, seen, format_callback))
+        # All values are not stored by key None in dict self.edges
+        for key in self.edges:
+            if key is not None:
+                for root in self.edges.get(key, ()):
+                    roots.extend(self._nested(root, seen, format_callback))
         return roots
 
     def can_fast_delete(self, *args, **kwargs):

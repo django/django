@@ -24,9 +24,9 @@ from django.utils.six import StringIO
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
-    Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice, City,
-    Collector, Color, Color2, ComplexSortedPerson, CoverLetter, CustomArticle,
-    CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
+    Bookmark, Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice,
+    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
+    CustomArticle, CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
     EmptyModelHidden, EmptyModelMixin, EmptyModelVisible, ExplicitlyProvidedPK,
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gadget, Gallery,
@@ -907,6 +907,7 @@ site.register(Gadget, GadgetAdmin)
 site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
+site.register(Bookmark)
 site.register(PlotDetails)
 site.register(CyclicOne)
 site.register(CyclicTwo)
