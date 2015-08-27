@@ -513,6 +513,14 @@ for the field. This affects :class:`~django.db.models.CharField`,
 :class:`~django.db.models.SlugField` and
 :class:`~django.db.models.CommaSeparatedIntegerField`.
 
+``TextField`` limitations
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL can index only the first N chars of a ``BLOB`` or ``TEXT`` column. Since
+``TextField`` doesn't have a defined length, you can't mark it as
+``unique=True``. MySQL will report: "BLOB/TEXT column '<db_column>' used in key
+specification without a key length".
+
 .. _mysql-fractional-seconds:
 
 Fractional seconds support for Time and DateTime fields
