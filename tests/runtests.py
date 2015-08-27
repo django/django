@@ -140,6 +140,7 @@ def setup(verbosity, test_labels):
         # us skip creating migrations for the test models.
         'auth': 'django.contrib.auth.tests.migrations',
         'contenttypes': 'contenttypes_tests.migrations',
+        'sessions': 'sessions_tests.migrations',
     }
     log_config = DEFAULT_LOGGING
     # Filter out non-error logging so we don't have to capture it in lots of

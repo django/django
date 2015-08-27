@@ -514,8 +514,10 @@ access sessions using the normal Django database API::
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
-Note that you'll need to call ``get_decoded()`` to get the session dictionary.
-This is necessary because the dictionary is stored in an encoded format::
+Note that you'll need to call
+:meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
+dictionary. This is necessary because the dictionary is stored in an encoded
+format::
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
@@ -669,6 +671,177 @@ Technical details
 
 * Django only sends a cookie if it needs to. If you don't set any session
   data, it won't send a session cookie.
+
+The ``SessionStore`` object
+---------------------------
+
+When working with sessions internally, Django uses a session store object from
+the corresponding session engine. By convention, the session store object class
+is named ``SessionStore`` and is located in the module designated by
+:setting:`SESSION_ENGINE`.
+
+All ``SessionStore`` classes available in Django inherit from
+:class:`~backends.base.SessionBase` and implement data manipulation methods,
+namely:
+
+* ``exists()``
+* ``create()``
+* ``save()``
+* ``delete()``
+* ``load()``
+* :meth:`~backends.base.SessionBase.clear_expired`
+
+In order to build a custom session engine or to customize an existing one, you
+may create a new class inheriting from :class:`~backends.base.SessionBase` or
+any other existing ``SessionStore`` class.
+
+Extending most of the session engines is quite straightforward, but doing so
+with database-backed session engines generally requires some extra effort (see
+the next section for details).
+
+.. _extending-database-backed-session-engines:
+
+Extending database-backed session engines
+=========================================
+
+.. versionadded:: 1.9
+
+Creating a custom database-backed session engine built upon those included in
+Django (namely ``db`` and ``cached_db``) may be done by inheriting
+:class:`~base_session.AbstractBaseSession` and either ``SessionStore`` class.
+
+``AbstractBaseSession`` and ``BaseSessionManager`` are importable from
+``django.contrib.sessions.base_session`` so that they can be imported without
+including ``django.contrib.sessions`` in :setting:`INSTALLED_APPS`.
+
+.. class:: base_session.AbstractBaseSession
+
+    .. versionadded:: 1.9
+
+    The abstract base session model.
+
+    .. attribute:: session_key
+
+        Primary key. The field itself may contain up to 40 characters. The
+        current implementation generates a 32-character string (a random
+        sequence of digits and lowercase ASCII letters).
+
+    .. attribute:: session_data
+
+        A string containing an encoded and serialized session dictionary.
+
+    .. attribute:: expire_date
+
+        A datetime designating when the session expires.
+
+        Expired sessions are not available to a user, however, they may still
+        be stored in the database until the :djadmin:`clearsessions` management
+        command is run.
+
+    .. classmethod:: get_session_store_class()
+
+        Returns a session store class to be used with this session model.
+
+    .. method:: get_decoded()
+
+        Returns decoded session data.
+
+        Decoding is performed by the session store class.
+
+You can also customize the model manager by subclassing
+:class:`~django.contrib.sessions.base_session.BaseSessionManager`:
+
+.. class:: base_session.BaseSessionManager
+
+    .. versionadded:: 1.9
+
+    .. method:: encode(session_dict)
+
+        Returns the given session dictionary serialized and encoded as a string.
+
+        Encoding is performed by the session store class tied to a model class.
+
+    .. method:: save(session_key, session_dict, expire_date)
+
+        Saves session data for a provided session key, or deletes the session
+        in case the data is empty.
+
+Customization of ``SessionStore`` classes is achieved by overriding methods
+and properties described below:
+
+.. class:: backends.db.SessionStore
+
+    Implements database-backed session store.
+
+    .. classmethod:: get_model_class()
+
+        .. versionadded:: 1.9
+
+        Override this method to return a custom session model if you need one.
+
+    .. method:: create_model_instance(data)
+
+        .. versionadded:: 1.9
+
+        Returns a new instance of the session model object, which represents
+        the current session state.
+
+        Overriding this method provides the ability to modify session model
+        data before it's saved to database.
+
+.. class:: backends.cached_db.SessionStore
+
+    Implements cached database-backed session store.
+
+    .. attribute:: cache_key_prefix
+
+        .. versionadded:: 1.9
+
+        A prefix added to a session key to build a cache key string.
+
+Example
+-------
+
+The example below shows a custom database-backed session engine that includes
+an additional database column to store an account ID (thus providing an option
+to query the database for all active sessions for an account)::
+
+    from django.contrib.sessions.backends.db import SessionStore as DBStore
+    from django.contrib.sessions.base_session import AbstractBaseSession
+    from django.db import models
+
+    class CustomSession(AbstractBaseSession):
+        account_id = models.IntegerField(null=True, db_index=True)
+
+        class Meta:
+            app_label = 'mysessions'
+
+        @classmethod
+        def get_session_store_class(cls):
+            return SessionStore
+
+    class SessionStore(DBStore):
+        @classmethod
+        def get_model_class(cls):
+            return CustomSession
+
+        def create_model_instance(self, data):
+            obj = super(SessionStore, self).create_model_instance(data)
+            try:
+                account_id = int(data.get('_auth_user_id'))
+            except (ValueError, TypeError):
+                account_id = None
+            obj.account_id = account_id
+            return obj
+
+If you are migrating from the Django's built-in ``cached_db`` session store to
+a custom one based on ``cached_db``, you should override the cache key prefix
+in order to prevent a namespace clash::
+
+    class SessionStore(CachedDBStore):
+        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+
+        # ...
 
 Session IDs in URLs
 ===================
