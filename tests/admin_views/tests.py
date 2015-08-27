@@ -619,7 +619,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_change_list_null_boolean_display(self):
         Post.objects.create(public=None)
         response = self.client.get(reverse('admin:admin_views_post_changelist'))
-        self.assertContains(response, 'icon-unknown.gif')
+        self.assertContains(response, 'icon-unknown.svg')
 
     def test_i18n_language_non_english_default(self):
         """
