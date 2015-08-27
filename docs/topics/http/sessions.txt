@@ -319,27 +319,21 @@ You can edit it multiple times.
 Session serialization
 ---------------------
 
-Before version 1.6, Django defaulted to using :mod:`pickle` to serialize
-session data before storing it in the backend. If you're using the :ref:`signed
-cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
-known by an attacker (there isn't an inherent vulnerability in Django that
-would cause it to leak), the attacker could insert a string into their session
-which, when unpickled, executes arbitrary code on the server. The technique for
-doing so is simple and easily available on the internet. Although the cookie
-session storage signs the cookie-stored data to prevent tampering, a
-:setting:`SECRET_KEY` leak immediately escalates to a remote code execution
-vulnerability.
-
-This attack can be mitigated by serializing session data using JSON rather
-than :mod:`pickle`. To facilitate this, Django 1.5.3 introduced a new setting,
-:setting:`SESSION_SERIALIZER`, to customize the session serialization format.
-For backwards compatibility, this setting defaults to
-using :class:`django.contrib.sessions.serializers.PickleSerializer` in
-Django 1.5.x, but, for security hardening, defaults to
-:class:`django.contrib.sessions.serializers.JSONSerializer` in Django 1.6.
-Even with the caveats described in :ref:`custom-serializers`, we highly
+By default, Django serializes session data using JSON. You can use the
+:setting:`SESSION_SERIALIZER` setting to customize the session serialization
+format. Even with the caveats described in :ref:`custom-serializers`, we highly
 recommend sticking with JSON serialization *especially if you are using the
 cookie backend*.
+
+For example, here's an attack scenario if you use :mod:`pickle` to serialize
+session data. If you're using the :ref:`signed cookie session backend
+<cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
+(there isn't an inherent vulnerability in Django that would cause it to leak),
+the attacker could insert a string into their session which, when unpickled,
+executes arbitrary code on the server. The technique for doing so is simple and
+easily available on the internet. Although the cookie session storage signs the
+cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
+immediately escalates to a remote code execution vulnerability.
 
 Bundled Serializers
 ^^^^^^^^^^^^^^^^^^^
