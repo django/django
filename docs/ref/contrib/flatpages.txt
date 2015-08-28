@@ -177,6 +177,12 @@ If you've activated the automatic Django admin interface, you should see a
 "Flatpages" section on the admin index page. Edit flatpages as you edit any
 other object in the system.
 
+.. versionchanged:: 1.9
+
+The ``enable_comments`` field has been removed from the ``FlatPageAdmin``
+class, you need said field you can add it again with a custom ``ModelAdmin``
+for ``FlatPage``.
+
 Via the Python API
 ------------------
 

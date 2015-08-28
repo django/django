@@ -996,6 +996,8 @@ Miscellaneous
   levels. Previously, messages of ``ERROR`` level or higher were printed to the
   console.
 
+* ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
