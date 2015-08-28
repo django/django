@@ -176,8 +176,16 @@ class RelatedFieldListFilter(FieldListFilter):
         self.title = self.lookup_title
         self.empty_value_display = model_admin.get_empty_value_display()
 
+    @property
+    def include_empty_choice(self):
+        """
+        Return True if a "(None)" choice should be included, which filters
+        out everything except empty relationships.
+        """
+        return self.field.null or (self.field.is_relation and self.field.many_to_many)
+
     def has_output(self):
-        if self.field.null:
+        if self.include_empty_choice:
             extra = 1
         else:
             extra = 0
@@ -204,7 +212,7 @@ class RelatedFieldListFilter(FieldListFilter):
                 }, [self.lookup_kwarg_isnull]),
                 'display': val,
             }
-        if self.field.null:
+        if self.include_empty_choice:
             yield {
                 'selected': bool(self.lookup_val_isnull),
                 'query_string': cl.get_query_string({
