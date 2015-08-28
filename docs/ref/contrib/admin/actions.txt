@@ -34,6 +34,12 @@ models. For example, here's the user module from Django's built-in
     For more background on bulk deletion, see the documentation on :ref:`object
     deletion <topics-db-queries-delete>`.
 
+.. note::
+
+    .. versionadded:: 1.9
+
+    ``Change`` permission is needed for actions to accessible.
+
 Read on to find out how to add your own actions to this list.
 
 Writing actions

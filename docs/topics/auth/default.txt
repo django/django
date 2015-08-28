@@ -170,6 +170,7 @@ The Django admin site uses permissions as follows:
 
 Permissions can be set not only per type of object, but also per specific
 object instance. By using the
+:meth:`~django.contrib.admin.ModelAdmin.has_view_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_add_permission`,
 :meth:`~django.contrib.admin.ModelAdmin.has_change_permission` and
 :meth:`~django.contrib.admin.ModelAdmin.has_delete_permission` methods provided
