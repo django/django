@@ -223,9 +223,9 @@ class NestedObjects(Collector):
         for root in self.edges.get(None, ()):
             roots.extend(self._nested(root, seen, format_callback))
         # All values are not stored by key None in dict self.edges
-        for key in self.edges:
+        for key, subroots in self.edges.items():
             if key is not None:
-                for root in self.edges.get(key, ()):
+                for root in subroots:
                     roots.extend(self._nested(root, seen, format_callback))
         return roots
 
