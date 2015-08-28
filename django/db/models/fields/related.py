@@ -2304,8 +2304,6 @@ class ManyToManyField(RelatedField):
 
         self.db_table = db_table
         self.swappable = swappable
-        # Many-to-many fields are always nullable.
-        self.null = True
 
     def check(self, **kwargs):
         errors = super(ManyToManyField, self).check(**kwargs)
@@ -2552,7 +2550,6 @@ class ManyToManyField(RelatedField):
     def deconstruct(self):
         name, path, args, kwargs = super(ManyToManyField, self).deconstruct()
         # Handle the simpler arguments.
-        del kwargs["null"]
         if self.db_table is not None:
             kwargs['db_table'] = self.db_table
         if self.remote_field.db_constraint is not True:

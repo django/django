@@ -523,6 +523,16 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
 
+        # With one book, the list filter should appear because there is also a
+        # (None) option.
+        Book.objects.exclude(pk=self.djangonaut_book.pk).delete()
+        filterspec = changelist.get_filters(request)[0]
+        self.assertEqual(len(filterspec), 2)
+        # With no books remaining, no list filters should appear.
+        Book.objects.all().delete()
+        filterspec = changelist.get_filters(request)[0]
+        self.assertEqual(len(filterspec), 0)
+
     def test_relatedonlyfieldlistfilter_foreignkey(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)
 
