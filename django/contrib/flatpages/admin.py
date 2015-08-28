@@ -8,11 +8,13 @@ class FlatPageAdmin(admin.ModelAdmin):
     form = FlatpageForm
     fieldsets = (
         (None, {'fields': ('url', 'title', 'content', 'sites')}),
-        (_('Advanced options'), {'classes': ('collapse',),
-        'fields': ('enable_comments', 'registration_required', 'template_name')}),
+        (_('Advanced options'), {
+            'classes': ('collapse',),
+            'fields': ('registration_required', 'template_name'),
+        }),
     )
     list_display = ('url', 'title')
-    list_filter = ('sites', 'enable_comments', 'registration_required')
+    list_filter = ('sites', 'registration_required')
     search_fields = ('url', 'title')
 
 admin.site.register(FlatPage, FlatPageAdmin)
