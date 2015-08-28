@@ -110,6 +110,12 @@ class AdminViewBasicTestCase(TestCase):
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
             content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1
@@ -1050,6 +1056,12 @@ class AdminViewFormUrlTest(TestCase):
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
             content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1
@@ -1350,6 +1362,12 @@ class AdminViewPermissionsTest(TestCase):
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
             content='<p>Middle content</p>', date=datetime.datetime(2008, 3, 18, 11, 54, 58), section=cls.s1
@@ -1374,6 +1392,10 @@ class AdminViewPermissionsTest(TestCase):
         # User who can delete Articles
         cls.u4.user_permissions.add(get_perm(Article, get_permission_codename('delete', opts)))
         cls.u4.user_permissions.add(get_perm(Section, get_permission_codename('delete', Section._meta)))
+
+        # User who can view Articles
+        cls.u7.user_permissions.add(get_perm(Article, get_permission_codename('view', opts)))
+        cls.u7.user_permissions.add(get_perm(Section, get_permission_codename('view', Section._meta)))
 
         # login POST dicts
         cls.index_url = reverse('admin:index')
@@ -1415,6 +1437,11 @@ class AdminViewPermissionsTest(TestCase):
         cls.joepublic_login = {
             REDIRECT_FIELD_NAME: cls.index_url,
             'username': 'joepublic',
+            'password': 'secret',
+        }
+        cls.viewuser_login = {
+            REDIRECT_FIELD_NAME: cls.index_url,
+            'username': 'viewuser',
             'password': 'secret',
         }
         cls.no_username_login = {
@@ -1491,6 +1518,24 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(login.status_code, 200)
         form = login.context[0].get('form')
         self.assertEqual(form.errors['username'][0], 'This field is required.')
+
+    def test_login_view_user(self):
+        """
+        Make sure that staff members with only view permission can log in.
+
+        Successful posts to the login page will redirect to the original url.
+        Unsuccessful attempts will continue to render the login page with
+        a 200 status code.
+        """
+        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
+
+        # View User
+        response = self.client.get(self.index_url)
+        self.assertEqual(response.status_code, 302)
+        login = self.client.post(login_url, self.viewuser_login)
+        self.assertRedirects(login, self.index_url)
+        self.assertFalse(login.context)
+        self.client.get(reverse('admin:logout'))
 
     def test_login_redirect_for_direct_get(self):
         """
@@ -1678,6 +1723,17 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(post.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
+        # view user should be able to view the list of article but not change any of them
+        self.client.get(self.index_url)
+        self.client.post(login_url, self.viewuser_login)
+        response = self.client.get(article_changelist_url)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get(article_change_url)
+        self.assertEqual(response.status_code, 200)
+        post = self.client.post(article_change_url, change_dict)
+        self.assertEqual(post.status_code, 403)
+        self.client.get(reverse('admin:logout'))
+
         # change user can view all items and edit them
         self.client.get(self.index_url)
         self.client.post(login_url, self.changeuser_login)
@@ -1706,7 +1762,14 @@ class AdminViewPermissionsTest(TestCase):
         r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         change_url_1 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r1.pk,))
         change_url_2 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r2.pk,))
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
+        logins = [
+            self.super_login,
+            self.viewuser_login,
+            self.changeuser_login,
+            self.adduser_login,
+            self.deleteuser_login
+            ]
+        for login_dict in logins:
             self.client.post(login_url, login_dict)
             response = self.client.get(change_url_1)
             self.assertEqual(response.status_code, 403)
@@ -1796,7 +1859,12 @@ class AdminViewPermissionsTest(TestCase):
         # Test redirection when using row-level change permissions. Refs #11513.
         rl1 = RowLevelChangePermissionModel.objects.create(name="odd id")
         rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
+        logins = [self.super_login,
+                  self.viewuser_login,
+                  self.changeuser_login,
+                  self.adduser_login,
+                  self.deleteuser_login]
+        for login_dict in logins:
             self.client.post(login_url, login_dict)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url)
@@ -1820,6 +1888,20 @@ class AdminViewPermissionsTest(TestCase):
             self.assertContains(response, 'login-form')
 
             self.client.get(reverse('admin:logout'))
+
+    def test_history_view_with_view_permission(self):
+        """
+        History view should restrict access for user with view permissions.
+
+        The user should be able to view the list of article but not change any of them.
+        """
+        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
+
+        self.client.get(self.index_url)
+        self.client.post(login_url, self.viewuser_login)
+        response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
+        self.assertEqual(response.status_code, 200)
+        self.client.get(reverse('admin:logout'))
 
     def test_history_view_bad_url(self):
         self.client.post(reverse('admin:login'), self.changeuser_login)
@@ -1986,6 +2068,17 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
 
+    def test_has_module_view_permission(self):
+        """
+        Ensure that has_module_permission() returns True for all users who
+        have view permission for that module, so that
+        the module is displayed on the admin index page.
+        """
+        self.client.login(**self.viewuser_login)
+        response = self.client.get(self.index_url)
+        self.assertContains(response, 'admin_views')
+        self.assertContains(response, 'Articles')
+
     def test_overriding_has_module_permission(self):
         """
         Ensure that overriding has_module_permission() has the desired effect.
@@ -2016,6 +2109,20 @@ class AdminViewPermissionsTest(TestCase):
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
+
+    def test_overriding_has_module_view_permission(self):
+        """
+        Ensure that overriding has_module_permission() has the desired effect.
+        In this case, it always returns False, so the module should not be
+        displayed on the admin index page for any users.
+        """
+        index_url = reverse('admin7:index')
+
+        self.client.login(**self.viewuser_login)
+        response = self.client.get(index_url)
+        self.assertNotContains(response, 'admin_views')
+        self.assertNotContains(response, 'Articles')
+        self.client.logout()
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
@@ -2095,6 +2202,12 @@ class AdminViewDeletedObjectsTest(TestCase):
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -2329,6 +2442,12 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -2680,6 +2799,12 @@ class AdminViewListEditable(TestCase):
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -3143,6 +3268,12 @@ class AdminSearchTest(TestCase):
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -5057,6 +5188,12 @@ class UserAdminTest(TestCase):
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
+        )
+        cls.u7 = User.objects.create(
+            id=107, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='viewuser',
+            first_name='View', last_name='User', email='vuser@example.com',
+            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
