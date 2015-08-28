@@ -367,7 +367,7 @@ class BaseDateListView(MultipleObjectMixin, DateMixin, View):
         paginate_by = self.get_paginate_by(qs)
 
         if not allow_future:
-            now = timezone.now() if self.uses_datetime_field else timezone_today()
+            now = timezone.now() if self.uses_datetime_field else timezone.localdate()
             qs = qs.filter(**{'%s__lte' % date_field: now})
 
         if not allow_empty:
@@ -741,7 +741,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
         else:
             result = end
 
-        if allow_future or result <= timezone_today():
+        if allow_future or result <= timezone.localdate():
             return result
         else:
             return None
@@ -766,7 +766,7 @@ def _get_next_prev(generic_view, date, is_previous, period):
             if generic_view.uses_datetime_field:
                 now = timezone.now()
             else:
-                now = timezone_today()
+                now = timezone.localdate()
             lookup['%s__lte' % date_field] = now
 
         qs = generic_view.get_queryset().filter(**lookup).order_by(ordering)
@@ -786,13 +786,3 @@ def _get_next_prev(generic_view, date, is_previous, period):
 
         # Return the first day of the period.
         return get_current(result)
-
-
-def timezone_today():
-    """
-    Return the current date in the current time zone.
-    """
-    if settings.USE_TZ:
-        return timezone.localtime(timezone.now()).date()
-    else:
-        return datetime.date.today()

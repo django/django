@@ -3,7 +3,7 @@ import datetime
 import pickle
 import unittest
 
-from django.test import override_settings
+from django.test import mock, override_settings
 from django.utils import timezone
 
 try:
@@ -26,6 +26,8 @@ class TimezoneTests(unittest.TestCase):
         local_tz = timezone.LocalTimezone()
         local_now = timezone.localtime(now, local_tz)
         self.assertEqual(local_now.tzinfo, local_tz)
+        local_default = timezone.localtime(timezone=local_tz)
+        self.assertEqual(local_default.tzinfo, local_tz)
 
     def test_localtime_naive(self):
         with self.assertRaises(ValueError):
@@ -46,6 +48,24 @@ class TimezoneTests(unittest.TestCase):
             self.assertTrue(timezone.is_aware(timezone.now()))
         with override_settings(USE_TZ=False):
             self.assertTrue(timezone.is_naive(timezone.now()))
+
+    @override_settings(USE_TZ=True)
+    def test_localdate_tz(self):
+        with timezone.override(EAT):
+            value = datetime.datetime(2014, 12, 31, 22, 0, 1, tzinfo=CET)
+            self.assertEqual(timezone.localdate(value, EAT), datetime.date(2015, 1, 1))
+            with mock.patch('django.utils.timezone._now_utc') as _now_utc:
+                _now_utc.return_value = value
+                self.assertEqual(timezone.localdate(), datetime.date(2015, 1, 1))
+
+    @override_settings(USE_TZ=False)
+    def test_localdate_no_tz(self):
+        with timezone.override(EAT):
+            value = datetime.datetime(2014, 12, 13, 22, 0, 1, tzinfo=CET)
+            self.assertEqual(timezone.localdate(value, EAT), datetime.date(2014, 12, 13))
+            with mock.patch('django.utils.timezone.date') as date:
+                date.today.return_value = datetime.date(2014, 12, 31)
+                self.assertEqual(timezone.localdate(), datetime.date(2014, 12, 31))
 
     def test_override(self):
         default = timezone.get_default_timezone()

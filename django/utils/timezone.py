@@ -6,7 +6,7 @@ This module uses pytz when it's available and fallbacks when it isn't.
 
 import sys
 import time as _time
-from datetime import datetime, timedelta, tzinfo
+from datetime import date, datetime, timedelta, tzinfo
 from threading import local
 
 from django.conf import settings
@@ -295,13 +295,15 @@ def template_localtime(value, use_tz=None):
 
 # Utilities
 
-def localtime(value, timezone=None):
+def localtime(value=None, timezone=None):
     """
     Converts an aware datetime.datetime to local time.
 
     Local time is defined by the current time zone, unless another time zone
     is specified.
     """
+    if value is None:
+        value = _now_utc()
     if timezone is None:
         timezone = get_current_timezone()
     # If `value` is naive, astimezone() will raise a ValueError,
@@ -319,9 +321,26 @@ def now():
     """
     if settings.USE_TZ:
         # timeit shows that datetime.now(tz=utc) is 24% slower
-        return datetime.utcnow().replace(tzinfo=utc)
+        return _now_utc()
     else:
         return datetime.now()
+
+
+def _now_utc():
+    """
+    Returns an aware datetime.datetime.
+    """
+    return datetime.utcnow().replace(tzinfo=utc)
+
+
+def localdate(value=None, timezone=None):
+    """
+    Return the datetime.date in the current time zone.
+    """
+    if settings.USE_TZ:
+        return localtime(value, timezone).date()
+    else:
+        return value.date() if value else date.today()
 
 
 # By design, these four functions don't perform any checks on their arguments.
