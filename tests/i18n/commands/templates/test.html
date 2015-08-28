@@ -58,6 +58,18 @@ continued here.{% endcomment %}
 {% trans "Translatable literal #7b" as var context "Special trans context #2" %}
 {% trans "Translatable literal #7c" context "Special trans context #3" as var %}
 
+{% trans "Translatable literal #7.1a" | upper context "context #7.1a" %}
+{% trans "Translatable literal #7.1b" |upper as var context "context #7.1b" %}
+{% trans "Translatable literal #7.1c"| upper context "context #7.1c" as var %}
+
+{% trans "Translatable literal #7.1d"|add:" foo" context "context #7.1d" %}
+{% trans "Translatable literal #7.1e"|add:' ûè本' as var context "context #7.1e" %}
+{% with foo=" foo" %}
+    {% trans "Translatable literal #7.1f"|add:foo context "context #7.1f" as var %}
+{% endwith %}
+{% trans "Translatable literal #7.1g"|add:2 context "context #7.1g" as var %}
+{% trans "Translatable literal #7.1h" | add:"foo" | add:2 context "context #7.1h" as var %}
+
 {% blocktrans context "Special blocktrans context #1" %}Translatable literal #8a{% endblocktrans %}
 {% blocktrans count 2 context "Special blocktrans context #2" %}Translatable literal #8b-singular{% plural %}Translatable literal #8b-plural{% endblocktrans %}
 {% blocktrans context "Special blocktrans context #3" count 2 %}Translatable literal #8c-singular{% plural %}Translatable literal #8c-plural{% endblocktrans %}
@@ -79,7 +91,7 @@ continued here.{% endcomment %}
   line breaks, this time
   should be trimmed.
 {% endblocktrans %}
-{% trans "I'm on line 82" %}
+{% trans "Get my line number" %}
 
 {% blocktrans trimmed count counter=mylist|length %}
 First `trans`, then `blocktrans` with a plural

@@ -102,14 +102,27 @@ class ExtractorTests(SimpleTestCase):
             # #: path/to/file.html:123
             cwd_prefix = ''
         parts = ['#: ']
-        parts.append(os.path.join(cwd_prefix, *comment_parts))
+
+        path = os.path.join(cwd_prefix, *comment_parts)
+        parts.append(path)
+
+        if isinstance(line_number, six.string_types):
+            line_number = self._get_token_line_number(path, line_number)
         if line_number is not None:
             parts.append(':%d' % line_number)
+
         needle = ''.join(parts)
         if assert_presence:
             return self.assertIn(needle, po_contents, '"%s" not found in final .po file.' % needle)
         else:
             return self.assertNotIn(needle, po_contents, '"%s" shouldn\'t be in final .po file.' % needle)
+
+    def _get_token_line_number(self, path, token):
+        with open(path) as f:
+            for line, content in enumerate(f, 1):
+                if token in force_text(content):
+                    return line
+        self.fail("The token '%s' could not be found in %s, please check the test config" % (token, path))
 
     def assertLocationCommentPresent(self, po_filename, line_number, *comment_parts):
         """
@@ -121,7 +134,11 @@ class ExtractorTests(SimpleTestCase):
 
         (or `#: .\dirA\dirB\foo.py:42` on Windows)
 
-        None can be passed for the line_number argument to skip checking of the :42 suffix part.
+        None can be passed for the line_number argument to skip checking of
+        the :42 suffix part.
+        A string token can also be pased as line_number, in which case it
+        will be searched in the template, and its line number will be used.
+        A msgid is a suitable candidate.
         """
         return self._assertPoLocComment(True, po_filename, line_number, *comment_parts)
 
@@ -179,8 +196,8 @@ class BasicExtractorTests(ExtractorTests):
             # should be trimmed
             self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
         # #21406 -- Should adjust for eaten line numbers
-        self.assertMsgId("I'm on line 82", po_contents)
-        self.assertLocationCommentPresent(self.PO_FILE, 82, 'templates', 'test.html')
+        self.assertMsgId("Get my line number", po_contents)
+        self.assertLocationCommentPresent(self.PO_FILE, 'Get my line number', 'templates', 'test.html')
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
@@ -234,6 +251,11 @@ class BasicExtractorTests(ExtractorTests):
             self.assertMsgId("Translatable literal #7b", po_contents)
             self.assertIn('msgctxt "Special trans context #3"', po_contents)
             self.assertMsgId("Translatable literal #7c", po_contents)
+
+            # {% trans %} with a filter
+            for minor_part in 'abcdefgh':  # Iterate from #7.1a to #7.1h template markers
+                self.assertIn('msgctxt "context #7.1{}"'.format(minor_part), po_contents)
+                self.assertMsgId('Translatable literal #7.1{}'.format(minor_part), po_contents)
 
             # {% blocktrans %}
             self.assertIn('msgctxt "Special blocktrans context #1"', po_contents)
@@ -578,7 +600,7 @@ class LocationCommentsTests(ExtractorTests):
         management.call_command('makemessages', locale=[LOCALE], verbosity=0, no_location=False)
         self.assertTrue(os.path.exists(self.PO_FILE))
         # #16903 -- Standard comment with source file relative path should be present
-        self.assertLocationCommentPresent(self.PO_FILE, 55, 'templates', 'test.html')
+        self.assertLocationCommentPresent(self.PO_FILE, 'Translatable literal #6b', 'templates', 'test.html')
 
         # #21208 -- Leaky paths in comments on Windows e.g. #: path\to\file.html.py:123
         self.assertLocationCommentNotPresent(self.PO_FILE, None, 'templates', 'test.html.py')
