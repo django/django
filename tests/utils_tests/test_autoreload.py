@@ -169,3 +169,19 @@ class TestFilenameGenerator(SimpleTestCase):
             with self.assertRaises(SyntaxError):
                 autoreload.check_errors(import_module)('test_syntax_error')
         self.assertFileFoundOnlyNew(filename)
+
+    def test_check_errors_catches_all_exceptions(self):
+        """
+        Since Python may raise arbitrary exceptions when importing code,
+        check_errors() must catch Exception, not just some subclasses.
+        """
+        dirname = tempfile.mkdtemp()
+        filename = os.path.join(dirname, 'test_exception.py')
+        self.addCleanup(shutil.rmtree, dirname)
+        with open(filename, 'w') as f:
+            f.write("raise Exception")
+
+        with extend_sys_path(dirname):
+            with self.assertRaises(Exception):
+                autoreload.check_errors(import_module)('test_exception')
+        self.assertFileFound(filename)
