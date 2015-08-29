@@ -235,7 +235,6 @@ class Collector(object):
                     sub_objs = field.bulk_related_objects(new_objs, self.using)
                     self.collect(sub_objs,
                                  source=model,
-                                 source_attr=field.remote_field.related_name,
                                  nullable=True)
 
     def related_objects(self, related, objs):
