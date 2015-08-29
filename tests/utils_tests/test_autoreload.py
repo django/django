@@ -90,6 +90,10 @@ class TestFilenameGenerator(SimpleTestCase):
         django_mo = os.path.join(django_dir, 'nl', 'LC_MESSAGES', 'django.mo')
         self.assertFileNotFound(django_mo)
 
+    def test_paths_are_native_strings(self):
+        for filename in autoreload.gen_filenames():
+            self.assertIsInstance(filename, str)
+
     def test_only_new_files(self):
         """
         When calling a second time gen_filenames with only_new = True, only

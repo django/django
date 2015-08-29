@@ -37,6 +37,7 @@ import traceback
 from django.apps import apps
 from django.conf import settings
 from django.core.signals import request_finished
+from django.utils._os import npath
 from django.utils.six.moves import _thread as thread
 
 # This import does nothing, but it's necessary to avoid some race conditions
@@ -106,7 +107,7 @@ def gen_filenames(only_new=False):
                                  'conf', 'locale'),
                     'locale']
         for app_config in reversed(list(apps.get_app_configs())):
-            basedirs.append(os.path.join(app_config.path, 'locale'))
+            basedirs.append(os.path.join(npath(app_config.path), 'locale'))
         basedirs.extend(settings.LOCALE_PATHS)
         basedirs = [os.path.abspath(basedir) for basedir in basedirs
                     if os.path.isdir(basedir)]
