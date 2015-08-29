@@ -288,15 +288,50 @@ names, which means you end up with a ``list`` of values, rather than a
             for row in cursor.fetchall()
         ]
 
-Here is an example of the difference between the two::
+It is also possible to use ``namedtuple`` from the Python standard library
+module `collections`__.  A ``namedtuple`` is a tuple-like object that has
+fields accessible by attribute lookup as well as being indexable and iterable.
+Results are immutable and accessible by field names or indices, which might be
+useful::
+
+    from collections import namedtuple
+
+    def namedtuplefetchall(cursor):
+        "Returns all rows from a cursor as a namedtuple"
+        nt_result = namedtuple(
+            'Result', [column.name for column in cursor.description]
+        )
+
+        return [
+            nt_result(*row) for row in cursor.fetchall()
+        ]
+
+__ https://docs.python.org/2.7/library/collections.html#collections.namedtuple
+
+Here is an example of the difference between the three::
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> cursor.fetchall()
     ((54360982L, None), (54360880L, None))
+    >>> first_row = dictfetchall(cursor)[0]
+    >>> first_row[0]
+    54360982L
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
     >>> dictfetchall(cursor)
     [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
+    >>> first_row = dictfetchall(cursor)[0]
+    >>> first_row['id']
+    54360982L
+
+    >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
+    >>> namedtuplefetchall(cursor)
+    [Result(id=54360982L, parent_id=None), Result(id=54360880L, parent_id=None)]
+    >>> first_row = namedtuplefetchall(cursor)[0]
+    >>> first_row.id
+    54360982L
+    >>> first_row[0]
+    54360982L
 
 Connections and cursors
 -----------------------
