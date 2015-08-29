@@ -224,8 +224,7 @@ def check_errors(fn):
         global _exception
         try:
             fn(*args, **kwargs)
-        except (ImportError, IndentationError, NameError, SyntaxError,
-                TypeError, AttributeError):
+        except Exception:
             _exception = sys.exc_info()
 
             et, ev, tb = _exception
