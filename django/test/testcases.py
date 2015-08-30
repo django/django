@@ -1252,8 +1252,7 @@ class LiveServerThread(threading.Thread):
             # one that is free to use for the WSGI server.
             for index, port in enumerate(self.possible_ports):
                 try:
-                    self.httpd = WSGIServer(
-                        (self.host, port), QuietWSGIRequestHandler)
+                    self.httpd = self._create_server(port)
                 except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
                             e.errno == errno.EADDRINUSE):
@@ -1276,6 +1275,9 @@ class LiveServerThread(threading.Thread):
         except Exception as e:
             self.error = e
             self.is_ready.set()
+
+    def _create_server(self, port):
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1339,9 +1341,8 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(host, possible_ports,
-                                             cls.static_handler,
-                                             connections_override=connections_override)
+        cls.server_thread = cls._create_server_thread(
+            host, possible_ports, connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
@@ -1352,6 +1353,11 @@ class LiveServerTestCase(TransactionTestCase):
             # case of errors.
             cls._tearDownClassInternal()
             raise cls.server_thread.error
+
+    @classmethod
+    def _create_server_thread(cls, host, possible_ports, connections_override):
+        return LiveServerThread(host, possible_ports, cls.static_handler,
+                                connections_override=connections_override)
 
     @classmethod
     def _tearDownClassInternal(cls):
