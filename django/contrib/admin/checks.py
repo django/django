@@ -505,6 +505,7 @@ class ModelAdminChecks(BaseModelAdminChecks):
         errors.extend(self._check_list_editable(cls, model))
         errors.extend(self._check_search_fields(cls, model))
         errors.extend(self._check_date_hierarchy(cls, model))
+        errors.extend(self._check_approximate_date_hierarchy(cls, model))
         return errors
 
     def _check_save_as(self, cls, model):
@@ -826,6 +827,18 @@ class ModelAdminChecks(BaseModelAdminChecks):
 
         if not isinstance(cls.search_fields, (list, tuple)):
             return must_be('a list or tuple', option='search_fields', obj=cls, id='admin.E126')
+        else:
+            return []
+
+    def _check_approximate_date_hierarchy(self, cls, model):
+        if cls.approximate_date_hierarchy not in {0, 1, 2, 3, True, False}:
+            return [checks.Error(
+                "The value of 'approximate_date_hierarchy' must be 0, 1, 2, 3, True, or False, not %r." % (
+                    cls.approximate_date_hierarchy,
+                ),
+                obj=cls,
+                id='admin.E129',
+            )]
         else:
             return []
 
