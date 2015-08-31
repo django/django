@@ -134,7 +134,6 @@ class FormsRegressionsTestCase(TestCase):
         """
         Re-cleaning an instance that was added via a ModelForm should not raise
         a pk uniqueness error.
-
         """
         class CheeseForm(ModelForm):
             class Meta:

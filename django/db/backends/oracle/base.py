@@ -542,8 +542,9 @@ class FormatStylePlaceholderCursor(object):
 
 
 class CursorIterator(six.Iterator):
-
-    """Cursor iterator wrapper that invokes our custom row factory."""
+    """
+    Cursor iterator wrapper that invokes our custom row factory.
+    """
 
     def __init__(self, cursor):
         self.cursor = cursor

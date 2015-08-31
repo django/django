@@ -220,7 +220,6 @@ class PasswordResetForm(forms.Form):
         This allows subclasses to more easily customize the default policies
         that prevent inactive users and users with unusable passwords from
         resetting their password.
-
         """
         active_users = get_user_model()._default_manager.filter(
             email__iexact=email, is_active=True)

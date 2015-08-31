@@ -101,7 +101,6 @@ class ClassDecoratedTestCaseSuper(TestCase):
     """
     Dummy class for testing max recursion error in child class call to
     super().  Refs #17011.
-
     """
     def test_max_recursion_error(self):
         pass
@@ -130,7 +129,6 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         """
         Overriding a method on a super class and then calling that method on
         the super class should not trigger infinite recursion. See #17011.
-
         """
         try:
             super(ClassDecoratedTestCase, self).test_max_recursion_error()

@@ -25,7 +25,6 @@ class WSGITest(TestCase):
         """
         Verify that ``get_wsgi_application`` returns a functioning WSGI
         callable.
-
         """
         application = get_wsgi_application()
 
@@ -80,7 +79,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         """
         If ``WSGI_APPLICATION`` is a dotted path, the referenced object is
         returned.
-
         """
         app = get_internal_wsgi_application()
 
@@ -93,7 +91,6 @@ class GetInternalWSGIApplicationTest(unittest.TestCase):
         """
         If ``WSGI_APPLICATION`` is ``None``, the return value of
         ``get_wsgi_application`` is returned.
-
         """
         # Mock out get_wsgi_application so we know its return value is used
         fake_app = object()

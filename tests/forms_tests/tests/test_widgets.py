@@ -1295,7 +1295,6 @@ class FakeFieldFile(object):
     """
     Quacks like a FieldFile (has a .url and unicode representation), but
     doesn't require us to care about storages etc.
-
     """
     url = 'something'
 
@@ -1308,7 +1307,6 @@ class ClearableFileInputTests(SimpleTestCase):
         """
         A ClearableFileInput with is_required False and rendered with
         an initial value that is a file renders a clear checkbox.
-
         """
         widget = ClearableFileInput()
         widget.is_required = False
@@ -1368,7 +1366,6 @@ class ClearableFileInputTests(SimpleTestCase):
         """
         A ClearableFileInput with is_required=False does not render a clear
         checkbox.
-
         """
         widget = ClearableFileInput()
         widget.is_required = True
@@ -1384,7 +1381,6 @@ class ClearableFileInputTests(SimpleTestCase):
         """
         A ClearableFileInput instantiated with no initial value does not render
         a clear checkbox.
-
         """
         widget = ClearableFileInput()
         widget.is_required = False
@@ -1395,7 +1391,6 @@ class ClearableFileInputTests(SimpleTestCase):
         """
         ClearableFileInput.value_from_datadict returns False if the clear
         checkbox is checked, if not required.
-
         """
         widget = ClearableFileInput()
         widget.is_required = False
@@ -1408,7 +1403,6 @@ class ClearableFileInputTests(SimpleTestCase):
         """
         ClearableFileInput.value_from_datadict never returns False if the field
         is required.
-
         """
         widget = ClearableFileInput()
         widget.is_required = True

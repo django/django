@@ -548,7 +548,6 @@ class BaseCacheTests(object):
         keys that would be refused by memcached. This encourages portable
         caching code without making it too difficult to use production backends
         with more liberal key rules. Refs #6447.
-
         """
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
@@ -1124,7 +1123,6 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
         In order to be memcached-API-library agnostic, we only assert
         that a generic exception of some kind is raised.
-
         """
         # memcached does not allow whitespace or control characters in keys
         self.assertRaises(Exception, cache.set, 'key with spaces', 'value')
@@ -1234,7 +1232,6 @@ class CustomCacheKeyValidationTests(SimpleTestCase):
     Tests for the ability to mixin a custom ``validate_key`` method to
     a custom cache backend that otherwise inherits from a builtin
     backend, and override the default key validation. Refs #6447.
-
     """
     def test_custom_key_validation(self):
         # this key is both longer than 250 characters, and has spaces
