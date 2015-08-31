@@ -1,6 +1,7 @@
 import logging
 import os
 import unittest
+from collections import OrderedDict
 from importlib import import_module
 from unittest import TestSuite, defaultTestLoader
 
@@ -9,7 +10,8 @@ from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
-from django.utils.six import StringIO
+from django.utils.module_loading import import_string
+from django.utils.six import StringIO, string_types
 
 
 class DebugSQLTextTestResult(unittest.TextTestResult):
@@ -61,6 +63,7 @@ class DiscoverRunner(object):
     test_runner = unittest.TextTestRunner
     test_loader = defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
+    extensions = ['django.test.extensions.MailOutbox']
 
     def __init__(self, pattern=None, top_level=None, verbosity=1,
                  interactive=True, failfast=False, keepdb=False,
@@ -98,6 +101,10 @@ class DiscoverRunner(object):
         setup_test_environment()
         settings.DEBUG = False
         unittest.installHandler()
+
+    def setup_extensions(self):
+        for extension in self._extensions:
+            extension.setup_environment()
 
     def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
         suite = self.test_suite()
@@ -158,7 +165,35 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
+        self.collect_extensions(suite)
+
         return reorder_suite(suite, self.reorder_by, self.reverse)
+
+    def collect_extensions(self, suite):
+        extensions = OrderedDict()
+        for extension in self.extensions:
+            if isinstance(extension, string_types):
+                extension = import_string(extension)
+            extensions[extension] = extension()
+        self.add_extensions_to_tests(suite, extensions, list(extensions.keys()))
+        self._extensions = list(extensions.values())
+
+    def add_extensions_to_tests(self, suite, extensions, global_extensions):
+        for test in suite._tests:
+            if hasattr(test, '_tests'):
+                self.add_extensions_to_tests(test, extensions, global_extensions)
+            else:
+                test_level_extensions = []
+                for extension in getattr(test, 'extensions', []):
+                    if isinstance(extension, string_types):
+                        extension = import_string(extension)
+                    if extension not in global_extensions:
+                        test_level_extensions.append(extension)
+                test._extensions = []
+                for extension in global_extensions + test_level_extensions:
+                    if extension not in extensions:
+                        extensions[extension] = extension()
+                    test._extensions.append(extensions[extension])
 
     def setup_databases(self, **kwargs):
         return setup_databases(
@@ -175,6 +210,7 @@ class DiscoverRunner(object):
             verbosity=self.verbosity,
             failfast=self.failfast,
             resultclass=resultclass,
+            **kwargs
         ).run(suite)
 
     def teardown_databases(self, old_config, **kwargs):
@@ -189,6 +225,10 @@ class DiscoverRunner(object):
     def teardown_test_environment(self, **kwargs):
         unittest.removeHandler()
         teardown_test_environment()
+
+    def teardown_extensions(self):
+        for extension in reversed(self._extensions):
+            extension.teardown_environment()
 
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
@@ -208,7 +248,9 @@ class DiscoverRunner(object):
         self.setup_test_environment()
         suite = self.build_suite(test_labels, extra_tests)
         old_config = self.setup_databases()
-        result = self.run_suite(suite)
+        self.setup_extensions()
+        result = self.run_suite(suite, **kwargs)
+        self.teardown_extensions()
         self.teardown_databases(old_config)
         self.teardown_test_environment()
         return self.suite_result(suite, result)

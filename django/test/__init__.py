@@ -3,6 +3,7 @@ Django Unit Test and Doctest framework.
 """
 
 from django.test.client import Client, RequestFactory
+from django.test.extensions import TestExtension
 from django.test.testcases import (
     LiveServerTestCase, SimpleTestCase, TestCase, TransactionTestCase,
     skipIfDBFeature, skipUnlessAnyDBFeature, skipUnlessDBFeature,
@@ -16,7 +17,8 @@ __all__ = [
     'Client', 'RequestFactory', 'TestCase', 'TransactionTestCase',
     'SimpleTestCase', 'LiveServerTestCase', 'skipIfDBFeature',
     'skipUnlessAnyDBFeature', 'skipUnlessDBFeature', 'ignore_warnings',
-    'modify_settings', 'override_settings', 'override_system_checks'
+    'modify_settings', 'override_settings', 'override_system_checks',
+    'TestExtension'
 ]
 
 # To simplify Django's test suite; not meant as a public API

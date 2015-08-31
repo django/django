@@ -18,7 +18,6 @@ from unittest.util import safe_repr
 
 from django.apps import apps
 from django.conf import settings
-from django.core import mail
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
@@ -161,6 +160,8 @@ class SimpleTestCase(unittest.TestCase):
     client_class = Client
     _overridden_settings = None
     _modified_settings = None
+    extensions = []
+    _extensions = []
 
     # Tests shouldn't be allowed to query the database since
     # this base class doesn't enforce any isolation.
@@ -223,11 +224,11 @@ class SimpleTestCase(unittest.TestCase):
 
         * Creating a test client.
         * If the class has a 'urls' attribute, replace ROOT_URLCONF with it.
-        * Clearing the mail test outbox.
         """
         self.client = self.client_class()
         self._urlconf_setup()
-        mail.outbox = []
+        for extension in self._extensions:
+            extension.setup_test()
 
     def _urlconf_setup(self):
         if hasattr(self, 'urls'):
@@ -247,6 +248,8 @@ class SimpleTestCase(unittest.TestCase):
         * Putting back the original ROOT_URLCONF if it was changed.
         """
         self._urlconf_teardown()
+        for extension in reversed(self._extensions):
+            extension.teardown_test()
 
     def _urlconf_teardown(self):
         if hasattr(self, '_old_root_urlconf'):
