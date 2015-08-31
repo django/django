@@ -206,7 +206,7 @@ class DefaultRoleTest(AdminDocsTestCase):
 
     def test_parse_rst(self):
         """
-        Tests that ``django.contrib.admindocs.utils.parse_rst`` uses
+        ``django.contrib.admindocs.utils.parse_rst`` should use
         ``cmsreference`` as the default role.
         """
         markup = ('<p><a class="reference external" href="/admindocs/%s">'
@@ -224,7 +224,7 @@ class DefaultRoleTest(AdminDocsTestCase):
 
     def test_publish_parts(self):
         """
-        Tests that Django hasn't broken the default role for interpreted text
+        Django shouldn't break the default role for interpreted text
         when ``publish_parts`` is used directly, by setting it to
         ``cmsreference``. See #6681.
         """
@@ -250,9 +250,9 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
 
     def test_method_excludes(self):
         """
-        Test that methods that begin with strings defined in
+        Methods that begin with strings defined in
         ``django.contrib.admindocs.views.MODEL_METHODS_EXCLUDE``
-        do not get displayed in the admin docs
+        should not get displayed in the admin docs.
         """
         self.assertContains(self.response, "<td>get_full_name</td>")
         self.assertNotContains(self.response, "<td>_get_full_name</td>")
