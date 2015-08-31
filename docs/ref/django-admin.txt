@@ -753,6 +753,14 @@ option does not, however, check for matching database schema beyond matching
 table names and so is only safe to use if you are confident that your existing
 schema matches what is recorded in your initial migration.
 
+.. django-admin-option:: --run-syncdb
+
+.. versionadded:: 1.9
+
+The ``--run-syncdb`` option allows creating tables for apps without migrations.
+While this isn't recommended, the migrations framework is sometimes too slow
+on large projects with hundreds of models.
+
 .. deprecated:: 1.8
 
     The ``--list`` option has been moved to the :djadmin:`showmigrations`
