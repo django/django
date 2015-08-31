@@ -38,6 +38,14 @@ class Message(object):
     def __str__(self):
         return force_text(self.message)
 
+    def __repr__(self):
+        return '<%(cls)s level=%(level)d, level_tag="%(tag)s", message="%(msg)s">' % {
+            'cls': self.__class__.__name__,
+            'level': self.level,
+            'msg': str(self),
+            'tag': self.level_tag,
+        }
+
     def _get_tags(self):
         extra_tags = force_text(self.extra_tags, strings_only=True)
         if extra_tags and self.level_tag:
@@ -183,3 +191,11 @@ class BaseStorage(object):
             self._level = int(value)
 
     level = property(_get_level, _set_level, _set_level)
+
+    def __repr__(self):
+        return '<%(cls)s [%(count)d] used=%(used)r, added_new=%(added)r>' % {
+            'cls': self.__class__.__name__,
+            'used': self.used,
+            'added': self.added_new,
+            'count': len(self),
+        }

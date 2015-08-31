@@ -1,4 +1,5 @@
 from django.contrib.messages import constants
+from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.fallback import (
     CookieStorage, FallbackStorage,
 )
@@ -174,3 +175,11 @@ class FallbackTest(BaseTests, SimpleTestCase):
         self.assertEqual(cookie_storing, 0)
         session_storing = self.stored_session_messages_count(storage, response)
         self.assertEqual(session_storing, 1)
+
+    def test_repr(self):
+        storage = self.get_storage()
+        storage.storages[0]._loaded_data = [Message(constants.INFO, 'Test message 1'),
+                                            Message(constants.INFO, 'Test message 2', extra_tags='tag')]
+        expected = ('<FallbackStorage storages=[<CookieStorage [2] used=False, added_new=False, '
+                    'cookie_name="messages">, <SessionStorage [0] used=False, added_new=False>]>')
+        self.assertEqual(repr(storage), expected)

@@ -24,3 +24,9 @@ class MessageMiddleware(object):
             if unstored_messages and settings.DEBUG:
                 raise ValueError('Not all temporary messages could be stored.')
         return response
+
+    def __repr__(self):
+        return '<%(cls)s MESSAGE_STORAGE="%(storage)s">' % {
+            'cls': self.__class__.__name__,
+            'storage': settings.MESSAGE_STORAGE,
+        }

@@ -8,10 +8,12 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip import HAS_GEOIP
+from django.contrib.gis.geoip.prototypes import GeoIP_lib_version
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
 from django.test import ignore_warnings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text
 
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
@@ -128,3 +130,21 @@ class GeoIPTest(unittest.TestCase):
         self.assertEqual(len(warns), 1)
         msg = str(warns[0].message)
         self.assertIn('django.contrib.gis.geoip is deprecated', msg)
+
+    def test_repr(self):
+        path = settings.GEOIP_PATH
+        g = GeoIP(path=path)
+        country_path = g._country_file
+        city_path = g._city_file
+        if GeoIP_lib_version:
+            expected = '<GeoIP [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">' % {
+                'version': force_text(GeoIP_lib_version()),
+                'country': country_path,
+                'city': city_path,
+            }
+        else:
+            expected = '<GeoIP _country_file="%(country)s", _city_file="%(city)s">' % {
+                'country': country_path,
+                'city': city_path,
+            }
+        self.assertEqual(repr(g), expected)
