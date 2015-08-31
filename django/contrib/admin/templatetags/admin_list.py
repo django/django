@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
 from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
@@ -16,6 +17,7 @@ from django.db import models
 from django.template import Library
 from django.template.loader import get_template
 from django.utils import formats
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.html import escapejs, format_html
 from django.utils.safestring import mark_safe
@@ -201,18 +203,18 @@ def items_for_result(cl, result, form):
         except ObjectDoesNotExist:
             result_repr = empty_value_display
         else:
-            empty_value_display = getattr(attr, 'empty_value_display', empty_value_display)
+            empty_value_display = mark_safe(getattr(attr, 'empty_value_display', empty_value_display))
             if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if boolean or not value:
-                    allow_tags = True
                 result_repr = display_for_value(value, empty_value_display, boolean)
-                # Strip HTML tags in the resulting text, except if the
-                # function has an "allow_tags" attribute set to True.
                 if allow_tags:
+                    warnings.warn(
+                        "The allow_tags attribute is deprecated. Return a SafeString instance by "
+                        "using format_html, format_html_join or mark_safe instead.",
+                        RemovedInDjango20Warning, stacklevel=2)
                     result_repr = mark_safe(result_repr)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
