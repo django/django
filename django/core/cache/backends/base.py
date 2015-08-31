@@ -232,7 +232,6 @@ class BaseCache(object):
         Warn about keys that would not be portable to the memcached
         backend. This encourages (but does not force) writing backend-portable
         cache code.
-
         """
         if len(key) > MEMCACHE_MAX_KEY_LENGTH:
             warnings.warn('Cache key will cause errors if used with memcached: '

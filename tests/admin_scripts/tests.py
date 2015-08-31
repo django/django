@@ -1199,7 +1199,6 @@ class ManageCheck(AdminScriptTestCase):
         command should not raise `CommandError` exception.
 
         In this test we also test output format.
-
         """
 
         self.write_settings('settings.py',

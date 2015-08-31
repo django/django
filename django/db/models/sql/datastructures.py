@@ -41,7 +41,6 @@ class Join(object):
           to join_type)
         - as_sql()
         - relabeled_clone()
-
     """
     def __init__(self, table_name, parent_alias, table_alias, join_type,
                  join_field, nullable):

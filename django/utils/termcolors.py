@@ -166,7 +166,6 @@ def parse_color_setting(config_string):
 
     Valid options:
         'bold', 'underscore', 'blink', 'reverse', 'conceal'
-
     """
     if not config_string:
         return PALETTES[DEFAULT_PALETTE]

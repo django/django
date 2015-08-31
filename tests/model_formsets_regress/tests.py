@@ -214,7 +214,6 @@ class InlineFormsetTests(TestCase):
         Existing and new inlines are saved with save_as_new.
 
         Regression for #14938.
-
         """
         efnet = Network.objects.create(name="EFNet")
         host1 = Host.objects.create(hostname="irc.he.net", network=efnet)

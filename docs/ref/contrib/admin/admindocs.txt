@@ -71,7 +71,6 @@ A model with useful documentation might look like this::
         """
         Stores a single blog entry, related to :model:`blog.Blog` and
         :model:`auth.User`.
-
         """
         slug = models.SlugField(help_text="A short label, generally used in URLs.")
         author = models.ForeignKey(
@@ -115,7 +114,6 @@ For example::
         **Template:**
 
         :template:`myapp/my_template.html`
-
         """
         context = {'mymodel': MyModel.objects.get(slug=slug)}
         return render(request, 'myapp/my_template.html', context)

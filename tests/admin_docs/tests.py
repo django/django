@@ -389,7 +389,6 @@ class TestUtils(AdminDocsTestCase):
     :template:`myapp/my_template.html` (DESCRIPTION)
 
     some_metadata: some data
-
     """
 
     def setUp(self):
