@@ -457,7 +457,6 @@ class QueryDict(MultiValueDict):
                 'next=%2Fa%26b%2F'
                 >>> q.urlencode(safe='/')
                 'next=/a%26b/'
-
         """
         output = []
         if safe:
@@ -524,7 +523,6 @@ def validate_host(host, allowed_hosts):
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.
-
     """
     host = host[:-1] if host.endswith('.') else host
 

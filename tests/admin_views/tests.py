@@ -2129,7 +2129,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         Cyclic relationships should still cause each object to only be
         listed once.
-
         """
         one = '<li>Cyclic one: <a href="%s">I am recursive</a>' % (
             reverse('admin:admin_views_cyclicone_change', args=(self.cy1.pk,)),
@@ -2181,7 +2180,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         If a deleted object has two relationships from another model,
         both of those should be followed in looking for related
         objects to delete.
-
         """
         should_contain = '<li>Plot: <a href="%s">World Domination</a>' % reverse(
             'admin:admin_views_plot_change', args=(self.pl1.pk,)
@@ -2196,7 +2194,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         If a deleted object has two relationships pointing to it from
         another object, the other object should still only be listed
         once.
-
         """
         should_contain = '<li>Plot: <a href="%s">World Peace</a></li>' % reverse(
             'admin:admin_views_plot_change', args=(self.pl2.pk,)
@@ -2209,7 +2206,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         In the case of an inherited model, if either the child or
         parent-model instance is deleted, both instances are listed
         for deletion, as well as any relationships they have.
-
         """
         should_contain = [
             '<li>Villain: <a href="%s">Bob</a>' % reverse('admin:admin_views_villain_change', args=(self.sv1.pk,)),
@@ -2228,7 +2224,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         If a deleted object has GenericForeignKeys pointing to it,
         those objects should be listed for deletion.
-
         """
         plot = self.pl3
         tag = FunkyTag.objects.create(content_object=plot, name='hott')

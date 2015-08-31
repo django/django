@@ -654,7 +654,6 @@ class SimpleTestCase(unittest.TestCase):
             field_args: the args passed to instantiate the field
             field_kwargs: the kwargs passed to instantiate the field
             empty_value: the expected clean output for inputs in empty_values
-
         """
         if field_args is None:
             field_args = []

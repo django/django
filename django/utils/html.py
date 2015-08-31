@@ -114,7 +114,6 @@ def format_html_join(sep, format_string, args_generator):
 
       format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
-
     """
     return mark_safe(conditional_escape(sep).join(
         format_html(format_string, *tuple(args))

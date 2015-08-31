@@ -52,7 +52,6 @@ class BasicFieldTests(test.TestCase):
         """
         Regression test for #13071: NullBooleanField should not throw
         a validation error when given a value of None.
-
         """
         nullboolean = NullBooleanModel(nbfield=None)
         try:
@@ -691,7 +690,6 @@ class TypeCoercionTests(test.TestCase):
     Test that database lookups can accept the wrong types and convert
     them with no error: especially on Postgres 8.3+ which does not do
     automatic casting at the DB level. See #10015.
-
     """
     def test_lookup_integer_in_charfield(self):
         self.assertEqual(Post.objects.filter(title=9).count(), 0)
@@ -705,7 +703,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data will clear its instance attribute
         value if passed False.
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')
@@ -717,7 +714,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data considers None to mean "no change"
         rather than "clear".
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')
@@ -729,7 +725,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data, if passed a truthy value, updates
         its instance attribute.
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')

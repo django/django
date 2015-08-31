@@ -340,7 +340,6 @@ class DateQuotingTest(TestCase):
         #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -353,7 +352,6 @@ class DateQuotingTest(TestCase):
         which clash with strings passed to it (e.g. 'day') - see #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)

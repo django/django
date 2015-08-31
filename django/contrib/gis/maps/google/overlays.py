@@ -239,7 +239,6 @@ class GIcon(object):
         infowindowanchor:
             The pixel coordinate relative to the top left corner of the icon
             image at which the info window is anchored to this icon.
-
     """
     def __init__(self, varname, image=None, iconsize=None,
                  shadow=None, shadowsize=None, iconanchor=None,

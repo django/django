@@ -391,7 +391,6 @@ class NamespacePackageAppTests(SimpleTestCase):
 
         (Because then we wouldn't know where to load its templates, static
         assets, etc from.)
-
         """
         # Temporarily add two directories to sys.path that both contain
         # components of the "nsapp" package.

@@ -176,7 +176,6 @@ class LocaleRegexProvider(object):
     """
     A mixin to provide a default regex property which can vary by active
     language.
-
     """
     def __init__(self, regex):
         # regex is either a string representing a regular expression, or a

@@ -121,7 +121,6 @@ def teardown_test_environment():
 
         - Restoring the original test renderer
         - Restoring the email sending functions
-
     """
     Template._render = Template._original_render
     del Template._original_render
