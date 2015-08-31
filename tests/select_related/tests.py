@@ -163,6 +163,26 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
 
+    def test_select_related_after_values(self):
+        """
+        Running select_related() after calling values() raises a TypeError
+        """
+
+        message = "Cannot call select_related() after .values() or .values_list()"
+
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values('name').select_related('genus'))
+
+    def test_select_related_after_values_list(self):
+        """
+        Running select_related() after calling values_list() raises a TypeError
+        """
+
+        message = "Cannot call select_related() after .values() or .values_list()"
+
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values_list('name').select_related('genus'))
+
 
 class SelectRelatedValidationTests(SimpleTestCase):
     """
