@@ -9,9 +9,8 @@ from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import ignore_warnings, mock, override_settings
+from django.test import mock, override_settings
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -159,37 +158,6 @@ class MigrateTests(MigrationTestBase):
         """
         with self.assertRaisesMessage(CommandError, "Conflicting migrations detected"):
             call_command("migrate", "migrations")
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
-    def test_migrate_list(self):
-        """
-        Tests --list output of migrate command
-        """
-        out = six.StringIO()
-        with mock.patch('django.core.management.color.supports_color', lambda *args: True):
-            call_command("migrate", list=True, stdout=out, verbosity=0, no_color=False)
-        self.assertEqual(
-            '\x1b[1mmigrations\n\x1b[0m'
-            ' [ ] 0001_initial\n'
-            ' [ ] 0002_second\n',
-            out.getvalue().lower()
-        )
-
-        call_command("migrate", "migrations", "0001", verbosity=0)
-
-        out = six.StringIO()
-        # Giving the explicit app_label tests for selective `show_migration_list` in the command
-        call_command("migrate", "migrations", list=True, stdout=out, verbosity=0, no_color=True)
-        self.assertEqual(
-            'migrations\n'
-            ' [x] 0001_initial\n'
-            ' [ ] 0002_second\n',
-            out.getvalue().lower()
-        )
-
-        # Cleanup by unmigrating everything
-        call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
     def test_showmigrations_list(self):

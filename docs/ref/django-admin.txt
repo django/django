@@ -768,11 +768,6 @@ The ``--run-syncdb`` option allows creating tables for apps without migrations.
 While this isn't recommended, the migrations framework is sometimes too slow
 on large projects with hundreds of models.
 
-.. deprecated:: 1.8
-
-    The ``--list`` option has been moved to the :djadmin:`showmigrations`
-    command.
-
 runserver [port or address:port]
 --------------------------------
 
