@@ -36,3 +36,6 @@ Bugfixes
 * Changed ``Count`` queries to execute ``COUNT(*)`` instead of ``COUNT('*')``
   as versions of Django before 1.8 did (:ticket:`25377`). This may fix a
   performance regression on some databases.
+
+* Fixed custom queryset chaining with ``values()`` and ``values_list()``
+  (:ticket:`20625`).

@@ -937,10 +937,10 @@ class QuerySet(object):
                                              using=self.db)
 
     def _clone(self, klass=None, setup=False, **kwargs):
+        base_queryset_class = getattr(self, '_base_queryset_class', self.__class__)
         if klass is None:
             klass = self.__class__
-        elif not issubclass(self.__class__, klass):
-            base_queryset_class = getattr(self, '_base_queryset_class', self.__class__)
+        elif not (issubclass(base_queryset_class, klass) or issubclass(klass, base_queryset_class)):
             class_bases = (klass, base_queryset_class)
             class_dict = {
                 '_base_queryset_class': base_queryset_class,
