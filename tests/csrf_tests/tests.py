@@ -352,6 +352,19 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
+    def test_https_csrf_trusted_origin_allowed(self):
+        """
+        A POST HTTPS request with a referer added to the CSRF_TRUSTED_ORIGINS
+        setting is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
     def test_ensures_csrf_cookie_no_middleware(self):
         """
         Tests that ensures_csrf_cookie decorator fulfils its promise
