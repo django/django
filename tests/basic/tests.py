@@ -1,13 +1,11 @@
 from __future__ import unicode_literals
 
 import threading
-import warnings
 from datetime import datetime, timedelta
 
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.fields import Field
-from django.db.models.fields.related import ForeignObjectRel
 from django.db.models.manager import BaseManager
 from django.db.models.query import EmptyQuerySet, QuerySet
 from django.test import (
@@ -771,16 +769,3 @@ class ModelRefreshTests(TestCase):
         a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
         with self.assertNumQueries(0):
             a.refresh_from_db(fields=[])
-
-
-class TestRelatedObjectDeprecation(SimpleTestCase):
-    def test_field_related_deprecation(self):
-        field = SelfRef._meta.get_field('selfref')
-        with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            self.assertIsInstance(field.related, ForeignObjectRel)
-            self.assertEqual(len(warns), 1)
-            self.assertEqual(
-                str(warns.pop().message),
-                'Usage of field.related has been deprecated. Use field.remote_field instead.'
-            )
