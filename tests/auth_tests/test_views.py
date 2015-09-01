@@ -24,11 +24,8 @@ from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import (
-    TestCase, ignore_warnings, modify_settings, override_settings,
-)
+from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import patch_logger
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
 from django.utils.six.moves.urllib.parse import ParseResult, urlparse
@@ -208,19 +205,6 @@ class PasswordResetTest(AuthViewsTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual("staffmember@example.com", mail.outbox[0].from_email)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    @override_settings(ALLOWED_HOSTS=['adminsite.com'])
-    def test_admin_reset(self):
-        "If the reset view is marked as being for admin, the HTTP_HOST header is used for a domain override."
-        response = self.client.post('/admin_password_reset/',
-            {'email': 'staffmember@example.com'},
-            HTTP_HOST='adminsite.com'
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("http://adminsite.com", mail.outbox[0].body)
-        self.assertEqual(settings.DEFAULT_FROM_EMAIL, mail.outbox[0].from_email)
 
     # Skip any 500 handler action (like sending more mail...)
     @override_settings(DEBUG_PROPAGATE_EXCEPTIONS=True)

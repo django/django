@@ -17,9 +17,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
@@ -166,7 +164,7 @@ def redirect_to_login(next, login_url=None,
 
 @deprecate_current_app
 @csrf_protect
-def password_reset(request, is_admin_site=False,
+def password_reset(request,
                    template_name='registration/password_reset_form.html',
                    email_template_name='registration/password_reset_email.html',
                    subject_template_name='registration/password_reset_subject.txt',
@@ -194,14 +192,6 @@ def password_reset(request, is_admin_site=False,
                 'html_email_template_name': html_email_template_name,
                 'extra_email_context': extra_email_context,
             }
-            if is_admin_site:
-                warnings.warn(
-                    "The is_admin_site argument to "
-                    "django.contrib.auth.views.password_reset() is deprecated "
-                    "and will be removed in Django 1.10.",
-                    RemovedInDjango110Warning, 3
-                )
-                opts = dict(opts, domain_override=request.get_host())
             form.save(**opts)
             return HttpResponseRedirect(post_reset_redirect)
     else:

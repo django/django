@@ -85,7 +85,6 @@ urlpatterns = auth_urlpatterns + [
         dict(post_reset_redirect='password_reset')),
     url(r'^password_change/custom/$', views.password_change, dict(post_change_redirect='/custom/')),
     url(r'^password_change/custom/named/$', views.password_change, dict(post_change_redirect='password_reset')),
-    url(r'^admin_password_reset/$', views.password_reset, dict(is_admin_site=True)),
     url(r'^login_required/$', login_required(views.password_reset)),
     url(r'^login_required_login_url/$', login_required(views.password_reset, login_url='/somewhere/')),
 
