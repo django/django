@@ -1219,7 +1219,7 @@ implementation details see :ref:`using-the-views`.
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
 
-.. function:: password_reset(request, is_admin_site=False, template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', password_reset_form=PasswordResetForm, token_generator=default_token_generator, post_reset_redirect=None, from_email=None, current_app=None, extra_context=None, html_email_template_name=None, extra_email_context=None)
+.. function:: password_reset(request, template_name='registration/password_reset_form.html', email_template_name='registration/password_reset_email.html', subject_template_name='registration/password_reset_subject.txt', password_reset_form=PasswordResetForm, token_generator=default_token_generator, post_reset_redirect=None, from_email=None, current_app=None, extra_context=None, html_email_template_name=None, extra_email_context=None)
 
     Allows a user to reset their password by generating a one-time use link
     that can be used to reset the password, and sending that link to the
@@ -1282,11 +1282,6 @@ implementation details see :ref:`using-the-views`.
 
     * ``extra_email_context``: A dictionary of context data that will available
       in the email template.
-
-    .. deprecated:: 1.8
-
-        The ``is_admin_site`` argument is deprecated and will be removed in
-        Django 1.10.
 
     .. deprecated:: 1.9
 
