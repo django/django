@@ -14,11 +14,8 @@ from django.db.models.fields.related import ManyToManyRel
 from django.forms.utils import flatatt
 from django.template.defaultfilters import capfirst, linebreaksbr
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
-from django.utils.functional import cached_property
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -291,21 +288,6 @@ class InlineAdminForm(AdminForm):
         self.absolute_url = view_on_site_url
         super(InlineAdminForm, self).__init__(form, fieldsets, prepopulated_fields,
             readonly_fields, model_admin)
-
-    @cached_property
-    def original_content_type_id(self):
-        warnings.warn(
-            'InlineAdminForm.original_content_type_id is deprecated and will be '
-            'removed in Django 1.10. If you were using this attribute to construct '
-            'the "view on site" URL, use the `absolute_url` attribute instead.',
-            RemovedInDjango110Warning, stacklevel=2
-        )
-        if self.original is not None:
-            # Since this module gets imported in the application's root package,
-            # it cannot import models from other applications at the module level.
-            from django.contrib.contenttypes.models import ContentType
-            return ContentType.objects.get_for_model(self.original).pk
-        raise AttributeError
 
     def __iter__(self):
         for name, options in self.fieldsets:
