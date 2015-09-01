@@ -12,9 +12,7 @@ from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
@@ -357,13 +355,6 @@ class RelatedField(Field):
         if self.verbose_name is None:
             self.verbose_name = self.remote_field.model._meta.verbose_name
         self.remote_field.set_field_name()
-
-    @property
-    def related(self):
-        warnings.warn(
-            "Usage of field.related has been deprecated. Use field.remote_field instead.",
-            RemovedInDjango110Warning, 2)
-        return self.remote_field
 
     def do_related_class(self, other, cls):
         self.set_attributes_from_rel()
