@@ -677,6 +677,16 @@ creating a user or changing usernames::
         username = forms.CharField(max_length=30, help_text='Required. '
             '30 characters or fewer. Letters, digits and @/./+/-/_ only.')
 
+If you wish to keep this restriction in the admin, set
+:attr:`UserAdmin.add_form <django.contrib.auth.admin.UserAdmin.add_form>`
+to use this form.
+
+    class MyUserAdmin(UserAdmin):
+        add_form = MyUserCreationForm
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
