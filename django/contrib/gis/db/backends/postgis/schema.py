@@ -1,4 +1,4 @@
-from django.db.backends.postgresql_psycopg2.schema import DatabaseSchemaEditor
+from django.db.backends.postgresql.schema import DatabaseSchemaEditor
 
 
 class PostGISSchemaEditor(DatabaseSchemaEditor):

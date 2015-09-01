@@ -135,7 +135,6 @@ class CallbackFilter(logging.Filter):
     A logging filter that checks the return value of a given callable (which
     takes the record-to-be-logged as its only parameter) to decide whether to
     log a record.
-
     """
     def __init__(self, callback):
         self.callback = callback

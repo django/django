@@ -8,6 +8,7 @@ import os
 from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
+from django.db.migrations.recorder import MigrationRecorder
 from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
@@ -413,6 +414,51 @@ class MigrateTests(MigrationTestBase):
         """
         call_command("migrate", "migrated_unapplied_app", stdout=six.StringIO())
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_record_replaced(self):
+        """
+        Running a single squashed migration should record all of the original
+        replaced migrations as run.
+        """
+        recorder = MigrationRecorder(connection)
+        out = six.StringIO()
+        call_command("migrate", "migrations", verbosity=0)
+        call_command("showmigrations", "migrations", stdout=out, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            out.getvalue().lower()
+        )
+        applied_migrations = recorder.applied_migrations()
+        self.assertIn(("migrations", "0001_initial"), applied_migrations)
+        self.assertIn(("migrations", "0002_second"), applied_migrations)
+        self.assertIn(("migrations", "0001_squashed_0002"), applied_migrations)
+        # Rollback changes
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_record_squashed(self):
+        """
+        Running migrate for a squashed migration should record as run
+        if all of the replaced migrations have been run (#25231).
+        """
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        out = six.StringIO()
+        call_command("migrate", "migrations", verbosity=0)
+        call_command("showmigrations", "migrations", stdout=out, no_color=True)
+        self.assertEqual(
+            'migrations\n'
+            ' [x] 0001_squashed_0002 (2 squashed migrations)\n',
+            out.getvalue().lower()
+        )
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations()
+        )
+        # No changes were actually applied so there is nothing to rollback
+
 
 class MakeMigrationsTests(MigrationTestBase):
     """
@@ -463,6 +509,19 @@ class MakeMigrationsTests(MigrationTestBase):
                     self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)  # Meta.verbose_name_plural
                     self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
                     self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
+
+    def test_makemigrations_order(self):
+        """
+        makemigrations should recognize number-only migrations (0001.py).
+        """
+        module = 'migrations.test_migrations_order'
+        with self.temporary_migration_module(module=module) as migration_dir:
+            if hasattr(importlib, 'invalidate_caches'):
+                # Python 3 importlib caches os.listdir() on some platforms like
+                # Mac OS X (#23850).
+                importlib.invalidate_caches()
+            call_command('makemigrations', 'migrations', '--empty', '-n', 'a', '-v', '0')
+            self.assertTrue(os.path.exists(os.path.join(migration_dir, '0002_a.py')))
 
     def test_failing_migration(self):
         # If a migration fails to serialize, it shouldn't generate an empty file. #21280
@@ -550,6 +609,16 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
             call_command("makemigrations", "migrations", stdout=out)
         self.assertIn("No changes detected in app 'migrations'", out.getvalue())
+
+    def test_makemigrations_no_apps_initial(self):
+        """
+        makemigrations should detect initial is needed on empty migration
+        modules if no app provided.
+        """
+        out = six.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations_empty"):
+            call_command("makemigrations", stdout=out)
+        self.assertIn("0001_initial.py", out.getvalue())
 
     def test_makemigrations_migrations_announce(self):
         """
@@ -860,6 +929,39 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn("No conflicts detected to merge.", out.getvalue())
             except CommandError:
                 self.fail("Makemigrations fails resolving conflicts in an unspecified app")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+            "migrations.migrations_test_apps.conflicting_app_with_dependencies"])
+    def test_makemigrations_merge_dont_output_dependency_operations(self):
+        """
+        Makes sure that makemigrations --merge does not output any operations
+        from apps that don't belong to a given app.
+        """
+        # Monkeypatch interactive questioner to auto accept
+        with mock.patch('django.db.migrations.questioner.input', mock.Mock(return_value='N')):
+            out = six.StringIO()
+            with mock.patch('django.core.management.color.supports_color', lambda *args: False):
+                call_command(
+                    "makemigrations", "conflicting_app_with_dependencies",
+                    merge=True, interactive=True, stdout=out
+                )
+            val = out.getvalue().lower()
+            self.assertIn('merging conflicting_app_with_dependencies\n', val)
+            self.assertIn(
+                '  branch 0002_conflicting_second\n'
+                '    - create model something\n',
+                val
+            )
+            self.assertIn(
+                '  branch 0002_second\n'
+                '    - delete model tribble\n'
+                '    - remove field silly_field from author\n'
+                '    - add field rating to author\n'
+                '    - create model book\n',
+                val
+            )
 
     def test_makemigrations_with_custom_name(self):
         """

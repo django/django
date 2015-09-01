@@ -123,7 +123,6 @@ def get_deleted_objects(objs, opts, user, admin_site, using):
 
     Returns a nested list of strings suitable for display in the
     template with the ``unordered_list`` filter.
-
     """
     collector = NestedObjects(using=using)
     collector.collect(objs)
@@ -216,7 +215,6 @@ class NestedObjects(Collector):
     def nested(self, format_callback=None):
         """
         Return the graph as a nested list.
-
         """
         seen = set()
         roots = []
@@ -238,7 +236,6 @@ def model_format_dict(obj):
     typically for use with string formatting.
 
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
-
     """
     if isinstance(obj, (models.Model, models.base.ModelBase)):
         opts = obj._meta
@@ -260,7 +257,6 @@ def model_ngettext(obj, n=None):
     `obj` may be a `Model` instance, `Model` subclass, or `QuerySet` instance.
     If `obj` is a `QuerySet` instance, `n` is optional and the length of the
     `QuerySet` is used.
-
     """
     if isinstance(obj, models.query.QuerySet):
         if n is None:
@@ -304,9 +300,14 @@ def _get_non_gfk_field(opts, name):
     """
     For historical reasons, the admin app relies on GenericForeignKeys as being
     "not found" by get_field(). This could likely be cleaned up.
+
+    Reverse relations should also be excluded as these aren't attributes of the
+    model (rather something like `foo_set`).
     """
     field = opts.get_field(name)
-    if field.is_relation and field.many_to_one and not field.related_model:
+    if (field.is_relation and
+            # Generic foreign keys OR reverse relations
+            ((field.many_to_one and not field.related_model) or field.one_to_many)):
         raise FieldDoesNotExist()
     return field
 
@@ -438,7 +439,6 @@ def reverse_field_path(model, path):
     return (Group, "user__order").
 
     Final field must be a related model, not a data field.
-
     """
     reversed_path = []
     parent = model

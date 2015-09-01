@@ -80,7 +80,6 @@ class FlatpageAdminFormTests(TestCase):
         """
         Existing flatpages can be edited in the admin form without triggering
         the url-uniqueness validation.
-
         """
         existing = FlatPage.objects.create(
             url="/myflatpage1/", title="Some page", content="The content")

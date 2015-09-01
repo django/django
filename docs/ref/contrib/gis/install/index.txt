@@ -234,15 +234,12 @@ Foundation, however, this is not required.
 Python
 ^^^^^^
 
-Although OS X comes with Python installed, users can use framework
-installers (`2.7`__, `3.2`__ and `3.3`__ are available) provided by
-the Python Software Foundation.  An advantage to using the installer is
-that OS X's Python will remain "pristine" for internal operating system
-use.
+Although OS X comes with Python installed, users can use `framework
+installers`__ provided by the Python Software Foundation.  An advantage to
+using the installer is that OS X's Python will remain "pristine" for internal
+operating system use.
 
-__ https://python.org/ftp/python/2.7.5/
-__ https://python.org/ftp/python/3.2.5/
-__ https://python.org/ftp/python/3.3.2/
+__ https://www.python.org/ftp/python/
 
 .. note::
 

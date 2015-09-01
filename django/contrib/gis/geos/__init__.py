@@ -5,7 +5,7 @@ for more details: https://docs.djangoproject.com/en/dev/ref/contrib/gis/geos/
 from .collections import (  # NOQA
     GeometryCollection, MultiLineString, MultiPoint, MultiPolygon,
 )
-from .error import GEOSException, GEOSIndexError  # NOQA
+from .error import GEOSException  # NOQA
 from .factory import fromfile, fromstr  # NOQA
 from .geometry import GEOSGeometry, hex_regex, wkt_regex  # NOQA
 from .io import WKBReader, WKBWriter, WKTReader, WKTWriter  # NOQA

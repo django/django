@@ -94,7 +94,8 @@ write :ref:`raw queries <executing-raw-queries>` or execute
 :ref:`custom sql <executing-custom-sql>`. These capabilities should be used
 sparingly and you should always be careful to properly escape any parameters
 that the user can control. In addition, you should exercise caution when using
-:meth:`extra() <django.db.models.query.QuerySet.extra>`.
+:meth:`~django.db.models.query.QuerySet.extra` and
+:class:`~django.db.models.expressions.RawSQL`.
 
 Clickjacking protection
 =======================
@@ -248,7 +249,7 @@ User-uploaded content
      file extensions for user uploaded files and configure the web server
      to only serve such files.
 
-.. _same-origin policy: http://en.wikipedia.org/wiki/Same-origin_policy
+.. _same-origin policy: https://en.wikipedia.org/wiki/Same-origin_policy
 
 .. _additional-security-topics:
 
@@ -270,4 +271,4 @@ security protection of the Web server, operating system and other components.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 
-.. _LimitRequestBody: http://httpd.apache.org/docs/2.2/mod/core.html#limitrequestbody
+.. _LimitRequestBody: http://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody

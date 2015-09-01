@@ -619,7 +619,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_change_list_null_boolean_display(self):
         Post.objects.create(public=None)
         response = self.client.get(reverse('admin:admin_views_post_changelist'))
-        self.assertContains(response, 'icon-unknown.gif')
+        self.assertContains(response, 'icon-unknown.svg')
 
     def test_i18n_language_non_english_default(self):
         """
@@ -2129,7 +2129,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         Cyclic relationships should still cause each object to only be
         listed once.
-
         """
         one = '<li>Cyclic one: <a href="%s">I am recursive</a>' % (
             reverse('admin:admin_views_cyclicone_change', args=(self.cy1.pk,)),
@@ -2181,7 +2180,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         If a deleted object has two relationships from another model,
         both of those should be followed in looking for related
         objects to delete.
-
         """
         should_contain = '<li>Plot: <a href="%s">World Domination</a>' % reverse(
             'admin:admin_views_plot_change', args=(self.pl1.pk,)
@@ -2196,7 +2194,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         If a deleted object has two relationships pointing to it from
         another object, the other object should still only be listed
         once.
-
         """
         should_contain = '<li>Plot: <a href="%s">World Peace</a></li>' % reverse(
             'admin:admin_views_plot_change', args=(self.pl2.pk,)
@@ -2209,7 +2206,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         In the case of an inherited model, if either the child or
         parent-model instance is deleted, both instances are listed
         for deletion, as well as any relationships they have.
-
         """
         should_contain = [
             '<li>Villain: <a href="%s">Bob</a>' % reverse('admin:admin_views_villain_change', args=(self.sv1.pk,)),
@@ -2228,7 +2224,6 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         If a deleted object has GenericForeignKeys pointing to it,
         those objects should be listed for deletion.
-
         """
         plot = self.pl3
         tag = FunkyTag.objects.create(content_object=plot, name='hott')
@@ -4607,8 +4602,11 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
+        # Wait until we're on the delete page.
+        self.wait_for('.cancel-link')
         self.selenium.find_element_by_class_name('cancel-link').click()
-        self.wait_page_loaded()
+        # Wait until we're back on the change page.
+        self.wait_for_text('#content h1', 'Change pizza')
         self.assertEqual(self.selenium.current_url, full_url)
         self.assertEqual(Pizza.objects.count(), 1)
 
@@ -4626,8 +4624,11 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
         self.selenium.get(full_url)
         self.selenium.find_element_by_class_name('deletelink').click()
+        # Wait until we're on the delete page.
+        self.wait_for('.cancel-link')
         self.selenium.find_element_by_class_name('cancel-link').click()
-        self.wait_page_loaded()
+        # Wait until we're back on the change page.
+        self.wait_for_text('#content h1', 'Change pizza')
         self.assertEqual(self.selenium.current_url, full_url)
         self.assertEqual(Pizza.objects.count(), 1)
         self.assertEqual(Topping.objects.count(), 2)
@@ -4881,6 +4882,16 @@ class RawIdFieldsTest(TestCase):
         response2 = self.client.get(popup_url)
         self.assertNotContains(response2, "Kilbraken")
         self.assertContains(response2, "Palin")
+
+    def test_list_display_method_same_name_as_reverse_accessor(self):
+        """
+        Should be able to use a ModelAdmin method in list_display that has the
+        same name as a reverse model field ("sketch" in this case).
+        """
+        actor = Actor.objects.create(name="Palin", age=27)
+        Inquisition.objects.create(expected=True, leader=actor, country="England")
+        response = self.client.get(reverse('admin:admin_views_inquisition_changelist'))
+        self.assertContains(response, 'list-display-sketch')
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],

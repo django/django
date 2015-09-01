@@ -14,6 +14,7 @@ from . import PostgreSQLTestCase
 from .models import (
     ArrayFieldSubclass, CharArrayModel, DateTimeArrayModel, IntegerArrayModel,
     NestedIntegerArrayModel, NullableIntegerArrayModel, OtherTypesArrayModel,
+    PostgreSQLModel,
 )
 
 try:
@@ -96,6 +97,12 @@ class TestSaveLoad(PostgreSQLTestCase):
         self.assertEqual(instance.ips, loaded.ips)
         self.assertEqual(instance.uuids, loaded.uuids)
         self.assertEqual(instance.decimals, loaded.decimals)
+
+    def test_model_set_on_base_field(self):
+        instance = IntegerArrayModel()
+        field = instance._meta.get_field('field')
+        self.assertEqual(field.model, IntegerArrayModel)
+        self.assertEqual(field.base_field.model, IntegerArrayModel)
 
 
 class TestQuerying(PostgreSQLTestCase):
@@ -240,16 +247,20 @@ class TestQuerying(PostgreSQLTestCase):
 class TestChecks(PostgreSQLTestCase):
 
     def test_field_checks(self):
-        field = ArrayField(models.CharField())
-        field.set_attributes_from_name('field')
-        errors = field.check()
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.CharField())
+
+        model = MyModel()
+        errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E001')
 
     def test_invalid_base_fields(self):
-        field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
-        field.set_attributes_from_name('field')
-        errors = field.check()
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
+
+        model = MyModel()
+        errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
 
@@ -297,6 +308,33 @@ class TestMigrations(TransactionTestCase):
         call_command('migrate', 'postgres_tests', verbosity=0)
         with connection.cursor() as cursor:
             self.assertIn(table_name, connection.introspection.table_names(cursor))
+        call_command('migrate', 'postgres_tests', 'zero', verbosity=0)
+        with connection.cursor() as cursor:
+            self.assertNotIn(table_name, connection.introspection.table_names(cursor))
+
+    @override_settings(MIGRATION_MODULES={
+        "postgres_tests": "postgres_tests.array_index_migrations",
+    })
+    def test_adding_arrayfield_with_index(self):
+        """
+        ArrayField shouldn't have varchar_patterns_ops or text_patterns_ops indexes.
+        """
+        table_name = 'postgres_tests_chartextarrayindexmodel'
+        call_command('migrate', 'postgres_tests', verbosity=0)
+        with connection.cursor() as cursor:
+            like_constraint_field_names = [
+                c.rsplit('_', 2)[0][len(table_name) + 1:]
+                for c in connection.introspection.get_constraints(cursor, table_name)
+                if c.endswith('_like')
+            ]
+        # Only the CharField should have a LIKE index.
+        self.assertEqual(like_constraint_field_names, ['char2'])
+        with connection.cursor() as cursor:
+            indexes = connection.introspection.get_indexes(cursor, table_name)
+        # All fields should have regular indexes.
+        self.assertIn('char', indexes)
+        self.assertIn('char2', indexes)
+        self.assertIn('text', indexes)
         call_command('migrate', 'postgres_tests', 'zero', verbosity=0)
         with connection.cursor() as cursor:
             self.assertNotIn(table_name, connection.introspection.table_names(cursor))

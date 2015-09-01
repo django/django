@@ -32,6 +32,5 @@ def do_static(parser, token):
         {% static variable_with_path %}
         {% static "myapp/css/base.css" as admin_base_css %}
         {% static variable_with_path as varname %}
-
     """
     return StaticFilesNode.handle_token(parser, token)

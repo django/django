@@ -141,7 +141,7 @@ class I18nTagTests(SimpleTestCase):
 
     @setup({'i18n12': '{% load i18n %}'
                       '{% get_available_languages as langs %}{% for lang in langs %}'
-                      '{% ifequal lang.0 "de" %}{{ lang.0 }}{% endifequal %}{% endfor %}'})
+                      '{% if lang.0 == "de" %}{{ lang.0 }}{% endif %}{% endfor %}'})
     def test_i18n12(self):
         """
         usage of the get_available_languages tag
@@ -511,3 +511,13 @@ class I18nTagTests(SimpleTestCase):
         msg = "The 'noop' option was specified more than once."
         with self.assertRaisesMessage(TemplateSyntaxError, msg):
             self.engine.render_to_string('template')
+
+    @setup({'template': '{% load i18n %}{% trans "%s" %}'})
+    def test_trans_tag_using_a_string_that_looks_like_str_fmt(self):
+        output = self.engine.render_to_string('template')
+        self.assertEqual(output, '%s')
+
+    @setup({'template': '{% load i18n %}{% blocktrans %}%s{% endblocktrans %}'})
+    def test_blocktrans_tag_using_a_string_that_looks_like_str_fmt(self):
+        output = self.engine.render_to_string('template')
+        self.assertEqual(output, '%s')

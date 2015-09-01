@@ -80,6 +80,9 @@ class ExtractorTests(SimpleTestCase):
     def assertMsgId(self, msgid, haystack, use_quotes=True):
         return self._assertPoKeyword('msgid', msgid, haystack, use_quotes=use_quotes)
 
+    def assertMsgIdPlural(self, msgid, haystack, use_quotes=True):
+        return self._assertPoKeyword('msgid_plural', msgid, haystack, use_quotes=use_quotes)
+
     def assertMsgStr(self, msgstr, haystack, use_quotes=True):
         return self._assertPoKeyword('msgstr', msgstr, haystack, use_quotes=use_quotes)
 
@@ -149,53 +152,21 @@ class BasicExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with io.open(self.PO_FILE, 'r', encoding='utf-8') as fp:
             po_contents = fp.read()
-            self.assertIn('#. Translators: This comment should be extracted', po_contents)
             self.assertNotIn('This comment should not be extracted', po_contents)
-            # Comments in templates
-            self.assertIn('#. Translators: Django template comment for translators', po_contents)
-            self.assertIn("#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents)
 
+            # Comments in templates
+            self.assertIn('#. Translators: This comment should be extracted', po_contents)
+            self.assertIn("#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents)
             self.assertIn('#. Translators: One-line translator comment #1', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #1\n#. continued here.', po_contents)
-
             self.assertIn('#. Translators: One-line translator comment #2', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #2\n#. continued here.', po_contents)
-
             self.assertIn('#. Translators: One-line translator comment #3', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #3\n#. continued here.', po_contents)
-
             self.assertIn('#. Translators: One-line translator comment #4', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #4\n#. continued here.', po_contents)
-
             self.assertIn('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.', po_contents)
-
-    def test_templatize_trans_tag(self):
-        # ticket #11240
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('Literal with a percent symbol at the end %%', po_contents)
-            self.assertMsgId('Literal with a percent %% symbol in the middle', po_contents)
-            self.assertMsgId('Completed 50%% of all the tasks', po_contents)
-            self.assertMsgId('Completed 99%% of all the tasks', po_contents)
-            self.assertMsgId("Shouldn't double escape this sequence: %% (two percent signs)", po_contents)
-            self.assertMsgId("Shouldn't double escape this sequence %% either", po_contents)
-            self.assertMsgId("Looks like a str fmt spec %%s but shouldn't be interpreted as such", po_contents)
-            self.assertMsgId("Looks like a str fmt spec %% o but shouldn't be interpreted as such", po_contents)
-
-    def test_templatize_blocktrans_tag(self):
-        # ticket #11966
-        os.chdir(self.test_dir)
-        management.call_command('makemessages', locale=[LOCALE], verbosity=0)
-        self.assertTrue(os.path.exists(self.PO_FILE))
-        with open(self.PO_FILE, 'r') as fp:
-            po_contents = force_text(fp.read())
-            self.assertMsgId('I think that 100%% is more that 50%% of anything.', po_contents)
-            self.assertMsgId('I think that 100%% is more that 50%% of %(obj)s.', po_contents)
-            self.assertMsgId("Blocktrans extraction shouldn't double escape this: %%, a=%(a)s", po_contents)
 
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
@@ -208,8 +179,8 @@ class BasicExtractorTests(ExtractorTests):
             # should be trimmed
             self.assertMsgId("Again some text with a few line breaks, this time should be trimmed.", po_contents)
         # #21406 -- Should adjust for eaten line numbers
-        self.assertMsgId("I'm on line 97", po_contents)
-        self.assertLocationCommentPresent(self.PO_FILE, 97, 'templates', 'test.html')
+        self.assertMsgId("I'm on line 82", po_contents)
+        self.assertLocationCommentPresent(self.PO_FILE, 82, 'templates', 'test.html')
 
     def test_force_en_us_locale(self):
         """Value of locale-munging option used by the command is the right one"""
@@ -556,6 +527,21 @@ class CopyPluralFormsExtractorTests(ExtractorTests):
             po_contents = fp.read()
             found = re.findall(r'^(?P<value>"Plural-Forms.+?\\n")\s*$', po_contents, re.MULTILINE | re.DOTALL)
             self.assertEqual(1, len(found))
+
+    def test_trans_and_plural_blocktrans_collision(self):
+        """
+        Ensures a correct workaround for the gettext bug when handling a literal
+        found inside a {% trans %} tag and also in another file inside a
+        {% blocktrans %} with a plural (#17375).
+        """
+        os.chdir(self.test_dir)
+        management.call_command('makemessages', locale=[LOCALE], extensions=['html', 'djtpl'], verbosity=0)
+        self.assertTrue(os.path.exists(self.PO_FILE))
+        with open(self.PO_FILE, 'r') as fp:
+            po_contents = force_text(fp.read())
+            self.assertNotIn("#-#-#-#-#  django.pot (PACKAGE VERSION)  #-#-#-#-#\\n", po_contents)
+            self.assertMsgId('First `trans`, then `blocktrans` with a plural', po_contents)
+            self.assertMsgIdPlural('Plural for a `trans` and `blocktrans` collision case', po_contents)
 
 
 class NoWrapExtractorTests(ExtractorTests):

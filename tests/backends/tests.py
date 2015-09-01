@@ -18,7 +18,7 @@ from django.db import (
     reset_queries, transaction,
 )
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.postgresql_psycopg2 import version as pg_version
+from django.db.backends.postgresql import version as pg_version
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper, format_number
 from django.db.models import Avg, StdDev, Sum, Variance
@@ -313,7 +313,7 @@ class PostgreSQLTests(TestCase):
         self.assertEqual(a[0], b[0])
 
     def test_lookup_cast(self):
-        from django.db.backends.postgresql_psycopg2.operations import DatabaseOperations
+        from django.db.backends.postgresql.operations import DatabaseOperations
 
         do = DatabaseOperations(connection=None)
         for lookup in ('iexact', 'contains', 'icontains', 'startswith',
@@ -321,8 +321,8 @@ class PostgreSQLTests(TestCase):
             self.assertIn('::text', do.lookup_cast(lookup))
 
     def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql_psycopg2.base import psycopg2_version
-        version_path = 'django.db.backends.postgresql_psycopg2.base.Database.__version__'
+        from django.db.backends.postgresql.base import psycopg2_version
+        version_path = 'django.db.backends.postgresql.base.Database.__version__'
 
         with mock.patch(version_path, '2.6.9'):
             self.assertEqual(psycopg2_version(), (2, 6, 9))
@@ -340,7 +340,6 @@ class DateQuotingTest(TestCase):
         #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -353,7 +352,6 @@ class DateQuotingTest(TestCase):
         which clash with strings passed to it (e.g. 'day') - see #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)

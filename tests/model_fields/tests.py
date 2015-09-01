@@ -52,7 +52,6 @@ class BasicFieldTests(test.TestCase):
         """
         Regression test for #13071: NullBooleanField should not throw
         a validation error when given a value of None.
-
         """
         nullboolean = NullBooleanModel(nbfield=None)
         try:
@@ -480,8 +479,8 @@ class BooleanFieldTests(test.TestCase):
 class ChoicesTests(test.SimpleTestCase):
     def test_choices_and_field_display(self):
         """
-        Check that get_choices and get_flatchoices interact with
-        get_FIELD_display to return the expected values (#7913).
+        Check that get_choices() interacts with get_FIELD_display() to return
+        the expected values (#7913).
         """
         self.assertEqual(Whiz(c=1).get_c_display(), 'First')    # A nested value
         self.assertEqual(Whiz(c=0).get_c_display(), 'Other')    # A top level value
@@ -691,7 +690,6 @@ class TypeCoercionTests(test.TestCase):
     Test that database lookups can accept the wrong types and convert
     them with no error: especially on Postgres 8.3+ which does not do
     automatic casting at the DB level. See #10015.
-
     """
     def test_lookup_integer_in_charfield(self):
         self.assertEqual(Post.objects.filter(title=9).count(), 0)
@@ -705,7 +703,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data will clear its instance attribute
         value if passed False.
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')
@@ -717,7 +714,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data considers None to mean "no change"
         rather than "clear".
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')
@@ -729,7 +725,6 @@ class FileFieldTests(unittest.TestCase):
         """
         Test that FileField.save_form_data, if passed a truthy value, updates
         its instance attribute.
-
         """
         d = Document(myfile='something.txt')
         self.assertEqual(d.myfile, 'something.txt')

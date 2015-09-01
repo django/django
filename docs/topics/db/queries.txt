@@ -426,13 +426,13 @@ probably use:
 :lookup:`exact`
     An "exact" match. For example::
 
-        >>> Entry.objects.get(headline__exact="Man bites dog")
+        >>> Entry.objects.get(headline__exact="Cat bites dog")
 
     Would generate SQL along these lines:
 
     .. code-block:: sql
 
-        SELECT ... WHERE headline = 'Man bites dog';
+        SELECT ... WHERE headline = 'Cat bites dog';
 
     If you don't provide a lookup type -- that is, if your keyword argument
     doesn't contain a double underscore -- the lookup type is assumed to be

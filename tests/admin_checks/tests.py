@@ -69,6 +69,22 @@ class SystemChecksTestCase(SimpleTestCase):
             custom_site.unregister(Song)
             admin.sites.system_check_errors = []
 
+    def test_field_name_not_in_list_display(self):
+        class SongAdmin(admin.ModelAdmin):
+            list_editable = ["original_release"]
+
+        errors = SongAdmin.check(model=Song)
+        expected = [
+            checks.Error(
+                "The value of 'list_editable[0]' refers to 'original_release', "
+                "which is not contained in 'list_display'.",
+                hint=None,
+                obj=SongAdmin,
+                id='admin.E122',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_readonly_and_editable(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ["original_release"]
@@ -125,7 +141,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_fieldsets_fields_non_tuple(self):
         """
-        Tests for a tuple/list within fieldsets[1]['fields'].
+        Tests for a tuple/list for the first fieldset's fields.
         """
         class NotATupleAdmin(admin.ModelAdmin):
             list_display = ["pk", "title"]
@@ -139,7 +155,7 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = NotATupleAdmin.check(model=Song)
         expected = [
             checks.Error(
-                "The value of 'fieldsets[1]['fields']' must be a list or tuple.",
+                "The value of 'fieldsets[0][1]['fields']' must be a list or tuple.",
                 hint=None,
                 obj=NotATupleAdmin,
                 id='admin.E008',
@@ -149,7 +165,7 @@ class SystemChecksTestCase(SimpleTestCase):
 
     def test_nonfirst_fieldset(self):
         """
-        Tests for a tuple/list within the second fieldsets[2]['fields'].
+        Tests for a tuple/list for the second fieldset's fields.
         """
         class NotATupleAdmin(admin.ModelAdmin):
             fieldsets = [
@@ -164,7 +180,7 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = NotATupleAdmin.check(model=Song)
         expected = [
             checks.Error(
-                "The value of 'fieldsets[1]['fields']' must be a list or tuple.",
+                "The value of 'fieldsets[1][1]['fields']' must be a list or tuple.",
                 hint=None,
                 obj=NotATupleAdmin,
                 id='admin.E008',

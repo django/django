@@ -7,6 +7,7 @@ from django.template import Library, Node, TemplateSyntaxError, Variable
 from django.template.base import TOKEN_TEXT, TOKEN_VAR, render_value_in_context
 from django.template.defaulttags import token_kwargs
 from django.utils import six, translation
+from django.utils.safestring import SafeData, mark_safe
 
 register = Library()
 
@@ -86,6 +87,11 @@ class TranslateNode(Node):
                 self.message_context.resolve(context))
         output = self.filter_expression.resolve(context)
         value = render_value_in_context(output, context)
+        # Restore percent signs. Percent signs in template text are doubled
+        # so they are not interpreted as string format flags.
+        is_safe = isinstance(value, SafeData)
+        value = value.replace('%%', '%')
+        value = mark_safe(value) if is_safe else value
         if self.asvar:
             context[self.asvar] = value
             return ''
@@ -540,7 +546,6 @@ def language(parser, token):
         {% language "de" %}
             This is {{ bar }} and {{ boo }}.
         {% endlanguage %}
-
     """
     bits = token.split_contents()
     if len(bits) != 2:

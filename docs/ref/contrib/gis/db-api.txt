@@ -226,18 +226,17 @@ in southern Texas::
         # A projected coordinate system (only valid for South Texas!)
         # is used, units are in meters.
         point = models.PointField(srid=32140)
-        objects = models.GeoManager()
 
 Then distance queries may be performed as follows::
 
-    >>> from django.contrib.gis.geos import *
+    >>> from django.contrib.gis.geos import fromstr
     >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
-    >>> from geoapp import SouthTexasCity
+    >>> from geoapp.models import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
     >>> pnt = fromstr('POINT(-96.876369 29.905320)', srid=4326)
     # If numeric parameter, units of field (meters in this case) are assumed.
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
-    # Find all Cities within 7 km, > 20 miles away, and > 100 chains  away (an obscure unit)
+    # Find all Cities within 7 km, > 20 miles away, and > 100 chains away (an obscure unit)
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, D(km=7)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(mi=20)))
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(pnt, D(chain=100)))

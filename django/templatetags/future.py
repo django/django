@@ -58,7 +58,6 @@ def firstof(parser, token):
     Or if only some variables should be escaped, you can use::
 
         {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
-
     """
     warnings.warn(
         "Loading the `firstof` tag from the `future` library is deprecated and "

@@ -39,9 +39,9 @@ transaction. If the response is produced without problems, Django commits the
 transaction. If the view produces an exception, Django rolls back the
 transaction.
 
-You may perform partial commits and rollbacks in your view code, typically with
-the :func:`atomic` context manager. However, at the end of the view, either
-all the changes will be committed, or none of them.
+You may perform subtransactions using savepoints in your view code, typically
+with the :func:`atomic` context manager. However, at the end of the view,
+either all or none of the changes will be committed.
 
 .. warning::
 
@@ -366,7 +366,7 @@ and the :func:`atomic` (or :setting:`ATOMIC_REQUESTS
 autocommit is disabled and you are not within an atomic block will result in an
 error.
 
-.. _two-phase commit: http://en.wikipedia.org/wiki/Two-phase_commit_protocol
+.. _two-phase commit: https://en.wikipedia.org/wiki/Two-phase_commit_protocol
 .. _psycopg Two-Phase Commit protocol support: http://initd.org/psycopg/docs/usage.html#tpc
 .. _optional Two-Phase Commit Extensions in the Python DB-API specification: https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions
 

@@ -80,7 +80,8 @@ class Command(BaseCommand):
                 for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting migrations detected (%s).\nTo fix them run "
+                "Conflicting migrations detected; multiple leaf nodes in the "
+                "migration graph: (%s).\nTo fix them run "
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
@@ -194,13 +195,17 @@ class Command(BaseCommand):
             questioner = InteractiveMigrationQuestioner()
         else:
             questioner = MigrationQuestioner(defaults={'ask_merge': True})
+
         for app_label, migration_names in conflicts.items():
             # Grab out the migrations in question, and work out their
             # common ancestor.
             merge_migrations = []
             for migration_name in migration_names:
                 migration = loader.get_migration(app_label, migration_name)
-                migration.ancestry = loader.graph.forwards_plan((app_label, migration_name))
+                migration.ancestry = [
+                    mig for mig in loader.graph.forwards_plan((app_label, migration_name))
+                    if mig[0] == migration.app_label
+                ]
                 merge_migrations.append(migration)
             all_items_equal = lambda seq: all(item == seq[0] for item in seq[1:])
             merge_migrations_generations = zip(*[m.ancestry for m in merge_migrations])

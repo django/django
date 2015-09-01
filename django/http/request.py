@@ -79,7 +79,7 @@ class HttpRequest(object):
         else:
             # Reconstruct the host using the algorithm from PEP 333.
             host = self.META['SERVER_NAME']
-            server_port = str(self.META['SERVER_PORT'])
+            server_port = self.get_port()
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
 
@@ -97,6 +97,14 @@ class HttpRequest(object):
             else:
                 msg += " The domain name provided is not valid according to RFC 1034/1035."
             raise DisallowedHost(msg)
+
+    def get_port(self):
+        """Return the port number for the request as a string."""
+        if settings.USE_X_FORWARDED_PORT and 'HTTP_X_FORWARDED_PORT' in self.META:
+            port = self.META['HTTP_X_FORWARDED_PORT']
+        else:
+            port = self.META['SERVER_PORT']
+        return str(port)
 
     def get_full_path(self, force_append_slash=False):
         # RFC 3986 requires query string arguments to be in the ASCII range.
@@ -449,7 +457,6 @@ class QueryDict(MultiValueDict):
                 'next=%2Fa%26b%2F'
                 >>> q.urlencode(safe='/')
                 'next=/a%26b/'
-
         """
         output = []
         if safe:
@@ -516,7 +523,6 @@ def validate_host(host, allowed_hosts):
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.
-
     """
     host = host[:-1] if host.endswith('.') else host
 

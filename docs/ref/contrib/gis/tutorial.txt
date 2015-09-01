@@ -158,7 +158,7 @@ extensions:
   data stored in the shapefile.
 
 __ http://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
-__ http://en.wikipedia.org/wiki/Shapefile
+__ https://en.wikipedia.org/wiki/Shapefile
 
 Use ``ogrinfo`` to examine spatial data
 ---------------------------------------
@@ -238,20 +238,14 @@ model to represent this data::
         lon = models.FloatField()
         lat = models.FloatField()
 
-        # GeoDjango-specific: a geometry field (MultiPolygonField), and
-        # overriding the default manager with a GeoManager instance.
+        # GeoDjango-specific: a geometry field (MultiPolygonField)
         mpoly = models.MultiPolygonField()
-        objects = models.GeoManager()
 
         # Returns the string representation of the model.
         def __str__(self):              # __unicode__ on Python 2
             return self.name
 
-Please note two important things:
-
-1. The ``models`` module is imported from ``django.contrib.gis.db``.
-2. You must override the model's default manager with
-   :class:`~django.contrib.gis.db.models.GeoManager` to perform spatial queries.
+Note that the ``models`` module is imported from ``django.contrib.gis.db``.
 
 The default spatial reference system for geometry fields is WGS84 (meaning
 the `SRID`__ is 4326) -- in other words, the field coordinates are in
@@ -259,7 +253,7 @@ longitude, latitude pairs in units of degrees.  To use a different
 coordinate system, set the SRID of the geometry field with the ``srid``
 argument. Use an integer representing the coordinate system's EPSG code.
 
-__ http://en.wikipedia.org/wiki/SRID
+__ https://en.wikipedia.org/wiki/SRID
 
 Run ``migrate``
 ---------------
@@ -579,7 +573,6 @@ directly into the ``models.py`` of a GeoDjango application::
         lon = models.FloatField()
         lat = models.FloatField()
         geom = models.MultiPolygonField(srid=4326)
-        objects = models.GeoManager()
 
     # Auto-generated `LayerMapping` dictionary for WorldBorder model
     worldborders_mapping = {

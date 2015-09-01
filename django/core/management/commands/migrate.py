@@ -94,7 +94,8 @@ class Command(BaseCommand):
                 for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting migrations detected (%s).\nTo fix them run "
+                "Conflicting migrations detected; multiple leaf nodes in the "
+                "migration graph: (%s).\nTo fix them run "
                 "'python manage.py makemigrations --merge'" % name_str
             )
 
@@ -171,6 +172,7 @@ class Command(BaseCommand):
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
+            executor.check_replacements()
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
                 # If there's changes that aren't in migrations yet, tell them how to fix it.

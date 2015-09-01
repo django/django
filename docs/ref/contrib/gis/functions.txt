@@ -106,7 +106,7 @@ Keyword Argument       Description
                        default value is 2.
 =====================  =====================================================
 
-__ http://en.wikipedia.org/wiki/Geography_Markup_Language
+__ https://en.wikipedia.org/wiki/Geography_Markup_Language
 
 AsKML
 -----
@@ -216,8 +216,9 @@ In the following example, the distance from the city of Hobart to every other
 :class:`~django.contrib.gis.db.models.PointField` in the ``AustraliaCity``
 queryset is calculated::
 
+    >>> from django.contrib.gis.db.models.functions import Distance
     >>> pnt = AustraliaCity.objects.get(name='Hobart').point
-    >>> for city in AustraliaCity.objects.distance('point', pnt):
+    >>> for city in AustraliaCity.objects.annotate(distance=Distance('point', pnt)):
     ...     print(city.name, city.distance)
     Wollongong 990071.220408 m
     Shellharbour 972804.613941 m
@@ -264,7 +265,7 @@ GeoHash
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
 
-__ http://en.wikipedia.org/wiki/Geohash
+__ https://en.wikipedia.org/wiki/Geohash
 
 Intersection
 ------------

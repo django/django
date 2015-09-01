@@ -1,5 +1,5 @@
 =================================
-Introduction to Class-based views
+Introduction to class-based views
 =================================
 
 Class-based views provide an alternative way to implement views as Python
@@ -43,7 +43,7 @@ The toolkit of base classes and mixins that Django uses to build class-based
 generic views are built for maximum flexibility, and as such have many hooks in
 the form of default method implementations and attributes that you are unlikely
 to be concerned with in the simplest use cases. For example, instead of
-limiting you to a class based attribute for ``form_class``, the implementation
+limiting you to a class-based attribute for ``form_class``, the implementation
 uses a ``get_form`` method, which calls a ``get_form_class`` method, which in
 its default implementation just returns the ``form_class`` attribute of the
 class. This gives you several options for specifying what form to use, from a
@@ -279,8 +279,18 @@ that it can be used on an instance method. For example::
         def dispatch(self, *args, **kwargs):
             return super(ProtectedView, self).dispatch(*args, **kwargs)
 
-In this example, every instance of ``ProtectedView`` will have
-login protection.
+Or, more succinctly, you can decorate the class instead and pass the name
+of the method to be decorated as the keyword argument ``name``::
+
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+.. versionchanged:: 1.9
+
+    The ability to use ``method_decorator()`` on a class was added.
+
+In this example, every instance of ``ProtectedView`` will have login protection.
 
 .. note::
 

@@ -77,8 +77,7 @@ mention:
 
 * The response gets an additional ``Content-Disposition`` header, which
   contains the name of the PDF file. This filename is arbitrary: Call it
-  whatever you want. It'll be used by browsers in the "Save as..."
-  dialogue, etc.
+  whatever you want. It'll be used by browsers in the "Save as..." dialog, etc.
 
 * The ``Content-Disposition`` header starts with ``'attachment; '`` in this
   example. This forces Web browsers to pop-up a dialog box
@@ -155,7 +154,7 @@ Further resources
 
 .. _PDFlib: http://www.pdflib.org/
 .. _`Pisa XHTML2PDF`: http://www.xhtml2pdf.com/
-.. _HTMLdoc: http://www.htmldoc.org/
+.. _HTMLdoc: https://www.msweet.org/projects.php?Z1
 
 Other formats
 =============

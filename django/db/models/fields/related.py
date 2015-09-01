@@ -303,6 +303,33 @@ class RelatedField(Field):
                 field.do_related_class(related, model)
             lazy_related_operation(resolve_related_class, cls, self.remote_field.model, field=self)
 
+    def get_forward_related_filter(self, obj):
+        """
+        Return the keyword arguments that when supplied to
+        self.model.object.filter(), would select all instances related through
+        this field to the remote obj. This is used to build the querysets
+        returned by related descriptors. obj is an instance of
+        self.related_field.model.
+        """
+        return {
+            '%s__%s' % (self.name, rh_field.name): getattr(obj, rh_field.attname)
+            for _, rh_field in self.related_fields
+        }
+
+    def get_reverse_related_filter(self, obj):
+        """
+        Complement to get_forward_related_filter(). Return the keyword
+        arguments that when passed to self.related_field.model.object.filter()
+        select all instances of self.related_field.model related through
+        this field to obj. obj is an instance of self.model.
+        """
+        base_filter = {
+            rh_field.attname: getattr(obj, lh_field.attname)
+            for lh_field, rh_field in self.related_fields
+        }
+        base_filter.update(self.get_extra_descriptor_filter(obj) or {})
+        return base_filter
+
     @property
     def swappable_setting(self):
         """
@@ -314,17 +341,8 @@ class RelatedField(Field):
             if isinstance(self.remote_field.model, six.string_types):
                 to_string = self.remote_field.model
             else:
-                to_string = "%s.%s" % (
-                    self.remote_field.model._meta.app_label,
-                    self.remote_field.model._meta.object_name,
-                )
-            # See if anything swapped/swappable matches
-            for model in apps.get_models(include_swapped=True):
-                if model._meta.swapped:
-                    if model._meta.swapped == to_string:
-                        return model._meta.swappable
-                if ("%s.%s" % (model._meta.app_label, model._meta.object_name)) == to_string and model._meta.swappable:
-                    return model._meta.swappable
+                to_string = self.remote_field.model._meta.label
+            return apps.get_swappable_settings_name(to_string)
         return None
 
     def set_attributes_from_rel(self):
@@ -462,11 +480,9 @@ class SingleRelatedObjectDescriptor(object):
             if related_pk is None:
                 rel_obj = None
             else:
-                params = {}
-                for lh_field, rh_field in self.related.field.related_fields:
-                    params['%s__%s' % (self.related.field.name, rh_field.name)] = getattr(instance, rh_field.attname)
+                filter_args = self.related.field.get_forward_related_filter(instance)
                 try:
-                    rel_obj = self.get_queryset(instance=instance).get(**params)
+                    rel_obj = self.get_queryset(instance=instance).get(**filter_args)
                 except self.related.related_model.DoesNotExist:
                     rel_obj = None
                 else:
@@ -515,7 +531,7 @@ class SingleRelatedObjectDescriptor(object):
                     raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        if not self.related.field.allow_unsaved_instance_assignment and None in related_pk:
+        if None in related_pk:
             raise ValueError(
                 'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
                 (value, instance._meta.object_name)
@@ -612,16 +628,8 @@ class ReverseSingleRelatedObjectDescriptor(object):
             if None in val:
                 rel_obj = None
             else:
-                params = {
-                    rh_field.attname: getattr(instance, lh_field.attname)
-                    for lh_field, rh_field in self.field.related_fields}
                 qs = self.get_queryset(instance=instance)
-                extra_filter = self.field.get_extra_descriptor_filter(instance)
-                if isinstance(extra_filter, dict):
-                    params.update(extra_filter)
-                    qs = qs.filter(**params)
-                else:
-                    qs = qs.filter(extra_filter, **params)
+                qs = qs.filter(**self.field.get_reverse_related_filter(instance))
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get()
                 if not self.field.remote_field.multiple:
@@ -685,12 +693,6 @@ class ReverseSingleRelatedObjectDescriptor(object):
         # Set the values of the related field.
         else:
             for lh_field, rh_field in self.field.related_fields:
-                pk = value._get_pk_val()
-                if not self.field.allow_unsaved_instance_assignment and pk is None:
-                    raise ValueError(
-                        'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                        (value, self.field.remote_field.model._meta.object_name)
-                    )
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
         # Since we already know what the related object is, seed the related
@@ -1601,7 +1603,6 @@ class ForeignObject(RelatedField):
     one_to_many = False
     one_to_one = False
 
-    allow_unsaved_instance_assignment = False
     requires_unique_target = True
     related_accessor_class = ForeignRelatedObjectsDescriptor
     rel_class = ForeignObjectRel

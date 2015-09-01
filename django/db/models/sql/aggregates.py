@@ -49,7 +49,6 @@ class Aggregate(RegisterLookupMixin):
          * is_computed, a boolean indicating if this output of this aggregate
            is a computed float (e.g., an average), regardless of the input
            type.
-
         """
         self.col = col
         self.source = source

@@ -396,7 +396,7 @@ class Options(object):
                     # or as part of validation.
                     return swapped_for
 
-                if '%s.%s' % (swapped_label, swapped_object.lower()) not in (None, self.label_lower):
+                if '%s.%s' % (swapped_label, swapped_object.lower()) != self.label_lower:
                     return swapped_for
         return None
 
@@ -651,12 +651,12 @@ class Options(object):
 
     def get_base_chain(self, model):
         """
-        Returns a list of parent classes leading to 'model' (order from closet
-        to most distant ancestor). This has to handle the case were 'model' is
-        a grandparent or even more distant relation.
+        Return a list of parent classes leading to `model` (ordered from
+        closest to most distant ancestor). This has to handle the case where
+        `model` is a grandparent or even more distant relation.
         """
         if not self.parents:
-            return None
+            return []
         if model in self.parents:
             return [model]
         for parent in self.parents:
@@ -664,7 +664,7 @@ class Options(object):
             if res:
                 res.insert(0, parent)
                 return res
-        return None
+        return []
 
     def get_parent_list(self):
         """

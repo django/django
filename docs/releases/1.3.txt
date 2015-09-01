@@ -458,7 +458,7 @@ prohibited). However, if avoiding profanities is important to you, you
 would be well advised to seek out a better, less naive approach to the
 problem.
 
-.. _Scunthorpe problem: http://en.wikipedia.org/wiki/Scunthorpe_problem
+.. _Scunthorpe problem: https://en.wikipedia.org/wiki/Scunthorpe_problem
 .. _commit that implemented this change: https://code.djangoproject.com/changeset/13996
 
 Localflavor changes

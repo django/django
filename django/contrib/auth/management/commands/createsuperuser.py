@@ -8,6 +8,7 @@ import sys
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import get_default_username
+from django.contrib.auth.password_validation import validate_password
 from django.core import exceptions
 from django.core.management.base import BaseCommand, CommandError
 from django.db import DEFAULT_DB_ALIAS
@@ -56,6 +57,9 @@ class Command(BaseCommand):
         # If not provided, create the user with an unusable password
         password = None
         user_data = {}
+        # Same as user_data but with foreign keys as fake model instances
+        # instead of raw IDs.
+        fake_user_data = {}
 
         # Do quick and dirty validation if --noinput
         if not options['interactive']:
@@ -121,21 +125,35 @@ class Command(BaseCommand):
                                 field.remote_field.field_name,
                             ) if field.remote_field else '',
                         ))
-                        user_data[field_name] = self.get_input_data(field, message)
+                        input_value = self.get_input_data(field, message)
+                        user_data[field_name] = input_value
+                        fake_user_data[field_name] = input_value
+
+                        # Wrap any foreign keys in fake model instances
+                        if field.remote_field:
+                            fake_user_data[field_name] = field.remote_field.model(input_value)
 
                 # Get a password
                 while password is None:
-                    if not password:
-                        password = getpass.getpass()
-                        password2 = getpass.getpass(force_str('Password (again): '))
-                        if password != password2:
-                            self.stderr.write("Error: Your passwords didn't match.")
-                            password = None
-                            continue
+                    password = getpass.getpass()
+                    password2 = getpass.getpass(force_str('Password (again): '))
+                    if password != password2:
+                        self.stderr.write("Error: Your passwords didn't match.")
+                        password = None
+                        # Don't validate passwords that don't match.
+                        continue
+
                     if password.strip() == '':
                         self.stderr.write("Error: Blank passwords aren't allowed.")
                         password = None
+                        # Don't validate blank passwords.
                         continue
+
+                    try:
+                        validate_password(password2, self.UserModel(**fake_user_data))
+                    except exceptions.ValidationError as err:
+                        self.stderr.write(', '.join(err.messages))
+                        password = None
 
             except KeyboardInterrupt:
                 self.stderr.write("\nOperation cancelled.")

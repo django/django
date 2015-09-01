@@ -165,7 +165,6 @@ class FileDescriptor(object):
 
         >>> with open('/tmp/hello.world', 'r') as f:
         ...     instance.file = File(f)
-
     """
     def __init__(self, field):
         self.field = field

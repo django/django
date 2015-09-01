@@ -23,13 +23,14 @@ class HStoreField(forms.CharField):
     def to_python(self, value):
         if not value:
             return {}
-        try:
-            value = json.loads(value)
-        except ValueError:
-            raise ValidationError(
-                self.error_messages['invalid_json'],
-                code='invalid_json',
-            )
+        if not isinstance(value, dict):
+            try:
+                value = json.loads(value)
+            except ValueError:
+                raise ValidationError(
+                    self.error_messages['invalid_json'],
+                    code='invalid_json',
+                )
         # Cast everything to strings for ease.
         for key, val in value.items():
             value[key] = six.text_type(val)
@@ -43,4 +44,4 @@ class HStoreField(forms.CharField):
         # the same as an empty dict, if the data or initial value we get
         # is None, replace it w/ {}.
         initial_value = self.to_python(initial)
-        return super(forms.HStoreField, self).has_changed(initial_value, data)
+        return super(HStoreField, self).has_changed(initial_value, data)

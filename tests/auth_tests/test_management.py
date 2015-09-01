@@ -43,6 +43,8 @@ def mock_inputs(inputs):
                     if six.PY2:
                         # getpass on Windows only supports prompt as bytestring (#19807)
                         assert isinstance(prompt, six.binary_type)
+                    if callable(inputs['password']):
+                        return inputs['password']()
                     return inputs['password']
 
             def mock_input(prompt):
@@ -107,6 +109,9 @@ class GetDefaultUsernameTestCase(TestCase):
         self.assertEqual(management.get_default_username(), 'julia')
 
 
+@override_settings(AUTH_PASSWORD_VALIDATORS=[
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+])
 class ChangepasswordManagementCommandTestCase(TestCase):
 
     def setUp(self):
@@ -139,10 +144,23 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         mismatched passwords three times.
         """
         command = changepassword.Command()
-        command._get_pass = lambda *args: args or 'foo'
+        command._get_pass = lambda *args: str(args) or 'foo'
 
         with self.assertRaises(CommandError):
             command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
+
+    def test_password_validation(self):
+        """
+        A CommandError should be raised if the user enters in passwords which
+        fail validation three times.
+        """
+        command = changepassword.Command()
+        command._get_pass = lambda *args: '1234567890'
+
+        abort_msg = "Aborting password change for user 'joe' after 3 attempts"
+        with self.assertRaisesMessage(CommandError, abort_msg):
+            command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
+        self.assertIn('This password is entirely numeric.', self.stdout.getvalue())
 
     def test_that_changepassword_command_works_with_nonascii_output(self):
         """
@@ -158,7 +176,10 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         command.execute(username="J\xfalia", stdout=self.stdout)
 
 
-@override_settings(SILENCED_SYSTEM_CHECKS=['fields.W342'])  # ForeignKey(unique=True)
+@override_settings(
+    SILENCED_SYSTEM_CHECKS=['fields.W342'],  # ForeignKey(unique=True)
+    AUTH_PASSWORD_VALIDATORS=[{'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'}],
+)
 class CreatesuperuserManagementCommandTestCase(TestCase):
 
     def test_basic_usage(self):
@@ -440,6 +461,106 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
             u = CustomUserWithFK._default_manager.get(email=email)
             self.assertEqual(u.username, email)
             self.assertEqual(u.group, group)
+
+        test(self)
+
+    def test_password_validation(self):
+        """
+        Creation should fail if the password fails validation.
+        """
+        new_io = six.StringIO()
+
+        # Returns '1234567890' the first two times it is called, then
+        # 'password' subsequently.
+        def bad_then_good_password(index=[0]):
+            index[0] += 1
+            if index[0] <= 2:
+                return '1234567890'
+            return 'password'
+
+        @mock_inputs({
+            'password': bad_then_good_password,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "This password is entirely numeric.\n"
+                "Superuser created successfully."
+            )
+
+        test(self)
+
+    def test_validation_mismatched_passwords(self):
+        """
+        Creation should fail if the user enters mismatched passwords.
+        """
+        new_io = six.StringIO()
+
+        # The first two passwords do not match, but the second two do match and
+        # are valid.
+        entered_passwords = ["password", "not password", "password2", "password2"]
+
+        def mismatched_passwords_then_matched():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({
+            'password': mismatched_passwords_then_matched,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: Your passwords didn't match.\n"
+                "Superuser created successfully."
+            )
+
+        test(self)
+
+    def test_validation_blank_password_entered(self):
+        """
+        Creation should fail if the user enters blank passwords.
+        """
+        new_io = six.StringIO()
+
+        # The first two passwords are empty strings, but the second two are
+        # valid.
+        entered_passwords = ["", "", "password2", "password2"]
+
+        def blank_passwords_then_valid():
+            return entered_passwords.pop(0)
+
+        @mock_inputs({
+            'password': blank_passwords_then_valid,
+            'username': 'joe1234567890',
+        })
+        def test(self):
+            call_command(
+                "createsuperuser",
+                interactive=True,
+                stdin=MockTTY(),
+                stdout=new_io,
+                stderr=new_io,
+            )
+            self.assertEqual(
+                new_io.getvalue().strip(),
+                "Error: Blank passwords aren't allowed.\n"
+                "Superuser created successfully."
+            )
 
         test(self)
 

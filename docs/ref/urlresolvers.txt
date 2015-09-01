@@ -26,6 +26,7 @@ you can use any of the following to reverse the URL::
     reverse('news_archive')
 
     # passing a callable object
+    # (This is discouraged because you can't reverse namespaced views this way.)
     from news import views
     reverse(views.archive)
 

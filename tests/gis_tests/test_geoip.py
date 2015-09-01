@@ -3,12 +3,17 @@ from __future__ import unicode_literals
 
 import os
 import unittest
+import warnings
 from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.gis.geoip import HAS_GEOIP
+from django.contrib.gis.geoip.prototypes import GeoIP_lib_version
 from django.contrib.gis.geos import HAS_GEOS, GEOSGeometry
+from django.test import ignore_warnings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_text
 
 if HAS_GEOIP:
     from django.contrib.gis.geoip import GeoIP, GeoIPException
@@ -22,7 +27,10 @@ if HAS_GEOIP:
 
 @skipUnless(HAS_GEOIP and getattr(settings, "GEOIP_PATH", None),
     "GeoIP is required along with the GEOIP_PATH setting.")
+@ignore_warnings(category=RemovedInDjango20Warning)
 class GeoIPTest(unittest.TestCase):
+    addr = '128.249.1.1'
+    fqdn = 'tmc.edu'
 
     def test01_init(self):
         "Testing GeoIP initialization."
@@ -68,10 +76,7 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP country querying methods."
         g = GeoIP(city='<foo>')
 
-        fqdn = 'www.google.com'
-        addr = '12.215.42.19'
-
-        for query in (fqdn, addr):
+        for query in (self.fqdn, self.addr):
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query), 'Failed for func %s and query %s' % (func, query))
             for func in (g.country_name, g.country_name_by_addr, g.country_name_by_name):
@@ -84,9 +89,7 @@ class GeoIPTest(unittest.TestCase):
         "Testing GeoIP city querying methods."
         g = GeoIP(country='<foo>')
 
-        addr = '128.249.1.1'
-        fqdn = 'tmc.edu'
-        for query in (fqdn, addr):
+        for query in (self.fqdn, self.addr):
             # Country queries should still work.
             for func in (g.country_code, g.country_code_by_addr, g.country_code_by_name):
                 self.assertEqual('US', func(query))
@@ -118,3 +121,30 @@ class GeoIPTest(unittest.TestCase):
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
+
+    def test_deprecation_warning(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            GeoIP()
+
+        self.assertEqual(len(warns), 1)
+        msg = str(warns[0].message)
+        self.assertIn('django.contrib.gis.geoip is deprecated', msg)
+
+    def test_repr(self):
+        path = settings.GEOIP_PATH
+        g = GeoIP(path=path)
+        country_path = g._country_file
+        city_path = g._city_file
+        if GeoIP_lib_version:
+            expected = '<GeoIP [v%(version)s] _country_file="%(country)s", _city_file="%(city)s">' % {
+                'version': force_text(GeoIP_lib_version()),
+                'country': country_path,
+                'city': city_path,
+            }
+        else:
+            expected = '<GeoIP _country_file="%(country)s", _city_file="%(city)s">' % {
+                'country': country_path,
+                'city': city_path,
+            }
+        self.assertEqual(repr(g), expected)

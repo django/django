@@ -34,7 +34,7 @@ INTERNAL_IPS = []
 ALLOWED_HOSTS = []
 
 # Local time zone for this installation. All choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
+# https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
 TIME_ZONE = 'America/Chicago'
@@ -428,6 +428,7 @@ DEFAULT_INDEX_TABLESPACE = ''
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 USE_X_FORWARDED_HOST = False
+USE_X_FORWARDED_PORT = False
 
 # The Python dotted path to the WSGI application that Django's internal server
 # (runserver) will use. If `None`, the return value of

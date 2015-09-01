@@ -747,9 +747,9 @@ TECHNICAL_500_TEMPLATE = ("""
    <p>In template <code>{{ template_info.name }}</code>, error at line <strong>{{ template_info.line }}</strong></p>
    <h3>{{ template_info.message }}</h3>
    <table class="source{% if template_info.top %} cut-top{% endif %}
-      {% ifnotequal template_info.bottom template_info.total %} cut-bottom{% endifnotequal %}">
+      {% if template_info.bottom != template_info.total %} cut-bottom{% endif %}">
    {% for source_line in template_info.source_lines %}
-   {% ifequal source_line.0 template_info.line %}
+   {% if source_line.0 == template_info.line %}
    <tr class="error"><th>{{ source_line.0 }}</th>
      <td>{{ template_info.before }}"""
       """<span class="specific">{{ template_info.during }}</span>"""
@@ -758,7 +758,7 @@ TECHNICAL_500_TEMPLATE = ("""
    {% else %}
       <tr><th>{{ source_line.0 }}</th>
       <td>{{ source_line.1 }}</td></tr>
-   {% endifequal %}
+   {% endif %}
    {% endfor %}
    </table>
 </div>
@@ -872,11 +872,11 @@ Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ template_info.message }}"""
 "{% for source_line in template_info.source_lines %}"
-"{% ifequal source_line.0 template_info.line %}"
+"{% if source_line.0 == template_info.line %}"
 "   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}"
 "{% else %}"
 "   {{ source_line.0 }} : {{ source_line.1 }}"
-"""{% endifequal %}{% endfor %}{% endif %}
+"""{% endif %}{% endfor %}{% endif %}
 
 Traceback:{% for frame in frames %}
 {% ifchanged frame.exc_cause %}{% if frame.exc_cause %}{% if frame.exc_cause_explicit %}
@@ -1072,11 +1072,11 @@ Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ template_info.message }}
 {% for source_line in template_info.source_lines %}"""
-"{% ifequal source_line.0 template_info.line %}"
+"{% if source_line.0 == template_info.line %}"
 "   {{ source_line.0 }} : {{ template_info.before }} {{ template_info.during }} {{ template_info.after }}"
 "{% else %}"
 "   {{ source_line.0 }} : {{ source_line.1 }}"
-"""{% endifequal %}{% endfor %}{% endif %}{% if frames %}
+"""{% endif %}{% endfor %}{% endif %}{% if frames %}
 
 Traceback:"""
 "{% for frame in frames %}"

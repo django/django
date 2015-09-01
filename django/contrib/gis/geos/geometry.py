@@ -12,7 +12,7 @@ from django.contrib.gis.geometry.regex import hex_regex, json_regex, wkt_regex
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
-from django.contrib.gis.geos.error import GEOSException, GEOSIndexError
+from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
@@ -26,9 +26,6 @@ from django.utils.encoding import force_bytes, force_text
 class GEOSGeometry(GEOSBase, ListMixin):
     "A class that, generally, encapsulates a GEOS geometry."
 
-    # Raise GEOSIndexError instead of plain IndexError
-    # (see ticket #4740 and GEOSIndexError docstring)
-    _IndexError = GEOSIndexError
     _GEOS_CLASSES = None
 
     ptr_type = GEOM_PTR

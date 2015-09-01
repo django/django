@@ -344,7 +344,7 @@ Finally, a performance note: these regular expressions are compiled the first
 time the URLconf module is loaded. They're super fast (as long as the lookups
 aren't too complex as noted above).
 
-.. _Wikipedia's entry: http://en.wikipedia.org/wiki/Regular_expression
+.. _Wikipedia's entry: https://en.wikipedia.org/wiki/Regular_expression
 
 :func:`~django.conf.urls.url` argument: view
 --------------------------------------------

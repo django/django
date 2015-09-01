@@ -49,7 +49,7 @@ totally fine with GeoDjango. Your mileage may vary.
     independently of Django.  In other words, no database or settings file
     required -- just import them as normal from :mod:`django.contrib.gis`.
 
-.. _PROJ.4: http://trac.osgeo.org/proj/
+.. _PROJ.4: https://github.com/OSGeo/proj.4/wiki/
 __ http://postgis.net/
 __ http://www.gaia-gis.it/gaia-sins/
 
@@ -263,4 +263,4 @@ the GDAL library.  For example::
        It is easier to install the shifting files now, then to have debug a
        problem caused by their absence later.
 .. [#] Specifically, GeoDjango provides support for the `OGR
-       <http://gdal.org/ogr>`_ library, a component of GDAL.
+       <http://gdal.org/ogr_arch.html>`_ library, a component of GDAL.

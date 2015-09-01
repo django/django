@@ -20,7 +20,7 @@ from django.core.cache import (
     DEFAULT_CACHE_ALIAS, CacheKeyWarning, cache, caches,
 )
 from django.core.cache.utils import make_template_fragment_key
-from django.db import connection, connections, transaction
+from django.db import connection, connections
 from django.http import HttpRequest, HttpResponse, StreamingHttpResponse
 from django.middleware.cache import (
     CacheMiddleware, FetchFromCacheMiddleware, UpdateCacheMiddleware,
@@ -548,7 +548,6 @@ class BaseCacheTests(object):
         keys that would be refused by memcached. This encourages portable
         caching code without making it too difficult to use production backends
         with more liberal key rules. Refs #6447.
-
         """
         # mimic custom ``make_key`` method being defined since the default will
         # never show the below warnings
@@ -971,13 +970,6 @@ class DBCacheTests(BaseCacheTests, TransactionTestCase):
         self.assertEqual(out.getvalue(),
             "Cache table 'test cache table' created.\n")
 
-    def test_clear_commits_transaction(self):
-        # Ensure the database transaction is committed (#19896)
-        cache.set("key1", "spam")
-        cache.clear()
-        transaction.rollback()
-        self.assertIsNone(cache.get("key1"))
-
 
 @override_settings(USE_TZ=True)
 class DBCacheWithTimeZoneTests(DBCacheTests):
@@ -1131,7 +1123,6 @@ class MemcachedCacheTests(BaseCacheTests, TestCase):
 
         In order to be memcached-API-library agnostic, we only assert
         that a generic exception of some kind is raised.
-
         """
         # memcached does not allow whitespace or control characters in keys
         self.assertRaises(Exception, cache.set, 'key with spaces', 'value')
@@ -1241,7 +1232,6 @@ class CustomCacheKeyValidationTests(SimpleTestCase):
     Tests for the ability to mixin a custom ``validate_key`` method to
     a custom cache backend that otherwise inherits from a builtin
     backend, and override the default key validation. Refs #6447.
-
     """
     def test_custom_key_validation(self):
         # this key is both longer than 250 characters, and has spaces

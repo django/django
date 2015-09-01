@@ -15,11 +15,11 @@ class SimpleTests(TestCase):
     @skipIf(six.PY3, "tests a __str__ method returning unicode under Python 2")
     def test_basic(self):
         a = Article.objects.create(
-            headline=b'Area man programs in Python',
+            headline=b'Parrot programs in Python',
             pub_date=datetime.datetime(2005, 7, 28)
         )
-        self.assertEqual(str(a), str('Area man programs in Python'))
-        self.assertEqual(repr(a), str('<Article: Area man programs in Python>'))
+        self.assertEqual(str(a), str('Parrot programs in Python'))
+        self.assertEqual(repr(a), str('<Article: Parrot programs in Python>'))
 
     def test_international(self):
         a = InternationalArticle.objects.create(

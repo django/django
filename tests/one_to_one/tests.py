@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
-from django.db import IntegrityError, connection, models, transaction
+from django.db import IntegrityError, connection, transaction
 from django.test import TestCase
 
 from .models import (
     Bar, Director, Favorites, HiddenPointer, ManualPrimaryKey, MultiModel,
-    Place, RelatedModel, Restaurant, School, Target, UndergroundBar, Waiter,
+    Place, Pointer, RelatedModel, Restaurant, School, Target, UndergroundBar,
+    Waiter,
 )
 
 
@@ -134,41 +135,9 @@ class OneToOneTests(TestCase):
         should raise an exception.
         """
         place = Place(name='User', address='London')
-        with self.assertRaisesMessage(ValueError,
-                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (place, Restaurant.place.field.remote_field.model._meta.object_name)):
+        msg = "save() prohibited to prevent data loss due to unsaved related object 'place'."
+        with self.assertRaisesMessage(ValueError, msg):
             Restaurant.objects.create(place=place, serves_hot_dogs=True, serves_pizza=False)
-        bar = UndergroundBar()
-        p = Place(name='User', address='London')
-        with self.assertRaisesMessage(ValueError,
-                            'Cannot assign "%r": "%s" instance isn\'t saved in the database.'
-                            % (bar, p._meta.object_name)):
-            p.undergroundbar = bar
-
-    def test_unsaved_object_check_override(self):
-        """
-        #24495 - Assigning an unsaved object to a OneToOneField
-        should be allowed when the allow_unsaved_instance_assignment
-        attribute has been set to True.
-        """
-        class UnsavedOneToOneField(models.OneToOneField):
-            # A OneToOneField which can point to an unsaved object
-            allow_unsaved_instance_assignment = True
-
-        class Band(models.Model):
-            name = models.CharField(max_length=50)
-
-        class BandManager(models.Model):
-            band = UnsavedOneToOneField(Band, models.CASCADE)
-            first_name = models.CharField(max_length=50)
-            last_name = models.CharField(max_length=50)
-
-        band = Band(name='The Beatles')
-        manager = BandManager(first_name='Brian', last_name='Epstein')
-        # This should not raise an exception as the OneToOneField between
-        # manager and band has allow_unsaved_instance_assignment=True.
-        manager.band = band
-        self.assertEqual(manager.band, band)
 
     def test_reverse_relationship_cache_cascade(self):
         """
@@ -249,6 +218,11 @@ class OneToOneTests(TestCase):
         r = Restaurant(place=p)
         self.assertIs(r.place, p)
 
+        # Creation using keyword argument and unsaved related instance (#8070).
+        p = Place()
+        r = Restaurant(place=p)
+        self.assertTrue(r.place is p)
+
         # Creation using attname keyword argument and an id will cause the related
         # object to be fetched.
         p = Place.objects.get(name="Demon Dogs")
@@ -282,6 +256,13 @@ class OneToOneTests(TestCase):
             Target.objects.exclude(second_pointer=None),
             []
         )
+
+    def test_o2o_primary_key_delete(self):
+        t = Target.objects.create(name='name')
+        Pointer.objects.create(other=t)
+        num_deleted, objs = Pointer.objects.filter(other__name='name').delete()
+        self.assertEqual(num_deleted, 1)
+        self.assertEqual(objs, {'one_to_one.Pointer': 1})
 
     def test_reverse_object_does_not_exist_cache(self):
         """
@@ -392,8 +373,12 @@ class OneToOneTests(TestCase):
         """
         p = Place()
         b = UndergroundBar.objects.create()
+        msg = (
+            'Cannot assign "<UndergroundBar: UndergroundBar object>": "Place" '
+            'instance isn\'t saved in the database.'
+        )
         with self.assertNumQueries(0):
-            with self.assertRaises(ValueError):
+            with self.assertRaisesMessage(ValueError, msg):
                 p.undergroundbar = b
 
     def test_nullable_o2o_delete(self):

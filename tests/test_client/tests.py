@@ -640,6 +640,14 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[1].to[0], 'second@example.com')
         self.assertEqual(mail.outbox[1].to[1], 'third@example.com')
 
+    def test_exception_following_nested_client_request(self):
+        """
+        A nested test client request shouldn't clobber exception signals from
+        the outer client request.
+        """
+        with self.assertRaisesMessage(Exception, 'exception message'):
+            self.client.get('/nesting_exception_view/')
+
 
 @override_settings(
     MIDDLEWARE_CLASSES=['django.middleware.csrf.CsrfViewMiddleware'],

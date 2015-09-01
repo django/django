@@ -1,4 +1,3 @@
-import hashlib
 import logging
 import re
 
@@ -7,6 +6,7 @@ from django.conf import settings
 from django.core import urlresolvers
 from django.core.exceptions import PermissionDenied
 from django.core.mail import mail_managers
+from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
 
 logger = logging.getLogger('django.request')
@@ -50,62 +50,78 @@ class CommonMiddleware(object):
                 if user_agent_regex.search(request.META['HTTP_USER_AGENT']):
                     raise PermissionDenied('Forbidden user agent')
 
-        # Check for a redirect based on settings.APPEND_SLASH
-        # and settings.PREPEND_WWW
+        # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
-        old_url = [host, request.get_full_path()]
-        new_url = old_url[:]
 
-        if (settings.PREPEND_WWW and old_url[0] and
-                not old_url[0].startswith('www.')):
-            new_url[0] = 'www.' + old_url[0]
+        if settings.PREPEND_WWW and host and not host.startswith('www.'):
+            host = 'www.' + host
 
-        # Append a slash if APPEND_SLASH is set and the URL doesn't have a
-        # trailing slash and there is no pattern for the current path
-        if settings.APPEND_SLASH and (not old_url[1].endswith('/')):
+            # Check if we also need to append a slash so we can do it all
+            # with a single redirect.
+            if self.should_redirect_with_slash(request):
+                path = self.get_full_path_with_slash(request)
+            else:
+                path = request.get_full_path()
+
+            return self.response_redirect_class('%s://%s%s' % (request.scheme, host, path))
+
+    def should_redirect_with_slash(self, request):
+        """
+        Return True if settings.APPEND_SLASH is True and appending a slash to
+        the request path turns an invalid path into a valid one.
+        """
+        if settings.APPEND_SLASH and not request.get_full_path().endswith('/'):
             urlconf = getattr(request, 'urlconf', None)
-            if (not urlresolvers.is_valid_path(request.path_info, urlconf) and
-                    urlresolvers.is_valid_path("%s/" % request.path_info, urlconf)):
-                new_url[1] = request.get_full_path(force_append_slash=True)
-                if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
-                    raise RuntimeError((""
-                    "You called this URL via %(method)s, but the URL doesn't end "
-                    "in a slash and you have APPEND_SLASH set. Django can't "
-                    "redirect to the slash URL while maintaining %(method)s data. "
-                    "Change your form to point to %(url)s (note the trailing "
-                    "slash), or set APPEND_SLASH=False in your Django "
-                    "settings.") % {'method': request.method, 'url': ''.join(new_url)})
+            return (
+                not urlresolvers.is_valid_path(request.path_info, urlconf)
+                and urlresolvers.is_valid_path('%s/' % request.path_info, urlconf)
+            )
+        return False
 
-        if new_url == old_url:
-            # No redirects required.
-            return
-        if new_url[0] != old_url[0]:
-            newurl = "%s://%s%s" % (
-                request.scheme,
-                new_url[0], new_url[1])
-        else:
-            newurl = new_url[1]
-        return self.response_redirect_class(newurl)
+    def get_full_path_with_slash(self, request):
+        """
+        Return the full path of the request with a trailing slash appended.
+
+        Raise a RuntimeError if settings.DEBUG is True and request.method is
+        GET, PUT, or PATCH.
+        """
+        new_path = request.get_full_path(force_append_slash=True)
+        if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
+            raise RuntimeError(
+                "You called this URL via %(method)s, but the URL doesn't end "
+                "in a slash and you have APPEND_SLASH set. Django can't "
+                "redirect to the slash URL while maintaining %(method)s data. "
+                "Change your form to point to %(url)s (note the trailing "
+                "slash), or set APPEND_SLASH=False in your Django settings." % {
+                    'method': request.method,
+                    'url': request.get_host() + new_path,
+                }
+            )
+        return new_path
 
     def process_response(self, request, response):
         """
         Calculate the ETag, if needed.
+
+        When the status code of the response is 404, it may redirect to a path
+        with an appended slash if should_redirect_with_slash() returns True.
         """
+        # If the given URL is "Not Found", then check if we should redirect to
+        # a path with a slash appended.
+        if response.status_code == 404:
+            if self.should_redirect_with_slash(request):
+                return self.response_redirect_class(self.get_full_path_with_slash(request))
+
         if settings.USE_ETAGS:
+            if not response.has_header('ETag'):
+                set_response_etag(response)
+
             if response.has_header('ETag'):
-                etag = response['ETag']
-            elif response.streaming:
-                etag = None
-            else:
-                etag = '"%s"' % hashlib.md5(response.content).hexdigest()
-            if etag is not None:
-                if (200 <= response.status_code < 300
-                        and request.META.get('HTTP_IF_NONE_MATCH') == etag):
-                    cookies = response.cookies
-                    response = http.HttpResponseNotModified()
-                    response.cookies = cookies
-                else:
-                    response['ETag'] = etag
+                return get_conditional_response(
+                    request,
+                    etag=response['ETag'],
+                    response=response,
+                )
 
         return response
 
@@ -143,10 +159,17 @@ class BrokenLinkEmailsMiddleware(object):
 
     def is_ignorable_request(self, request, uri, domain, referer):
         """
-        Returns True if the given request *shouldn't* notify the site managers.
+        Return True if the given request *shouldn't* notify the site managers
+        according to project settings or in three specific situations:
+         - If the referer is empty.
+         - If a '?' in referer is identified as a search engine source.
+         - If the referer is equal to the current URL (assumed to be a
+           malicious bot).
         """
-        # '?' in referer is identified as search engine source
+        full_url = "%s://%s/%s" % (request.scheme, domain, uri.lstrip('/'))
         if (not referer or
-                (not self.is_internal_request(domain, referer) and '?' in referer)):
+                (not self.is_internal_request(domain, referer) and '?' in referer) or
+                (referer == uri or referer == full_url)):
             return True
+
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

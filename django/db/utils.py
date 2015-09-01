@@ -104,7 +104,14 @@ class DatabaseErrorWrapper(object):
 
 
 def load_backend(backend_name):
-    # Look for a fully qualified database backend name
+    """
+    Return a database backend's "base" module given a fully qualified database
+    backend name, or raise an error if it doesn't exist.
+    """
+    # This backend was renamed in Django 1.9.
+    if backend_name == 'django.db.backends.postgresql_psycopg2':
+        backend_name = 'django.db.backends.postgresql'
+
     try:
         return import_module('%s.base' % backend_name)
     except ImportError as e_user:
@@ -114,7 +121,8 @@ def load_backend(backend_name):
         try:
             builtin_backends = [
                 name for _, name, ispkg in pkgutil.iter_modules([npath(backend_dir)])
-                if ispkg and name not in {'base', 'dummy'}]
+                if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+            ]
         except EnvironmentError:
             builtin_backends = []
         if backend_name not in ['django.db.backends.%s' % b for b in

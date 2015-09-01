@@ -19,7 +19,7 @@ from django.core import checks, exceptions, validators
 # django.core.exceptions. It is retained here for backwards compatibility
 # purposes.
 from django.core.exceptions import FieldDoesNotExist  # NOQA
-from django.db import connection
+from django.db import connection, connections, router
 from django.db.models.lookups import (
     Lookup, RegisterLookupMixin, Transform, default_lookups,
 )
@@ -315,7 +315,11 @@ class Field(RegisterLookupMixin):
             return []
 
     def _check_backend_specific_checks(self, **kwargs):
-        return connection.validation.check_field(self, **kwargs)
+        app_label = self.model._meta.app_label
+        for db in connections:
+            if router.allow_migrate(db, app_label, model=self.model):
+                return connections[db].validation.check_field(self, **kwargs)
+        return []
 
     def _check_deprecation_details(self):
         if self.system_check_removed_details is not None:
@@ -674,6 +678,13 @@ class Field(RegisterLookupMixin):
             setattr(cls, 'get_%s_display' % self.name,
                     curry(cls._get_FIELD_display, field=self))
 
+    def get_filter_kwargs_for_object(self, obj):
+        """
+        Return a dict that when passed as kwargs to self.model.filter(), would
+        yield all instances having the same value for this field as obj has.
+        """
+        return {self.name: getattr(obj, self.attname)}
+
     def get_attname(self):
         return self.name
 
@@ -825,14 +836,6 @@ class Field(RegisterLookupMixin):
 
     def get_choices_default(self):
         return self.get_choices()
-
-    def get_flatchoices(self, include_blank=True,
-                        blank_choice=BLANK_CHOICE_DASH):
-        """
-        Returns flattened choices with a default blank choice included.
-        """
-        first_choice = blank_choice if include_blank else []
-        return first_choice + list(self.flatchoices)
 
     @warn_about_renamed_method(
         'Field', '_get_val_from_obj', 'value_from_object',

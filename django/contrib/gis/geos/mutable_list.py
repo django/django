@@ -4,7 +4,7 @@
 This module contains a base type which provides list-style mutations
 without specific data storage methods.
 
-See also http://www.aryehleib.com/MutableLists.html
+See also http://static.aryehleib.com/oldsite/MutableLists.html
 
 Author: Aryeh Leib Taurog.
 """
@@ -55,14 +55,10 @@ class ListMixin(object):
 
     type or tuple _allowed:
         A type or tuple of allowed item types [Optional]
-
-    class _IndexError:
-        The type of exception to be raise on invalid index [Optional]
     """
 
     _minlength = 0
     _maxlength = None
-    _IndexError = IndexError
 
     # ### Python initialization and special list interface methods ###
 
@@ -113,11 +109,6 @@ class ListMixin(object):
             self._check_allowed((val,))
             self._set_single(index, val)
 
-    def __iter__(self):
-        "Iterate over the items in the list"
-        for i in range(len(self)):
-            yield self[i]
-
     # ### Special methods for arithmetic operations ###
     def __add__(self, other):
         'add another list-like object'
@@ -155,7 +146,7 @@ class ListMixin(object):
         for i in range(olen):
             try:
                 c = self[i] == other[i]
-            except self._IndexError:
+            except IndexError:
                 # self must be shorter
                 return False
             if not c:
@@ -167,7 +158,7 @@ class ListMixin(object):
         for i in range(olen):
             try:
                 c = self[i] < other[i]
-            except self._IndexError:
+            except IndexError:
                 # self must be shorter
                 return True
             if c:
@@ -254,7 +245,7 @@ class ListMixin(object):
             return index
         if correct and -length <= index < 0:
             return index + length
-        raise self._IndexError('invalid index: %s' % str(index))
+        raise IndexError('invalid index: %s' % str(index))
 
     def _check_allowed(self, items):
         if hasattr(self, '_allowed'):

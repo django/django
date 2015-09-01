@@ -306,7 +306,6 @@ def receiver(signal, **kwargs):
         @receiver([post_save, post_delete], sender=MyModel)
         def signals_receiver(sender, **kwargs):
             ...
-
     """
     def _decorator(func):
         if isinstance(signal, (list, tuple)):

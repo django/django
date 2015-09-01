@@ -5,13 +5,13 @@ import errno
 import json
 import os
 import posixpath
-import re
 import socket
 import sys
 import threading
 import unittest
 import warnings
 from collections import Counter
+from contextlib import contextmanager
 from copy import copy
 from functools import wraps
 from unittest.util import safe_repr
@@ -604,10 +604,16 @@ class SimpleTestCase(unittest.TestCase):
             msg_prefix + "Template '%s' was used unexpectedly in rendering"
             " the response" % template_name)
 
+    @contextmanager
+    def _assert_raises_message_cm(self, expected_exception, expected_message):
+        with self.assertRaises(expected_exception) as cm:
+            yield cm
+        self.assertIn(expected_message, str(cm.exception))
+
     def assertRaisesMessage(self, expected_exception, expected_message, *args, **kwargs):
         """
-        Asserts that the message in a raised exception matches the passed
-        value.
+        Asserts that expected_message is found in the the message of a raised
+        exception.
 
         Args:
             expected_exception: Exception class expected to be raised.
@@ -618,9 +624,21 @@ class SimpleTestCase(unittest.TestCase):
         # callable_obj was a documented kwarg in Django 1.8 and older.
         callable_obj = kwargs.pop('callable_obj', None)
         if callable_obj:
-            args = (callable_obj,) + args
-        return six.assertRaisesRegex(self, expected_exception,
-                re.escape(expected_message), *args, **kwargs)
+            warnings.warn(
+                'The callable_obj kwarg is deprecated. Pass the callable '
+                'as a positional argument instead.', RemovedInDjango20Warning
+            )
+        elif len(args):
+            callable_obj = args[0]
+            args = args[1:]
+
+        cm = self._assert_raises_message_cm(expected_exception, expected_message)
+        # Assertion used in context manager fashion.
+        if callable_obj is None:
+            return cm
+        # Assertion was passed a callable.
+        with cm:
+            callable_obj(*args, **kwargs)
 
     def assertFieldOutput(self, fieldclass, valid, invalid, field_args=None,
             field_kwargs=None, empty_value=''):
@@ -636,7 +654,6 @@ class SimpleTestCase(unittest.TestCase):
             field_args: the args passed to instantiate the field
             field_kwargs: the kwargs passed to instantiate the field
             empty_value: the expected clean output for inputs in empty_values
-
         """
         if field_args is None:
             field_args = []
@@ -766,6 +783,13 @@ class SimpleTestCase(unittest.TestCase):
         else:
             if not result:
                 standardMsg = '%s != %s' % (safe_repr(xml1, True), safe_repr(xml2, True))
+                diff = ('\n' + '\n'.join(
+                    difflib.ndiff(
+                        six.text_type(xml1).splitlines(),
+                        six.text_type(xml2).splitlines(),
+                    )
+                ))
+                standardMsg = self._truncateMessage(standardMsg, diff)
                 self.fail(self._formatMessage(msg, standardMsg))
 
     def assertXMLNotEqual(self, xml1, xml2, msg=None):
@@ -915,10 +939,19 @@ class TransactionTestCase(SimpleTestCase):
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
+            inhibit_post_migrate = (
+                self.available_apps is not None
+                or (
+                    # Inhibit the post_migrate signal when using serialized
+                    # rollback to avoid trying to recreate the serialized data.
+                    self.serialized_rollback and
+                    hasattr(connections[db_name], '_test_serialized_contents')
+                )
+            )
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_migrate=self.available_apps is not None)
+                         inhibit_post_migrate=inhibit_post_migrate)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
@@ -999,7 +1032,11 @@ class TestCase(TransactionTestCase):
                     except Exception:
                         cls._rollback_atomics(cls.cls_atomics)
                         raise
-        cls.setUpTestData()
+        try:
+            cls.setUpTestData()
+        except Exception:
+            cls._rollback_atomics(cls.cls_atomics)
+            raise
 
     @classmethod
     def tearDownClass(cls):

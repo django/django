@@ -4,7 +4,7 @@ import unittest
 import warnings
 from types import ModuleType
 
-from django.conf import LazySettings, Settings, settings
+from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -101,7 +101,6 @@ class ClassDecoratedTestCaseSuper(TestCase):
     """
     Dummy class for testing max recursion error in child class call to
     super().  Refs #17011.
-
     """
     def test_max_recursion_error(self):
         pass
@@ -130,7 +129,6 @@ class ClassDecoratedTestCase(ClassDecoratedTestCaseSuper):
         """
         Overriding a method on a super class and then calling that method on
         the super class should not trigger infinite recursion. See #17011.
-
         """
         try:
             super(ClassDecoratedTestCase, self).test_max_recursion_error()
@@ -441,6 +439,31 @@ class IsOverriddenTest(SimpleTestCase):
         self.assertFalse(settings.is_overridden('ALLOWED_HOSTS'))
         with override_settings(ALLOWED_HOSTS=[]):
             self.assertTrue(settings.is_overridden('ALLOWED_HOSTS'))
+
+    def test_unevaluated_lazysettings_repr(self):
+        lazy_settings = LazySettings()
+        expected = '<LazySettings [Unevaluated]>'
+        self.assertEqual(repr(lazy_settings), expected)
+
+    def test_evaluated_lazysettings_repr(self):
+        lazy_settings = LazySettings()
+        module = os.environ.get(ENVIRONMENT_VARIABLE)
+        expected = '<LazySettings "%s">' % module
+        # Force evaluation of the lazy object.
+        lazy_settings.APPEND_SLASH
+        self.assertEqual(repr(lazy_settings), expected)
+
+    def test_usersettingsholder_repr(self):
+        lazy_settings = LazySettings()
+        lazy_settings.configure(APPEND_SLASH=False)
+        expected = '<UserSettingsHolder>'
+        self.assertEqual(repr(lazy_settings._wrapped), expected)
+
+    def test_settings_repr(self):
+        module = os.environ.get(ENVIRONMENT_VARIABLE)
+        lazy_settings = Settings(module)
+        expected = '<Settings "%s">' % module
+        self.assertEqual(repr(lazy_settings), expected)
 
 
 class TestListSettings(unittest.TestCase):

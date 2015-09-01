@@ -45,6 +45,8 @@ details on these changes.
 
 * The ``GeoManager`` and ``GeoQuerySet`` classes will be removed.
 
+* The ``django.contrib.gis.geoip`` module will be removed.
+
 * The ``supports_recursion`` check for template loaders will be removed from:
 
   * ``django.template.engine.Engine.find_template()``
@@ -88,6 +90,9 @@ details on these changes.
 * ``django.template.loaders.eggs.Loader`` will be removed.
 
 * The ``current_app`` parameter to the ``contrib.auth`` views will be removed.
+
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` will be removed.
 
 .. _deprecation-removed-in-1.10:
 

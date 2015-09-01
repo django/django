@@ -346,7 +346,7 @@ example::
    use one of the ``add_message`` family of methods. It does not hide failures
    that may occur for other reasons.
 
-Adding messages in Class Based Views
+Adding messages in class-based views
 ------------------------------------
 
 .. class:: views.SuccessMessageMixin
@@ -388,8 +388,10 @@ method.
         success_message = "%(calculated_field)s was created successfully"
 
         def get_success_message(self, cleaned_data):
-            return self.success_message % dict(cleaned_data,
-                                               calculated_field=self.object.calculated_field)
+            return self.success_message % dict(
+                cleaned_data,
+                calculated_field=self.object.calculated_field,
+            )
 
 Expiration of messages
 ======================

@@ -8,7 +8,7 @@ from django.db.migrations.state import ProjectState
 from django.db.models.fields import NOT_PROVIDED
 from django.db.transaction import atomic
 from django.db.utils import IntegrityError
-from django.test import override_settings
+from django.test import override_settings, skipUnlessDBFeature
 from django.utils import six
 
 from .models import FoodManager, FoodQuerySet
@@ -1114,7 +1114,7 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards("test_alflpk", editor, new_state, project_state)
 
-    @unittest.skipUnless(connection.features.supports_foreign_keys, "No FK support")
+    @skipUnlessDBFeature('supports_foreign_keys')
     def test_alter_field_pk_fk(self):
         """
         Tests the AlterField operation on primary keys changes any FKs pointing to it.

@@ -625,7 +625,7 @@ Arguments sent with this signal:
 
 ``sender``
     The database wrapper class -- i.e.
-    ``django.db.backends.postgresql_psycopg2.DatabaseWrapper`` or
+    ``django.db.backends.postgresql.DatabaseWrapper`` or
     ``django.db.backends.mysql.DatabaseWrapper``, etc.
 
 ``connection``

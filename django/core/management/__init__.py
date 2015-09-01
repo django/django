@@ -14,7 +14,7 @@ from django.core.management.base import (
     BaseCommand, CommandError, CommandParser, handle_default_options,
 )
 from django.core.management.color import color_style
-from django.utils import lru_cache, six
+from django.utils import autoreload, lru_cache, six
 from django.utils._os import npath, upath
 
 
@@ -177,8 +177,14 @@ class ManagementUtility(object):
         try:
             app_name = commands[subcommand]
         except KeyError:
-            # This might trigger ImproperlyConfigured (masked in get_commands)
-            settings.INSTALLED_APPS
+            if os.environ.get('DJANGO_SETTINGS_MODULE'):
+                # If `subcommand` is missing due to misconfigured settings, the
+                # following line will retrigger an ImproperlyConfigured exception
+                # (get_commands() swallows the original one) so the user is
+                # informed about it.
+                settings.INSTALLED_APPS
+            else:
+                sys.stderr.write("No Django settings specified.\n")
             sys.stderr.write("Unknown command: %r\nType '%s help' for usage.\n" %
                 (subcommand, self.prog_name))
             sys.exit(1)
@@ -302,7 +308,20 @@ class ManagementUtility(object):
                 settings.configure()
 
         if settings.configured:
-            django.setup()
+            # Start the auto-reloading dev server even if the code is broken.
+            # The hardcoded condition is a code smell but we can't rely on a
+            # flag on the command class because we haven't located it yet.
+            if subcommand == 'runserver' and '--noreload' not in self.argv:
+                try:
+                    autoreload.check_errors(django.setup)()
+                except Exception:
+                    # The exception will be raised later in the child process
+                    # started by the autoreloader.
+                    pass
+
+            # In all other cases, django.setup() is required to succeed.
+            else:
+                django.setup()
 
         self.autocomplete()
 

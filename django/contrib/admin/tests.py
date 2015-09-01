@@ -45,6 +45,13 @@ class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
         from selenium.webdriver.support.wait import WebDriverWait
         WebDriverWait(self.selenium, timeout).until(callback)
 
+    def wait_for_popup(self, num_windows=2, timeout=10):
+        """
+        Block until `num_windows` are present (usually 2, but can be
+        overridden in the case of pop-ups opening other pop-ups).
+        """
+        self.wait_until(lambda d: len(d.window_handles) == num_windows, timeout)
+
     def wait_loaded_tag(self, tag_name, timeout=10):
         """
         Helper function that blocks until the element with the given tag name

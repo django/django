@@ -159,16 +159,16 @@ class FunctionTests(SimpleTestCase):
             'www.mystore.com/30%OffCoupons</a>!',
         )
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Caf%C3%A9'),
-            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Caf%C3%A9</a>',
+            urlize('https://en.wikipedia.org/wiki/Caf%C3%A9'),
+            '<a href="https://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Caf%C3%A9</a>',
         )
 
     def test_unicode(self):
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Café'),
-            '<a href="http://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Café</a>',
+            urlize('https://en.wikipedia.org/wiki/Café'),
+            '<a href="https://en.wikipedia.org/wiki/Caf%C3%A9" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Café</a>',
         )
 
     def test_parenthesis(self):
@@ -176,14 +176,14 @@ class FunctionTests(SimpleTestCase):
         #11911 - Check urlize keeps balanced parentheses
         """
         self.assertEqual(
-            urlize('http://en.wikipedia.org/wiki/Django_(web_framework)'),
-            '<a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>',
+            urlize('https://en.wikipedia.org/wiki/Django_(web_framework)'),
+            '<a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>',
         )
         self.assertEqual(
-            urlize('(see http://en.wikipedia.org/wiki/Django_(web_framework))'),
-            '(see <a href="http://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
-            'http://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
+            urlize('(see https://en.wikipedia.org/wiki/Django_(web_framework))'),
+            '(see <a href="https://en.wikipedia.org/wiki/Django_(web_framework)" rel="nofollow">'
+            'https://en.wikipedia.org/wiki/Django_(web_framework)</a>)',
         )
 
     def test_nofollow(self):

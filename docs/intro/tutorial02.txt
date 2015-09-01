@@ -26,7 +26,7 @@ settings:
 
 * :setting:`ENGINE <DATABASE-ENGINE>` -- Either
   ``'django.db.backends.sqlite3'``,
-  ``'django.db.backends.postgresql_psycopg2'``,
+  ``'django.db.backends.postgresql'``,
   ``'django.db.backends.mysql'``, or
   ``'django.db.backends.oracle'``. Other backends are :ref:`also available
   <third-party-notes>`.
@@ -206,13 +206,13 @@ look like this:
     :filename: mysite/settings.py
 
     INSTALLED_APPS = [
+        'polls',
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
         'django.contrib.messages',
         'django.contrib.staticfiles',
-        'polls',
     ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:

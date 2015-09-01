@@ -176,7 +176,7 @@ Django's Git repository:
     commit message, GitHub will close the pull request, but the Trac plugin
     will also close the same numbered ticket in Trac.
 
-.. _Trac plugin: https://github.com/aaugustin/trac-github
+.. _Trac plugin: https://github.com/trac-hacks/trac-github
 
 * If your commit references a ticket in the Django `ticket tracker`_ but
   does *not* close the ticket, include the phrase "Refs #xxxxx", where "xxxxx"

@@ -12,7 +12,7 @@ from django.contrib.admin.utils import (
     label_for_field, lookup_field, quote,
 )
 from django.db import DEFAULT_DB_ALIAS, models
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.utils import six
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
@@ -94,7 +94,7 @@ class NestedObjectsTests(TestCase):
         n.collect([Vehicle.objects.first()])
 
 
-class UtilsTests(TestCase):
+class UtilsTests(SimpleTestCase):
 
     empty_value = '-empty-'
 
@@ -115,7 +115,7 @@ class UtilsTests(TestCase):
 
         simple_function = lambda obj: SIMPLE_FUNCTION
 
-        site_obj = Site.objects.create(domain=SITE_NAME)
+        site_obj = Site(domain=SITE_NAME)
         article = Article(
             site=site_obj,
             title=TITLE_TEXT,
@@ -166,7 +166,7 @@ class UtilsTests(TestCase):
         # Regression test for #13071: NullBooleanField has special
         # handling.
         display_value = display_for_field(None, models.NullBooleanField(), self.empty_value)
-        expected = '<img src="%sadmin/img/icon-unknown.gif" alt="None" />' % settings.STATIC_URL
+        expected = '<img src="%sadmin/img/svg/icon-unknown.svg" alt="None" />' % settings.STATIC_URL
         self.assertHTMLEqual(display_value, expected)
 
         display_value = display_for_field(None, models.DecimalField(), self.empty_value)

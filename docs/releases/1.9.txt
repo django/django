@@ -115,6 +115,16 @@ though:
 
 .. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
 
+New styling for ``contrib.admin``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The admin sports a modern, flat design with new SVG icons which look perfect
+on HiDPI screens. It still provides a fully-functional experience to `YUI's
+A-grade`_ browsers. Older browser may experience varying levels of graceful
+degradation.
+
+.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -178,6 +188,13 @@ Minor features
   makes it possible to use ``REMOTE_USER`` for setups where the header is only
   populated on login pages instead of every request in the session.
 
+:mod:`django.contrib.contenttypes`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* It's now possible to use
+  :attr:`~django.db.models.Options.order_with_respect_to` with a
+  ``GenericForeignKey``.
+
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -204,6 +221,9 @@ Minor features
   <django.contrib.gis.gdal.GDALRaster.transform>` method allows transforming a
   raster into a different spatial reference system by specifying a target
   ``srid``.
+
+* The new :class:`~django.contrib.gis.geoip2.GeoIP2` class allows using
+  MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -235,7 +255,10 @@ Minor features
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The session model and ``SessionStore`` classes for the ``db`` and
+  ``cached_db`` backends are refactored to allow a custom database session
+  backend to build upon them. See
+  :ref:`extending-database-backed-session-engines` for more details.
 
 :mod:`django.contrib.sitemaps`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -323,8 +346,11 @@ Forms
 Generic Views
 ^^^^^^^^^^^^^
 
-* Class based views generated using ``as_view()`` now have ``view_class``
+* Class-based views generated using ``as_view()`` now have ``view_class``
   and ``view_initkwargs`` attributes.
+
+* :func:`~django.utils.decorators.method_decorator` can now be used to
+  :ref:`decorate classes instead of methods <decorating-class-based-views>`.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
@@ -342,6 +368,10 @@ Internationalization
   for languages which can be written in different scripts, for example Latin
   and Cyrillic (e.g. ``be@latin``).
 
+* Added the :func:`django.views.i18n.json_catalog` view to help build a custom
+  client-side i18n library upon Django translations. It returns a JSON object
+  containing a translations catalog, formatting settings, and a plural rule.
+
 * Added the ``name_translated`` attribute to the object returned by the
   :ttag:`get_language_info` template tag. Also added a corresponding template
   filter: :tfilter:`language_name_translated`.
@@ -349,6 +379,9 @@ Internationalization
 * You can now run :djadmin:`compilemessages` from the root directory of your
   project and it will find all the app message files that were created by
   :djadmin:`makemessages`.
+
+* :djadmin:`makemessages` now calls xgettext once per locale directory rather
+  than once per translatable file. This speeds up localization builds.
 
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
@@ -443,6 +476,8 @@ Models
   :attr:`~django.db.models.SlugField.allow_unicode` argument to allow Unicode
   characters in slugs.
 
+* Added support for referencing annotations in ``QuerySet.distinct()``.
+
 CSRF
 ^^^^
 
@@ -523,6 +558,18 @@ Requests and Responses
   returning an :class:`~django.http.HttpResponseForbidden` so that
   :data:`~django.conf.urls.handler403` is invoked.
 
+* Added :meth:`HttpRequest.get_port() <django.http.HttpRequest.get_port>` to
+  fetch the originating port of the request.
+
+* Added the ``json_dumps_params`` parameter to
+  :class:`~django.http.JsonResponse` to allow passing keyword arguments to the
+  ``json.dumps()`` call used to generate the response.
+
+* The :class:`~django.middleware.common.BrokenLinkEmailsMiddleware` now
+  ignores 404s when the referer is equal to the requested URL. To circumvent
+  the empty referer check already implemented, some Web bots set the referer to
+  the requested URL.
+
 Tests
 ^^^^^
 
@@ -555,6 +602,13 @@ Validators
 
 * Added :func:`~django.core.validators.validate_unicode_slug` to validate slugs
   that may contain Unicode characters.
+
+Database backends
+^^^^^^^^^^^^^^^^^
+
+* The PostgreSQL backend (``django.db.backends.postgresql_psycopg2``) is also
+  available as ``django.db.backends.postgresql``. The old name will continue to
+  be available for backwards compatibility.
 
 Backwards incompatible changes in 1.9
 =====================================
@@ -842,11 +896,47 @@ returned a list, but an iterator is more efficient.
 Existing code that depends on ``list`` specific features, such as indexing,
 can be ported by converting the iterator into a ``list`` using ``list()``.
 
+Implicit ``QuerySet`` ``__in`` lookup removed
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In earlier versions, queries such as::
+
+    Model.objects.filter(related_id=RelatedModel.objects.all())
+
+would implicitly convert to::
+
+    Model.objects.filter(related_id__in=RelatedModel.objects.all())
+
+resulting in SQL like ``"related_id IN (SELECT id FROM ...)"``.
+
+This implicit ``__in`` no longer happens so the "IN" SQL is now "=", and if the
+subquery returns multiple results, at least some databases will throw an error.
+
+.. _admin-browser-support-19:
+
+``contrib.admin`` browser support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The admin no longer supports Internet Explorer 8 and below, as these browsers
+have reached end-of-life.
+
+CSS and images to support Internet Explorer 6 and 7 have been removed. PNG and
+GIF icons have been replaced with SVG icons, which are not supported by
+Internet Explorer 8 and earlier.
+
+The jQuery library embedded in the admin has been upgraded from version 1.11.2
+to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
+Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
+file size. If you need to support IE8 and must also use the latest version of
+Django, you can override the admin's copy of jQuery with your own by creating
+a Django application with this structure::
+
+    app/static/admin/js/vendor/
+        jquery.js
+        jquery.min.js
+
 Miscellaneous
 ~~~~~~~~~~~~~
-
-* CSS and images in ``contrib.admin`` to support Internet Explorer 6 & 7 have
-  been removed as these browsers have reached end-of-life.
 
 * The jQuery static files in ``contrib.admin`` have been moved into a
   ``vendor/jquery`` subdirectory.
@@ -911,11 +1001,24 @@ Miscellaneous
   whitespace by default. This can be disabled by setting the new
   :attr:`~django.forms.CharField.strip` argument to ``False``.
 
+* Template text that is translated and uses two or more consecutive percent
+  signs, e.g. ``"%%"``, may have a new `msgid` after ``makemessages`` is run
+  (most likely the translation will be marked fuzzy). The new ``msgid`` will be
+  marked ``"#, python-format"``.
+
 * If neither :attr:`request.current_app <django.http.HttpRequest.current_app>`
   nor :class:`Context.current_app <django.template.Context>` are set, the
   :ttag:`url` template tag will now use the namespace of the current request.
   Set ``request.current_app`` to ``None`` if you don't want to use a namespace
   hint.
+
+* The :setting:`SILENCED_SYSTEM_CHECKS` setting now silences messages of all
+  levels. Previously, messages of ``ERROR`` level or higher were printed to the
+  console.
+
+* The ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``
+  as it's unused by the application. If your project or a third-party app makes
+  use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it back.
 
 .. _deprecated-features-1.9:
 
@@ -942,7 +1045,7 @@ versions:
     {% cycle row1,row2,row3 %}
 
 Its parsing caused bugs with the current syntax, so support for the old syntax
-will be removed in Django 2.0 following an accelerated deprecation.
+will be removed in Django 1.10 following an accelerated deprecation.
 
 ``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1037,6 +1140,13 @@ As of Django 1.8, ``current_app`` is set on the ``request`` object. For
 consistency, these views will require the caller to set ``current_app`` on the
 ``request`` instead of passing it in a separate argument.
 
+``django.contrib.gis.geoip``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :mod:`django.contrib.gis.geoip2` module supersedes
+``django.contrib.gis.geoip``. The new module provides a similar API except that
+it doesn't provide the legacy GeoIP-Python API compatibility methods.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -1076,6 +1186,10 @@ Miscellaneous
 
 * ``django.template.loaders.eggs.Loader`` is deprecated as distributing
   applications as eggs is not recommended.
+
+* The ``callable_obj`` keyword argument to
+  ``SimpleTestCase.assertRaisesMessage()`` is deprecated. Pass the callable as
+  a positional argument instead.
 
 .. removed-features-1.9:
 

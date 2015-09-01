@@ -317,7 +317,6 @@ class DefusedExpatParser(_ExpatParser):
     An expat parser hardened against XML bomb attacks.
 
     Forbids DTDs, external entity references
-
     """
     def __init__(self, *args, **kwargs):
         _ExpatParser.__init__(self, *args, **kwargs)

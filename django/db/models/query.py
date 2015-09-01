@@ -843,6 +843,10 @@ class QuerySet(object):
 
         If select_related(None) is called, the list is cleared.
         """
+
+        if self._fields is not None:
+            raise TypeError("Cannot call select_related() after .values() or .values_list()")
+
         obj = self._clone()
         if fields == (None,):
             obj.query.select_related = False

@@ -19,7 +19,6 @@ class Command(RunserverCommand):
         Returns the static files serving handler wrapping the default handler,
         if static files should be served. Otherwise just returns the default
         handler.
-
         """
         handler = super(Command, self).get_handler(*args, **options)
         use_static_handler = options.get('use_static_handler', True)

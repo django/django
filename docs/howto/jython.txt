@@ -45,7 +45,7 @@ The `django-jython`_ project contains database backends and management commands
 for Django/Jython development. Note that the builtin Django backends won't work
 on top of Jython.
 
-.. _`django-jython`: http://code.google.com/p/django-jython/
+.. _`django-jython`: https://github.com/beachmachine/django-jython
 
 To install it, follow the `installation instructions`_ detailed on the project
 Web site. Also, read the `database backends`_ documentation there.

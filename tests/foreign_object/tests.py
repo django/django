@@ -1,7 +1,6 @@
 import datetime
 from operator import attrgetter
 
-from django import forms
 from django.core.exceptions import FieldError
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import translation
@@ -319,6 +318,9 @@ class MultiColumnFKTests(TestCase):
         at1_fi.save()
         at2_en = ArticleTranslation(article=a1, lang='en', title='Title', body='Lalalalala')
         at2_en.save()
+
+        self.assertEqual(Article.objects.get(pk=a1.pk).active_translation, at1_fi)
+
         with self.assertNumQueries(1):
             fetched = Article.objects.select_related('active_translation').get(
                 active_translation__title='Otsikko')
@@ -389,26 +391,3 @@ class MultiColumnFKTests(TestCase):
         """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
-
-
-class FormsTests(TestCase):
-    # ForeignObjects should not have any form fields, currently the user needs
-    # to manually deal with the foreignobject relation.
-    class ArticleForm(forms.ModelForm):
-        class Meta:
-            model = Article
-            fields = '__all__'
-
-    def test_foreign_object_form(self):
-        # A very crude test checking that the non-concrete fields do not get form fields.
-        form = FormsTests.ArticleForm()
-        self.assertIn('id_pub_date', form.as_table())
-        self.assertNotIn('active_translation', form.as_table())
-        form = FormsTests.ArticleForm(data={'pub_date': str(datetime.date.today())})
-        self.assertTrue(form.is_valid())
-        a = form.save()
-        self.assertEqual(a.pub_date, datetime.date.today())
-        form = FormsTests.ArticleForm(instance=a, data={'pub_date': '2013-01-01'})
-        a2 = form.save()
-        self.assertEqual(a.pk, a2.pk)
-        self.assertEqual(a2.pub_date, datetime.date(2013, 1, 1))

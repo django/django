@@ -57,7 +57,6 @@ Example
     class TestGeo(models.Model):
         name = models.CharField(max_length=25) # corresponds to the 'str' field
         poly = models.PolygonField(srid=4269) # we want our model in a different SRID
-        objects = models.GeoManager()
 
         def __str__(self):              # __unicode__ on Python 2
             return 'Name: %s' % self.name
