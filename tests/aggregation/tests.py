@@ -7,13 +7,12 @@ from decimal import Decimal
 from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import (
-    F, Aggregate, Avg, Count, DecimalField, DurationField, FloatField, Func,
-    IntegerField, Max, Min, Sum, Value,
+    F, Avg, Count, DecimalField, DurationField, FloatField, Func, IntegerField,
+    Max, Min, Sum, Value,
 )
-from django.test import TestCase, ignore_warnings
+from django.test import TestCase
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import six, timezone
-from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import Author, Book, Publisher, Store
 
@@ -1184,23 +1183,3 @@ class AggregateTestCase(TestCase):
         ).filter(rating_or_num_awards__gt=F('num_awards')).order_by('num_awards')
         self.assertQuerysetEqual(
             qs2, [1, 3], lambda v: v.num_awards)
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_backwards_compatibility(self):
-        from django.db.models.sql import aggregates as sql_aggregates
-
-        class SqlNewSum(sql_aggregates.Aggregate):
-            sql_function = 'SUM'
-
-        class NewSum(Aggregate):
-            name = 'Sum'
-
-            def add_to_query(self, query, alias, col, source, is_summary):
-                klass = SqlNewSum
-                aggregate = klass(
-                    col, source=source, is_summary=is_summary, **self.extra)
-                query.annotations[alias] = aggregate
-
-        qs = Author.objects.values('name').annotate(another_age=NewSum('age') + F('age'))
-        a = qs.get(name="Adrian Holovaty")
-        self.assertEqual(a['another_age'], 68)
