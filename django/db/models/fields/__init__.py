@@ -1124,7 +1124,6 @@ class CharField(Field):
         return super(CharField, self).formfield(**defaults)
 
 
-# TODO: Maybe move this into contrib, because it's specialized.
 class CommaSeparatedIntegerField(CharField):
     default_validators = [validators.validate_comma_separated_integer_list]
     description = _("Comma-separated integers")
