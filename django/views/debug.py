@@ -862,7 +862,8 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}
+    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.
@@ -1044,7 +1045,8 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """)
 
-TECHNICAL_500_TEXT_TEMPLATE = ("""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = ("""
+{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
@@ -1062,7 +1064,8 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}
+    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.
