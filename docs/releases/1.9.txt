@@ -484,6 +484,9 @@ CSRF
 * The request header's name used for CSRF authentication can be customized
   with :setting:`CSRF_HEADER_NAME`.
 
+* The new setting :setting:`CSRF_TRUSTED_ORIGINS` was added to allow cross
+  origin unsafe (e.g. ``POST``) requests under HTTPS.
+
 Signals
 ^^^^^^^
 
