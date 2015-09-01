@@ -7,7 +7,6 @@ databases). The abstraction barrier only works one way: this module has to know
 all about the internals of models in order to get the information it needs.
 """
 import copy
-import warnings
 from collections import Counter, Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
@@ -31,7 +30,6 @@ from django.db.models.sql.where import (
     AND, OR, ExtraWhere, NothingNode, WhereNode,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.tree import Node
 
@@ -213,13 +211,6 @@ class Query(object):
         if self._annotations is None:
             self._annotations = OrderedDict()
         return self._annotations
-
-    @property
-    def aggregates(self):
-        warnings.warn(
-            "The aggregates property is deprecated. Use annotations instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        return self.annotations
 
     def __str__(self):
         """
@@ -972,12 +963,6 @@ class Query(object):
             curr_opts = int_model._meta
             alias = seen[int_model] = joins[-1]
         return alias or seen[None]
-
-    def add_aggregate(self, aggregate, model, alias, is_summary):
-        warnings.warn(
-            "add_aggregate() is deprecated. Use add_annotation() instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        self.add_annotation(aggregate, alias, is_summary)
 
     def add_annotation(self, annotation, alias, is_summary=False):
         """
@@ -1818,12 +1803,6 @@ class Query(object):
         """
         target[model] = {f.attname for f in fields}
 
-    def set_aggregate_mask(self, names):
-        warnings.warn(
-            "set_aggregate_mask() is deprecated. Use set_annotation_mask() instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        self.set_annotation_mask(names)
-
     def set_annotation_mask(self, names):
         "Set the mask of annotations that will actually be returned by the SELECT"
         if names is None:
@@ -1831,12 +1810,6 @@ class Query(object):
         else:
             self.annotation_select_mask = set(names)
         self._annotation_select_cache = None
-
-    def append_aggregate_mask(self, names):
-        warnings.warn(
-            "append_aggregate_mask() is deprecated. Use append_annotation_mask() instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        self.append_annotation_mask(names)
 
     def append_annotation_mask(self, names):
         if self.annotation_select_mask is not None:
@@ -1873,13 +1846,6 @@ class Query(object):
             return self._annotation_select_cache
         else:
             return self.annotations
-
-    @property
-    def aggregate_select(self):
-        warnings.warn(
-            "aggregate_select() is deprecated. Use annotation_select() instead.",
-            RemovedInDjango110Warning, stacklevel=2)
-        return self.annotation_select
 
     @property
     def extra_select(self):
