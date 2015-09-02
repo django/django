@@ -1,6 +1,5 @@
-/* eslint strict: 0 */
-
 (function(globals) {
+    'use strict';
     var django = globals.django || (globals.django = {});
 
     django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };

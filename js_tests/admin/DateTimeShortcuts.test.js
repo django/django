@@ -1,5 +1,6 @@
 /* global module, test, DateTimeShortcuts */
-/* eslint strict: 0 */
+/* eslint global-strict: 0, strict: 0 */
+'use strict';
 
 module('admin.DateTimeShortcuts');
 
