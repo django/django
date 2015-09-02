@@ -234,7 +234,10 @@ class InspectDBTestCase(TestCase):
                      table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
                      stdout=out)
         output = out.getvalue()
-        self.assertIn("        unique_together = (('field1', 'field2'),)", output, msg='inspectdb should generate unique_together.')
+        self.assertIn(
+            "        unique_together = (('field1', 'field2'),)", output,
+            msg='inspectdb should generate unique_together.'
+        )
 
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
