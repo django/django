@@ -219,26 +219,26 @@ Fortunately, because Channels has standardised WebSocket event
 authentication, as well as using Django's session framework (which authentication
 relies on).
 
-All we need to do is add the ``websocket_auth`` decorator to our views,
+All we need to do is add the ``django_http_auth`` decorator to our views,
 and we'll get extra ``session`` and ``user`` keyword arguments we can use;
 let's make one where users can only chat to people with the same first letter
 of their username::
 
-    from channels import Channel
-    from channels.decorators import consumer, websocket_auth
+    from channels import Channel, Group
+    from channels.decorators import consumer, django_http_auth
 
     @consumer("django.websocket.connect", "django.websocket.keepalive")
-    @websocket_auth
+    @django_http_auth
     def ws_add(channel, send_channel, user, **kwargs):
         Group("chat-%s" % user.username[0]).add(send_channel)
 
     @consumer("django.websocket.receive")
-    @websocket_auth
+    @django_http_auth
     def ws_message(channel, send_channel, content, user, **kwargs):
         Group("chat-%s" % user.username[0]).send(content=content)
 
     @consumer("django.websocket.disconnect")
-    @websocket_auth
+    @django_http_auth
     def ws_disconnect(channel, send_channel, user, **kwargs):
         Group("chat-%s" % user.username[0]).discard(send_channel)
 
@@ -266,7 +266,7 @@ some other data store - sound familiar? This is what Django's session framework
 does for HTTP requests, only there it uses cookies as the lookup key rather
 than the ``send_channel``.
 
-Now, as you saw above, you can use the ``websocket_auth`` decorator to get
+Now, as you saw above, you can use the ``django_http_auth`` decorator to get
 both a ``user`` and a ``session`` variable in your message arguments - and,
 indeed, there is a ``websocket_session`` decorator that will just give you
 the ``session`` attribute.
