@@ -510,7 +510,7 @@ class ModelFormBaseTest(TestCase):
         self.assertHTMLEqual(
             str(OrderFields()),
             """<tr><th><label for="id_url">The URL:</label></th><td><input id="id_url" type="text" name="url" maxlength="40" /></td></tr>
-<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""  #NOQA
+<tr><th><label for="id_name">Name:</label></th><td><input id="id_name" type="text" name="name" maxlength="20" /></td></tr>"""  # NOQA
         )
 
     def test_orderfields2_form(self):
