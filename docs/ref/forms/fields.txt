@@ -853,14 +853,6 @@ For each field, we describe the default widget used if you don't specify
         Defaults to ``False``. If enabled, stripping will be applied before the
         regex validation.
 
-    .. deprecated:: 1.8
-
-        The optional argument ``error_message`` is also accepted for backwards
-        compatibility but will be removed in Django 1.10. The preferred way to
-        provide an error message is to use the :attr:`~Field.error_messages`
-        argument, passing a dictionary with ``'invalid'`` as a key and the error
-        message as the value.
-
 ``SlugField``
 ~~~~~~~~~~~~~
 
