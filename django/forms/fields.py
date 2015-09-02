@@ -10,7 +10,6 @@ import os
 import re
 import sys
 import uuid
-import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 
@@ -513,16 +512,6 @@ class RegexField(CharField):
         'Enter a valid value' is too generic for you.
         """
         kwargs.setdefault('strip', False)
-        # error_message is just kept for backwards compatibility:
-        if error_message is not None:
-            warnings.warn(
-                "The 'error_message' argument is deprecated. Use "
-                "Field.error_messages['invalid'] instead.",
-                RemovedInDjango110Warning, stacklevel=2
-            )
-            error_messages = kwargs.get('error_messages') or {}
-            error_messages['invalid'] = error_message
-            kwargs['error_messages'] = error_messages
         super(RegexField, self).__init__(max_length, min_length, *args, **kwargs)
         self._set_regex(regex)
 

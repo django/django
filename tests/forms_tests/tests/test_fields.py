@@ -759,13 +759,6 @@ class FieldsTests(SimpleTestCase):
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, ' 2A2')
         self.assertRaisesMessage(ValidationError, "'Enter a valid value.'", f.clean, '2A2 ')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)  # error_message deprecation
-    def test_regexfield_4(self):
-        f = RegexField('^[0-9][0-9][0-9][0-9]$', error_message='Enter a four-digit number.')
-        self.assertEqual('1234', f.clean('1234'))
-        self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, '123')
-        self.assertRaisesMessage(ValidationError, "'Enter a four-digit number.'", f.clean, 'abcd')
-
     def test_regexfield_5(self):
         f = RegexField('^[0-9]+$', min_length=5, max_length=10)
         self.assertRaisesMessage(
