@@ -130,7 +130,7 @@ details on these changes.
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
 
-* The class :class:`~django.core.management.NoArgsCommand` will be removed. Use
+* The class ``django.core.management.NoArgsCommand`` will be removed. Use
   :class:`~django.core.management.BaseCommand` instead, which takes no arguments
   by default.
 
