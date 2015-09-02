@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 from datetime import datetime
 from operator import attrgetter
 from unittest import skipUnless
@@ -75,6 +76,8 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
+        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+
         self.assertQuerysetEqual(Article.objects.iterator(),
             [
                 'Article 5',
