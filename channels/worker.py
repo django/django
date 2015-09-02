@@ -1,4 +1,4 @@
-import time
+import traceback
 
 
 class Worker(object):
@@ -22,4 +22,7 @@ class Worker(object):
             consumer = self.channel_backend.registry.consumer_for_channel(channel)
             if self.callback:
                 self.callback(channel, message)
-            consumer(channel=channel, **message)
+            try:
+                consumer(channel=channel, **message)
+            except:
+                traceback.print_exc()
