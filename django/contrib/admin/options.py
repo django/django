@@ -42,7 +42,9 @@ from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import string_concat, ugettext as _, ungettext
+from django.utils.translation import (
+    override, string_concat, ugettext as _, ungettext,
+)
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -268,10 +270,12 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             return self.view_on_site(obj)
         elif self.view_on_site and hasattr(obj, 'get_absolute_url'):
             # use the ContentType lookup if view_on_site is True
-            return reverse('admin:view_on_site', kwargs={
-                'content_type_id': get_content_type_for_model(obj).pk,
-                'object_id': obj.pk
-            })
+
+            with override(obj.language_code):
+                return reverse('admin:view_on_site', kwargs={
+                    'content_type_id': get_content_type_for_model(obj).pk,
+                    'object_id': obj.pk
+                })
 
     def get_empty_value_display(self):
         """
