@@ -42,7 +42,9 @@ from django.utils.html import escape, escapejs
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import (override, string_concat, ugettext as _, ungettext)
+from django.utils.translation import (
+    override, string_concat, ugettext as _, ungettext,
+)
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
