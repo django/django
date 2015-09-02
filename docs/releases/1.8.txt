@@ -1672,10 +1672,10 @@ will be removed in Django 1.10.
 ``GeoQuerySet`` aggregate methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The ``collect()``, ``extent()``, ``extent3d()``, ``makeline()``, and ``union()``
-aggregate methods are deprecated and should be replaced by their function-based
-aggregate equivalents (``Collect``, ``Extent``, ``Extent3D``, ``MakeLine``, and
-``Union``).
+The ``collect()``, ``extent()``, ``extent3d()``, ``make_line()``, and
+``unionagg()`` aggregate methods are deprecated and should be replaced by their
+function-based aggregate equivalents (``Collect``, ``Extent``, ``Extent3D``,
+``MakeLine``, and ``Union``).
 
 .. _deprecated-signature-of-allow-migrate:
 
