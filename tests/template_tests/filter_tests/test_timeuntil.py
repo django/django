@@ -25,7 +25,9 @@ class TimeuntilTests(TimezoneTestCase):
 
     @setup({'timeuntil03': '{{ a|timeuntil }}'})
     def test_timeuntil03(self):
-        output = self.engine.render_to_string('timeuntil03', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds=10))})
+        output = self.engine.render_to_string(
+            'timeuntil03', {'a': (datetime.now() + timedelta(hours=8, minutes=10, seconds=10))}
+        )
         self.assertEqual(output, '8\xa0hours, 10\xa0minutes')
 
     # Compare to a given parameter
@@ -53,7 +55,9 @@ class TimeuntilTests(TimezoneTestCase):
 
     @setup({'timeuntil07': '{{ earlier|timeuntil:now }}'})
     def test_timeuntil07(self):
-        output = self.engine.render_to_string('timeuntil07', {'now': self.now, 'earlier': self.now - timedelta(days=7)})
+        output = self.engine.render_to_string(
+            'timeuntil07', {'now': self.now, 'earlier': self.now - timedelta(days=7)}
+        )
         self.assertEqual(output, '0\xa0minutes')
 
     @setup({'timeuntil08': '{{ later|timeuntil }}'})
