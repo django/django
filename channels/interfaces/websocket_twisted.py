@@ -18,6 +18,7 @@ class InterfaceProtocol(WebSocketServerProtocol):
         self.channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         self.request_info = {
             "path": request.path,
+            "GET": request.params,
         }
 
     def onOpen(self):

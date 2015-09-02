@@ -8,8 +8,8 @@ def encode_request(request):
     """
     # TODO: More stuff
     value = {
-        "GET": list(request.GET.lists()),
-        "POST": list(request.POST.lists()),
+        "GET": dict(request.GET.lists()),
+        "POST": dict(request.POST.lists()),
         "COOKIES": request.COOKIES,
         "META": {k: v for k, v in request.META.items() if not k.startswith("wsgi")},
         "path": request.path,
