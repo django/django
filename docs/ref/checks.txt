@@ -80,6 +80,7 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flagging potential problems with version upgrades.
 * ``security``: Checks security related configuration.
 * ``templates``: Checks template related configuration.
+* ``caches``: Checks cache related configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -569,3 +570,12 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+
+Caches
+------
+
+The following checks verify that your :setting:`CACHES` setting is correctly
+configured:
+
+* **caches.E001**: You must define a ``'default'`` cache in your
+  :setting:`CACHES` setting.
