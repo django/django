@@ -7,14 +7,12 @@ from __future__ import unicode_literals
 
 import os
 import sys
-import warnings
 from argparse import ArgumentParser
 
 import django
 from django.core import checks
 from django.core.management.color import color_style, no_style
 from django.db import connections
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str
 
 
@@ -500,35 +498,3 @@ class LabelCommand(BaseCommand):
         string as given on the command line.
         """
         raise NotImplementedError('subclasses of LabelCommand must provide a handle_label() method')
-
-
-class NoArgsCommand(BaseCommand):
-    """
-    A command which takes no arguments on the command line.
-
-    Rather than implementing ``handle()``, subclasses must implement
-    ``handle_noargs()``; ``handle()`` itself is overridden to ensure
-    no arguments are passed to the command.
-
-    Attempting to pass arguments will raise ``CommandError``.
-    """
-    args = ''
-
-    def __init__(self):
-        warnings.warn(
-            "NoArgsCommand class is deprecated and will be removed in Django 1.10. "
-            "Use BaseCommand instead, which takes no arguments by default.",
-            RemovedInDjango110Warning
-        )
-        super(NoArgsCommand, self).__init__()
-
-    def handle(self, *args, **options):
-        if args:
-            raise CommandError("Command doesn't accept any arguments")
-        return self.handle_noargs(**options)
-
-    def handle_noargs(self, **options):
-        """
-        Perform this command's actions.
-        """
-        raise NotImplementedError('subclasses of NoArgsCommand must provide a handle_noargs() method')

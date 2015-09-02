@@ -1384,9 +1384,9 @@ arguments through ``argparse.add_argument()``. See
 ``django.core.management.NoArgsCommand``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The class :class:`~django.core.management.NoArgsCommand` is now deprecated and
-will be removed in Django 1.10. Use :class:`~django.core.management.BaseCommand`
-instead, which takes no arguments by default.
+The class ``NoArgsCommand`` is now deprecated and will be removed in Django
+1.10. Use :class:`~django.core.management.BaseCommand` instead, which takes no
+arguments by default.
 
 Listing all migrations in a project
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -352,22 +352,6 @@ Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
     Perform the command's actions for ``label``, which will be the string as
     given on the command line.
 
-.. class:: NoArgsCommand
-
-.. deprecated:: 1.8
-
-    Use :class:`BaseCommand` instead, which takes no arguments by default.
-
-A command which takes no arguments on the command line.
-
-Rather than implementing :meth:`~BaseCommand.handle`, subclasses must implement
-:meth:`~NoArgsCommand.handle_noargs`; :meth:`~BaseCommand.handle` itself is
-overridden to ensure no arguments are passed to the command.
-
-.. method:: NoArgsCommand.handle_noargs(**options)
-
-    Perform this command's actions
-
 .. _ref-command-exceptions:
 
 Command exceptions
