@@ -48,7 +48,6 @@ from django.utils.translation import (
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
-
 IS_POPUP_VAR = '_popup'
 TO_FIELD_VAR = '_to_field'
 
