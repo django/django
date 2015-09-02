@@ -25,9 +25,13 @@ class OptimizerTests(SimpleTestCase):
         expected = [repr(f.deconstruct()) for f in expected]
         self.assertEqual(expected, result)
         if exact is not None and iterations != exact:
-            raise self.failureException("Optimization did not take exactly %s iterations (it took %s)" % (exact, iterations))
+            raise self.failureException(
+                "Optimization did not take exactly %s iterations (it took %s)" % (exact, iterations)
+            )
         if less_than is not None and iterations >= less_than:
-            raise self.failureException("Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations))
+            raise self.failureException(
+                "Optimization did not take less than %s iterations (it took %s)" % (less_than, iterations)
+            )
 
     def assertDoesNotOptimize(self, operations):
         self.assertOptimizesTo(operations, operations)
@@ -280,12 +284,16 @@ class OptimizerTests(SimpleTestCase):
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
-                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+                migrations.AddField(
+                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
+                ),
             ],
             [
                 migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
                 migrations.CreateModel("LinkThrough", []),
-                migrations.AddField("Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")),
+                migrations.AddField(
+                    "Foo", "link", models.ManyToManyField("migrations.Link", through="migrations.LinkThrough")
+                ),
             ],
         )
 
