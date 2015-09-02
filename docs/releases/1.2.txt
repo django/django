@@ -358,8 +358,7 @@ Support for 3D geometry fields was added, and may be enabled
 by setting the :attr:`~django.contrib.gis.db.models.GeometryField.dim`
 keyword to 3 in your :class:`~django.contrib.gis.db.models.GeometryField`.
 The :class:`~django.contrib.gis.db.models.Extent3D` aggregate
-and :meth:`~django.contrib.gis.db.models.GeoQuerySet.extent3d` ``GeoQuerySet``
-method were added as a part of this feature.
+and ``extent3d()`` ``GeoQuerySet`` method were added as a part of this feature.
 
 The following :class:`~django.contrib.gis.db.models.GeoQuerySet`
 methods are new in 1.2:

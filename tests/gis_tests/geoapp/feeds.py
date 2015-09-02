@@ -23,8 +23,8 @@ class TestGeoRSS2(TestGeoRSS1):
     def geometry(self, obj):
         # This should attach a <georss:box> element for the extent of
         # of the cities in the database.  This tuple came from
-        # calling `City.objects.extent()` -- we can't do that call here
-        # because `extent` is not implemented for MySQL/Oracle.
+        # calling `City.objects.aggregate(Extent())` -- we can't do that call
+        # here because `Extent` is not implemented for MySQL/Oracle.
         return (-123.30, -41.32, 174.78, 48.46)
 
     def item_geometry(self, item):

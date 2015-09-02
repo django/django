@@ -13,9 +13,7 @@ from django.core.management import call_command
 from django.db import connection
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils import six
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import no_oracle, oracle, postgis, spatialite
 from .models import (
@@ -493,11 +491,9 @@ class GeoQuerySetTest(TestCase):
             self.assertIsInstance(country.envelope, Polygon)
 
     @skipUnlessDBFeature("supports_extent_aggr")
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_extent(self):
         """
-        Testing the (deprecated) `extent` GeoQuerySet method and the Extent
-        aggregate.
+        Testing the `Extent` aggregate.
         """
         # Reference query:
         # `SELECT ST_extent(point) FROM geoapp_city WHERE (name='Houston' or name='Dallas');`
@@ -505,13 +501,9 @@ class GeoQuerySetTest(TestCase):
         expected = (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
         qs = City.objects.filter(name__in=('Houston', 'Dallas'))
-        extent1 = qs.extent()
-        extent2 = qs.aggregate(Extent('point'))['point__extent']
-
-        for extent in (extent1, extent2):
-            for val, exp in zip(extent, expected):
-                self.assertAlmostEqual(exp, val, 4)
-        self.assertIsNone(City.objects.filter(name=('Smalltown')).extent())
+        extent = qs.aggregate(Extent('point'))['point__extent']
+        for val, exp in zip(extent, expected):
+            self.assertAlmostEqual(exp, val, 4)
         self.assertIsNone(City.objects.filter(name=('Smalltown')).aggregate(Extent('point'))['point__extent'])
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -651,11 +643,9 @@ class GeoQuerySetTest(TestCase):
         for ptown in [ptown1, ptown2]:
             self.assertEqual('<Point><coordinates>-104.609252,38.255001</coordinates></Point>', ptown.kml)
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_make_line(self):
         """
-        Testing the (deprecated) `make_line` GeoQuerySet method and the MakeLine
-        aggregate.
+        Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
             # Only PostGIS has support for the MakeLine aggregate. For other
@@ -666,9 +656,6 @@ class GeoQuerySetTest(TestCase):
             )
             return
 
-        # Ensuring that a `TypeError` is raised on models without PointFields.
-        self.assertRaises(TypeError, State.objects.make_line)
-        self.assertRaises(TypeError, Country.objects.make_line)
         # MakeLine on an inappropriate field returns simply None
         self.assertIsNone(State.objects.aggregate(MakeLine('poly'))['poly__makeline'])
         # Reference query:
@@ -681,11 +668,11 @@ class GeoQuerySetTest(TestCase):
         )
         # We check for equality with a tolerance of 10e-5 which is a lower bound
         # of the precisions of ref_line coordinates
-        line1 = City.objects.make_line()
-        line2 = City.objects.aggregate(MakeLine('point'))['point__makeline']
-        for line in (line1, line2):
-            self.assertTrue(ref_line.equals_exact(line, tolerance=10e-5),
-                "%s != %s" % (ref_line, line))
+        line = City.objects.aggregate(MakeLine('point'))['point__makeline']
+        self.assertTrue(
+            ref_line.equals_exact(line, tolerance=10e-5),
+            "%s != %s" % (ref_line, line)
+        )
 
     @skipUnlessDBFeature("has_num_geom_method")
     def test_num_geom(self):
@@ -863,33 +850,25 @@ class GeoQuerySetTest(TestCase):
     # but this seems unexpected and should be investigated to determine the cause.
     @skipUnlessDBFeature("has_unionagg_method")
     @no_oracle
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_unionagg(self):
         """
-        Testing the (deprecated) `unionagg` (aggregate union) GeoQuerySet method
-        and the Union aggregate.
+        Testing the `Union` aggregate.
         """
         tx = Country.objects.get(name='Texas').mpoly
         # Houston, Dallas -- Ordering may differ depending on backend or GEOS version.
         union1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)')
         union2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)')
         qs = City.objects.filter(point__within=tx)
-        self.assertRaises(TypeError, qs.unionagg, 'name')
         self.assertRaises(ValueError, qs.aggregate, Union('name'))
         # Using `field_name` keyword argument in one query and specifying an
         # order in the other (which should not be used because this is
         # an aggregate method on a spatial column)
-        u1 = qs.unionagg(field_name='point')
-        u2 = qs.order_by('name').unionagg()
-        u3 = qs.aggregate(Union('point'))['point__union']
-        u4 = qs.order_by('name').aggregate(Union('point'))['point__union']
+        u1 = qs.aggregate(Union('point'))['point__union']
+        u2 = qs.order_by('name').aggregate(Union('point'))['point__union']
         tol = 0.00001
         self.assertTrue(union1.equals_exact(u1, tol) or union2.equals_exact(u1, tol))
         self.assertTrue(union1.equals_exact(u2, tol) or union2.equals_exact(u2, tol))
-        self.assertTrue(union1.equals_exact(u3, tol) or union2.equals_exact(u3, tol))
-        self.assertTrue(union1.equals_exact(u4, tol) or union2.equals_exact(u4, tol))
         qs = City.objects.filter(name='NotACity')
-        self.assertIsNone(qs.unionagg(field_name='point'))
         self.assertIsNone(qs.aggregate(Union('point'))['point__union'])
 
     def test_within_subquery(self):
