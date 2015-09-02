@@ -5,9 +5,7 @@ import warnings
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.test import (
-    SimpleTestCase, TestCase, ignore_warnings, override_settings,
-)
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
 from django.utils.deprecation import RemovedInDjango110Warning
 from django.views.generic.base import View
@@ -152,7 +150,6 @@ class CreateViewTests(TestCase):
         self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_create_with_interpolated_redirect(self):
         res = self.client.post(
             '/edit/authors/create/interpolate_redirect/',
@@ -292,7 +289,6 @@ class UpdateViewTests(TestCase):
         self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_update_with_interpolated_redirect(self):
         a = Author.objects.create(
             name='Randall Munroe',
@@ -399,7 +395,6 @@ class DeleteViewTests(TestCase):
         self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_delete_with_interpolated_redirect(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.post('/edit/author/%d/delete/interpolate_redirect/' % a.pk)

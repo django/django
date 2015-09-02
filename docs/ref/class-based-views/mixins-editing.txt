@@ -160,12 +160,6 @@ ModelFormMixin
         example, you could use ``success_url="/polls/{slug}/"`` to
         redirect to a URL composed out of the ``slug`` field on a model.
 
-        .. versionchanged:: 1.8
-
-            Support for the new brace-based Python formatting syntax has been
-            added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 1.10.
-
     .. method:: get_form_class()
 
         Retrieve the form class to instantiate. If
@@ -258,12 +252,6 @@ DeletionMixin
         interpolated against the object's field attributes. For example, you
         could use ``success_url="/parent/{parent_id}/"`` to redirect to a URL
         composed out of the ``parent_id`` field on a model.
-
-        .. versionchanged:: 1.8
-
-            Support for the new brace-based Python formatting syntax has been
-            added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 1.10.
 
     .. method:: get_success_url()
 
