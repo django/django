@@ -11,6 +11,7 @@ class Tags(object):
     Built-in tags for internal checks.
     """
     admin = 'admin'
+    caches = 'caches'
     compatibility = 'compatibility'
     models = 'models'
     security = 'security'

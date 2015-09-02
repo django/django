@@ -29,9 +29,6 @@ __all__ = [
 
 DEFAULT_CACHE_ALIAS = 'default'
 
-if DEFAULT_CACHE_ALIAS not in settings.CACHES:
-    raise ImproperlyConfigured("You must define a '%s' cache" % DEFAULT_CACHE_ALIAS)
-
 
 def _create_cache(backend, **kwargs):
     try:
