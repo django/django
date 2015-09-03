@@ -93,7 +93,7 @@
 }
 
 .selector-add {
-    background: url(../img/svg/selector-icons.svg) 0 -96px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -96px no-repeat;
     cursor: default;
 }
 
@@ -103,7 +103,7 @@
 }
 
 .selector-remove {
-    background: url(../img/svg/selector-icons.svg) 0 -64px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -64px no-repeat;
     cursor: default;
 }
 
@@ -136,7 +136,7 @@ a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
 }
 
 a.selector-chooseall {
-    background: url(../img/svg/selector-icons.svg) right -160px no-repeat;
+    background: url(../img/selector-icons.svg) right -160px no-repeat;
     cursor: default;
 }
 
@@ -146,7 +146,7 @@ a.active.selector-chooseall {
 }
 
 a.selector-clearall {
-    background: url(../img/svg/selector-icons.svg) 0 -128px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -128px no-repeat;
     cursor: default;
 }
 
@@ -197,7 +197,7 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-add {
-    background: url(../img/svg/selector-icons.svg) 0 0 no-repeat;
+    background: url(../img/selector-icons.svg) 0 0 no-repeat;
     cursor: default;
 }
 
@@ -207,7 +207,7 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-remove {
-    background: url(../img/svg/selector-icons.svg) 0 -32px no-repeat;
+    background: url(../img/selector-icons.svg) 0 -32px no-repeat;
     cursor: default;
 }
 
@@ -217,7 +217,7 @@ a.active.selector-clearall {
 }
 
 .selector .help-icon {
-    background: url(../img/svg/icon-unknown.svg) 0 0 no-repeat;
+    background: url(../img/icon-unknown.svg) 0 0 no-repeat;
     display: inline-block;
     vertical-align: middle;
     margin: -2px 0 0 2px;
@@ -226,11 +226,11 @@ a.active.selector-clearall {
 }
 
 .selector .selector-chosen .help-icon {
-    background: url(../img/svg/icon-unknown-alt.svg) 0 0 no-repeat;
+    background: url(../img/icon-unknown-alt.svg) 0 0 no-repeat;
 }
 
 .selector .search-label-icon {
-    background: url(../img/svg/search.svg) 0 0 no-repeat;
+    background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
     height: 18px;
     width: 18px;
@@ -282,7 +282,7 @@ table p.datetime {
 }
 
 .datetimeshortcuts .clock-icon {
-    background: url(../img/svg/icon-clock.svg) 0 0 no-repeat;
+    background: url(../img/icon-clock.svg) 0 0 no-repeat;
 }
 
 .datetimeshortcuts a:hover .clock-icon {
@@ -290,7 +290,7 @@ table p.datetime {
 }
 
 .datetimeshortcuts .date-icon {
-    background: url(../img/svg/icon-calendar.svg) 0 0 no-repeat;
+    background: url(../img/icon-calendar.svg) 0 0 no-repeat;
     top: -1px;
 }
 
@@ -473,7 +473,7 @@ span.clearable-file-input label {
 
 .calendarnav-previous {
     left: 10px;
-    background: url(../img/svg/calendar-icons.svg) 0 0 no-repeat;
+    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
 }
 
 .calendarbox .calendarnav-previous:hover {
@@ -482,7 +482,7 @@ span.clearable-file-input label {
 
 .calendarnav-next {
     right: 10px;
-    background: url(../img/svg/calendar-icons.svg) 0 -30px no-repeat;
+    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
 }
 
 .calendarbox .calendarnav-next:hover {
@@ -587,7 +587,7 @@ ul.orderer li.deleted:hover, ul.orderer li.deleted a.selector:hover {
 .inline-deletelink {
     float: right;
     text-indent: -9999px;
-    background: url(../img/svg/inline-delete.svg) 0 0 no-repeat;
+    background: url(../img/inline-delete.svg) 0 0 no-repeat;
     width: 16px;
     height: 16px;
     border: 0px none;

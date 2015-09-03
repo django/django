@@ -371,7 +371,7 @@ table thead th.sorted .sortoptions a {
     width: 14px;
     height: 14px;
     display: inline-block;
-    background: url(../img/svg/sorting-icons.svg) 0 0 no-repeat;
+    background: url(../img/sorting-icons.svg) 0 0 no-repeat;
     background-size: 14px auto;
 }
 
@@ -571,18 +571,18 @@ ul.messagelist li {
     font-size: 13px;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: #dfd url(../img/svg/icon-yes.svg) 40px 12px no-repeat;
+    background: #dfd url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
     color: #333;
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/svg/icon-alert.svg) 40px 14px no-repeat;
+    background: #ffc url(../img/icon-alert.svg) 40px 14px no-repeat;
     background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/svg/icon-no.svg) 40px 12px no-repeat;
+    background: #ffefef url(../img/icon-no.svg) 40px 12px no-repeat;
     background-size: 16px auto;
 }
 
@@ -656,7 +656,7 @@ div.system-message p.system-message-title {
     padding: 4px 5px 4px 25px;
     margin: 0;
     color: #c11;
-    background: #ffefef url(../img/svg/icon-no.svg) 5px 5px no-repeat;
+    background: #ffefef url(../img/icon-no.svg) 5px 5px no-repeat;
 }
 
 .description {
@@ -687,17 +687,17 @@ div.breadcrumbs a:hover {
 
 .addlink {
     padding-left: 16px;
-    background: url(../img/svg/icon-addlink.svg) 0 1px no-repeat;
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
 .changelink, .inlinechangelink {
     padding-left: 16px;
-    background: url(../img/svg/icon-changelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
 .deletelink {
     padding-left: 16px;
-    background: url(../img/svg/icon-deletelink.svg) 0 1px no-repeat;
+    background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
 }
 
 a.deletelink:link, a.deletelink:visited {
@@ -755,12 +755,12 @@ a.deletelink:hover {
 }
 
 .object-tools a.viewsitelink, .object-tools a.golink {
-    background: #999 url(../img/svg/tooltag-arrowright.svg) 93% center no-repeat;
+    background: #999 url(../img/tooltag-arrowright.svg) 93% center no-repeat;
     padding-right: 26px;
 }
 
 .object-tools a.addlink {
-    background: #999 url(../img/svg/tooltag-add.svg) 93% center no-repeat;
+    background: #999 url(../img/tooltag-add.svg) 93% center no-repeat;
     padding-right: 26px;
 }
 
