@@ -18,24 +18,26 @@ class Command(RunserverCommand):
         return WSGIInterface(self.channel_backend)
 
     def run(self, *args, **options):
-        # Force disable reloader for now
-        options['use_reloader'] = False
+        # Run the rest
+        return super(Command, self).run(*args, **options)
+
+    def inner_run(self, *args, **options):
         # Check a handler is registered for http reqs
         self.channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         auto_import_consumers()
         if not self.channel_backend.registry.consumer_for_channel("django.wsgi.request"):
             # Register the default one
             self.channel_backend.registry.add_consumer(UrlConsumer(), ["django.wsgi.request"])
-        # Launch a worker thread
-        worker = WorkerThread(self.channel_backend)
-        worker.daemon = True
-        worker.start()
         # Note that this is the right one on the console
         self.stdout.write("Worker thread running, channels enabled")
         if self.channel_backend.local_only:
             self.stdout.write("Local channel backend detected, no remote channels support")
-        # Run the rest
-        return super(Command, self).run(*args, **options)
+        # Launch a worker thread
+        worker = WorkerThread(self.channel_backend)
+        worker.daemon = True
+        worker.start()
+        # Run rest of inner run
+        super(Command, self).inner_run(*args, **options)
 
 
 class WorkerThread(threading.Thread):
