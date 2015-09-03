@@ -19,7 +19,7 @@ class GEvent(object):
     add_event() call.
 
     For more information please see the Google Maps API Reference:
-     http://code.google.com/apis/maps/documentation/reference.html#GEvent
+     https://developers.google.com/maps/documentation/javascript/reference#event
 
     Example:
 
@@ -83,7 +83,7 @@ class GPolygon(GOverlayBase):
     """
     A Python wrapper for the Google GPolygon object.  For more information
     please see the Google Maps API Reference:
-     http://code.google.com/apis/maps/documentation/reference.html#GPolygon
+     https://developers.google.com/maps/documentation/javascript/reference#Polygon
     """
     def __init__(self, poly,
                  stroke_color='#0000ff', stroke_weight=2, stroke_opacity=1,
@@ -143,7 +143,7 @@ class GPolyline(GOverlayBase):
     """
     A Python wrapper for the Google GPolyline object.  For more information
     please see the Google Maps API Reference:
-     http://code.google.com/apis/maps/documentation/reference.html#GPolyline
+     https://developers.google.com/maps/documentation/javascript/reference#Polyline
     """
     def __init__(self, geom, color='#0000ff', weight=2, opacity=1):
         """
@@ -194,7 +194,7 @@ class GIcon(object):
     in turn, correspond to a subset of the attributes of the official GIcon
     javascript object:
 
-    http://code.google.com/apis/maps/documentation/reference.html#GIcon
+    https://developers.google.com/maps/documentation/javascript/reference#Icon
 
     Because a Google map often uses several different icons, a name field has
     been added to the required arguments.
@@ -267,7 +267,7 @@ class GMarker(GOverlayBase):
     """
     A Python wrapper for the Google GMarker object.  For more information
     please see the Google Maps API Reference:
-     http://code.google.com/apis/maps/documentation/reference.html#GMarker
+     https://developers.google.com/maps/documentation/javascript/reference#Marker
 
     Example:
 

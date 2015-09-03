@@ -60,7 +60,7 @@ very well with `nginx`_. Additionally, Django follows the WSGI spec
 
 .. _Apache: http://httpd.apache.org/
 .. _nginx: http://nginx.org/
-.. _mod_wsgi: http://code.google.com/p/modwsgi/
+.. _mod_wsgi: http://www.modwsgi.org/
 
 .. _database-installation:
 
