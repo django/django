@@ -1621,7 +1621,7 @@ attribute will change from ``True`` to ``False`` in Django 1.9.
 Using ``AuthenticationMiddleware`` without ``SessionAuthenticationMiddleware``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:class:`django.contrib.auth.middleware.SessionAuthenticationMiddleware` was
+``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` was
 added in Django 1.7. In Django 1.7.2, its functionality was moved to
 ``auth.get_user()`` and, for backwards compatibility, enabled only if
 ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` appears in

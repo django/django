@@ -106,7 +106,7 @@ Bugfixes
   (:ticket:`23950`).
 
 * Prevented the
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` from
+  ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` from
   setting a ``"Vary: Cookie"`` header on all responses (:ticket:`23939`).
 
 * Fixed a crash when adding ``blank=True`` to ``TextField()`` on MySQL

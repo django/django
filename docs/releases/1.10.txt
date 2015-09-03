@@ -349,7 +349,9 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 
 * Session verification is enabled regardless of whether or not
   ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
-  ``MIDDLEWARE_CLASSES``.
+  ``MIDDLEWARE_CLASSES``. ``SessionAuthenticationMiddleware`` no longer has
+  any purpose and can be removed from ``MIDDLEWARE_CLASSES``. It's kept as
+  a stub until Django 2.0 as a courtesy for users who don't read this note.
 
 * Private attribute ``django.db.models.Field.related`` is removed.
 

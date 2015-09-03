@@ -28,8 +28,8 @@ class SessionAuthenticationMiddleware(object):
     correspond to the user's current session authentication hash. However, it
     caused the "Vary: Cookie" header on all responses.
 
-    Now a backwards compatibility shim that enables session verification in
-    auth.get_user() if this middleware is in MIDDLEWARE_CLASSES.
+    It's now a shim to allow a single settings file to more easily support
+    multiple versions of Django. Will be RemovedInDjango20Warning.
     """
     def process_request(self, request):
         pass

@@ -1943,9 +1943,7 @@ The secret key is used for:
 
 * All :doc:`sessions </topics/http/sessions>` if you are using
   any other session backend than ``django.contrib.sessions.backends.cache``,
-  or if you use
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
-  and are using the default
+  or are using the default
   :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`.
 * All :doc:`messages </ref/contrib/messages>` if you are using
   :class:`~django.contrib.messages.storage.cookie.CookieStorage` or

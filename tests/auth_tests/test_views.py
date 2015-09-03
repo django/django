@@ -24,7 +24,7 @@ from django.core.urlresolvers import NoReverseMatch, reverse, reverse_lazy
 from django.db import connection
 from django.http import HttpRequest, QueryDict
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import TestCase, modify_settings, override_settings
+from django.test import TestCase, override_settings
 from django.test.utils import patch_logger
 from django.utils.encoding import force_text
 from django.utils.http import urlquote
@@ -506,9 +506,6 @@ class ChangePasswordTest(AuthViewsTestCase):
         self.assertURLEqual(response.url, '/password_reset/')
 
 
-@modify_settings(MIDDLEWARE_CLASSES={
-    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-})
 class SessionAuthenticationTests(AuthViewsTestCase):
     def test_user_password_change_updates_session(self):
         """
@@ -876,9 +873,6 @@ class LogoutTest(AuthViewsTestCase):
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@modify_settings(MIDDLEWARE_CLASSES={
-    'append': 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-})
 @override_settings(
     PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='auth_tests.urls_admin',

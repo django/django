@@ -773,7 +773,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         user = User.objects.get(username='super')
         user.set_unusable_password()
         user.save()
-
+        self.client.force_login(user)
         response = self.client.get(reverse('admin:index'))
         self.assertNotContains(response, reverse('admin:password_change'),
             msg_prefix='The "change password" link should not be displayed if a user does not have a usable password.')
