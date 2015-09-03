@@ -28,9 +28,6 @@ from django.forms.widgets import (
 )
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
-from django.utils.deprecation import (
-    RemovedInDjango110Warning, RenameMethodsBase,
-)
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
 from django.utils.ipv6 import clean_ipv6_address
@@ -48,13 +45,7 @@ __all__ = (
 )
 
 
-class RenameFieldMethods(RenameMethodsBase):
-    renamed_methods = (
-        ('_has_changed', 'has_changed', RemovedInDjango110Warning),
-    )
-
-
-class Field(six.with_metaclass(RenameFieldMethods, object)):
+class Field(object):
     widget = TextInput  # Default widget to use when rendering this type of Field.
     hidden_widget = HiddenInput  # Default widget to use when rendering this as "hidden".
     default_validators = []  # Default set of validators
