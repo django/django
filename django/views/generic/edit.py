@@ -1,11 +1,6 @@
-import inspect
-import warnings
-
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import models as model_forms
 from django.http import HttpResponseRedirect
-from django.utils import six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
@@ -13,28 +8,7 @@ from django.views.generic.detail import (
 )
 
 
-class FormMixinBase(type):
-    def __new__(cls, name, bases, attrs):
-        get_form = attrs.get('get_form')
-        if get_form and inspect.isfunction(get_form):
-            try:
-                inspect.getcallargs(get_form, None)
-            except TypeError:
-                warnings.warn(
-                    "`%s.%s.get_form` method must define a default value for "
-                    "its `form_class` argument." % (attrs['__module__'], name),
-                    RemovedInDjango110Warning, stacklevel=2
-                )
-
-                def get_form_with_form_class(self, form_class=None):
-                    if form_class is None:
-                        form_class = self.get_form_class()
-                    return get_form(self, form_class=form_class)
-                attrs['get_form'] = get_form_with_form_class
-        return super(FormMixinBase, cls).__new__(cls, name, bases, attrs)
-
-
-class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
+class FormMixin(ContextMixin):
     """
     A mixin that provides a way to show and handle a form in a request.
     """

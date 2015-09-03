@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 
-import warnings
-
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.client import RequestFactory
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.views.generic.base import View
 from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
@@ -57,28 +54,6 @@ class FormMixinTests(SimpleTestCase):
         self.assertIsInstance(
             FormClassTestFormMixin().get_form(), forms.Form,
             'get_form() should fallback to get_form_class() if none is provided.'
-        )
-
-    def test_get_form_missing_form_class_default_value(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.filterwarnings('always')
-
-            class MissingDefaultValue(FormMixin):
-                request = RequestFactory().get('/')
-                form_class = forms.Form
-
-                def get_form(self, form_class):
-                    return form_class(**self.get_form_kwargs())
-        self.assertEqual(len(w), 1)
-        self.assertEqual(w[0].category, RemovedInDjango110Warning)
-        self.assertEqual(
-            str(w[0].message),
-            '`generic_views.test_edit.MissingDefaultValue.get_form` method '
-            'must define a default value for its `form_class` argument.'
-        )
-
-        self.assertIsInstance(
-            MissingDefaultValue().get_form(), forms.Form,
         )
 
     def test_get_context_data(self):
