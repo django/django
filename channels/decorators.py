@@ -47,12 +47,14 @@ def http_session(func):
     @functools.wraps(func)
     def inner(*args, **kwargs):
         if "COOKIES" not in kwargs and "GET" not in kwargs:
-            print kwargs
             raise ValueError("No COOKIES or GET sent to consumer; this decorator can only be used on messages containing at least one.")
         # Make sure there's a session key
         session_key = None
         if "GET" in kwargs:
-            session_key = kwargs['GET'].get("session_key")
+            try:
+                session_key = kwargs['GET'].get("session_key", [])[0]
+            except IndexError:
+                pass
         if "COOKIES" in kwargs and session_key is None:
             session_key = kwargs['COOKIES'].get(settings.SESSION_COOKIE_NAME)
         # Make a session storage
