@@ -194,7 +194,7 @@ Once you have a compiled :class:`Template` object, you can render a context
 with it. You can reuse the same template to render it several times with
 different contexts.
 
-.. class:: Context(dict_=None, current_app=_current_app_undefined)
+.. class:: Context(dict_=None)
 
     This class lives at ``django.template.Context``. The constructor takes
     two optional arguments:
@@ -204,11 +204,6 @@ different contexts.
     * The name of the current application. This application name is used
       to help :ref:`resolve namespaced URLs<topics-http-reversing-url-namespaces>`.
       If you're not using namespaced URLs, you can ignore this argument.
-
-      .. deprecated:: 1.8
-
-          The ``current_app`` argument is deprecated. If you need it, you must
-          now use a :class:`RequestContext` instead of a :class:`Context`.
 
     For details, see :ref:`playing-with-context` below.
 

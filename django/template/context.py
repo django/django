@@ -1,13 +1,8 @@
-import warnings
 from contextlib import contextmanager
 from copy import copy
 
-from django.utils.deprecation import RemovedInDjango110Warning
-
 # Hard-coded processor for easier use of CSRF protection.
 _builtin_context_processors = ('django.template.context_processors.csrf',)
-
-_current_app_undefined = object()
 
 
 class ContextPopException(Exception):
@@ -135,16 +130,8 @@ class BaseContext(object):
 
 class Context(BaseContext):
     "A stack container for variable context"
-    def __init__(self, dict_=None, autoescape=True,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None):
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of Context is deprecated. Use "
-                "RequestContext and set the current_app attribute of its "
-                "request instead.", RemovedInDjango110Warning, stacklevel=2)
+    def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
-        self._current_app = current_app
         self.use_l10n = use_l10n
         self.use_tz = use_tz
         self.template_name = "unknown"
@@ -153,14 +140,6 @@ class Context(BaseContext):
         # templates -- during rendering, see bind_template.
         self.template = None
         super(Context, self).__init__(dict_)
-
-    @property
-    def current_app(self):
-        return None if self._current_app is _current_app_undefined else self._current_app
-
-    @property
-    def is_current_app_set(self):
-        return self._current_app is not _current_app_undefined
 
     @contextmanager
     def bind_template(self, template):
@@ -222,19 +201,9 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None,
-            current_app=_current_app_undefined,
-            use_l10n=None, use_tz=None):
-        # current_app isn't passed here to avoid triggering the deprecation
-        # warning in Context.__init__.
+    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None):
         super(RequestContext, self).__init__(
             dict_, use_l10n=use_l10n, use_tz=use_tz)
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of RequestContext is deprecated. "
-                "Set the current_app attribute of its request instead.",
-                RemovedInDjango110Warning, stacklevel=2)
-        self._current_app = current_app
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)

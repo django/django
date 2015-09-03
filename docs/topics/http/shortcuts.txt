@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, current_app=_current_app_undefined, dirs=_dirs_undefined, using=None)
+.. function:: render(request, template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, dirs=_dirs_undefined, using=None)
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -66,16 +66,6 @@ Optional arguments
 
 ``status``
     The status code for the response. Defaults to ``200``.
-
-``current_app``
-    A hint indicating which application contains the current view. See the
-    :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
-    for more information.
-
-    .. deprecated:: 1.8
-
-       The ``current_app`` argument is deprecated. Instead you should set
-       ``request.current_app``.
 
 ``using``
     The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for

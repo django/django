@@ -189,7 +189,7 @@ TemplateResponse objects
 Methods
 -------
 
-.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, current_app=None, charset=None, using=None)
+.. method:: TemplateResponse.__init__(request, template, context=None, content_type=None, status=None, charset=None, using=None)
 
     Instantiates a :class:`~django.template.response.TemplateResponse` object
     with the given request, template, context, content type, HTTP status, and
@@ -223,16 +223,6 @@ Methods
 
     ``status``
         The HTTP status code for the response.
-
-    ``current_app``
-        A hint indicating which application contains the current view. See the
-        :ref:`namespaced URL resolution strategy <topics-http-reversing-url-namespaces>`
-        for more information.
-
-        .. deprecated:: 1.8
-
-           The ``current_app`` argument is deprecated. Instead you should set
-           ``request.current_app``.
 
     ``charset``
         The charset in which the response will be encoded. If not given it will

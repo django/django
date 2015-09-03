@@ -109,19 +109,3 @@ def render_view_with_status(request):
 def render_view_with_using(request):
     using = request.GET.get('using')
     return render(request, 'shortcuts/using.html', using=using)
-
-
-def render_view_with_current_app(request):
-    return render(request, 'shortcuts/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, current_app="foobar_app")
-
-
-def render_view_with_current_app_conflict(request):
-    # This should fail because we don't passing both a current_app and
-    # context_instance:
-    return render(request, 'shortcuts/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, current_app="foobar_app", context_instance=RequestContext(request))
