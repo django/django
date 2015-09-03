@@ -528,6 +528,15 @@ class Plot(models.Model):
 
 
 @python_2_unicode_compatible
+class Bookmark(models.Model):
+    name = models.CharField(max_length=60)
+    tag = GenericRelation(FunkyTag, related_query_name='bookmark')
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class PlotDetails(models.Model):
     details = models.CharField(max_length=100)
     plot = models.OneToOneField(Plot, models.CASCADE)
