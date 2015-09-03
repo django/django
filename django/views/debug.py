@@ -669,7 +669,7 @@ TECHNICAL_500_TEMPLATE = ("""
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request.build_absolute_uri|escape }}</td>
+      <td>{{ request.get_raw_uri|escape }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -849,7 +849,7 @@ Environment:
 
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.build_absolute_uri|escape }}
+Request URL: {{ request.get_raw_uri|escape }}
 {% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
@@ -1048,7 +1048,7 @@ TECHNICAL_500_TEXT_TEMPLATE = ("""{% firstof exception_type 'Report' %}{% if req
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.build_absolute_uri }}{% endif %}
+Request URL: {{ request.get_raw_uri }}{% endif %}
 Django Version: {{ django_version_info }}
 Python Executable: {{ sys_executable }}
 Python Version: {{ sys_version_info }}

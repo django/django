@@ -68,8 +68,11 @@ class HttpRequest(object):
             '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
         )
 
-    def get_host(self):
-        """Returns the HTTP host using the environment or request headers."""
+    def _get_raw_host(self):
+        """
+        Return the HTTP host using the environment or request headers. Skip
+        allowed hosts protection, so may return an insecure host.
+        """
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
                 'HTTP_X_FORWARDED_HOST' in self.META):
@@ -82,6 +85,11 @@ class HttpRequest(object):
             server_port = self.get_port()
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
+        return host
+
+    def get_host(self):
+        """Return the HTTP host using the environment or request headers."""
+        host = self._get_raw_host()
 
         # There is no hostname validation when DEBUG=True
         if settings.DEBUG:
@@ -137,6 +145,17 @@ class HttpRequest(object):
             else:
                 raise
         return value
+
+    def get_raw_uri(self):
+        """
+        Return an absolute URI from variables available in this request. Skip
+        allowed hosts protection, so may return insecure URI.
+        """
+        return '{scheme}://{host}{path}'.format(
+            scheme=self.scheme,
+            host=self._get_raw_host(),
+            path=self.get_full_path(),
+        )
 
     def build_absolute_uri(self, location=None):
         """
