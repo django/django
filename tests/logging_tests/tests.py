@@ -352,6 +352,25 @@ class AdminEmailHandlerTest(SimpleTestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['manager@example.com'])
 
+    @override_settings(ALLOWED_HOSTS='example.com')
+    def test_disallowed_host_doesnt_crash(self):
+        admin_email_handler = self.get_admin_email_handler(self.logger)
+        old_include_html = admin_email_handler.include_html
+
+        # Text email
+        admin_email_handler.include_html = False
+        try:
+            self.client.get('/', HTTP_HOST='evil.com')
+        finally:
+            admin_email_handler.include_html = old_include_html
+
+        # HTML email
+        admin_email_handler.include_html = True
+        try:
+            self.client.get('/', HTTP_HOST='evil.com')
+        finally:
+            admin_email_handler.include_html = old_include_html
+
 
 class SettingsConfigTest(AdminScriptTestCase):
     """
