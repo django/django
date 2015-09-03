@@ -923,7 +923,6 @@ by 3rd parties that allow you to use other databases with Django:
 * `Microsoft SQL Server`_
 * Firebird_
 * ODBC_
-* ADSDB_
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
@@ -931,8 +930,7 @@ unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
 
 .. _SAP SQL Anywhere: https://github.com/sqlanywhere/sqlany-django
-.. _IBM DB2: http://code.google.com/p/ibm-db/
+.. _IBM DB2: https://pypi.python.org/pypi/ibm_db/
 .. _Microsoft SQL Server: http://django-mssql.readthedocs.org/en/latest/
 .. _Firebird: https://github.com/maxirobaina/django-firebird
 .. _ODBC: https://github.com/lionheart/django-pyodbc/
-.. _ADSDB: http://code.google.com/p/adsdb-django/

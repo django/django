@@ -1,5 +1,5 @@
 # This code was mostly based on ipaddr-py
-# Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
+# Copyright 2007 Google Inc. https://github.com/google/ipaddr-py
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
 from django.utils.six.moves import range
