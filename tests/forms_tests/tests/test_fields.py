@@ -44,10 +44,9 @@ from django.forms import (
     Textarea, TextInput, TimeField, TypedChoiceField, TypedMultipleChoiceField,
     URLField, UUIDField, ValidationError, Widget, forms,
 )
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils import formats, six, translation
 from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.duration import duration_string
 
 try:
@@ -568,14 +567,11 @@ class FieldsTests(SimpleTestCase):
         f = DateField()
         self.assertRaisesMessage(ValidationError, "'Enter a valid date.'", f.clean, 'a\x00b')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)  # for _has_changed
     def test_datefield_changed(self):
         format = '%d/%m/%Y'
         f = DateField(input_formats=[format])
         d = datetime.date(2007, 9, 17)
         self.assertFalse(f.has_changed(d, '17/09/2007'))
-        # Test for deprecated behavior _has_changed
-        self.assertFalse(f._has_changed(d, '17/09/2007'))
 
     def test_datefield_strptime(self):
         """Test that field.strptime doesn't raise an UnicodeEncodeError (#16123)"""
