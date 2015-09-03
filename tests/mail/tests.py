@@ -86,11 +86,18 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
         self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com'])
 
-        # Testing with Bcc
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'], cc=['cc@example.com', 'cc.other@example.com'], bcc=['bcc@example.com'])
+    def test_bcc(self):
+        """Regression test for #25341"""
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], bcc=['bcc@example.com'])
         message = email.message()
-        self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
-        self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com'])
+        self.assertEqual(message['Bcc'], 'bcc@example.com')
+        self.assertEqual(email.recipients(), ['to@example.com', 'bcc@example.com'])
+
+        # Testing with multiple Bcc
+        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com'], bcc=['bcc@example.com', 'bcc.other@example.com'])
+        message = email.message()
+        self.assertEqual(message['Bcc'], 'bcc@example.com, bcc.other@example.com')
+        self.assertEqual(email.recipients(), ['to@example.com', 'bcc@example.com', 'bcc.other@example.com'])
 
     def test_reply_to(self):
         email = EmailMessage(
