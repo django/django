@@ -277,8 +277,8 @@ alias::
 
 By default, the Python DB API will return results without their field
 names, which means you end up with a ``list`` of values, rather than a
-``dict``. At a small performance cost, you can return results as a
-``dict`` by using something like this::
+``dict``. At a small performance and memory cost, you can return results
+as a ``dict`` by using something like this::
 
     def dictfetchall(cursor):
         "Returns all rows from a cursor as a dict"
@@ -288,15 +288,49 @@ names, which means you end up with a ``list`` of values, rather than a
             for row in cursor.fetchall()
         ]
 
-Here is an example of the difference between the two::
+It is also possible to use ``namedtuple`` from the Python standard library
+module `collections`__.  A ``namedtuple`` is a tuple-like object that has
+fields accessible by attribute lookup as well as being indexable and iterable.
+Results are immutable and accessible by field names or indices, which might be
+useful::
+
+    from collections import namedtuple
+    def namedtuplefetchall(cursor):
+        "Returns all rows from a cursor as a namedtuple"
+        desc = cursor.description
+        nt_result = namedtuple(
+            'Result', [col[0] for col in desc]
+        )
+        return [
+            nt_result(*row) for row in cursor.fetchall()
+        ]
+
+__ https://docs.python.org/2.7/library/collections.html#collections.namedtuple
+
+Here is an example of the difference between the three::
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
-    >>> cursor.fetchall()
-    ((54360982L, None), (54360880L, None))
+    >>> results = cursor.fetchall()
+    >>> results
+    ((54360982, None), (54360880, None))
+    >>> results[0][0]
+    54360982
 
     >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
-    >>> dictfetchall(cursor)
-    [{'parent_id': None, 'id': 54360982L}, {'parent_id': None, 'id': 54360880L}]
+    >>> results = dictfetchall(cursor)
+    >>> results
+    [{'parent_id': None, 'id': 54360982}, {'parent_id': None, 'id': 54360880}]
+    >>> results[0]['id']
+    54360982
+
+    >>> cursor.execute("SELECT id, parent_id FROM test LIMIT 2");
+    >>> results = namedtuplefetchall(cursor)
+    >>> results
+    [Result(id=54360982, parent_id=None), Result(id=54360880, parent_id=None)]
+    >>> results[0].id
+    54360982
+    >>> results[0][0]
+    54360982
 
 Connections and cursors
 -----------------------
