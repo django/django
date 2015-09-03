@@ -103,18 +103,8 @@ class ShortcutTests(SimpleTestCase):
         self.assertEqual(response.content, b'Jinja2\n')
 
     @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_with_current_app(self):
-        response = self.client.get('/render/current_app/')
-        self.assertEqual(response.context.request.current_app, "foobar_app")
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_render_with_dirs(self):
         response = self.client.get('/render/dirs/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'spam eggs\n')
         self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_with_current_app_conflict(self):
-        with self.assertRaises(ValueError):
-            self.client.get('/render/current_app_conflict/')

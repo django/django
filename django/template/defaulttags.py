@@ -432,23 +432,11 @@ class URLNode(Node):
             smart_text(k, 'ascii'): v.resolve(context)
             for k, v in self.kwargs.items()
         }
-
         view_name = self.view_name.resolve(context)
-
         try:
-            current_app = context.request.current_app
+            current_app = context.request.resolver_match.namespace
         except AttributeError:
-            # Leave only the else block when the deprecation path for
-            # Context.current_app completes in Django 1.10.
-            # Can also remove the Context.is_current_app_set property.
-            if context.is_current_app_set:
-                current_app = context.current_app
-            else:
-                try:
-                    current_app = context.request.resolver_match.namespace
-                except AttributeError:
-                    current_app = None
-
+            current_app = None
         # Try to look up the URL twice: once given the view name, and again
         # relative to what we guess is the "main" app. If they both fail,
         # re-raise the NoReverseMatch unless we're using the

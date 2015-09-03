@@ -166,13 +166,6 @@ def inclusion_only_unlimited_args_from_template(*args):
 inclusion_only_unlimited_args_from_template.anything = "Expected inclusion_only_unlimited_args_from_template __dict__"
 
 
-@register.inclusion_tag('test_incl_tag_current_app.html', takes_context=True)
-def inclusion_tag_current_app(context):
-    """Expected inclusion_tag_current_app __doc__"""
-    return {}
-inclusion_tag_current_app.anything = "Expected inclusion_tag_current_app __dict__"
-
-
 @register.inclusion_tag('test_incl_tag_use_l10n.html', takes_context=True)
 def inclusion_tag_use_l10n(context):
     """Expected inclusion_tag_use_l10n __doc__"""

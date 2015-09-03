@@ -282,11 +282,6 @@ class TemplateResponseTest(SimpleTestCase):
         response = TemplateResponse(request, 'template_tests/using.html', using='jinja2').render()
         self.assertEqual(response.content, b'Jinja2\n')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_custom_app(self):
-        self._response('{{ foo }}', current_app="foobar")
-        self.assertEqual(self._request.current_app, 'foobar')
-
     def test_pickling(self):
         # Create a template response. The context is
         # known to be unpickleable (e.g., a function).
@@ -310,8 +305,12 @@ class TemplateResponseTest(SimpleTestCase):
 
         # ...and the unpickled response doesn't have the
         # template-related attributes, so it can't be re-rendered
-        template_attrs = ('template_name', 'context_data',
-            '_post_render_callbacks', '_request', '_current_app')
+        template_attrs = (
+            'template_name',
+            'context_data',
+            '_post_render_callbacks',
+            '_request',
+        )
         for attr in template_attrs:
             self.assertFalse(hasattr(unpickled_response, attr))
 

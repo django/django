@@ -18,6 +18,4 @@ urlpatterns = [
     url(r'^render/dirs/$', views.render_with_dirs),
     url(r'^render/status/$', views.render_view_with_status),
     url(r'^render/using/$', views.render_view_with_using),
-    url(r'^render/current_app/$', views.render_view_with_current_app),
-    url(r'^render/current_app_conflict/$', views.render_view_with_current_app_conflict),
 ]

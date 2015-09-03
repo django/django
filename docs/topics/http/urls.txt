@@ -680,13 +680,6 @@ the fully qualified name into parts and then tries the following lookup:
    setting the current application on the :attr:`request.current_app
    <django.http.HttpRequest.current_app>` attribute.
 
-   .. versionchanged:: 1.8
-
-      In previous versions of Django, you had to set the ``current_app``
-      attribute on any :class:`~django.template.Context` or
-      :class:`~django.template.RequestContext` that is used to render a
-      template.
-
    .. versionchanged:: 1.9
 
       Previously, the :ttag:`url` template tag did not use the namespace of the

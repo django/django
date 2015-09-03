@@ -6,7 +6,7 @@ from django.utils.deprecation import RemovedInDjango110Warning
 
 from .backends.django import Template as BackendTemplate
 from .base import Template
-from .context import Context, RequestContext, _current_app_undefined
+from .context import Context, RequestContext
 from .loader import get_template, select_template
 
 
@@ -190,19 +190,10 @@ class SimpleTemplateResponse(HttpResponse):
 
 
 class TemplateResponse(SimpleTemplateResponse):
-    rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request', '_current_app']
+    rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
 
     def __init__(self, request, template, context=None, content_type=None,
-            status=None, current_app=_current_app_undefined, charset=None,
-            using=None):
-        # As a convenience we'll allow callers to provide current_app without
-        # having to avoid needing to create the RequestContext directly
-        if current_app is not _current_app_undefined:
-            warnings.warn(
-                "The current_app argument of TemplateResponse is deprecated. "
-                "Set the current_app attribute of its request instead.",
-                RemovedInDjango110Warning, stacklevel=2)
-            request.current_app = current_app
+            status=None, charset=None, using=None):
         super(TemplateResponse, self).__init__(
             template, context, content_type, status, charset, using)
         self._request = request
