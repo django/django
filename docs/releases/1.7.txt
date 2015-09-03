@@ -435,9 +435,8 @@ Minor features
   method was added and if your :setting:`AUTH_USER_MODEL` inherits from
   :class:`~django.contrib.auth.models.AbstractBaseUser`, changing a user's
   password now invalidates old sessions if the
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` is
-  enabled. See :ref:`session-invalidation-on-password-change` for more details
-  including upgrade considerations when enabling this new middleware.
+  ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` is
+  enabled. See :ref:`session-invalidation-on-password-change` for more details.
 
 ``django.contrib.formtools``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1455,7 +1454,7 @@ Miscellaneous
   when the input is not valid UTF-8.
 
 * With the addition of the
-  :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware` to
+  ``django.contrib.auth.middleware.SessionAuthenticationMiddleware`` to
   the default project template (pre-1.7.2 only), a database must be created
   before accessing a page using :djadmin:`runserver`.
 

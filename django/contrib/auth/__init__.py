@@ -173,8 +173,7 @@ def get_user(request):
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
             # Verify the session
-            if ('django.contrib.auth.middleware.SessionAuthenticationMiddleware'
-                    in settings.MIDDLEWARE_CLASSES and hasattr(user, 'get_session_auth_hash')):
+            if hasattr(user, 'get_session_auth_hash'):
                 session_hash = request.session.get(HASH_SESSION_KEY)
                 session_hash_verified = session_hash and constant_time_compare(
                     session_hash,
@@ -196,8 +195,7 @@ def get_permission_codename(action, opts):
 
 def update_session_auth_hash(request, user):
     """
-    Updating a user's password logs out all sessions for the user if
-    django.contrib.auth.middleware.SessionAuthenticationMiddleware is enabled.
+    Updating a user's password logs out all sessions for the user.
 
     This function takes the current request and the updated user object from
     which the new session hash will be derived and updates the session hash
