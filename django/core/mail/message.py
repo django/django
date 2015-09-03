@@ -259,6 +259,8 @@ class EmailMessage(object):
         msg['To'] = self.extra_headers.get('To', ', '.join(map(force_text, self.to)))
         if self.cc:
             msg['Cc'] = ', '.join(map(force_text, self.cc))
+        if self.bcc:
+            msg['Bcc'] = ', '.join(map(force_text, self.bcc))
         if self.reply_to:
             msg['Reply-To'] = self.extra_headers.get('Reply-To', ', '.join(map(force_text, self.reply_to)))
 
