@@ -349,7 +349,10 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_non_gfk_ct_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_field points to a field that isn't part of a GenericForeignKey"
+        """
+        A GenericInlineModelAdmin raises problems if the ct_field points to a field that isn't part of a
+        GenericForeignKey
+        """
 
         class InfluenceInline(GenericStackedInline):
             model = Influence
@@ -361,7 +364,10 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                "'admin_checks.Influence' has no GenericForeignKey using content type field 'name' and object ID field 'object_id'.",
+                (
+                    "'admin_checks.Influence' has no GenericForeignKey using content type field 'name' and object ID "
+                    "field 'object_id'."
+                ),
                 hint=None,
                 obj=InfluenceInline,
                 id='admin.E304',
@@ -370,7 +376,10 @@ class SystemChecksTestCase(SimpleTestCase):
         self.assertEqual(errors, expected)
 
     def test_generic_inline_model_admin_non_gfk_fk_field(self):
-        "A GenericInlineModelAdmin raises problems if the ct_fk_field points to a field that isn't part of a GenericForeignKey"
+        """
+        A GenericInlineModelAdmin raises problems if the ct_fk_field points to a field that isn't part of a
+        GenericForeignKey
+        """
 
         class InfluenceInline(GenericStackedInline):
             model = Influence
@@ -382,7 +391,10 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin.check(model=Song)
         expected = [
             checks.Error(
-                "'admin_checks.Influence' has no GenericForeignKey using content type field 'content_type' and object ID field 'name'.",
+                (
+                    "'admin_checks.Influence' has no GenericForeignKey using content type field 'content_type' and "
+                    "object ID field 'name'."
+                ),
                 hint=None,
                 obj=InfluenceInline,
                 id='admin.E304',
@@ -401,8 +413,10 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = RawIdNonexistingAdmin.check(model=Album)
         expected = [
             checks.Error(
-                ("The value of 'raw_id_fields[0]' refers to 'nonexisting', which is "
-                 "not an attribute of 'admin_checks.Album'."),
+                (
+                    "The value of 'raw_id_fields[0]' refers to 'nonexisting', which is not an attribute of "
+                    "'admin_checks.Album'."
+                ),
                 hint=None,
                 obj=RawIdNonexistingAdmin,
                 id='admin.E002',

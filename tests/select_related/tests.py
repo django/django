@@ -53,7 +53,11 @@ class SelectRelatedTests(TestCase):
         extra queries
         """
         with self.assertNumQueries(1):
-            person = Species.objects.select_related('genus__family__order__klass__phylum__kingdom__domain').get(name="sapiens")
+            person = (
+                Species.objects
+                .select_related('genus__family__order__klass__phylum__kingdom__domain')
+                .get(name="sapiens")
+            )
             domain = person.genus.family.order.klass.phylum.kingdom.domain
             self.assertEqual(domain.name, 'Eukaryota')
 

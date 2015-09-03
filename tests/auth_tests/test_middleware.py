@@ -38,7 +38,8 @@ class TestSessionAuthenticationMiddleware(TestCase):
         self.assertEqual(session_key, self.request.session.session_key)
 
     def test_changed_password_invalidates_session_with_middleware(self):
-        with self.modify_settings(MIDDLEWARE_CLASSES={'append': ['django.contrib.auth.middleware.SessionAuthenticationMiddleware']}):
+        with self.modify_settings(
+                MIDDLEWARE_CLASSES={'append': ['django.contrib.auth.middleware.SessionAuthenticationMiddleware']}):
             # After password change, user should be anonymous
             self.user.set_password('new_password')
             self.user.save()

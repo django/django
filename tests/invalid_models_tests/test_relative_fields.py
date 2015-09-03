@@ -357,7 +357,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_symmetric_self_reference_with_intermediate_table_and_through_fields(self):
-        """Using through_fields in a m2m with an intermediate model shouldn't mask its incompatibility with symmetry."""
+        """
+        Using through_fields in a m2m with an intermediate model shouldn't mask its incompatibility with symmetry.
+        """
         class Person(models.Model):
             # Explicit symmetrical=True.
             friends = models.ManyToManyField('self',
@@ -1333,7 +1335,9 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             pass
 
         class Event(models.Model):
-            invitees = models.ManyToManyField(Fan, through='Invitation', through_fields=('invalid_field_1', 'invalid_field_2'))
+            invitees = models.ManyToManyField(
+                Fan, through='Invitation', through_fields=('invalid_field_1', 'invalid_field_2')
+            )
 
         class Invitation(models.Model):
             event = models.ForeignKey(Event, models.CASCADE)

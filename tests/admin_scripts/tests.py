@@ -61,7 +61,8 @@ class AdminScriptTestCase(unittest.TestCase):
                 'ROOT_URLCONF',
                 'SECRET_KEY',
                 'TEST_RUNNER',  # We need to include TEST_RUNNER, otherwise we get a compatibility warning.
-                'MIDDLEWARE_CLASSES',  # We need to include MIDDLEWARE_CLASSES, otherwise we get a compatibility warning.
+                # We need to include MIDDLEWARE_CLASSES, otherwise we get a compatibility warning.
+                'MIDDLEWARE_CLASSES',
             ]
             for s in exports:
                 if hasattr(settings, s):
@@ -955,21 +956,36 @@ class ManageAlternateSettings(AdminScriptTestCase):
         "alternate: manage.py can execute user commands if settings are provided as argument"
         args = ['noargs_command', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', 'alternate_s"
+                "ettings'), ('traceback', False), ('verbosity', 1)]"
+            )
+        )
         self.assertNoOutput(err)
 
     def test_custom_command_with_environment(self):
         "alternate: manage.py can execute user commands if settings are provided in environment"
         args = ['noargs_command']
         out, err = self.run_manage(args, 'alternate_settings')
-        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('tra"
+                "ceback', False), ('verbosity', 1)]"
+            )
+        )
         self.assertNoOutput(err)
 
     def test_custom_command_output_color(self):
         "alternate: manage.py output syntax color can be deactivated with the `--no-color` option"
         args = ['noargs_command', '--no-color', '--settings=alternate_settings']
         out, err = self.run_manage(args)
-        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE: noargs_command options=[('no_color', True), ('pythonpath', None), ('settings', 'alternate_se"
+                "ttings'), ('traceback', False), ('verbosity', 1)]"
+            )
+        )
         self.assertNoOutput(err)
 
 
@@ -1651,7 +1667,12 @@ class CommandTypes(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE: noargs_command options=[('no_color', False), ('pythonpath', None), ('settings', None), ('tra"
+                "ceback', False), ('verbosity', 1)]"
+            )
+        )
 
     def test_noargs_with_args(self):
         "NoArg Commands raise an error if an argument is provided"
@@ -1665,7 +1686,12 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
-        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('ver"
+                "bosity', 1)]"
+            )
+        )
 
     def test_app_command_no_apps(self):
         "User AppCommands raise an error when no app name is provided"
@@ -1679,9 +1705,19 @@ class CommandTypes(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.auth, options=")
-        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('ver"
+                "bosity', 1)]"
+            )
+        )
         self.assertOutput(out, "EXECUTE:AppCommand name=django.contrib.contenttypes, options=")
-        self.assertOutput(out, ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                ", options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('ver"
+                "bosity', 1)]"
+            )
+        )
 
     def test_app_command_invalid_app_label(self):
         "User AppCommands can execute when a single app name is provided"
@@ -1700,7 +1736,12 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings'"
+                ", None), ('traceback', False), ('verbosity', 1)]"
+            )
+        )
 
     def test_label_command_no_label(self):
         "User LabelCommands raise an error if no label is provided"
@@ -1713,8 +1754,18 @@ class CommandTypes(AdminScriptTestCase):
         args = ['label_command', 'testlabel', 'anotherlabel']
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
-        self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
+        self.assertOutput(
+            out, (
+                "EXECUTE:LabelCommand label=testlabel, options=[('no_color', False), ('pythonpath', None), ('settings'"
+                ", None), ('traceback', False), ('verbosity', 1)]"
+            )
+        )
+        self.assertOutput(
+            out, (
+                "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settin"
+                "gs', None), ('traceback', False), ('verbosity', 1)]"
+            )
+        )
 
 
 class Discovery(SimpleTestCase):
@@ -1785,7 +1836,13 @@ class ArgumentOrder(AdminScriptTestCase):
     def _test(self, args, option_b="'2'"):
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
-        self.assertOutput(out, "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option_b', %s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', False), ('verbosity', 1)]" % option_b)
+        self.assertOutput(
+            out, (
+                "EXECUTE:BaseCommand labels=('testlabel',), options=[('no_color', False), ('option_a', 'x'), ('option"
+                "_b', %s), ('option_c', '3'), ('pythonpath', None), ('settings', 'alternate_settings'), ('traceback', "
+                "False), ('verbosity', 1)]"
+            ) % option_b
+        )
 
 
 @override_settings(ROOT_URLCONF='admin_scripts.urls')
@@ -1898,7 +1955,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, 'run.py')))
 
     def test_custom_project_template_from_tarball_by_url(self):
-        "Make sure the startproject management command is able to use a different project template from a tarball via a url"
+        """
+        Make sure the startproject management command is able to use a different project template from a tarball via a
+        url
+        """
         template_url = '%s/custom_templates/project_template.tgz' % self.live_server_url
 
         args = ['startproject', '--template', template_url, 'urltestproject']
@@ -1962,7 +2022,10 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.write_settings('alternate_settings.py')
         self.addCleanup(self.remove_settings, 'alternate_settings.py')
         template_path = os.path.join(custom_templates_dir, 'project_template')
-        args = ['custom_startproject', '--template', template_path, 'another_project', 'project_dir', '--extra', '<&>', '--settings=alternate_settings']
+        args = [
+            'custom_startproject', '--template', template_path, 'another_project', 'project_dir', '--extra', '<&>',
+            '--settings=alternate_settings'
+        ]
         testproject_dir = os.path.join(test_dir, 'project_dir')
         os.mkdir(testproject_dir)
         self.addCleanup(shutil.rmtree, testproject_dir)
@@ -1987,7 +2050,9 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertFalse(os.path.exists(testproject_dir))
 
     def test_custom_project_template_with_non_ascii_templates(self):
-        "Ticket 18091: Make sure the startproject management command is able to render templates with non-ASCII content"
+        """
+        Ticket 18091: Make sure the startproject management command is able to render templates with non-ASCII content
+        """
         template_path = os.path.join(custom_templates_dir, 'project_template')
         args = ['startproject', '--template', template_path, '--extension=txt', 'customtestproject']
         testproject_dir = os.path.join(test_dir, 'customtestproject')

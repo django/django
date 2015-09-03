@@ -363,7 +363,8 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed(template_name='template_used/base.html'):
                 pass
 
-        with six.assertRaisesRegex(self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
+        with six.assertRaisesRegex(
+                self, AssertionError, r'^template_used/base\.html.*template_used/alternative\.html$'):
             with self.assertTemplateUsed('template_used/base.html'):
                 render_to_string('template_used/alternative.html')
 
@@ -527,7 +528,7 @@ class HTMLEqualTests(SimpleTestCase):
         <tr><th>
             <label for="id_birthday">Birthday:</label></th><td><input type="text" name="birthday" value="1940-10-9" id="id_birthday" />
         </td></tr>
-        """)
+        """)  # NOQA
 
         self.assertHTMLEqual(
             """<!DOCTYPE html>
@@ -645,7 +646,9 @@ class HTMLEqualTests(SimpleTestCase):
 
     def test_unicode_handling(self):
         response = HttpResponse('<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>')
-        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(
+            response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True
+        )
 
 
 class JSONEqualTests(SimpleTestCase):
@@ -805,9 +808,17 @@ class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ['Enter a valid email address.']
         self.assertFieldOutput(EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': error_invalid + ['Another error']})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid})
-        self.assertRaises(AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'}, {'aaa': ['Come on, gimme some well formatted data, dude.']})
+        self.assertRaises(
+            AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'},
+            {'aaa': error_invalid + ['Another error']}
+        )
+        self.assertRaises(
+            AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'Wrong output'}, {'aaa': error_invalid}
+        )
+        self.assertRaises(
+            AssertionError, self.assertFieldOutput, EmailField, {'a@a.com': 'a@a.com'},
+            {'aaa': ['Come on, gimme some well formatted data, dude.']}
+        )
 
     def test_custom_required_message(self):
         class MyCustomField(IntegerField):

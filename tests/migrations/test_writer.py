@@ -441,7 +441,9 @@ class WriterTests(SimpleTestCase):
             "operations": [
                 migrations.CreateModel("MyModel", tuple(fields.items()), options, (models.Model,)),
                 migrations.CreateModel("MyModel2", tuple(fields.items()), bases=(models.Model,)),
-                migrations.CreateModel(name="MyModel3", fields=tuple(fields.items()), options=options, bases=(models.Model,)),
+                migrations.CreateModel(
+                    name="MyModel3", fields=tuple(fields.items()), options=options, bases=(models.Model,)
+                ),
                 migrations.DeleteModel("MyModel"),
                 migrations.AddField("OtherModel", "datetimefield", fields["datetimefield"]),
             ],

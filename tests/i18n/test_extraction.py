@@ -156,7 +156,9 @@ class BasicExtractorTests(ExtractorTests):
 
             # Comments in templates
             self.assertIn('#. Translators: This comment should be extracted', po_contents)
-            self.assertIn("#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents)
+            self.assertIn(
+                "#. Translators: Django comment block for translators\n#. string's meaning unveiled", po_contents
+            )
             self.assertIn('#. Translators: One-line translator comment #1', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #1\n#. continued here.', po_contents)
             self.assertIn('#. Translators: One-line translator comment #2', po_contents)
@@ -165,8 +167,15 @@ class BasicExtractorTests(ExtractorTests):
             self.assertIn('#. Translators: Two-line translator comment #3\n#. continued here.', po_contents)
             self.assertIn('#. Translators: One-line translator comment #4', po_contents)
             self.assertIn('#. Translators: Two-line translator comment #4\n#. continued here.', po_contents)
-            self.assertIn('#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö', po_contents)
-            self.assertIn('#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. continued here.', po_contents)
+            self.assertIn(
+                '#. Translators: One-line translator comment #5 -- with non ASCII characters: áéíóúö', po_contents
+            )
+            self.assertIn(
+                (
+                    '#. Translators: Two-line translator comment #5 -- with non ASCII characters: áéíóúö\n#. '
+                    'continued here.'
+                ), po_contents
+            )
 
     def test_blocktrans_trimmed(self):
         os.chdir(self.test_dir)
@@ -188,12 +197,16 @@ class BasicExtractorTests(ExtractorTests):
 
     def test_extraction_error(self):
         os.chdir(self.test_dir)
-        self.assertRaises(SyntaxError, management.call_command, 'makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
+        self.assertRaises(
+            SyntaxError, management.call_command, 'makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0
+        )
         with self.assertRaises(SyntaxError) as context_manager:
             management.call_command('makemessages', locale=[LOCALE], extensions=['tpl'], verbosity=0)
         six.assertRegex(
-            self, str(context_manager.exception),
-            r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_error\.tpl, line 3\)'
+            self, str(context_manager.exception), (
+                r'Translation blocks must not include other block tags: blocktrans \(file templates[/\\]template_with_'
+                r'error\.tpl, line 3\)'
+            )
         )
         # Check that the temporary file was cleaned up
         self.assertFalse(os.path.exists('./templates/template_with_error.tpl.py'))
@@ -273,16 +286,22 @@ class BasicExtractorTests(ExtractorTests):
             for w in ws:
                 self.assertTrue(issubclass(w.category, TranslatorCommentWarning))
             six.assertRegex(
-                self, str(ws[0].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates[/\\]comments.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
+                self, str(ws[0].message), (
+                    r"The translator-targeted comment 'Translators: ignored i18n comment #1' \(file templates[/\\]comm"
+                    r"ents.thtml, line 4\) was ignored, because it wasn't the last item on the line\."
+                )
             )
             six.assertRegex(
-                self, str(ws[1].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates[/\\]comments.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
+                self, str(ws[1].message), (
+                    r"The translator-targeted comment 'Translators: ignored i18n comment #3' \(file templates[/\\]comm"
+                    r"ents.thtml, line 6\) was ignored, because it wasn't the last item on the line\."
+                )
             )
             six.assertRegex(
-                self, str(ws[2].message),
-                r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates[/\\]comments.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
+                self, str(ws[2].message), (
+                    r"The translator-targeted comment 'Translators: ignored i18n comment #4' \(file templates[/\\]comm"
+                    r"ents.thtml, line 8\) was ignored, because it wasn't the last item on the line\."
+                )
             )
         # Now test .po file contents
         self.assertTrue(os.path.exists(self.PO_FILE))
@@ -552,7 +571,12 @@ class NoWrapExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
-            self.assertMsgId('This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap option.', po_contents)
+            self.assertMsgId(
+                (
+                    'This literal should also be included wrapped or not wrapped depending on the use of the --no-wrap'
+                    ' option.'
+                ), po_contents
+            )
 
     def test_no_wrap_disabled(self):
         os.chdir(self.test_dir)
@@ -560,7 +584,12 @@ class NoWrapExtractorTests(ExtractorTests):
         self.assertTrue(os.path.exists(self.PO_FILE))
         with open(self.PO_FILE, 'r') as fp:
             po_contents = force_text(fp.read())
-            self.assertMsgId('""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the --no-wrap option."', po_contents, use_quotes=False)
+            self.assertMsgId(
+                (
+                    '""\n"This literal should also be included wrapped or not wrapped depending on the "\n"use of the '
+                    '--no-wrap option."'
+                ), po_contents, use_quotes=False
+            )
 
 
 class LocationCommentsTests(ExtractorTests):

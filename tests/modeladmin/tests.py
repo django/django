@@ -1026,9 +1026,11 @@ class ListDisplayLinksCheckTests(CheckTestCase):
             list_display_links = ('non_existent_field',)
 
         self.assertIsInvalid(
-            ValidationTestModelAdmin, ValidationTestModel,
-            "The value of 'list_display_links[0]' refers to 'non_existent_field', which is not defined in 'list_display'.",
-            'admin.E111')
+            ValidationTestModelAdmin, ValidationTestModel, (
+                "The value of 'list_display_links[0]' refers to 'non_existent_field', which is not defined in 'list_di"
+                "splay'."
+            ), 'admin.E111'
+        )
 
     def test_missing_in_list_display(self):
         class ValidationTestModelAdmin(ModelAdmin):
@@ -1241,9 +1243,10 @@ class OrderingCheckTests(CheckTestCase):
 
         self.assertIsInvalid(
             ValidationTestModelAdmin,
-            ValidationTestModel,
-            "The value of 'ordering[0]' refers to 'non_existent_field', which is not an attribute of 'modeladmin.ValidationTestModel'.",
-            'admin.E033',
+            ValidationTestModel, (
+                "The value of 'ordering[0]' refers to 'non_existent_field', which is not an attribute of 'modeladmin.V"
+                "alidationTestModel'."
+            ), 'admin.E033'
         )
 
     def test_random_marker_not_alone(self):
