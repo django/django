@@ -32,13 +32,6 @@ class ShortcutTests(SimpleTestCase):
         self.assertEqual(response.content, b'FOO.BAR..\n')
         self.assertEqual(response['Content-Type'], 'application/x-rendertest')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_to_response_with_dirs(self):
-        response = self.client.get('/render_to_response/dirs/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'spam eggs\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-
     def test_render_to_response_with_status(self):
         response = self.client.get('/render_to_response/status/')
         self.assertEqual(response.status_code, 403)
@@ -101,10 +94,3 @@ class ShortcutTests(SimpleTestCase):
         self.assertEqual(response.content, b'DTL\n')
         response = self.client.get('/render/using/?using=jinja2')
         self.assertEqual(response.content, b'Jinja2\n')
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_with_dirs(self):
-        response = self.client.get('/render/dirs/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'spam eggs\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')

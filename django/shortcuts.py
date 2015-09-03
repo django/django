@@ -12,7 +12,7 @@ from django.http import (
 )
 from django.template import RequestContext, loader
 from django.template.engine import (
-    _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
+    _context_instance_undefined, _dictionary_undefined
 )
 from django.utils import six
 from django.utils.encoding import force_text
@@ -21,14 +21,13 @@ from django.utils.functional import Promise
 
 def render_to_response(template_name, context=None,
                        context_instance=_context_instance_undefined,
-                       content_type=None, status=None, dirs=_dirs_undefined,
+                       content_type=None, status=None,
                        dictionary=_dictionary_undefined, using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
     if (context_instance is _context_instance_undefined
-            and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
         content = loader.render_to_string(template_name, context, using=using)
@@ -36,7 +35,7 @@ def render_to_response(template_name, context=None,
     else:
         # Some deprecated arguments were passed - use the legacy code path
         content = loader.render_to_string(
-            template_name, context, context_instance, dirs, dictionary,
+            template_name, context, context_instance, dictionary,
             using=using)
 
     return HttpResponse(content, content_type, status)
@@ -45,7 +44,7 @@ def render_to_response(template_name, context=None,
 def render(request, template_name, context=None,
            context_instance=_context_instance_undefined,
            content_type=None, status=None,
-           dirs=_dirs_undefined, dictionary=_dictionary_undefined,
+           dictionary=_dictionary_undefined,
            using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
@@ -53,7 +52,6 @@ def render(request, template_name, context=None,
     Uses a RequestContext by default.
     """
     if (context_instance is _context_instance_undefined
-            and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
         # In Django 1.10, request should become a positional argument.
@@ -66,7 +64,7 @@ def render(request, template_name, context=None,
         else:
             context_instance = RequestContext(request)
         content = loader.render_to_string(
-            template_name, context, context_instance, dirs, dictionary,
+            template_name, context, context_instance, dictionary,
             using=using)
 
     return HttpResponse(content, content_type, status)

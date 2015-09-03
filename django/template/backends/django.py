@@ -10,7 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.template import TemplateDoesNotExist
 from django.template.context import Context, RequestContext, make_context
-from django.template.engine import Engine, _dirs_undefined
+from django.template.engine import Engine
 from django.template.library import InvalidTemplateLibrary
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango110Warning
@@ -35,9 +35,9 @@ class DjangoTemplates(BaseEngine):
     def from_string(self, template_code):
         return Template(self.engine.from_string(template_code), self)
 
-    def get_template(self, template_name, dirs=_dirs_undefined):
+    def get_template(self, template_name):
         try:
-            return Template(self.engine.get_template(template_name, dirs), self)
+            return Template(self.engine.get_template(template_name), self)
         except TemplateDoesNotExist as exc:
             reraise(exc, self)
 

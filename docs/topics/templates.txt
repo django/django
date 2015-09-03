@@ -95,7 +95,7 @@ Usage
 
 The ``django.template.loader`` module defines two functions to load templates.
 
-.. function:: get_template(template_name, dirs=_dirs_undefined, using=None)
+.. function:: get_template(template_name, using=None)
 
     This function loads the template with the given name and returns a
     ``Template`` object.
@@ -115,10 +115,6 @@ The ``django.template.loader`` module defines two functions to load templates.
     If you want to restrict the search to a particular template engine, pass
     the engine's :setting:`NAME <TEMPLATES-NAME>` in the ``using`` argument.
 
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
-
     .. versionchanged:: 1.8
 
        The ``using`` parameter was added.
@@ -128,15 +124,11 @@ The ``django.template.loader`` module defines two functions to load templates.
         ``get_template()`` returns a backend-dependent ``Template`` instead
         of a :class:`django.template.Template`.
 
-.. function:: select_template(template_name_list, dirs=_dirs_undefined, using=None)
+.. function:: select_template(template_name_list, using=None)
 
     ``select_template()`` is just like ``get_template()``, except it takes a
     list of template names. It tries each name in order and returns the first
     template that exists.
-
-    .. deprecated:: 1.8
-
-       The ``dirs`` parameter was deprecated.
 
     .. versionchanged:: 1.8
 

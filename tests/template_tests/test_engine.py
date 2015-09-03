@@ -89,28 +89,3 @@ class LoaderTests(SimpleTestCase):
 
         template = engine.get_template('priority/foo.html')
         self.assertEqual(template.render(Context()), 'priority\n')
-
-
-@ignore_warnings(category=RemovedInDjango110Warning)
-class TemplateDirsOverrideTests(SimpleTestCase):
-    DIRS = ((OTHER_DIR, ), [OTHER_DIR])
-
-    def setUp(self):
-        self.engine = Engine()
-
-    def test_render_to_string(self):
-        for dirs in self.DIRS:
-            self.assertEqual(
-                self.engine.render_to_string('test_dirs.html', dirs=dirs),
-                'spam eggs\n',
-            )
-
-    def test_get_template(self):
-        for dirs in self.DIRS:
-            template = self.engine.get_template('test_dirs.html', dirs=dirs)
-            self.assertEqual(template.render(Context()), 'spam eggs\n')
-
-    def test_select_template(self):
-        for dirs in self.DIRS:
-            template = self.engine.select_template(['test_dirs.html'], dirs=dirs)
-            self.assertEqual(template.render(Context()), 'spam eggs\n')
