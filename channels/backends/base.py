@@ -20,8 +20,8 @@ class BaseChannelBackend(object):
     # Causes errors if you try to run workers/interfaces separately with it.
     local_only = False
 
-    def __init__(self, expiry=60):
-        self.registry = ConsumerRegistry()
+    def __init__(self, routing, expiry=60):
+        self.registry = ConsumerRegistry(routing)
         self.expiry = expiry
 
     def send(self, channel, message):

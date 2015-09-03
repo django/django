@@ -17,14 +17,15 @@ channel if you don't provide another consumer that listens to it - remember,
 only one consumer can listen to any given channel.
 
 As a very basic example, let's write a consumer that overrides the built-in
-handling and handles every HTTP request directly. Make a new project, a new
-app, and put this in a ``consumers.py`` file in the app::
+handling and handles every HTTP request directly. This isn't something you'd
+usually do in a project, but it's a good illustration of how channels
+now underlie every part of Django.
+
+Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
 
     from channels import Channel
-    from channels.decorators import consumer
     from django.http import HttpResponse
 
-    @consumer("django.wsgi.request")
     def http_consumer(response_channel, path, **kwargs):
         response = HttpResponse("Hello world! You asked for %s" % path)
         Channel(response_channel).send(**response.channel_encode())
@@ -36,6 +37,30 @@ are in a key-value format. There are ``channel_decode()`` and
 but here we just take two of the request variables directly as keyword
 arguments for simplicity.
 
+Now, go into your ``settings.py`` file, and set up a channel backend; by default,
+Django will just use a local backend and route HTTP requests to the normal
+URL resolver (we'll come back to backends in a minute).
+
+For now, we want to override the *channel routing* so that, rather than going
+to the URL resolver and our normal view stack, all HTTP requests go to our
+custom consumer we wrote above. Here's what that looks like::
+
+    CHANNEL_BACKENDS = {
+        "default": {
+            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
+            "ROUTING": {
+                "django.wsgi.request": "myproject.myapp.consumers.http_consumer",
+            },
+        },
+    }
+
+As you can see, this is a little like Django's ``DATABASES`` setting; there are
+named channel backends, with a default one called ``default``. Each backend
+needs a class specified which powers it - we'll come to the options there later -
+and a routing scheme, which can either be defined directly as a dict or as
+a string pointing to a dict in another file (if you'd rather keep it outside
+settings).
+
 If you start up ``python manage.py runserver`` and go to
 ``http://localhost:8000``, you'll see that, rather than a default Django page,
 you get the Hello World response, so things are working. If you don't see
@@ -44,12 +69,22 @@ a response, check you :doc:`installed Channels correctly <installation>`.
 Now, that's not very exciting - raw HTTP responses are something Django can
 do any time. Let's try some WebSockets, and make a basic chat server!
 
-Delete that consumer from above - we'll need the normal Django view layer to
-serve templates later - and make this WebSocket consumer instead::
+Delete that consumer and its routing - we'll want the normal Django view layer to
+serve HTTP requests from now on - and make this WebSocket consumer instead::
 
-    @consumer("django.websocket.connect")
-    def ws_connect(channel, send_channel, **kwargs):
+    def ws_add(channel, send_channel, **kwargs):
         Group("chat").add(send_channel)
+
+Hook it up to the ``django.websocket.connect`` channel like this::
+
+    CHANNEL_BACKENDS = {
+        "default": {
+            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
+            "ROUTING": {
+                "django.websocket.connect": "myproject.myapp.consumers.ws_add",
+            },
+        },
+    }
 
 Now, let's look at what this is doing. It's tied to the
 ``django.websocket.connect`` channel, which means that it'll get a message
@@ -71,22 +106,25 @@ so we can hook that up to re-add the channel (it's safe to add the channel to
 a group it's already in - similarly, it's safe to discard a channel from a
 group it's not in)::
 
-    @consumer("django.websocket.keepalive")
+    # Connected to django.websocket.keepalive
     def ws_keepalive(channel, send_channel, **kwargs):
         Group("chat").add(send_channel)
 
 Of course, this is exactly the same code as the ``connect`` handler, so let's
-just combine them::
+just route both channels to the same consumer::
 
-    @consumer("django.websocket.connect", "django.websocket.keepalive")
-    def ws_add(channel, send_channel, **kwargs):
-        Group("chat").add(send_channel)
+    ...
+    "ROUTING": {
+        "django.websocket.connect": "myproject.myapp.consumers.ws_add",
+        "django.websocket.keepalive": "myproject.myapp.consumers.ws_add",
+    },
+    ...
 
 And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
 
-    @consumer("django.websocket.disconnect")
+    # Connected to django.websocket.disconnect
     def ws_disconnect(channel, send_channel, **kwargs):
         Group("chat").discard(send_channel)
 
@@ -96,19 +134,32 @@ we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
 
     from channels import Channel, Group
-    from channels.decorators import consumer
 
-    @consumer("django.websocket.connect", "django.websocket.keepalive")
+    # Connected to django.websocket.connect and django.websocket.keepalive
     def ws_add(channel, send_channel, **kwargs):
         Group("chat").add(send_channel)
 
-    @consumer("django.websocket.receive")
+    # Connected to django.websocket.receive
     def ws_message(channel, send_channel, content, **kwargs):
         Group("chat").send(content=content)
 
-    @consumer("django.websocket.disconnect")
+    # Connected to django.websocket.disconnect
     def ws_disconnect(channel, send_channel, **kwargs):
         Group("chat").discard(send_channel)
+
+And what our routing should look like in ``settings.py``::
+
+    CHANNEL_BACKENDS = {
+        "default": {
+            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
+            "ROUTING": {
+                "django.websocket.connect": "myproject.myapp.consumers.ws_add",
+                "django.websocket.keepalive": "myproject.myapp.consumers.ws_add",
+                "django.websocket.receive": "myproject.myapp.consumers.ws_message",
+                "django.websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
+            },
+        },
+    }
 
 With all that code in your ``consumers.py`` file, you now have a working
 set of a logic for a chat server. All you need to do now is get it deployed,
@@ -132,23 +183,11 @@ process; this is enough to serve normal WSGI style requests (``runserver`` is
 just running a WSGI interface and a worker in two separate threads), but now we want
 WebSocket support we'll need a separate process to keep things clean.
 
-For simplicity, we'll use the database channel backend - this uses two tables
+If you notice, in the example above we switched our default backend to the
+database channel backend. This uses two tables
 in the database to do message handling, and isn't particularly fast but
-requires no extra dependencies. Put this in your ``settings.py`` file::
-
-    CHANNEL_BACKENDS = {
-        "default": {
-            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
-        },
-    }
-
-As you can see, the format is quite similar to the ``DATABASES`` setting in
-Django, but for this case much simpler, as it just uses the default database
-(you can set which alias it uses with the ``DB_ALIAS`` key).
-
-In production, we'd recommend you use something like the Redis channel backend;
-you can :doc:`read about the backends <backends>` and see how to set them up
-and their performance considerations if you wish.
+requires no extra dependencies. When you deploy to production, you'll want to
+use a backend like the Redis backend that has much better throughput.
 
 The second thing, once we have a networked channel backend set up, is to make
 sure we're running the WebSocket interface server. Even in development, we need
@@ -182,7 +221,9 @@ to test your new code::
 You should see an alert come back immediately saying "hello world" - your
 message has round-tripped through the server and come back to trigger the alert.
 You can open another tab and do the same there if you like, and both tabs will
-receive the message and show an alert.
+receive the message and show an alert, as any incoming message is sent to the
+``chat`` group by the ``ws_message`` consumer, and both your tabs will have
+been put into the ``chat`` group when they connected.
 
 Feel free to put some calls to ``print`` in your handler functions too, if you
 like, so you can understand when they're called. If you run three or four
@@ -204,11 +245,10 @@ user ID, I can just auto-add that channel to all the relevant groups (mentions
 of that user, for example).
 
 Handily, as WebSockets start off using the HTTP protocol, they have a lot of
-familiar features, including a path, GET parameters, and cookies. Notably,
-the cookies allow us to perform authentication using the same methods the
-normal Django middleware does. Middleware only runs on requests to views,
-however, and not on raw consumer calls; it's tailored to work with single
-HTTP requests, and so we need a different solution to authenticate WebSockets.
+familiar features, including a path, GET parameters, and cookies. We'd like to
+use these to hook into the familiar Django session and authentication systems;
+after all, WebSockets are no good unless we can identify who they belong to
+and do things securely.
 
 In addition, we don't want the interface servers storing data or trying to run
 authentication; they're meant to be simple, lean, fast processes without much
@@ -217,7 +257,11 @@ state, and so we'll need to do our authentication inside our consumer functions.
 Fortunately, because Channels has standardised WebSocket event
 :doc:`message-standards`, it ships with decorators that help you with
 authentication, as well as using Django's session framework (which authentication
-relies on).
+relies on). Channels can use Django sessions either from cookies (if you're running your websocket
+server on the same port as your main site, which requires a reverse proxy that
+understands WebSockets), or from a ``session_key`` GET parameter, which
+is much more portable, and works in development where you need to run a separate
+WebSocket server (by default, on port 9000).
 
 All we need to do is add the ``django_http_auth`` decorator to our views,
 and we'll get extra ``session`` and ``user`` keyword arguments we can use;
@@ -225,26 +269,33 @@ let's make one where users can only chat to people with the same first letter
 of their username::
 
     from channels import Channel, Group
-    from channels.decorators import consumer, django_http_auth
+    from channels.decorators import django_http_auth
 
-    @consumer("django.websocket.connect", "django.websocket.keepalive")
     @django_http_auth
     def ws_add(channel, send_channel, user, **kwargs):
         Group("chat-%s" % user.username[0]).add(send_channel)
 
-    @consumer("django.websocket.receive")
     @django_http_auth
     def ws_message(channel, send_channel, content, user, **kwargs):
         Group("chat-%s" % user.username[0]).send(content=content)
 
-    @consumer("django.websocket.disconnect")
     @django_http_auth
     def ws_disconnect(channel, send_channel, user, **kwargs):
         Group("chat-%s" % user.username[0]).discard(send_channel)
 
-(Note that we always end consumers with ``**kwargs``; this is to save us
+Now, when we connect to the WebSocket we'll have to remember to provide the
+Django session ID as part of the URL, like this::
+
+    socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
+
+You can get the current session key in a template with ``{{ request.session.session_key }}``.
+Note that Channels can't work with signed cookie sessions - since only HTTP
+responses can set cookies, it needs a backend it can write to separately to
+store state.
+
+(Also note that we always end consumers with ``**kwargs``; this is to save us
 from writing out all variables we might get sent and to allow forwards-compatibility
-with any additions to the message formats in the future)
+with any additions to the message formats in the future.)
 
 Persisting Data
 ---------------

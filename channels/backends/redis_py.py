@@ -13,8 +13,8 @@ class RedisChannelBackend(BaseChannelBackend):
     multiple processes fine, but it's going to be pretty bad at throughput.
     """
 
-    def __init__(self, expiry=60, host="localhost", port=6379, prefix="django-channels:"):
-        super(RedisChannelBackend, self).__init__(expiry)
+    def __init__(self, routing, expiry=60, host="localhost", port=6379, prefix="django-channels:"):
+        super(RedisChannelBackend, self).__init__(routing=routing, expiry=expiry)
         self.host = host
         self.port = port
         self.prefix = prefix

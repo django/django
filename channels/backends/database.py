@@ -16,8 +16,8 @@ class DatabaseChannelBackend(BaseChannelBackend):
     multiple processes fine, but it's going to be pretty bad at throughput.
     """
 
-    def __init__(self, expiry=60, db_alias=DEFAULT_DB_ALIAS):
-        super(DatabaseChannelBackend, self).__init__(expiry)
+    def __init__(self, routing, expiry=60, db_alias=DEFAULT_DB_ALIAS):
+        super(DatabaseChannelBackend, self).__init__(routing=routing, expiry=expiry)
         self.db_alias = db_alias
 
     @property
