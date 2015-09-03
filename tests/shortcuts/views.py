@@ -1,10 +1,5 @@
-import os.path
-
 from django.shortcuts import render, render_to_response
 from django.template import Context, RequestContext
-from django.utils._os import upath
-
-dirs = (os.path.join(os.path.dirname(upath(__file__)), 'other_templates'),)
 
 
 def render_to_response_view(request):
@@ -36,10 +31,6 @@ def render_to_response_view_with_content_type(request):
         'foo': 'FOO',
         'bar': 'BAR',
     }, content_type='application/x-rendertest')
-
-
-def render_to_response_view_with_dirs(request):
-    return render_to_response('render_dirs_test.html', dirs=dirs)
 
 
 def render_to_response_view_with_status(request):
@@ -93,10 +84,6 @@ def render_view_with_content_type(request):
         'foo': 'FOO',
         'bar': 'BAR',
     }, content_type='application/x-rendertest')
-
-
-def render_with_dirs(request):
-    return render(request, 'render_dirs_test.html', dirs=dirs)
 
 
 def render_view_with_status(request):

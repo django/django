@@ -15,7 +15,7 @@ introduce controlled coupling for convenience's sake.
 ``render``
 ==========
 
-.. function:: render(request, template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, dirs=_dirs_undefined, using=None)
+.. function:: render(request, template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, using=None)
 
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -75,10 +75,6 @@ Optional arguments
 
     The ``using`` parameter was added.
 
-.. deprecated:: 1.8
-
-   The ``dirs`` parameter was deprecated.
-
 Example
 -------
 
@@ -107,7 +103,7 @@ This example is equivalent to::
 ``render_to_response``
 ======================
 
-.. function:: render_to_response(template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, dirs=_dirs_undefined, using=None)
+.. function:: render_to_response(template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, using=None)
 
    Renders a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
@@ -164,10 +160,6 @@ Optional arguments
 .. versionchanged:: 1.8
 
    The ``status`` and ``using`` parameters were added.
-
-.. deprecated:: 1.8
-
-   The ``dirs`` parameter was deprecated.
 
 Example
 -------

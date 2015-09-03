@@ -4,14 +4,12 @@ from django.utils.deprecation import RemovedInDjango110Warning
 
 from . import engines
 from .backends.django import DjangoTemplates
-from .engine import (
-    _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
-)
+from .engine import _context_instance_undefined, _dictionary_undefined
 from .exceptions import TemplateDoesNotExist
 from .loaders import base
 
 
-def get_template(template_name, dirs=_dirs_undefined, using=None):
+def get_template(template_name, using=None):
     """
     Loads and returns a template for the given name.
 
@@ -21,24 +19,14 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
     engines = _engine_list(using)
     for engine in engines:
         try:
-            # This is required for deprecating the dirs argument. Simply
-            # return engine.get_template(template_name) in Django 1.10.
-            if isinstance(engine, DjangoTemplates):
-                return engine.get_template(template_name, dirs)
-            elif dirs is not _dirs_undefined:
-                warnings.warn(
-                    "Skipping template backend %s because its get_template "
-                    "method doesn't support the dirs argument." % engine.name,
-                    stacklevel=2)
-            else:
-                return engine.get_template(template_name)
+            return engine.get_template(template_name)
         except TemplateDoesNotExist as e:
             chain.append(e)
 
     raise TemplateDoesNotExist(template_name, chain=chain)
 
 
-def select_template(template_name_list, dirs=_dirs_undefined, using=None):
+def select_template(template_name_list, using=None):
     """
     Loads and returns a template for one of the given names.
 
@@ -51,17 +39,7 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
     for template_name in template_name_list:
         for engine in engines:
             try:
-                # This is required for deprecating the dirs argument. Simply
-                # use engine.get_template(template_name) in Django 1.10.
-                if isinstance(engine, DjangoTemplates):
-                    return engine.get_template(template_name, dirs)
-                elif dirs is not _dirs_undefined:
-                    warnings.warn(
-                        "Skipping template backend %s because its get_template "
-                        "method doesn't support the dirs argument." % engine.name,
-                        stacklevel=2)
-                else:
-                    return engine.get_template(template_name)
+                return engine.get_template(template_name)
             except TemplateDoesNotExist as e:
                 chain.append(e)
 
@@ -73,7 +51,6 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
 
 def render_to_string(template_name, context=None,
                      context_instance=_context_instance_undefined,
-                     dirs=_dirs_undefined,
                      dictionary=_dictionary_undefined,
                      request=None, using=None):
     """
@@ -82,7 +59,6 @@ def render_to_string(template_name, context=None,
     template_name may be a string or a list of strings.
     """
     if (context_instance is _context_instance_undefined
-            and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
         if isinstance(template_name, (list, tuple)):
@@ -106,17 +82,12 @@ def render_to_string(template_name, context=None,
                             "when some deprecated arguments are passed.")
                     # Hack -- use the internal Engine instance of DjangoTemplates.
                     return engine.engine.render_to_string(
-                        template_name, context, context_instance, dirs, dictionary)
+                        template_name, context, context_instance, dictionary)
                 elif context_instance is not _context_instance_undefined:
                     warnings.warn(
                         "Skipping template backend %s because its render_to_string "
                         "method doesn't support the context_instance argument." %
                         engine.name, stacklevel=2)
-                elif dirs is not _dirs_undefined:
-                    warnings.warn(
-                        "Skipping template backend %s because its render_to_string "
-                        "method doesn't support the dirs argument." % engine.name,
-                        stacklevel=2)
                 elif dictionary is not _dictionary_undefined:
                     warnings.warn(
                         "Skipping template backend %s because its render_to_string "

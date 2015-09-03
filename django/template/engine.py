@@ -13,7 +13,6 @@ from .library import import_library
 
 _context_instance_undefined = object()
 _dictionary_undefined = object()
-_dirs_undefined = object()
 
 
 class Engine(object):
@@ -167,19 +166,12 @@ class Engine(object):
         """
         return Template(template_code, engine=self)
 
-    def get_template(self, template_name, dirs=_dirs_undefined):
+    def get_template(self, template_name):
         """
         Returns a compiled Template object for the given template name,
         handling template inheritance recursively.
         """
-        if dirs is _dirs_undefined:
-            dirs = None
-        else:
-            warnings.warn(
-                "The dirs argument of get_template is deprecated.",
-                RemovedInDjango110Warning, stacklevel=2)
-
-        template, origin = self.find_template(template_name, dirs)
+        template, origin = self.find_template(template_name)
         if not hasattr(template, 'render'):
             # template needs to be compiled
             template = Template(template, origin, template_name, engine=self)
@@ -193,7 +185,6 @@ class Engine(object):
 
     def render_to_string(self, template_name, context=None,
                          context_instance=_context_instance_undefined,
-                         dirs=_dirs_undefined,
                          dictionary=_dictionary_undefined):
         if context_instance is _context_instance_undefined:
             context_instance = None
@@ -201,14 +192,6 @@ class Engine(object):
             warnings.warn(
                 "The context_instance argument of render_to_string is "
                 "deprecated.", RemovedInDjango110Warning, stacklevel=2)
-        if dirs is _dirs_undefined:
-            # Do not set dirs to None here to avoid triggering the deprecation
-            # warning in select_template or get_template.
-            pass
-        else:
-            warnings.warn(
-                "The dirs argument of render_to_string is deprecated.",
-                RemovedInDjango110Warning, stacklevel=2)
         if dictionary is _dictionary_undefined:
             dictionary = None
         else:
@@ -218,9 +201,9 @@ class Engine(object):
             context = dictionary
 
         if isinstance(template_name, (list, tuple)):
-            t = self.select_template(template_name, dirs)
+            t = self.select_template(template_name)
         else:
-            t = self.get_template(template_name, dirs)
+            t = self.get_template(template_name)
         if not context_instance:
             # Django < 1.8 accepted a Context in `context` even though that's
             # unintended. Preserve this ability but don't rewrap `context`.
@@ -235,25 +218,16 @@ class Engine(object):
         with context_instance.push(context):
             return t.render(context_instance)
 
-    def select_template(self, template_name_list, dirs=_dirs_undefined):
+    def select_template(self, template_name_list):
         """
         Given a list of template names, returns the first that can be loaded.
         """
-        if dirs is _dirs_undefined:
-            # Do not set dirs to None here to avoid triggering the deprecation
-            # warning in get_template.
-            pass
-        else:
-            warnings.warn(
-                "The dirs argument of select_template is deprecated.",
-                RemovedInDjango110Warning, stacklevel=2)
-
         if not template_name_list:
             raise TemplateDoesNotExist("No template names provided")
         not_found = []
         for template_name in template_name_list:
             try:
-                return self.get_template(template_name, dirs)
+                return self.get_template(template_name)
             except TemplateDoesNotExist as exc:
                 if exc.args[0] not in not_found:
                     not_found.append(exc.args[0])
