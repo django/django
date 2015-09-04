@@ -108,15 +108,21 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
 
+        # Gets the list of additional domain names to search for,
+        # and appends it to ['django'] which should remain here
+        # unconditionally.
+        domains = ['django']
+        domains.extend(settings.LOCALE_FILENAMES)
+
         self._init_translation_catalog()
-        self._add_installed_apps_translations()
-        self._add_local_translations()
+        self._add_installed_apps_translations(domains)
+        self._add_local_translations(domains)
         self._add_fallback()
 
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
 
-    def _new_gnu_trans(self, localedir, use_null_fallback=True):
+    def _new_gnu_trans(self, domain, localedir, use_null_fallback=True):
         """
         Returns a mergeable gettext.GNUTranslations instance.
 
@@ -125,7 +131,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         references to 'fallback'.
         """
         translation = gettext_module.translation(
-            domain='django',
+            domain=domain,
             localedir=localedir,
             languages=[self.__locale],
             codeset='utf-8',
@@ -146,12 +152,12 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # default lang should be present and parseable, if not
             # gettext will raise an IOError (refs #18192).
             use_null_fallback = False
-        translation = self._new_gnu_trans(localedir, use_null_fallback)
+        translation = self._new_gnu_trans('django', localedir, use_null_fallback)
         self.plural = translation.plural
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
 
-    def _add_installed_apps_translations(self):
+    def _add_installed_apps_translations(self, domains):
         """Merges translations from each installed app."""
         try:
             app_configs = reversed(list(apps.get_app_configs()))
@@ -162,14 +168,16 @@ class DjangoTranslation(gettext_module.GNUTranslations):
                 "gettext calls at import time.")
         for app_config in app_configs:
             localedir = os.path.join(app_config.path, 'locale')
-            translation = self._new_gnu_trans(localedir)
-            self.merge(translation)
+            for domain in domains:
+                translation = self._new_gnu_trans(domain, localedir)
+                self.merge(translation)
 
-    def _add_local_translations(self):
+    def _add_local_translations(self, domains):
         """Merges translations defined in LOCALE_PATHS."""
         for localedir in reversed(settings.LOCALE_PATHS):
-            translation = self._new_gnu_trans(localedir)
-            self.merge(translation)
+            for domain in domains:
+                translation = self._new_gnu_trans(domain, localedir)
+                self.merge(translation)
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
