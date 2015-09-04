@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render, render_to_response
 from django.template.loader import render_to_string
 from django.test import Client
 from django.test.client import CONTENT_TYPE_RE
@@ -152,7 +151,7 @@ def read_buffer(request):
 def request_context_view(request):
     # Special attribute that won't be present on a plain HttpRequest
     request.special_path = request.path
-    return render_to_response('request_context.html', context_instance=RequestContext(request, {}))
+    return render(request, 'request_context.html')
 
 
 def render_template_multiple_times(request):

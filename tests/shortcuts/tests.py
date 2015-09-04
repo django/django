@@ -19,13 +19,6 @@ class ShortcutTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR..\n')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_to_response_with_request_context(self):
-        response = self.client.get('/render_to_response/request_context/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'FOO.BAR../render_to_response/request_context/\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-
     def test_render_to_response_with_content_type(self):
         response = self.client.get('/render_to_response/content_type/')
         self.assertEqual(response.status_code, 200)
@@ -67,13 +60,6 @@ class ShortcutTests(SimpleTestCase):
         response = self.client.get('/render/multiple_templates/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'FOO.BAR../render/multiple_templates/\n')
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_with_base_context(self):
-        response = self.client.get('/render/base_context/')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, b'FOO.BAR..\n')
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
 
     def test_render_with_content_type(self):
         response = self.client.get('/render/content_type/')
