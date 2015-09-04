@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from django.template import Context, RequestContext
+from django.template import RequestContext
 
 
 def render_to_response_view(request):
@@ -17,13 +17,6 @@ def render_to_response_view_with_multiple_templates(request):
         'foo': 'FOO',
         'bar': 'BAR',
     })
-
-
-def render_to_response_view_with_request_context(request):
-    return render_to_response('shortcuts/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, context_instance=RequestContext(request))
 
 
 def render_to_response_view_with_content_type(request):
@@ -70,13 +63,6 @@ def render_view_with_multiple_templates(request):
         'foo': 'FOO',
         'bar': 'BAR',
     })
-
-
-def render_view_with_base_context(request):
-    return render(request, 'shortcuts/render_test.html', {
-        'foo': 'FOO',
-        'bar': 'BAR',
-    }, context_instance=Context())
 
 
 def render_view_with_content_type(request):

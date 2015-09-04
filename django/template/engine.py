@@ -11,9 +11,6 @@ from .context import _builtin_context_processors
 from .exceptions import TemplateDoesNotExist
 from .library import import_library
 
-_context_instance_undefined = object()
-_dictionary_undefined = object()
-
 
 class Engine(object):
     default_builtins = [
@@ -183,40 +180,17 @@ class Engine(object):
     # will be removed in Django 1.10. It's superseded by a new render_to_string
     # function in django.template.loader.
 
-    def render_to_string(self, template_name, context=None,
-                         context_instance=_context_instance_undefined,
-                         dictionary=_dictionary_undefined):
-        if context_instance is _context_instance_undefined:
-            context_instance = None
-        else:
-            warnings.warn(
-                "The context_instance argument of render_to_string is "
-                "deprecated.", RemovedInDjango110Warning, stacklevel=2)
-        if dictionary is _dictionary_undefined:
-            dictionary = None
-        else:
-            warnings.warn(
-                "The dictionary argument of render_to_string was renamed to "
-                "context.", RemovedInDjango110Warning, stacklevel=2)
-            context = dictionary
-
+    def render_to_string(self, template_name, context=None):
         if isinstance(template_name, (list, tuple)):
             t = self.select_template(template_name)
         else:
             t = self.get_template(template_name)
-        if not context_instance:
-            # Django < 1.8 accepted a Context in `context` even though that's
-            # unintended. Preserve this ability but don't rewrap `context`.
-            if isinstance(context, Context):
-                return t.render(context)
-            else:
-                return t.render(Context(context))
-        if not context:
-            return t.render(context_instance)
-        # Add the context to the context stack, ensuring it gets removed again
-        # to keep the context_instance in the same state it started in.
-        with context_instance.push(context):
-            return t.render(context_instance)
+        # Django < 1.8 accepted a Context in `context` even though that's
+        # unintended. Preserve this ability but don't rewrap `context`.
+        if isinstance(context, Context):
+            return t.render(context)
+        else:
+            return t.render(Context(context))
 
     def select_template(self, template_name_list):
         """

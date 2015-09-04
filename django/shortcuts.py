@@ -10,63 +10,27 @@ from django.db.models.query import QuerySet
 from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
-from django.template import RequestContext, loader
-from django.template.engine import (
-    _context_instance_undefined, _dictionary_undefined
-)
+from django.template import loader
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
 
-def render_to_response(template_name, context=None,
-                       context_instance=_context_instance_undefined,
-                       content_type=None, status=None,
-                       dictionary=_dictionary_undefined, using=None):
+def render_to_response(template_name, context=None, content_type=None, status=None, using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
     """
-    if (context_instance is _context_instance_undefined
-            and dictionary is _dictionary_undefined):
-        # No deprecated arguments were passed - use the new code path
-        content = loader.render_to_string(template_name, context, using=using)
-
-    else:
-        # Some deprecated arguments were passed - use the legacy code path
-        content = loader.render_to_string(
-            template_name, context, context_instance, dictionary,
-            using=using)
-
+    content = loader.render_to_string(template_name, context, using=using)
     return HttpResponse(content, content_type, status)
 
 
-def render(request, template_name, context=None,
-           context_instance=_context_instance_undefined,
-           content_type=None, status=None,
-           dictionary=_dictionary_undefined,
-           using=None):
+def render(request, template_name, context=None, content_type=None, status=None, using=None):
     """
     Returns a HttpResponse whose content is filled with the result of calling
     django.template.loader.render_to_string() with the passed arguments.
-    Uses a RequestContext by default.
     """
-    if (context_instance is _context_instance_undefined
-            and dictionary is _dictionary_undefined):
-        # No deprecated arguments were passed - use the new code path
-        # In Django 1.10, request should become a positional argument.
-        content = loader.render_to_string(
-            template_name, context, request=request, using=using)
-    else:
-        # Some deprecated arguments were passed - use the legacy code path
-        if context_instance is not _context_instance_undefined:
-            pass
-        else:
-            context_instance = RequestContext(request)
-        content = loader.render_to_string(
-            template_name, context, context_instance, dictionary,
-            using=using)
-
+    content = loader.render_to_string(template_name, context, request, using=using)
     return HttpResponse(content, content_type, status)
 
 

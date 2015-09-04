@@ -261,7 +261,7 @@ the following templates:
 In addition, to cut down on the repetitive nature of loading and rendering
 templates, Django provides a shortcut function which automates the process.
 
-.. function:: render_to_string(template_name, context=None, context_instance=_context_instance_undefined, request=None, using=None)
+.. function:: render_to_string(template_name, context=None, request=None, using=None)
 
     ``render_to_string()`` loads a template like :func:`get_template` and
     calls its ``render()`` method immediately. It takes the following
@@ -274,24 +274,6 @@ templates, Django provides a shortcut function which automates the process.
 
     ``context``
         A :class:`dict` to be used as the template's context for rendering.
-
-        .. versionchanged:: 1.8
-
-            The ``context`` argument used to be called ``dictionary``. That name
-            is deprecated in Django 1.8 and will be removed in Django 1.10.
-
-            ``context`` is now optional. An empty context will be used if it
-            isn't provided.
-
-    ``context_instance``
-        An instance of :class:`~django.template.Context` or a subclass (e.g., an
-        instance of :class:`~django.template.RequestContext`) to use as the
-        template's context.
-
-        .. deprecated:: 1.8
-
-            The ``context_instance`` argument is deprecated. Use ``context`` and
-            if needed ``request``.
 
     ``request``
         An optional :class:`~django.http.HttpRequest` that will be available
