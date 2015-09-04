@@ -589,12 +589,17 @@ class NullBooleanSelect(Select):
 
     def value_from_datadict(self, data, files, name):
         value = data.get(name)
-        return {'2': True,
-                True: True,
-                'True': True,
-                '3': False,
-                'False': False,
-                False: False}.get(value)
+
+        values = {'2': True,
+                  '3': False,
+                  'true': True,
+                  'false': False}.get(value)
+
+        if isinstance(value, six.string_types):
+            value = values.get(value.lower(), value)
+
+        return bool(value)
+
 
 
 class SelectMultiple(Select):
