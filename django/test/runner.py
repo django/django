@@ -270,6 +270,10 @@ class ParallelTestSuite(unittest.TestSuite):
     that they have been run in parallel.
     """
 
+    # In case someone wants to modify these in a subclass.
+    init_worker = _init_worker
+    run_subsuite = _run_subsuite
+
     def __init__(self, suite, processes, failfast=False):
         self.subsuites = partition_suite_by_case(suite)
         self.processes = processes
@@ -297,13 +301,13 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=_init_worker,
+            initializer=self.init_worker.__func__,
             initargs=[counter])
         args = [
             (index, subsuite, self.failfast)
             for index, subsuite in enumerate(self.subsuites)
         ]
-        test_results = pool.imap_unordered(_run_subsuite, args)
+        test_results = pool.imap_unordered(self.run_subsuite.__func__, args)
 
         while True:
             if result.shouldStop:
@@ -339,6 +343,7 @@ class DiscoverRunner(object):
     """
 
     test_suite = unittest.TestSuite
+    parallel_test_suite = ParallelTestSuite
     test_runner = unittest.TextTestRunner
     test_loader = unittest.defaultTestLoader
     reorder_by = (TestCase, SimpleTestCase)
@@ -448,7 +453,7 @@ class DiscoverRunner(object):
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
         if self.parallel > 1:
-            suite = ParallelTestSuite(suite, self.parallel, self.failfast)
+            suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
 
         return suite
 
