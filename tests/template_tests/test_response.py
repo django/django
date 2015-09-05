@@ -248,12 +248,6 @@ class TemplateResponseTest(SimpleTestCase):
                                   {'foo': 'bar'}).render()
         self.assertEqual(response.content, b'baryes')
 
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_with_context(self):
-        response = self._response('{{ foo }}{{ processors }}',
-                                  Context({'foo': 'bar'})).render()
-        self.assertEqual(response.content, b'bar')
-
     def test_context_processor_priority(self):
         # context processors should be overridden by passed-in context
         response = self._response('{{ foo }}{{ processors }}',

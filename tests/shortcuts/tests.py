@@ -1,6 +1,5 @@
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-from django.utils.deprecation import RemovedInDjango110Warning
 
 
 @override_settings(
@@ -38,16 +37,6 @@ class ShortcutTests(SimpleTestCase):
         self.assertEqual(response.content, b'DTL\n')
         response = self.client.get('/render_to_response/using/?using=jinja2')
         self.assertEqual(response.content, b'Jinja2\n')
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_render_to_response_with_context_instance_misuse(self):
-        """
-        For backwards-compatibility, ensure that it's possible to pass a
-        RequestContext instance in the dictionary argument instead of the
-        context_instance argument.
-        """
-        response = self.client.get('/render_to_response/context_instance_misuse/')
-        self.assertContains(response, 'context processor output')
 
     def test_render(self):
         response = self.client.get('/render/')
