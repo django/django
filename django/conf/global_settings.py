@@ -10,7 +10,6 @@ gettext_noop = lambda s: s
 ####################
 
 DEBUG = False
-TEMPLATE_DEBUG = False
 
 # Whether the framework should propagate raw exceptions rather than catching
 # them. This is useful under some testing situations and should never be used
@@ -198,34 +197,6 @@ EMAIL_TIMEOUT = None
 
 # List of strings representing installed apps.
 INSTALLED_APPS = []
-
-# List of locations of the template source files, in search order.
-TEMPLATE_DIRS = []
-
-# List of callables that know how to import templates from various sources.
-# See the comments in django/core/template/loader.py for interface
-# documentation.
-TEMPLATE_LOADERS = [
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-]
-
-# List of processors used by RequestContext to populate the context.
-# Each one should be a callable that takes the request object as its
-# only parameter and returns a dictionary to add to the context.
-TEMPLATE_CONTEXT_PROCESSORS = [
-    'django.contrib.auth.context_processors.auth',
-    'django.template.context_processors.debug',
-    'django.template.context_processors.i18n',
-    'django.template.context_processors.media',
-    'django.template.context_processors.static',
-    'django.template.context_processors.tz',
-    # 'django.template.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-]
-
-# Output to use in template system for invalid (e.g. misspelled) variables.
-TEMPLATE_STRING_IF_INVALID = ''
 
 TEMPLATES = []
 
