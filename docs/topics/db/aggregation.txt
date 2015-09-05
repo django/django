@@ -73,7 +73,7 @@ In a hurry? Here's how to do common aggregate queries, assuming the models above
     {'price_per_page': 0.4470664529184653}
 
     # All the following queries involve traversing the Book<->Publisher
-    # many-to-many relationship backward
+    # foreign key relationship backwards.
 
     # Each publisher, each with a count of books as a "num_books" attribute.
     >>> from django.db.models import Count
@@ -242,7 +242,7 @@ price field of the book model to produce a minimum and maximum value.
 
 The same rules apply to the ``aggregate()`` clause. If you wanted to
 know the lowest and highest price of any book that is available for sale
-in a store, you could use the aggregate::
+in any of the stores, you could use the aggregate::
 
     >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Max('books__price'))
 
