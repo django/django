@@ -19,12 +19,9 @@ from django.test.runner import default_test_processes
 from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
-from django.utils.deprecation import (
-    RemovedInDjango20Warning, RemovedInDjango110Warning,
-)
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.log import DEFAULT_LOGGING
 
-warnings.simplefilter("error", RemovedInDjango110Warning)
 warnings.simplefilter("error", RemovedInDjango20Warning)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))

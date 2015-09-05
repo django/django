@@ -8,11 +8,7 @@ class RemovedInDjango20Warning(PendingDeprecationWarning):
     pass
 
 
-class RemovedInDjango110Warning(DeprecationWarning):
-    pass
-
-
-RemovedInNextVersionWarning = RemovedInDjango110Warning
+RemovedInNextVersionWarning = DeprecationWarning
 
 
 class warn_about_renamed_method(object):
