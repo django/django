@@ -7,7 +7,6 @@ from django.utils.inspect import func_supports_parameter
 
 class Loader(object):
     # Only used to raise a deprecation warning. Remove in Django 1.10.
-    is_usable = False
     _accepts_engine_in_init = True
 
     def __init__(self, engine):
