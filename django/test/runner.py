@@ -377,22 +377,23 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
     mirrors = []
 
     for signature, (db_name, aliases) in test_databases.items():
-        test_db_name = None
+        first_alias = None
         # Actually create the database for the first connection
         for alias in aliases:
             connection = connections[alias]
-            if test_db_name is None:
-                test_db_name = connection.creation.create_test_db(
+            old_names.append((connection, db_name, first_alias is None))
+
+            if first_alias is None:
+                first_alias = alias
+                connection.creation.create_test_db(
                     verbosity,
                     autoclobber=not interactive,
                     keepdb=keepdb,
                     serialize=connection.settings_dict.get("TEST", {}).get("SERIALIZE", True),
                 )
-                destroy = True
             else:
-                connection.settings_dict['NAME'] = test_db_name
-                destroy = False
-            old_names.append((connection, db_name, destroy))
+                connections[alias].creation.set_as_test_mirror(
+                    connections[first_alias].settings_dict)
 
     for alias, mirror_alias in mirrored_aliases.items():
         mirrors.append((alias, connections[alias].settings_dict['NAME']))
