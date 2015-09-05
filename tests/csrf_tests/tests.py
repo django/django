@@ -304,6 +304,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
+        req.META['SERVER_PORT'] = '443'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNotNone(req2)
         self.assertEqual(403, req2.status_code)
@@ -322,6 +323,20 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         self.assertEqual(403, req2.status_code)
         # Non-ASCII
         req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNotNone(req2)
+        self.assertEqual(403, req2.status_code)
+        # missing scheme
+        # >>> urlparse('//example.com/')
+        # ParseResult(scheme='', netloc='example.com', path='/', params='', query='', fragment='')
+        req.META['HTTP_REFERER'] = '//example.com/'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNotNone(req2)
+        self.assertEqual(403, req2.status_code)
+        # missing netloc
+        # >>> urlparse('https://')
+        # ParseResult(scheme='https', netloc='', path='', params='', query='', fragment='')
+        req.META['HTTP_REFERER'] = 'https://'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNotNone(req2)
         self.assertEqual(403, req2.status_code)
@@ -351,6 +366,57 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req.META['HTTP_REFERER'] = 'https://www.example.com'
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
+
+    @override_settings(
+        ALLOWED_HOSTS=['www.example.com'],
+        CSRF_COOKIE_DOMAIN='.example.com',
+    )
+    def test_https_good_referer_matches_cookie_domain(self):
+        """
+        A POST HTTPS request with a good referer should be accepted from a
+        subdomain that's allowed by CSRF_COOKIE_DOMAIN.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://foo.example.com/'
+        req.META['SERVER_PORT'] = '443'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
+    @override_settings(
+        ALLOWED_HOSTS=['www.example.com'],
+        CSRF_COOKIE_DOMAIN='.example.com',
+    )
+    def test_https_good_referer_matches_cookie_domain_with_different_port(self):
+        """
+        A POST HTTPS request with a good referer should be accepted from a
+        subdomain that's allowed by CSRF_COOKIE_DOMAIN and a non-443 port.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://foo.example.com:4443/'
+        req.META['SERVER_PORT'] = '4443'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
+    @override_settings(
+        ALLOWED_HOSTS=['www.example.com'],
+        CSRF_COOKIE_DOMAIN='.example.com',
+    )
+    def test_https_reject_insecure_referer(self):
+        """
+        A POST HTTPS request from an insecure referer should be rejected.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'http://example.com/'
+        req.META['SERVER_PORT'] = '443'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNotNone(req2)
+        self.assertEqual(403, req2.status_code)
 
     def test_ensures_csrf_cookie_no_middleware(self):
         """
