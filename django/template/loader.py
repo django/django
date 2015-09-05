@@ -1,10 +1,5 @@
-import warnings
-
-from django.utils.deprecation import RemovedInDjango110Warning
-
 from . import engines
 from .exceptions import TemplateDoesNotExist
-from .loaders import base
 
 
 def get_template(template_name, using=None):
@@ -62,14 +57,3 @@ def render_to_string(template_name, context=None, request=None, using=None):
 
 def _engine_list(using=None):
     return engines.all() if using is None else [engines[using]]
-
-
-class BaseLoader(base.Loader):
-    _accepts_engine_in_init = False
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "django.template.loader.BaseLoader was superseded by "
-            "django.template.loaders.base.Loader.",
-            RemovedInDjango110Warning, stacklevel=2)
-        super(BaseLoader, self).__init__(*args, **kwargs)

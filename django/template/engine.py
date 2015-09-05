@@ -1,8 +1,5 @@
-import warnings
-
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import lru_cache, six
-from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
@@ -122,16 +119,7 @@ class Engine(object):
 
         if isinstance(loader, six.string_types):
             loader_class = import_string(loader)
-
-            if getattr(loader_class, '_accepts_engine_in_init', False):
-                args.insert(0, self)
-            else:
-                warnings.warn(
-                    "%s inherits from django.template.loader.BaseLoader "
-                    "instead of django.template.loaders.base.Loader. " %
-                    loader, RemovedInDjango110Warning, stacklevel=2)
-
-            return loader_class(*args)
+            return loader_class(self, *args)
         else:
             raise ImproperlyConfigured(
                 "Invalid value in template loaders configuration: %r" % loader)
