@@ -68,7 +68,7 @@ The :setting:`DATABASES` setting in any test settings module needs to define
 two databases:
 
 * A ``default`` database. This database should use the backend that
-  you want to use for primary testing
+  you want to use for primary testing.
 
 * A database with the alias ``other``. The ``other`` database is used to
   establish that queries can be directed to different databases. As a result,
@@ -98,8 +98,8 @@ These test databases are deleted when the tests are finished.
 
 You will also need to ensure that your database uses UTF-8 as the default
 character set. If your database server doesn't use UTF-8 as a default charset,
-you will need to include a value for :setting:`TEST_CHARSET` in the settings
-dictionary for the applicable database.
+you will need to include a value for :setting:`CHARSET <TEST_CHARSET>` in the
+test settings dictionary for the applicable database.
 
 .. _runtests-specifying-labels:
 
