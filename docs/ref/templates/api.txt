@@ -968,11 +968,6 @@ loaders. Custom ``Loader`` classes should inherit from
 ``django.template.loaders.base.Loader`` and define the ``get_contents()`` and
 ``get_template_sources()`` methods.
 
-.. versionchanged:: 1.8
-
-    ``django.template.loaders.base.Loader`` used to be defined at
-    ``django.template.loader.BaseLoader``.
-
 .. versionchanged:: 1.9
 
     In previous versions of Django, custom loaders defined a single method:
