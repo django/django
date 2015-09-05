@@ -398,12 +398,12 @@ a subclass of dictionary. Exceptions are outlined here:
     Returns ``True`` if the given key is set. This lets you do, e.g., ``if "foo"
     in request.GET``.
 
-.. method:: QueryDict.get(key, default)
+.. method:: QueryDict.get(key, default=None)
 
     Uses the same logic as ``__getitem__()`` above, with a hook for returning a
     default value if the key doesn't exist.
 
-.. method:: QueryDict.setdefault(key, default)
+.. method:: QueryDict.setdefault(key, default=None)
 
     Just like the standard dictionary ``setdefault()`` method, except it uses
     ``__setitem__()`` internally.
@@ -461,7 +461,7 @@ In addition, ``QueryDict`` has the following methods:
     Returns a copy of the object, using ``copy.deepcopy()`` from the Python
     standard library. This copy will be mutable even if the original was not.
 
-.. method:: QueryDict.getlist(key, default)
+.. method:: QueryDict.getlist(key, default=None)
 
     Returns the data with the requested key, as a Python list. Returns an
     empty list if the key doesn't exist and no default value was provided.
@@ -476,7 +476,7 @@ In addition, ``QueryDict`` has the following methods:
 
     Appends an item to the internal list associated with key.
 
-.. method:: QueryDict.setlistdefault(key, default_list)
+.. method:: QueryDict.setlistdefault(key, default_list=None)
 
     Just like ``setdefault``, except it takes a list of values instead of a
     single value.
