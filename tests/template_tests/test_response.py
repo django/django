@@ -5,15 +5,12 @@ import time
 from datetime import datetime
 
 from django.conf import settings
-from django.template import Context, engines
+from django.template import engines
 from django.template.response import (
     ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
 )
-from django.test import (
-    RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
-)
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
-from django.utils.deprecation import RemovedInDjango110Warning
 
 from .utils import TEMPLATE_DIR
 
@@ -115,14 +112,6 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         response = self._response('{{ foo }}{{ processors }}',
                                   {'foo': 'bar'})
         self.assertEqual(response.context_data, {'foo': 'bar'})
-        response.render()
-        self.assertEqual(response.content, b'bar')
-
-    @ignore_warnings(category=RemovedInDjango110Warning)
-    def test_context_instance(self):
-        response = self._response('{{ foo }}{{ processors }}',
-                                  Context({'foo': 'bar'}))
-        self.assertEqual(response.context_data.__class__, Context)
         response.render()
         self.assertEqual(response.content, b'bar')
 
