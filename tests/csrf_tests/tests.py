@@ -90,8 +90,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_view_token_too_long(self):
         """
-        Check that if the token is longer than expected, it is ignored and
-        a new token is created.
+        If the token is longer than expected, it is ignored and a new token is
+        created.
         """
         req = self._get_GET_no_csrf_cookie_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000
@@ -311,7 +311,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_malformed_referer(self):
         """
-        Test that a POST HTTPS request with a bad referer is rejected
+        A POST HTTPS request with a bad referer is rejected.
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
@@ -329,7 +329,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
         """
-        Test that a POST HTTPS request with a good referer is accepted
+        A POST HTTPS request with a good referer is accepted.
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
@@ -341,8 +341,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer_2(self):
         """
-        Test that a POST HTTPS request with a good referer is accepted
-        where the referer contains no trailing slash
+        A POST HTTPS request with a good referer is accepted where the referer
+        contains no trailing slash.
         """
         # See ticket #15617
         req = self._get_POST_request_with_token()
@@ -352,10 +352,22 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
+    def test_https_csrf_trusted_origin_allowed(self):
+        """
+        A POST HTTPS request with a referer added to the CSRF_TRUSTED_ORIGINS
+        setting is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
     def test_ensures_csrf_cookie_no_middleware(self):
         """
-        Tests that ensures_csrf_cookie decorator fulfils its promise
-        with no middleware
+        ensure_csrf_cookie decorator fulfils its promise with no  middleware.
         """
         @ensure_csrf_cookie
         def view(request):
@@ -369,8 +381,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_ensures_csrf_cookie_with_middleware(self):
         """
-        Tests that ensures_csrf_cookie decorator fulfils its promise
-        with the middleware enabled.
+        ensure_csrf_cookie decorator fulfils its promise with the middleware
+        enabled.
         """
         @ensure_csrf_cookie
         def view(request):
@@ -386,7 +398,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_ensures_csrf_cookie_no_logging(self):
         """
-        Tests that ensure_csrf_cookie doesn't log warnings. See #19436.
+        ensure_csrf_cookie doesn't log warnings. See #19436.
         """
         @ensure_csrf_cookie
         def view(request):
@@ -412,8 +424,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_csrf_cookie_age(self):
         """
-        Test to verify CSRF cookie age can be set using
-        settings.CSRF_COOKIE_AGE.
+        Verify CSRF cookie age can be set using settings.CSRF_COOKIE_AGE.
         """
         req = self._get_GET_no_csrf_cookie_request()
 
@@ -434,8 +445,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_csrf_cookie_age_none(self):
         """
-        Test to verify CSRF cookie age does not have max age set and therefore
-        uses session-based cookies.
+        Verify CSRF cookie age does not have max age set and therefore uses
+        session-based cookies.
         """
         req = self._get_GET_no_csrf_cookie_request()
 
