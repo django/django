@@ -1027,18 +1027,17 @@ url
 ^^^
 
 Returns an absolute path reference (a URL without the domain name) matching a
-given view function and optional parameters. Any special characters in the
-resulting path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
+given view and optional parameters. Any special characters in the resulting
+path will be encoded using :func:`~django.utils.encoding.iri_to_uri`.
 
 This is a way to output links without violating the DRY principle by having to
 hard-code URLs in your templates::
 
     {% url 'some-url-name' v1 v2 %}
 
-The first argument is a path to a view function in the format
-``package.package.module.function``. It can be a quoted literal or any other
-context variable. Additional arguments are optional and
-should be space-separated values that will be used as arguments in the URL.
+The first argument is a :func:`~django.conf.urls.url` ``name``. It can be a
+quoted literal or any other context variable. Additional arguments are optional
+and should be space-separated values that will be used as arguments in the URL.
 The example above shows passing positional arguments. Alternatively you may
 use keyword syntax::
 
@@ -1053,7 +1052,7 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    ('^client/([0-9]+)/$', 'app_views.client', name='app-views-client')
+    ('^client/([0-9]+)/$', app_views.client, name='app-views-client')
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
@@ -1067,10 +1066,6 @@ such as this:
     {% url 'app-views-client' client.id %}
 
 The template tag will output the string ``/clients/client/123/``.
-
-If you're using :ref:`named URL patterns <naming-url-patterns>`, you can
-refer to the name of the pattern in the ``url`` tag instead of using the
-path to the view.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
 :exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
@@ -1104,15 +1099,15 @@ by the context as to the current application.
 
 .. deprecated:: 1.8
 
-    The dotted Python path syntax is deprecated and will be removed in
-    Django 1.10::
+    You can also pass a dotted Python path to a view function, but this syntax
+    is deprecated and will be removed in Django 1.10::
 
         {% url 'path.to.some_view' v1 v2 %}
 
 .. warning::
 
-    Don't forget to put quotes around the function path or pattern name,
-    otherwise the value will be interpreted as a context variable!
+    Don't forget to put quotes around the :func:`~django.conf.urls.url`
+    ``name``, otherwise the value will be interpreted as a context variable!
 
 .. templatetag:: verbatim
 
