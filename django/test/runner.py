@@ -1,3 +1,4 @@
+import collections
 import logging
 import os
 import unittest
@@ -321,9 +322,19 @@ def partition_suite(suite, classes, bins, reverse=False):
                 bins[-1].add(test)
 
 
-def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
-    # First pass -- work out which databases actually need to be created,
-    # and which ones are test mirrors or duplicate entries in DATABASES
+def get_unique_databases_and_mirrors():
+    """
+    Figure out which databases actually need to be created.
+
+    Deduplicate entries in DATABASES that correspond the same database or are
+    configured as test mirrors.
+
+    Returns two values:
+
+    - test_databases: ordered mapping of signatures to (name, list of aliases)
+                      where all aliases share the same unerlying database
+    - mirrored_aliases: mapping of mirror aliases to original aliases
+    """
     mirrored_aliases = {}
     test_databases = {}
     dependencies = {}
@@ -351,12 +362,21 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
                 if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
                     dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
-    # Second pass -- actually create the databases.
+    test_databases = dependency_ordered(test_databases.items(), dependencies)
+    test_databases = collections.OrderedDict(test_databases)
+    return test_databases, mirrored_aliases
+
+
+def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
+    """
+    Creates the test databases.
+    """
+    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
+
     old_names = []
     mirrors = []
 
-    for signature, (db_name, aliases) in dependency_ordered(
-            test_databases.items(), dependencies):
+    for signature, (db_name, aliases) in test_databases.items():
         test_db_name = None
         # Actually create the database for the first connection
         for alias in aliases:
@@ -382,4 +402,5 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
     if debug_sql:
         for alias in connections:
             connections[alias].force_debug_cursor = True
+
     return old_names, mirrors
