@@ -6,6 +6,7 @@ from unittest import TestSuite, defaultTestLoader
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import DEFAULT_DB_ALIAS, connections
 from django.test import SimpleTestCase, TestCase
 from django.test.utils import setup_test_environment, teardown_test_environment
 from django.utils.datastructures import OrderedSet
@@ -321,8 +322,6 @@ def partition_suite(suite, classes, bins, reverse=False):
 
 
 def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwargs):
-    from django.db import connections, DEFAULT_DB_ALIAS
-
     # First pass -- work out which databases actually need to be created,
     # and which ones are test mirrors or duplicate entries in DATABASES
     mirrored_aliases = {}
