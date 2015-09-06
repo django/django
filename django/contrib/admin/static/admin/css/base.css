@@ -91,14 +91,6 @@ ul li {
     padding: 1px 0;
 }
 
-ul.plainlist {
-    margin-left: 0 !important;
-}
-
-ul.plainlist li {
-    list-style-type: none;
-}
-
 li ul {
     margin-bottom: 0;
 }
@@ -187,8 +179,8 @@ p.mini {
     margin-top: -3px;
 }
 
-.help, p.help {
-    font-size: 10px !important;
+.help, p.help, form p.help {
+    font-size: 11px;
     color: #999;
 }
 
@@ -201,12 +193,8 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 }
 
 .quiet, a.quiet:link, a.quiet:visited {
-    color: #999 !important;
-    font-weight: normal !important;
-}
-
-.quiet strong {
-    font-weight: bold !important;
+    color: #999;
+    font-weight: normal;
 }
 
 .float-right {
@@ -274,24 +262,6 @@ tfoot td {
 tfoot td {
     border-bottom: none;
     border-top: 1px solid #eee;
-}
-
-thead th:first-child,
-tfoot td:first-child {
-    border-left: none !important;
-}
-
-thead th.optional {
-    font-weight: normal !important;
-}
-
-tr.row-label td {
-    font-size: 9px;
-    padding-top: 2px;
-    padding-bottom: 0;
-    border-bottom: none;
-    color: #666;
-    margin-top: -1px;
 }
 
 tr.alt {
@@ -426,7 +396,7 @@ input, textarea, select, .form-row p, form .button {
 }
 
 textarea {
-    vertical-align: top !important;
+    vertical-align: top;
 }
 
 input[type=text], input[type=password], input[type=email], input[type=url],
@@ -571,7 +541,7 @@ ul.messagelist li.error {
 }
 
 .errornote {
-    font-size: 14px !important;
+    font-size: 14px;
     font-weight: 700;
     display: block;
     padding: 10px 12px;
@@ -584,14 +554,14 @@ ul.messagelist li.error {
 }
 
 ul.errorlist {
-    margin: 0 0 4px !important;
-    padding: 0 !important;
+    margin: 0 0 4px;
+    padding: 0;
     color: #ba2121;
     background: #fff;
 }
 
 ul.errorlist li {
-    font-size: 13px !important;
+    font-size: 13px;
     display: block;
     margin-bottom: 4px;
 }
@@ -606,12 +576,12 @@ ul.errorlist li a {
 }
 
 td ul.errorlist {
-    margin: 0 !important;
-    padding: 0 !important;
+    margin: 0;
+    padding: 0;
 }
 
 td ul.errorlist li {
-    margin: 0 !important;
+    margin: 0;
 }
 
 .form-row.errors {
@@ -769,7 +739,6 @@ table#change-history tbody th {
 
 #content {
     padding: 20px 40px;
-    margin: 0;
 }
 
 .dashboard #content {
@@ -796,17 +765,17 @@ table#change-history tbody th {
 /* COLUMN TYPES */
 
 .colMS {
-    margin-right: 20em !important;
+    margin-right: 300px;
 }
 
 .colSM {
-    margin-left: 20em !important;
+    margin-left: 300px;
 }
 
 .colSM #content-related {
     float: left;
     margin-right: 0;
-    margin-left: -19em;
+    margin-left: -300px;
 }
 
 .colSM #content-main {
@@ -816,13 +785,6 @@ table#change-history tbody th {
 .popup .colM {
     width: auto;
 }
-
-.subcol {
-    float: left;
-    width: 46%;
-    margin-right: 15px;
-}
-
 
 /* HEADER */
 

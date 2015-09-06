@@ -19,14 +19,10 @@
     min-height: 400px;
 }
 
-.change-list .filtered {
-    background: #fff !important;
-}
-
 .change-list .filtered .results, .change-list .filtered .paginator,
 .filtered #toolbar, .filtered div.xfull {
-    margin-right: 280px !important;
-    width: auto !important;
+    margin-right: 280px;
+    width: auto;
 }
 
 .change-list .filtered table tbody th {
@@ -38,7 +34,7 @@
 }
 
 #changelist .toplinks {
-    border-bottom: 1px solid #ccc !important;
+    border-bottom: 1px solid #ddd;
 }
 
 #changelist .paginator {
@@ -191,8 +187,8 @@
 .change-list ul.toplinks {
     display: block;
     float: left;
-    padding: 0 !important;
-    margin: 0 !important;
+    padding: 0;
+    margin: 0;
     width: 100%;
 }
 
@@ -230,19 +226,18 @@
 }
 
 .paginator a.showall {
-    padding: 0 !important;
-    border: none !important;
-    background: none !important;
-    color: #5b80b2 !important;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #5b80b2;
 }
 
 .paginator a.showall:hover {
-    color: #036 !important;
-    background: none !important;
+    background: none;
+    color: #036;
 }
 
 .paginator .end {
-    border-width: 2px !important;
     margin-right: 6px;
 }
 
@@ -261,7 +256,7 @@
 /* ACTIONS */
 
 .filtered .actions {
-    margin-right: 280px !important;
+    margin-right: 280px;
     border-right: none;
 }
 
