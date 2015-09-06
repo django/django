@@ -50,12 +50,10 @@ def method_decorator(decorator, name=''):
             if hasattr(decorator, "__iter__"):
                 # we assume it respects the sequence protocol and
                 # excuse if we are wrong.
-                # we use reversed because it returns an iterator
-                # reducing the assignement overhead
                 try:
-                    decorators = reversed(decorator)
+                    decorators = decorator[::-1]
                 except TypeError:
-                    decorators = reversed(tuple(decorator))
+                    decorators = tuple(decorator)[::-1]
                 for dec in decorators:
                     function = dec(function)
                 return function
