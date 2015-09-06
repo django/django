@@ -30,6 +30,11 @@ th {
     text-align: right;
 }
 
+.module ul, .module ol {
+    margin-left: 0;
+    margin-right: 1.5em;
+}
+
 .addlink, .changelink {
     padding-left: 0;
     padding-right: 16px;
@@ -74,8 +79,8 @@ div.breadcrumbs {
 }
 
 .colMS {
-    margin-left: 20em !important;
-    margin-right: 10px !important;
+    margin-left: 300px;
+    margin-right: 0;
 }
 
 /* SORTABLE TABLES */
@@ -98,10 +103,6 @@ thead th.sorted .text {
 
 /* changelists styles */
 
-.change-list .filtered {
-    background: #fff !important;
-}
-
 .change-list .filtered table {
     border-left: none;
     border-right: 0px none;
@@ -115,8 +116,8 @@ thead th.sorted .text {
 }
 
 .change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0px !important;
-    margin-left: 280px !important;
+    margin-right: 0;
+    margin-left: 280px;
 }
 
 #changelist-filter li.selected {
@@ -129,10 +130,8 @@ thead th.sorted .text {
 }
 
 .filtered .actions {
-    border-left:1px solid #DDDDDD;
-    margin-left:160px !important;
-    border-right: 0 none;
-    margin-right:0 !important;
+    margin-left: 280px;
+    margin-right: 0;
 }
 
 #changelist table tbody td:first-child, #changelist table tbody th:first-child {

@@ -20,7 +20,6 @@
 
 form .form-row p {
     padding-left: 0;
-    font-size: 11px !important;
 }
 
 .hidden {
@@ -29,21 +28,15 @@ form .form-row p {
 
 /* FORM LABELS */
 
-form h4 {
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-}
-
 label {
-    font-weight: normal !important;
+    font-weight: normal;
     color: #666;
     font-size: 13px;
 }
 
 .required label, label.required {
-    font-weight: bold !important;
-    color: #333 !important;
+    font-weight: bold;
+    color: #333;
 }
 
 /* RADIO BUTTONS */
@@ -91,8 +84,7 @@ form ul.inline li {
     height: 26px;
 }
 
-.aligned label + p:not(.help) {
-    font-size: 13px !important;
+.aligned label + p {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
@@ -158,7 +150,8 @@ form .aligned table p {
 }
 
 .aligned .vCheckboxLabel {
-    float: none !important;
+    float: none;
+    width: auto;
     display: inline-block;
     vertical-align: -3px;
     padding: 0 0 5px 5px;
@@ -174,7 +167,7 @@ form .aligned table p {
 
 .checkbox-row p.help {
     margin-left: 0;
-    padding-left: 0 !important;
+    padding-left: 0;
 }
 
 fieldset .field-box {
@@ -185,11 +178,11 @@ fieldset .field-box {
 /* WIDE FIELDSETS */
 
 .wide label {
-    width: 200px !important;
+    width: 200px;
 }
 
-form .wide p {
-    margin-left: 200px !important;
+form .wide p, form .wide input + p.help {
+    margin-left: 200px;
 }
 
 form .wide p.help {
@@ -207,7 +200,7 @@ fieldset.collapsed * {
 }
 
 fieldset.collapsed h2, fieldset.collapsed {
-    display: block !important;
+    display: block;
 }
 
 fieldset.collapsed {
@@ -227,7 +220,7 @@ fieldset .collapse-toggle {
 
 fieldset.collapsed .collapse-toggle {
     background: transparent;
-    display: inline !important;
+    display: inline;
     color: #447e9b;
 }
 
@@ -291,7 +284,7 @@ body.popup .submit-row {
 /* CUSTOM FORM FIELDS */
 
 .vSelectMultipleField {
-    vertical-align: top !important;
+    vertical-align: top;
 }
 
 .vCheckboxField {
@@ -300,6 +293,7 @@ body.popup .submit-row {
 
 .vDateField, .vTimeField {
     margin-right: 2px;
+    margin-bottom: 4px;
 }
 
 .vDateField {
