@@ -183,8 +183,7 @@ class DiscoverRunner(object):
         """
         Destroys all the non-mirror databases.
         """
-        old_names, mirrors = old_config
-        for connection, old_name, destroy in old_names:
+        for connection, old_name, destroy in old_config:
             if destroy:
                 connection.creation.destroy_test_db(old_name, self.verbosity, self.keepdb)
 
@@ -374,7 +373,6 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
     test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
 
     old_names = []
-    mirrors = []
 
     for signature, (db_name, aliases) in test_databases.items():
         first_alias = None
@@ -396,7 +394,6 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
                     connections[first_alias].settings_dict)
 
     for alias, mirror_alias in mirrored_aliases.items():
-        mirrors.append((alias, connections[alias].settings_dict['NAME']))
         connections[alias].creation.set_as_test_mirror(
             connections[mirror_alias].settings_dict)
 
@@ -404,4 +401,4 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, **kwa
         for alias in connections:
             connections[alias].force_debug_cursor = True
 
-    return old_names, mirrors
+    return old_names
