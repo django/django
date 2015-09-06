@@ -995,6 +995,7 @@ Miscellaneous
 * Private function ``django.utils.functional.total_ordering()`` has been
   removed. It contained a workaround for a ``functools.total_ordering()`` bug
   in Python versions older than 2.7.3.
+
 * XML serialization (either through :djadmin:`dumpdata` or the syndication
   framework) used to output any characters it received. Now if the content to
   be serialized contains any control characters not allowed in the XML 1.0
@@ -1022,6 +1023,12 @@ Miscellaneous
 * The ``FlatPage.enable_comments`` field is removed from the ``FlatPageAdmin``
   as it's unused by the application. If your project or a third-party app makes
   use of it, :ref:`create a custom ModelAdmin <flatpages-admin>` to add it back.
+
+* The return value of
+  :meth:`~django.test.runner.DiscoverRunner.setup_databases` and the first
+  argument of :meth:`~django.test.runner.DiscoverRunner.teardown_databases`
+  changed. They used to be ``(old_names, mirrors)`` tuples. Now they're just
+  the first item, ``old_names``.
 
 .. _deprecated-features-1.9:
 
