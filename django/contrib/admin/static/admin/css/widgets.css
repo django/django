@@ -243,14 +243,12 @@ p.datetime {
     margin: 0;
     padding: 0;
     color: #666;
-    font-size: 13px !important;
     font-weight: bold;
 }
 
 form .form-row p.datetime {
-    font-size: 13px !important;
     margin-left: 160px;
-    padding-left: 10px !important;
+    padding-left: 10px;
 }
 
 .datetime span {
@@ -260,10 +258,10 @@ form .form-row p.datetime {
     color: #ccc;
 }
 
-.datetime input {
+.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
     min-width: 0;
     margin-left: 5px;
-    margin-bottom: 4px !important;
+    margin-bottom: 4px;
 }
 
 table p.datetime {
@@ -490,8 +488,8 @@ span.clearable-file-input label {
 }
 
 .calendar-cancel {
-    margin: 0 !important;
-    padding: 4px 0 !important;
+    margin: 0;
+    padding: 4px 0;
     font-size: 12px;
     background: #eee;
     border-top: 1px solid #ddd;
