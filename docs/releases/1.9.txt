@@ -135,6 +135,10 @@ Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
 
+This option is enabled by default for Django's own test suite on database
+backends that support it (this is all the built-in backends except for
+Oracle).
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -686,7 +690,8 @@ Database backend API
   and hasn't been called anywhere in Django's code or tests.
 
 * In order to support test parallelization, you must implement the
-  ``DatabaseCreation._clone_test_db()`` method. You may have to adjust
+  ``DatabaseCreation._clone_test_db()`` method and set
+  ``DatabaseFeatures.can_clone_databases = True``. You may have to adjust
   ``DatabaseCreation.get_test_db_clone_settings()``.
 
 Default settings that were tuples are now lists
