@@ -284,3 +284,16 @@ combine this with ``--verbosity=2``, all SQL queries will be output::
 .. versionadded:: 1.8
 
     The ``--reverse`` and ``--debug-sql`` options were added.
+
+By default tests are run in parallel with one process per core. You can adjust
+this behavior with the ``--parallel`` option::
+
+    $ ./runtests.py basic --parallel=1
+
+You can also use the ``DJANGO_TEST_PROCESSES`` environment variable for this
+purpose.
+
+.. versionadded:: 1.9
+
+    Support for running tests in parallel and the ``--parallel`` option were
+    added.
