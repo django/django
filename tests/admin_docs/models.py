@@ -44,6 +44,17 @@ class Person(models.Model):
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)
 
+    def rename_company(self, new_name):
+        self.company.name = new_name
+        self.company.save()
+        return new_name
+
+    def dummy_function(self, baz, rox, *some_args, **some_kwargs):
+        return some_kwargs
+
+    def suffix_company_name(self, suffix='ltd'):
+        return self.company.name + suffix
+
     def add_image(self):
         pass
 
