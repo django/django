@@ -2025,6 +2025,28 @@ class AdminViewPermissionsTest(TestCase):
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
 
+    def test_post_save_message_no_forbidden_links_visible(self):
+        """
+        Post-save message shouldn't contain a link to the change form if the
+        user doen't have the change permission.
+        """
+        login = self.client.post(reverse('admin:login'), self.adduser_login)
+        self.assertRedirects(login, self.index_url)
+        # Emulate Article creation for user with add-only permission.
+        post_data = {
+            "title": "Fun & games",
+            "content": "Some content",
+            "date_0": "2015-10-31",
+            "date_1": "16:35:00",
+            "_save": "Save",
+        }
+        response = self.client.post(reverse('admin:admin_views_article_add'), post_data, follow=True)
+        self.assertContains(
+            response,
+            '<li class="success">The article "Fun &amp; games" was added successfully.</li>',
+            html=True
+        )
+
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_views.urls")
@@ -3801,10 +3823,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The cover letter &quot;Candidate, Best&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The cover letter "<a href="%s">'
+            'Candidate, Best</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_coverletter_change', args=(pk,)), html=True
         )
 
         # model has no __unicode__ method
@@ -3819,10 +3843,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = ShortMessage.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The short message &quot;ShortMessage object&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The short message "<a href="%s">'
+            'ShortMessage object</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_shortmessage_change', args=(pk,)), html=True
         )
 
     def test_add_model_modeladmin_only_qs(self):
@@ -3840,10 +3866,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The telegram &quot;Urgent telegram&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The telegram "<a href="%s">'
+            'Urgent telegram</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_telegram_change', args=(pk,)), html=True
         )
 
         # model has no __unicode__ method
@@ -3858,10 +3886,12 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = Paper.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The paper &quot;Paper object&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The paper "<a href="%s">'
+            'Paper object</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_paper_change', args=(pk,)), html=True
         )
 
     def test_edit_model_modeladmin_defer_qs(self):
@@ -3885,8 +3915,9 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="success">The cover letter &quot;John Doe II&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The cover letter "<a href="%s">'
+            'John Doe II</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_coverletter_change', args=(cl.pk,)), html=True
         )
 
         # model has no __unicode__ method
@@ -3906,11 +3937,10 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name. The ugly(!)
         # instance representation is set by six.text_type()
         self.assertContains(
-            response, (
-                '<li class="success">The short message '
-                '&quot;ShortMessage_Deferred_timestamp object&quot; was '
-                'changed successfully.</li>'
-            ), html=True
+            response,
+            '<li class="success">The short message "<a href="%s">'
+            'ShortMessage_Deferred_timestamp object</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), html=True
         )
 
     def test_edit_model_modeladmin_only_qs(self):
@@ -3934,8 +3964,9 @@ class AdminCustomQuerysetTest(TestCase):
         # representation is set by model's __unicode__()
         self.assertContains(
             response,
-            '<li class="success">The telegram &quot;Telegram without typo&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The telegram "<a href="%s">'
+            'Telegram without typo</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_telegram_change', args=(t.pk,)), html=True
         )
 
         # model has no __unicode__ method
@@ -3956,8 +3987,9 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="success">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The paper "<a href="%s">'
+            'Paper_Deferred_author object</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_paper_change', args=(p.pk,)), html=True
         )
 
     def test_history_view_custom_qs(self):

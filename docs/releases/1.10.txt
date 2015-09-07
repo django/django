@@ -36,6 +36,9 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* The success message that appears after adding or editing an object now
+  contains a link to the object's change form.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
