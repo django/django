@@ -33,7 +33,8 @@ Django settings files, use ``django-admin`` with
 option.
 
 The command-line examples throughout this document use ``django-admin`` to
-be consistent, but any example can use ``manage.py`` just as well.
+be consistent, but any example can use ``python -m django`` or ``manage.py``
+just as well.
 
 Usage
 =====
@@ -41,6 +42,7 @@ Usage
 .. code-block:: console
 
     $ django-admin <command> [options]
+    $ python -m django <command> [options]
     $ manage.py <command> [options]
 
 ``command`` should be one of the commands listed in this document.
