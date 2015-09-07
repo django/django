@@ -409,8 +409,7 @@ Management Commands
 * The :djadmin:`createcachetable` command now has a ``--dry-run`` flag to
   print out the SQL rather than execute it.
 
-* The :djadmin:`startapp` command creates an ``apps.py`` file and adds
-  ``default_app_config`` in ``__init__.py``.
+* The :djadmin:`startapp` command creates an ``apps.py`` file.
 
 * When using the PostgreSQL backend, the :djadmin:`dbshell` command can connect
   to the database using the password from your settings file (instead of

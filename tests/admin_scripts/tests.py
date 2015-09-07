@@ -599,10 +599,6 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
             self.assertIn("name = 'settings_test'", content)
-        with open(os.path.join(app_path, '__init__.py'), 'r') as f:
-            content = f.read()
-            expected_content = "default_app_config = 'settings_test.apps.SettingsTestConfig'"
-            self.assertIn(expected_content, content)
         if not PY3:
             with open(os.path.join(app_path, 'models.py'), 'r') as fp:
                 content = fp.read()
