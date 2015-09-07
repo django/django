@@ -2,7 +2,6 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
-import copy
 import datetime
 import re
 import threading
@@ -10,7 +9,6 @@ import unittest
 import warnings
 from decimal import Decimal, Rounded
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (
@@ -182,8 +180,8 @@ class PostgreSQLTests(TestCase):
                 nodb_conn = connection._nodb_connection
         del connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], settings.DATABASES[DEFAULT_DB_ALIAS]['NAME'])
-        # Check a RuntimeWarning nas been emitted
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
+        # Check a RuntimeWarning has been emitted
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0].message.__class__, RuntimeWarning)
 
@@ -219,9 +217,7 @@ class PostgreSQLTests(TestCase):
         PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
         transaction is rolled back (#17062).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         try:
             # Ensure the database default time zone is different than
@@ -258,10 +254,9 @@ class PostgreSQLTests(TestCase):
         The connection wrapper shouldn't believe that autocommit is enabled
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['AUTOCOMMIT'] = False
+
         try:
             # Open a database connection.
             new_connection.cursor()
@@ -285,10 +280,8 @@ class PostgreSQLTests(TestCase):
         # Check the level on the psycopg2 connection, not the Django wrapper.
         self.assertEqual(connection.connection.isolation_level, read_committed)
 
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['OPTIONS']['isolation_level'] = serializable
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
@@ -748,8 +741,7 @@ class BackendTestCase(TransactionTestCase):
         """
         old_queries_limit = BaseDatabaseWrapper.queries_limit
         BaseDatabaseWrapper.queries_limit = 3
-        new_connections = ConnectionHandler(settings.DATABASES)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         # Initialize the connection and clear initialization statements.
         with new_connection.cursor():
