@@ -1,5 +1,7 @@
 from django.http import HttpRequest
 from django.utils.datastructures import MultiValueDict
+from django.http.request import QueryDict
+from django.conf import settings
 
 
 def encode_request(request):
@@ -25,8 +27,8 @@ def decode_request(value):
     Decodes a request JSONish value to a HttpRequest object.
     """
     request = HttpRequest()
-    request.GET = MultiValueDict(value['GET'])
-    request.POST = MultiValueDict(value['POST'])
+    request.GET = CustomQueryDict(value['GET'])
+    request.POST = CustomQueryDict(value['POST'])
     request.COOKIES = value['COOKIES']
     request.META = value['META']
     request.path = value['path']
@@ -34,3 +36,12 @@ def decode_request(value):
     request.path_info = value['path_info']
     request.response_channel = value['response_channel']
     return request
+
+
+class CustomQueryDict(QueryDict):
+    """
+    Custom override of QueryDict that sets things directly.
+    """
+
+    def __init__(self, values):
+        MultiValueDict.__init__(self, values)
