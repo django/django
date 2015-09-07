@@ -486,6 +486,7 @@ class ModelAdmin(BaseModelAdmin):
     list_editable = ()
     search_fields = ()
     date_hierarchy = None
+    approximate_date_hierarchy = False
     save_as = False
     save_on_top = False
     paginator = Paginator
@@ -1464,7 +1465,8 @@ class ModelAdmin(BaseModelAdmin):
         try:
             cl = ChangeList(request, self.model, list_display,
                 list_display_links, list_filter, self.date_hierarchy,
-                search_fields, list_select_related, self.list_per_page,
+                self.approximate_date_hierarchy, search_fields,
+                list_select_related, self.list_per_page,
                 self.list_max_show_all, self.list_editable, self)
 
         except IncorrectLookupParameters:

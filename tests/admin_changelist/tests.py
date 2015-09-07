@@ -54,8 +54,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/child/')
         list_select_related = m.get_list_select_related(request)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                        m.list_filter, m.date_hierarchy, m.search_fields,
-                        list_select_related, m.list_per_page,
+                        m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                        m.search_fields, list_select_related, m.list_per_page,
                         m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.queryset.query.select_related, {
             'parent': {'name': {}}
@@ -66,8 +66,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
-                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
-                        list_select_related, ia.list_per_page,
+                        ia.list_filter, ia.date_hierarchy, ia.approximate_date_hierarchy,
+                        ia.search_fields, list_select_related, ia.list_per_page,
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}})
 
@@ -77,8 +77,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
-                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
-                        list_select_related, ia.list_per_page,
+                        ia.list_filter, ia.date_hierarchy, ia.approximate_date_hierarchy,
+                        ia.search_fields, list_select_related, ia.list_per_page,
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, False)
 
@@ -93,8 +93,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/invitation/')
         list_select_related = ia.get_list_select_related(request)
         cl = ChangeList(request, Child, ia.list_display, ia.list_display_links,
-                        ia.list_filter, ia.date_hierarchy, ia.search_fields,
-                        list_select_related, ia.list_per_page,
+                        ia.list_filter, ia.date_hierarchy, ia.approximate_date_hierarchy,
+                        ia.search_fields, list_select_related, ia.list_per_page,
                         ia.list_max_show_all, ia.list_editable, ia)
         self.assertEqual(cl.queryset.query.select_related, {'player': {}, 'band': {}})
 
@@ -109,7 +109,7 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
             m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -135,7 +135,7 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
             m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -159,7 +159,7 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,m.search_fields,
             m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -185,7 +185,7 @@ class ChangeListTests(TestCase):
         list_display = m.get_list_display(request)
         list_display_links = m.get_list_display_links(request, list_display)
         cl = ChangeList(request, Child, list_display, list_display_links,
-            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
             m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         cl.formset = None
         template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
@@ -218,7 +218,7 @@ class ChangeListTests(TestCase):
         m.list_display_links = ['id']
         m.list_editable = ['name']
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
         FormSet = m.get_changelist_formset(request)
         cl.formset = FormSet(queryset=cl.result_list)
@@ -250,7 +250,7 @@ class ChangeListTests(TestCase):
         m.list_editable = ['name']
         self.assertRaises(IncorrectLookupParameters, lambda:
             ChangeList(request, Child, m.list_display, m.list_display_links,
-                    m.list_filter, m.date_hierarchy, m.search_fields,
+                    m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
                     m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m))
 
     def test_custom_paginator(self):
@@ -262,7 +262,7 @@ class ChangeListTests(TestCase):
         m = CustomPaginationAdmin(Child, custom_site)
 
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy, m.search_fields,
                 m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
@@ -284,7 +284,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, Band, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
+                m.approximate_date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page,
                 m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
@@ -307,8 +308,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, Group, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
-                m.list_max_show_all, m.list_editable, m)
+                m.approximate_date_hierarchy, m.search_fields, m.list_select_related,
+                m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
 
@@ -332,8 +333,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, Concert, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
-                m.list_max_show_all, m.list_editable, m)
+                m.approximate_date_hierarchy, m.search_fields, m.list_select_related,
+                m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
 
@@ -356,8 +357,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, Quartet, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
-                m.list_max_show_all, m.list_editable, m)
+                m.approximate_date_hierarchy, m.search_fields, m.list_select_related,
+                m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
 
@@ -380,8 +381,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, ChordsBand, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
-                m.list_max_show_all, m.list_editable, m)
+                m.approximate_date_hierarchy, m.search_fields, m.list_select_related,
+                m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         cl.get_results(request)
 
@@ -402,8 +403,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/parent/', data={'child__name': 'Daniel'})
 
         cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
-                        m.list_filter, m.date_hierarchy, m.search_fields,
-                        m.list_select_related, m.list_per_page,
+                        m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                        m.search_fields, m.list_select_related, m.list_per_page,
                         m.list_max_show_all, m.list_editable, m)
 
         # Make sure distinct() was called
@@ -422,8 +423,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/parent/', data={SEARCH_VAR: 'daniel'})
 
         cl = ChangeList(request, Parent, m.list_display, m.list_display_links,
-                        m.list_filter, m.date_hierarchy, m.search_fields,
-                        m.list_select_related, m.list_per_page,
+                        m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                        m.search_fields, m.list_select_related, m.list_per_page,
                         m.list_max_show_all, m.list_editable, m)
 
         # Make sure distinct() was called
@@ -446,8 +447,8 @@ class ChangeListTests(TestCase):
 
         cl = ChangeList(request, Concert, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
-                m.list_max_show_all, m.list_editable, m)
+                m.approximate_date_hierarchy, m.search_fields, m.list_select_related,
+                m.list_per_page, m.list_max_show_all, m.list_editable, m)
 
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
@@ -467,9 +468,9 @@ class ChangeListTests(TestCase):
         # Test default queryset
         m = ChildAdmin(Child, custom_site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all,
-                m.list_editable, m)
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.queryset.count(), 60)
         self.assertEqual(cl.paginator.count, 60)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3, 4, 5, 6])
@@ -477,9 +478,9 @@ class ChangeListTests(TestCase):
         # Test custom queryset
         m = FilteredChildAdmin(Child, custom_site)
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, m.list_max_show_all,
-                m.list_editable, m)
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                m.list_max_show_all, m.list_editable, m)
         self.assertEqual(cl.queryset.count(), 30)
         self.assertEqual(cl.paginator.count, 30)
         self.assertEqual(list(cl.paginator.page_range), [1, 2, 3])
@@ -552,8 +553,9 @@ class ChangeListTests(TestCase):
         m = ChildAdmin(Child, custom_site)
         # 200 is the max we'll pass to ChangeList
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, 200, m.list_editable, m)
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                200, m.list_editable, m)
         cl.get_results(request)
         self.assertEqual(len(cl.result_list), 60)
 
@@ -562,8 +564,9 @@ class ChangeListTests(TestCase):
         m = ChildAdmin(Child, custom_site)
         # 30 is the max we'll pass to ChangeList for this test
         cl = ChangeList(request, Child, m.list_display, m.list_display_links,
-                m.list_filter, m.date_hierarchy, m.search_fields,
-                m.list_select_related, m.list_per_page, 30, m.list_editable, m)
+                m.list_filter, m.date_hierarchy, m.approximate_date_hierarchy,
+                m.search_fields, m.list_select_related, m.list_per_page,
+                30, m.list_editable, m)
         cl.get_results(request)
         self.assertEqual(len(cl.result_list), 10)
 
@@ -749,7 +752,8 @@ class ChangeListTests(TestCase):
         request = self.factory.get('/group/')
         cl = ChangeList(request, Group, m.list_display,
                 m.list_display_links, m.list_filter, m.date_hierarchy,
-                m.search_fields, m.list_select_related, m.list_per_page,
+                m.approximate_date_hierarchy, m.search_fields,
+                m.list_select_related, m.list_per_page,
                 m.list_max_show_all, m.list_editable, m)
         per_page = cl.list_per_page = 10
 
