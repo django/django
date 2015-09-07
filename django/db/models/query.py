@@ -115,7 +115,7 @@ class ValuesIterable(BaseIterable):
 
 class ValuesListIterable(BaseIterable):
     """
-    Iterable returned by QuerySet.values_lists(flat=False)
+    Iterable returned by QuerySet.values_list(flat=False)
     that yields a tuple for each row.
     """
 
@@ -148,7 +148,7 @@ class ValuesListIterable(BaseIterable):
 
 class FlatValuesListIterable(BaseIterable):
     """
-    Iterable returned by QuerySet.values_lists(flat=True) that
+    Iterable returned by QuerySet.values_list(flat=True) that
     yields single values.
     """
 
