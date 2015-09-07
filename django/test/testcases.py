@@ -5,8 +5,11 @@ import errno
 import json
 import os
 import posixpath
+import random
 import socket
+import ssl
 import sys
+import tempfile
 import threading
 import unittest
 import warnings
@@ -47,6 +50,11 @@ from django.utils.six.moves.urllib.parse import (
 )
 from django.utils.six.moves.urllib.request import url2pathname
 from django.views.static import serve
+
+try:
+    from OpenSSL import crypto
+except ImportError:
+    crypto = None
 
 __all__ = ('TestCase', 'TransactionTestCase',
            'SimpleTestCase', 'skipIfDBFeature', 'skipUnlessDBFeature')
@@ -1251,8 +1259,7 @@ class LiveServerThread(threading.Thread):
             # one that is free to use for the WSGI server.
             for index, port in enumerate(self.possible_ports):
                 try:
-                    self.httpd = WSGIServer(
-                        (self.host, port), QuietWSGIRequestHandler)
+                    self.httpd = self._create_server(port)
                 except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
                             e.errno == errno.EADDRINUSE):
@@ -1275,6 +1282,9 @@ class LiveServerThread(threading.Thread):
         except Exception as e:
             self.error = e
             self.is_ready.set()
+
+    def _create_server(self, port):
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1338,9 +1348,8 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(host, possible_ports,
-                                             cls.static_handler,
-                                             connections_override=connections_override)
+        cls.server_thread = cls._create_server_thread(
+            host, possible_ports, connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
@@ -1351,6 +1360,11 @@ class LiveServerTestCase(TransactionTestCase):
             # case of errors.
             cls._tearDownClassInternal()
             raise cls.server_thread.error
+
+    @classmethod
+    def _create_server_thread(cls, host, possible_ports, connections_override):
+        return LiveServerThread(host, possible_ports, cls.static_handler,
+                                connections_override=connections_override)
 
     @classmethod
     def _tearDownClassInternal(cls):
@@ -1370,3 +1384,105 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
+
+
+class HTTPSWSGIServer(WSGIServer):
+    def __init__(self, address, handler_class, certificate, key):
+        super(HTTPSWSGIServer, self).__init__(address, handler_class)
+        self.socket = ssl.wrap_socket(
+            self.socket, certfile=certificate, keyfile=key, server_side=True,
+            ssl_version=ssl.PROTOCOL_TLSv1, cert_reqs=ssl.CERT_NONE)
+
+
+class LiveHTTPSServerThread(LiveServerThread):
+    def __init__(self, host, possible_ports, static_handler,
+                 connections_override, certificate, private_key):
+        self.certificate = certificate
+        self.key = private_key
+        super(LiveHTTPSServerThread, self).__init__(
+            host, possible_ports, static_handler, connections_override)
+
+    def _create_server(self, port):
+        return HTTPSWSGIServer((self.host, port), QuietWSGIRequestHandler,
+                               self.certificate, self.key)
+
+
+class LiveHTTPSServerTestCase(LiveServerTestCase):
+    """
+    Does basically the same as LiveServerTestCase, but launches an HTTPS server
+    instead of HTTP.
+    """
+    certificate_path = None
+    private_key_path = None
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.certificate_path and cls.certificate_path:
+            cls._temporary_certificate_used = False
+        else:
+            cls.certificate_path, cls.private_key_path = (
+                cls.generate_certificate())
+            cls._temporary_certificate_used = True
+        super(LiveHTTPSServerTestCase, cls).setUpClass()
+
+    @classmethod
+    def generate_certificate(cls):
+        if not crypto:
+            raise unittest.SkipTest('pyOpenSSL is not installed')
+        return CertificateGenerator(domain=cls._get_host()).generate()
+
+    @staticmethod
+    def _get_host():
+        specified_address = os.environ.get(
+            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+        return specified_address.split(':')[0]
+
+    @classmethod
+    def tearDownClass(cls):
+        super(LiveHTTPSServerTestCase, cls).tearDownClass()
+        if cls._temporary_certificate_used:
+            os.remove(cls.certificate_path)
+            os.remove(cls.private_key_path)
+
+    @classproperty
+    def live_server_url(cls):
+        return 'https://%s:%s' % (
+            cls.server_thread.host, cls.server_thread.port)
+
+    @classmethod
+    def _create_server_thread(cls, host, possible_ports, connections_override):
+        return LiveHTTPSServerThread(
+            host, possible_ports, cls.static_handler, connections_override,
+            cls.certificate_path, cls.private_key_path)
+
+
+class CertificateGenerator(object):
+    def __init__(self, domain):
+        self.domain = domain
+
+    def generate(self):
+        private_key_path = tempfile.mkstemp(suffix='testserver.key')[1]
+        certificate_path = tempfile.mkstemp(suffix='testserver.crt')[1]
+        private_key = self._generate_private_key()
+        certificate = self._generate_certificate(private_key)
+        with open(private_key_path, 'wb') as f:
+            f.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, private_key))
+        with open(certificate_path, 'wb') as f:
+            f.write(crypto.dump_certificate(crypto.FILETYPE_PEM, certificate))
+        return certificate_path, private_key_path
+
+    def _generate_private_key(self):
+        private_key = crypto.PKey()
+        private_key.generate_key(crypto.TYPE_RSA, 1024)
+        return private_key
+
+    def _generate_certificate(self, private_key):
+        certificate = crypto.X509()
+        certificate.get_subject().CN = self.domain
+        certificate.set_serial_number(random.randrange(10000))
+        certificate.gmtime_adj_notBefore(0)
+        certificate.gmtime_adj_notAfter(365 * 24 * 60 * 60)
+        certificate.set_issuer(certificate.get_subject())
+        certificate.set_pubkey(private_key)
+        certificate.sign(private_key, 'sha1')
+        return certificate

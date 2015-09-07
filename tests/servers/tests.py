@@ -7,13 +7,18 @@ from __future__ import unicode_literals
 import contextlib
 import os
 import socket
+import unittest
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import LiveServerTestCase, override_settings
+from django.test import (
+    LiveHTTPSServerTestCase, LiveServerTestCase, override_settings,
+)
 from django.utils._os import upath
 from django.utils.http import urlencode
+from django.utils.module_loading import import_string
 from django.utils.six import text_type
 from django.utils.six.moves.urllib.error import HTTPError
+from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.six.moves.urllib.request import urlopen
 
 from .models import Person
@@ -174,3 +179,54 @@ class LiveServerDatabase(LiveServerBase):
             ['jane', 'robert', 'emily'],
             lambda b: b.name
         )
+
+
+run_selenium = os.environ.get('DJANGO_SELENIUM_TESTS', False)
+
+
+@unittest.skipIf(not run_selenium, 'Selenium tests not requested')
+@override_settings(ROOT_URLCONF='servers.urls', **TEST_SETTINGS)
+class BaseLiveHTTPSServer(LiveHTTPSServerTestCase):
+    available_apps = [
+        'servers',
+    ]
+
+    @property
+    def webdriver_class(self):
+        raise NotImplementedError
+
+    @classmethod
+    def setUpClass(cls):
+        super(BaseLiveHTTPSServer, cls).setUpClass()
+        try:
+            cls.selenium = import_string(cls.webdriver_class)()
+        except Exception as e:
+            raise unittest.SkipTest(
+                'Selenium webdriver "%s" not installed or not operational: %s'
+                % (cls.webdriver_class, str(e)))
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.selenium.quit()
+        super(BaseLiveHTTPSServer, cls).tearDownClass()
+
+    def test_if_secure_cookies_are_sent_and_received(self):
+        url_in_domain = urljoin(self.live_server_url, 'example_view/')
+        self.selenium.get(url_in_domain)
+        self.selenium.add_cookie(
+            {'name': 'http_cookie', 'value': 'present!', 'secure': False})
+        self.selenium.add_cookie(
+            {'name': 'https_cookie', 'value': 'present!', 'secure': True})
+        environ_url = urljoin(self.live_server_url, 'environ_view/')
+        self.selenium.get(environ_url)
+        body = self.selenium.find_element_by_tag_name('body').text
+        self.assertIn('http_cookie=present!', body)
+        self.assertIn('https_cookie=present!', body)
+
+
+class LiveHTTPSServerOnFirefox(BaseLiveHTTPSServer):
+    webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
+
+
+class LiveHTTPSServerOnChrome(BaseLiveHTTPSServer):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
