@@ -159,7 +159,7 @@ a.active.selector-clearall {
 
 .stacked {
     float: left;
-    width: 500px;
+    width: 490px;
 }
 
 .stacked select {
@@ -176,13 +176,13 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-available input {
-    width: 442px;
+    width: 422px;
 }
 
 .stacked ul.selector-chooser {
     height: 22px;
     width: 50px;
-    margin: 0 0 3px 40%;
+    margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
 }
@@ -197,22 +197,22 @@ a.active.selector-clearall {
 }
 
 .stacked .selector-add {
-    background: url(../img/selector-icons.svg) 0 0 no-repeat;
-    cursor: default;
-}
-
-.stacked .active.selector-add {
-    background-position: 0 -16px;
-    cursor: pointer;
-}
-
-.stacked .selector-remove {
     background: url(../img/selector-icons.svg) 0 -32px no-repeat;
     cursor: default;
 }
 
-.stacked .active.selector-remove {
+.stacked .active.selector-add {
     background-position: 0 -48px;
+    cursor: pointer;
+}
+
+.stacked .selector-remove {
+    background: url(../img/selector-icons.svg) 0 0 no-repeat;
+    cursor: default;
+}
+
+.stacked .active.selector-remove {
+    background-position: 0 -16px;
     cursor: pointer;
 }
 
