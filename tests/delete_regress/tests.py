@@ -2,9 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.conf import settings
-from django.db import DEFAULT_DB_ALIAS, models, transaction
-from django.db.utils import ConnectionHandler
+from django.db import connection, models, transaction
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import (
@@ -24,8 +22,7 @@ class DeleteLockingTest(TransactionTestCase):
 
     def setUp(self):
         # Create a second connection to the default database
-        new_connections = ConnectionHandler(settings.DATABASES)
-        self.conn2 = new_connections[DEFAULT_DB_ALIAS]
+        self.conn2 = connection.copy()
         self.conn2.set_autocommit(False)
 
     def tearDown(self):
