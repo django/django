@@ -418,6 +418,9 @@ Management Commands
 * The ``django`` package may be run as a script, i.e. ``python -m django``,
   which will behave the same as ``django-admin``.
 
+* Management commands that have the ``--noinput`` option now also take
+  ``--no-input`` as an alias for that option.
+
 Migrations
 ^^^^^^^^^^
 

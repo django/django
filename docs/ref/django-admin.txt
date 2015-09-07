@@ -1552,7 +1552,12 @@ If not provided all locales are processed.
 
 Use the ``--noinput`` option to suppress all user prompting, such as "Are
 you sure?" confirmation messages. This is useful if ``django-admin`` is
-being executed as an unattended, automated script.
+being executed as an unattended, automated script. You can use ``--no-input``
+as an alias for this option.
+
+.. versionchanged:: 1.9
+
+    The ``--no-input`` alias was added.
 
 Extra niceties
 ==============

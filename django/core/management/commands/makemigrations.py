@@ -29,7 +29,8 @@ class Command(BaseCommand):
             help="Enable fixing of migration conflicts.")
         parser.add_argument('--empty', action='store_true', dest='empty', default=False,
             help="Create an empty migration.")
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+        parser.add_argument('--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('-n', '--name', action='store', dest='name', default=None,
             help="Use this name for migration file(s).")
