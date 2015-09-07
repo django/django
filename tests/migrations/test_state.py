@@ -625,8 +625,16 @@ class StateTests(SimpleTestCase):
                 app_label = "migrations"
                 apps = new_apps
 
+        class Publisher(models.Model):
+            name = models.TextField()
+
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
         class Book(models.Model):
             author = models.ForeignKey(Author, models.CASCADE)
+            publisher = models.ForeignKey(Publisher, models.CASCADE)
 
             class Meta:
                 app_label = "migrations"
@@ -642,21 +650,46 @@ class StateTests(SimpleTestCase):
         # Make a valid ProjectState and render it
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Author))
+        project_state.add_model(ModelState.from_model(Publisher))
         project_state.add_model(ModelState.from_model(Book))
         project_state.add_model(ModelState.from_model(Magazine))
-        self.assertEqual(len(project_state.apps.get_models()), 3)
+        self.assertEqual(len(project_state.apps.get_models()), 4)
 
         # now make an invalid one with a ForeignKey
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Book))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as cm:
             project_state.apps
+        self.assertEqual(
+            str(cm.exception),
+            "Unhandled pending operations for models:\n"
+            "  migrations.author (referred to by fields: migrations.Book.author)\n"
+            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+        )
 
         # and another with ManyToManyField
         project_state = ProjectState()
         project_state.add_model(ModelState.from_model(Magazine))
-        with self.assertRaises(ValueError):
+        with self.assertRaises(ValueError) as cm:
             project_state.apps
+        self.assertEqual(
+            str(cm.exception),
+            "Unhandled pending operations for models:\n"
+            "  migrations.author (referred to by fields: "
+            "migrations.Magazine.authors, migrations.Magazine_authors.author)"
+        )
+
+        # and now with multiple models and multiple fields
+        project_state.add_model(ModelState.from_model(Book))
+        with self.assertRaises(ValueError) as cm:
+            project_state.apps
+        self.assertEqual(
+            str(cm.exception),
+            "Unhandled pending operations for models:\n"
+            "  migrations.author (referred to by fields: "
+            "migrations.Book.author, migrations.Magazine.authors, migrations.Magazine_authors.author)\n"
+            "  migrations.publisher (referred to by fields: migrations.Book.publisher)"
+        )
 
     def test_real_apps(self):
         """
