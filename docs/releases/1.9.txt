@@ -1212,6 +1212,12 @@ Miscellaneous
   ``SimpleTestCase.assertRaisesMessage()`` is deprecated. Pass the callable as
   a positional argument instead.
 
+* The ``allow_tags`` attribute on methods of ``ModelAdmin`` has been
+  deprecated. Use :func:`~django.utils.html.format_html`,
+  :func:`~django.utils.html.format_html_join`, or
+  :func:`~django.utils.safestring.mark_safe` when constructing the method's
+  return value instead.
+
 .. removed-features-1.9:
 
 Features removed in 1.9
