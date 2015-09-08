@@ -23,7 +23,6 @@ now underlie every part of Django.
 
 Make a new project, a new app, and put this in a ``consumers.py`` file in the app::
 
-    from channels import Channel
     from django.http import HttpResponse
 
     def http_consumer(message):
