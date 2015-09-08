@@ -131,7 +131,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q.getlist('foo'), [])
 
         q.setlist('foo', ['bar', 'baz'])
-        self.assertEqual(q.get('foo', 'default'), 'baz')
+        self.assertEqual(q.get('foo', 'default'), ['bar', 'baz'])
         self.assertEqual(q.getlist('foo'), ['bar', 'baz'])
 
         q.appendlist('foo', 'another')
@@ -152,7 +152,7 @@ class QueryDictTests(unittest.TestCase):
 
         q.update({'foo': 'hello'})
         self.assertEqual(q['foo'], 'hello')
-        self.assertEqual(q.get('foo', 'not available'), 'hello')
+        self.assertEqual(q.get('foo', 'not available'), ['bar', 'baz', 'another', 'hello'])
         self.assertEqual(q.getlist('foo'), ['bar', 'baz', 'another', 'hello'])
         self.assertEqual(q.pop('foo'), ['bar', 'baz', 'another', 'hello'])
         self.assertEqual(q.pop('foo', 'not there'), 'not there')
@@ -173,7 +173,7 @@ class QueryDictTests(unittest.TestCase):
         self.assertEqual(q['vote'], 'no')
         self.assertRaises(AttributeError, q.__setitem__, 'something', 'bar')
 
-        self.assertEqual(q.get('vote', 'default'), 'no')
+        self.assertEqual(q.get('vote', 'default'), ['yes', 'no'])
         self.assertEqual(q.get('foo', 'default'), 'default')
         self.assertEqual(q.getlist('vote'), ['yes', 'no'])
         self.assertEqual(q.getlist('foo'), [])
