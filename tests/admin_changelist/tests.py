@@ -12,9 +12,10 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import reverse
 from django.template import Context, Template
-from django.test import TestCase, override_settings
+from django.test import TestCase, ignore_warnings, override_settings
 from django.test.client import RequestFactory
 from django.utils import formats, six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 from .admin import (
     BandAdmin, ChildAdmin, ChordsBandAdmin, ConcertAdmin,
@@ -168,7 +169,7 @@ class ChangeListTests(TestCase):
         link = reverse('admin:admin_changelist_child_change', args=(new_child.id,))
         row_html = (
             '<tbody><tr class="row1"><th class="field-name"><a href="%s">name</a></th>'
-            '<td class="field-age_display">&dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
+            '<td class="field-age_display">&amp;dagger;</td><td class="field-age">-empty-</td></tr></tbody>' % link
         )
         self.assertNotEqual(table_output.find(row_html), -1,
             'Failed to find expected row element: %s' % table_output)
@@ -252,6 +253,38 @@ class ChangeListTests(TestCase):
             ChangeList(request, Child, m.list_display, m.list_display_links,
                     m.list_filter, m.date_hierarchy, m.search_fields,
                     m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_result_list_with_allow_tags(self):
+        """
+        Test for deprecation of allow_tags attribute
+        """
+        new_parent = Parent.objects.create(name='parent')
+        for i in range(2):
+            Child.objects.create(name='name %s' % i, parent=new_parent)
+        request = self.factory.get('/child/')
+        m = ChildAdmin(Child, custom_site)
+
+        def custom_method(self, obj=None):
+            return 'Unsafe html <br />'
+        custom_method.allow_tags = True
+
+        # Add custom method with allow_tags attribute
+        m.custom_method = custom_method
+        m.list_display = ['id', 'name', 'parent', 'custom_method']
+
+        cl = ChangeList(
+            request, Child, m.list_display, m.list_display_links,
+            m.list_filter, m.date_hierarchy, m.search_fields,
+            m.list_select_related, m.list_per_page, m.list_max_show_all, m.list_editable, m
+        )
+        FormSet = m.get_changelist_formset(request)
+        cl.formset = FormSet(queryset=cl.result_list)
+        template = Template('{% load admin_list %}{% spaceless %}{% result_list cl %}{% endspaceless %}')
+        context = Context({'cl': cl})
+        table_output = template.render(context)
+        custom_field_html = '<td class="field-custom_method">Unsafe html <br /></td>'
+        self.assertInHTML(custom_field_html, table_output)
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
