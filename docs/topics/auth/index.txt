@@ -60,12 +60,14 @@ startproject <startproject>`, these consist of two items listed in your
    </ref/contrib/contenttypes>`, which allows permissions to be associated with
    models you create.
 
-and two items in your :setting:`MIDDLEWARE_CLASSES` setting:
+and these items in your :setting:`MIDDLEWARE_CLASSES` setting:
 
 1. :class:`~django.contrib.sessions.middleware.SessionMiddleware` manages
    :doc:`sessions </topics/http/sessions>` across requests.
 2. :class:`~django.contrib.auth.middleware.AuthenticationMiddleware` associates
    users with requests using sessions.
+3. :class:`~django.contrib.auth.middleware.SessionAuthenticationMiddleware`
+   logs users out of their other sessions after a password change.
 
 With these settings in place, running the command ``manage.py migrate`` creates
 the necessary database tables for auth related models and permissions for any

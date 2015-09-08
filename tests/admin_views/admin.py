@@ -15,6 +15,7 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import EmailMessage
+from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.safestring import mark_safe
@@ -23,9 +24,9 @@ from django.utils.six import StringIO
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
-    Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice, City,
-    Collector, Color, Color2, ComplexSortedPerson, CoverLetter, CustomArticle,
-    CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
+    Bookmark, Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice,
+    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
+    CustomArticle, CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
     EmptyModelHidden, EmptyModelMixin, EmptyModelVisible, ExplicitlyProvidedPK,
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gadget, Gallery,
@@ -168,7 +169,11 @@ class ThingAdmin(admin.ModelAdmin):
 
 
 class InquisitionAdmin(admin.ModelAdmin):
-    list_display = ('leader', 'country', 'expected')
+    list_display = ('leader', 'country', 'expected', 'sketch')
+
+    def sketch(self, obj):
+        # A method with the same name as a reverse accessor.
+        return 'list-display-sketch'
 
 
 class SketchAdmin(admin.ModelAdmin):
@@ -288,6 +293,7 @@ class ChildInline(admin.StackedInline):
 class ParentAdmin(admin.ModelAdmin):
     model = Parent
     inlines = [ChildInline]
+    save_as = True
 
     list_editable = ('name',)
 
@@ -309,7 +315,7 @@ class OldSubscriberAdmin(admin.ModelAdmin):
     actions = None
 
 
-temp_storage = FileSystemStorage(tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR']))
+temp_storage = FileSystemStorage(tempfile.mkdtemp())
 UPLOAD_TO = os.path.join(temp_storage.location, 'test_upload')
 
 
@@ -653,6 +659,7 @@ class RelatedPrepopulatedInline1(admin.StackedInline):
             'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
         }),
     )
+    formfield_overrides = {models.CharField: {'strip': False}}
     model = RelatedPrepopulated
     extra = 1
     prepopulated_fields = {'slug1': ['name', 'pubdate'],
@@ -670,11 +677,15 @@ class MainPrepopulatedAdmin(admin.ModelAdmin):
     inlines = [RelatedPrepopulatedInline1, RelatedPrepopulatedInline2]
     fieldsets = (
         (None, {
-            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2',),)
+            'fields': (('pubdate', 'status'), ('name', 'slug1', 'slug2', 'slug3'))
         }),
     )
-    prepopulated_fields = {'slug1': ['name', 'pubdate'],
-                           'slug2': ['status', 'name']}
+    formfield_overrides = {models.CharField: {'strip': False}}
+    prepopulated_fields = {
+        'slug1': ['name', 'pubdate'],
+        'slug2': ['status', 'name'],
+        'slug3': ['name'],
+    }
 
 
 class UnorderedObjectAdmin(admin.ModelAdmin):
@@ -693,7 +704,7 @@ class UnchangeableObjectAdmin(admin.ModelAdmin):
     def get_urls(self):
         # Disable change_view, but leave other urls untouched
         urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
-        return [p for p in urlpatterns if not p.name.endswith("_change")]
+        return [p for p in urlpatterns if p.name and not p.name.endswith("_change")]
 
 
 def callable_on_unknown(obj):
@@ -870,7 +881,7 @@ site = admin.AdminSite(name="admin")
 site.site_url = '/my-site-url/'
 site.register(Article, ArticleAdmin)
 site.register(CustomArticle, CustomArticleAdmin)
-site.register(Section, save_as=True, inlines=[ArticleInline])
+site.register(Section, save_as=True, inlines=[ArticleInline], readonly_fields=['name_property'])
 site.register(ModelWithStringPrimaryKey)
 site.register(Color)
 site.register(Thing, ThingAdmin)
@@ -901,6 +912,7 @@ site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
 site.register(PlotDetails)
+site.register(Bookmark)
 site.register(CyclicOne)
 site.register(CyclicTwo)
 site.register(WorkHour, WorkHourAdmin)

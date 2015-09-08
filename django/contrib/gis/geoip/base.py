@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 from ctypes import c_char_p
 
 from django.contrib.gis.geoip.libgeoip import GEOIP_SETTINGS
@@ -11,7 +12,8 @@ from django.contrib.gis.geoip.prototypes import (
 )
 from django.core.validators import ipv4_re
 from django.utils import six
-from django.utils.encoding import force_bytes
+from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.encoding import force_bytes, force_text
 
 # Regular expressions for recognizing the GeoIP free database editions.
 free_regex = re.compile(r'^GEO-\d{3}FREE')
@@ -81,6 +83,13 @@ class GeoIP(object):
         * city: The name of the GeoIP city data file.  Defaults to
             'GeoLiteCity.dat'; overrides the GEOIP_CITY settings attribute.
         """
+
+        warnings.warn(
+            "django.contrib.gis.geoip is deprecated in favor of "
+            "django.contrib.gis.geoip2 and the MaxMind GeoLite2 database "
+            "format.", RemovedInDjango20Warning, 2
+        )
+
         # Checking the given cache option.
         if cache in self.cache_options:
             self._cache = cache
@@ -89,7 +98,7 @@ class GeoIP(object):
 
         # Getting the GeoIP data path.
         if not path:
-            path = GEOIP_SETTINGS.get('GEOIP_PATH', None)
+            path = GEOIP_SETTINGS.get('GEOIP_PATH')
             if not path:
                 raise GeoIPException('GeoIP path must be provided via parameter or the GEOIP_PATH setting.')
         if not isinstance(path, six.string_types):
@@ -135,6 +144,17 @@ class GeoIP(object):
             GeoIP_delete(self._country)
         if self._city:
             GeoIP_delete(self._city)
+
+    def __repr__(self):
+        version = ''
+        if GeoIP_lib_version is not None:
+            version += ' [v%s]' % force_text(GeoIP_lib_version())
+        return '<%(cls)s%(version)s _country_file="%(country)s", _city_file="%(city)s">' % {
+            'cls': self.__class__.__name__,
+            'version': version,
+            'country': self._country_file,
+            'city': self._city_file,
+        }
 
     def _check_query(self, query, country=False, city=False, city_or_country=False):
         "Helper routine for checking the query and database availability."

@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import uuid
 from unittest import skipUnless
 
 from django.core import serializers
@@ -18,7 +19,7 @@ from django.core.serializers.base import DeserializationError
 from django.core.serializers.xml_serializer import DTDForbidden
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils.functional import curry
 
@@ -27,14 +28,15 @@ from .models import (
     BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
     DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
     ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
-    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FloatData,
-    FloatPKData, GenericData, GenericIPAddressData, GenericIPAddressPKData,
-    InheritAbstractModel, InheritBaseModel, IntegerData, IntegerPKData,
-    Intermediate, LengthModel, M2MData, M2MIntermediateData, M2MSelfData,
-    ModifyingSaveData, NaturalKeyAnchor, NullBooleanData, O2OData,
-    PositiveIntegerData, PositiveIntegerPKData, PositiveSmallIntegerData,
-    PositiveSmallIntegerPKData, ProxyBaseModel, ProxyProxyBaseModel, SlugData,
-    SlugPKData, SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor,
+    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
+    FloatData, FloatPKData, GenericData, GenericIPAddressData,
+    GenericIPAddressPKData, InheritAbstractModel, InheritBaseModel,
+    IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
+    M2MIntermediateData, M2MSelfData, ModifyingSaveData, NaturalKeyAnchor,
+    NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
+    PositiveSmallIntegerData, PositiveSmallIntegerPKData, ProxyBaseModel,
+    ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
+    TextData, TimeData, UniqueAnchor, UUIDData,
 )
 
 try:
@@ -199,6 +201,7 @@ im_obj = (im_create, im_compare)
 o2o_obj = (o2o_create, o2o_compare)
 pk_obj = (pk_create, pk_compare)
 inherited_obj = (inherited_create, inherited_compare)
+uuid_obj = uuid.uuid4()
 
 test_data = [
     # Format: (data type, PK value, Model Class, data)
@@ -354,6 +357,8 @@ The end."""),
     # The end."""),
     # (pk_obj, 770, TimePKData, datetime.time(10, 42, 37)),
     # (pk_obj, 790, XMLPKData, "<foo></foo>"),
+    (pk_obj, 791, UUIDData, uuid_obj),
+    (fk_obj, 792, FKToUUID, uuid_obj),
 
     (data_obj, 800, AutoNowDateTimeData, datetime.datetime(2006, 6, 16, 10, 42, 37)),
     (data_obj, 810, ModifyingSaveData, 42),
@@ -579,7 +584,7 @@ for format in [f for f in serializers.get_serializer_formats()
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))
 
 
-class XmlDeserializerSecurityTests(TestCase):
+class XmlDeserializerSecurityTests(SimpleTestCase):
 
     def test_no_dtd(self):
         """
@@ -587,7 +592,6 @@ class XmlDeserializerSecurityTests(TestCase):
 
         This is the most straightforward way to prevent all entity definitions
         and avoid both external entities and entity-expansion attacks.
-
         """
         xml = '<?xml version="1.0" standalone="no"?><!DOCTYPE example SYSTEM "http://example.com/example.dtd">'
         with self.assertRaises(DTDForbidden):

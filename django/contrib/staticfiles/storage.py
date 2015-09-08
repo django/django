@@ -308,7 +308,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         except ValueError:
             pass
         else:
-            version = stored.get('version', None)
+            version = stored.get('version')
             if version == '1.0':
                 return stored.get('paths', OrderedDict())
         raise ValueError("Couldn't load manifest '%s' (version %s)" %
@@ -341,7 +341,7 @@ class _MappingCache(object):
         self.cache.set(key, value)
 
     def __getitem__(self, key):
-        value = self.cache.get(key, None)
+        value = self.cache.get(key)
         if value is None:
             raise KeyError("Couldn't find a file name '%s'" % key)
         return value

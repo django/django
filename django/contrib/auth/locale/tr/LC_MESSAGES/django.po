@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# Burak Yavuz, 2014
+# BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-09-07 17:59+0000\n"
-"Last-Translator: Burak Yavuz\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:35+0000\n"
+"Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/projects/p/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -25,80 +25,47 @@ msgstr ""
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Kişisel bilgiler"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "İzinler"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Önemli tarihler"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "%(key)r birincil anahtarı olan %(name)s nesnesi mevcut değil."
+
 msgid "Password changed successfully."
 msgstr "Parola başarılı olarak değiştirildi."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Parolayı değiştir: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Kimlik Doğrulama ve Yetkilendirme"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Ayarlı parola yok."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Geçersiz parola biçimi veya bilinmeyen adresleme algoritması."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Bu kullanıcı adında bir kullanıcı zaten mevcut."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "İki parola alanı uyuşmadı."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Kullanıcı adı"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Zorunlu. 30 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
-"+/-/_ karakterleri kullanılabilir."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Bu değer sadece harfleri, rakamları ve @/./+/-/_ karakterlerini içerebilir."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Parola"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Parola onayı"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Doğrulama için yukarıdaki parolanın aynısını girin."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -108,7 +75,6 @@ msgstr ""
 "yoktur, fakat <a href=\"password/\">bu formu</a> kullanarak parolayı "
 "değiştirebilirsiniz."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -117,102 +83,72 @@ msgstr ""
 "Lütfen doğru %(username)s ve parola girin. Her iki alanında büyük küçük "
 "harfe duyarlı olabileceğini unutmayın."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Bu hesap devre dışı."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "E-posta"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Yeni parola"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Yeni parola onayı"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Eski parolanız yanlış girildi. Lütfen tekrar girin."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Eski parola"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Parola (tekrar)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algoritma"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "yinelemeler"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "tuz"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "adresleme"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "iş faktörü"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "sağlama"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "adı"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "kod adı"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "izin"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "izinler"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "gruplar"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "parola"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "son oturum açma"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "süper kullanıcı durumu"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -220,55 +156,55 @@ msgstr ""
 "Bu kullanıcıya ayrı ayrı izin atamadan tüm izinlerin verilip verilmeyeceğini "
 "belirler."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Bu kullanıcının bağlı olduğu gruplar. Bir kullanıcı, her bir grubuna verilen "
-"tüm izinleri alacak."
+"Bu kullanıcının ait olduğu gruplar. Bir kullanıcı kendi gruplarının her "
+"birine verilmiş olan tüm izinleri alacak."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "kullanıcı izinleri"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Bu kullanıcı için belirli izinler."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "kullanıcı adı"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Geçerli bir kullanıcı adı girin."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Zorunlu. 30 karakter ya da daha az olmalı. Sadece harfler, rakamlar ve @/./"
+"+/-/_ karakterleri kullanılabilir."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Geçerli bir kullanıcı adı girin. Bu değer sadece harfleri, sayıları ve @/./"
+"+/-/_ karakterlerini içerebilir."
+
+msgid "A user with that username already exists."
+msgstr "Bu kullanıcı adında bir kullanıcı zaten mevcut."
+
 msgid "first name"
 msgstr "adı"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "soyadı"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "e-posta adresi"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "görev durumu"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Kullanıcının bu yönetici sitesine oturum açıp açamayacağını belirler."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "etkin"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -276,55 +212,39 @@ msgstr ""
 "Bu kullanıcının etkin olarak işlem görüp görmediğini belirler. Hesapları "
 "silmek yerine bunun işaretini kaldırın."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "katılma tarihi"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "kullanıcı"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "kullanıcılar"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s sitesinde parola sıfırlama"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Geçerli bir e-posta adresi girin."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Oturum kapatıldı"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Parolayı sıfırla"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Parola sıfırlama başarılı"
+msgid "Password reset sent"
+msgstr "Parola sıfırlama gönderildi"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Yeni parolayı girin"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Parola sıfırlama başarısız"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Parola sıfırlama tamamlandı"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Parola değiştirme"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Parola değiştirme başarılı"

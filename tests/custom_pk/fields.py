@@ -43,7 +43,7 @@ class MyAutoField(models.CharField):
             value = MyWrapper(value)
         return value
 
-    def from_db_value(self, value, connection, context):
+    def from_db_value(self, value, expression, connection, context):
         if not value:
             return
         return MyWrapper(value)

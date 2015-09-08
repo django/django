@@ -1,5 +1,7 @@
 from django import http
 from django.template import Context, Engine, TemplateDoesNotExist, loader
+from django.utils import six
+from django.utils.encoding import force_text
 from django.views.decorators.csrf import requires_csrf_token
 
 
@@ -7,7 +9,7 @@ from django.views.decorators.csrf import requires_csrf_token
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.
 @requires_csrf_token
-def page_not_found(request, template_name='404.html'):
+def page_not_found(request, exception, template_name='404.html'):
     """
     Default 404 handler.
 
@@ -15,8 +17,24 @@ def page_not_found(request, template_name='404.html'):
     Context:
         request_path
             The path of the requested URL (e.g., '/app/pages/bad_page/')
+        exception
+            The message from the exception which triggered the 404 (if one was
+            supplied), or the exception class name
     """
-    context = {'request_path': request.path}
+    exception_repr = exception.__class__.__name__
+    # Try to get an "interesting" exception message, if any (and not the ugly
+    # Resolver404 dictionary)
+    try:
+        message = exception.args[0]
+    except (AttributeError, IndexError):
+        pass
+    else:
+        if isinstance(message, six.text_type):
+            exception_repr = message
+    context = {
+        'request_path': request.path,
+        'exception': exception_repr,
+    }
     try:
         template = loader.get_template(template_name)
         body = template.render(context, request)
@@ -46,7 +64,7 @@ def server_error(request, template_name='500.html'):
 
 
 @requires_csrf_token
-def bad_request(request, template_name='400.html'):
+def bad_request(request, exception, template_name='400.html'):
     """
     400 error handler.
 
@@ -57,6 +75,7 @@ def bad_request(request, template_name='400.html'):
         template = loader.get_template(template_name)
     except TemplateDoesNotExist:
         return http.HttpResponseBadRequest('<h1>Bad Request (400)</h1>', content_type='text/html')
+    # No exception content is passed to the template, to not disclose any sensitive information.
     return http.HttpResponseBadRequest(template.render())
 
 
@@ -64,7 +83,7 @@ def bad_request(request, template_name='400.html'):
 # therefore need @requires_csrf_token in case the template needs
 # {% csrf_token %}.
 @requires_csrf_token
-def permission_denied(request, template_name='403.html'):
+def permission_denied(request, exception, template_name='403.html'):
     """
     Permission denied (403) handler.
 
@@ -78,4 +97,6 @@ def permission_denied(request, template_name='403.html'):
         template = loader.get_template(template_name)
     except TemplateDoesNotExist:
         return http.HttpResponseForbidden('<h1>403 Forbidden</h1>', content_type='text/html')
-    return http.HttpResponseForbidden(template.render(request=request))
+    return http.HttpResponseForbidden(
+        template.render(request=request, context={'exception': force_text(exception)})
+    )

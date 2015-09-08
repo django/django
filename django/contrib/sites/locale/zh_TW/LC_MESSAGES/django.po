@@ -17,18 +17,14 @@ msgstr ""
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:39
 msgid "domain name"
 msgstr "網域名稱"
 
-#: models.py:40
 msgid "display name"
 msgstr "顯示名稱"
 
-#: models.py:45
 msgid "site"
 msgstr "網站"
 
-#: models.py:46
 msgid "sites"
 msgstr "網站"

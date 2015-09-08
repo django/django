@@ -4,8 +4,9 @@ from django import forms
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
+from django.db import IntegrityError
 from django.db.models import Q
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from .models import (
@@ -247,6 +248,32 @@ class GenericRelationsTests(TestCase):
             self.comp_func
         )
 
+    def test_add_bulk(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        t1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        t2 = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        # One update() query.
+        with self.assertNumQueries(1):
+            bacon.tags.add(t1, t2)
+        self.assertEqual(t1.content_object, bacon)
+        self.assertEqual(t2.content_object, bacon)
+
+    def test_add_bulk_false(self):
+        bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
+        t1 = TaggedItem.objects.create(content_object=self.quartz, tag="shiny")
+        t2 = TaggedItem.objects.create(content_object=self.quartz, tag="clearish")
+        # One save() for each object.
+        with self.assertNumQueries(2):
+            bacon.tags.add(t1, t2, bulk=False)
+        self.assertEqual(t1.content_object, bacon)
+        self.assertEqual(t2.content_object, bacon)
+
+    def test_add_rejects_unsaved_objects(self):
+        t1 = TaggedItem(content_object=self.quartz, tag="shiny")
+        msg = "<TaggedItem: shiny> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            self.bacon.tags.add(t1)
+
     def test_set(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         fatty = bacon.tags.create(tag="fatty")
@@ -266,13 +293,13 @@ class GenericRelationsTests(TestCase):
         bacon.tags.set([])
         self.assertQuerysetEqual(bacon.tags.all(), [])
 
-        bacon.tags.set([fatty, salty], clear=True)
+        bacon.tags.set([fatty, salty], bulk=False, clear=True)
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
             "<TaggedItem: salty>",
         ])
 
-        bacon.tags.set([fatty], clear=True)
+        bacon.tags.set([fatty], bulk=False, clear=True)
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
         ])
@@ -460,6 +487,15 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(FieldError, msg):
             TaggedItem.objects.get(content_object='')
 
+    def test_unsaved_instance_on_generic_foreign_key(self):
+        """
+        Assigning an unsaved object to GenericForeignKey should raise an
+        exception on model.save().
+        """
+        quartz = Mineral(name="Quartz", hardness=7)
+        with self.assertRaises(IntegrityError):
+            TaggedItem.objects.create(tag="shiny", content_object=quartz)
+
 
 class CustomWidget(forms.TextInput):
     pass
@@ -618,7 +654,7 @@ class ProxyRelatedModelTest(TestCase):
         self.assertEqual(base, newrel.bases.get())
 
 
-class TestInitWithNoneArgument(TestCase):
+class TestInitWithNoneArgument(SimpleTestCase):
     def test_none_not_allowed(self):
         # TaggedItem requires a content_type, initializing with None should
         # raise a ValueError.

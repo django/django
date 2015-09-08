@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Antoni Aloy <aaloy@apsl.net>, 2015
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-08-16 10:50+0000\n"
-"Last-Translator: Carles Barrobés <carles@barrobes.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Catalan (http://www.transifex.com/projects/p/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -18,77 +19,47 @@ msgstr ""
 "Language: ca\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Informació personal"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Permisos"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Dates importants"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Contrasenya canviada amb èxit"
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Canviar contrasenya: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Autenticació i Autorització"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "No s'ha establert la clau."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format de clau incorrecta o algorisme de hash desconegut."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Ja existeix un usuari amb aquest nom."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Els dos camps de contrasenya no coincideixen."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Nom d'usuari"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Obligatori. 30 o menys caràcters. Només lletres, dígits i @/./+/-/_."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Aquest valor ha de contenir només lletres, números i @/./+/-/_."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Contrasenya"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Confirmació de contrasenya"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Introduïu la mateixa contrasenya de dalt, per fer-ne la verificació."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -98,7 +69,6 @@ msgstr ""
 "veure la contrasenya d'aquest usuari, però la podeu canviar fent servir <a "
 "href=\"password/\">aquest formulari</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -107,103 +77,73 @@ msgstr ""
 "SSi us plau, introduïu un %(username)s i clau. Observeu que ambdós camps "
 "poden ser sensibles a majúscules."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Aquest compte està inactiu"
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Correu electrònic"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Contrasenya nova"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Contrasenya nova confirmada"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr ""
 "La vostra antiga contrasenya no és correcta. Si us plau, introduïu-la de nou."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Contrasenya antiga"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Contrasenya (de nou)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algorisme"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteracions"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "sal"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "factor de treball"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "suma de comprovació"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "nom"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "nom en clau"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "permís"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "permisos"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grup"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grups"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "contrasenya"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "últim inici de sessió"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "estat de superusuari"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
@@ -211,55 +151,53 @@ msgstr ""
 "Designa que aquest usuari té tots els permisos sense assignar-los "
 "explícitament."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Els grups als quals pertany aquest usuari. A un usuari se li concediran tots "
-"els permisos de cadascun dels seus grups."
+"Els grups als que pertany l'usuari. Un usuari tindrà tots els permisos que "
+"tenguin cada un dels seus grups."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "permisos de l'usuari"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Permisos específics per a aquest usuari."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "nom d'usuari"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Introdueix un nom d'usuari vàlid"
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Obligatori. 30 o menys caràcters. Només lletres, dígits i @/./+/-/_."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Introdueixi un nom d'usuari vàlid. Aquest valor pot contenir sols lletres, "
+"números i els caràcters @/./+/-/_ "
+
+msgid "A user with that username already exists."
+msgstr "Ja existeix un usuari amb aquest nom."
+
 msgid "first name"
 msgstr "nom propi"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "cognoms"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "adreça de correu electrònic"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "membre del personal"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Designa si l'usuari pot entrar al lloc administratiu."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "actiu"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -267,55 +205,39 @@ msgstr ""
 "Designa si aquest usuari ha de ser tractat com a actiu. Deseleccioneu-ho "
 "enlloc d'esborrar comptes d'usuari."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "data d'incorporació"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "usuari"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "usuaris"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Reinicialitzar la contrasenya a %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Introduïu una adreça de correu electrònic vàlida"
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Sessió finalitzada"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Restablir contrasenya"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Restabliment de contrasenya amb èxit"
+msgid "Password reset sent"
+msgstr "Restabliment de clau enviat"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Introduïu la nova contrasenya"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Restabliment de contrasenya fallat"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Contrasenya restablerta"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Canvi de contrasenya"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Contrasenya canviada amb èxit"

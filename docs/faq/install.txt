@@ -16,9 +16,9 @@ How do I get started?
 What are Django's prerequisites?
 --------------------------------
 
-Django requires Python, specifically Python 2.7 or 3.3 and above. Other Python
-libraries may be required for some uses, but you'll receive an error about it
-as they're needed.
+Django requires Python. See the table in the next question for the versions of
+Python that work with each version of Django. Other Python libraries may be
+required for some uses, but you'll receive an error about it as they're needed.
 
 For a development environment -- if you just want to experiment with Django --
 you don't need to have a separate Web server installed; Django comes with its
@@ -37,6 +37,8 @@ PostgreSQL fans, and MySQL_, `SQLite 3`_, and Oracle_ are also supported.
 .. _`SQLite 3`: http://www.sqlite.org/
 .. _Oracle: http://www.oracle.com/
 
+.. _faq-python-version-support:
+
 What Python version can I use with Django?
 ------------------------------------------
 
@@ -44,14 +46,19 @@ What Python version can I use with Django?
 Django version Python versions
 ============== ===============
 1.4            2.5, 2.6, 2.7
-1.6            2.6, 2.7 and 3.2, 3.3
 **1.7, 1.8**   **2.7** and **3.2, 3.3, 3.4**
-1.9            2.7, 3.3, 3.4, 3.5
+1.9            2.7, 3.4, 3.5
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
 supported. You can find the latest micro version for each series on the `Python
 download page <https://www.python.org/downloads/>`_.
+
+Typically, we will support a Python version up to and including the first
+Django LTS release whose security support ends after security support for that
+version of Python ends. For example, Python 3.3 security support ends September
+2017 and Django 1.8 LTS security support ends April 2018. Therefore Django 1.8
+is the last version to support Python 3.3.
 
 What Python version should I use with Django?
 ---------------------------------------------

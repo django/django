@@ -18,10 +18,12 @@ of spatially enabled data.
    db-api
    forms-api
    geoquerysets
+   functions
    measure
    geos
    gdal
    geoip
+   geoip2
    utils
    commands
    admin

@@ -4,13 +4,20 @@ from collections import deque
 from contextlib import contextmanager
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.db import DEFAULT_DB_ALIAS
 from django.db.backends import utils
 from django.db.backends.signals import connection_created
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError, DatabaseErrorWrapper
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.six.moves import _thread as thread
+
+try:
+    import pytz
+except ImportError:
+    pytz = None
 
 NO_DB_ALIAS = '__no_db__'
 
@@ -71,6 +78,48 @@ class BaseDatabaseWrapper(object):
         self.allow_thread_sharing = allow_thread_sharing
         self._thread_ident = thread.get_ident()
 
+        # A list of no-argument functions to run when the transaction commits.
+        # Each entry is an (sids, func) tuple, where sids is a set of the
+        # active savepoint IDs when this function was registered.
+        self.run_on_commit = []
+
+        # Should we run the on-commit hooks the next time set_autocommit(True)
+        # is called?
+        self.run_commit_hooks_on_set_autocommit_on = False
+
+    @cached_property
+    def timezone(self):
+        """
+        Time zone for datetimes stored as naive values in the database.
+
+        Returns a tzinfo object or None.
+
+        This is only needed when time zone support is enabled and the database
+        doesn't support time zones. (When the database supports time zones,
+        the adapter handles aware datetimes so Django doesn't need to.)
+        """
+        if not settings.USE_TZ:
+            return None
+        elif self.features.supports_timezones:
+            return None
+        elif self.settings_dict['TIME_ZONE'] is None:
+            return timezone.utc
+        else:
+            # Only this branch requires pytz.
+            return pytz.timezone(self.settings_dict['TIME_ZONE'])
+
+    @cached_property
+    def timezone_name(self):
+        """
+        Name of the time zone of the database connection.
+        """
+        if not settings.USE_TZ:
+            return settings.TIME_ZONE
+        elif self.settings_dict['TIME_ZONE'] is None:
+            return 'UTC'
+        else:
+            return self.settings_dict['TIME_ZONE']
+
     @property
     def queries_logged(self):
         return self.force_debug_cursor or settings.DEBUG
@@ -105,6 +154,8 @@ class BaseDatabaseWrapper(object):
 
     def connect(self):
         """Connects to the database. Assumes that the connection is closed."""
+        # Check for invalid configurations.
+        self.check_settings()
         # In case the previous connection was closed while in an atomic block
         self.in_atomic_block = False
         self.savepoint_ids = []
@@ -120,6 +171,23 @@ class BaseDatabaseWrapper(object):
         self.set_autocommit(self.settings_dict['AUTOCOMMIT'])
         self.init_connection_state()
         connection_created.send(sender=self.__class__, connection=self)
+
+        self.run_on_commit = []
+
+    def check_settings(self):
+        if self.settings_dict['TIME_ZONE'] is not None:
+            if not settings.USE_TZ:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because USE_TZ is "
+                    "False." % self.alias)
+            elif self.features.supports_timezones:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because its engine "
+                    "handles time zones conversions natively." % self.alias)
+            elif pytz is None:
+                raise ImproperlyConfigured(
+                    "Connection '%s' cannot set TIME_ZONE because pytz isn't "
+                    "installed." % self.alias)
 
     def ensure_connection(self):
         """
@@ -173,6 +241,7 @@ class BaseDatabaseWrapper(object):
         self._commit()
         # A successful commit means that the database connection works.
         self.errors_occurred = False
+        self.run_commit_hooks_on_set_autocommit_on = True
 
     def rollback(self):
         """
@@ -184,11 +253,15 @@ class BaseDatabaseWrapper(object):
         # A successful rollback means that the database connection works.
         self.errors_occurred = False
 
+        self.run_on_commit = []
+
     def close(self):
         """
         Closes the connection to the database.
         """
         self.validate_thread_sharing()
+        self.run_on_commit = []
+
         # Don't call validate_no_atomic_block() to avoid making it difficult
         # to get rid of a connection in an invalid state. The next connect()
         # will reset the transaction state anyway.
@@ -253,6 +326,11 @@ class BaseDatabaseWrapper(object):
         self.validate_thread_sharing()
         self._savepoint_rollback(sid)
 
+        # Remove any callbacks registered while this savepoint was active.
+        self.run_on_commit = [
+            (sids, func) for (sids, func) in self.run_on_commit if sid not in sids
+        ]
+
     def savepoint_commit(self, sid):
         """
         Releases a savepoint. Does nothing if savepoints are not supported.
@@ -286,14 +364,37 @@ class BaseDatabaseWrapper(object):
         self.ensure_connection()
         return self.autocommit
 
-    def set_autocommit(self, autocommit):
+    def set_autocommit(self, autocommit, force_begin_transaction_with_broken_autocommit=False):
         """
         Enable or disable autocommit.
+
+        The usual way to start a transaction is to turn autocommit off.
+        SQLite does not properly start a transaction when disabling
+        autocommit. To avoid this buggy behavior and to actually enter a new
+        transaction, an explcit BEGIN is required. Using
+        force_begin_transaction_with_broken_autocommit=True will issue an
+        explicit BEGIN with SQLite. This option will be ignored for other
+        backends.
         """
         self.validate_no_atomic_block()
         self.ensure_connection()
-        self._set_autocommit(autocommit)
+
+        start_transaction_under_autocommit = (
+            force_begin_transaction_with_broken_autocommit
+            and not autocommit
+            and self.features.autocommits_when_autocommit_is_off
+        )
+
+        if start_transaction_under_autocommit:
+            self._start_transaction_under_autocommit()
+        else:
+            self._set_autocommit(autocommit)
+
         self.autocommit = autocommit
+
+        if autocommit and self.run_commit_hooks_on_set_autocommit_on:
+            self.run_and_clear_commit_hooks()
+            self.run_commit_hooks_on_set_autocommit_on = False
 
     def get_rollback(self):
         """
@@ -501,3 +602,23 @@ class BaseDatabaseWrapper(object):
             raise NotImplementedError(
                 'The SchemaEditorClass attribute of this database wrapper is still None')
         return self.SchemaEditorClass(self, *args, **kwargs)
+
+    def on_commit(self, func):
+        if self.in_atomic_block:
+            # Transaction in progress; save for execution on commit.
+            self.run_on_commit.append((set(self.savepoint_ids), func))
+        elif not self.get_autocommit():
+            raise TransactionManagementError('on_commit() cannot be used in manual transaction management')
+        else:
+            # No transaction in progress and in autocommit mode; execute
+            # immediately.
+            func()
+
+    def run_and_clear_commit_hooks(self):
+        self.validate_no_atomic_block()
+        try:
+            while self.run_on_commit:
+                sids, func = self.run_on_commit.pop(0)
+                func()
+        finally:
+            self.run_on_commit = []

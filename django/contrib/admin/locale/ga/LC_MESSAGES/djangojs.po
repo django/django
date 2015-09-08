@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Irish (http://www.transifex.com/projects/p/django/language/"
 "ga/)\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : "
 "4);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "%s ar fáil"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -34,40 +32,32 @@ msgstr ""
 "sa bhosca thíos agus ansin cliceáil ar an saighead \"Roghnaigh\" idir an dá "
 "boscaí."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 "Scríobh isteach sa bhosca seo a scagadh síos ar an liosta de %s ar fáil."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "Scagaire"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "Roghnaigh iomlán"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "Cliceáil anseo chun %s go léir a roghnú."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "Roghnaigh"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "Bain amach"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "Roghnófar %s"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -76,17 +66,13 @@ msgstr ""
 "roghnaionn tú cuid acu sa bhosca thíos agus ansin cliceáil ar an saighead "
 "\"Bain\" idir an dá boscaí."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "Scrois gach ceann"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Cliceáil anseo chun %s go léir roghnaithe a scroiseadh."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s  roghnaithe"
@@ -95,8 +81,6 @@ msgstr[2] "%(sel)s de %(cnt)s  roghnaithe"
 msgstr[3] "%(sel)s de %(cnt)s  roghnaithe"
 msgstr[4] "%(sel)s de %(cnt)s  roghnaithe"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -104,8 +88,6 @@ msgstr ""
 "Tá aithrithe nach bhfuil sabhailte ar chuid do na réimse.  Má ritheann tú "
 "gníomh, caillfidh tú do chuid aithrithe."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -114,8 +96,6 @@ msgstr ""
 "Tá gníomh roghnaithe agat, ach níl do aithrithe sabhailte ar cuid de na "
 "réímse. Clic OK chun iad a sábháil.  Caithfidh tú an gníomh a rith arís."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -124,8 +104,7 @@ msgstr ""
 "Tá gníomh roghnaithe agat, ach níl do aithrithe sabhailte ar cuid de na "
 "réímse. Is dócha go bhfuil tú ag iarraidh an cnaipe Té ná an cnaipe Sábháil."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] ""
@@ -134,8 +113,7 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
@@ -144,54 +122,39 @@ msgstr[2] ""
 msgstr[3] ""
 msgstr[4] ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "Anois"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "Clog"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "Roghnaigh am"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "Meán oíche"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "6 a.m."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "Nóin"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "Cealaigh"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "Inniu"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "Féilire"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "Inné"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "Amárach"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
@@ -199,17 +162,11 @@ msgstr ""
 "Eanair Feabhra Márta Aibreán Bealtaine Meitheamh Iúil Lúnasa Mean Fómhair "
 "Deireadh Fómhair Nollaig"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "D L M C D A S"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "Taispeán"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "Folaigh"

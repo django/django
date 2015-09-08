@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.http import HttpResponseForbidden
-from django.template import Context, Template
+from django.template import Context, Engine
 from django.utils.translation import ugettext as _
 from django.utils.version import get_docs_version
 
@@ -67,9 +67,9 @@ CSRF_FAILURE_TEMPLATE = """
   <ul>
     <li>Your browser is accepting cookies.</li>
 
-    <li>The view function uses <a
-    href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/templates/api/#subclassing-context-requestcontext"><code>RequestContext</code></a>
-    for the template, instead of <code>Context</code>.</li>
+    <li>The view function passes a <code>request</code> to the template's <a
+    href="https://docs.djangoproject.com/en/dev/topics/templates/#django.template.backends.base.Template.render"><code>render</code></a>
+    method.</li>
 
     <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
     {% templatetag closeblock %}</code> template tag inside each POST form that
@@ -102,7 +102,7 @@ def csrf_failure(request, reason=""):
     Default view used when request fails CSRF protection
     """
     from django.middleware.csrf import REASON_NO_REFERER, REASON_NO_CSRF_COOKIE
-    t = Template(CSRF_FAILURE_TEMPLATE)
+    t = Engine().from_string(CSRF_FAILURE_TEMPLATE)
     c = Context({
         'title': _("Forbidden"),
         'main': _("CSRF verification failed. Request aborted."),

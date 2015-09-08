@@ -16,7 +16,11 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
             return "%s the place" % self.name
 
     class Restaurant(models.Model):
-        place = models.OneToOneField(Place, primary_key=True)
+        place = models.OneToOneField(
+            Place,
+            on_delete=models.CASCADE,
+            primary_key=True,
+        )
         serves_hot_dogs = models.BooleanField(default=False)
         serves_pizza = models.BooleanField(default=False)
 
@@ -24,7 +28,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
             return "%s the restaurant" % self.place.name
 
     class Waiter(models.Model):
-        restaurant = models.ForeignKey(Restaurant)
+        restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
         name = models.CharField(max_length=50)
 
         def __str__(self):              # __unicode__ on Python 2
@@ -92,19 +96,17 @@ relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
 raises ``ValueError``::
 
     >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
-    >>> Restaurant(place=p3, serves_hot_dogs=True, serves_pizza=False)
+    >>> Restaurant.objects.create(place=p3, serves_hot_dogs=True, serves_pizza=False)
     Traceback (most recent call last):
     ...
-    ValueError: 'Cannot assign "<Place: Demon Dogs>": "Place" instance isn't saved in the database.'
-    >>> p.restaurant = Restaurant(place=p, serves_hot_dogs=True, serves_pizza=False)
-    Traceback (most recent call last):
-    ...
-    ValueError: 'Cannot assign "<Restaurant: Demon Dogs the restaurant>": "Restaurant" instance isn't saved in the database.'
+    ValueError: save() prohibited to prevent data loss due to unsaved related object 'place'.
 
-.. versionchanged:: 1.8
+.. versionchanged:: 1.8.4
 
-    Previously, assigning unsaved objects did not raise an error and could
-    result in silent data loss.
+    Previously, saving an object with unsaved related objects did not raise an
+    error and could result in silent data loss. In 1.8-1.8.3, unsaved model
+    instances couldn't be assigned to related fields, but this restriction was
+    removed to allow easier usage of in-memory models.
 
 Restaurant.objects.all() just returns the Restaurants, not the Places.  Note
 that there are two restaurants - Ace Hardware the Restaurant was created in the

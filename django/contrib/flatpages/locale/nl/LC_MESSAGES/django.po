@@ -4,14 +4,15 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2012
+# Sander Steffann <sander@steffann.nl>, 2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:41+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-20 22:33+0000\n"
+"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
 "nl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,24 +21,19 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/flatpages/admin.py:11
 msgid "Advanced options"
 msgstr "Geavanceerde opties"
 
-#: contrib/flatpages/apps.py:8
 msgid "Flat Pages"
-msgstr ""
+msgstr "Platte pagina's"
 
-#: contrib/flatpages/forms.py:8 contrib/flatpages/models.py:12
 msgid "URL"
 msgstr "URL"
 
-#: contrib/flatpages/forms.py:9
 msgid ""
 "Example: '/about/contact/'. Make sure to have leading and trailing slashes."
 msgstr "Voorbeeld: '/about/contact/'. Zorg voor slashes aan het begin en eind."
 
-#: contrib/flatpages/forms.py:11
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
@@ -45,36 +41,28 @@ msgstr ""
 "Deze waarde mag alleen letters, cijfers, punten, lage streepjes, streepjes, "
 "schuine strepen of tildes bevatten."
 
-#: contrib/flatpages/forms.py:22
 msgid "URL is missing a leading slash."
 msgstr "In de URL ontbreekt een begin slash."
 
-#: contrib/flatpages/forms.py:29
 msgid "URL is missing a trailing slash."
 msgstr "In de URL ontbreekt een eind slash."
 
-#: contrib/flatpages/forms.py:46
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
 msgstr "Platte pagina met url %(url)s bestaat al voor site %(site)s"
 
-#: contrib/flatpages/models.py:13
 msgid "title"
 msgstr "titel"
 
-#: contrib/flatpages/models.py:14
 msgid "content"
 msgstr "inhoud"
 
-#: contrib/flatpages/models.py:15
 msgid "enable comments"
 msgstr "opmerkingen toestaan"
 
-#: contrib/flatpages/models.py:16
 msgid "template name"
 msgstr "sjabloonnaam"
 
-#: contrib/flatpages/models.py:17
 msgid ""
 "Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
 "will use 'flatpages/default.html'."
@@ -82,24 +70,16 @@ msgstr ""
 "Voorbeeld: 'flatpages/contact_page.html'. Als deze niet is opgegeven, dan "
 "wordt 'flatpages/default.html' gebruikt."
 
-#: contrib/flatpages/models.py:18
 msgid "registration required"
 msgstr "registratie verplicht"
 
-#: contrib/flatpages/models.py:19
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Indien dit is aangevinkt kunnen alleen ingelogde gebruikers deze pagina "
 "bekijken."
 
-#: contrib/flatpages/models.py:25
 msgid "flat page"
 msgstr "platte pagina"
 
-#: contrib/flatpages/models.py:26
 msgid "flat pages"
 msgstr "platte pagina's"
-
-#: contrib/flatpages/tests/test_forms.py:98
-msgid "This field is required."
-msgstr "Dit veld is verplicht."

@@ -41,12 +41,13 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Installation <intro/install>`
 
 * **Tutorial:**
-  :doc:`Part 1: Models <intro/tutorial01>` |
-  :doc:`Part 2: The admin site <intro/tutorial02>` |
+  :doc:`Part 1: Requests and responses <intro/tutorial01>` |
+  :doc:`Part 2: Models and the admin site <intro/tutorial02>` |
   :doc:`Part 3: Views and templates <intro/tutorial03>` |
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
-  :doc:`Part 6: Static files <intro/tutorial06>`
+  :doc:`Part 6: Static files <intro/tutorial06>` |
+  :doc:`Part 7: Customizing the admin site <intro/tutorial07>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -152,7 +153,6 @@ designers and how it can be extended by programmers:
 * **For designers:**
   :doc:`Language overview <ref/templates/language>` |
   :doc:`Built-in tags and filters <ref/templates/builtins>` |
-  :doc:`Web design helpers <ref/contrib/webdesign>` |
   :doc:`Humanization <ref/contrib/humanize>`
 
 * **For programmers:**
@@ -243,7 +243,6 @@ regions:
   :doc:`Internationalization <topics/i18n/translation>` |
   :ref:`Localization <how-to-create-language-files>` |
   :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
-* :doc:`"Local flavor" <topics/localflavor>`
 * :doc:`Time zones </topics/i18n/timezones>`
 
 Performance and optimization
@@ -276,7 +275,12 @@ Common Web application tools
 Django offers multiple tools commonly needed in the development of Web
 applications:
 
-* :doc:`Authentication <topics/auth/index>`
+* **Authentication:**
+  :doc:`Overview <topics/auth/index>` |
+  :doc:`Using the authentication system <topics/auth/default>` |
+  :doc:`Password management <topics/auth/passwords>` |
+  :doc:`Customizing authentication <topics/auth/customizing>` |
+  :doc:`API Reference <ref/contrib/auth>`
 * :doc:`Caching <topics/cache>`
 * :doc:`Logging <topics/logging>`
 * :doc:`Sending emails <topics/email>`

@@ -6,7 +6,7 @@ import re
 import warnings
 
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import allow_lazy
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -26,7 +26,7 @@ WRAPPING_PUNCTUATION = [('(', ')'), ('<', '>'), ('[', ']'), ('&lt;', '&gt;'), ('
 DOTS = ['&middot;', '*', '\u2022', '&#149;', '&bull;', '&#8226;']
 
 unencoded_ampersands_re = re.compile(r'&(?!(\w+|#\d+);)')
-word_split_re = re.compile(r'(\s+)')
+word_split_re = re.compile(r'''([\s<>"']+)''')
 simple_url_re = re.compile(r'^https?://\[?\w', re.IGNORECASE)
 simple_url_2_re = re.compile(r'^www\.|^(?!http)\w[^@]+\.(com|edu|gov|int|mil|net|org)($|/.*)$', re.IGNORECASE)
 simple_email_re = re.compile(r'^\S+@\S+\.\S+$')
@@ -114,7 +114,6 @@ def format_html_join(sep, format_string, args_generator):
 
       format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
                                                   for u in users))
-
     """
     return mark_safe(conditional_escape(sep).join(
         format_html(format_string, *tuple(args))
@@ -175,8 +174,10 @@ def strip_tags(value):
     # is redundant, but helps to reduce number of executions of _strip_once.
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
-        if new_value == value:
-            # _strip_once was not able to detect more tags
+        if len(new_value) >= len(value):
+            # _strip_once was not able to detect more tags or length increased
+            # due to http://bugs.python.org/issue20288
+            # (affects Python 2 < 2.7.7 and Python 3 < 3.3.5)
             break
         value = new_value
     return value
@@ -188,7 +189,7 @@ def remove_tags(html, tags):
     warnings.warn(
         "django.utils.html.remove_tags() and the removetags template filter "
         "are deprecated. Consider using the bleach library instead.",
-        RemovedInDjango20Warning, stacklevel=3
+        RemovedInDjango110Warning, stacklevel=3
     )
     tags = [re.escape(tag) for tag in tags.split()]
     tags_re = '(%s)' % '|'.join(tags)
@@ -210,7 +211,7 @@ def strip_entities(value):
     """Returns the given HTML with all entities (&something;) stripped."""
     warnings.warn(
         "django.utils.html.strip_entities() is deprecated.",
-        RemovedInDjango20Warning, stacklevel=2
+        RemovedInDjango110Warning, stacklevel=2
     )
     return re.sub(r'&(?:\w+|#\d+);', '', force_text(value))
 strip_entities = allow_lazy(strip_entities, six.text_type)
@@ -282,17 +283,17 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         smart_urlquote. For example:
         http://example.com?x=1&amp;y=&lt;2&gt; => http://example.com?x=1&y=<2>
         """
-        if not safe_input:
-            return text, text, trail
         unescaped = (text + trail).replace(
             '&amp;', '&').replace('&lt;', '<').replace(
             '&gt;', '>').replace('&quot;', '"').replace('&#39;', "'")
-        # ';' in trail can be either trailing punctuation or end-of-entity marker
-        if unescaped.endswith(';'):
-            return text, unescaped[:-1], trail
-        else:
+        if trail and unescaped.endswith(trail):
+            # Remove trail for unescaped if it was not consumed by unescape
+            unescaped = unescaped[:-len(trail)]
+        elif trail == ';':
+            # Trail was consumed by unescape (as end-of-entity marker), move it to text
             text += trail
-            return text, unescaped, ''
+            trail = ''
+        return text, unescaped, trail
 
     words = word_split_re.split(force_text(text))
     for i, word in enumerate(words):
@@ -337,7 +338,7 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
                 if autoescape and not safe_input:
                     lead, trail = escape(lead), escape(trail)
                     trimmed = escape(trimmed)
-                middle = '<a href="%s"%s>%s</a>' % (url, nofollow_attr, trimmed)
+                middle = '<a href="%s"%s>%s</a>' % (escape(url), nofollow_attr, trimmed)
                 words[i] = mark_safe('%s%s%s' % (lead, middle, trail))
             else:
                 if safe_input:
@@ -358,3 +359,34 @@ def avoid_wrapping(value):
     spaces where there previously were normal spaces.
     """
     return value.replace(" ", "\xa0")
+
+
+def html_safe(klass):
+    """
+    A decorator that defines the __html__ method. This helps non-Django
+    templates to detect classes whose __str__ methods return SafeText.
+    """
+    if '__html__' in klass.__dict__:
+        raise ValueError(
+            "can't apply @html_safe to %s because it defines "
+            "__html__()." % klass.__name__
+        )
+    if six.PY2:
+        if '__unicode__' not in klass.__dict__:
+            raise ValueError(
+                "can't apply @html_safe to %s because it doesn't "
+                "define __unicode__()." % klass.__name__
+            )
+        klass_unicode = klass.__unicode__
+        klass.__unicode__ = lambda self: mark_safe(klass_unicode(self))
+        klass.__html__ = lambda self: unicode(self)  # NOQA: unicode undefined on PY3
+    else:
+        if '__str__' not in klass.__dict__:
+            raise ValueError(
+                "can't apply @html_safe to %s because it doesn't "
+                "define __str__()." % klass.__name__
+            )
+        klass_str = klass.__str__
+        klass.__str__ = lambda self: mark_safe(klass_str(self))
+        klass.__html__ = lambda self: str(self)
+    return klass

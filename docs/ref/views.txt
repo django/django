@@ -61,7 +61,7 @@ these with your own custom views, see :ref:`customizing-error-views`.
 The 404 (page not found) view
 -----------------------------
 
-.. function:: defaults.page_not_found(request, template_name='404.html')
+.. function:: defaults.page_not_found(request, exception, template_name='404.html')
 
 When you raise :exc:`~django.http.Http404` from within a view, Django loads a
 special view devoted to handling 404 errors. By default, it's the view
@@ -69,8 +69,10 @@ special view devoted to handling 404 errors. By default, it's the view
 simple "Not Found" message or loads and renders the template ``404.html`` if
 you created it in your root template directory.
 
-The default 404 view will pass one variable to the template: ``request_path``,
-which is the URL that resulted in the error.
+The default 404 view will pass two variables to the template: ``request_path``,
+which is the URL that resulted in the error, and ``exception``, which is a
+useful representation of the exception that triggered the view (e.g. containing
+any message passed to a specific ``Http404`` instance).
 
 Three things to note about 404 views:
 
@@ -84,6 +86,12 @@ Three things to note about 404 views:
 * If :setting:`DEBUG` is set to ``True`` (in your settings module), then
   your 404 view will never be used, and your URLconf will be displayed
   instead, with some debug information.
+
+.. versionchanged:: 1.9
+
+    The signature of ``page_not_found()`` changed. The function now accepts a
+    second parameter, the exception that triggered the error. A useful
+    representation of the exception is also passed in the template context.
 
 .. _http_internal_server_error_view:
 
@@ -110,7 +118,7 @@ instead, with some debug information.
 The 403 (HTTP Forbidden) view
 -----------------------------
 
-.. function:: defaults.permission_denied(request, template_name='403.html')
+.. function:: defaults.permission_denied(request, exception, template_name='403.html')
 
 In the same vein as the 404 and 500 views, Django has a view to handle 403
 Forbidden errors. If a view results in a 403 exception then Django will, by
@@ -118,7 +126,9 @@ default, call the view ``django.views.defaults.permission_denied``.
 
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
-"403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification).
+"403 Forbidden", as per :rfc:`2616` (the HTTP 1.1 Specification). The template
+context contains ``exception``, which is the unicode representation of the
+exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a
 :exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
@@ -131,12 +141,19 @@ view you can use code like this::
             raise PermissionDenied
         # ...
 
+.. versionchanged:: 1.9
+
+    The signature of ``permission_denied()`` changed in Django 1.9. The function
+    now accepts a second parameter, the exception that triggered the error. The
+    unicode representation of the exception is also passed in the template
+    context.
+
 .. _http_bad_request_view:
 
 The 400 (bad request) view
 --------------------------
 
-.. function:: defaults.bad_request(request, template_name='400.html')
+.. function:: defaults.bad_request(request, exception, template_name='400.html')
 
 When a :exc:`~django.core.exceptions.SuspiciousOperation` is raised in Django,
 it may be handled by a component of Django (for example resetting the session
@@ -145,6 +162,14 @@ data). If not specifically handled, Django will consider the current request a
 
 ``django.views.defaults.bad_request``, is otherwise very similar to the
 ``server_error`` view, but returns with the status code 400 indicating that
-the error condition was the result of a client operation.
+the error condition was the result of a client operation. By default, nothing
+related to the exception that triggered the view is passed to the template
+context, as the exception message might contain sensitive information like
+filesystem paths.
 
 ``bad_request`` views are also only used when :setting:`DEBUG` is ``False``.
+
+.. versionchanged:: 1.9
+
+    The signature of ``bad_request()`` changed in Django 1.9. The function
+    now accepts a second parameter, the exception that triggered the error.

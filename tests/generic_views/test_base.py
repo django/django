@@ -6,7 +6,7 @@ import unittest
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import resolve
 from django.http import HttpResponse
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
 from django.views.generic import RedirectView, TemplateView, View
 
@@ -241,7 +241,7 @@ class ViewTest(unittest.TestCase):
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class TemplateViewTest(TestCase):
+class TemplateViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 
@@ -352,7 +352,7 @@ class TemplateViewTest(TestCase):
 
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
-class RedirectViewTest(TestCase):
+class RedirectViewTest(SimpleTestCase):
 
     rf = RequestFactory()
 

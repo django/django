@@ -6,8 +6,8 @@ from django.utils import six
 
 from .models import (
     Book, Car, CustomManager, CustomQuerySet, DeconstructibleCustomManager,
-    FunPerson, OneToOneRestrictedModel, Person, PersonManager,
-    PublishedBookManager, RelatedModel, RestrictedModel,
+    FunPerson, OneToOneRestrictedModel, Person, PersonFromAbstract,
+    PersonManager, PublishedBookManager, RelatedModel, RestrictedModel,
 )
 
 
@@ -512,6 +512,17 @@ class CustomManagerTests(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             mgr.deconstruct()
 
+    def test_abstract_model_with_custom_manager_name(self):
+        """
+        A custom manager may be defined on an abstract model.
+        It will be inherited by the abstract model's children.
+        """
+        PersonFromAbstract.abstract_persons.create(objects='Test')
+        self.assertQuerysetEqual(
+            PersonFromAbstract.abstract_persons.all(), ["Test"],
+            lambda c: c.objects,
+        )
+
 
 class TestCars(TestCase):
 
@@ -586,3 +597,12 @@ class CustomManagersRegressTestCase(TestCase):
         obj = RelatedModel.objects.get(name="xyzzy")
         obj.delete()
         self.assertEqual(len(OneToOneRestrictedModel.plain_manager.all()), 0)
+
+    def test_queryset_with_custom_init(self):
+        """
+        BaseManager.get_queryset() should use kwargs rather than args to allow
+        custom kwargs (#24911).
+        """
+        qs_custom = Person.custom_init_queryset_manager.all()
+        qs_default = Person.objects.all()
+        self.assertQuerysetEqual(qs_custom, qs_default)

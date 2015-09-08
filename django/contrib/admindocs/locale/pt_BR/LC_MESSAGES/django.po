@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-27 14:20+0000\n"
-"Last-Translator: Allisson Azevedo <allisson@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
 "django/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -20,49 +20,21 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
 msgstr "Documentação Administrativa"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
-#: contrib/admindocs/templates/admin_doc/index.html:6
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
-#: contrib/admindocs/templates/admin_doc/model_detail.html:14
-#: contrib/admindocs/templates/admin_doc/model_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_detail.html:6
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
-#: contrib/admindocs/templates/admin_doc/view_detail.html:6
-#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "Início"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:10
-#: contrib/admindocs/templates/admin_doc/index.html:14
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
-#: contrib/admindocs/templates/admin_doc/model_detail.html:15
-#: contrib/admindocs/templates/admin_doc/model_index.html:9
-#: contrib/admindocs/templates/admin_doc/template_detail.html:7
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
-#: contrib/admindocs/templates/admin_doc/view_detail.html:7
-#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "Documentação"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "Itens de bookmark"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "Documentação de itens de bookmark"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -81,59 +53,45 @@ msgstr ""
 "como \"interno\" (converse com seu administrador de sistemas se você não\n"
 "souber se seu computador é \"interno\").</p>\n"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "Documentação para esta página"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr ""
 "Leva você de qualquer página para a documentação da view que gera tal página."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "Mostar ID de objeto"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "Mostra o tipo de conteúdo e ID único para páginas que representam um objeto."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "Editar este objeto (janela atual)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "Vai para a página de administração que representa um objeto."
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "Editar este objeto (nova janela)"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "Como acima, mas abre a página de administração em uma nova janela."
 
-#: contrib/admindocs/templates/admin_doc/index.html:17
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "Tags"
 
-#: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
 msgstr "Lista de todas as template tags e suas funções."
 
-#: contrib/admindocs/templates/admin_doc/index.html:20
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "Filtros"
 
-#: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
@@ -141,14 +99,9 @@ msgstr ""
 "Os filtros são ações que podem ser aplicadas às variáveis ​​de um template "
 "para alterar a saída."
 
-#: contrib/admindocs/templates/admin_doc/index.html:23
-#: contrib/admindocs/templates/admin_doc/model_detail.html:16
-#: contrib/admindocs/templates/admin_doc/model_index.html:10
-#: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "Models"
 
-#: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
@@ -158,14 +111,9 @@ msgstr ""
 "associados. Cada model tem uma lista de campos que podem ser acessados ​​como "
 "variáveis ​​de template"
 
-#: contrib/admindocs/templates/admin_doc/index.html:26
-#: contrib/admindocs/templates/admin_doc/view_detail.html:8
-#: contrib/admindocs/templates/admin_doc/view_index.html:9
-#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
 msgstr "Views"
 
-#: contrib/admindocs/templates/admin_doc/index.html:27
 msgid ""
 "Each page on the public site is generated by a view. The view defines which "
 "template is used to generate the page and which objects are available to "
@@ -175,17 +123,14 @@ msgstr ""
 "template será usado para gerar a página e quais objetos estarão disponíveis "
 "para esse modelo."
 
-#: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
 "Ferramentas para o seu navegador para acessar rapidamente a funcionalidade "
 "de administração."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
 msgstr "Por favor, instale o docutils"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
@@ -194,7 +139,6 @@ msgstr ""
 "O sistema de documentação de administração exige a biblioteca <a href="
 "\"%(link)s\">docutils</a> do Python."
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
@@ -202,76 +146,58 @@ msgstr ""
 "Por favor, peça para os seus administradores para instalar o <a href="
 "\"%(link)s\">docutils</a>."
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:35
 msgid "Field"
 msgstr "Campo"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
 msgstr "Tipo"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
 msgstr "Descrição"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
 msgstr "Voltar para Documentação do Model"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
 msgstr "Documentação do model"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
 msgstr "Grupos de models"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "Templates"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
 msgstr "Template: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
 msgstr "Template: \"%(name)s\""
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "Caminho de busca para o template \"%(name)s\":"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
 msgstr "(não existe)"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
 msgstr "Voltar para Documentação"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
 msgstr "Filtros do template"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
 msgstr "Documentação do filtro do template"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
 msgstr "Filtros built-in"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
@@ -280,20 +206,15 @@ msgstr ""
 "Para usar esses filtros, coloque o código <code>%(code)s</code> no seu "
 "template antes de usar o filtro."
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
 msgstr "Tags de template"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
 msgstr "Documentação da tag de template"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
 msgstr "Tags built-in"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
@@ -302,45 +223,35 @@ msgstr ""
 "Para usar estas tags, coloque o código <code>%(code)s</code> no seu template "
 "antes de usar a tag."
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
 msgstr "View: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
 msgstr "Contexto:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
 msgstr "Templates:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
 msgstr "Voltar para a Documentação das Views"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
 msgstr "Ver documentação"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
 msgstr "Ir para namespace"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
 msgstr "Namespace vazio"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
 msgstr "Views por namespace %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
 msgstr "Views por namespace vazio"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
 msgid ""
 "\n"
@@ -350,73 +261,49 @@ msgstr ""
 "\n"
 "View função: <code>%(full_name)s</code>. Nome: <code>%(url_name)s</code>.\n"
 
-#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
 msgstr "Booleano (Verdadeiro ou Falso)"
 
-#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "Campo do tipo: %(field_type)s"
 
-#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
-#: contrib/admindocs/views.py:80
 msgid "tag:"
 msgstr "tag:"
 
-#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
-#: contrib/admindocs/views.py:113
 msgid "filter:"
 msgstr "filtro:"
 
-#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
-#: contrib/admindocs/views.py:164
 msgid "view:"
 msgstr "view:"
 
-#: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
 msgstr "App %(app_label)r não encontrado"
 
-#: contrib/admindocs/views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr "Model %(model_name)r não encontrado na aplicação %(app_label)r"
 
-#: contrib/admindocs/views.py:208
+msgid "model:"
+msgstr "model:"
+
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "o objeto `%(app_label)s.%(data_type)s` relacionado"
 
-#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
-#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
-msgid "model:"
-msgstr "model:"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "objetos `%(app_label)s.%(object_name)s` relacionados"
 
-#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
 #, python-format
 msgid "all %s"
 msgstr "todos %s"
 
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
 #, python-format
 msgid "number of %s"
 msgstr "número de %s"
 
-#. Translators: %s is an object type name
-#: contrib/admindocs/views.py:275
-#, python-format
-msgid "Attributes on %s objects"
-msgstr "Atributos dos objetos de %s"
-
-#: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s não aparenta ser um objeto urlpattern"

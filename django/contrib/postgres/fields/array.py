@@ -8,12 +8,9 @@ from django.db.models import Field, IntegerField, Transform
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
 
+from .utils import AttributeSetter
+
 __all__ = ['ArrayField']
-
-
-class AttributeSetter(object):
-    def __init__(self, name, value):
-        setattr(self, name, value)
 
 
 class ArrayField(Field):
@@ -31,9 +28,13 @@ class ArrayField(Field):
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
         super(ArrayField, self).__init__(**kwargs)
 
+    def contribute_to_class(self, cls, name, **kwargs):
+        super(ArrayField, self).contribute_to_class(cls, name, **kwargs)
+        self.base_field.model = cls
+
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
-        if self.base_field.rel:
+        if self.base_field.remote_field:
             errors.append(
                 checks.Error(
                     'Base field for array cannot be a related field.',
@@ -93,7 +94,7 @@ class ArrayField(Field):
 
     def value_to_string(self, obj):
         values = []
-        vals = self._get_val_from_obj(obj)
+        vals = self.value_from_object(obj)
         base_field = self.base_field
 
         for val in vals:
@@ -137,6 +138,18 @@ class ArrayField(Field):
                 raise exceptions.ValidationError(
                     self.error_messages['nested_array_mismatch'],
                     code='nested_array_mismatch',
+                )
+
+    def run_validators(self, value):
+        super(ArrayField, self).run_validators(value)
+        for i, part in enumerate(value):
+            try:
+                self.base_field.run_validators(part)
+            except exceptions.ValidationError as e:
+                raise exceptions.ValidationError(
+                    string_concat(self.error_messages['item_invalid'], ' '.join(e.messages)),
+                    code='item_invalid',
+                    params={'nth': i},
                 )
 
     def formfield(self, **kwargs):

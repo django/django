@@ -1,0 +1,107 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:21+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
+"language/mk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: mk\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL eкстензии"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Членот %(nth)s на низата не помина валидација: "
+
+msgid "Nested arrays must have the same length."
+msgstr "Вгнездени низи мораат да имаат иста должина."
+
+msgid "Map of strings to strings"
+msgstr "Асоцијативна низа на текстуален податок со текстуален податок."
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Вредноста за \"%(key)s\" не е нишка од знаци."
+
+msgid "Could not load JSON data."
+msgstr "Не можеа да се вчитаат JSON податоци."
+
+msgid "Enter two valid values."
+msgstr "Внесете две валидни вредности."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Почетокот на опсегот не смее да го надминува крајот на опсегот."
+
+msgid "Enter two whole numbers."
+msgstr ""
+
+msgid "Enter two numbers."
+msgstr ""
+
+msgid "Enter two valid date/times."
+msgstr ""
+
+msgid "Enter two valid dates."
+msgstr ""
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Листата соджи %(show_value)d елемент, не смее да содржи повеќе од "
+"%(limit_value)d."
+msgstr[1] ""
+"Листата содржи %(show_value)d елементи, не треба да содржи повеќе од "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Листата содржи %(show_value)d елемент, не треба да содржи помалку од "
+"%(limit_value)d."
+msgstr[1] ""
+"Листата содржи %(show_value)d елемент, не треба да содржи помалку од "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Некои клучеви недостигаа: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Беа дадени некои непознати клучеви: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Осигурајте се дека овој опсег во целост е помал или еднаков на "
+"%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Осигурајте се дека овој опсег во целост е поголем или еднаков на "
+"%(limit_value)s."

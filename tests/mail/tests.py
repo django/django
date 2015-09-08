@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import asyncore
+import mimetypes
 import os
 import shutil
 import smtpd
@@ -20,6 +21,7 @@ from django.core.mail import (
 from django.core.mail.backends import console, dummy, filebased, locmem, smtp
 from django.core.mail.message import BadHeaderError
 from django.test import SimpleTestCase, override_settings
+from django.utils._os import upath
 from django.utils.encoding import force_bytes, force_text
 from django.utils.six import PY3, StringIO, binary_type
 from django.utils.translation import ugettext_lazy
@@ -304,6 +306,35 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         message = message_from_bytes(msg_bytes)
         payload = message.get_payload()
         self.assertEqual(payload[1].get_filename(), 'une pièce jointe.pdf')
+
+    def test_attach_file(self):
+        """
+        Test attaching a file against different mimetypes and make sure that
+        a file will be attached and sent properly even if an invalid mimetype
+        is specified.
+        """
+        files = (
+            # filename, actual mimetype
+            ('file.txt', 'text/plain'),
+            ('file.png', 'image/png'),
+            ('file_txt', None),
+            ('file_png', None),
+            ('file_txt.png', 'image/png'),
+            ('file_png.txt', 'text/plain'),
+        )
+        test_mimetypes = ['text/plain', 'image/png', None]
+
+        for basename, real_mimetype in files:
+            for mimetype in test_mimetypes:
+                email = EmailMessage('subject', 'body', 'from@example.com', ['to@example.com'])
+                self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
+                self.assertEqual(email.attachments, [])
+                file_path = os.path.join(os.path.dirname(upath(__file__)), 'attachments', basename)
+                email.attach_file(file_path, mimetype=mimetype)
+                self.assertEqual(len(email.attachments), 1)
+                self.assertIn(basename, email.attachments[0])
+                msgs_sent_num = email.send()
+                self.assertEqual(msgs_sent_num, 1)
 
     def test_dummy_backend(self):
         """
@@ -665,15 +696,37 @@ class BaseEmailBackendTests(HeadersCheckMixin, object):
         self.assertEqual(message.get('from'), "tester")
         self.assertEqual(message.get('to'), "django")
 
+    def test_lazy_addresses(self):
+        """
+        Email sending should support lazy email addresses (#24416).
+        """
+        _ = ugettext_lazy
+        self.assertTrue(send_mail('Subject', 'Content', _('tester'), [_('django')]))
+        message = self.get_the_message()
+        self.assertEqual(message.get('from'), 'tester')
+        self.assertEqual(message.get('to'), 'django')
+
+        self.flush_mailbox()
+        m = EmailMessage(
+            'Subject', 'Content', _('tester'), [_('to1'), _('to2')],
+            cc=[_('cc1'), _('cc2')],
+            bcc=[_('bcc')],
+            reply_to=[_('reply')],
+        )
+        self.assertEqual(m.recipients(), ['to1', 'to2', 'cc1', 'cc2', 'bcc'])
+        m.send()
+        message = self.get_the_message()
+        self.assertEqual(message.get('from'), 'tester')
+        self.assertEqual(message.get('to'), 'to1, to2')
+        self.assertEqual(message.get('cc'), 'cc1, cc2')
+        self.assertEqual(message.get('Reply-To'), 'reply')
+
     def test_close_connection(self):
         """
         Test that connection can be closed (even when not explicitly opened)
         """
         conn = mail.get_connection(username='', password='')
-        try:
-            conn.close()
-        except Exception as e:
-            self.fail("close() unexpectedly raised an exception: %s" % e)
+        conn.close()
 
     def test_use_as_contextmanager(self):
         """
@@ -843,6 +896,9 @@ class FakeSMTPServer(smtpd.SMTPServer, threading.Thread):
 
     def __init__(self, *args, **kwargs):
         threading.Thread.__init__(self)
+        # New kwarg added in Python 3.5; default switching to False in 3.6.
+        if sys.version_info >= (3, 5):
+            kwargs['decode_data'] = True
         smtpd.SMTPServer.__init__(self, *args, **kwargs)
         self._sink = []
         self.active = False
@@ -1118,7 +1174,4 @@ class SMTPBackendStoppedServerTest(SMTPBackendTestsBase):
         backend = smtp.EmailBackend(username='', password='')
         backend.open()
         self.server.stop()
-        try:
-            backend.close()
-        except Exception as e:
-            self.fail("close() unexpectedly raised an exception: %s" % e)
+        backend.close()

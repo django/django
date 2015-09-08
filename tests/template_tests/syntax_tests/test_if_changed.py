@@ -1,9 +1,11 @@
+from django.template import Context, Engine
 from django.test import SimpleTestCase
 
 from ..utils import setup
 
 
 class IfChangedTagTests(SimpleTestCase):
+    libraries = {'custom': 'template_tests.templatetags.custom'}
 
     @setup({'ifchanged01': '{% for n in num %}{% ifchanged %}{{ n }}{% endifchanged %}{% endfor %}'})
     def test_ifchanged01(self):
@@ -123,14 +125,14 @@ class IfChangedTagTests(SimpleTestCase):
         self.assertEqual(output, '1-first,1-other,2-first,2-other,2-other,3-first,')
 
     @setup({'ifchanged-else02': '{% for id in ids %}{{ id }}-'
-                                '{% ifchanged id %}{% cycle red,blue %}{% else %}grey{% endifchanged %}'
+                                '{% ifchanged id %}{% cycle "red" "blue" %}{% else %}grey{% endifchanged %}'
                                 ',{% endfor %}'})
     def test_ifchanged_else02(self):
         output = self.engine.render_to_string('ifchanged-else02', {'ids': [1, 1, 2, 2, 2, 3]})
         self.assertEqual(output, '1-red,1-grey,2-blue,2-grey,2-grey,3-red,')
 
     @setup({'ifchanged-else03': '{% for id in ids %}{{ id }}'
-                                '{% ifchanged id %}-{% cycle red,blue %}{% else %}{% endifchanged %}'
+                                '{% ifchanged id %}-{% cycle "red" "blue" %}{% else %}{% endifchanged %}'
                                 ',{% endfor %}'})
     def test_ifchanged_else03(self):
         output = self.engine.render_to_string('ifchanged-else03', {'ids': [1, 1, 2, 2, 2, 3]})
@@ -152,3 +154,59 @@ class IfChangedTagTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('ifchanged-filter-ws', {'num': (1, 2, 3)})
         self.assertEqual(output, '..1..2..3')
+
+
+class IfChangedTests(SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.engine = Engine()
+        super(IfChangedTests, cls).setUpClass()
+
+    def test_ifchanged_concurrency(self):
+        """
+        #15849 -- ifchanged should be thread-safe.
+        """
+        template = self.engine.from_string(
+            '[0{% for x in foo %},{% with var=get_value %}{% ifchanged %}'
+            '{{ var }}{% endifchanged %}{% endwith %}{% endfor %}]'
+        )
+
+        # Using generator to mimic concurrency.
+        # The generator is not passed to the 'for' loop, because it does a list(values)
+        # instead, call gen.next() in the template to control the generator.
+        def gen():
+            yield 1
+            yield 2
+            # Simulate that another thread is now rendering.
+            # When the IfChangeNode stores state at 'self' it stays at '3' and skip the last yielded value below.
+            iter2 = iter([1, 2, 3])
+            output2 = template.render(Context({'foo': range(3), 'get_value': lambda: next(iter2)}))
+            self.assertEqual(output2, '[0,1,2,3]', 'Expected [0,1,2,3] in second parallel template, got {}'.format(output2))
+            yield 3
+
+        gen1 = gen()
+        output1 = template.render(Context({'foo': range(3), 'get_value': lambda: next(gen1)}))
+        self.assertEqual(output1, '[0,1,2,3]', 'Expected [0,1,2,3] in first template, got {}'.format(output1))
+
+    def test_ifchanged_render_once(self):
+        """
+        #19890. The content of ifchanged template tag was rendered twice.
+        """
+        template = self.engine.from_string('{% ifchanged %}{% cycle "1st time" "2nd time" %}{% endifchanged %}')
+        output = template.render(Context({}))
+        self.assertEqual(output, '1st time')
+
+    def test_include(self):
+        """
+        #23516 -- This works as a regression test only if the cached loader
+        isn't used. Hence we don't use the @setup decorator.
+        """
+        engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'template': '{% for x in vars %}{% include "include" %}{% endfor %}',
+                'include': '{% ifchanged %}{{ x }}{% endifchanged %}',
+            }),
+        ])
+        output = engine.render_to_string('template', dict(vars=[1, 1, 2, 2, 3, 3]))
+        self.assertEqual(output, "123")

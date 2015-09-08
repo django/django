@@ -1,13 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Viktar Palstsiuk <vipals@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-05-21 09:39+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-04-08 13:04+0000\n"
+"Last-Translator: Viktar Palstsiuk <vipals@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/projects/p/django/"
 "language/be/)\n"
 "MIME-Version: 1.0\n"
@@ -17,80 +18,47 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Асабістыя зьвесткі"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Дазволы"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Важныя даты"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Аб'ект %(name)s з першасным ключом %(key)r не існуе."
+
 msgid "Password changed successfully."
 msgstr "Пароль зьмянілі."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Зьмяніць пароль: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
-msgstr ""
+msgstr "Аўтэнтыфікацыя і аўтарызацыя"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
-msgstr ""
+msgstr "Пароль не зададзены."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
-msgstr ""
+msgstr "Няправільны фармат паролю або невядомы алгарытм хэшавання."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Карыстальнік з такім іменем ужо існуе."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Не супадаюць паролі ў двух палях."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Імя карыстальніка"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr ""
-"Абавязковае поле. Да трыццаці знакаў. Толькі лічбы, літары ды знакі «@», "
-"«.» (кропка), «+», «-», «_»."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr ""
-"Дазваляюцца толькі літары, лічбы ды знакі «@», «.» (кропка), «+», «-», «_»."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Пароль"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Пацьвердзіце пароль"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Дзеля пэўнасьці набярыце такі самы пароль яшчэ раз."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -99,164 +67,135 @@ msgstr ""
 "Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
 "карыстальніка нельга, але яго можна зьмяніць <a href=\"password/\">тут</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
+"Калі ласка, увядзіце правільны %(username)s і пароль. Адзначым, што абодва "
+"палі могуць быць адчувальныя да рэгістра."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Рахунак ня дзейнічае."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
-msgstr ""
+msgstr "Электронная пошта"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Новы пароль"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Пацьвердзіце новы пароль"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Пазначылі неадпаведны стары пароль. Набярыце яго зноўку."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Стары пароль"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Пароль (яшчэ раз)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "альґарытм"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "паўтарэньні"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "соль"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "скарот"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "множнік працы"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "кантрольная сума"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "назва"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "найменьне"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "дазвол"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "дазволы"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "суполка"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "суполкі"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "пароль"
 
-#: contrib/auth/models.py:193
 msgid "last login"
 msgstr "апошні раз уваходзіў"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "становішча спраўніка"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr ""
 "Паказвае, ці мае карыстальнік усе дазволы без таго, каб іх яўна прызначаць."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
 "Суполкі, у якія ўваходзіць карыстальнік. Карыстальнік атрымае дазволы, якія "
 "мае кожная ягоная суполка."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "дазволы карыстальніка"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
-msgstr ""
+msgstr "Адмысловыя правы для гэтага карыстальніка."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "імя карыстальніка"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
+"Абавязковае поле. Да трыццаці знакаў. Толькі лічбы, літары ды знакі «@», "
+"«.» (кропка), «+», «-», «_»."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі літары, "
+"лічбы і сімвалы @/./+/-/_."
+
+msgid "A user with that username already exists."
+msgstr "Карыстальнік з такім іменем ужо існуе."
+
 msgid "first name"
 msgstr "імя"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "прозьвішча"
 
-#: contrib/auth/models.py:375
 msgid "email address"
-msgstr ""
+msgstr "адрас электроннай пошты"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "становішча"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Паказвае, ці можа карыстальнік ўваходзіць на кіраўнічую пляцоўку."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "дзейны"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -264,55 +203,39 @@ msgstr ""
 "Паказвае, ці трэба ставіцца да карыстальніка як да дзейнага. Замест таго "
 "каб, каб выдаляць рахунак, зраіце карыстальніка нядзейным."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "калі далучылі"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "карыстальнік"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "карыстальнікі"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Узнавіць пароль на %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr ""
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Не ўвайшоў"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
-msgstr ""
+msgstr "Аднаўленне пароля"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr ""
+msgid "Password reset sent"
+msgstr "Запыт на аднаўленне пароля адасланы"
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
-msgstr ""
+msgstr "Пазначце новы пароль"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
-msgstr ""
+msgstr "Не ўдалося аднавіць пароль"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
-msgstr ""
+msgstr "Аднаўленне пароля скончана"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
-msgstr ""
+msgstr "Змена пароля"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
-msgstr ""
+msgstr "Змена пароля прайшла паспяхова"

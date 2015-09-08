@@ -27,6 +27,7 @@
 
 {{ description }}
 
+<h3>{% trans 'Fields' %}</h3>
 <div class="module">
 <table class="model">
 <thead>
@@ -47,6 +48,30 @@
 </tbody>
 </table>
 </div>
+
+{% if methods %}
+<h3>{% trans 'Methods with arguments' %}</h3>
+<div class="module">
+<table class="model">
+<thead>
+<tr>
+    <th>{% trans 'Method' %}</th>
+    <th>{% trans 'Arguments' %}</th>
+    <th>{% trans 'Description' %}</th>
+</tr>
+</thead>
+<tbody>
+{% for method in methods|dictsort:"name" %}
+<tr>
+    <td>{{ method.name }}</td>
+    <td>{{ method.arguments }}</td>
+    <td>{{ method.verbose }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
 
 <p class="small"><a href="{% url 'django-admindocs-models-index' %}">&lsaquo; {% trans 'Back to Model Documentation' %}</a></p>
 </div>

@@ -280,7 +280,9 @@ example of using ``RunPython`` to create some initial objects on a ``Country``
 model::
 
     # -*- coding: utf-8 -*-
-    from django.db import models, migrations
+    from __future__ import unicode_literals
+
+    from django.db import migrations, models
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
@@ -305,7 +307,7 @@ model::
 This is generally the operation you would use to create
 :ref:`data migrations <data-migrations>`, run
 custom data updates and alterations, and anything else you need access to an
-ORM and/or python code for.
+ORM and/or Python code for.
 
 If you're upgrading from South, this is basically the South pattern as an
 operation - one or two methods for forwards and backwards, with an ORM and
@@ -322,11 +324,23 @@ or that you use :class:`SeparateDatabaseAndState` to add in operations that will
 reflect your changes to the model state - otherwise, the versioned ORM and
 the autodetector will stop working correctly.
 
-By default, ``RunPython`` will run its contents inside a transaction even
-on databases that do not support DDL transactions (for example, MySQL and
+By default, ``RunPython`` will run its contents inside a transaction on
+databases that do not support DDL transactions (for example, MySQL and
 Oracle). This should be safe, but may cause a crash if you attempt to use
-the ``schema_editor`` provided on these backends; in this case, please
-set ``atomic=False``.
+the ``schema_editor`` provided on these backends; in this case, pass
+``atomic=False`` to the ``RunPython`` operation.
+
+On databases that do support DDL transactions (SQLite and PostgreSQL),
+``RunPython`` operations do not have any transactions automatically added
+besides the transactions created for each migration (the ``atomic`` parameter
+has no effect on these databases). Thus, on PostgreSQL, for example, you should
+avoid combining schema changes and ``RunPython`` operations in the same
+migration or you may hit errors like ``OperationalError: cannot ALTER TABLE
+"mytable" because it has pending trigger events``.
+
+If you have a different database and aren't sure if it supports DDL
+transactions, check the ``django.db.connection.features.can_rollback_ddl``
+attribute.
 
 .. warning::
 
@@ -402,7 +416,8 @@ You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they're
 easy to read and cover a lot of the example usage of semi-internal aspects
 of the migration framework like ``ProjectState`` and the patterns used to get
-historical models.
+historical models, as well as ``ModelState`` and the patterns used to mutate
+historical models in ``state_forwards()``.
 
 Some things to note:
 
@@ -420,6 +435,16 @@ Some things to note:
 * You might see implementations of ``references_model`` on the built-in
   operations; this is part of the autodetection code and does not matter for
   custom operations.
+
+.. warning::
+
+    For performance reasons, the :class:`~django.db.models.Field` instances in
+    ``ModelState.fields`` are reused across migrations. You must never change
+    the attributes on these instances. If you need to mutate a field in
+    ``state_forwards()``, you must remove the old instance from
+    ``ModelState.fields`` and add a new instance in its place. The same is true
+    for the :class:`~django.db.models.Manager` instances in
+    ``ModelState.managers``.
 
 As a simple example, let's make an operation that loads PostgreSQL extensions
 (which contain some of PostgreSQL's more exciting features). It's simple enough;

@@ -37,7 +37,7 @@ class OGRGeomType(object):
             type_input = type_input.lower()
             if type_input == 'geometry':
                 type_input = 'unknown'
-            num = self._str_types.get(type_input, None)
+            num = self._str_types.get(type_input)
             if num is None:
                 raise GDALException('Invalid OGR String Type "%s"' % type_input)
         elif isinstance(type_input, int):
@@ -85,3 +85,11 @@ class OGRGeomType(object):
         elif s == 'Unknown':
             s = 'Geometry'
         return s + 'Field'
+
+    def to_multi(self):
+        """
+        Transform Point, LineString, Polygon, and their 25D equivalents
+        to their Multi... counterpart.
+        """
+        if self.name.startswith(('Point', 'LineString', 'Polygon')):
+            self.num += 3

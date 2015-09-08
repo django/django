@@ -9,9 +9,9 @@ that'll work while you walk through the introduction.
 Install Python
 --------------
 
-Being a Python Web framework, Django requires Python. It works with Python 2.7
-3.3+. All these versions of Python include a lightweight database called
-SQLite_ so you won't need to set up a database just yet.
+Being a Python Web framework, Django requires Python. See
+:ref:`faq-python-version-support` for details. Python includes a lightweight
+database called SQLite_ so you won't need to set up a database just yet.
 
 .. _sqlite: http://sqlite.org/
 
@@ -28,8 +28,8 @@ your operating system's package manager.
 You can verify that Python is installed by typing ``python`` from your shell;
 you should see something like::
 
-    Python 3.3.3 (default, Nov 26 2013, 13:33:18)
-    [GCC 4.8.2] on linux
+    Python 3.4.x
+    [GCC 4.x] on linux
     Type "help", "copyright", "credits" or "license" for more information.
     >>>
 
@@ -57,12 +57,15 @@ You've got three easy options to install Django:
   who have operating systems that distribute Django.
 
 * :ref:`Install an official release <installing-official-release>`. This
-  is the best approach for users who want a stable version number and aren't
-  concerned about running a slightly older version of Django.
+  is the best approach for most users.
 
 * :ref:`Install the latest development version
-  <installing-development-version>`. This is best for users who want the
-  latest-and-greatest features and aren't afraid of running brand-new code.
+  <installing-development-version>`. This option is for enthusiasts who want
+  the latest-and-greatest features and aren't afraid of running brand new code.
+  You might encounter new bugs in the development version, but reporting them
+  helps the development of Django. Also, releases of third-party packages are
+  less likely to be compatible with the development version than with the
+  latest stable release.
 
 .. admonition:: Always refer to the documentation that corresponds to the
     version of Django you're using!

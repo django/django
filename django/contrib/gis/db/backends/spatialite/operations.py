@@ -1,3 +1,9 @@
+"""
+SQL functions reference lists:
+http://www.gaia-gis.it/spatialite-2.4.0/spatialite-sql-2.4.html
+http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
+http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
+"""
 import re
 import sys
 
@@ -73,6 +79,25 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'distance_lt': SpatialOperator(func='Distance', op='<'),
         'distance_lte': SpatialOperator(func='Distance', op='<='),
     }
+
+    @cached_property
+    def function_names(self):
+        return {
+            'Length': 'ST_Length',
+            'Reverse': 'ST_Reverse',
+            'Scale': 'ScaleCoords',
+            'Translate': 'ST_Translate' if self.spatial_version >= (3, 1, 0) else 'ShiftCoords',
+            'Union': 'ST_Union',
+        }
+
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
+        if self.spatial_version < (3, 1, 0):
+            unsupported.add('SnapToGrid')
+        if self.spatial_version < (4, 0, 0):
+            unsupported.update({'Perimeter', 'Reverse'})
+        return unsupported
 
     @cached_property
     def spatial_version(self):
@@ -262,7 +287,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
             converters.append(self.convert_geometry)
         return converters
 
-    def convert_geometry(self, value, expression, context):
+    def convert_geometry(self, value, expression, connection, context):
         if value:
             value = Geometry(value)
             if 'transformed_srid' in context:

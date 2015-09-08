@@ -95,6 +95,11 @@ W019 = Warning(
     id='security.W019',
 )
 
+W020 = Warning(
+    "ALLOWED_HOSTS must not be empty in deployment.",
+    id='security.W020',
+)
+
 
 def _security_middleware():
     return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
@@ -182,3 +187,8 @@ def check_xframe_deny(app_configs, **kwargs):
         settings.X_FRAME_OPTIONS == 'DENY'
     )
     return [] if passed_check else [W019]
+
+
+@register(Tags.security, deploy=True)
+def check_allowed_hosts(app_configs, **kwargs):
+    return [] if settings.ALLOWED_HOSTS else [W020]

@@ -10,7 +10,7 @@
      {% for field in inline_admin_formset.fields %}
        {% if not field.widget.is_hidden %}
          <th{% if forloop.first %} colspan="2"{% endif %}{% if field.required %} class="required"{% endif %}>{{ field.label|capfirst }}
-         {% if field.help_text %}&nbsp;<img src="{% static "admin/img/icon-unknown.gif" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}" />{% endif %}
+         {% if field.help_text %}&nbsp;<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}" />{% endif %}
          </th>
        {% endif %}
      {% endfor %}
@@ -74,11 +74,10 @@
 <script type="text/javascript">
 
 (function($) {
-  $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr").tabularFormset({
-    prefix: "{{ inline_admin_formset.formset.prefix }}",
-    adminStaticPrefix: '{% static "admin/" %}',
-    addText: "{% blocktrans with inline_admin_formset.opts.verbose_name|capfirst as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}",
-    deleteText: "{% trans 'Remove' %}"
+  $("#{{ inline_admin_formset.formset.prefix|escapejs }}-group .tabular.inline-related tbody tr").tabularFormset({
+    prefix: "{{ inline_admin_formset.formset.prefix|escapejs }}",
+    addText: "{% filter escapejs %}{% blocktrans with inline_admin_formset.opts.verbose_name|capfirst as verbose_name %}Add another {{ verbose_name }}{% endblocktrans %}{% endfilter %}",
+    deleteText: "{% filter escapejs %}{% trans 'Remove' %}{% endfilter %}"
   });
 })(django.jQuery);
 </script>

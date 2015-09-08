@@ -10,7 +10,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpRequest, HttpResponse, RawPostDataException, UnreadablePostError,
-    build_request_repr, parse_cookie,
+    parse_cookie,
 )
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
@@ -60,9 +60,6 @@ class RequestsTests(SimpleTestCase):
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
         self.assertEqual(repr(request), str_prefix("<HttpRequest: GET '/somepath/'>"))
-        self.assertEqual(build_request_repr(request), str_prefix("<HttpRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
-                         str_prefix("<HttpRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
     def test_httprequest_repr_invalid_method_and_path(self):
         request = HttpRequest()
@@ -73,22 +70,6 @@ class RequestsTests(SimpleTestCase):
         request = HttpRequest()
         request.path = ""
         self.assertEqual(repr(request), str_prefix("<HttpRequest>"))
-
-    def test_bad_httprequest_repr(self):
-        """
-        If an exception occurs when parsing GET, POST, COOKIES, or META, the
-        repr of the request should show it.
-        """
-        class Bomb(object):
-            """An object that raises an exception when printed out."""
-            def __repr__(self):
-                raise Exception('boom!')
-
-        bomb = Bomb()
-        for attr in ['GET', 'POST', 'COOKIES', 'META']:
-            request = HttpRequest()
-            setattr(request, attr, {'bomb': bomb})
-            self.assertIn('%s:<could not parse>' % attr, build_request_repr(request))
 
     def test_wsgirequest(self):
         request = WSGIRequest({'PATH_INFO': 'bogus', 'REQUEST_METHOD': 'bogus', 'wsgi.input': BytesIO(b'')})
@@ -147,9 +128,6 @@ class RequestsTests(SimpleTestCase):
         request.COOKIES = {'post-key': 'post-value'}
         request.META = {'post-key': 'post-value'}
         self.assertEqual(repr(request), str_prefix("<WSGIRequest: GET '/somepath/'>"))
-        self.assertEqual(build_request_repr(request), str_prefix("<WSGIRequest\npath:/somepath/,\nGET:{%(_)s'get-key': %(_)s'get-value'},\nPOST:{%(_)s'post-key': %(_)s'post-value'},\nCOOKIES:{%(_)s'post-key': %(_)s'post-value'},\nMETA:{%(_)s'post-key': %(_)s'post-value'}>"))
-        self.assertEqual(build_request_repr(request, path_override='/otherpath/', GET_override={'a': 'b'}, POST_override={'c': 'd'}, COOKIES_override={'e': 'f'}, META_override={'g': 'h'}),
-                         str_prefix("<WSGIRequest\npath:/otherpath/,\nGET:{%(_)s'a': %(_)s'b'},\nPOST:{%(_)s'c': %(_)s'd'},\nCOOKIES:{%(_)s'e': %(_)s'f'},\nMETA:{%(_)s'g': %(_)s'h'}>"))
 
     def test_wsgirequest_path_info(self):
         def wsgi_str(path_info):
@@ -524,6 +502,18 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_get_raw_uri(self):
+        factory = RequestFactory(HTTP_HOST='evil.com')
+        request = factory.get('////absolute-uri')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com//absolute-uri')
+
+        request = factory.get('/?foo=bar')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com/?foo=bar')
+
+        request = factory.get('/path/with:colons')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
+
 
 class HostValidationTests(SimpleTestCase):
     poisoned_hosts = [
@@ -672,6 +662,38 @@ class HostValidationTests(SimpleTestCase):
                     'HTTP_HOST': host,
                 }
                 request.get_host()
+
+    @override_settings(USE_X_FORWARDED_PORT=False)
+    def test_get_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_PORT': '80',
+        }
+        # Shouldn't use the X-Forwarded-Port header
+        self.assertEqual(request.get_port(), '8080')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
+
+    @override_settings(USE_X_FORWARDED_PORT=True)
+    def test_get_port_with_x_forwarded_port(self):
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+            'HTTP_X_FORWARDED_PORT': '80',
+        }
+        # Should use the X-Forwarded-Port header
+        self.assertEqual(request.get_port(), '80')
+
+        request = HttpRequest()
+        request.META = {
+            'SERVER_PORT': '8080',
+        }
+        self.assertEqual(request.get_port(), '8080')
 
     @override_settings(DEBUG=True, ALLOWED_HOSTS=[])
     def test_host_validation_disabled_in_debug_mode(self):

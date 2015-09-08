@@ -9,7 +9,6 @@ except ImportError:
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    needs_datetime_string_cast = False
     interprets_empty_strings_as_nulls = True
     uses_savepoints = True
     has_select_for_update = True
@@ -35,7 +34,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_combined_alters = False
     nulls_order_largest = True
     requires_literal_defaults = True
-    connection_persists_old_columns = True
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
     uppercases_column_names = True

@@ -22,10 +22,17 @@ class BaseRangeField(forms.MultiValueField):
         super(BaseRangeField, self).__init__(**kwargs)
 
     def prepare_value(self, value):
+        lower_base, upper_base = self.fields
         if isinstance(value, self.range_type):
-            return [value.lower, value.upper]
+            return [
+                lower_base.prepare_value(value.lower),
+                upper_base.prepare_value(value.upper),
+            ]
         if value is None:
-            return [None, None]
+            return [
+                lower_base.prepare_value(None),
+                upper_base.prepare_value(None),
+            ]
         return value
 
     def compress(self, values):
@@ -49,21 +56,25 @@ class BaseRangeField(forms.MultiValueField):
 
 
 class IntegerRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two whole numbers.')}
     base_field = forms.IntegerField
     range_type = NumericRange
 
 
 class FloatRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two numbers.')}
     base_field = forms.FloatField
     range_type = NumericRange
 
 
 class DateTimeRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two valid date/times.')}
     base_field = forms.DateTimeField
     range_type = DateTimeTZRange
 
 
 class DateRangeField(BaseRangeField):
+    default_error_messages = {'invalid': _('Enter two valid dates.')}
     base_field = forms.DateField
     range_type = DateRange
 

@@ -2,6 +2,7 @@
 #
 # Translators:
 # Dimitris Glezos <glezos@transifex.com>, 2011
+# Giannis Meletakis <meletakis@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Panos Laganakos <panos.laganakos@gmail.com>, 2014
 # Yorgos Pagles <y.pagles@gmail.com>, 2011-2012
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-17 08:42+0000\n"
-"Last-Translator: Panos Laganakos <panos.laganakos@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-02-02 19:32+0000\n"
+"Last-Translator: Giannis Meletakis <meletakis@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
 "el/)\n"
 "MIME-Version: 1.0\n"
@@ -20,68 +21,51 @@ msgstr ""
 "Language: el\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "Επιτυχημένη διαγραφή %(count)d %(items)s."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "Αδύνατη τη διαγραφή του %(name)s"
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "Είστε σίγουροι;"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Διαγραφη επιλεγμένων %(verbose_name_plural)s"
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "Διαχείριση"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "Όλα"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "Ναι"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "Όχι"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "Οποιαδήποτε ημερομηνία"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "Σήμερα"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "Τελευταίες 7 ημέρες"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "Αυτόν το μήνα"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "Αυτόν το χρόνο"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -91,91 +75,76 @@ msgstr ""
 "προσωπικού. Σημειώστε οτι και στα δύο πεδία μπορεί να έχει σημασία αν είναι "
 "κεφαλαία ή μικρά. "
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "Ενέργεια:"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "ώρα ενέργειας"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "κωδικός αντικειμένου"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "αναπαράσταση αντικειμένου"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "σημαία ενέργειας"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "αλλαγή μηνύματος"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "εγγραφή καταγραφής"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "εγγραφές καταγραφής"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "Προστέθηκαν \"%(object)s\"."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "Αλλάχθηκαν \"%(object)s\" - %(changes)s"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "Διαγράφηκαν \"%(object)s.\""
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "LogEntry Object"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "Κανένα"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+"Κρατήστε πατημένο το \"Control\", ή το \"Command\" αν έχετε Mac, για να "
+"επιλέξετε παραπάνω από ένα."
+
 #, python-format
 msgid "Changed %s."
 msgstr "Έγινε επεξεργασία του %s."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "και"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "Προστέθηκε %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "Έγινε επεξεργασία %(list)s για %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "Διαγράφη %(name)s \"%(object)s\"."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "Κανένα πεδίο δεν άλλαξε."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
@@ -183,7 +152,6 @@ msgstr ""
 "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία. Μπορείτε να το "
 "επεξεργαστείτε πάλι παρακάτω."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
@@ -192,12 +160,10 @@ msgstr ""
 "To %(name)s \"%(obj)s\" προστέθηκε επιτυχώς. Μπορείτε να προσθέσετε και άλλο "
 "%(name)s παρακάτω."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "Το %(name)s \"%(obj)s\" αποθηκεύτηκε με επιτυχία."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
@@ -206,7 +172,6 @@ msgstr ""
 "Το %(name)s \"%(obj)s\" αλλάχθηκε επιτυχώς. Μπορείτε να το επεξεργαστείτε "
 "ξανά παρακάτω."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
@@ -215,12 +180,10 @@ msgstr ""
 "To %(name)s \"%(obj)s\" αλλάχθηκε επιτυχώς. Μπορείτε να προσθέσετε και άλλο "
 "%(name)s παρακάτω."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Το %(name)s \"%(obj)s\" αλλάχτηκε με επιτυχία."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
@@ -229,66 +192,54 @@ msgstr ""
 "αντικείμενο. Πρέπει να επιλέξετε ένα ή περισσότερα αντικείμενα για να "
 "πραγματοποιήσετε ενέργειες σε αυτά."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "Δεν έχει επιλεγεί ενέργεια."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "Το %(name)s \"%(obj)s\" διαγράφηκε με επιτυχία."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr " Το αντικείμενο %(name)s  με πρωτεύον κλειδί %(key)r δεν βρέθηκε."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "Προσθήκη %s"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "Αλλαγή του %s"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "Σφάλμα βάσης δεδομένων"
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s άλλαξε επιτυχώς."
 msgstr[1] "%(count)s %(name)s άλλαξαν επιτυχώς."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "Επιλέχθηκε %(total_count)s"
 msgstr[1] "Επιλέχθηκαν και τα %(total_count)s"
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "Επιλέγησαν 0 από %(cnt)s"
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "Ιστορικό αλλαγών: %s"
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -297,71 +248,40 @@ msgstr ""
 "Η διαγραφή %(class_name)s %(instance)s θα απαιτούσε την διαγραφή των "
 "ακόλουθων προστατευόμενων συγγενεύων αντικειμένων: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "Διαχειριστής ιστότοπου Django"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "Διαχείριση Django"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "Διαχείριση του ιστότοπου"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "Σύνδεση"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "Διαχείριση %(app)s"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "Η σελίδα δε βρέθηκε"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "Λυπόμαστε, αλλά η σελίδα που ζητήθηκε δε μπόρεσε να βρεθεί."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "Αρχική"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "Σφάλμα εξυπηρετητή"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "Σφάλμα εξυπηρετητή (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "Σφάλμα εξυπηρετητή <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -369,28 +289,22 @@ msgstr ""
 "Υπήρξε ένα σφάλμα. Έχει αναφερθεί στους διαχειριστές της σελίδας μέσω email, "
 "και λογικά θα διορθωθεί αμεσα. Ευχαριστούμε για την υπομονή σας."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "Εκτέλεση της επιλεγμένης ενέργειας"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Μετάβαση"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "Κάντε κλικ εδώ για να επιλέξετε τα αντικείμενα σε όλες τις σελίδες"
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "Επιλέξτε και τα %(total_count)s %(module_name)s"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "Καθαρισμός επιλογής"
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
@@ -399,114 +313,65 @@ msgstr ""
 "ολοκλήρωση αυτού του βήματος θα έχετε την επιλογή να προσθέσετε όλα τα "
 "υπόλοιπα στοιχεία για τον χρήστη."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Εισάγετε όνομα χρήστη και κωδικό πρόσβασης."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "Αλλαγή συνθηματικού"
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "Παρακαλούμε διορθώστε το παρακάτω λάθος."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "Παρακαλοϋμε διορθώστε τα παρακάτω λάθη."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Εισάγετε ένα νέο κωδικό πρόσβασης για τον χρήστη <strong>%(username)s</"
 "strong>."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "Συνθηματικό"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "Συνθηματικό (ξανά)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "Εισάγετε το ίδιο συνθηματικό όπως παραπάνω, για λόγους επιβεβαίωσης."
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "Καλωσήρθατε,"
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr "Δες την εφαρμογή"
+
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "Αποσύνδεση"
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "Προσθήκη"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "Ιστορικό"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "Προβολή στην ιστοσελίδα"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "Προσθήκη %(name)s"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "Φίλτρο"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "Διαγραφή από την ταξινόμηση"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "Προτεραιότητα ταξινόμησης: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "Εναλλαγή ταξινόμησης"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "Διαγραφή"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -518,7 +383,6 @@ msgstr ""
 "για τα οποία δεν έχετε δικάιωμα διαγραφής. Τα είδη των αντικειμένων αυτών "
 "είναι:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -527,7 +391,6 @@ msgstr ""
 "Η διαγραφή του %(object_name)s '%(escaped_object)s'  απαιτεί την διαγραφή "
 "των παρακάτω προστατευμένων αντικειμένων:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -537,16 +400,18 @@ msgstr ""
 "\"%(escaped_object)s\". Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω "
 "συσχετισμένα αντικείμενα θα διαγραφούν επίσης:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr "Αντικείμενα"
+
 msgid "Yes, I'm sure"
 msgstr "Ναι, είμαι βέβαιος"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr "Όχι, επέστρεψε με πίσω."
+
 msgid "Delete multiple objects"
 msgstr "Διαγραφή πολλών αντικειμένων"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -557,7 +422,6 @@ msgstr ""
 "διαγραφή συσχετισμένων αντικειμένων για τα οποία δεν έχετε το διακαίωμα "
 "διαγραφής:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -566,7 +430,6 @@ msgstr ""
 "Η διαγραφή των επιλεγμένων %(objects_name)s απαιτεί την διαγραφή των "
 "παρακάτω προστατευμένων αντικειμένων:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -576,56 +439,45 @@ msgstr ""
 "Αν προχωρήσετε με την διαγραφή όλα τα παρακάτω συσχετισμένα αντικείμενα θα "
 "διαγραφούν επίσης:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "Επεξεργασία"
+
 msgid "Remove"
 msgstr "Αφαίρεση"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "Προσθήκη νέου %(verbose_name)s"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "Θέλετε να πραγματοποιηθεί διαγραφή?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " Ανά %(filter_title)s "
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr "Περίληψη"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Μοντέλα στην εφαρμογή %(name)s"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "Επεξεργασία"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "Δεν έχετε δικαίωμα να επεξεργαστείτε τίποτα."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "Πρόσφατες ενέργειες"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "Οι ενέργειες μου"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "Κανένα διαθέσιμο"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "Άγνωστο περιεχόμενο"
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -635,27 +487,18 @@ msgstr ""
 "βεβαιωθείτε ότι οι απαραίτητοι πίνακες έχουν δημιουργηθεί και ότι η βάση "
 "είναι προσβάσιμη από τον αντίστοιχο χρήστη που έχετε δηλώσει."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "Συνθηματικό:"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "Ξεχάσατε το συνθηματικό ή τον κωδικό χρήστη σας;"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "Ημερομηνία/ώρα"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "Χρήστης"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "Ενέργεια"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -663,61 +506,58 @@ msgstr ""
 "Δεν υπάρχει ιστορικό αλλαγών γι' αυτό το αντικείμενο. Είναι πιθανό η "
 "προσθήκη του να μην πραγματοποιήθηκε χρησιμοποιώντας το διαχειριστικό."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "Εμφάνιση όλων"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "Αποθήκευση"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Άλλαξε το επιλεγμένο %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Πρόσθεσε άλλο ένα %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Διέγραψε το επιλεγμένο %(model)s"
+
 msgid "Search"
 msgstr "Αναζήτηση"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s αποτέλεσμα"
 msgstr[1] "%(counter)s αποτελέσματα"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "%(full_result_count)s συνολικά"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "Αποθήκευση ως νέο"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "Αποθήκευση και προσθήκη καινούριου"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "Αποθήκευση και συνέχεια επεξεργασίας"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Ευχαριστούμε που διαθέσατε κάποιο ποιοτικό χρόνο στον ιστότοπο σήμερα."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "Σύνδεση ξανά"
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "Αλλαγή συνθηματικού"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "Το συνθηματικό σας έχει αλλαχτεί."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -726,36 +566,20 @@ msgstr ""
 "κατόπιν εισάγετε το νέο σας συνθηματικό δύο φορές ούτως ώστε να "
 "πιστοποιήσουμε ότι το πληκτρολογήσατε σωστά."
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "Προηγούμενος κωδικός πρόσβασης"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "Νέος κωδικός πρόσβασης"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "Αλλαγή του συνθηματικού μου"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "Επαναφορά συνθηματικού"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr ""
 "Ορίσατε επιτυχώς έναν κωδικό πρόσβασής. Πλέον έχετε την δυνατότητα να "
 "συνδεθήτε."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "Επιβεβαίωση επαναφοράς κωδικού πρόσβασης"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -763,15 +587,12 @@ msgstr ""
 "Παρακαλούμε πληκτρολογήστε το νέο κωδικό πρόσβασης δύο φορές ώστε να "
 "βεβαιωθούμε ότι δεν πληκτρολογήσατε κάποιον χαρακτήρα λανθασμένα."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "Νέο συνθηματικό:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "Επιβεβαίωση συνθηματικού:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -781,15 +602,14 @@ msgstr ""
 "πραγματοποιήσετε και πάλι την διαδικασία αίτησης επαναφοράς του κωδικού "
 "πρόσβασης."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"Σας στείλαμε οδηγίες για να ρυθμίσετε τον κωδικό σας. Θα πρέπει να τις "
-"λάβετε σύντομα."
+"Σας έχουμε αποστείλει οδηγίες σχετικά με τον ορισμό του κωδικού σας, αν "
+"υπάρχει ήδη κάποιος λογαριασμός με την διεύθυνση ηλεκτρονικού ταχυδρομείου "
+"που δηλώσατε. Θα λάβετε τις οδηγίες σύντομα."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -798,7 +618,6 @@ msgstr ""
 "διεύθυνση με την οποία έχετε εγγραφεί, και ελέγξτε τον φάκελο με τα "
 "ανεπιθύμητα."
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -807,28 +626,23 @@ msgstr ""
 "Λαμβάνετε αυτό το email επειδή ζητήσατε επαναφορά κωδικού για τον λογαριασμό "
 "σας στο %(site_name)s."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr ""
 "Παρακαλούμε επισκεφθήτε την ακόλουθη σελίδα και επιλέξτε ένα νέο κωδικό "
 "πρόσβασης: "
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr ""
 "Το όνομα χρήστη με το οποίο είστε καταχωρημένος για την περίπτωση στην οποία "
 "το έχετε ξεχάσει:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "Ευχαριστούμε που χρησιμοποιήσατε τον ιστότοπο μας!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "Η ομάδα του %(site_name)s"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -836,52 +650,37 @@ msgstr ""
 "Ξεχάσατε τον κωδικό σας; Εισάγετε το email σας παρακάτω, και θα σας "
 "αποστείλουμε οδηγίες για να ρυθμίσετε εναν καινούργιο."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "Ηλεκτρονική διεύθυνση:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "Επαναφορά του συνθηματικού μου"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "Όλες οι ημερομηνίες"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(Κενό)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "Επιλέξτε %s"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "Επιλέξτε %s προς αλλαγή"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "Ημ/νία:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "Ώρα:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "Αναζήτηση"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "Προσθέστε κι άλλο"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "Τώρα:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "Επεξεργασία:"

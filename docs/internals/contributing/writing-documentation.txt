@@ -192,7 +192,7 @@ __ http://sphinx-doc.org/markup/
 
   To link, use ``:djadminopt:`--traceback```.
 
-* Links to Trac tickets (typically reserved for minor release notes)::
+* Links to Trac tickets (typically reserved for patch release notes)::
 
         :ticket:`12345`
 
@@ -210,7 +210,7 @@ Our policy for new features is:
 
 Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
-blank line and an optional content (indented).
+blank line and an optional description (indented).
 
 General improvements, or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
@@ -355,14 +355,6 @@ look better:
 
   That is, use metadata instead of titles.
 
-* Add more links -- nearly everything that's an inline code literal
-  right now can probably be turned into a xref.
-
-  See the ``literals_to_xrefs.py`` file in ``_ext`` -- it's a shell script
-  to help do this work.
-
-  This will probably be a continuing, never-ending project.
-
 * Whenever possible, use links. So, use ``:setting:`ADMINS``` instead
   of ````ADMINS````.
 
@@ -420,3 +412,19 @@ Translating documentation
 
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
+
+.. _django-admin-manpage:
+
+``django-admin`` man page
+-------------------------
+
+Sphinx can generate a manual page for the
+:doc:`django-admin </ref/django-admin>` command. This is configured in
+``docs/conf.py``. Unlike other documentation output, this man page should be
+included in the Django repository and the releases as
+``docs/man/django-admin.1``. There isn't a need to update this file when
+updating the documentation, as it's updated once as part of the release process.
+
+To generate an updated version of the man page, run ``make man`` in the
+``docs`` directory. The new man page will be written in
+``docs/_build/man/django-admin.1``.

@@ -1,8 +1,8 @@
 from django.apps import apps
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 
-class NoModelTests(TestCase):
+class NoModelTests(SimpleTestCase):
 
     def test_no_models(self):
         """Test that it's possible to load an app with no models.py file."""

@@ -1,6 +1,5 @@
 from django.contrib.gis.gdal import OGRGeomType
-from django.db.backends.postgresql_psycopg2.introspection import \
-    DatabaseIntrospection
+from django.db.backends.postgresql.introspection import DatabaseIntrospection
 
 
 class GeoIntrospectionError(Exception):
@@ -19,6 +18,26 @@ class PostGISIntrospection(DatabaseIntrospection):
         'spatial_ref_sys',
         'raster_overviews',
     ]
+
+    # Overridden from parent to include raster indices in retrieval.
+    # Raster indices have pg_index.indkey value 0 because they are an
+    # expression over the raster column through the ST_ConvexHull function.
+    # So the default query has to be adapted to include raster indices.
+    _get_indexes_query = """
+        SELECT DISTINCT attr.attname, idx.indkey, idx.indisunique, idx.indisprimary
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index idx, pg_catalog.pg_attribute attr
+        LEFT JOIN pg_catalog.pg_type t ON t.oid = attr.atttypid
+        WHERE
+            c.oid = idx.indrelid
+            AND idx.indexrelid = c2.oid
+            AND attr.attrelid = c.oid
+            AND (
+                attr.attnum = idx.indkey[0] OR
+                (t.typname LIKE 'raster' AND idx.indkey = '0')
+            )
+            AND attr.attnum > 0
+            AND c.relname = %s"""
 
     def get_postgis_types(self):
         """

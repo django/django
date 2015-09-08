@@ -30,8 +30,8 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, related_name='book_contact_set')
-    publisher = models.ForeignKey(Publisher)
+    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
 
     def __str__(self):
@@ -65,7 +65,7 @@ class Employee(models.Model):
     first_name = models.CharField(max_length=20)
     manager = models.BooleanField(default=False)
     last_name = models.CharField(max_length=20)
-    store = models.ForeignKey(Store)
+    store = models.ForeignKey(Store, models.CASCADE)
     age = models.IntegerField()
     salary = models.DecimalField(max_digits=8, decimal_places=2)
 
@@ -84,3 +84,12 @@ class Company(models.Model):
         return ('Company(name=%s, motto=%s, ticker_name=%s, description=%s)'
             % (self.name, self.motto, self.ticker_name, self.description)
         )
+
+
+@python_2_unicode_compatible
+class Ticket(models.Model):
+    active_at = models.DateTimeField()
+    duration = models.DurationField()
+
+    def __str__(self):
+        return '{} - {}'.format(self.active_at, self.duration)

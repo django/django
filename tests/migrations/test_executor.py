@@ -2,6 +2,8 @@ from django.apps.registry import apps as global_apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
+from django.db.migrations.recorder import MigrationRecorder
+from django.db.utils import DatabaseError
 from django.test import TestCase, modify_settings, override_settings
 
 from .test_base import MigrationTestBase
@@ -186,7 +188,14 @@ class ExecutorTests(MigrationTestBase):
                 (executor.loader.graph.nodes["migrations", "0001_initial"], False),
             ],
         )
-        executor.migrate([("migrations", "0001_initial")])
+        # Applying the migration should raise a database level error
+        # because we haven't given the --fake-initial option
+        with self.assertRaises(DatabaseError):
+            executor.migrate([("migrations", "0001_initial")])
+        # Reset the faked state
+        state = {"faked": None}
+        # Allow faking of initial CreateModel operations
+        executor.migrate([("migrations", "0001_initial")], fake_initial=True)
         self.assertEqual(state["faked"], True)
         # And migrate back to clean up the database
         executor.loader.build_graph()
@@ -367,6 +376,85 @@ class ExecutorTests(MigrationTestBase):
             ("unapply_success", migrations['migrations', '0001_initial'], False),
         ]
         self.assertEqual(call_args_list, expected)
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.alter_fk.author_app",
+            "migrations.migrations_test_apps.alter_fk.book_app",
+        ]
+    )
+    def test_alter_id_type_with_fk(self):
+        try:
+            executor = MigrationExecutor(connection)
+            self.assertTableNotExists("author_app_author")
+            self.assertTableNotExists("book_app_book")
+            # Apply initial migrations
+            executor.migrate([
+                ("author_app", "0001_initial"),
+                ("book_app", "0001_initial"),
+            ])
+            self.assertTableExists("author_app_author")
+            self.assertTableExists("book_app_book")
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+
+            # Apply PK type alteration
+            executor.migrate([("author_app", "0002_alter_id")])
+
+            # Rebuild the graph to reflect the new DB state
+            executor.loader.build_graph()
+        finally:
+            # We can't simply unapply the migrations here because there is no
+            # implicit cast from VARCHAR to INT on the database level.
+            with connection.schema_editor() as editor:
+                editor.execute(editor.sql_delete_table % {"table": "book_app_book"})
+                editor.execute(editor.sql_delete_table % {"table": "author_app_author"})
+            self.assertTableNotExists("author_app_author")
+            self.assertTableNotExists("book_app_book")
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_apply_all_replaced_marks_replacement_as_applied(self):
+        """
+        Applying all replaced migrations marks replacement as applied (#24628).
+        """
+        recorder = MigrationRecorder(connection)
+        # Place the database in a state where the replaced migrations are
+        # partially applied: 0001 is applied, 0002 is not.
+        recorder.record_applied("migrations", "0001_initial")
+        executor = MigrationExecutor(connection)
+        # Use fake because we don't actually have the first migration
+        # applied, so the second will fail. And there's no need to actually
+        # create/modify tables here, we're just testing the
+        # MigrationRecord, which works the same with or without fake.
+        executor.migrate([("migrations", "0002_second")], fake=True)
+
+        # Because we've now applied 0001 and 0002 both, their squashed
+        # replacement should be marked as applied.
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations(),
+        )
+
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
+    def test_migrate_marks_replacement_applied_even_if_it_did_nothing(self):
+        """
+        A new squash migration will be marked as applied even if all its
+        replaced migrations were previously already applied (#24628).
+        """
+        recorder = MigrationRecorder(connection)
+        # Record all replaced migrations as applied
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        executor = MigrationExecutor(connection)
+        executor.migrate([("migrations", "0001_squashed_0002")])
+
+        # Because 0001 and 0002 are both applied, even though this migrate run
+        # didn't apply anything new, their squashed replacement should be
+        # marked as applied.
+        self.assertIn(
+            ("migrations", "0001_squashed_0002"),
+            recorder.applied_migrations(),
+        )
 
 
 class FakeLoader(object):

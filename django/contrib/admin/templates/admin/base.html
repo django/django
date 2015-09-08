@@ -6,14 +6,13 @@
 <link rel="stylesheet" type="text/css" href="{% block stylesheet %}{% static "admin/css/base.css" %}{% endblock %}" />
 {% block extrastyle %}{% endblock %}
 {% if LANGUAGE_BIDI %}<link rel="stylesheet" type="text/css" href="{% block stylesheet_rtl %}{% static "admin/css/rtl.css" %}{% endblock %}" />{% endif %}
-<script type="text/javascript">window.__admin_media_prefix__ = "{% filter escapejs %}{% static "admin/" %}{% endfilter %}";</script>
-<script type="text/javascript">window.__admin_utc_offset__ = "{% filter escapejs %}{% now "Z" %}{% endfilter %}";</script>
 {% block extrahead %}{% endblock %}
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 </head>
 {% load i18n %}
 
-<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}">
+<body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
+  data-admin-utc-offset="{% filter escapejs %}{% now "Z" %}{% endfilter %}">
 
 <!-- Container -->
 <div id="container">

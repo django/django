@@ -1,16 +1,18 @@
+from __future__ import absolute_import
+
 import inspect
 import warnings
 
 
-class RemovedInDjango21Warning(PendingDeprecationWarning):
+class RemovedInDjango20Warning(PendingDeprecationWarning):
     pass
 
 
-class RemovedInDjango20Warning(DeprecationWarning):
+class RemovedInDjango110Warning(DeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango20Warning
+RemovedInNextVersionWarning = RemovedInDjango110Warning
 
 
 class warn_about_renamed_method(object):

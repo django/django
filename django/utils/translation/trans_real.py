@@ -43,9 +43,12 @@ accept_language_re = re.compile(r'''
         (?:\s*,\s*|$)                                 # Multiple accepts per header.
         ''', re.VERBOSE)
 
-language_code_re = re.compile(r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*$', re.IGNORECASE)
+language_code_re = re.compile(
+    r'^[a-z]{1,8}(?:-[a-z0-9]{1,8})*(?:@[a-z0-9]{1,20})?$',
+    re.IGNORECASE
+)
 
-language_code_prefix_re = re.compile(r'^/([\w-]+)(/|$)')
+language_code_prefix_re = re.compile(r'^/([\w@-]+)(/|$)')
 
 
 @receiver(setting_changed)
@@ -104,7 +107,6 @@ class DjangoTranslation(gettext_module.GNUTranslations):
         self.__language = language
         self.__to_language = to_language(language)
         self.__locale = to_locale(language)
-        self.plural = lambda n: int(n != 1)
 
         self._init_translation_catalog()
         self._add_installed_apps_translations()
@@ -132,6 +134,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # provides merge support for NullTranslations()
             translation._catalog = {}
             translation._info = {}
+            translation.plural = lambda n: int(n != 1)
         return translation
 
     def _init_translation_catalog(self):
@@ -144,6 +147,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # gettext will raise an IOError (refs #18192).
             use_null_fallback = False
         translation = self._new_gnu_trans(localedir, use_null_fallback)
+        self.plural = translation.plural
         self._info = translation._info.copy()
         self._catalog = translation._catalog.copy()
 
@@ -169,11 +173,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
 
     def _add_fallback(self):
         """Sets the GNUTranslations() fallback with the default language."""
-        # Don't set a fallback for the default language or for
-        # en-us (as it's empty, so it'll ALWAYS fall back to the default
-        # language; found this as part of #21498, as we set en-us for
-        # management commands)
-        if self.__language == settings.LANGUAGE_CODE or self.__language == "en-us":
+        # Don't set a fallback for the default language or any English variant
+        # (as it's empty, so it'll ALWAYS fall back to the default language)
+        if self.__language == settings.LANGUAGE_CODE or self.__language.startswith('en'):
             return
         default_translation = translation(settings.LANGUAGE_CODE)
         self.add_fallback(default_translation)
@@ -249,8 +251,12 @@ def get_language_bidi():
     * False = left-to-right layout
     * True = right-to-left layout
     """
-    base_lang = get_language().split('-')[0]
-    return base_lang in settings.LANGUAGES_BIDI
+    lang = get_language()
+    if lang is None:
+        return False
+    else:
+        base_lang = get_language().split('-')[0]
+        return base_lang in settings.LANGUAGES_BIDI
 
 
 def catalog():
@@ -395,7 +401,7 @@ def check_for_language(lang_code):
     <https://www.djangoproject.com/weblog/2007/oct/26/security-fix/>.
     """
     # First, a quick check to make sure lang_code is well-formed (#21458)
-    if not language_code_re.search(lang_code):
+    if lang_code is None or not language_code_re.search(lang_code):
         return False
     for path in all_locale_paths():
         if gettext_module.find('django', path, [to_locale(lang_code)]) is not None:
@@ -523,12 +529,18 @@ def blankout(src, char):
 
 
 context_re = re.compile(r"""^\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?'))\s*""")
-inline_re = re.compile(r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*""")
+inline_re = re.compile(
+    # Match the trans 'some text' part
+    r"""^\s*trans\s+((?:"[^"]*?")|(?:'[^']*?'))"""
+    # Match and ignore optional filters
+    r"""(?:\s*\|\s*[^\s:]+(?::(?:[^\s'":]+|(?:"[^"]*?")|(?:'[^']*?')))?)*"""
+    # Match the optional context part
+    r"""(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?\s*"""
+)
 block_re = re.compile(r"""^\s*blocktrans(\s+.*context\s+((?:"[^"]*?")|(?:'[^']*?')))?(?:\s+|$)""")
 endblock_re = re.compile(r"""^\s*endblocktrans$""")
 plural_re = re.compile(r"""^\s*plural$""")
 constant_re = re.compile(r"""_\(((?:".*?")|(?:'.*?'))\)""")
-one_percent_re = re.compile(r"""(?<!%)%(?!%)""")
 
 
 def templatize(src, origin=None):
@@ -558,7 +570,7 @@ def templatize(src, origin=None):
             message = trim_whitespace(message)
         return message
 
-    for t in Lexer(src, origin).tokenize():
+    for t in Lexer(src).tokenize():
         if incomment:
             if t.token_type == TOKEN_BLOCK and t.contents == 'endcomment':
                 content = ''.join(comment)
@@ -625,7 +637,7 @@ def templatize(src, origin=None):
                 else:
                     singular.append('%%(%s)s' % t.contents)
             elif t.token_type == TOKEN_TEXT:
-                contents = one_percent_re.sub('%%', t.contents)
+                contents = t.contents.replace('%', '%%')
                 if inplural:
                     plural.append(contents)
                 else:
@@ -661,7 +673,7 @@ def templatize(src, origin=None):
                         g = g.strip('"')
                     elif g[0] == "'":
                         g = g.strip("'")
-                    g = one_percent_re.sub('%%', g)
+                    g = g.replace('%', '%%')
                     if imatch.group(2):
                         # A context is provided
                         context_match = context_re.match(imatch.group(2))

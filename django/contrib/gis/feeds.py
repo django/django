@@ -36,7 +36,7 @@ class GeoFeedMixin(object):
         This routine adds a GeoRSS XML element using the given item and handler.
         """
         # Getting the Geometry object.
-        geom = item.get('geometry', None)
+        geom = item.get('geometry')
         if geom is not None:
             if isinstance(geom, (list, tuple)):
                 # Special case if a tuple/list was passed in.  The tuple may be

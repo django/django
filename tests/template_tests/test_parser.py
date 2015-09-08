@@ -5,43 +5,27 @@ from __future__ import unicode_literals
 
 from unittest import TestCase
 
-from django.template import Library, Template, TemplateSyntaxError
+from django.template import Library, TemplateSyntaxError
 from django.template.base import (
-    FilterExpression, Parser, TokenParser, Variable,
+    TOKEN_BLOCK, FilterExpression, Parser, Token, Variable,
 )
-from django.test import override_settings
+from django.template.defaultfilters import register as filter_library
 from django.utils import six
 
 
 class ParserTests(TestCase):
-    def test_token_parsing(self):
-        # Tests for TokenParser behavior in the face of quoted strings with
-        # spaces.
 
-        p = TokenParser("tag thevar|filter sometag")
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), "thevar|filter")
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
-
-        p = TokenParser('tag "a value"|filter sometag')
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), '"a value"|filter')
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
-
-        p = TokenParser("tag 'a value'|filter sometag")
-        self.assertEqual(p.tagname, "tag")
-        self.assertEqual(p.value(), "'a value'|filter")
-        self.assertTrue(p.more())
-        self.assertEqual(p.tag(), "sometag")
-        self.assertFalse(p.more())
+    def test_token_smart_split(self):
+        """
+        #7027 -- _() syntax should work with spaces
+        """
+        token = Token(TOKEN_BLOCK, 'sometag _("Page not found") value|yesno:_("yes,no")')
+        split = token.split_contents()
+        self.assertEqual(split, ["sometag", '_("Page not found")', 'value|yesno:_("yes,no")'])
 
     def test_filter_parsing(self):
         c = {"article": {"section": "News"}}
-        p = Parser("")
+        p = Parser("", builtins=[filter_library])
 
         def fe_test(s, val):
             self.assertEqual(FilterExpression(s, p).resolve(c), val)
@@ -88,14 +72,6 @@ class ParserTests(TestCase):
         # Variables should raise on non string type
         with six.assertRaisesRegex(self, TypeError, "Variable must be a string or number, got <(class|type) 'dict'>"):
             Variable({})
-
-    @override_settings(DEBUG=True, TEMPLATE_DEBUG=True)
-    def test_compile_filter_error(self):
-        # regression test for #19819
-        msg = "Could not parse the remainder: '@bar' from 'foo@bar'"
-        with six.assertRaisesRegex(self, TemplateSyntaxError, msg) as cm:
-            Template("{% if 1 %}{{ foo@bar }}{% endif %}")
-        self.assertEqual(cm.exception.django_template_source[1], (10, 23))
 
     def test_filter_args_count(self):
         p = Parser("")

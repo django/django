@@ -4,13 +4,13 @@ from django import test
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.fields import CharField, related
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .models import BasePerson, Person
 from .results import TEST_RESULTS
 
 
-class OptionsBaseTests(test.TestCase):
+class OptionsBaseTests(test.SimpleTestCase):
 
     def _map_related_query_names(self, res):
         return tuple((o.field.related_query_name(), m) for o, m in res)
@@ -26,11 +26,11 @@ class M2MTests(OptionsBaseTests):
             with warnings.catch_warnings(record=True) as warning:
                 warnings.simplefilter("always")
                 models = [model for field, model in model._meta.get_m2m_with_model()]
-                self.assertEqual([RemovedInDjango20Warning], [w.message.__class__ for w in warning])
+                self.assertEqual([RemovedInDjango110Warning], [w.message.__class__ for w in warning])
             self.assertEqual(models, expected_result)
 
 
-@test.ignore_warnings(category=RemovedInDjango20Warning)
+@test.ignore_warnings(category=RemovedInDjango110Warning)
 class RelatedObjectsTests(OptionsBaseTests):
     key_name = lambda self, r: r[0]
 
@@ -83,7 +83,7 @@ class RelatedObjectsTests(OptionsBaseTests):
             )
 
 
-@test.ignore_warnings(category=RemovedInDjango20Warning)
+@test.ignore_warnings(category=RemovedInDjango110Warning)
 class RelatedM2MTests(OptionsBaseTests):
 
     def test_related_m2m_with_model(self):
@@ -111,7 +111,7 @@ class RelatedM2MTests(OptionsBaseTests):
         self.assertIn('friends_inherited_rel_+', [o.field.related_query_name() for o in related_m2m])
 
 
-@test.ignore_warnings(category=RemovedInDjango20Warning)
+@test.ignore_warnings(category=RemovedInDjango110Warning)
 class GetFieldByNameTests(OptionsBaseTests):
 
     def test_get_data_field(self):
@@ -149,15 +149,15 @@ class GetFieldByNameTests(OptionsBaseTests):
             )
             self.assertEqual(Person._meta.get_field('m2m_base', many_to_many=True).name, 'm2m_base')
 
-            # 2 RemovedInDjango20Warning messages should be raised, one for each call of get_field()
+            # 2 RemovedInDjango110Warning messages should be raised, one for each call of get_field()
             # with the 'many_to_many' argument.
             self.assertEqual(
-                [RemovedInDjango20Warning, RemovedInDjango20Warning],
+                [RemovedInDjango110Warning, RemovedInDjango110Warning],
                 [w.message.__class__ for w in warning]
             )
 
 
-@test.ignore_warnings(category=RemovedInDjango20Warning)
+@test.ignore_warnings(category=RemovedInDjango110Warning)
 class GetAllFieldNamesTestCase(OptionsBaseTests):
 
     def test_get_all_field_names(self):

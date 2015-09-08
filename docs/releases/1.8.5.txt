@@ -1,0 +1,25 @@
+==========================
+Django 1.8.5 release notes
+==========================
+
+*Under development*
+
+Django 1.8.5 fixes several bugs in 1.8.4.
+
+Bugfixes
+========
+
+* Made the development server's autoreload more robust (:ticket:`24704`).
+
+* Fixed ``AssertionError`` in some delete queries with a model containing a
+  field that is both a foreign and primary key (:ticket:`24951`).
+
+* Fixed ``AssertionError`` in some complex queries (:ticket:`24525`).
+
+* Fixed a migrations crash with ``GenericForeignKey`` (:ticket:`25040`).
+
+* Made ``translation.override()`` clear the overridden language when a
+  translation isn't initially active (:ticket:`25295`).
+
+* Fixed crash when using a value in ``ModelAdmin.list_display`` that clashed
+  with a reverse field on the model (:ticket:`25299`).

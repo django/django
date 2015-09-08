@@ -64,7 +64,7 @@ will try to use a locale specific format whenever it outputs a value
 in a template.
 
 However, it may not always be appropriate to use localized values --
-for example, if you're outputting Javascript or XML that is designed
+for example, if you're outputting JavaScript or XML that is designed
 to be machine-readable, you will always want unlocalized values. You
 may also want to use localization in selected templates, rather than
 using localization everywhere.

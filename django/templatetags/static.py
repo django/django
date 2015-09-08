@@ -1,5 +1,4 @@
 from django import template
-from django.template.base import Node
 from django.utils.encoding import iri_to_uri
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -66,7 +65,6 @@ def get_static_prefix(parser, token):
 
         {% get_static_prefix %}
         {% get_static_prefix as static_prefix %}
-
     """
     return PrefixNode.handle_token(parser, token, "STATIC_URL")
 
@@ -85,12 +83,11 @@ def get_media_prefix(parser, token):
 
         {% get_media_prefix %}
         {% get_media_prefix as media_prefix %}
-
     """
     return PrefixNode.handle_token(parser, token, "MEDIA_URL")
 
 
-class StaticNode(Node):
+class StaticNode(template.Node):
     def __init__(self, varname=None, path=None):
         if path is None:
             raise template.TemplateSyntaxError(
@@ -149,7 +146,6 @@ def do_static(parser, token):
         {% static variable_with_path %}
         {% static "myapp/css/base.css" as admin_base_css %}
         {% static variable_with_path as varname %}
-
     """
     return StaticNode.handle_token(parser, token)
 

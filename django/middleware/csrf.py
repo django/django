@@ -19,7 +19,7 @@ from django.utils.http import same_origin
 logger = logging.getLogger('django.request')
 
 REASON_NO_REFERER = "Referer checking failed - no Referer."
-REASON_BAD_REFERER = "Referer checking failed - %s does not match %s."
+REASON_BAD_REFERER = "Referer checking failed - %s does not match any trusted origins."
 REASON_NO_CSRF_COOKIE = "CSRF cookie not set."
 REASON_BAD_TOKEN = "CSRF token missing or incorrect."
 
@@ -40,15 +40,17 @@ def _get_new_csrf_key():
 def get_token(request):
     """
     Returns the CSRF token required for a POST form. The token is an
-    alphanumeric value.
+    alphanumeric value. A new token is created if one is not already set.
 
     A side effect of calling this function is to make the csrf_protect
     decorator and the CsrfViewMiddleware add a CSRF cookie and a 'Vary: Cookie'
     header to the outgoing response.  For this reason, you may need to use this
     function lazily, as is done by the csrf context processor.
     """
+    if "CSRF_COOKIE" not in request.META:
+        request.META["CSRF_COOKIE"] = _get_new_csrf_key()
     request.META["CSRF_COOKIE_USED"] = True
-    return request.META.get("CSRF_COOKIE", None)
+    return request.META["CSRF_COOKIE"]
 
 
 def rotate_token(request):
@@ -112,9 +114,6 @@ class CsrfViewMiddleware(object):
             request.META['CSRF_COOKIE'] = csrf_token
         except KeyError:
             csrf_token = None
-            # Generate token and store it in the request, so it's
-            # available to the view.
-            request.META["CSRF_COOKIE"] = _get_new_csrf_key()
 
         # Wait until request.META["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
@@ -155,10 +154,15 @@ class CsrfViewMiddleware(object):
                 if referer is None:
                     return self._reject(request, REASON_NO_REFERER)
 
+                # Here we generate a list of all acceptable HTTP referers,
+                # including the current host since that has been validated
+                # upstream.
+                good_hosts = list(settings.CSRF_TRUSTED_ORIGINS)
                 # Note that request.get_host() includes the port.
-                good_referer = 'https://%s/' % request.get_host()
-                if not same_origin(referer, good_referer):
-                    reason = REASON_BAD_REFERER % (referer, good_referer)
+                good_hosts.append(request.get_host())
+                good_referers = ['https://{0}/'.format(host) for host in good_hosts]
+                if not any(same_origin(referer, host) for host in good_referers):
+                    reason = REASON_BAD_REFERER % referer
                     return self._reject(request, reason)
 
             if csrf_token is None:
@@ -183,7 +187,7 @@ class CsrfViewMiddleware(object):
             if request_csrf_token == "":
                 # Fall back to X-CSRFToken, to make things easier for AJAX,
                 # and possible for PUT/DELETE.
-                request_csrf_token = request.META.get('HTTP_X_CSRFTOKEN', '')
+                request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, '')
 
             if not constant_time_compare(request_csrf_token, csrf_token):
                 return self._reject(request, REASON_BAD_TOKEN)
@@ -192,12 +196,6 @@ class CsrfViewMiddleware(object):
 
     def process_response(self, request, response):
         if getattr(response, 'csrf_processing_done', False):
-            return response
-
-        # If CSRF_COOKIE is unset, then CsrfViewMiddleware.process_view was
-        # never called, probably because a request middleware returned a response
-        # (for example, contrib.auth redirecting to a login page).
-        if request.META.get("CSRF_COOKIE") is None:
             return response
 
         if not request.META.get("CSRF_COOKIE_USED", False):

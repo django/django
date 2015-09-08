@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
 import os
+import sys
+import tempfile
+import unittest
 import warnings
 
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
+from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
     TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
@@ -46,6 +50,8 @@ class DumpDataAssertMixin(object):
                          natural_foreign_keys=False, natural_primary_keys=False,
                          use_base_manager=False, exclude_list=[], primary_keys=''):
         new_io = six.StringIO()
+        if filename:
+            filename = os.path.join(tempfile.gettempdir(), filename)
         management.call_command('dumpdata', *args, **{'format': format,
                                                       'stdout': new_io,
                                                       'stderr': new_io,
@@ -213,13 +219,18 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Excluding a bogus app should throw an error
         with six.assertRaisesRegex(self, management.CommandError,
-                "Unknown app in excludes: foo_app"):
+                "No installed app with label 'foo_app'."):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['foo_app'])
 
         # Excluding a bogus model should throw an error
         with six.assertRaisesRegex(self, management.CommandError,
                 "Unknown model in excludes: fixtures.FooModel"):
             self._dumpdata_assert(['fixtures', 'sites'], '', exclude_list=['fixtures.FooModel'])
+
+    @unittest.skipIf(sys.platform.startswith('win'), "Windows doesn't support '?' in filenames.")
+    def test_load_fixture_with_special_characters(self):
+        management.call_command('loaddata', 'fixture_with[special]chars', verbosity=0)
+        self.assertQuerysetEqual(Article.objects.all(), ['<Article: How To Deal With Special Characters>'])
 
     def test_dumpdata_with_filtering_manager(self):
         spy1 = Spy.objects.create(name='Paul')
@@ -275,6 +286,31 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         management.call_command('loaddata', 'fixture1.json', verbosity=0)
         self._dumpdata_assert(['fixtures'], '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": "News Stories"}}, {"pk": 2, "model": "fixtures.article", "fields": {"headline": "Poker has no place on ESPN", "pub_date": "2006-06-16T12:00:00"}}, {"pk": 3, "model": "fixtures.article", "fields": {"headline": "Time to reform copyright", "pub_date": "2006-06-16T13:00:00"}}]',
                 filename='dumpdata.json')
+
+    def test_dumpdata_progressbar(self):
+        """
+        Dumpdata shows a progress bar on the command line when --output is set,
+        stdout is a tty, and verbosity > 0.
+        """
+        management.call_command('loaddata', 'fixture1.json', verbosity=0)
+        new_io = six.StringIO()
+        new_io.isatty = lambda: True
+        _, filename = tempfile.mkstemp()
+        options = {
+            'format': 'json',
+            'stdout': new_io,
+            'stderr': new_io,
+            'output': filename,
+        }
+        management.call_command('dumpdata', 'fixtures', **options)
+        self.assertTrue(new_io.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n'))
+
+        # Test no progress bar when verbosity = 0
+        options['verbosity'] = 0
+        new_io = six.StringIO()
+        new_io.isatty = lambda: True
+        management.call_command('dumpdata', 'fixtures', **options)
+        self.assertEqual(new_io.getvalue(), '')
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
@@ -338,6 +374,16 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         self.assertQuerysetEqual(Article.objects.all(), [
             '<Article: Who needs more than one database?>',
         ])
+
+    def test_loaddata_verbosity_three(self):
+        output = six.StringIO()
+        management.call_command('loaddata', 'fixture1.json', verbosity=3, stdout=output, stderr=output)
+        command_output = force_text(output.getvalue())
+        self.assertIn(
+            "\rProcessed 1 object(s).\rProcessed 2 object(s)."
+            "\rProcessed 3 object(s).\rProcessed 4 object(s).\n",
+            command_output
+        )
 
     def test_loading_using(self):
         # Load db fixtures 1 and 2. These will load using the 'default' database identifier explicitly

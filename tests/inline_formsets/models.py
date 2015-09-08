@@ -12,9 +12,9 @@ class Parent(models.Model):
 
 
 class Child(models.Model):
-    mother = models.ForeignKey(Parent, related_name='mothers_children')
-    father = models.ForeignKey(Parent, related_name='fathers_children')
-    school = models.ForeignKey(School)
+    mother = models.ForeignKey(Parent, models.CASCADE, related_name='mothers_children')
+    father = models.ForeignKey(Parent, models.CASCADE, related_name='fathers_children')
+    school = models.ForeignKey(School, models.CASCADE)
     name = models.CharField(max_length=100)
 
 
@@ -28,7 +28,7 @@ class Poet(models.Model):
 
 @python_2_unicode_compatible
 class Poem(models.Model):
-    poet = models.ForeignKey(Poet)
+    poet = models.ForeignKey(Poet, models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):

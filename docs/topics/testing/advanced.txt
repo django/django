@@ -40,6 +40,8 @@ The following is a simple unit test using the request factory::
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
+    from .views import my_view
+
     class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
@@ -95,7 +97,9 @@ configuration::
             'ENGINE': 'django.db.backends.mysql',
             'NAME': 'myproject',
             'HOST': 'dbreplica',
-            'TEST_MIRROR': 'default'
+            'TEST': {
+                'MIRROR': 'default',
+            },
             # ... plus some other settings
         }
     }
@@ -109,8 +113,8 @@ normal activity, any write to ``default`` will appear on ``replica``.
 If Django created two independent test databases, this would break any
 tests that expected replication to occur. However, the ``replica``
 database has been configured as a test mirror (using the
-:setting:`TEST_MIRROR` setting), indicating that under testing,
-``replica`` should be treated as a mirror of ``default``.
+:setting:`MIRROR <TEST_MIRROR>` test setting), indicating that under
+testing, ``replica`` should be treated as a mirror of ``default``.
 
 When the test environment is configured, a test version of ``replica``
 will *not* be created. Instead the connection to ``replica``
@@ -130,41 +134,51 @@ However, no guarantees are made on the creation order of any other
 databases in your test setup.
 
 If your database configuration requires a specific creation order, you
-can specify the dependencies that exist using the
-:setting:`TEST_DEPENDENCIES` setting. Consider the following
-(simplified) example database configuration::
+can specify the dependencies that exist using the :setting:`DEPENDENCIES
+<TEST_DEPENDENCIES>` test setting. Consider the following (simplified)
+example database configuration::
 
     DATABASES = {
         'default': {
-             # ... db settings
-             'TEST_DEPENDENCIES': ['diamonds']
+            # ... db settings
+            'TEST': {
+                'DEPENDENCIES': ['diamonds'],
+            },
         },
         'diamonds': {
-            # ... db settings
-             'TEST_DEPENDENCIES': []
+             ... db settings
+            'TEST': {
+                'DEPENDENCIES': [],
+            },
         },
         'clubs': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds'],
+            },
         },
         'spades': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds','hearts']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds', 'hearts'],
+            },
         },
         'hearts': {
             # ... db settings
-            'TEST_DEPENDENCIES': ['diamonds','clubs']
+            'TEST': {
+                'DEPENDENCIES': ['diamonds', 'clubs'],
+            },
         }
     }
 
 Under this configuration, the ``diamonds`` database will be created first,
 as it is the only database alias without dependencies. The ``default`` and
 ``clubs`` alias will be created next (although the order of creation of this
-pair is not guaranteed); then ``hearts``; and finally ``spades``.
+pair is not guaranteed), then ``hearts``, and finally ``spades``.
 
-If there are any circular dependencies in the
-:setting:`TEST_DEPENDENCIES` definition, an ``ImproperlyConfigured``
-exception will be raised.
+If there are any circular dependencies in the :setting:`DEPENDENCIES
+<TEST_DEPENDENCIES>` definition, an
+:exc:`~django.core.exceptions.ImproperlyConfigured` exception will be raised.
 
 Advanced features of ``TransactionTestCase``
 ============================================
@@ -568,7 +582,7 @@ django.db.connection.creation
 The creation module of the database backend also provides some utilities that
 can be useful during testing.
 
-.. function:: create_test_db([verbosity=1, autoclobber=False, serialize=True, keepdb=False])
+.. function:: create_test_db(verbosity=1, autoclobber=False, serialize=True, keepdb=False)
 
     Creates a new test database and runs ``migrate`` against it.
 
@@ -610,7 +624,7 @@ can be useful during testing.
 
         The ``keepdb`` argument was added.
 
-.. function:: destroy_test_db(old_database_name, [verbosity=1, keepdb=False])
+.. function:: destroy_test_db(old_database_name, verbosity=1, keepdb=False)
 
     Destroys the database whose name is the value of :setting:`NAME` in
     :setting:`DATABASES`, and sets :setting:`NAME` to the value of

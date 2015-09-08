@@ -5,6 +5,12 @@ Geolocation with GeoIP
 .. module:: django.contrib.gis.geoip
    :synopsis: High-level Python interface for MaxMind's GeoIP C library.
 
+.. deprecated:: 1.9
+
+    This module is deprecated in favor of :doc:`django.contrib.gis.geoip2
+    </ref/contrib/gis/geoip2>`, which supports IPv6 and the GeoLite2 database
+    format.
+
 The :class:`GeoIP` object is a ctypes wrapper for the
 `MaxMind GeoIP C API`__. [#]_
 
@@ -89,7 +95,7 @@ Defaults to ``'GeoLiteCity.dat'``.
 ``GeoIP`` API
 =============
 
-.. class:: GeoIP([path=None, cache=0, country=None, city=None])
+.. class:: GeoIP(path=None, cache=0, country=None, city=None)
 
 The ``GeoIP`` object does not require any parameters to use the default
 settings.  However, at the very least the :setting:`GEOIP_PATH` setting

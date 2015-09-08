@@ -12,11 +12,13 @@ from django.apps import apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
+from django.core.urlresolvers import get_script_prefix, set_script_prefix
 from django.db import reset_queries
 from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
 from django.utils import six
+from django.utils.decorators import ContextDecorator
 from django.utils.encoding import force_str
 from django.utils.translation import deactivate
 
@@ -27,7 +29,7 @@ except ImportError:
 
 
 __all__ = (
-    'Approximate', 'ContextList', 'get_runner',
+    'Approximate', 'ContextList', 'isolate_lru_cache', 'get_runner',
     'modify_settings', 'override_settings',
     'requires_tz_support',
     'setup_test_environment', 'teardown_test_environment',
@@ -119,7 +121,6 @@ def teardown_test_environment():
 
         - Restoring the original test renderer
         - Restoring the email sending functions
-
     """
     Template._render = Template._original_render
     del Template._original_render
@@ -502,6 +503,16 @@ def extend_sys_path(*paths):
 
 
 @contextmanager
+def isolate_lru_cache(lru_cache_object):
+    """Clear the cache of an LRU cache object on entering and exiting."""
+    lru_cache_object.cache_clear()
+    try:
+        yield
+    finally:
+        lru_cache_object.cache_clear()
+
+
+@contextmanager
 def captured_output(stream_name):
     """Return a context manager used by captured_stdout/stdin/stderr
     that temporarily replaces the sys stream *stream_name* with a StringIO.
@@ -595,3 +606,37 @@ def require_jinja2(test_func):
         'OPTIONS': {'keep_trailing_newline': True},
     }])(test_func)
     return test_func
+
+
+class ScriptPrefix(ContextDecorator):
+    def __enter__(self):
+        set_script_prefix(self.prefix)
+
+    def __exit__(self, exc_type, exc_val, traceback):
+        set_script_prefix(self.old_prefix)
+
+    def __init__(self, prefix):
+        self.prefix = prefix
+        self.old_prefix = get_script_prefix()
+
+
+def override_script_prefix(prefix):
+    """
+    Decorator or context manager to temporary override the script prefix.
+    """
+    return ScriptPrefix(prefix)
+
+
+class LoggingCaptureMixin(object):
+    """
+    Capture the output from the 'django' logger and store it on the class's
+    logger_output attribute.
+    """
+    def setUp(self):
+        self.logger = logging.getLogger('django')
+        self.old_stream = self.logger.handlers[0].stream
+        self.logger_output = six.StringIO()
+        self.logger.handlers[0].stream = self.logger_output
+
+    def tearDown(self):
+        self.logger.handlers[0].stream = self.old_stream

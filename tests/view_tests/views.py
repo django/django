@@ -2,16 +2,14 @@ from __future__ import unicode_literals
 
 import datetime
 import decimal
+import logging
 import sys
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.core.urlresolvers import get_resolver
-from django.http import (
-    Http404, HttpResponse, HttpResponseRedirect, JsonResponse,
-)
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, render_to_response
 from django.template import TemplateDoesNotExist
-from django.utils.log import getLogger
 from django.views.debug import (
     SafeExceptionReporterFilter, technical_500_response,
 )
@@ -54,7 +52,7 @@ def raises400(request):
 
 
 def raises403(request):
-    raise PermissionDenied
+    raise PermissionDenied("Insufficient Permissions")
 
 
 def raises404(request):
@@ -71,13 +69,6 @@ class Http404View(View):
         raise Http404("Testing class-based technical 404.")
 
 
-def redirect(request):
-    """
-    Forces an HTTP redirect.
-    """
-    return HttpResponseRedirect("target/")
-
-
 def view_exception(request, n):
     raise BrokenException(except_args[int(n)])
 
@@ -89,6 +80,10 @@ def template_exception(request, n):
 
 def jsi18n(request):
     return render_to_response('jsi18n.html')
+
+
+def jsi18n_multi_catalogs(request):
+    return render_to_response('jsi18n-multi-catalogs.html')
 
 
 def raises_template_does_not_exist(request, path='i_dont_exist.html'):
@@ -107,7 +102,7 @@ def render_no_template(request):
 
 
 def send_log(request, exc_info):
-    logger = getLogger('django.request')
+    logger = logging.getLogger('django')
     # The default logging config has a logging filter to ensure admin emails are
     # only sent with DEBUG=False, but since someone might choose to remove that
     # filter, we still want to be able to test the behavior of error emails

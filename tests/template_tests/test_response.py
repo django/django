@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import os
 import pickle
 import time
 from datetime import datetime
@@ -14,8 +13,9 @@ from django.test import (
     RequestFactory, SimpleTestCase, ignore_warnings, override_settings,
 )
 from django.test.utils import require_jinja2
-from django.utils._os import upath
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
+
+from .utils import TEMPLATE_DIR
 
 
 def test_processor(request):
@@ -118,7 +118,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
         response.render()
         self.assertEqual(response.content, b'bar')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_context_instance(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'}))
@@ -224,7 +224,7 @@ class SimpleTemplateResponseTest(SimpleTestCase):
 
 @override_settings(TEMPLATES=[{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'DIRS': [os.path.join(os.path.dirname(upath(__file__)), 'templates')],
+    'DIRS': [TEMPLATE_DIR],
     'OPTIONS': {
         'context_processors': [test_processor_name],
     },
@@ -248,7 +248,7 @@ class TemplateResponseTest(SimpleTestCase):
                                   {'foo': 'bar'}).render()
         self.assertEqual(response.content, b'baryes')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_render_with_context(self):
         response = self._response('{{ foo }}{{ processors }}',
                                   Context({'foo': 'bar'})).render()
@@ -282,7 +282,7 @@ class TemplateResponseTest(SimpleTestCase):
         response = TemplateResponse(request, 'template_tests/using.html', using='jinja2').render()
         self.assertEqual(response.content, b'Jinja2\n')
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_custom_app(self):
         self._response('{{ foo }}', current_app="foobar")
         self.assertEqual(self._request.current_app, 'foobar')

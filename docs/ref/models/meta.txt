@@ -151,7 +151,7 @@ Migrating from the old API
 
 As part of the formalization of the ``Model._meta`` API (from the
 :class:`django.db.models.options.Options` class), a number of methods and
-properties have been deprecated and will be removed in Django 2.0.
+properties have been deprecated and will be removed in Django 1.10.
 
 These old APIs can be replicated by either:
 
@@ -213,7 +213,7 @@ can be made to convert your code to the new API:
           for f in MyModel._meta.get_fields()
           if not f.is_relation
               or f.one_to_one
-              or (f.one_to_many and f.related_model)
+              or (f.many_to_one and f.related_model)
       ]
 
 * ``MyModel._meta.get_concrete_fields_with_model()``::
@@ -224,7 +224,7 @@ can be made to convert your code to the new API:
           if f.concrete and (
               not f.is_relation
               or f.one_to_one
-              or (f.one_to_many and f.related_model)
+              or (f.many_to_one and f.related_model)
           )
       ]
 
@@ -240,7 +240,7 @@ can be made to convert your code to the new API:
 
       [
           f for f in MyModel._meta.get_fields()
-          if f.many_to_one and f.auto_created
+          if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
 * ``MyModel._meta.get_all_related_objects_with_model()``::
@@ -248,7 +248,7 @@ can be made to convert your code to the new API:
       [
           (f, f.model if f.model != MyModel else None)
           for f in MyModel._meta.get_fields()
-          if f.many_to_one and f.auto_created
+          if (f.one_to_many or f.one_to_one) and f.auto_created
       ]
 
 * ``MyModel._meta.get_all_related_many_to_many_objects()``::
@@ -274,7 +274,7 @@ can be made to convert your code to the new API:
           for field in MyModel._meta.get_fields()
           # For complete backwards compatibility, you may want to exclude
           # GenericForeignKey from the results.
-          if not (field.one_to_many and field.related_model is None)
+          if not (field.many_to_one and field.related_model is None)
       )))
 
   This provides a 100% backwards compatible replacement, ensuring that both

@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Vlada Macek <macek@sandbox.cz>, 2012,2014
+# Vláďa Macek <macek@sandbox.cz>, 2012,2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-23 09:18+0000\n"
-"Last-Translator: Vlada Macek <macek@sandbox.cz>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
 "cs/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +18,26 @@ msgstr ""
 "Language: cs\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
 msgstr "Typy obsahu"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "název třídy modelu v Pythonu"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "typ obsahu"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "typy obsahu"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Typ obsahu %(ct_id)s nemá přidružený model."
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Objekt %(obj_id)s typu obsahu %(ct_id)s neexistuje."
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Objektům %(ct_name)s chybí metoda get_absolute_url()."

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-18 20:56+0100\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -349,7 +349,11 @@ msgstr ""
 msgid "Traditional Chinese"
 msgstr ""
 
-#: contrib/sitemaps/apps.py:8
+#: contrib/messages/apps.py:7
+msgid "Messages"
+msgstr ""
+
+#: contrib/sitemaps/apps.py:7
 msgid "Site Maps"
 msgstr ""
 

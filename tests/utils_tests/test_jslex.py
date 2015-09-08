@@ -3,11 +3,11 @@
 # originally from https://bitbucket.org/ned/jslex
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils.jslex import JsLexer, prepare_js_for_gettext
 
 
-class JsTokensTest(TestCase):
+class JsTokensTest(SimpleTestCase):
     LEX_CASES = [
         # ids
         ("a ABC $ _ a123", ["id a", "id ABC", "id $", "id _", "id a123"]),
@@ -207,7 +207,7 @@ GETTEXT_CASES = (
 )
 
 
-class JsToCForGettextTest(TestCase):
+class JsToCForGettextTest(SimpleTestCase):
     pass
 
 

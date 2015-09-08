@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import unittest
 
 from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     AdvancedUserStat, Child1, Child2, Child3, Child4, Image, Parent1, Parent2,
@@ -213,7 +213,7 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(p.child1.child4.name1, 'n1')
 
 
-class ReverseSelectRelatedValidationTests(TestCase):
+class ReverseSelectRelatedValidationTests(SimpleTestCase):
     """
     Rverse related fields should be listed in the validation message when an
     invalid field is given in select_related().

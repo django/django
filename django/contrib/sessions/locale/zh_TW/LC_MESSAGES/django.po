@@ -17,22 +17,17 @@ msgstr ""
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: models.py:38
 msgid "session key"
 msgstr "session 鍵值"
 
-#: models.py:40
 msgid "session data"
 msgstr "session 資料"
 
-#: models.py:41
 msgid "expire date"
 msgstr "到期日期"
 
-#: models.py:46
 msgid "session"
 msgstr "session"
 
-#: models.py:47
 msgid "sessions"
 msgstr "sessions"

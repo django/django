@@ -5,6 +5,7 @@ from django.contrib.admin.utils import quote
 from django.contrib.contenttypes.models import ContentType
 from django.core.urlresolvers import NoReverseMatch, reverse
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -17,18 +18,34 @@ class LogEntryManager(models.Manager):
     use_in_migrations = True
 
     def log_action(self, user_id, content_type_id, object_id, object_repr, action_flag, change_message=''):
-        e = self.model(
-            None, None, user_id, content_type_id, smart_text(object_id),
-            object_repr[:200], action_flag, change_message
+        self.model.objects.create(
+            user_id=user_id,
+            content_type_id=content_type_id,
+            object_id=smart_text(object_id),
+            object_repr=object_repr[:200],
+            action_flag=action_flag,
+            change_message=change_message,
         )
-        e.save()
 
 
 @python_2_unicode_compatible
 class LogEntry(models.Model):
-    action_time = models.DateTimeField(_('action time'), auto_now=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    action_time = models.DateTimeField(
+        _('action time'),
+        default=timezone.now,
+        editable=False,
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        models.CASCADE,
+        verbose_name=_('user'),
+    )
+    content_type = models.ForeignKey(
+        ContentType,
+        models.SET_NULL,
+        verbose_name=_('content type'),
+        blank=True, null=True,
+    )
     object_id = models.TextField(_('object id'), blank=True, null=True)
     object_repr = models.CharField(_('object repr'), max_length=200)
     action_flag = models.PositiveSmallIntegerField(_('action flag'))
@@ -46,14 +63,14 @@ class LogEntry(models.Model):
         return smart_text(self.action_time)
 
     def __str__(self):
-        if self.action_flag == ADDITION:
+        if self.is_addition():
             return ugettext('Added "%(object)s".') % {'object': self.object_repr}
-        elif self.action_flag == CHANGE:
+        elif self.is_change():
             return ugettext('Changed "%(object)s" - %(changes)s') % {
                 'object': self.object_repr,
                 'changes': self.change_message,
             }
-        elif self.action_flag == DELETION:
+        elif self.is_deletion():
             return ugettext('Deleted "%(object)s."') % {'object': self.object_repr}
 
         return ugettext('LogEntry Object')
@@ -74,7 +91,6 @@ class LogEntry(models.Model):
     def get_admin_url(self):
         """
         Returns the admin URL to edit the object represented by this log entry.
-        This is relative to the Django admin index page.
         """
         if self.content_type and self.object_id:
             url_name = 'admin:%s_%s_change' % (self.content_type.app_label, self.content_type.model)

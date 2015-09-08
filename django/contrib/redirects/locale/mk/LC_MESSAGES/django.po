@@ -2,14 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# vvangelovski <vvangelovski@gmail.com>, 2014
+# Vasil Vangelovski <vvangelovski@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-14 21:39+0000\n"
-"Last-Translator: vvangelovski <vvangelovski@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Macedonian (http://www.transifex.com/projects/p/django/"
 "language/mk/)\n"
 "MIME-Version: 1.0\n"
@@ -18,15 +18,12 @@ msgstr ""
 "Language: mk\n"
 "Plural-Forms: nplurals=2; plural=(n % 10 == 1 && n % 100 != 11) ? 0 : 1;\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Пренасочувања"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "пренасочи од"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -34,11 +31,9 @@ msgstr ""
 "Ова треба да биде апсолутна патека без името на домејнот. На пр. „/nastani/"
 "prebaraj/“."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "пренасочи кон"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -46,10 +41,8 @@ msgstr ""
 "Ова може да биде или апсолутна патека (како погоре) или цела адреса што "
 "почнува со „http://“."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "пренасочување"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "пренасочувања"

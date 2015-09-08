@@ -21,11 +21,10 @@
 
 <script type="text/javascript">
 (function($) {
-  $("#{{ inline_admin_formset.formset.prefix }}-group .inline-related").stackedFormset({
-    prefix: '{{ inline_admin_formset.formset.prefix }}',
-    adminStaticPrefix: '{% static "admin/" %}',
-    deleteText: "{% trans "Remove" %}",
-    addText: "{% blocktrans with verbose_name=inline_admin_formset.opts.verbose_name|capfirst %}Add another {{ verbose_name }}{% endblocktrans %}"
+  $("#{{ inline_admin_formset.formset.prefix|escapejs }}-group .inline-related").stackedFormset({
+    prefix: "{{ inline_admin_formset.formset.prefix|escapejs }}",
+    deleteText: "{% filter escapejs %}{% trans "Remove" %}{% endfilter %}",
+    addText: "{% filter escapejs %}{% blocktrans with verbose_name=inline_admin_formset.opts.verbose_name|capfirst %}Add another {{ verbose_name }}{% endblocktrans %}{% endfilter %}"
   });
 })(django.jQuery);
 </script>

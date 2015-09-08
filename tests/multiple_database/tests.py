@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import datetime
 import pickle
+import warnings
 from operator import attrgetter
 
 from django.contrib.auth.models import User
@@ -10,7 +11,8 @@ from django.core import management
 from django.db import DEFAULT_DB_ALIAS, connections, router, transaction
 from django.db.models import signals
 from django.db.utils import ConnectionRouter
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
+from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
 from .models import Book, Person, Pet, Review, UserProfile
@@ -534,7 +536,7 @@ class QueryTestCase(TestCase):
         "ForeignKey.validate() uses the correct database"
         mickey = Person.objects.using('other').create(name="Mickey")
         pluto = Pet.objects.using('other').create(name="Pluto", owner=mickey)
-        self.assertEqual(None, pluto.full_clean())
+        self.assertIsNone(pluto.full_clean())
 
     def test_o2o_separation(self):
         "OneToOne fields are constrained to a single database"
@@ -860,7 +862,7 @@ class QueryTestCase(TestCase):
                                   extra_arg=True)
 
 
-class ConnectionRouterTestCase(TestCase):
+class ConnectionRouterTestCase(SimpleTestCase):
     @override_settings(DATABASE_ROUTERS=[
         'multiple_database.tests.TestRouter',
         'multiple_database.tests.WriteRouter'])
@@ -901,28 +903,58 @@ class RouterTestCase(TestCase):
     def test_migrate_selection(self):
         "Synchronization behavior is predictable"
 
-        self.assertTrue(router.allow_migrate('default', User))
-        self.assertTrue(router.allow_migrate('default', Book))
+        self.assertTrue(router.allow_migrate_model('default', User))
+        self.assertTrue(router.allow_migrate_model('default', Book))
 
-        self.assertTrue(router.allow_migrate('other', User))
-        self.assertTrue(router.allow_migrate('other', Book))
+        self.assertTrue(router.allow_migrate_model('other', User))
+        self.assertTrue(router.allow_migrate_model('other', Book))
 
         with override_settings(DATABASE_ROUTERS=[TestRouter(), AuthRouter()]):
             # Add the auth router to the chain. TestRouter is a universal
             # synchronizer, so it should have no effect.
-            self.assertTrue(router.allow_migrate('default', User))
-            self.assertTrue(router.allow_migrate('default', Book))
+            self.assertTrue(router.allow_migrate_model('default', User))
+            self.assertTrue(router.allow_migrate_model('default', Book))
 
-            self.assertTrue(router.allow_migrate('other', User))
-            self.assertTrue(router.allow_migrate('other', Book))
+            self.assertTrue(router.allow_migrate_model('other', User))
+            self.assertTrue(router.allow_migrate_model('other', Book))
 
         with override_settings(DATABASE_ROUTERS=[AuthRouter(), TestRouter()]):
             # Now check what happens if the router order is reversed.
-            self.assertFalse(router.allow_migrate('default', User))
-            self.assertTrue(router.allow_migrate('default', Book))
+            self.assertFalse(router.allow_migrate_model('default', User))
+            self.assertTrue(router.allow_migrate_model('default', Book))
 
-            self.assertTrue(router.allow_migrate('other', User))
-            self.assertFalse(router.allow_migrate('other', Book))
+            self.assertTrue(router.allow_migrate_model('other', User))
+            self.assertTrue(router.allow_migrate_model('other', Book))
+
+    def test_migrate_legacy_router(self):
+        class LegacyRouter(object):
+            def allow_migrate(self, db, model):
+                """
+                Deprecated allow_migrate signature should trigger
+                RemovedInDjango110Warning.
+                """
+                assert db == 'default'
+                assert model is User
+                return True
+
+        with override_settings(DATABASE_ROUTERS=[LegacyRouter()]):
+            with warnings.catch_warnings(record=True) as recorded:
+                warnings.filterwarnings('always')
+
+                msg = (
+                    "The signature of allow_migrate has changed from "
+                    "allow_migrate(self, db, model) to "
+                    "allow_migrate(self, db, app_label, model_name=None, **hints). "
+                    "Support for the old signature will be removed in Django 1.10."
+                )
+
+                self.assertTrue(router.allow_migrate_model('default', User))
+                self.assertEqual(force_text(recorded.pop().message), msg)
+
+                self.assertEqual(recorded, [])
+
+                self.assertTrue(router.allow_migrate('default', 'app_label'))
+                self.assertEqual(force_text(recorded.pop().message), msg)
 
     def test_partial_router(self):
         "A router can choose to implement a subset of methods"
@@ -939,8 +971,8 @@ class RouterTestCase(TestCase):
 
         self.assertTrue(router.allow_relation(dive, dive))
 
-        self.assertTrue(router.allow_migrate('default', User))
-        self.assertTrue(router.allow_migrate('default', Book))
+        self.assertTrue(router.allow_migrate_model('default', User))
+        self.assertTrue(router.allow_migrate_model('default', Book))
 
         with override_settings(DATABASE_ROUTERS=[WriteRouter(), AuthRouter(), TestRouter()]):
             self.assertEqual(router.db_for_read(User), 'default')
@@ -951,8 +983,8 @@ class RouterTestCase(TestCase):
 
             self.assertTrue(router.allow_relation(dive, dive))
 
-            self.assertFalse(router.allow_migrate('default', User))
-            self.assertTrue(router.allow_migrate('default', Book))
+            self.assertFalse(router.allow_migrate_model('default', User))
+            self.assertTrue(router.allow_migrate_model('default', Book))
 
     def test_database_routing(self):
         marty = Person.objects.using('default').create(name="Marty Alchin")
@@ -1011,6 +1043,17 @@ class RouterTestCase(TestCase):
         self.assertEqual(Book.objects.using('default').count(), 1)
         self.assertEqual(Book.objects.using('other').count(), 1)
 
+    def test_invalid_set_foreign_key_assignment(self):
+        marty = Person.objects.using('default').create(name="Marty Alchin")
+        dive = Book.objects.using('other').create(
+            title="Dive into Python",
+            published=datetime.date(2009, 5, 4),
+        )
+        # Set a foreign key set with an object from a different database
+        msg = "<Book: Dive into Python> instance isn't saved. Use bulk=False or save the object first."
+        with self.assertRaisesMessage(ValueError, msg):
+            marty.edited.set([dive])
+
     def test_foreign_key_cross_database_protection(self):
         "Foreign keys can cross databases if they two databases have a common source"
         # Create a book and author on the default database
@@ -1053,7 +1096,7 @@ class RouterTestCase(TestCase):
 
         # Set a foreign key set with an object from a different database
         try:
-            marty.edited = [pro, dive]
+            marty.edited.set([pro, dive], bulk=False)
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 
@@ -1075,7 +1118,7 @@ class RouterTestCase(TestCase):
 
         # Add to a foreign key set with an object from a different database
         try:
-            marty.edited.add(dive)
+            marty.edited.add(dive, bulk=False)
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 
@@ -1492,11 +1535,11 @@ class AntiPetRouter(object):
     # A router that only expresses an opinion on migrate,
     # passing pets to the 'other' database
 
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, model_name=None, **hints):
         if db == 'other':
-            return model._meta.object_name == 'Pet'
+            return model_name == 'pet'
         else:
-            return model._meta.object_name != 'Pet'
+            return model_name != 'pet'
 
 
 class FixtureTestCase(TestCase):
@@ -1757,7 +1800,7 @@ class RouterModelArgumentTestCase(TestCase):
 
 
 class SyncOnlyDefaultDatabaseRouter(object):
-    def allow_migrate(self, db, model):
+    def allow_migrate(self, db, app_label, **hints):
         return db == DEFAULT_DB_ALIAS
 
 

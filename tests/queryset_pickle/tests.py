@@ -2,11 +2,13 @@ from __future__ import unicode_literals
 
 import datetime
 import pickle
+import unittest
 import warnings
 
 from django.test import TestCase
+from django.utils import six
 from django.utils.encoding import force_text
-from django.utils.version import get_major_version, get_version
+from django.utils.version import get_version
 
 from .models import Container, Event, Group, Happening, M2MModel
 
@@ -28,20 +30,18 @@ class PickleabilityTestCase(TestCase):
     def test_datetime_callable_default_filter(self):
         self.assert_pickles(Happening.objects.filter(when=datetime.datetime.now()))
 
-    def test_lambda_as_default(self):
+    def test_string_as_default(self):
         self.assert_pickles(Happening.objects.filter(name="test"))
 
     def test_standalone_method_as_default(self):
         self.assert_pickles(Happening.objects.filter(number1=1))
 
+    @unittest.skipIf(six.PY2, "Field doesn't exist on Python 2.")
     def test_staticmethod_as_default(self):
         self.assert_pickles(Happening.objects.filter(number2=1))
 
-    def test_classmethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number3=1))
-
-    def test_membermethod_as_default(self):
-        self.assert_pickles(Happening.objects.filter(number4=1))
+    def test_filter_reverse_fk(self):
+        self.assert_pickles(Group.objects.filter(event=1))
 
     def test_doesnotexist_exception(self):
         # Ticket #17776
@@ -79,7 +79,7 @@ class PickleabilityTestCase(TestCase):
         m1 = M2MModel.objects.create()
         g1 = Group.objects.create(name='foof')
         m1.groups.add(g1)
-        m2m_through = M2MModel._meta.get_field('groups').rel.through
+        m2m_through = M2MModel._meta.get_field('groups').remote_field.through
         original = m2m_through.objects.get()
         dumped = pickle.dumps(original)
         reloaded = pickle.loads(dumped)
@@ -116,6 +116,20 @@ class PickleabilityTestCase(TestCase):
         groups = pickle.loads(pickle.dumps(groups))
         self.assertQuerysetEqual(groups, [g], lambda x: x)
 
+    def test_pickle_prefetch_related_with_m2m_and_objects_deletion(self):
+        """
+        #24831 -- Cached properties on ManyToOneRel created in QuerySet.delete()
+        caused subsequent QuerySet pickling to fail.
+        """
+        g = Group.objects.create(name='foo')
+        m2m = M2MModel.objects.create()
+        m2m.groups.add(g)
+        Group.objects.all().delete()
+
+        m2ms = M2MModel.objects.prefetch_related('groups')
+        m2ms = pickle.loads(pickle.dumps(m2ms))
+        self.assertQuerysetEqual(m2ms, [m2m], lambda x: x)
+
     def test_missing_django_version_unpickling(self):
         """
         #21430 -- Verifies a warning is raised for querysets that are
@@ -137,7 +151,8 @@ class PickleabilityTestCase(TestCase):
         with warnings.catch_warnings(record=True) as recorded:
             pickle.loads(pickle.dumps(qs))
             msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled queryset instance's Django version %s does not "
-                "match the current version %s."
-                % (str(float(get_major_version()) - 0.1), get_version()))
+            self.assertEqual(
+                msg,
+                "Pickled queryset instance's Django version 1.0 does not "
+                "match the current version %s." % get_version()
+            )

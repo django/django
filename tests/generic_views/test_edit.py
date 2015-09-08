@@ -5,9 +5,11 @@ import warnings
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import (
+    SimpleTestCase, TestCase, ignore_warnings, override_settings,
+)
 from django.test.client import RequestFactory
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.views.generic.base import View
 from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
@@ -16,7 +18,7 @@ from .models import Artist, Author
 from .test_forms import AuthorForm
 
 
-class FormMixinTests(TestCase):
+class FormMixinTests(SimpleTestCase):
     def test_initial_data(self):
         """ Test instance independence of initial data dict (see #16138) """
         initial_1 = FormMixin().get_initial()
@@ -35,7 +37,7 @@ class FormMixinTests(TestCase):
             request = get_request
 
         default_kwargs = TestFormMixin().get_form_kwargs()
-        self.assertEqual(None, default_kwargs.get('prefix'))
+        self.assertIsNone(default_kwargs.get('prefix'))
 
         set_mixin = TestFormMixin()
         set_mixin.prefix = test_string
@@ -70,7 +72,7 @@ class FormMixinTests(TestCase):
                 def get_form(self, form_class):
                     return form_class(**self.get_form_kwargs())
         self.assertEqual(len(w), 1)
-        self.assertEqual(w[0].category, RemovedInDjango20Warning)
+        self.assertEqual(w[0].category, RemovedInDjango110Warning)
         self.assertEqual(
             str(w[0].message),
             '`generic_views.test_edit.MissingDefaultValue.get_form` method '
@@ -81,16 +83,23 @@ class FormMixinTests(TestCase):
             MissingDefaultValue().get_form(), forms.Form,
         )
 
+    def test_get_context_data(self):
+        class FormContext(FormMixin):
+            request = RequestFactory().get('/')
+            form_class = forms.Form
+
+        self.assertIsInstance(FormContext().get_context_data()['form'], forms.Form)
+
 
 @override_settings(ROOT_URLCONF='generic_views.urls')
 class BasicFormTests(TestCase):
 
     def test_post_data(self):
         res = self.client.post('/contact/', {'name': "Me", 'message': "Hello"})
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
 
 
-class ModelFormMixinTests(TestCase):
+class ModelFormMixinTests(SimpleTestCase):
     def test_get_form(self):
         form_class = views.AuthorGetQuerySetFormView().get_form_class()
         self.assertEqual(form_class._meta.model, Author)
@@ -117,7 +126,7 @@ class CreateViewTests(TestCase):
         res = self.client.post('/edit/authors/create/',
                         {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
 
     def test_create_invalid(self):
@@ -133,17 +142,17 @@ class CreateViewTests(TestCase):
                         {'name': 'Rene Magritte'})
         self.assertEqual(res.status_code, 302)
         artist = Artist.objects.get(name='Rene Magritte')
-        self.assertRedirects(res, 'http://testserver/detail/artist/%d/' % artist.pk)
+        self.assertRedirects(res, '/detail/artist/%d/' % artist.pk)
         self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Rene Magritte>'])
 
     def test_create_with_redirect(self):
         res = self.client.post('/edit/authors/create/redirect/',
                             {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_create_with_interpolated_redirect(self):
         res = self.client.post(
             '/edit/authors/create/interpolate_redirect/',
@@ -152,7 +161,7 @@ class CreateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe>'])
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.first().pk
-        self.assertRedirects(res, 'http://testserver/edit/author/%d/update/' % pk)
+        self.assertRedirects(res, '/edit/author/%d/update/' % pk)
         # Also test with escaped chars in URL
         res = self.client.post(
             '/edit/authors/create/interpolate_redirect_nonascii/',
@@ -160,7 +169,7 @@ class CreateViewTests(TestCase):
         )
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.get(name='John Doe').pk
-        self.assertRedirects(res, 'http://testserver/%C3%A9dit/author/{}/update/'.format(pk))
+        self.assertRedirects(res, '/%C3%A9dit/author/{}/update/'.format(pk))
 
     def test_create_with_special_properties(self):
         res = self.client.get('/edit/authors/create/special/')
@@ -189,7 +198,7 @@ class CreateViewTests(TestCase):
         res = self.client.post('/edit/authors/create/restricted/',
             {'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/accounts/login/?next=/edit/authors/create/restricted/')
+        self.assertRedirects(res, '/accounts/login/?next=/edit/authors/create/restricted/')
 
     def test_create_view_with_restricted_fields(self):
 
@@ -249,7 +258,7 @@ class UpdateViewTests(TestCase):
         res = self.client.post('/edit/author/%d/update/' % a.pk,
                         {'name': 'Randall Munroe (xkcd)', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
 
     def test_update_invalid(self):
@@ -269,7 +278,7 @@ class UpdateViewTests(TestCase):
         res = self.client.post('/edit/artists/%d/update/' % a.pk,
                         {'name': 'Rene Magritte'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/detail/artist/%d/' % a.pk)
+        self.assertRedirects(res, '/detail/artist/%d/' % a.pk)
         self.assertQuerysetEqual(Artist.objects.all(), ['<Artist: Rene Magritte>'])
 
     def test_update_with_redirect(self):
@@ -280,10 +289,10 @@ class UpdateViewTests(TestCase):
         res = self.client.post('/edit/author/%d/update/redirect/' % a.pk,
                         {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_update_with_interpolated_redirect(self):
         a = Author.objects.create(
             name='Randall Munroe',
@@ -296,7 +305,7 @@ class UpdateViewTests(TestCase):
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.first().pk
-        self.assertRedirects(res, 'http://testserver/edit/author/%d/update/' % pk)
+        self.assertRedirects(res, '/edit/author/%d/update/' % pk)
         # Also test with escaped chars in URL
         res = self.client.post(
             '/edit/author/%d/update/interpolate_redirect_nonascii/' % a.pk,
@@ -304,7 +313,7 @@ class UpdateViewTests(TestCase):
         )
         self.assertEqual(res.status_code, 302)
         pk = Author.objects.get(name='John Doe').pk
-        self.assertRedirects(res, 'http://testserver/%C3%A9dit/author/{}/update/'.format(pk))
+        self.assertRedirects(res, '/%C3%A9dit/author/{}/update/'.format(pk))
 
     def test_update_with_special_properties(self):
         a = Author.objects.create(
@@ -322,7 +331,7 @@ class UpdateViewTests(TestCase):
         res = self.client.post('/edit/author/%d/update/special/' % a.pk,
                         {'name': 'Randall Munroe (author of xkcd)', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/detail/author/%d/' % a.pk)
+        self.assertRedirects(res, '/detail/author/%d/' % a.pk)
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (author of xkcd)>'])
 
     def test_update_without_redirect(self):
@@ -354,7 +363,7 @@ class UpdateViewTests(TestCase):
         res = self.client.post('/edit/author/update/',
                         {'name': 'Randall Munroe (xkcd)', 'slug': 'randall-munroe'})
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), ['<Author: Randall Munroe (xkcd)>'])
 
 
@@ -372,7 +381,7 @@ class DeleteViewTests(TestCase):
         # Deletion with POST
         res = self.client.post('/edit/author/%d/delete/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_by_delete(self):
@@ -380,28 +389,28 @@ class DeleteViewTests(TestCase):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.delete('/edit/author/%d/delete/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_with_redirect(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.post('/edit/author/%d/delete/redirect/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/')
+        self.assertRedirects(res, '/edit/authors/create/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
-    @ignore_warnings(category=RemovedInDjango20Warning)
+    @ignore_warnings(category=RemovedInDjango110Warning)
     def test_delete_with_interpolated_redirect(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.post('/edit/author/%d/delete/interpolate_redirect/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/edit/authors/create/?deleted=%d' % a.pk)
+        self.assertRedirects(res, '/edit/authors/create/?deleted=%d' % a.pk)
         self.assertQuerysetEqual(Author.objects.all(), [])
         # Also test with escaped chars in URL
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
         res = self.client.post('/edit/author/{}/delete/interpolate_redirect_nonascii/'.format(a.pk))
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/%C3%A9dit/authors/create/?deleted={}'.format(a.pk))
+        self.assertRedirects(res, '/%C3%A9dit/authors/create/?deleted={}'.format(a.pk))
 
     def test_delete_with_special_properties(self):
         a = Author.objects.create(**{'name': 'Randall Munroe', 'slug': 'randall-munroe'})
@@ -414,7 +423,7 @@ class DeleteViewTests(TestCase):
 
         res = self.client.post('/edit/author/%d/delete/special/' % a.pk)
         self.assertEqual(res.status_code, 302)
-        self.assertRedirects(res, 'http://testserver/list/authors/')
+        self.assertRedirects(res, '/list/authors/')
         self.assertQuerysetEqual(Author.objects.all(), [])
 
     def test_delete_without_redirect(self):

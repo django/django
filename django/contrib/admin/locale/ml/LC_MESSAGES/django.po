@@ -9,9 +9,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-07-25 19:51+0000\n"
-"Last-Translator: Aby Thomas <abyzthomas@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Malayalam (http://www.transifex.com/projects/p/django/"
 "language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -20,68 +20,51 @@ msgstr ""
 "Language: ml\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/actions.py:50
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
 msgstr "%(count)d %(items)s നീക്കം ചെയ്തു."
 
-#: contrib/admin/actions.py:62 contrib/admin/options.py:1616
 #, python-format
 msgid "Cannot delete %(name)s"
 msgstr "%(name)s നീക്കം ചെയ്യാന്‍ കഴിയില്ല."
 
-#: contrib/admin/actions.py:64 contrib/admin/options.py:1618
 msgid "Are you sure?"
 msgstr "തീര്‍ച്ചയാണോ?"
 
-#: contrib/admin/actions.py:84
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "തെരഞ്ഞെടുത്ത %(verbose_name_plural)s നീക്കം ചെയ്യുക."
 
-#: contrib/admin/apps.py:11
 msgid "Administration"
 msgstr "ഭരണം"
 
-#: contrib/admin/filters.py:104 contrib/admin/filters.py:199
-#: contrib/admin/filters.py:239 contrib/admin/filters.py:276
-#: contrib/admin/filters.py:387
 msgid "All"
 msgstr "എല്ലാം"
 
-#: contrib/admin/filters.py:240
 msgid "Yes"
 msgstr "അതെ"
 
-#: contrib/admin/filters.py:241
 msgid "No"
 msgstr "അല്ല"
 
-#: contrib/admin/filters.py:255
 msgid "Unknown"
 msgstr "അജ്ഞാതം"
 
-#: contrib/admin/filters.py:315
 msgid "Any date"
 msgstr "ഏതെങ്കിലും തീയതി"
 
-#: contrib/admin/filters.py:316
 msgid "Today"
 msgstr "ഇന്ന്"
 
-#: contrib/admin/filters.py:320
 msgid "Past 7 days"
 msgstr "കഴിഞ്ഞ ഏഴു ദിവസം"
 
-#: contrib/admin/filters.py:324
 msgid "This month"
 msgstr "ഈ മാസം"
 
-#: contrib/admin/filters.py:328
 msgid "This year"
 msgstr "ഈ വര്‍ഷം"
 
-#: contrib/admin/forms.py:14
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -91,193 +74,158 @@ msgstr ""
 "കള്ളികളിലും അക്ഷരങ്ങള്‍ (ഇംഗ്ലീഷിലെ) വലിയക്ഷരമോ ചെറിയക്ഷരമോ എന്നത് പ്രധാനമാണെന്നത് "
 "ശ്രദ്ധിയ്ക്കുക."
 
-#: contrib/admin/helpers.py:23
 msgid "Action:"
 msgstr "ആക്ഷന്‍"
 
-#: contrib/admin/models.py:25
 msgid "action time"
 msgstr "ആക്ഷന്‍ സമയം"
 
-#: contrib/admin/models.py:28
 msgid "object id"
 msgstr "ഒബ്ജെക്ട് ഐഡി"
 
-#: contrib/admin/models.py:29
 msgid "object repr"
 msgstr "ഒബ്ജെക്ട് സൂചന"
 
-#: contrib/admin/models.py:30
 msgid "action flag"
 msgstr "ആക്ഷന്‍ ഫ്ളാഗ്"
 
-#: contrib/admin/models.py:31
 msgid "change message"
 msgstr "സന്ദേശം മാറ്റുക"
 
-#: contrib/admin/models.py:36
 msgid "log entry"
 msgstr "ലോഗ് എന്ട്രി"
 
-#: contrib/admin/models.py:37
 msgid "log entries"
 msgstr "ലോഗ് എന്ട്രികള്‍"
 
-#: contrib/admin/models.py:46
 #, python-format
 msgid "Added \"%(object)s\"."
 msgstr "\"%(object)s\" ചേര്‍ത്തു."
 
-#: contrib/admin/models.py:48
 #, python-format
 msgid "Changed \"%(object)s\" - %(changes)s"
 msgstr "\"%(object)s\"ല്‍ %(changes)s മാറ്റം വരുത്തി"
 
-#: contrib/admin/models.py:53
 #, python-format
 msgid "Deleted \"%(object)s.\""
 msgstr "\"%(object)s\" നീക്കം ചെയ്തു."
 
-#: contrib/admin/models.py:55
 msgid "LogEntry Object"
 msgstr "ലോഗ്‌എന്‍ട്രി വസ്തു"
 
-#: contrib/admin/options.py:230 contrib/admin/options.py:259
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-#: contrib/admin/options.py:956
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
 #, python-format
 msgid "Changed %s."
 msgstr "%s മാറ്റി."
 
-#: contrib/admin/options.py:956 contrib/admin/options.py:966
-#: contrib/admin/options.py:1808
 msgid "and"
 msgstr "ഉം"
 
-#: contrib/admin/options.py:961
 #, python-format
 msgid "Added %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ചേര്‍ത്തു."
 
-#: contrib/admin/options.py:965
 #, python-format
 msgid "Changed %(list)s for %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ന്റെ %(list)s മാറ്റി."
 
-#: contrib/admin/options.py:970
 #, python-format
 msgid "Deleted %(name)s \"%(object)s\"."
 msgstr "%(name)s \"%(object)s\" ഡിലീറ്റ് ചെയ്തു."
 
-#: contrib/admin/options.py:974
 msgid "No fields changed."
 msgstr "ഒരു മാറ്റവുമില്ല."
 
-#: contrib/admin/options.py:1098 contrib/admin/options.py:1138
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may edit it again below."
 msgstr "%(name)s \"%(obj)s\" കൂട്ടി ചേര്‍ത്തു. താഴെ നിന്നും മാറ്റം വരുത്താം."
 
-#: contrib/admin/options.py:1109
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr "%(name)s \"%(obj)s\" കൂട്ടി ചേര്‍ത്തു. താഴെ ഒരു %(name)s കൂടെ കൂട്ടിച്ചേർക്കാം."
 
-#: contrib/admin/options.py:1116
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
 msgstr "%(name)s \"%(obj)s\" വിജയകരമായി കൂട്ടിച്ചേര്ത്തു."
 
-#: contrib/admin/options.py:1131
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr "%(name)s \"%(obj)s\" മാറ്റം വരുത്തി. താഴെ വീണ്ടും മാറ്റം വരുത്താം."
 
-#: contrib/admin/options.py:1148
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr "%(name)s \"%(obj)s\" മാറ്റം വരുത്തി. താഴെ ഒരു %(name)s കൂടെ കൂട്ടിച്ചേർക്കാം."
 
-#: contrib/admin/options.py:1157
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" ല്‍ മാറ്റം വരുത്തി."
 
-#: contrib/admin/options.py:1240 contrib/admin/options.py:1481
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr "ആക്ഷന്‍ നടപ്പിലാക്കേണ്ട വകകള്‍ തെരഞ്ഞെടുക്കണം. ഒന്നും മാറ്റിയിട്ടില്ല."
 
-#: contrib/admin/options.py:1259
 msgid "No action selected."
 msgstr "ആക്ഷനൊന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: contrib/admin/options.py:1271
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "%(name)s \"%(obj)s\" നീക്കം ചെയ്തു."
 
-#: contrib/admin/options.py:1348 contrib/admin/options.py:1593
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(key)r എന്ന പ്രാഥമിക കീ ഉള്ള %(name)s വസ്തു ഒന്നും നിലവിലില്ല."
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Add %s"
 msgstr "%s ചേര്‍ക്കുക"
 
-#: contrib/admin/options.py:1398
 #, python-format
 msgid "Change %s"
 msgstr "%s മാറ്റാം"
 
-#: contrib/admin/options.py:1460
 msgid "Database error"
 msgstr "ഡേറ്റാബേസ് തകരാറാണ്."
 
-#: contrib/admin/options.py:1523
 #, python-format
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 msgstr[1] "%(count)s %(name)s ല്‍ മാറ്റം വരുത്തി."
 
-#: contrib/admin/options.py:1550
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s തെരഞ്ഞെടുത്തു."
 msgstr[1] "%(total_count)sഉം തെരഞ്ഞെടുത്തു."
 
-#: contrib/admin/options.py:1556
 #, python-format
 msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s ല്‍ ഒന്നും തെരഞ്ഞെടുത്തില്ല."
 
-#: contrib/admin/options.py:1655
 #, python-format
 msgid "Change history: %s"
 msgstr "%s ലെ മാറ്റങ്ങള്‍."
 
-#. Translators: Model verbose name and instance representation, suitable to be
-#. an item in a list
-#: contrib/admin/options.py:1802
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
 
-#: contrib/admin/options.py:1809
 #, python-format
 msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
@@ -286,71 +234,40 @@ msgstr ""
 " %(class_name)s %(instance)s നീക്കം ചെയ്യണമെങ്കിൽ അതിനോട് ബന്ധപ്പെട്ടതായ താഴെപ്പറയുന്ന "
 "എല്ലാ വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്: %(related_objects)s"
 
-#: contrib/admin/sites.py:36 contrib/admin/templates/admin/base_site.html:3
 msgid "Django site admin"
 msgstr "ജാംഗോ സൈറ്റ് അഡ്മിന്‍"
 
-#: contrib/admin/sites.py:39 contrib/admin/templates/admin/base_site.html:6
 msgid "Django administration"
 msgstr "ജാംഗോ ഭരണം"
 
-#: contrib/admin/sites.py:42
 msgid "Site administration"
 msgstr "സൈറ്റ് ഭരണം"
 
-#: contrib/admin/sites.py:345 contrib/admin/templates/admin/login.html:47
-#: contrib/admin/templates/registration/password_reset_complete.html:18
-#: contrib/admin/tests.py:113
 msgid "Log in"
 msgstr "ലോഗ്-ഇന്‍"
 
-#: contrib/admin/sites.py:472
 #, python-format
 msgid "%(app)s administration"
 msgstr "%(app)s ഭരണം"
 
-#: contrib/admin/templates/admin/404.html:4
-#: contrib/admin/templates/admin/404.html:8
 msgid "Page not found"
 msgstr "പേജ് കണ്ടില്ല"
 
-#: contrib/admin/templates/admin/404.html:10
 msgid "We're sorry, but the requested page could not be found."
 msgstr "ക്ഷമിക്കണം, ആവശ്യപ്പെട്ട പേജ് കണ്ടെത്താന്‍ കഴിഞ്ഞില്ല."
 
-#: contrib/admin/templates/admin/500.html:6
-#: contrib/admin/templates/admin/app_index.html:9
-#: contrib/admin/templates/admin/auth/user/change_password.html:13
-#: contrib/admin/templates/admin/base.html:50
-#: contrib/admin/templates/admin/change_form.html:18
-#: contrib/admin/templates/admin/change_list.html:40
-#: contrib/admin/templates/admin/delete_confirmation.html:8
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:8
-#: contrib/admin/templates/admin/invalid_setup.html:6
-#: contrib/admin/templates/admin/object_history.html:6
-#: contrib/admin/templates/registration/logged_out.html:4
-#: contrib/admin/templates/registration/password_change_done.html:6
-#: contrib/admin/templates/registration/password_change_form.html:7
-#: contrib/admin/templates/registration/password_reset_complete.html:6
-#: contrib/admin/templates/registration/password_reset_confirm.html:6
-#: contrib/admin/templates/registration/password_reset_done.html:6
-#: contrib/admin/templates/registration/password_reset_form.html:6
 msgid "Home"
 msgstr "പൂമുഖം"
 
-#: contrib/admin/templates/admin/500.html:7
 msgid "Server error"
 msgstr "സെര്‍വര്‍ തകരാറാണ്"
 
-#: contrib/admin/templates/admin/500.html:11
 msgid "Server error (500)"
 msgstr "സെര്‍വര്‍ തകരാറാണ് (500)"
 
-#: contrib/admin/templates/admin/500.html:14
 msgid "Server Error <em>(500)</em>"
 msgstr "സെര്‍വര്‍ തകരാറാണ് <em>(500)</em>"
 
-#: contrib/admin/templates/admin/500.html:15
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
@@ -358,139 +275,84 @@ msgstr ""
 "എന്തോ തകരാറ് സംഭവിച്ചു. ബന്ധപ്പെട്ട സൈറ്റ് ഭരണകർത്താക്കളെ ഈമെയിൽ മുഖാന്തരം അറിയിച്ചിട്ടുണ്ട്. "
 "ഷമയൊടെ കത്തിരിക്കുനതിന് നന്ദി."
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Run the selected action"
 msgstr "തെരഞ്ഞെടുത്ത ആക്ഷന്‍ നടപ്പിലാക്കുക"
 
-#: contrib/admin/templates/admin/actions.html:4
 msgid "Go"
 msgstr "Go"
 
-#: contrib/admin/templates/admin/actions.html:11
 msgid "Click here to select the objects across all pages"
 msgstr "എല്ലാ പേജിലേയും വസ്തുക്കള്‍ തെരഞ്ഞെടുക്കാന്‍ ഇവിടെ ക്ലിക് ചെയ്യുക."
 
-#: contrib/admin/templates/admin/actions.html:11
 #, python-format
 msgid "Select all %(total_count)s %(module_name)s"
 msgstr "മുഴുവന്‍ %(total_count)s %(module_name)s ഉം തെരഞ്ഞെടുക്കുക"
 
-#: contrib/admin/templates/admin/actions.html:13
 msgid "Clear selection"
 msgstr "തെരഞ്ഞെടുത്തത് റദ്ദാക്കുക."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:6
 msgid ""
 "First, enter a username and password. Then, you'll be able to edit more user "
 "options."
 msgstr "ആദ്യം, യൂസര്‍ നാമവും പാസ് വേര്‍ഡും നല്കണം. പിന്നെ, കൂടുതല്‍ കാര്യങ്ങള്‍ മാറ്റാവുന്നതാണ്."
 
-#: contrib/admin/templates/admin/auth/user/add_form.html:8
 msgid "Enter a username and password."
 msgstr "Enter a username and password."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:17
-#: contrib/admin/templates/admin/auth/user/change_password.html:51
-#: contrib/admin/templates/admin/base.html:39
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Change password"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റുക."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the error below."
 msgstr "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:27
-#: contrib/admin/templates/admin/change_form.html:47
-#: contrib/admin/templates/admin/change_list.html:67
-#: contrib/admin/templates/admin/login.html:17
-#: contrib/admin/templates/registration/password_change_form.html:21
 msgid "Please correct the errors below."
 msgstr "ദയവായി താഴെയുള്ള തെറ്റുകള്‍ പരിഹരിക്കുക."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:31
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> ന് പുതിയ പാസ് വേര്‍ഡ് നല്കുക."
 
-#: contrib/admin/templates/admin/auth/user/change_password.html:38
-msgid "Password"
-msgstr "പാസ് വേര്‍ഡ്"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:44
-#: contrib/admin/templates/registration/password_change_form.html:42
-msgid "Password (again)"
-msgstr "പാസ് വേര്‍ഡ് (വീണ്ടും)"
-
-#: contrib/admin/templates/admin/auth/user/change_password.html:45
-msgid "Enter the same password as above, for verification."
-msgstr "പാസ് വേര്‍ഡ് മുകളിലെ പോലെ തന്നെ നല്കുക. (ഉറപ്പു വരുത്താനാണ്.)"
-
-#: contrib/admin/templates/admin/base.html:30
 msgid "Welcome,"
 msgstr "സ്വാഗതം, "
 
-#: contrib/admin/templates/admin/base.html:36
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
+msgid "View site"
+msgstr ""
+
 msgid "Documentation"
 msgstr "സഹായക്കുറിപ്പുകള്‍"
 
-#: contrib/admin/templates/admin/base.html:41
-#: contrib/admin/templates/registration/password_change_done.html:3
-#: contrib/admin/templates/registration/password_change_form.html:4
 msgid "Log out"
 msgstr "പുറത്ത് കടക്കുക."
 
-#: contrib/admin/templates/admin/change_form.html:21
-#: contrib/admin/templates/admin/index.html:31
 msgid "Add"
 msgstr "ചേര്‍ക്കുക"
 
-#: contrib/admin/templates/admin/change_form.html:33
-#: contrib/admin/templates/admin/object_history.html:10
 msgid "History"
 msgstr "ചരിത്രം"
 
-#: contrib/admin/templates/admin/change_form.html:35
-#: contrib/admin/templates/admin/edit_inline/stacked.html:9
-#: contrib/admin/templates/admin/edit_inline/tabular.html:30
 msgid "View on site"
 msgstr "View on site"
 
-#: contrib/admin/templates/admin/change_list.html:58
 #, python-format
 msgid "Add %(name)s"
 msgstr "%(name)s ചേര്‍ക്കുക"
 
-#: contrib/admin/templates/admin/change_list.html:78
 msgid "Filter"
 msgstr "അരിപ്പ"
 
-#: contrib/admin/templates/admin/change_list_results.html:17
 msgid "Remove from sorting"
 msgstr "ക്രമീകരണത്തില്‍ നിന്നും ഒഴിവാക്കുക"
 
-#: contrib/admin/templates/admin/change_list_results.html:18
 #, python-format
 msgid "Sorting priority: %(priority_number)s"
 msgstr "ക്രമീകരണത്തിനുള്ള മുന്‍ഗണന: %(priority_number)s"
 
-#: contrib/admin/templates/admin/change_list_results.html:19
 msgid "Toggle sorting"
 msgstr "ക്രമീകരണം വിപരീത ദിശയിലാക്കുക."
 
-#: contrib/admin/templates/admin/delete_confirmation.html:12
-#: contrib/admin/templates/admin/submit_line.html:6
 msgid "Delete"
 msgstr "നീക്കം ചെയ്യുക"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:19
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
@@ -501,7 +363,6 @@ msgstr ""
 "വസ്തുക്കളുംഡിലീറ്റ് ആവും. പക്ഷേ നിങ്ങള്‍ക്ക് താഴെ പറഞ്ഞ തരം വസ്തുക്കള്‍ ഡിലീറ്റ് ചെയ്യാനുള്ള അനുമതി "
 "ഇല്ല:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:27
 #, python-format
 msgid ""
 "Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
@@ -510,7 +371,6 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട %(object_name)s '%(escaped_object)s' നീക്കം ചെയ്യണമെങ്കിൽ അതിനോട് "
 "ബന്ധപ്പെട്ടതായ താഴെപ്പറയുന്ന എല്ലാ വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:35
 #, python-format
 msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
@@ -519,16 +379,18 @@ msgstr ""
 "%(object_name)s \"%(escaped_object)s\" നീക്കം ചെയ്യണമെന്ന് ഉറപ്പാണോ?അതുമായി ബന്ധമുള്ള "
 "താഴെപ്പറയുന്ന വസ്തുക്കളെല്ലാം നീക്കം ചെയ്യുന്നതാണ്:"
 
-#: contrib/admin/templates/admin/delete_confirmation.html:40
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:45
+msgid "Objects"
+msgstr ""
+
 msgid "Yes, I'm sure"
 msgstr "അതെ, തീര്‍ച്ചയാണ്"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:11
+msgid "No, take me back"
+msgstr ""
+
 msgid "Delete multiple objects"
 msgstr "ഒന്നിലേറെ വസ്തുക്കള്‍ നീക്കം ചെയ്യുക"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:18
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would result in deleting related "
@@ -538,7 +400,6 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട  %(objects_name)s നീക്കം ചെയ്താൽ അതിനോട് ബന്ധപ്പെട്ടതായ താഴെപ്പറയുന്ന "
 "എല്ലാ വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്,  പക്ഷെ അതിനുളള അവകാശം അക്കൗണ്ടിനില്ല:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:26
 #, python-format
 msgid ""
 "Deleting the selected %(objects_name)s would require deleting the following "
@@ -547,7 +408,6 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട  %(objects_name)s നീക്കം ചെയ്യണമെങ്കിൽ അതിനോട് ബന്ധപ്പെട്ടതായ "
 "താഴെപ്പറയുന്ന എല്ലാ വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്:"
 
-#: contrib/admin/templates/admin/delete_selected_confirmation.html:34
 #, python-format
 msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
@@ -556,56 +416,45 @@ msgstr ""
 "തിരഞ്ഞെടുക്കപ്പെട്ട  %(objects_name)s നീക്കം ചെയ്യണമെന്നു ഉറപ്പാണോ ? തിരഞ്ഞെടുക്കപ്പെട്ടതും "
 "അതിനോട് ബന്ധപ്പെട്ടതും ആയ എല്ലാ താഴെപ്പറയുന്ന വസ്തുക്കളും നീക്കം ചെയ്യുന്നതാണ്:"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:26
-#: contrib/admin/templates/admin/edit_inline/tabular.html:78
+msgid "Change"
+msgstr "മാറ്റുക"
+
 msgid "Remove"
 msgstr "നീക്കം ചെയ്യുക"
 
-#: contrib/admin/templates/admin/edit_inline/stacked.html:27
-#: contrib/admin/templates/admin/edit_inline/tabular.html:77
 #, python-format
 msgid "Add another %(verbose_name)s"
 msgstr "%(verbose_name)s ഒന്നു കൂടി ചേര്‍ക്കുക"
 
-#: contrib/admin/templates/admin/edit_inline/tabular.html:17
 msgid "Delete?"
 msgstr "ഡിലീറ്റ് ചെയ്യട്ടെ?"
 
-#: contrib/admin/templates/admin/filter.html:2
 #, python-format
 msgid " By %(filter_title)s "
 msgstr "%(filter_title)s ആൽ"
 
-#: contrib/admin/templates/admin/index.html:20
+msgid "Summary"
+msgstr ""
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "%(name)s മാതൃകയിലുള്ള"
 
-#: contrib/admin/templates/admin/index.html:37
-msgid "Change"
-msgstr "മാറ്റുക"
-
-#: contrib/admin/templates/admin/index.html:47
 msgid "You don't have permission to edit anything."
 msgstr "ഒന്നിലും മാറ്റം വരുത്താനുള്ള അനുമതി ഇല്ല."
 
-#: contrib/admin/templates/admin/index.html:55
 msgid "Recent Actions"
 msgstr "സമീപകാല പ്രവ്രുത്തികള്‍"
 
-#: contrib/admin/templates/admin/index.html:56
 msgid "My Actions"
 msgstr "എന്റെ പ്രവ്രുത്തികള്‍"
 
-#: contrib/admin/templates/admin/index.html:60
 msgid "None available"
 msgstr "ഒന്നും ലഭ്യമല്ല"
 
-#: contrib/admin/templates/admin/index.html:74
 msgid "Unknown content"
 msgstr "ഉള്ളടക്കം അറിയില്ല."
 
-#: contrib/admin/templates/admin/invalid_setup.html:12
 msgid ""
 "Something's wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
@@ -614,27 +463,18 @@ msgstr ""
 "നിങ്ങളുടെ ഡേറ്റാബേസ് ഇന്‍സ്ടാലേഷനില്‍ എന്തോ പിശകുണ്ട്. ശരിയായ ടേബിളുകള്‍ ഉണ്ടെന്നും ഡേറ്റാബേസ് "
 "വായനായോഗ്യമാണെന്നും ഉറപ്പു വരുത്തുക."
 
-#: contrib/admin/templates/admin/login.html:37
-msgid "Password:"
-msgstr "പാസ് വേര്‍ഡ്"
-
-#: contrib/admin/templates/admin/login.html:43
 msgid "Forgotten your password or username?"
 msgstr "രഹസ്യവാക്കോ ഉപയോക്തൃനാമമോ മറന്നുപോയോ?"
 
-#: contrib/admin/templates/admin/object_history.html:22
 msgid "Date/time"
 msgstr "തീയതി/സമയം"
 
-#: contrib/admin/templates/admin/object_history.html:23
 msgid "User"
 msgstr "യൂസര്‍"
 
-#: contrib/admin/templates/admin/object_history.html:24
 msgid "Action"
 msgstr "ആക്ഷന്‍"
 
-#: contrib/admin/templates/admin/object_history.html:38
 msgid ""
 "This object doesn't have a change history. It probably wasn't added via this "
 "admin site."
@@ -642,61 +482,58 @@ msgstr ""
 "ഈ വസ്തുവിന്റെ മാറ്റങ്ങളുടെ ചരിത്രം ലഭ്യമല്ല. ഒരുപക്ഷെ ഇത് അഡ്മിന്‍ സൈറ്റ് വഴി "
 "ചേര്‍ത്തതായിരിക്കില്ല."
 
-#: contrib/admin/templates/admin/pagination.html:10
 msgid "Show all"
 msgstr "എല്ലാം കാണട്ടെ"
 
-#: contrib/admin/templates/admin/pagination.html:11
-#: contrib/admin/templates/admin/submit_line.html:3
 msgid "Save"
 msgstr "സേവ് ചെയ്യണം"
 
-#: contrib/admin/templates/admin/search_form.html:7
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
 msgid "Search"
 msgstr "പരതുക"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s results"
 msgstr[1] "%(counter)s ഫലം"
 
-#: contrib/admin/templates/admin/search_form.html:9
 #, python-format
 msgid "%(full_result_count)s total"
 msgstr "ആകെ %(full_result_count)s"
 
-#: contrib/admin/templates/admin/submit_line.html:8
 msgid "Save as new"
 msgstr "പുതിയതായി സേവ് ചെയ്യണം"
 
-#: contrib/admin/templates/admin/submit_line.html:9
 msgid "Save and add another"
 msgstr "സേവ് ചെയ്ത ശേഷം വേറെ ചേര്‍ക്കണം"
 
-#: contrib/admin/templates/admin/submit_line.html:10
 msgid "Save and continue editing"
 msgstr "സേവ് ചെയ്ത ശേഷം മാറ്റം വരുത്താം"
 
-#: contrib/admin/templates/registration/logged_out.html:8
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "ഈ വെബ് സൈറ്റില്‍ കുറെ നല്ല സമയം ചെലവഴിച്ചതിനു നന്ദി."
 
-#: contrib/admin/templates/registration/logged_out.html:10
 msgid "Log in again"
 msgstr "വീണ്ടും ലോഗ്-ഇന്‍ ചെയ്യുക."
 
-#: contrib/admin/templates/registration/password_change_done.html:7
-#: contrib/admin/templates/registration/password_change_form.html:8
 msgid "Password change"
 msgstr "പാസ് വേര്‍ഡ് മാറ്റം"
 
-#: contrib/admin/templates/registration/password_change_done.html:14
 msgid "Your password was changed."
 msgstr "നിങ്ങളുടെ പാസ് വേര്‍ഡ് മാറ്റിക്കഴിഞ്ഞു."
 
-#: contrib/admin/templates/registration/password_change_form.html:26
 msgid ""
 "Please enter your old password, for security's sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
@@ -704,34 +541,18 @@ msgstr ""
 "സുരക്ഷയ്ക്കായി നിങ്ങളുടെ പഴയ പാസ് വേര്‍ഡ് നല്കുക. പിന്നെ, പുതിയ പാസ് വേര്‍ഡ് രണ്ട് തവണ നല്കുക. "
 "(ടയ്പ് ചെയ്തതു ശരിയാണെന്ന് ഉറപ്പാക്കാന്‍)"
 
-#: contrib/admin/templates/registration/password_change_form.html:32
-msgid "Old password"
-msgstr "പഴയ പാസ് വേര്‍ഡ്"
-
-#: contrib/admin/templates/registration/password_change_form.html:37
-msgid "New password"
-msgstr "പുതിയ പാസ് വേര്‍ഡ്"
-
-#: contrib/admin/templates/registration/password_change_form.html:48
-#: contrib/admin/templates/registration/password_reset_confirm.html:24
 msgid "Change my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് മാറ്റണം"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:7
-#: contrib/admin/templates/registration/password_reset_done.html:7
-#: contrib/admin/templates/registration/password_reset_form.html:7
 msgid "Password reset"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍"
 
-#: contrib/admin/templates/registration/password_reset_complete.html:16
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "നിങ്ങളുടെ പാസ് വേര്‍ഡ് തയ്യാര്‍. ഇനി ലോഗ്-ഇന്‍ ചെയ്യാം."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:7
 msgid "Password reset confirmation"
 msgstr "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കല്‍ ഉറപ്പാക്കല്‍"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:17
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
@@ -739,15 +560,12 @@ msgstr ""
 "ദയവായി നിങ്ങളുടെ പുതിയ പാസ് വേര്‍ഡ് രണ്ടു തവണ നല്കണം. ശരിയായാണ് ടൈപ്പു ചെയ്തത് എന്നു "
 "ഉറപ്പിക്കാനാണ്."
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:21
 msgid "New password:"
 msgstr "പുതിയ പാസ് വേര്‍ഡ്:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:23
 msgid "Confirm password:"
 msgstr "പാസ് വേര്‍ഡ് ഉറപ്പാക്കൂ:"
 
-#: contrib/admin/templates/registration/password_reset_confirm.html:29
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
@@ -755,14 +573,11 @@ msgstr ""
 "പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കാന്‍ നല്കിയ ലിങ്ക് യോഗ്യമല്ല. ഒരു പക്ഷേ, അതു മുന്പ് തന്നെ ഉപയോഗിച്ചു "
 "കഴിഞ്ഞതാവാം. പുതിയ ഒരു ലിങ്കിന് അപേക്ഷിക്കൂ."
 
-#: contrib/admin/templates/registration/password_reset_done.html:15
 msgid ""
-"We've emailed you instructions for setting your password. You should be "
-"receiving them shortly."
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
 msgstr ""
-"ഞങ്ങൾ പാസ് വേർഡ്‌ മാറ്റാനുള്ള നിർദേശങ്ങൾ ഇമെയിലിൽ അയച്ചിട്ടുണ്ട്. അല്പസമയത്തിനുള്ളിൽ ലഭിക്കുണം."
 
-#: contrib/admin/templates/registration/password_reset_done.html:17
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
 "you registered with, and check your spam folder."
@@ -770,7 +585,6 @@ msgstr ""
 "ഞങ്ങളുടെ ഇമെയിൽ കിട്ടിയില്ലെങ്കിൽ രജിസ്റ്റർ ചെയ്യാൻ ഉപയോകിച്ച അതെ ഇമെയിൽ വിലാസം തന്നെ "
 "ആണോ എന്ന് ഉറപ്പ് വരുത്തുക. ശരിയാണെങ്കിൽ സ്പാം ഫോൾഡറിലും നോക്കുക "
 
-#: contrib/admin/templates/registration/password_reset_email.html:2
 #, python-format
 msgid ""
 "You're receiving this email because you requested a password reset for your "
@@ -779,24 +593,19 @@ msgstr ""
 "നിങ്ങളുൾ പാസ് വേർഡ്‌ മാറ്റാനുള്ള നിർദേശങ്ങൾ %(site_name)s ഇൽ ആവശ്യപ്പെട്ടതുകൊണ്ടാണ് ഈ "
 "ഇമെയിൽ സന്ദേശം ലഭിച്ചദ്."
 
-#: contrib/admin/templates/registration/password_reset_email.html:4
 msgid "Please go to the following page and choose a new password:"
 msgstr "ദയവായി താഴെ പറയുന്ന പേജ് സന്ദര്‍ശിച്ച് പുതിയ പാസ് വേര്‍ഡ് തെരഞ്ഞെടുക്കുക:"
 
-#: contrib/admin/templates/registration/password_reset_email.html:8
 msgid "Your username, in case you've forgotten:"
 msgstr "നിങ്ങള്‍ മറന്നെങ്കില്‍, നിങ്ങളുടെ യൂസര്‍ നാമം, :"
 
-#: contrib/admin/templates/registration/password_reset_email.html:10
 msgid "Thanks for using our site!"
 msgstr "ഞങ്ങളുടെ സൈറ്റ് ഉപയോഗിച്ചതിന് നന്ദി!"
 
-#: contrib/admin/templates/registration/password_reset_email.html:12
 #, python-format
 msgid "The %(site_name)s team"
 msgstr "%(site_name)s പക്ഷം"
 
-#: contrib/admin/templates/registration/password_reset_form.html:15
 msgid ""
 "Forgotten your password? Enter your email address below, and we'll email "
 "instructions for setting a new one."
@@ -804,52 +613,37 @@ msgstr ""
 "പാസ് വേര്‍ഡ് മറന്നു പോയോ? നിങ്ങളുടെ ഇമെയിൽ വിലാസം താഴെ എഴുതുക. പാസ് വേർഡ്‌ മാറ്റാനുള്ള "
 "നിർദേശങ്ങൾ ഇമെയിലിൽ അയച്ചു തരുന്നതായിരിക്കും."
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Email address:"
 msgstr "ഇമെയിൽ വിലാസം:"
 
-#: contrib/admin/templates/registration/password_reset_form.html:19
 msgid "Reset my password"
 msgstr "എന്റെ പാസ് വേര്‍ഡ് പുനസ്ഥാപിക്കൂ"
 
-#: contrib/admin/templatetags/admin_list.py:379
 msgid "All dates"
 msgstr "എല്ലാ തീയതികളും"
 
-#: contrib/admin/views/main.py:34
 msgid "(None)"
 msgstr "(ഒന്നുമില്ല)"
 
-#: contrib/admin/views/main.py:107
 #, python-format
 msgid "Select %s"
 msgstr "%s തെരഞ്ഞെടുക്കൂ"
 
-#: contrib/admin/views/main.py:109
 #, python-format
 msgid "Select %s to change"
 msgstr "മാറ്റാനുള്ള %s തെരഞ്ഞെടുക്കൂ"
 
-#: contrib/admin/widgets.py:91
 msgid "Date:"
 msgstr "തീയതി:"
 
-#: contrib/admin/widgets.py:92
 msgid "Time:"
 msgstr "സമയം:"
 
-#: contrib/admin/widgets.py:176
 msgid "Lookup"
 msgstr "തിരയുക"
 
-#: contrib/admin/widgets.py:280
-msgid "Add Another"
-msgstr "ഒന്നു കൂടി ചേര്‍ക്കുക"
-
-#: contrib/admin/widgets.py:333
 msgid "Currently:"
 msgstr "പ്രചാരത്തിൽ:"
 
-#: contrib/admin/widgets.py:334
 msgid "Change:"
 msgstr "മാറ്റം"

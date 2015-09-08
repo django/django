@@ -196,7 +196,7 @@ The ``ContentTypeManager``
         it's preferred to use this method over the usual
         ``ContentType.objects.get(pk=id)``
 
-    .. method:: get_for_model(model[, for_concrete_model=True])
+    .. method:: get_for_model(model, for_concrete_model=True)
 
         Takes either a model class or an instance of a model, and returns the
         :class:`~django.contrib.contenttypes.models.ContentType` instance
@@ -204,7 +204,7 @@ The ``ContentTypeManager``
         the :class:`~django.contrib.contenttypes.models.ContentType` of a proxy
         model.
 
-    .. method:: get_for_models(*models[, for_concrete_models=True])
+    .. method:: get_for_models(*models, for_concrete_models=True)
 
         Takes a variadic number of model classes, and returns a dictionary
         mapping the model classes to the
@@ -256,7 +256,7 @@ A simple example is a tagging system, which might look like this::
 
     class TaggedItem(models.Model):
         tag = models.SlugField()
-        content_type = models.ForeignKey(ContentType)
+        content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
         object_id = models.PositiveIntegerField()
         content_object = GenericForeignKey('content_type', 'object_id')
 

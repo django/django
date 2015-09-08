@@ -58,9 +58,9 @@ class SessionBase(object):
     def get(self, key, default=None):
         return self._session.get(key, default)
 
-    def pop(self, key, *args):
+    def pop(self, key, default=None):
         self.modified = self.modified or key in self._session
-        return self._session.pop(key, *args)
+        return self._session.pop(key, default)
 
     def setdefault(self, key, value):
         if key in self._session:
@@ -161,10 +161,27 @@ class SessionBase(object):
             self._session_key = self._get_new_session_key()
         return self._session_key
 
+    def _validate_session_key(self, key):
+        """
+        Key must be truthy and at least 8 characters long. 8 characters is an
+        arbitrary lower bound for some minimal key security.
+        """
+        return key and len(key) >= 8
+
     def _get_session_key(self):
-        return self._session_key
+        return self.__session_key
+
+    def _set_session_key(self, value):
+        """
+        Validate session key on assignment. Invalid values will set to None.
+        """
+        if self._validate_session_key(value):
+            self.__session_key = value
+        else:
+            self.__session_key = None
 
     session_key = property(_get_session_key)
+    _session_key = property(_get_session_key, _set_session_key)
 
     def _get_session(self, no_load=False):
         """

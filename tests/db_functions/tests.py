@@ -1,18 +1,27 @@
 from __future__ import unicode_literals
 
+from datetime import datetime, timedelta
+from unittest import skipIf, skipUnless
+
+from django.db import connection
 from django.db.models import CharField, TextField, Value as V
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
-    Coalesce, Concat, Length, Lower, Substr, Upper,
+    Coalesce, Concat, Greatest, Least, Length, Lower, Now, Substr, Upper,
 )
-from django.test import TestCase
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six, timezone
 
-from .models import Article, Author
+from .models import Article, Author, Fan
 
 
 lorem_ipsum = """
     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
     tempor incididunt ut labore et dolore magna aliqua."""
+
+
+def truncate_microseconds(value):
+    return value if connection.features.supports_microsecond_precision else value.replace(microsecond=0)
 
 
 class FunctionTests(TestCase):
@@ -98,6 +107,196 @@ class FunctionTests(TestCase):
             ],
             lambda a: a.name
         )
+
+    def test_greatest(self):
+        now = timezone.now()
+        before = now - timedelta(hours=1)
+
+        Article.objects.create(
+            title="Testing with Django",
+            written=before,
+            published=now,
+        )
+
+        articles = Article.objects.annotate(
+            last_updated=Greatest('written', 'published'),
+        )
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
+
+    @skipUnlessDBFeature('greatest_least_ignores_nulls')
+    def test_greatest_ignores_null(self):
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            last_updated=Greatest('written', 'published'),
+        )
+        self.assertEqual(articles.first().last_updated, now)
+
+    @skipIfDBFeature('greatest_least_ignores_nulls')
+    def test_greatest_propogates_null(self):
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            last_updated=Greatest('written', 'published'),
+        )
+        self.assertIsNone(articles.first().last_updated)
+
+    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
+    def test_greatest_coalesce_workaround(self):
+        past = datetime(1900, 1, 1)
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            last_updated=Greatest(
+                Coalesce('written', past),
+                Coalesce('published', past),
+            ),
+        )
+        self.assertEqual(articles.first().last_updated, now)
+
+    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
+    def test_greatest_coalesce_workaround_mysql(self):
+        past = datetime(1900, 1, 1)
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        past_sql = RawSQL("cast(%s as datetime)", (past,))
+        articles = Article.objects.annotate(
+            last_updated=Greatest(
+                Coalesce('written', past_sql),
+                Coalesce('published', past_sql),
+            ),
+        )
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
+
+    def test_greatest_all_null(self):
+        Article.objects.create(title="Testing with Django", written=timezone.now())
+
+        articles = Article.objects.annotate(last_updated=Greatest('published', 'updated'))
+        self.assertIsNone(articles.first().last_updated)
+
+    def test_greatest_one_expressions(self):
+        with self.assertRaisesMessage(ValueError, 'Greatest must take at least two expressions'):
+            Greatest('written')
+
+    def test_greatest_related_field(self):
+        author = Author.objects.create(name='John Smith', age=45)
+        Fan.objects.create(name='Margaret', age=50, author=author)
+
+        authors = Author.objects.annotate(
+            highest_age=Greatest('age', 'fans__age'),
+        )
+        self.assertEqual(authors.first().highest_age, 50)
+
+    def test_greatest_update(self):
+        author = Author.objects.create(name='James Smith', goes_by='Jim')
+
+        Author.objects.update(alias=Greatest('name', 'goes_by'))
+
+        author.refresh_from_db()
+        self.assertEqual(author.alias, 'Jim')
+
+    def test_least(self):
+        now = timezone.now()
+        before = now - timedelta(hours=1)
+
+        Article.objects.create(
+            title="Testing with Django",
+            written=before,
+            published=now,
+        )
+
+        articles = Article.objects.annotate(
+            first_updated=Least('written', 'published'),
+        )
+        self.assertEqual(articles.first().first_updated, truncate_microseconds(before))
+
+    @skipUnlessDBFeature('greatest_least_ignores_nulls')
+    def test_least_ignores_null(self):
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            first_updated=Least('written', 'published'),
+        )
+        self.assertEqual(articles.first().first_updated, now)
+
+    @skipIfDBFeature('greatest_least_ignores_nulls')
+    def test_least_propogates_null(self):
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            first_updated=Least('written', 'published'),
+        )
+        self.assertIsNone(articles.first().first_updated)
+
+    @skipIf(connection.vendor == 'mysql', "This doesn't work on MySQL")
+    def test_least_coalesce_workaround(self):
+        future = datetime(2100, 1, 1)
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        articles = Article.objects.annotate(
+            last_updated=Least(
+                Coalesce('written', future),
+                Coalesce('published', future),
+            ),
+        )
+        self.assertEqual(articles.first().last_updated, now)
+
+    @skipUnless(connection.vendor == 'mysql', "MySQL-specific workaround")
+    def test_least_coalesce_workaround_mysql(self):
+        future = datetime(2100, 1, 1)
+        now = timezone.now()
+
+        Article.objects.create(title="Testing with Django", written=now)
+
+        future_sql = RawSQL("cast(%s as datetime)", (future,))
+        articles = Article.objects.annotate(
+            last_updated=Least(
+                Coalesce('written', future_sql),
+                Coalesce('published', future_sql),
+            ),
+        )
+        self.assertEqual(articles.first().last_updated, truncate_microseconds(now))
+
+    def test_least_all_null(self):
+        Article.objects.create(title="Testing with Django", written=timezone.now())
+
+        articles = Article.objects.annotate(first_updated=Least('published', 'updated'))
+        self.assertIsNone(articles.first().first_updated)
+
+    def test_least_one_expressions(self):
+        with self.assertRaisesMessage(ValueError, 'Least must take at least two expressions'):
+            Least('written')
+
+    def test_least_related_field(self):
+        author = Author.objects.create(name='John Smith', age=45)
+        Fan.objects.create(name='Margaret', age=50, author=author)
+
+        authors = Author.objects.annotate(
+            lowest_age=Least('age', 'fans__age'),
+        )
+        self.assertEqual(authors.first().lowest_age, 45)
+
+    def test_least_update(self):
+        author = Author.objects.create(name='James Smith', goes_by='Jim')
+
+        Author.objects.update(alias=Least('name', 'goes_by'))
+
+        author.refresh_from_db()
+        self.assertEqual(author.alias, 'James Smith')
 
     def test_concat(self):
         Author.objects.create(name='Jayden')
@@ -281,7 +480,7 @@ class FunctionTests(TestCase):
     def test_substr_with_expressions(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')
-        authors = Author.objects.annotate(name_part=Substr('name', V(5), V(3)))
+        authors = Author.objects.annotate(name_part=Substr('name', 5, 3))
         self.assertQuerysetEqual(
             authors.order_by('name'), [
                 ' Sm',
@@ -310,4 +509,41 @@ class FunctionTests(TestCase):
                 'Rhonda Simpson',
             ],
             lambda a: a.name
+        )
+
+    def test_now(self):
+        ar1 = Article.objects.create(
+            title='How to Django',
+            text=lorem_ipsum,
+            written=timezone.now(),
+        )
+        ar2 = Article.objects.create(
+            title='How to Time Travel',
+            text=lorem_ipsum,
+            written=timezone.now(),
+        )
+
+        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
+        self.assertEqual(num_updated, 1)
+
+        num_updated = Article.objects.filter(id=ar1.id, published=None).update(published=Now())
+        self.assertEqual(num_updated, 0)
+
+        ar1.refresh_from_db()
+        self.assertIsInstance(ar1.published, datetime)
+
+        ar2.published = Now() + timedelta(days=2)
+        ar2.save()
+        ar2.refresh_from_db()
+        self.assertIsInstance(ar2.published, datetime)
+
+        self.assertQuerysetEqual(
+            Article.objects.filter(published__lte=Now()),
+            ['How to Django'],
+            lambda a: a.title
+        )
+        self.assertQuerysetEqual(
+            Article.objects.filter(published__gt=Now()),
+            ['How to Time Travel'],
+            lambda a: a.title
         )

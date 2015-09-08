@@ -19,9 +19,7 @@ def add_domain(domain, url, secure=False):
     if url.startswith('//'):
         # Support network-path reference (see #16753) - RSS requires a protocol
         url = '%s:%s' % (protocol, url)
-    elif not (url.startswith('http://')
-            or url.startswith('https://')
-            or url.startswith('mailto:')):
+    elif not url.startswith(('http://', 'https://', 'mailto:')):
         url = iri_to_uri('%s://%s%s' % (protocol, domain, url))
     return url
 
@@ -41,7 +39,7 @@ class Feed(object):
         except ObjectDoesNotExist:
             raise Http404('Feed object does not exist.')
         feedgen = self.get_feed(obj, request)
-        response = HttpResponse(content_type=feedgen.mime_type)
+        response = HttpResponse(content_type=feedgen.content_type)
         if hasattr(self, 'item_pubdate') or hasattr(self, 'item_updateddate'):
             # if item_pubdate or item_updateddate is defined for the feed, set
             # header so as ConditionalGetMiddleware is able to send 304 NOT MODIFIED

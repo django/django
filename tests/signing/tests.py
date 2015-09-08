@@ -1,15 +1,16 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
 from django.core import signing
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.test.utils import freeze_time
 from django.utils import six
 from django.utils.encoding import force_str
 
 
-class TestSigner(TestCase):
+class TestSigner(SimpleTestCase):
 
     def test_signature(self):
         "signature() method should generate a signature"
@@ -112,8 +113,25 @@ class TestSigner(TestCase):
         s = signing.Signer(binary_key)
         self.assertEqual('foo:6NB0fssLW5RQvZ3Y-MTerq2rX7w', s.sign('foo'))
 
+    def test_valid_sep(self):
+        separators = ['/', '*sep*', ',']
+        for sep in separators:
+            signer = signing.Signer('predictable-secret', sep=sep)
+            self.assertEqual('foo%ssH9B01cZcJ9FoT_jEVkRkNULrl8' % sep, signer.sign('foo'))
 
-class TestTimestampSigner(TestCase):
+    def test_invalid_sep(self):
+        """should warn on invalid separator"""
+        separators = ['', '-', 'abc']
+        for sep in separators:
+            with warnings.catch_warnings(record=True) as recorded:
+                warnings.simplefilter('always')
+                signing.Signer(sep=sep)
+                self.assertEqual(len(recorded), 1)
+                msg = str(recorded[0].message)
+                self.assertTrue(msg.startswith('Unsafe Signer separator'))
+
+
+class TestTimestampSigner(SimpleTestCase):
 
     def test_timestamp_signer(self):
         value = 'hello'

@@ -1,23 +1,14 @@
 import warnings
 
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from . import engines
 from .backends.django import DjangoTemplates
-from .base import Origin, TemplateDoesNotExist
 from .engine import (
     _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
 )
+from .exceptions import TemplateDoesNotExist
 from .loaders import base
-
-
-class LoaderOrigin(Origin):
-    def __init__(self, display_name, loader, name, dirs):
-        super(LoaderOrigin, self).__init__(display_name)
-        self.loader, self.loadname, self.dirs = loader, name, dirs
-
-    def reload(self):
-        return self.loader(self.loadname, self.dirs)[0]
 
 
 def get_template(template_name, dirs=_dirs_undefined, using=None):
@@ -26,11 +17,12 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
+    chain = []
     engines = _engine_list(using)
     for engine in engines:
         try:
             # This is required for deprecating the dirs argument. Simply
-            # return engine.get_template(template_name) in Django 2.0.
+            # return engine.get_template(template_name) in Django 1.10.
             if isinstance(engine, DjangoTemplates):
                 return engine.get_template(template_name, dirs)
             elif dirs is not _dirs_undefined:
@@ -40,10 +32,10 @@ def get_template(template_name, dirs=_dirs_undefined, using=None):
                     stacklevel=2)
             else:
                 return engine.get_template(template_name)
-        except TemplateDoesNotExist:
-            pass
+        except TemplateDoesNotExist as e:
+            chain.append(e)
 
-    raise TemplateDoesNotExist(template_name)
+    raise TemplateDoesNotExist(template_name, chain=chain)
 
 
 def select_template(template_name_list, dirs=_dirs_undefined, using=None):
@@ -54,12 +46,13 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
 
     Raises TemplateDoesNotExist if no such template exists.
     """
+    chain = []
     engines = _engine_list(using)
     for template_name in template_name_list:
         for engine in engines:
             try:
                 # This is required for deprecating the dirs argument. Simply
-                # use engine.get_template(template_name) in Django 2.0.
+                # use engine.get_template(template_name) in Django 1.10.
                 if isinstance(engine, DjangoTemplates):
                     return engine.get_template(template_name, dirs)
                 elif dirs is not _dirs_undefined:
@@ -69,11 +62,11 @@ def select_template(template_name_list, dirs=_dirs_undefined, using=None):
                         stacklevel=2)
                 else:
                     return engine.get_template(template_name)
-            except TemplateDoesNotExist:
-                pass
+            except TemplateDoesNotExist as e:
+                chain.append(e)
 
     if template_name_list:
-        raise TemplateDoesNotExist(', '.join(template_name_list))
+        raise TemplateDoesNotExist(', '.join(template_name_list), chain=chain)
     else:
         raise TemplateDoesNotExist("No template names provided")
 
@@ -99,18 +92,18 @@ def render_to_string(template_name, context=None,
         return template.render(context, request)
 
     else:
+        chain = []
         # Some deprecated arguments were passed - use the legacy code path
         for engine in _engine_list(using):
             try:
                 # This is required for deprecating properly arguments specific
                 # to Django templates. Remove Engine.render_to_string() at the
-                # same time as this code path in Django 2.0.
+                # same time as this code path in Django 1.10.
                 if isinstance(engine, DjangoTemplates):
                     if request is not None:
                         raise ValueError(
                             "render_to_string doesn't support the request argument "
                             "when some deprecated arguments are passed.")
-                        continue
                     # Hack -- use the internal Engine instance of DjangoTemplates.
                     return engine.engine.render_to_string(
                         template_name, context, context_instance, dirs, dictionary)
@@ -129,13 +122,14 @@ def render_to_string(template_name, context=None,
                         "Skipping template backend %s because its render_to_string "
                         "method doesn't support the dictionary argument." %
                         engine.name, stacklevel=2)
-            except TemplateDoesNotExist:
+            except TemplateDoesNotExist as e:
+                chain.append(e)
                 continue
 
         if template_name:
             if isinstance(template_name, (list, tuple)):
                 template_name = ', '.join(template_name)
-            raise TemplateDoesNotExist(template_name)
+            raise TemplateDoesNotExist(template_name, chain=chain)
         else:
             raise TemplateDoesNotExist("No template names provided")
 
@@ -151,5 +145,5 @@ class BaseLoader(base.Loader):
         warnings.warn(
             "django.template.loader.BaseLoader was superseded by "
             "django.template.loaders.base.Loader.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         super(BaseLoader, self).__init__(*args, **kwargs)

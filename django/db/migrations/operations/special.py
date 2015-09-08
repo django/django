@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+from django.db import router
+
 from .base import Operation
 
 
@@ -10,6 +12,8 @@ class SeparateDatabaseAndState(Operation):
     that don't support state change to have it applied, or have operations
     that affect the state or not the database, or so on.
     """
+
+    serialization_expand_args = ['database_operations', 'state_operations']
 
     def __init__(self, database_operations=None, state_operations=None):
         self.database_operations = database_operations or []
@@ -94,13 +98,13 @@ class RunSQL(Operation):
             state_operation.state_forwards(app_label, state)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+        if router.allow_migrate(schema_editor.connection.alias, app_label, **self.hints):
             self._run_sql(schema_editor, self.sql)
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_sql is None:
             raise NotImplementedError("You cannot reverse this operation")
-        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+        if router.allow_migrate(schema_editor.connection.alias, app_label, **self.hints):
             self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
@@ -171,7 +175,7 @@ class RunPython(Operation):
         pass
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
-        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+        if router.allow_migrate(schema_editor.connection.alias, app_label, **self.hints):
             # We now execute the Python code in a context that contains a 'models'
             # object, representing the versioned models as an app registry.
             # We could try to override the global cache, but then people will still
@@ -181,7 +185,7 @@ class RunPython(Operation):
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if self.reverse_code is None:
             raise NotImplementedError("You cannot reverse this operation")
-        if self.allowed_to_migrate(schema_editor.connection.alias, None, hints=self.hints):
+        if router.allow_migrate(schema_editor.connection.alias, app_label, **self.hints):
             self.reverse_code(from_state.apps, schema_editor)
 
     def describe(self):

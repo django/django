@@ -17,6 +17,7 @@ from django.db import utils
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.duration import duration_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import cached_property
@@ -336,13 +337,14 @@ class OracleParam(object):
         # without being converted by DateTimeField.get_db_prep_value.
         if settings.USE_TZ and (isinstance(param, datetime.datetime) and
                                 not isinstance(param, Oracle_datetime)):
-            if timezone.is_naive(param):
-                warnings.warn("Oracle received a naive datetime (%s)"
-                              " while time zone support is active." % param,
-                              RuntimeWarning)
-                default_timezone = timezone.get_default_timezone()
-                param = timezone.make_aware(param, default_timezone)
-            param = Oracle_datetime.from_datetime(param.astimezone(timezone.utc))
+            if timezone.is_aware(param):
+                warnings.warn(
+                    "The Oracle database adapter received an aware datetime (%s), "
+                    "probably from cursor.execute(). Update your code to pass a "
+                    "naive datetime in the database connection's time zone (UTC by "
+                    "default).", RemovedInDjango20Warning)
+                param = param.astimezone(timezone.utc).replace(tzinfo=None)
+            param = Oracle_datetime.from_datetime(param)
 
         if isinstance(param, datetime.timedelta):
             param = duration_string(param)
@@ -540,8 +542,9 @@ class FormatStylePlaceholderCursor(object):
 
 
 class CursorIterator(six.Iterator):
-
-    """Cursor iterator wrapper that invokes our custom row factory."""
+    """
+    Cursor iterator wrapper that invokes our custom row factory.
+    """
 
     def __init__(self, cursor):
         self.cursor = cursor
@@ -588,12 +591,6 @@ def _rowfactory(row, cursor):
                 value = decimal.Decimal(value)
             else:
                 value = int(value)
-        # datetimes are returned as TIMESTAMP, except the results
-        # of "dates" queries, which are returned as DATETIME.
-        elif desc[1] in (Database.TIMESTAMP, Database.DATETIME):
-            # Confirm that dt is naive before overwriting its tzinfo.
-            if settings.USE_TZ and value is not None and timezone.is_naive(value):
-                value = value.replace(tzinfo=timezone.utc)
         elif desc[1] in (Database.STRING, Database.FIXED_CHAR,
                          Database.LONG_STRING):
             value = to_unicode(value)

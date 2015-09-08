@@ -15,8 +15,8 @@ from django.conf import settings
 from django.db import utils
 from django.db.backends import utils as backend_utils
 from django.db.backends.base.base import BaseDatabaseWrapper
-from django.db.backends.mysql.schema import DatabaseSchemaEditor
 from django.utils import six, timezone
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeBytes, SafeText
@@ -36,6 +36,7 @@ from .creation import DatabaseCreation                      # isort:skip
 from .features import DatabaseFeatures                      # isort:skip
 from .introspection import DatabaseIntrospection            # isort:skip
 from .operations import DatabaseOperations                  # isort:skip
+from .schema import DatabaseSchemaEditor                    # isort:skip
 from .validation import DatabaseValidation                  # isort:skip
 
 # We want version (1, 2, 1, 'final', 2) or later. We can't just use
@@ -51,27 +52,17 @@ if (version < (1, 2, 1) or (version[:3] == (1, 2, 1) and
 DatabaseError = Database.DatabaseError
 IntegrityError = Database.IntegrityError
 
-# It's impossible to import datetime_or_None directly from MySQLdb.times
-parse_datetime = conversions[FIELD_TYPE.DATETIME]
 
-
-def parse_datetime_with_timezone_support(value):
-    dt = parse_datetime(value)
-    # Confirm that dt is naive before overwriting its tzinfo.
-    if dt is not None and settings.USE_TZ and timezone.is_naive(dt):
-        dt = dt.replace(tzinfo=timezone.utc)
-    return dt
-
-
-def adapt_datetime_with_timezone_support(value, conv):
-    # Equivalent to DateTimeField.get_db_prep_value. Used only by raw SQL.
-    if settings.USE_TZ:
-        if timezone.is_naive(value):
-            warnings.warn("MySQL received a naive datetime (%s)"
-                          " while time zone support is active." % value,
-                          RuntimeWarning)
-            default_timezone = timezone.get_default_timezone()
-            value = timezone.make_aware(value, default_timezone)
+def adapt_datetime_warn_on_aware_datetime(value, conv):
+    # Remove this function and rely on the default adapter in Django 2.0.
+    if settings.USE_TZ and timezone.is_aware(value):
+        warnings.warn(
+            "The MySQL database adapter received an aware datetime (%s), "
+            "probably from cursor.execute(). Update your code to pass a "
+            "naive datetime in the database connection's time zone (UTC by "
+            "default).", RemovedInDjango20Warning)
+        # This doesn't account for the database connection's timezone,
+        # which isn't known. (That's why this adapter is deprecated.)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
     return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S.%f"), conv)
 
@@ -80,15 +71,12 @@ def adapt_datetime_with_timezone_support(value, conv):
 # and Django expects time, so we still need to override that. We also need to
 # add special handling for SafeText and SafeBytes as MySQLdb's type
 # checking is too tight to catch those (see Django ticket #6052).
-# Finally, MySQLdb always returns naive datetime objects. However, when
-# timezone support is active, Django expects timezone-aware datetime objects.
 django_conversions = conversions.copy()
 django_conversions.update({
     FIELD_TYPE.TIME: backend_utils.typecast_time,
     FIELD_TYPE.DECIMAL: backend_utils.typecast_decimal,
     FIELD_TYPE.NEWDECIMAL: backend_utils.typecast_decimal,
-    FIELD_TYPE.DATETIME: parse_datetime_with_timezone_support,
-    datetime.datetime: adapt_datetime_with_timezone_support,
+    datetime.datetime: adapt_datetime_warn_on_aware_datetime,
 })
 
 # This should match the numerical portion of the version numbers (we can treat

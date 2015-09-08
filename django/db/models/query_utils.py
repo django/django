@@ -13,7 +13,7 @@ from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db.backends import utils
 from django.db.models.constants import LOOKUP_SEP
-from django.utils import six, tree
+from django.utils import tree
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -53,7 +53,7 @@ class Q(tree.Node):
     default = AND
 
     def __init__(self, *args, **kwargs):
-        super(Q, self).__init__(children=list(args) + list(six.iteritems(kwargs)))
+        super(Q, self).__init__(children=list(args) + list(kwargs.items()))
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -87,7 +87,10 @@ class Q(tree.Node):
         return clone
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
-        clause, _ = query._add_q(self, reuse, allow_joins=allow_joins)
+        # We must promote any new joins to left outer joins so that when Q is
+        # used as an expression, rows aren't filtered due to joins.
+        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
+        query.promote_joins(joins)
         return clause
 
     @classmethod
@@ -181,9 +184,9 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
      * load_fields - the set of fields to be loaded on this model
      * reverse - boolean, True if we are checking a reverse select related
     """
-    if not field.rel:
+    if not field.remote_field:
         return False
-    if field.rel.parent_link and not reverse:
+    if field.remote_field.parent_link and not reverse:
         return False
     if restricted:
         if reverse and field.related_query_name() not in requested:
@@ -224,7 +227,7 @@ def deferred_class_factory(model, attrs):
     # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
     # object if the attrs are identical.
-    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(list(attrs))))
+    name = "%s_Deferred_%s" % (model.__name__, '_'.join(sorted(attrs)))
     name = utils.truncate_name(name, 80, 32)
 
     try:
@@ -250,7 +253,7 @@ deferred_class_factory.__safe_for_unpickling__ = True
 
 def refs_aggregate(lookup_parts, aggregates):
     """
-    A little helper method to check if the lookup_parts contains references
+    A helper method to check if the lookup_parts contains references
     to the given aggregates set. Because the LOOKUP_SEP is contained in the
     default annotation names we must check each prefix of the lookup_parts
     for a match.
@@ -260,3 +263,45 @@ def refs_aggregate(lookup_parts, aggregates):
         if level_n_lookup in aggregates and aggregates[level_n_lookup].contains_aggregate:
             return aggregates[level_n_lookup], lookup_parts[n:]
     return False, ()
+
+
+def refs_expression(lookup_parts, annotations):
+    """
+    A helper method to check if the lookup_parts contains references
+    to the given annotations set. Because the LOOKUP_SEP is contained in the
+    default annotation names we must check each prefix of the lookup_parts
+    for a match.
+    """
+    for n in range(len(lookup_parts) + 1):
+        level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
+        if level_n_lookup in annotations and annotations[level_n_lookup]:
+            return annotations[level_n_lookup], lookup_parts[n:]
+    return False, ()
+
+
+def check_rel_lookup_compatibility(model, target_opts, field):
+    """
+    Check that self.model is compatible with target_opts. Compatibility
+    is OK if:
+      1) model and opts match (where proxy inheritance is removed)
+      2) model is parent of opts' model or the other way around
+    """
+    def check(opts):
+        return (
+            model._meta.concrete_model == opts.concrete_model or
+            opts.concrete_model in model._meta.get_parent_list() or
+            model in opts.get_parent_list()
+        )
+    # If the field is a primary key, then doing a query against the field's
+    # model is ok, too. Consider the case:
+    # class Restaurant(models.Model):
+    #     place = OnetoOneField(Place, primary_key=True):
+    # Restaurant.objects.filter(pk__in=Restaurant.objects.all()).
+    # If we didn't have the primary key check, then pk__in (== place__in) would
+    # give Place's opts as the target opts, but Restaurant isn't compatible
+    # with that. This logic applies only to primary keys, as when doing __in=qs,
+    # we are going to turn this into __in=qs.values('pk') later on.
+    return (
+        check(target_opts) or
+        (getattr(field, 'primary_key', False) and check(field.model._meta))
+    )

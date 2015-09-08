@@ -60,10 +60,15 @@ Model reference
 ===============
 
 The **models** section of the ``admindocs`` page describes each model in the
-system along with all the fields and methods (without any arguments) available
-on it. While model properties don't have any arguments, they are not listed.
-Relationships to other models appear as hyperlinks. Descriptions are pulled
-from ``help_text`` attributes on fields or from docstrings on model methods.
+system along with all the fields and methods available on it. Relationships
+to other models appear as hyperlinks. Descriptions are pulled from ``help_text``
+attributes on fields or from docstrings on model methods.
+
+.. versionchanged:: 1.9
+
+    The **models** section of the ``admindocs`` now describes methods that take
+    arguments as well. In previous versions it was restricted to methods
+    without arguments.
 
 A model with useful documentation might look like this::
 
@@ -71,11 +76,14 @@ A model with useful documentation might look like this::
         """
         Stores a single blog entry, related to :model:`blog.Blog` and
         :model:`auth.User`.
-
         """
         slug = models.SlugField(help_text="A short label, generally used in URLs.")
-        author = models.ForeignKey(User)
-        blog = models.ForeignKey(Blog)
+        author = models.ForeignKey(
+            User,
+            models.SET_NULL,
+            blank=True, null=True,
+        )
+        blog = models.ForeignKey(Blog, models.CASCADE)
         ...
 
         def publish(self):
@@ -111,7 +119,6 @@ For example::
         **Template:**
 
         :template:`myapp/my_template.html`
-
         """
         context = {'mymodel': MyModel.objects.get(slug=slug)}
         return render(request, 'myapp/my_template.html', context)
@@ -141,22 +148,13 @@ template is stored.
 Included Bookmarklets
 =====================
 
-Several useful bookmarklets are available from the ``admindocs`` page:
+One bookmarklet is available from the ``admindocs`` page:
 
 Documentation for this page
     Jumps you from any page to the documentation for the view that generates
     that page.
 
-Show object ID
-    Shows the content-type and unique ID for pages that represent a single
-    object.
-
-Edit this object
-    Jumps to the admin page for pages that represent a single object.
-
-Using these bookmarklets requires that you are either logged into the
-:mod:`Django admin <django.contrib.admin>` as a
+Using this bookmarklet requires that ``XViewMiddleware`` is installed and that
+you are logged into the :mod:`Django admin <django.contrib.admin>` as a
 :class:`~django.contrib.auth.models.User` with
-:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``, or that the
-``XViewMiddleware`` is installed and you are accessing the site from an IP
-address listed in :setting:`INTERNAL_IPS`.
+:attr:`~django.contrib.auth.models.User.is_staff` set to ``True``.

@@ -1,37 +1,16 @@
-include README.rst
 include AUTHORS
+include Gruntfile.js
 include INSTALL
 include LICENSE
 include MANIFEST.in
-include django/contrib/gis/gdal/LICENSE
-include django/contrib/gis/geos/LICENSE
-include django/dispatch/license.txt
-include django/dispatch/license.python.txt
+include package.json
+include *.rst
+recursive-include django *
+prune django/contrib/admin/bin
 recursive-include docs *
-recursive-include scripts *
 recursive-include extras *
+recursive-include js_tests *
+recursive-include scripts *
 recursive-include tests *
-recursive-include django/conf/app_template *
-recursive-include django/conf/locale *
-recursive-include django/conf/project_template *
-recursive-include django/contrib/*/locale *
-recursive-include django/contrib/admin/templates *
-recursive-include django/contrib/admin/static *
-recursive-include django/contrib/admindocs/templates *
-recursive-include django/contrib/auth/fixtures *
-recursive-include django/contrib/auth/templates *
-recursive-include django/contrib/auth/tests/templates *
-recursive-include django/contrib/flatpages/fixtures *
-recursive-include django/contrib/flatpages/tests/templates *
-recursive-include django/contrib/gis/gdal/tests/data *
-recursive-include django/contrib/gis/static *
-recursive-include django/contrib/gis/templates *
-recursive-include django/contrib/gis/tests/data *
-recursive-include django/contrib/gis/tests/distapp/fixtures *
-recursive-include django/contrib/gis/tests/geoapp/fixtures *
-recursive-include django/contrib/gis/tests/geogapp/fixtures *
-recursive-include django/contrib/gis/tests/relatedapp/fixtures *
-recursive-include django/contrib/sitemaps/templates *
-recursive-include django/contrib/sitemaps/tests/templates *
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]

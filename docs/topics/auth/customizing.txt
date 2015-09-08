@@ -281,11 +281,12 @@ can or cannot do with Task instances, specific to your application::
             )
 
 The only thing this does is create those extra permissions when you run
-:djadmin:`manage.py migrate <migrate>`. Your code is in charge of checking the
-value of these permissions when a user is trying to access the functionality
-provided by the application (viewing tasks, changing the status of tasks,
-closing tasks.) Continuing the above example, the following checks if a user may
-view tasks::
+:djadmin:`manage.py migrate <migrate>` (the function that creates permissions
+is connected to the :data:`~django.db.models.signals.post_migrate` signal).
+Your code is in charge of checking the value of these permissions when a user
+is trying to access the functionality provided by the application (viewing
+tasks, changing the status of tasks, closing tasks.) Continuing the above
+example, the following checks if a user may view tasks::
 
     user.has_perm('app.view_task')
 
@@ -311,7 +312,7 @@ you might create an Employee model::
     from django.contrib.auth.models import User
 
     class Employee(models.Model):
-        user = models.OneToOneField(User)
+        user = models.OneToOneField(User, on_delete=models.CASCADE)
         department = models.CharField(max_length=100)
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
@@ -407,6 +408,14 @@ use as your User model.
    have a ForeignKey to each other and seeing how ``makemigrations`` resolves that
    circular dependency if you want to see how it's usually done)
 
+.. admonition:: Reusable apps and ``AUTH_USER_MODEL``
+
+   Reusable apps shouldn't implement a custom user model. A project may use
+   many apps, and two reusable apps that implemented a custom user model
+   couldn't be used together. If you need to store per user information in your
+   app, use a :class:`~django.db.models.ForeignKey` or
+   :class:`~django.db.models.OneToOneField` to ``settings.AUTH_USER_MODEL``
+   as described below.
 
 Referencing the User model
 --------------------------
@@ -434,7 +443,10 @@ different User model.
         from django.db import models
 
         class Article(models.Model):
-            author = models.ForeignKey(settings.AUTH_USER_MODEL)
+            author = models.ForeignKey(
+                settings.AUTH_USER_MODEL,
+                on_delete=models.CASCADE,
+            )
 
     When connecting to signals sent by the ``User`` model, you should specify
     the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
@@ -442,7 +454,7 @@ different User model.
         from django.conf import settings
         from django.db.models.signals import post_save
 
-        def post_save_receiver(signal, sender, instance, **kwargs):
+        def post_save_receiver(sender, instance, created, **kwargs):
             pass
 
         post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
@@ -469,18 +481,23 @@ Specifying a custom User model
 
 Django expects your custom User model to meet some minimum requirements.
 
-1. Your model must have an integer primary key.
+#. If you use the default authentication backend, then your model must have a
+   single unique field that can be used for identification purposes. This can
+   be a username, an email address, or any other unique attribute. A non-unique
+   username field is allowed if you use a custom authentication backend that
+   can support it.
 
-2. Your model must have a single unique field that can be used for
-   identification purposes. This can be a username, an email address,
-   or any other unique attribute.
-
-3. Your model must provide a way to address the user in a "short" and
+#. Your model must provide a way to address the user in a "short" and
    "long" form. The most common interpretation of this would be to use
    the user's given name as the "short" identifier, and the user's full
    name as the "long" identifier. However, there are no constraints on
    what these two methods return - if you want, they can return exactly
    the same value.
+
+.. versionchanged:: 1.8
+
+    Older versions of Django required your model to have an integer primary
+    key as well.
 
 The easiest way to construct a compliant custom User model is to inherit from
 :class:`~django.contrib.auth.models.AbstractBaseUser`.
@@ -495,10 +512,11 @@ password resets. You must then provide some key implementation details:
     .. attribute:: USERNAME_FIELD
 
         A string describing the name of the field on the User model that is
-        used as the unique identifier. This will usually be a username of
-        some kind, but it can also be an email address, or any other unique
-        identifier. The field *must* be unique (i.e., have ``unique=True``
-        set in its definition).
+        used as the unique identifier. This will usually be a username of some
+        kind, but it can also be an email address, or any other unique
+        identifier. The field *must* be unique (i.e., have ``unique=True`` set
+        in its definition), unless you use a custom authentication backend that
+        can support non-unique usernames.
 
         In the following example, the field ``identifier`` is used
         as the identifying field::
@@ -574,6 +592,16 @@ password resets. You must then provide some key implementation details:
         would be the first name of the user, but it can be any string that
         identifies the user in an informal way. It may also return the same
         value as :meth:`django.contrib.auth.models.User.get_full_name()`.
+
+    .. admonition:: Importing ``AbstractBaseUser``
+
+        .. versionadded:: 1.9
+
+        ``AbstractBaseUser`` and ``BaseUserManager`` are importable from
+        ``django.contrib.auth.base_user`` so that they can be imported without
+        including ``django.contrib.auth`` in :setting:`INSTALLED_APPS` (this
+        raised a deprecation warning in older versions and is no longer
+        supported in Django 1.9).
 
 The following methods are available on any subclass of
 :class:`~django.contrib.auth.models.AbstractBaseUser`:
@@ -880,15 +908,6 @@ If your project uses proxy models, you must either modify the proxy to extend
 the User model that is currently in use in your project, or merge your proxy's
 behavior into your User subclass.
 
-Custom users and signals
-------------------------
-
-Another limitation of custom User models is that you can't use
-:func:`django.contrib.auth.get_user_model()` as the sender or target of a signal
-handler. Instead, you must register the handler with the resulting User model.
-See :doc:`/topics/signals` for more information on registering and sending
-signals.
-
 Custom users and testing/fixtures
 ---------------------------------
 
@@ -903,6 +922,13 @@ To ensure that your test suite will pass in any project configuration,
 This decorator will cause a test case to be skipped if any User model other
 than the default Django user is in use. This decorator can be applied to a
 single test, or to an entire test class.
+
+.. deprecated:: 1.9
+
+    With the test discovery changes in Django 1.6, the tests for
+    ``django.contrib`` apps are no longer run as part of the user's project.
+    Therefore, the ``@skipIfCustomUser`` decorator is no longer needed to
+    decorate tests in ``django.contrib.auth``.
 
 Depending on your application, tests may also be needed to be added to ensure
 that the application works with *any* user model, not just the default User

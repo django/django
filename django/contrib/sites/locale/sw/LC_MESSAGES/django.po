@@ -1,14 +1,14 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# machaku <bmachaku@gmail.com>, 2013-2014
+# Emil <bmachaku@gmail.com>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-22 16:52+0000\n"
-"Last-Translator: machaku <bmachaku@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Swahili (http://www.transifex.com/projects/p/django/language/"
 "sw/)\n"
 "MIME-Version: 1.0\n"
@@ -17,26 +17,20 @@ msgstr ""
 "Language: sw\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "Tovuti"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Jina la kikoa haliwezi kuwa na nafasi yeyote kati yake."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "jina la kikoa"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "jina"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "tovuti"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "tovuti"

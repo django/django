@@ -250,6 +250,13 @@ The initial serialization is usually very quick, but if you wish to exclude
 some apps from this process (and speed up test runs slightly), you may add
 those apps to :setting:`TEST_NON_SERIALIZED_APPS`.
 
+.. versionchanged:: 1.9
+
+To prevent serialized data from being loaded twice, setting
+``serialized_rollback=True`` disables the
+:data:`~django.db.models.signals.post_migrate` signal when flushing the test
+database.
+
 Other test conditions
 ---------------------
 
@@ -311,6 +318,8 @@ Note that the return code for the test-runner script is 1 for any number of
 failed and erroneous tests. If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
+
+.. _speeding-up-tests-auth-hashers:
 
 Speeding up the tests
 ---------------------

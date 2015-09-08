@@ -13,6 +13,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import unittest
 
 import django
@@ -21,18 +22,23 @@ from django.conf import settings
 from django.core.management import (
     BaseCommand, CommandError, call_command, color,
 )
-from django.test import LiveServerTestCase, TestCase, mock, override_settings
+from django.db import ConnectionHandler
+from django.db.migrations.exceptions import MigrationSchemaMissing
+from django.db.migrations.recorder import MigrationRecorder
+from django.test import (
+    LiveServerTestCase, SimpleTestCase, mock, override_settings,
+)
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
-from django.utils.six import StringIO
+from django.utils.six import PY3, StringIO
 
-test_dir = os.path.realpath(os.path.join(os.environ['DJANGO_TEST_TEMP_DIR'], 'test_project'))
+test_dir = os.path.realpath(os.path.join(tempfile.gettempdir(), 'test_project'))
 if not os.path.exists(test_dir):
     os.mkdir(test_dir)
     open(os.path.join(test_dir, '__init__.py'), 'w').close()
 
-custom_templates_dir = os.path.join(os.path.dirname(__file__), 'custom_templates')
+custom_templates_dir = os.path.join(os.path.dirname(upath(__file__)), 'custom_templates')
 SYSTEM_CHECK_MSG = 'System check identified no issues'
 
 
@@ -54,8 +60,6 @@ class AdminScriptTestCase(unittest.TestCase):
                 'DATABASES',
                 'ROOT_URLCONF',
                 'SECRET_KEY',
-                'TEST_RUNNER',  # We need to include TEST_RUNNER, otherwise we get a compatibility warning.
-                'MIDDLEWARE_CLASSES',  # We need to include MIDDLEWARE_CLASSES, otherwise we get a compatibility warning.
             ]
             for s in exports:
                 if hasattr(settings, s):
@@ -113,7 +117,7 @@ class AdminScriptTestCase(unittest.TestCase):
     def run_test(self, script, args, settings_file=None, apps=None):
         base_dir = os.path.dirname(test_dir)
         # The base dir for Django's tests is one level up.
-        tests_dir = os.path.dirname(os.path.dirname(__file__))
+        tests_dir = os.path.dirname(os.path.dirname(upath(__file__)))
         # The base dir for Django is one level above the test dir. We don't use
         # `import django` to figure that out, so we don't pick up a Django
         # from site-packages or similar.
@@ -277,7 +281,8 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         "default: django-admin can execute user commands if settings are provided as argument"
@@ -345,7 +350,8 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         "fulldefault: django-admin can execute user commands if settings are provided as argument"
@@ -412,7 +418,8 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         "minimal: django-admin can't execute user commands, even if settings are provided as argument"
@@ -479,7 +486,8 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         "alternate: django-admin can execute user commands if settings are provided as argument"
@@ -549,7 +557,8 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_custom_command_with_settings(self):
         "alternate: django-admin can execute user commands if settings are provided as argument"
@@ -586,6 +595,17 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
+        with open(os.path.join(app_path, 'apps.py'), 'r') as f:
+            content = f.read()
+            self.assertIn("class SettingsTestConfig(AppConfig)", content)
+            self.assertIn("name = 'settings_test'", content)
+        if not PY3:
+            with open(os.path.join(app_path, 'models.py'), 'r') as fp:
+                content = fp.read()
+            self.assertIn(
+                "from __future__ import unicode_literals\n",
+                content,
+            )
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
@@ -623,7 +643,8 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         args = ['noargs_command']
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
-        self.assertOutput(err, "settings are not configured")
+        self.assertOutput(err, "No Django settings specified")
+        self.assertOutput(err, "Unknown command: 'noargs_command'")
 
     def test_builtin_with_settings(self):
         "directory: django-admin builtin commands succeed if settings are provided as argument"
@@ -1172,7 +1193,6 @@ class ManageCheck(AdminScriptTestCase):
         command should not raise `CommandError` exception.
 
         In this test we also test output format.
-
         """
 
         self.write_settings('settings.py',
@@ -1246,7 +1266,8 @@ class ManageRunserver(AdminScriptTestCase):
         def monkey_run(*args, **options):
             return
 
-        self.cmd = Command()
+        self.output = StringIO()
+        self.cmd = Command(stdout=self.output)
         self.cmd.run = monkey_run
 
     def assertServerSettings(self, addr, port, ipv6=None, raw_ipv6=False):
@@ -1297,6 +1318,26 @@ class ManageRunserver(AdminScriptTestCase):
         self.cmd.handle(addrport="deadbeef:7654")
         self.assertServerSettings('deadbeef', '7654')
 
+    def test_no_database(self):
+        """
+        Ensure runserver.check_migrations doesn't choke on empty DATABASES.
+        """
+        tested_connections = ConnectionHandler({})
+        with mock.patch('django.core.management.commands.runserver.connections', new=tested_connections):
+            self.cmd.check_migrations()
+
+    def test_readonly_database(self):
+        """
+        Ensure runserver.check_migrations doesn't choke when a database is read-only
+        (with possibly no django_migrations table).
+        """
+        with mock.patch.object(
+                MigrationRecorder, 'ensure_schema',
+                side_effect=MigrationSchemaMissing()):
+            self.cmd.check_migrations()
+        # Check a warning is emitted
+        self.assertIn("Not checking migrations", self.output.getvalue())
+
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
     def setUp(self):
@@ -1312,6 +1353,21 @@ class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
         out, err = self.run_manage(['runserver'])
         self.assertNoOutput(out)
         self.assertOutput(err, 'CommandError: You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+
+
+class ManageTestserver(AdminScriptTestCase):
+    from django.core.management.commands.testserver import Command as TestserverCommand
+
+    @mock.patch.object(TestserverCommand, 'handle')
+    def test_testserver_handle_params(self, mock_handle):
+        out = StringIO()
+        call_command('testserver', 'blah.json', stdout=out)
+        mock_handle.assert_called_with(
+            'blah.json',
+            stdout=out, settings=None, pythonpath=None, verbosity=1,
+            traceback=False, addrport='', no_color=False, use_ipv6=False,
+            skip_checks=True, interactive=True,
+        )
 
 
 ##########################################################################
@@ -1577,6 +1633,7 @@ class CommandTypes(AdminScriptTestCase):
         being executed (#21255).
         """
         command = BaseCommand(stderr=StringIO())
+        command.check = lambda: []
         command.handle = lambda *args, **kwargs: args
         with mock.patch('django.core.management.base.connections') as mock_connections:
             command.run_from_argv(['', ''])
@@ -1654,7 +1711,7 @@ class CommandTypes(AdminScriptTestCase):
         self.assertOutput(out, "EXECUTE:LabelCommand label=anotherlabel, options=[('no_color', False), ('pythonpath', None), ('settings', None), ('traceback', False), ('verbosity', 1)]")
 
 
-class Discovery(TestCase):
+class Discovery(SimpleTestCase):
 
     def test_precedence(self):
         """
@@ -1980,3 +2037,12 @@ class Dumpdata(AdminScriptTestCase):
         out, err = self.run_manage(args)
         self.assertOutput(err, "You can only use --pks option with one model")
         self.assertNoOutput(out)
+
+
+class MainModule(AdminScriptTestCase):
+    """python -m django works like django-admin."""
+
+    def test_runs_django_admin(self):
+        cmd_out, _ = self.run_django_admin(['--version'])
+        mod_out, _ = self.run_test('-m', ['django', '--version'])
+        self.assertEqual(mod_out, cmd_out)

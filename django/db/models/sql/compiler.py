@@ -13,7 +13,7 @@ from django.db.models.sql.datastructures import EmptyResultSet
 from django.db.models.sql.query import Query, get_order_dir
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseError
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.six.moves import zip
 
 
@@ -136,21 +136,32 @@ class SQLCompiler(object):
         # If the DB can group by primary key, then group by the primary key of
         # query's main model. Note that for PostgreSQL the GROUP BY clause must
         # include the primary key of every table, but for MySQL it is enough to
-        # have the main table's primary key. Currently only the MySQL form is
-        # implemented.
-        # MySQLism: however, columns in HAVING clause must be added to the
-        # GROUP BY.
+        # have the main table's primary key.
         if self.connection.features.allows_group_by_pk:
             # The logic here is: if the main model's primary key is in the
             # query, then set new_expressions to that field. If that happens,
             # then also add having expressions to group by.
             pk = None
             for expr in expressions:
-                if (expr.output_field.primary_key and
-                        getattr(expr.output_field, 'model') == self.query.model):
+                # Is this a reference to query's base table primary key? If the
+                # expression isn't a Col-like, then skip the expression.
+                if (getattr(expr, 'target', None) == self.query.model._meta.pk and
+                        getattr(expr, 'alias', None) == self.query.tables[0]):
                     pk = expr
+                    break
             if pk:
+                # MySQLism: Columns in HAVING clause must be added to the GROUP BY.
                 expressions = [pk] + [expr for expr in expressions if expr in having]
+        elif self.connection.features.allows_group_by_selected_pks:
+            # Filter out all expressions associated with a table's primary key
+            # present in the grouped columns. This is done by identifying all
+            # tables that have their primary key included in the grouped
+            # columns and removing non-primary key columns referring to them.
+            pks = {expr for expr in expressions if hasattr(expr, 'target') and expr.target.primary_key}
+            aliases = {expr.alias for expr in pks}
+            expressions = [
+                expr for expr in expressions if expr in pks or getattr(expr, 'alias', None) not in aliases
+            ]
         return expressions
 
     def get_select(self):
@@ -219,7 +230,7 @@ class SQLCompiler(object):
 
     def get_order_by(self):
         """
-        Returns a list of 2-tuples of form (expr, (sql, params)) for the
+        Returns a list of 2-tuples of form (expr, (sql, params, is_ref)) for the
         ORDER BY clause.
 
         The order_by clause can alter the select clause (for example it
@@ -254,9 +265,16 @@ class SQLCompiler(object):
             descending = True if order == 'DESC' else False
 
             if col in self.query.annotation_select:
+                # Reference to expression in SELECT clause
                 order_by.append((
                     OrderBy(Ref(col, self.query.annotation_select[col]), descending=descending),
                     True))
+                continue
+            if col in self.query.annotations:
+                # References to an expression which is masked out of the SELECT clause
+                order_by.append((
+                    OrderBy(self.query.annotations[col], descending=descending),
+                    False))
                 continue
 
             if '.' in field:
@@ -320,7 +338,7 @@ class SQLCompiler(object):
         warnings.warn(
             "Calling a SQLCompiler directly is deprecated. "
             "Call compiler.quote_name_unless_alias instead.",
-            RemovedInDjango20Warning, stacklevel=2)
+            RemovedInDjango110Warning, stacklevel=2)
         return self.quote_name_unless_alias(name)
 
     def quote_name_unless_alias(self, name):
@@ -332,7 +350,8 @@ class SQLCompiler(object):
         if name in self.quote_cache:
             return self.quote_cache[name]
         if ((name in self.query.alias_map and name not in self.query.table_map) or
-                name in self.query.extra_select or name in self.query.external_aliases):
+                name in self.query.extra_select or (
+                    name in self.query.external_aliases and name not in self.query.table_map)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
@@ -465,7 +484,10 @@ class SQLCompiler(object):
         if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        nested_sql = obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        if nested_sql == ('', ()):
+            raise EmptyResultSet
+        return nested_sql
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -529,7 +551,10 @@ class SQLCompiler(object):
             _, targets, alias, joins, path, _ = self._setup_joins(parts, opts, None)
             targets, alias, _ = self.query.trim_joins(targets, joins, path)
             for target in targets:
-                result.append("%s.%s" % (qn(alias), qn2(target.column)))
+                if name in self.query.annotation_select:
+                    result.append(name)
+                else:
+                    result.append("%s.%s" % (qn(alias), qn2(target.column)))
         return result
 
     def find_ordering_name(self, name, opts, alias=None, default_order='ASC',
@@ -547,11 +572,11 @@ class SQLCompiler(object):
         # If we get to this point and the field is a relation to another model,
         # append the default ordering for that model unless the attribute name
         # of the field is specified.
-        if field.rel and path and opts.ordering and name != field.attname:
+        if field.is_relation and path and opts.ordering and name != field.attname:
             # Firstly, avoid infinite loops.
             if not already_seen:
                 already_seen = set()
-            join_tuple = tuple(self.query.alias_map[j].table_name for j in joins)
+            join_tuple = tuple(getattr(self.query.alias_map[j], 'join_cols', None) for j in joins)
             if join_tuple in already_seen:
                 raise FieldError('Infinite loop caused by ordering.')
             already_seen.add(join_tuple)
@@ -676,7 +701,7 @@ class SQLCompiler(object):
                                           only_load.get(field_model)):
                 continue
             klass_info = {
-                'model': f.rel.to,
+                'model': f.remote_field.model,
                 'field': f,
                 'reverse': False,
                 'from_parent': False,
@@ -686,13 +711,13 @@ class SQLCompiler(object):
             _, _, _, joins, _ = self.query.setup_joins(
                 [f.name], opts, root_alias)
             alias = joins[-1]
-            columns = self.get_default_columns(start_alias=alias, opts=f.rel.to._meta)
+            columns = self.get_default_columns(start_alias=alias, opts=f.remote_field.model._meta)
             for col in columns:
                 select_fields.append(len(select))
                 select.append((col, None))
             klass_info['select_fields'] = select_fields
             next_klass_infos = self.get_related_selections(
-                select, f.rel.to._meta, alias, cur_depth + 1, next, restricted)
+                select, f.remote_field.model._meta, alias, cur_depth + 1, next, restricted)
             get_related_klass_infos(klass_info, next_klass_infos)
 
         if restricted:
@@ -760,17 +785,15 @@ class SQLCompiler(object):
                 backend_converters = self.connection.ops.get_db_converters(expression)
                 field_converters = expression.get_db_converters(self.connection)
                 if backend_converters or field_converters:
-                    converters[i] = (backend_converters, field_converters, expression)
+                    converters[i] = (backend_converters + field_converters, expression)
         return converters
 
     def apply_converters(self, row, converters):
         row = list(row)
-        for pos, (backend_converters, field_converters, field) in converters.items():
+        for pos, (convs, expression) in converters.items():
             value = row[pos]
-            for converter in backend_converters:
-                value = converter(value, field, self.query.context)
-            for converter in field_converters:
-                value = converter(value, self.connection, self.query.context)
+            for converter in convs:
+                value = converter(value, expression, self.connection, self.query.context)
             row[pos] = value
         return tuple(row)
 
@@ -975,7 +998,7 @@ class SQLDeleteCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        assert len(self.query.tables) == 1, \
+        assert len([t for t in self.query.tables if self.query.alias_refcount[t] > 0]) == 1, \
             "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]
@@ -1005,8 +1028,11 @@ class SQLUpdateCompiler(SQLCompiler):
                 if val.contains_aggregate:
                     raise FieldError("Aggregate functions are not allowed in this query")
             elif hasattr(val, 'prepare_database_save'):
-                if field.rel:
-                    val = val.prepare_database_save(field)
+                if field.remote_field:
+                    val = field.get_db_prep_save(
+                        val.prepare_database_save(field),
+                        connection=self.connection,
+                    )
                 else:
                     raise TypeError("Database is trying to update a relational field "
                                     "of type %s with a value of type %s. Make sure "

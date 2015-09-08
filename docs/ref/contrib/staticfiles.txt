@@ -46,6 +46,12 @@ resolution works: the file that is first found in one of the specified
 locations will be used. If you're confused, the :djadmin:`findstatic` command
 can help show you which files are found.
 
+On subsequent ``collectstatic`` runs (if ``STATIC_ROOT`` isn't empty), files
+are copied only if they have a modified timestamp greater than the timestamp of
+the file in ``STATIC_ROOT``. Therefore if you remove an application from
+:setting:`INSTALLED_APPS`, it's a good idea to use the :djadminopt:`--clear`
+option in order to remove stale static files.
+
 Files are searched by using the :setting:`enabled finders
 <STATICFILES_FINDERS>`. The default is to look in all locations defined in
 :setting:`STATICFILES_DIRS` and in the ``'static'`` directory of apps
@@ -84,7 +90,12 @@ Some commonly used options are:
 
 .. django-admin-option:: --noinput
 
-    Do NOT prompt the user for input of any kind.
+    Do NOT prompt the user for input of any kind. You can use ``--no-input``
+    as an alias for this option.
+
+    .. versionchanged:: 1.9
+
+        The ``--no-input`` alias was added.
 
 .. django-admin-option:: -i <pattern>
 .. django-admin-option:: --ignore <pattern>
@@ -285,6 +296,12 @@ hashed names for all processed files in a file called ``staticfiles.json``.
 This happens once when you run the :djadmin:`collectstatic` management
 command.
 
+Due to the requirement of running :djadmin:`collectstatic`, this storage
+typically shouldn't be used when running tests as ``collectstatic`` isn't run
+as part of the normal test setup. During testing, ensure that the
+:setting:`STATICFILES_STORAGE` setting is set to something else like
+``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
+
 .. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
 The method that is used when creating the hashed name of a file.
@@ -345,6 +362,11 @@ slightly different call:
     {% load static from staticfiles %}
     {% static "images/hi.jpg" as myphoto %}
     <img src="{{ myphoto }}" alt="Hi!" />
+
+.. admonition:: Using Jinja2 templates?
+
+    See :class:`django.template.backends.jinja2.Jinja2` for information on
+    using the ``static`` tag with Jinja2.
 
 Finders Module
 ==============

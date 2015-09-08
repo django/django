@@ -5,14 +5,14 @@ import copy
 
 from django.core.exceptions import ValidationError
 from django.forms.utils import ErrorDict, ErrorList, flatatt
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy
 
 
-class FormsUtilsTestCase(TestCase):
+class FormsUtilsTestCase(SimpleTestCase):
     # Tests for forms/utils.py module.
 
     def test_flatatt(self):
@@ -131,3 +131,14 @@ class FormsUtilsTestCase(TestCase):
         e_deepcopy = copy.deepcopy(e)
         self.assertEqual(e, e_deepcopy)
         self.assertEqual(e.as_data(), e_copy.as_data())
+
+    def test_error_dict_html_safe(self):
+        e = ErrorDict()
+        e['username'] = 'Invalid username.'
+        self.assertTrue(hasattr(ErrorDict, '__html__'))
+        self.assertEqual(force_text(e), e.__html__())
+
+    def test_error_list_html_safe(self):
+        e = ErrorList(['Invalid username.'])
+        self.assertTrue(hasattr(ErrorList, '__html__'))
+        self.assertEqual(force_text(e), e.__html__())

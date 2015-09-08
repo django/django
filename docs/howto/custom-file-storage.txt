@@ -88,9 +88,15 @@ instead).
 .. method:: get_valid_name(name)
 
 Returns a filename suitable for use with the underlying storage system. The
-``name`` argument passed to this method is the original filename sent to the
-server, after having any path information removed. Override this to customize
-how non-standard characters are converted to safe filenames.
+``name`` argument passed to this method is either the original filename sent to
+the server or, if ``upload_to`` is a callable, the filename returned by that
+method after any path information is removed. Override this to customize how
+non-standard characters are converted to safe filenames.
+
+.. versionchanged:: 1.9
+
+    In older versions, this method was not called when ``upload_to`` was a
+    callable.
 
 The code provided on ``Storage`` retains only alpha-numeric characters, periods
 and underscores from the original filename, removing everything else.

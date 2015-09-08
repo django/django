@@ -487,7 +487,7 @@ escaped:
 Again, we stress that this behavior is on by default. If you're using Django's
 template system, you're protected.
 
-.. _Cross Site Scripting: http://en.wikipedia.org/wiki/Cross-site_scripting
+.. _Cross Site Scripting: https://en.wikipedia.org/wiki/Cross-site_scripting
 
 How to turn it off
 ------------------

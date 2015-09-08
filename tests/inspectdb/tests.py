@@ -144,15 +144,25 @@ class InspectDBTestCase(TestCase):
         output = out.getvalue()
         error_message = "inspectdb generated an attribute name which is a python keyword"
         # Recursive foreign keys should be set to 'self'
-        self.assertIn("parent = models.ForeignKey('self')", output)
-        self.assertNotIn("from = models.ForeignKey(InspectdbPeople)", output, msg=error_message)
+        self.assertIn("parent = models.ForeignKey('self', models.DO_NOTHING)", output)
+        self.assertNotIn(
+            "from = models.ForeignKey(InspectdbPeople, models.DO_NOTHING)",
+            output,
+            msg=error_message,
+        )
         # As InspectdbPeople model is defined after InspectdbMessage, it should be quoted
-        self.assertIn("from_field = models.ForeignKey('InspectdbPeople', db_column='from_id')",
-                      output)
-        self.assertIn("people_pk = models.ForeignKey(InspectdbPeople, primary_key=True)",
-                      output)
-        self.assertIn("people_unique = models.ForeignKey(InspectdbPeople, unique=True)",
-                      output)
+        self.assertIn(
+            "from_field = models.ForeignKey('InspectdbPeople', models.DO_NOTHING, db_column='from_id')",
+            output,
+        )
+        self.assertIn(
+            "people_pk = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, primary_key=True)",
+            output,
+        )
+        self.assertIn(
+            "people_unique = models.ForeignKey(InspectdbPeople, models.DO_NOTHING, unique=True)",
+            output,
+        )
 
     def test_digits_column_name_introspection(self):
         """Introspection of column names consist/start with digits (#16536/#17676)"""

@@ -8,7 +8,7 @@ from django.contrib.admin.utils import (
     display_for_field, display_for_value, label_for_field, lookup_field,
 )
 from django.contrib.admin.views.main import (
-    ALL_VAR, EMPTY_CHANGELIST_VALUE, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
+    ALL_VAR, ORDER_VAR, PAGE_VAR, SEARCH_VAR,
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import NoReverseMatch
@@ -174,7 +174,7 @@ def result_headers(cl):
 
 
 def _boolean_icon(field_val):
-    icon_url = static('admin/img/icon-%s.gif' %
+    icon_url = static('admin/img/icon-%s.svg' %
                       {True: 'yes', False: 'no', None: 'unknown'}[field_val])
     return format_html('<img src="{}" alt="{}" />', icon_url, field_val)
 
@@ -194,20 +194,22 @@ def items_for_result(cl, result, form):
     first = True
     pk = cl.lookup_opts.pk.attname
     for field_name in cl.list_display:
+        empty_value_display = cl.model_admin.get_empty_value_display()
         row_classes = ['field-%s' % field_name]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
-            result_repr = EMPTY_CHANGELIST_VALUE
+            result_repr = empty_value_display
         else:
-            if f is None:
+            empty_value_display = getattr(attr, 'empty_value_display', empty_value_display)
+            if f is None or f.auto_created:
                 if field_name == 'action_checkbox':
                     row_classes = ['action-checkbox']
                 allow_tags = getattr(attr, 'allow_tags', False)
                 boolean = getattr(attr, 'boolean', False)
-                if boolean:
+                if boolean or not value:
                     allow_tags = True
-                result_repr = display_for_value(value, boolean)
+                result_repr = display_for_value(value, empty_value_display, boolean)
                 # Strip HTML tags in the resulting text, except if the
                 # function has an "allow_tags" attribute set to True.
                 if allow_tags:
@@ -215,14 +217,14 @@ def items_for_result(cl, result, form):
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append('nowrap')
             else:
-                if isinstance(f.rel, models.ManyToOneRel):
+                if isinstance(f.remote_field, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
                     if field_val is None:
-                        result_repr = EMPTY_CHANGELIST_VALUE
+                        result_repr = empty_value_display
                     else:
                         result_repr = field_val
                 else:
-                    result_repr = display_for_field(value, f)
+                    result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(f, (models.DateField, models.TimeField, models.ForeignKey)):
                     row_classes.append('nowrap')
         if force_text(result_repr) == '':

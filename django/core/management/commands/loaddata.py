@@ -21,6 +21,7 @@ from django.utils import lru_cache
 from django.utils._os import upath
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
+from django.utils.glob import glob_escape
 
 try:
     import bz2
@@ -122,6 +123,7 @@ class Command(BaseCommand):
         """
         Loads fixtures files for a given label.
         """
+        show_progress = self.verbosity >= 3
         for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
             _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
             open_method, mode = self.compression_formats[cmp_fmt]
@@ -139,11 +141,16 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
-                    if router.allow_migrate(self.using, obj.object.__class__):
+                    if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
                         try:
                             obj.save(using=self.using)
+                            if show_progress:
+                                self.stdout.write(
+                                    '\rProcessed %i object(s).' % loaded_objects_in_fixture,
+                                    ending=''
+                                )
                         except (DatabaseError, IntegrityError) as e:
                             e.args = ("Could not load %(app_label)s.%(object_name)s(pk=%(pk)s): %(error_msg)s" % {
                                 'app_label': obj.object._meta.app_label,
@@ -152,7 +159,8 @@ class Command(BaseCommand):
                                 'error_msg': force_text(e)
                             },)
                             raise
-
+                if objects and show_progress:
+                    self.stdout.write('')  # add a newline after progress indicator
                 self.loaded_object_count += loaded_objects_in_fixture
                 self.fixture_object_count += objects_in_fixture
             except Exception as e:
@@ -202,7 +210,8 @@ class Command(BaseCommand):
             if self.verbosity >= 2:
                 self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
             fixture_files_in_dir = []
-            for candidate in glob.iglob(os.path.join(fixture_dir, fixture_name + '*')):
+            path = os.path.join(fixture_dir, fixture_name)
+            for candidate in glob.iglob(glob_escape(path) + '*'):
                 if os.path.basename(candidate) in targets:
                     # Save the fixture_dir and fixture_name for future error messages.
                     fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))

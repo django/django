@@ -209,6 +209,7 @@ this management data, an exception will be raised::
     ...     'form-0-pub_date': '',
     ... }
     >>> formset = ArticleFormSet(data)
+    >>> formset.is_valid()
     Traceback (most recent call last):
     ...
     django.forms.utils.ValidationError: ['ManagementForm data is missing or has been tampered with']
@@ -236,6 +237,8 @@ the management data by rendering ``{{ my_formset.management_form }}``
 pre-filled, and is also used to determine how many forms are required. You
 will probably never need to override either of these methods, so please be
 sure you understand what they do before doing so.
+
+.. _empty_form:
 
 ``empty_form``
 ~~~~~~~~~~~~~~
@@ -453,8 +456,7 @@ Lets you create a formset with the ability to select forms for deletion::
     ...     {'title': 'Article #2', 'pub_date': datetime.date(2008, 5, 11)},
     ... ])
     >>> for form in formset:
-    ....    print(form.as_table())
-    <input type="hidden" name="form-TOTAL_FORMS" value="3" id="id_form-TOTAL_FORMS" /><input type="hidden" name="form-INITIAL_FORMS" value="2" id="id_form-INITIAL_FORMS" /><input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS" />
+    ...     print(form.as_table())
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" value="Article #1" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" value="2008-05-10" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-DELETE">Delete:</label></th><td><input type="checkbox" name="form-0-DELETE" id="id_form-0-DELETE" /></td></tr>
@@ -532,6 +534,45 @@ default fields/attributes of the order and deletion fields::
     <tr><th><label for="id_form-0-title">Title:</label></th><td><input type="text" name="form-0-title" id="id_form-0-title" /></td></tr>
     <tr><th><label for="id_form-0-pub_date">Pub date:</label></th><td><input type="text" name="form-0-pub_date" id="id_form-0-pub_date" /></td></tr>
     <tr><th><label for="id_form-0-my_field">My field:</label></th><td><input type="text" name="form-0-my_field" id="id_form-0-my_field" /></td></tr>
+
+.. _custom-formset-form-kwargs:
+
+Passing custom parameters to formset forms
+------------------------------------------
+
+Sometimes your form class takes custom parameters, like ``MyArticleForm``.
+You can pass this parameter when instantiating the formset::
+
+    >>> from django.forms.formsets import BaseFormSet
+    >>> from django.forms.formsets import formset_factory
+    >>> from myapp.forms import ArticleForm
+
+    >>> class MyArticleForm(ArticleForm):
+    ...     def __init__(self, *args, **kwargs):
+    ...         self.user = kwargs.pop('user')
+    ...         super(MyArticleForm, self).__init__(*args, **kwargs)
+
+    >>> ArticleFormSet = formset_factory(MyArticleForm)
+    >>> formset = ArticleFormSet(form_kwargs={'user': request.user})
+
+The ``form_kwargs`` may also depend on the specific form instance. The formset
+base class provides a ``get_form_kwargs`` method. The method takes a single
+argument - the index of the form in the formset. The index is ``None`` for the
+:ref:`empty_form`::
+
+    >>> from django.forms.formsets import BaseFormSet
+    >>> from django.forms.formsets import formset_factory
+
+    >>> class BaseArticleFormSet(BaseFormSet):
+    ...     def get_form_kwargs(self, index):
+    ...         kwargs = super(BaseArticleFormSet, self).get_form_kwargs(index)
+    ...         kwargs['custom_kwarg'] = index
+    ...         return kwargs
+
+
+.. versionadded:: 1.9
+
+    The ``form_kwargs`` argument was added.
 
 Using a formset in views and templates
 --------------------------------------

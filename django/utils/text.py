@@ -410,13 +410,17 @@ def unescape_string_literal(s):
 unescape_string_literal = allow_lazy(unescape_string_literal)
 
 
-def slugify(value):
+def slugify(value, allow_unicode=False):
     """
-    Converts to ASCII. Converts spaces to hyphens. Removes characters that
-    aren't alphanumerics, underscores, or hyphens. Converts to lowercase.
-    Also strips leading and trailing whitespace.
+    Convert to ASCII if 'allow_unicode' is False. Convert spaces to hyphens.
+    Remove characters that aren't alphanumerics, underscores, or hyphens.
+    Convert to lowercase. Also strip leading and trailing whitespace.
     """
     value = force_text(value)
+    if allow_unicode:
+        value = unicodedata.normalize('NFKC', value)
+        value = re.sub('[^\w\s-]', '', value, flags=re.U).strip().lower()
+        return mark_safe(re.sub('[-\s]+', '-', value, flags=re.U))
     value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
     value = re.sub('[^\w\s-]', '', value).strip().lower()
     return mark_safe(re.sub('[-\s]+', '-', value))

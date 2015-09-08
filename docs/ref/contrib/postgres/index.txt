@@ -1,11 +1,16 @@
 ``django.contrib.postgres``
 ===========================
 
+.. module:: django.contrib.postgres
+    :synopsis: PostgreSQL-specific fields and features
+
 .. versionadded:: 1.8
 
 PostgreSQL has a number of features which are not shared by the other databases
 Django supports. This optional module contains model fields and form fields for
 a number of PostgreSQL specific data types.
+
+Psycopg2 2.5 or higher is required.
 
 .. note::
     Django is, and will continue to be, a database-agnostic web framework. We
@@ -26,8 +31,10 @@ a number of PostgreSQL specific data types.
 .. toctree::
     :maxdepth: 2
 
+    aggregates
     fields
     forms
+    functions
     lookups
     operations
     validators

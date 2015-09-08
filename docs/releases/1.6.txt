@@ -71,10 +71,6 @@ should improve performance. The existing APIs were deprecated, and new APIs
 were introduced, as described in the :doc:`transaction management docs
 </topics/db/transactions>`.
 
-Please review carefully the list of :ref:`known backwards-incompatibilities
-<transactions-upgrading-from-1.5>` to determine if you need to make changes in
-your code.
-
 Persistent database connections
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -319,7 +315,7 @@ Minor features
   a ``SuspiciousOperation`` reaches the WSGI handler to return an
   ``HttpResponseBadRequest``.
 
-* The :exc:`~django.core.exceptions.DoesNotExist` exception now includes a
+* The :exc:`~django.db.models.Model.DoesNotExist` exception now includes a
   message indicating the name of the attribute used for the lookup.
 
 * The :meth:`~django.db.models.query.QuerySet.get_or_create` method no longer
@@ -393,9 +389,7 @@ Behavior changes
 
 Database-level autocommit is enabled by default in Django 1.6. While this
 doesn't change the general spirit of Django's transaction management, there
-are a few known backwards-incompatibilities, described in the :ref:`transaction
-management docs <transactions-upgrading-from-1.5>`. You should review your
-code to determine if you're affected.
+are a few backwards-incompatibilities.
 
 Savepoints and ``assertNumQueries``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -863,7 +857,7 @@ Miscellaneous
   :meth:`~django.db.models.query.QuerySet.none` has been called:
   ``isinstance(qs.none(), EmptyQuerySet)``
 
-* If your CSS/Javascript code used to access HTML input widgets by type, you
+* If your CSS/JavaScript code used to access HTML input widgets by type, you
   should review it as ``type='text'`` widgets might be now output as
   ``type='email'``, ``type='url'`` or ``type='number'`` depending on their
   corresponding field type.
@@ -982,9 +976,6 @@ current APIs are deprecated:
 - ``django.db.transaction.commit_manually``
 - the ``TRANSACTIONS_MANAGED`` setting
 
-The reasons for this change and the upgrade path are described in the
-:ref:`transactions documentation <transactions-upgrading-from-1.5>`.
-
 ``django.contrib.comments``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1040,10 +1031,11 @@ If necessary, you can temporarily disable auto-escaping with
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``CacheMiddleware`` used to provide a way to cache requests only if they
-weren't made by a logged-in user. This mechanism was largely ineffective
-because the middleware correctly takes into account the ``Vary: Cookie`` HTTP
-header, and this header is being set on a variety of occasions, such as:
+``CacheMiddleware`` and ``UpdateCacheMiddleware`` used to provide a way to
+cache requests only if they weren't made by a logged-in user. This mechanism
+was largely ineffective because the middleware correctly takes into account the
+``Vary: Cookie`` HTTP header, and this header is being set on a variety of
+occasions, such as:
 
 * accessing the session, or
 * using CSRF protection, which is turned on by default, or
@@ -1130,7 +1122,8 @@ a ``get_queryset_compat`` method as below and use it internally to your manager:
         def get_queryset(self):
             return YourCustomQuerySet() # for example
 
-        get_query_set = get_queryset
+        if django.VERSION < (1, 6):
+            get_query_set = get_queryset
 
         def active(self): # for example
             return self.get_queryset_compat().filter(active=True)
@@ -1174,7 +1167,7 @@ This can lead to security problems where fields are added to the model and,
 unintentionally, automatically become editable by end users. In some cases,
 particular with boolean fields, it is possible for this problem to be completely
 invisible. This is a form of `Mass assignment vulnerability
-<http://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
+<https://en.wikipedia.org/wiki/Mass_assignment_vulnerability>`_.
 
 For this reason, this behavior is deprecated, and using the ``Meta.exclude``
 option is strongly discouraged. Instead, all fields that are intended for

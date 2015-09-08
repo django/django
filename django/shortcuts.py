@@ -19,7 +19,7 @@ from django.template.engine import (
     _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
 )
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 
@@ -62,7 +62,7 @@ def render(request, template_name, context=None,
             and dirs is _dirs_undefined
             and dictionary is _dictionary_undefined):
         # No deprecated arguments were passed - use the new code path
-        # In Django 2.0, request should become a positional argument.
+        # In Django 1.10, request should become a positional argument.
         content = loader.render_to_string(
             template_name, context, request=request, using=using)
 
@@ -78,7 +78,7 @@ def render(request, template_name, context=None,
                 warnings.warn(
                     "The current_app argument of render is deprecated. "
                     "Set the current_app attribute of request instead.",
-                    RemovedInDjango20Warning, stacklevel=2)
+                    RemovedInDjango110Warning, stacklevel=2)
                 request.current_app = current_app
                 # Directly set the private attribute to avoid triggering the
                 # warning in RequestContext.__init__.
@@ -184,7 +184,6 @@ def resolve_url(to, *args, **kwargs):
           be used to reverse-resolve the name.
 
         * A URL, which will be returned as-is.
-
     """
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):
@@ -197,7 +196,7 @@ def resolve_url(to, *args, **kwargs):
 
     if isinstance(to, six.string_types):
         # Handle relative URLs
-        if any(to.startswith(path) for path in ('./', '../')):
+        if to.startswith(('./', '../')):
             return to
 
     # Next try a reverse URL resolution.

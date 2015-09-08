@@ -4,13 +4,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Marco Bonetti, 2014
 # Nicola Larosa <transifex@teknico.net>, 2012
+# Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-27 16:28+0000\n"
-"Last-Translator: Marco Bonetti\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-28 19:10+0000\n"
+"Last-Translator: palmux <palmux@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/projects/p/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -19,33 +20,26 @@ msgstr ""
 "Language: it\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr "Content Types"
+msgstr "Content Type"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "nome della classe del modello Python"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "content type"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "content type"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "L'oggetto con content type %(ct_id)s non ha alcun modello associato"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "L'oggetto %(obj_id)s con content type %(ct_id)s non esiste"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "Gli oggetti %(ct_name)s non hanno un metodo get_absolute_url()"

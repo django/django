@@ -91,6 +91,13 @@ FormMixin
 
         Renders a response, providing the invalid form as context.
 
+    .. method:: get_context_data(**kwargs)
+
+        .. versionadded:: 1.9
+
+        Calls :meth:`get_form` and adds the result to the context data with the
+        name 'form'.
+
 ModelFormMixin
 --------------
 
@@ -157,7 +164,7 @@ ModelFormMixin
 
             Support for the new brace-based Python formatting syntax has been
             added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
+            deprecated and will be removed in Django 1.10.
 
     .. method:: get_form_class()
 
@@ -214,8 +221,13 @@ ProcessFormView
 
     .. method:: get(request, *args, **kwargs)
 
-        Constructs a form, then renders a response using a context that
-        contains that form.
+        Renders a response using a context created with
+        :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
+
+        .. versionchanged:: 1.9
+
+            Construction of the form was moved from this method to
+            :meth:`~django.views.generic.edit.FormMixin.get_context_data`.
 
     .. method:: post(request, *args, **kwargs)
 
@@ -251,7 +263,7 @@ DeletionMixin
 
             Support for the new brace-based Python formatting syntax has been
             added. The old ``%(slug)s`` placeholder syntax support has been
-            deprecated and will be removed in Django 2.0.
+            deprecated and will be removed in Django 1.10.
 
     .. method:: get_success_url()
 

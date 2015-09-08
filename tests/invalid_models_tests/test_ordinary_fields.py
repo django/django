@@ -5,6 +5,7 @@ import unittest
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import connection, models
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils.timezone import now
 
@@ -64,7 +65,7 @@ class BooleanFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class CharFieldTests(IsolatedModelsTestCase):
+class CharFieldTests(IsolatedModelsTestCase, TestCase):
 
     def test_valid_field(self):
         class Model(models.Model):
@@ -116,6 +117,22 @@ class CharFieldTests(IsolatedModelsTestCase):
     def test_bad_max_length_value(self):
         class Model(models.Model):
             field = models.CharField(max_length="bad")
+
+        field = Model._meta.get_field('field')
+        errors = field.check()
+        expected = [
+            Error(
+                "'max_length' must be a positive integer.",
+                hint=None,
+                obj=field,
+                id='fields.E121',
+            ),
+        ]
+        self.assertEqual(errors, expected)
+
+    def test_str_max_length_value(self):
+        class Model(models.Model):
+            field = models.CharField(max_length='20')
 
         field = Model._meta.get_field('field')
         errors = field.check()
@@ -199,7 +216,7 @@ class CharFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class DateFieldTests(IsolatedModelsTestCase):
+class DateFieldTests(IsolatedModelsTestCase, TestCase):
 
     def test_auto_now_and_auto_now_add_raise_error(self):
         class Model(models.Model):
@@ -265,7 +282,7 @@ class DateFieldTests(IsolatedModelsTestCase):
         self.test_fix_default_value()
 
 
-class DateTimeFieldTests(IsolatedModelsTestCase):
+class DateTimeFieldTests(IsolatedModelsTestCase, TestCase):
 
     def test_fix_default_value(self):
         class Model(models.Model):
@@ -532,7 +549,7 @@ class IntegerFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class TimeFieldTests(IsolatedModelsTestCase):
+class TimeFieldTests(IsolatedModelsTestCase, TestCase):
 
     def test_fix_default_value(self):
         class Model(models.Model):

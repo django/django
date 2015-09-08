@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.exceptions import FieldError
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .models import (
     Bookmark, Domain, Family, Genus, HybridSpecies, Kingdom, Klass, Order,
@@ -163,8 +163,28 @@ class SelectRelatedTests(TestCase):
             self.assertEqual(obj.parent_1, parent_1)
             self.assertEqual(obj.parent_2, parent_2)
 
+    def test_select_related_after_values(self):
+        """
+        Running select_related() after calling values() raises a TypeError
+        """
 
-class SelectRelatedValidationTests(TestCase):
+        message = "Cannot call select_related() after .values() or .values_list()"
+
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values('name').select_related('genus'))
+
+    def test_select_related_after_values_list(self):
+        """
+        Running select_related() after calling values_list() raises a TypeError
+        """
+
+        message = "Cannot call select_related() after .values() or .values_list()"
+
+        with self.assertRaisesMessage(TypeError, message):
+            list(Species.objects.values_list('name').select_related('genus'))
+
+
+class SelectRelatedValidationTests(SimpleTestCase):
     """
     select_related() should thrown an error on fields that do not exist and
     non-relational fields.

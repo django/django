@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-08-28 20:17+0000\n"
-"Last-Translator: vestimir <vestimir@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:10+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
 "language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -18,15 +18,12 @@ msgstr ""
 "Language: bg\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Препратки"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "препратка от"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -34,11 +31,9 @@ msgstr ""
 "Това трябва да бъде абсолютен път, без името на домейна.  Пример: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "препратка към"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -46,10 +41,8 @@ msgstr ""
 "Това може да бъде или абсолютен път (като горното) или пълен URL, започващ с "
 "'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "препратка"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "препратки"

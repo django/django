@@ -5,7 +5,8 @@ models for GeoDjango and/or mapping dictionaries for use with the
 """
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.gdal.field import (
-    OFTDate, OFTDateTime, OFTInteger, OFTReal, OFTString, OFTTime,
+    OFTDate, OFTDateTime, OFTInteger, OFTInteger64, OFTReal, OFTString,
+    OFTTime,
 )
 from django.utils import six
 from django.utils.six.moves import zip
@@ -43,11 +44,9 @@ def mapping(data_source, geom_name='geom', layer_key=0, multi_geom=False):
             mfield += 'field'
         _mapping[mfield] = field
     gtype = data_source[layer_key].geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
-        prefix = 'MULTI'
-    else:
-        prefix = ''
-    _mapping[geom_name] = prefix + str(gtype).upper()
+    if multi_geom:
+        gtype.to_multi()
+    _mapping[geom_name] = str(gtype).upper()
     return _mapping
 
 
@@ -197,6 +196,8 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
                 yield '    %s = models.FloatField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTInteger:
             yield '    %s = models.IntegerField(%s)' % (mfield, kwargs_str[2:])
+        elif field_type is OFTInteger64:
+            yield '    %s = models.BigIntegerField(%s)' % (mfield, kwargs_str[2:])
         elif field_type is OFTString:
             yield '    %s = models.CharField(max_length=%s%s)' % (mfield, width, kwargs_str)
         elif field_type is OFTDate:
@@ -210,10 +211,9 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
 
     # TODO: Autodetection of multigeometry types (see #7218).
     gtype = layer.geom_type
-    if multi_geom and gtype.num in (1, 2, 3):
-        geom_field = 'Multi%s' % gtype.django
-    else:
-        geom_field = gtype.django
+    if multi_geom:
+        gtype.to_multi()
+    geom_field = gtype.django
 
     # Setting up the SRID keyword string.
     if srid is None:
@@ -232,7 +232,6 @@ def _ogrinspect(data_source, model_name, geom_name='geom', layer_key=0, srid=Non
         srid_str = 'srid=%s' % srid
 
     yield '    %s = models.%s(%s)' % (geom_name, geom_field, srid_str)
-    yield '    objects = models.GeoManager()'
 
     if name_field:
         yield ''

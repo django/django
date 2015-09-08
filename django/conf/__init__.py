@@ -8,12 +8,12 @@ a list of all possible variables.
 
 import importlib
 import os
-import time     # Needed for Windows
+import time
 import warnings
 
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
@@ -41,6 +41,14 @@ class LazySettings(LazyObject):
                 % (desc, ENVIRONMENT_VARIABLE))
 
         self._wrapped = Settings(settings_module)
+
+    def __repr__(self):
+        # Hardcode the class name as otherwise it yields 'Settings'.
+        if self._wrapped is empty:
+            return '<LazySettings [Unevaluated]>'
+        return '<LazySettings "%(settings_module)s">' % {
+            'settings_module': self._wrapped.SETTINGS_MODULE,
+        }
 
     def __getattr__(self, name):
         if self._wrapped is empty:
@@ -114,11 +122,11 @@ class Settings(BaseSettings):
         if ('django.contrib.auth.middleware.AuthenticationMiddleware' in self.MIDDLEWARE_CLASSES and
                 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' not in self.MIDDLEWARE_CLASSES):
             warnings.warn(
-                "Session verification will become mandatory in Django 2.0. "
+                "Session verification will become mandatory in Django 1.10. "
                 "Please add 'django.contrib.auth.middleware.SessionAuthenticationMiddleware' "
                 "to your MIDDLEWARE_CLASSES setting when you are ready to opt-in after "
                 "reading the upgrade considerations in the 1.8 release notes.",
-                RemovedInDjango20Warning
+                RemovedInDjango110Warning
             )
 
         if hasattr(time, 'tzset') and self.TIME_ZONE:
@@ -135,6 +143,12 @@ class Settings(BaseSettings):
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
+
+    def __repr__(self):
+        return '<%(cls)s "%(settings_module)s">' % {
+            'cls': self.__class__.__name__,
+            'settings_module': self.SETTINGS_MODULE,
+        }
 
 
 class UserSettingsHolder(BaseSettings):
@@ -175,5 +189,10 @@ class UserSettingsHolder(BaseSettings):
         set_locally = (setting in self.__dict__)
         set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
         return (deleted or set_locally or set_on_default)
+
+    def __repr__(self):
+        return '<%(cls)s>' % {
+            'cls': self.__class__.__name__,
+        }
 
 settings = LazySettings()

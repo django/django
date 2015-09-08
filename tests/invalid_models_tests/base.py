@@ -2,10 +2,10 @@
 from __future__ import unicode_literals
 
 from django.apps import apps
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 
-class IsolatedModelsTestCase(TestCase):
+class IsolatedModelsTestCase(SimpleTestCase):
 
     def setUp(self):
         # The unmanaged models need to be removed after the test in order to

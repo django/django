@@ -1,3 +1,4 @@
+import functools
 import warnings
 
 from django.conf import settings
@@ -16,7 +17,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, QueryDict
 from django.shortcuts import resolve_url
 from django.template.response import TemplateResponse
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
+)
+from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlsafe_base64_decode
 from django.utils.six.moves.urllib.parse import urlparse, urlunparse
 from django.utils.translation import ugettext as _
@@ -25,16 +29,35 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 
 
-# Avoid shadowing the login() and logout() views below.
+def deprecate_current_app(func):
+    """
+    Handle deprecation of the current_app parameter of the views.
+    """
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        if 'current_app' in kwargs:
+            warnings.warn(
+                "Passing `current_app` as a keyword argument is deprecated. "
+                "Instead the caller of `{0}` should set "
+                "`request.current_app`.".format(func.__name__),
+                RemovedInDjango20Warning
+            )
+            current_app = kwargs.pop('current_app')
+            request = kwargs.get('request', None)
+            if request and current_app is not None:
+                request.current_app = current_app
+        return func(*args, **kwargs)
+    return inner
 
 
+@deprecate_current_app
 @sensitive_post_parameters()
 @csrf_protect
 @never_cache
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          current_app=None, extra_context=None):
+          extra_context=None):
     """
     Displays the login form and handles the login action.
     """
@@ -67,16 +90,14 @@ def login(request, template_name='registration/login.html',
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
+@deprecate_current_app
 def logout(request, next_page=None,
            template_name='registration/logged_out.html',
            redirect_field_name=REDIRECT_FIELD_NAME,
-           current_app=None, extra_context=None):
+           extra_context=None):
     """
     Logs out the user and displays 'You are logged out' message.
     """
@@ -106,20 +127,18 @@ def logout(request, next_page=None,
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
-def logout_then_login(request, login_url=None, current_app=None, extra_context=None):
+@deprecate_current_app
+def logout_then_login(request, login_url=None, extra_context=None):
     """
     Logs out the user if they are logged in. Then redirects to the log-in page.
     """
     if not login_url:
         login_url = settings.LOGIN_URL
     login_url = resolve_url(login_url)
-    return logout(request, login_url, current_app=current_app, extra_context=extra_context)
+    return logout(request, login_url, extra_context=extra_context)
 
 
 def redirect_to_login(next, login_url=None,
@@ -145,6 +164,7 @@ def redirect_to_login(next, login_url=None,
 #   prompts for a new password
 # - password_reset_complete shows a success message for the above
 
+@deprecate_current_app
 @csrf_protect
 def password_reset(request, is_admin_site=False,
                    template_name='registration/password_reset_form.html',
@@ -154,7 +174,6 @@ def password_reset(request, is_admin_site=False,
                    token_generator=default_token_generator,
                    post_reset_redirect=None,
                    from_email=None,
-                   current_app=None,
                    extra_context=None,
                    html_email_template_name=None):
     if post_reset_redirect is None:
@@ -177,8 +196,8 @@ def password_reset(request, is_admin_site=False,
                 warnings.warn(
                     "The is_admin_site argument to "
                     "django.contrib.auth.views.password_reset() is deprecated "
-                    "and will be removed in Django 2.0.",
-                    RemovedInDjango20Warning, 3
+                    "and will be removed in Django 1.10.",
+                    RemovedInDjango110Warning, 3
                 )
                 opts = dict(opts, domain_override=request.get_host())
             form.save(**opts)
@@ -192,23 +211,18 @@ def password_reset(request, is_admin_site=False,
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
+@deprecate_current_app
 def password_reset_done(request,
                         template_name='registration/password_reset_done.html',
-                        current_app=None, extra_context=None):
+                        extra_context=None):
     context = {
         'title': _('Password reset sent'),
     }
     if extra_context is not None:
         context.update(extra_context)
-
-    if current_app is not None:
-        request.current_app = current_app
 
     return TemplateResponse(request, template_name, context)
 
@@ -216,12 +230,13 @@ def password_reset_done(request,
 # Doesn't need csrf_protect since no-one can guess the URL
 @sensitive_post_parameters()
 @never_cache
+@deprecate_current_app
 def password_reset_confirm(request, uidb64=None, token=None,
                            template_name='registration/password_reset_confirm.html',
                            token_generator=default_token_generator,
                            set_password_form=SetPasswordForm,
                            post_reset_redirect=None,
-                           current_app=None, extra_context=None):
+                           extra_context=None):
     """
     View that checks the hash in a password reset link and presents a
     form for entering a new password.
@@ -233,7 +248,8 @@ def password_reset_confirm(request, uidb64=None, token=None,
     else:
         post_reset_redirect = resolve_url(post_reset_redirect)
     try:
-        uid = urlsafe_base64_decode(uidb64)
+        # urlsafe_base64_decode() decodes to bytestring on Python 3
+        uid = force_text(urlsafe_base64_decode(uidb64))
         user = UserModel._default_manager.get(pk=uid)
     except (TypeError, ValueError, OverflowError, UserModel.DoesNotExist):
         user = None
@@ -260,15 +276,13 @@ def password_reset_confirm(request, uidb64=None, token=None,
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
+@deprecate_current_app
 def password_reset_complete(request,
                             template_name='registration/password_reset_complete.html',
-                            current_app=None, extra_context=None):
+                            extra_context=None):
     context = {
         'login_url': resolve_url(settings.LOGIN_URL),
         'title': _('Password reset complete'),
@@ -276,20 +290,18 @@ def password_reset_complete(request,
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
 @sensitive_post_parameters()
 @csrf_protect
 @login_required
+@deprecate_current_app
 def password_change(request,
                     template_name='registration/password_change_form.html',
                     post_change_redirect=None,
                     password_change_form=PasswordChangeForm,
-                    current_app=None, extra_context=None):
+                    extra_context=None):
     if post_change_redirect is None:
         post_change_redirect = reverse('password_change_done')
     else:
@@ -313,23 +325,18 @@ def password_change(request,
     if extra_context is not None:
         context.update(extra_context)
 
-    if current_app is not None:
-        request.current_app = current_app
-
     return TemplateResponse(request, template_name, context)
 
 
 @login_required
+@deprecate_current_app
 def password_change_done(request,
                          template_name='registration/password_change_done.html',
-                         current_app=None, extra_context=None):
+                         extra_context=None):
     context = {
         'title': _('Password change successful'),
     }
     if extra_context is not None:
         context.update(extra_context)
-
-    if current_app is not None:
-        request.current_app = current_app
 
     return TemplateResponse(request, template_name, context)

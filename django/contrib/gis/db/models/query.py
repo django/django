@@ -15,7 +15,9 @@ from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
 from django.db.models.query import QuerySet
 from django.utils import six
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import (
+    RemovedInDjango20Warning, RemovedInDjango110Warning,
+)
 
 
 class GeoQuerySet(QuerySet):
@@ -30,7 +32,7 @@ class GeoQuerySet(QuerySet):
         # Performing setup here rather than in `_spatial_attribute` so that
         # we can get the units for `AreaField`.
         procedure_args, geo_field = self._spatial_setup(
-            'area', field_name=kwargs.get('field_name', None))
+            'area', field_name=kwargs.get('field_name'))
         s = {'procedure_args': procedure_args,
              'geo_field': geo_field,
              'setup': False,
@@ -69,7 +71,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The collect GeoQuerySet method is deprecated. Use the Collect() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Collect, **kwargs)
 
@@ -114,7 +116,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The extent GeoQuerySet method is deprecated. Use the Extent() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Extent, **kwargs)
 
@@ -127,7 +129,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The extent3d GeoQuerySet method is deprecated. Use the Extent3D() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Extent3D, **kwargs)
 
@@ -234,7 +236,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The make_line GeoQuerySet method is deprecated. Use the MakeLine() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.MakeLine, geo_field_type=PointField, **kwargs)
 
@@ -401,7 +403,7 @@ class GeoQuerySet(QuerySet):
         """
         if not isinstance(srid, six.integer_types):
             raise TypeError('An integer SRID must be provided.')
-        field_name = kwargs.get('field_name', None)
+        field_name = kwargs.get('field_name')
         self._spatial_setup('transform', field_name=field_name)
         self.query.add_context('transformed_srid', srid)
         return self._clone()
@@ -422,7 +424,7 @@ class GeoQuerySet(QuerySet):
         warnings.warn(
             "The unionagg GeoQuerySet method is deprecated. Use the Union() "
             "aggregate in an aggregate() or annotate() method.",
-            RemovedInDjango20Warning, stacklevel=2
+            RemovedInDjango110Warning, stacklevel=2
         )
         return self._spatial_aggregate(aggregates.Union, **kwargs)
 
@@ -513,6 +515,11 @@ class GeoQuerySet(QuerySet):
           The name of the model attribute to attach the output of
           the spatial function to.
         """
+        warnings.warn(
+            "The %s GeoQuerySet method is deprecated. See GeoDjango Functions "
+            "documentation to find the expression-based replacement." % att,
+            RemovedInDjango20Warning, stacklevel=2
+        )
         # Default settings.
         settings.setdefault('desc', None)
         settings.setdefault('geom_args', ())
@@ -527,7 +534,7 @@ class GeoQuerySet(QuerySet):
         if settings.get('setup', True):
             default_args, geo_field = self._spatial_setup(
                 att, desc=settings['desc'], field_name=field_name,
-                geo_field_type=settings.get('geo_field_type', None))
+                geo_field_type=settings.get('geo_field_type'))
             for k, v in six.iteritems(default_args):
                 settings['procedure_args'].setdefault(k, v)
         else:
@@ -556,7 +563,7 @@ class GeoQuerySet(QuerySet):
         fmt = '%%(function)s(%s)' % settings['procedure_fmt']
 
         # If the result of this function needs to be converted.
-        if settings.get('select_field', False):
+        if settings.get('select_field'):
             select_field = settings['select_field']
             if connection.ops.oracle:
                 select_field.empty_strings_allowed = False
@@ -576,7 +583,7 @@ class GeoQuerySet(QuerySet):
         DRY routine for GeoQuerySet distance attribute routines.
         """
         # Setting up the distance procedure arguments.
-        procedure_args, geo_field = self._spatial_setup(func, field_name=kwargs.get('field_name', None))
+        procedure_args, geo_field = self._spatial_setup(func, field_name=kwargs.get('field_name'))
 
         # If geodetic defaulting distance attribute to meters (Oracle and
         # PostGIS spherical distances return meters).  Otherwise, use the

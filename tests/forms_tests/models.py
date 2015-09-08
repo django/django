@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 import datetime
 import itertools
-import os
 import tempfile
 
 from django.core.files.storage import FileSystemStorage
@@ -11,11 +10,13 @@ from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 
 callable_default_counter = itertools.count()
-callable_default = lambda: next(callable_default_counter)
 
 
-temp_storage_location = tempfile.mkdtemp(dir=os.environ['DJANGO_TEST_TEMP_DIR'])
-temp_storage = FileSystemStorage(location=temp_storage_location)
+def callable_default():
+    return next(callable_default_counter)
+
+
+temp_storage = FileSystemStorage(location=tempfile.mkdtemp())
 
 
 class BoundaryModel(models.Model):
@@ -70,25 +71,64 @@ class ChoiceOptionModel(models.Model):
         return 'ChoiceOption %d' % self.pk
 
 
+def choice_default():
+    return ChoiceOptionModel.objects.get_or_create(name='default')[0].pk
+
+
+def choice_default_list():
+    return [choice_default()]
+
+
+def int_default():
+    return 1
+
+
+def int_list_default():
+    return [1]
+
+
 class ChoiceFieldModel(models.Model):
     """Model with ForeignKey to another model, for testing ModelForm
     generation with ModelChoiceField."""
-    choice = models.ForeignKey(ChoiceOptionModel, blank=False,
-                               default=lambda: ChoiceOptionModel.objects.get(name='default'))
-    choice_int = models.ForeignKey(ChoiceOptionModel, blank=False, related_name='choice_int',
-                                   default=lambda: 1)
-
-    multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice',
-                                          default=lambda: ChoiceOptionModel.objects.filter(name='default'))
-    multi_choice_int = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='multi_choice_int',
-                                              default=lambda: [1])
+    choice = models.ForeignKey(
+        ChoiceOptionModel,
+        models.CASCADE,
+        blank=False,
+        default=choice_default,
+    )
+    choice_int = models.ForeignKey(
+        ChoiceOptionModel,
+        models.CASCADE,
+        blank=False,
+        related_name='choice_int',
+        default=int_default,
+    )
+    multi_choice = models.ManyToManyField(
+        ChoiceOptionModel,
+        blank=False,
+        related_name='multi_choice',
+        default=choice_default_list,
+    )
+    multi_choice_int = models.ManyToManyField(
+        ChoiceOptionModel,
+        blank=False,
+        related_name='multi_choice_int',
+        default=int_list_default,
+    )
 
 
 class OptionalMultiChoiceModel(models.Model):
-    multi_choice = models.ManyToManyField(ChoiceOptionModel, blank=False, related_name='not_relevant',
-                                          default=lambda: ChoiceOptionModel.objects.filter(name='default'))
-    multi_choice_optional = models.ManyToManyField(ChoiceOptionModel, blank=True,
-                                                   related_name='not_relevant2')
+    multi_choice = models.ManyToManyField(
+        ChoiceOptionModel,
+        blank=False,
+        related_name='not_relevant',
+        default=choice_default,
+    )
+    multi_choice_optional = models.ManyToManyField(
+        ChoiceOptionModel,
+        blank=True,
+        related_name='not_relevant2',
+    )
 
 
 class FileModel(models.Model):

@@ -166,8 +166,8 @@ Django apps. Just follow these conventions:
 * Setting names are in all uppercase.
 * Don't reinvent an already-existing setting.
 
-For settings that are sequences, Django itself uses tuples, rather than lists,
-but this is only a convention.
+For settings that are sequences, Django itself uses lists, but this is only
+a convention.
 
 .. _settings-without-django-settings-module:
 
@@ -188,7 +188,7 @@ Example::
 
     from django.conf import settings
 
-    settings.configure(DEBUG=True, TEMPLATE_DEBUG=True)
+    settings.configure(DEBUG=True)
 
 Pass ``configure()`` as many keyword arguments as you'd like, with each keyword
 argument representing a setting and its value. Each argument name should be all
@@ -265,7 +265,29 @@ Also, it's an error to call ``configure()`` more than once, or to call
 It boils down to this: Use exactly one of either ``configure()`` or
 ``DJANGO_SETTINGS_MODULE``. Not both, and not neither.
 
-.. _@login_required: ../authentication/#the-login-required-decorator
+Calling ``django.setup()`` is required for "standalone" Django usage
+--------------------------------------------------------------------
+
+If you're using components of Django "standalone" -- for example, writing a
+Python script which loads some Django templates and renders them, or uses the
+ORM to fetch some data -- there's one more step you'll need in addition to
+configuring settings.
+
+After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
+``configure()``, you'll need to call :func:`django.setup()` to load your
+settings and populate Django's application registry. For example::
+
+    from django.conf import settings
+    from myapp import myapp_defaults
+
+    settings.configure(default_settings=myapp_defaults, DEBUG=True)
+    django.setup()
+
+    # Now this script can use any part of Django it needs.
+
+Note that calling ``django.setup()`` is only necessary if your code is truly
+standalone. When invoked by your Web server, or through :doc:`django-admin
+</ref/django-admin>`, Django will handle this for you.
 
 .. seealso::
 

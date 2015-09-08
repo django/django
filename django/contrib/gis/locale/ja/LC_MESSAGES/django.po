@@ -2,13 +2,13 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012,2014
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-28 10:02+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-29 02:56+0000\n"
 "Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
@@ -18,55 +18,45 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/gis/apps.py:8
 msgid "GIS"
 msgstr "地理情報システム"
 
-#: contrib/gis/db/models/fields.py:56
 msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
 msgstr "GIS基底フィールドです -- OpenGIS で決められた地形タイプに対応"
 
-#: contrib/gis/db/models/fields.py:298
 msgid "Point"
 msgstr "点"
 
-#: contrib/gis/db/models/fields.py:304
 msgid "Line string"
 msgstr "線"
 
-#: contrib/gis/db/models/fields.py:310
 msgid "Polygon"
 msgstr "ポリゴン"
 
-#: contrib/gis/db/models/fields.py:316
 msgid "Multi-point"
 msgstr "複数の点"
 
-#: contrib/gis/db/models/fields.py:322
 msgid "Multi-line string"
 msgstr "複数の線"
 
-#: contrib/gis/db/models/fields.py:328
 msgid "Multi polygon"
 msgstr "複数のポリゴン"
 
-#: contrib/gis/db/models/fields.py:334
 msgid "Geometry collection"
 msgstr "地形の集合"
 
-#: contrib/gis/forms/fields.py:22
+msgid "Extent Aggregate Field"
+msgstr "広さ集計フィールド"
+
 msgid "No geometry value provided."
 msgstr "geometry値がありません。"
 
-#: contrib/gis/forms/fields.py:23
 msgid "Invalid geometry value."
 msgstr "geometry値が不正です"
 
-#: contrib/gis/forms/fields.py:24
 msgid "Invalid geometry type."
 msgstr "geometryタイプが不正です。"
 
-#: contrib/gis/forms/fields.py:25
 msgid ""
 "An error occurred when transforming the geometry to the SRID of the geometry "
 "form field."
@@ -74,26 +64,21 @@ msgstr ""
 "geometry を geometry フォームフィールドの SRID に変換しようとしてエラーが起き"
 "ました。"
 
-#: contrib/gis/sitemaps/views.py:56
-#, python-format
-msgid "No sitemap available for section: %r"
-msgstr "このセクションで利用可能なサイトマップはありません: %r"
+msgid "Delete all Features"
+msgstr "すべての機能を削除"
 
-#: contrib/gis/sitemaps/views.py:70
-#, python-format
-msgid "Page %s empty"
-msgstr "ページ %s は空です"
+msgid "WKT debugging window:"
+msgstr "WKTデバッグウィンドウ:"
 
-#: contrib/gis/sitemaps/views.py:72
-#, python-format
-msgid "No page '%s'"
-msgstr "ページ '%s' は存在しません"
+msgid "Google Maps via GeoDjango"
+msgstr "GeoDjangoによるGoogleマップ"
 
-#: contrib/gis/views.py:10
+msgid "Debugging window (serialized value)"
+msgstr "デバッグウィンドウ(シリアライズされた値)"
+
 msgid "No feeds are registered."
 msgstr "フィードが登録されていません。"
 
-#: contrib/gis/views.py:16
 #, python-format
 msgid "Slug %r isn't registered."
 msgstr "スラグ %r は登録されていません。"

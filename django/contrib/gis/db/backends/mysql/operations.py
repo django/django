@@ -4,6 +4,7 @@ from django.contrib.gis.db.backends.base.operations import \
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.db.models import aggregates
 from django.db.backends.mysql.operations import DatabaseOperations
+from django.utils.functional import cached_property
 
 
 class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
@@ -32,7 +33,28 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         'within': SpatialOperator(func='MBRWithin'),
     }
 
-    disallowed_aggregates = (aggregates.Collect, aggregates.Extent, aggregates.Extent3D, aggregates.MakeLine, aggregates.Union)
+    function_names = {
+        'Distance': 'ST_Distance',
+        'Length': 'GLength',
+        'Union': 'ST_Union',
+    }
+
+    disallowed_aggregates = (
+        aggregates.Collect, aggregates.Extent, aggregates.Extent3D,
+        aggregates.MakeLine, aggregates.Union,
+    )
+
+    @cached_property
+    def unsupported_functions(self):
+        unsupported = {
+            'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG', 'BoundingCircle',
+            'Difference', 'ForceRHR', 'GeoHash', 'Intersection', 'MemSize',
+            'Perimeter', 'PointOnSurface', 'Reverse', 'Scale', 'SnapToGrid',
+            'SymDifference', 'Transform', 'Translate',
+        }
+        if self.connection.mysql_version < (5, 6, 1):
+            unsupported.update({'Distance', 'Union'})
+        return unsupported
 
     def geo_db_type(self, f):
         return f.geom_type

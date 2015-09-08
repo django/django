@@ -3,13 +3,14 @@
 # Translators:
 # Alexander Chernihov <aleksandr.chernigov@gmail.com>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mykola Zamkovoi <nickzam@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-09-24 12:17+0000\n"
-"Last-Translator: Alexander Chernihov <aleksandr.chernigov@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-11-02 20:29+0000\n"
+"Last-Translator: Mykola Zamkovoi <nickzam@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/projects/p/django/"
 "language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -19,15 +20,12 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr "Перенаправлення"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "перенаправлення з"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -35,22 +33,18 @@ msgstr ""
 "Це повинен бути абсолютний шлях, виключаючи ім'я домену. Приклад: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "перенаправлення до"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
 msgstr ""
-"Це може бути або абсолютний шлях (як вище), або повний URL, який починається "
-"з 'http://'."
+"Це може бути або абсолютний шлях (як вказано вище), або повний URL, що "
+"починається з 'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "перенаправлення"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "перенаправлення"

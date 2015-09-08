@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# supowski <supowski@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-03-22 17:59+0000\n"
+"Last-Translator: supowski <supowski@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/django/language/"
 "sk/)\n"
 "MIME-Version: 1.0\n"
@@ -17,15 +18,12 @@ msgstr ""
 "Language: sk\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
-msgstr ""
+msgstr "Presmerovania"
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "presmerovať z"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -33,11 +31,9 @@ msgstr ""
 "Tu by sa mala použiť absolútna cesta bez názvu domény. Napríklad: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "presmerovať na"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -45,10 +41,8 @@ msgstr ""
 "Toto môže byť buď absolútna cesta (ako vyššie) alebo úplné URL začínajúce na "
 "'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "presmerovanie"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "presmerovania"

@@ -59,8 +59,8 @@ for several versions of Django:
   Django 1.3. Upon the release of Django 1.5, Django 1.3's security
   support will end.
 
-* :ref:`Long-term support (LTS) releases <lts-releases>` will receive
-  security updates for a specified period.
+* :term:`Long-term support release`\s will receive security updates for a
+  specified period.
 
 When new releases are issued for security reasons, the accompanying
 notice will include a list of affected versions. This list is
@@ -112,8 +112,8 @@ On the day of disclosure, we will take the following steps:
    relevant patches and new releases, and crediting the reporter of
    the issue (if the reporter wishes to be publicly identified).
 
-4. Post a notice to the |django-announce| mailing list that links to the blog
-   post.
+4. Post a notice to the |django-announce| and oss-security@lists.openwall.com
+   mailing lists that links to the blog post.
 
 .. _the Python Package Index: https://pypi.python.org/pypi
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
@@ -171,11 +171,6 @@ groups:
    known users or distributors of Django, and will require a
    demonstrated ability to responsibly receive, keep confidential and
    act on these notifications.
-
-Additionally, a maximum of six days prior to disclosure, notification
-will be sent to the ``distros@vs.openwall.org`` mailing list, whose
-membership includes representatives of most major open-source
-operating system vendors.
 
 Requesting notifications
 ========================

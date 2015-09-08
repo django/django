@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aarni Koskela, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-11 11:11+0000\n"
+"Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
@@ -18,33 +19,26 @@ msgstr ""
 "Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/contenttypes/apps.py:9
 msgid "Content Types"
-msgstr ""
+msgstr "Sisältötyypit"
 
-#: contrib/contenttypes/models.py:134
 msgid "python model class name"
 msgstr "mallin python-luokan nimi"
 
-#: contrib/contenttypes/models.py:138
 msgid "content type"
 msgstr "sisältötyyppi"
 
-#: contrib/contenttypes/models.py:139
 msgid "content types"
 msgstr "sisältötyypit"
 
-#: contrib/contenttypes/views.py:19
 #, python-format
 msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Sisältötyypin %(ct_id)s objektiin ei ole liitetty mallia"
 
-#: contrib/contenttypes/views.py:23
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
 msgstr "Sisältötyypin %(ct_id)s objektia %(obj_id)s ei ole olemassa"
 
-#: contrib/contenttypes/views.py:29
 #, python-format
 msgid "%(ct_name)s objects don't have a get_absolute_url() method"
 msgstr "%(ct_name)s-objekteilla ei ole get_absolute_url()-metodia"

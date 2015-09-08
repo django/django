@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.template import Context, Template
-from django.test import TestCase
+from django.test import SimpleTestCase
 from django.utils import html, six, text
 from django.utils.encoding import force_bytes, force_text
 from django.utils.functional import lazy
@@ -20,7 +20,7 @@ class customescape(six.text_type):
         return self.replace('<', '<<').replace('>', '>>')
 
 
-class SafeStringTest(TestCase):
+class SafeStringTest(SimpleTestCase):
     def assertRenderEqual(self, tpl, expected, **context):
         context = Context(context)
         tpl = Template(tpl)

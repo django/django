@@ -67,7 +67,9 @@ def parse_rst(text, default_reference_context, thing_being_parsed=None):
         'doctitle_xform': True,
         'inital_header_level': 3,
         "default_reference_context": default_reference_context,
-        "link_base": reverse('django-admindocs-docroot').rstrip('/')
+        "link_base": reverse('django-admindocs-docroot').rstrip('/'),
+        'raw_enabled': False,
+        'file_insertion_enabled': False,
     }
     if thing_being_parsed:
         thing_being_parsed = force_bytes("<%s>" % thing_being_parsed)

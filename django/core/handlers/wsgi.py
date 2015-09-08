@@ -219,7 +219,7 @@ def get_script_name(environ):
 
     if script_url:
         path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
-        script_name = script_url[:-len(path_info)]
+        script_name = script_url[:-len(path_info)] if path_info else script_url
     else:
         script_name = get_bytes_from_wsgi(environ, 'SCRIPT_NAME', '')
 

@@ -3,13 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Maredudd ap Gwyndaf <maredudd@maredudd.com>, 2013-2014
+# pjrobertson <transifex@patjack.co.uk>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-20 12:20+0200\n"
-"PO-Revision-Date: 2014-08-26 13:57+0000\n"
-"Last-Translator: Maredudd ap Gwyndaf <maredudd@maredudd.com>\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 10:30+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Welsh (http://www.transifex.com/projects/p/django/language/"
 "cy/)\n"
 "MIME-Version: 1.0\n"
@@ -19,77 +20,47 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n==2) ? 1 : (n != 8 && n != "
 "11) ? 2 : 3;\n"
 
-#: contrib/auth/admin.py:44
 msgid "Personal info"
 msgstr "Gwybodaeth bersonol"
 
-#: contrib/auth/admin.py:45
 msgid "Permissions"
 msgstr "Hawliau"
 
-#: contrib/auth/admin.py:47
 msgid "Important dates"
 msgstr "Dyddiadau pwysig"
 
-#: contrib/auth/admin.py:134
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr ""
+
 msgid "Password changed successfully."
 msgstr "Newidwyd y gyfrinair."
 
-#: contrib/auth/admin.py:145
 #, python-format
 msgid "Change password: %s"
 msgstr "Newid cyfrinair: %s"
 
-#: contrib/auth/apps.py:10
 msgid "Authentication and Authorization"
 msgstr "Dilysu ac Awdurdodi"
 
-#: contrib/auth/forms.py:37 contrib/auth/tests/test_forms.py:316
-#: contrib/auth/tests/test_forms.py:321 contrib/auth/tests/test_forms.py:504
 msgid "No password set."
 msgstr "Cyfrinair heb ei osod."
 
-#: contrib/auth/forms.py:43 contrib/auth/tests/test_forms.py:326
-#: contrib/auth/tests/test_forms.py:332
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Fformat cyfrinair annilys neu algorithm hashio anhysbys."
 
-#: contrib/auth/forms.py:76
-msgid "A user with that username already exists."
-msgstr "Mae'r enw defnyddiwr yn bodoli'n barod."
-
-#: contrib/auth/forms.py:77 contrib/auth/forms.py:285
-#: contrib/auth/forms.py:349
 msgid "The two password fields didn't match."
 msgstr "Nid oedd y ddau faes cyfrinair yr un peth."
 
-#: contrib/auth/forms.py:79 contrib/auth/forms.py:129
-msgid "Username"
-msgstr "Enw defnyddiwr"
-
-#: contrib/auth/forms.py:81 contrib/auth/forms.py:130
-#: contrib/auth/models.py:368
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "Gofynnol. 30 nod neu lai. Llythrennau, digidau a @/./+/-/_ yn unig."
-
-#: contrib/auth/forms.py:84 contrib/auth/forms.py:133
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "Gall y gwerth ond cynnwyd llythrennau, rhifau a @/./+/-/_ ."
-
-#: contrib/auth/forms.py:86 contrib/auth/forms.py:135
-#: contrib/auth/forms.py:163 contrib/auth/forms.py:351
 msgid "Password"
 msgstr "Cyfrinair"
 
-#: contrib/auth/forms.py:88
 msgid "Password confirmation"
 msgstr "Cadarnhad cyfrinair"
 
-#: contrib/auth/forms.py:90
 msgid "Enter the same password as above, for verification."
 msgstr "Rhowch yr un cyfrinair ag uchod, er mwyn ei wirio."
 
-#: contrib/auth/forms.py:136
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
 "password, but you can change the password using <a href=\"password/\">this "
@@ -99,7 +70,6 @@ msgstr ""
 "defnyddiwr hyn, ond gallwch newid y gyfrinair gan ddefnyddio'r  <a href="
 "\"password/\">ffurflen hwn</a>."
 
-#: contrib/auth/forms.py:166
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
@@ -108,156 +78,120 @@ msgstr ""
 "Teipiwch yr %(username)s a chyfrinair cywir ar gyfer cyfrif staff. Noder y "
 "gall y ddau faes fod yn sensitif i lythrennau bach a llythrennau bras."
 
-#: contrib/auth/forms.py:168
 msgid "This account is inactive."
 msgstr "Mae'r cyfrif yn anweithredol."
 
-#: contrib/auth/forms.py:231
 msgid "Email"
 msgstr "Ebost"
 
-#: contrib/auth/forms.py:287
 msgid "New password"
 msgstr "Cyfrinair newydd"
 
-#: contrib/auth/forms.py:289
 msgid "New password confirmation"
 msgstr "Cadarnhad cyfrinair newydd"
 
-#: contrib/auth/forms.py:320
 msgid "Your old password was entered incorrectly. Please enter it again."
 msgstr "Rhoddwydd eich hen gyfrinair yn anghywir.  Triwch eto."
 
-#: contrib/auth/forms.py:323
 msgid "Old password"
 msgstr "Hen gyfrinair"
 
-#: contrib/auth/forms.py:353
 msgid "Password (again)"
 msgstr "Cyfrinair (eto)"
 
-#: contrib/auth/hashers.py:252 contrib/auth/hashers.py:335
-#: contrib/auth/hashers.py:383 contrib/auth/hashers.py:411
-#: contrib/auth/hashers.py:444 contrib/auth/hashers.py:477
-#: contrib/auth/hashers.py:511
 msgid "algorithm"
 msgstr "algorithm"
 
-#: contrib/auth/hashers.py:253
 msgid "iterations"
 msgstr "iteriadau"
 
-#: contrib/auth/hashers.py:254 contrib/auth/hashers.py:337
-#: contrib/auth/hashers.py:384 contrib/auth/hashers.py:412
-#: contrib/auth/hashers.py:512
 msgid "salt"
 msgstr "salt"
 
-#: contrib/auth/hashers.py:255 contrib/auth/hashers.py:385
-#: contrib/auth/hashers.py:413 contrib/auth/hashers.py:445
-#: contrib/auth/hashers.py:478 contrib/auth/hashers.py:513
 msgid "hash"
 msgstr "hash"
 
-#: contrib/auth/hashers.py:336
 msgid "work factor"
 msgstr "ffactor gwaith"
 
-#: contrib/auth/hashers.py:338
 msgid "checksum"
 msgstr "prawfswm"
 
-#: contrib/auth/models.py:63 contrib/auth/models.py:112
 msgid "name"
 msgstr "enw"
 
-#: contrib/auth/models.py:65
 msgid "codename"
 msgstr "enw arwyddol"
 
-#: contrib/auth/models.py:69
 msgid "permission"
 msgstr "hawl"
 
-#: contrib/auth/models.py:70 contrib/auth/models.py:114
 msgid "permissions"
 msgstr "hawliau"
 
-#: contrib/auth/models.py:119
 msgid "group"
 msgstr "grŵp"
 
-#: contrib/auth/models.py:120 contrib/auth/models.py:293
 msgid "groups"
 msgstr "grwpiau"
 
-#: contrib/auth/models.py:192
 msgid "password"
 msgstr "cyfrinair"
 
-#: contrib/auth/models.py:193
 msgid "last login"
-msgstr "mewngofnod olaf"
+msgstr "mewngofnod diwethaf"
 
-#: contrib/auth/models.py:290
 msgid "superuser status"
 msgstr "statws uwchddefnyddiwr"
 
-#: contrib/auth/models.py:291
 msgid ""
 "Designates that this user has all permissions without explicitly assigning "
 "them."
 msgstr "Dynoda bod gan y defnyddiwr yr holl hawliau heb eu dynodi'n benodol."
 
-#: contrib/auth/models.py:294
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
+"each of their groups."
 msgstr ""
-"Y grwpiau mae'r defnyddiwr yn perthyn iddynt.  Bydd gan y defnyddiwr yr holl "
-"hawliau a ganiateir i'w grwpiau."
 
-#: contrib/auth/models.py:299
 msgid "user permissions"
 msgstr "hawliau defnyddiwr"
 
-#: contrib/auth/models.py:300
 msgid "Specific permissions for this user."
 msgstr "Caniatâd penodol ar gyfer y defnyddiwr hwn."
 
-#: contrib/auth/models.py:367
 msgid "username"
 msgstr "enw defnyddiwr"
 
-#: contrib/auth/models.py:371
-msgid "Enter a valid username."
-msgstr "Rhowch enw defnyddiwr dilys."
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr "Gofynnol. 30 nod neu lai. Llythrennau, digidau a @/./+/-/_ yn unig."
 
-#: contrib/auth/models.py:373
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "Mae'r enw defnyddiwr yn bodoli'n barod."
+
 msgid "first name"
 msgstr "enw cyntaf"
 
-#: contrib/auth/models.py:374
 msgid "last name"
 msgstr "cyfenw"
 
-#: contrib/auth/models.py:375
 msgid "email address"
 msgstr "cyfeiriad ebost"
 
-#: contrib/auth/models.py:376
 msgid "staff status"
 msgstr "statws staff"
 
-#: contrib/auth/models.py:377
 msgid "Designates whether the user can log into this admin site."
 msgstr "Dynoda os gall y defnyddiwr fewngofnodi i'r adran weinyddol."
 
-#: contrib/auth/models.py:379
 msgid "active"
 msgstr "gweithredol"
 
-#: contrib/auth/models.py:380
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -265,55 +199,39 @@ msgstr ""
 "Dynoda os ydy'r defnyddiwr yn weithredol.  Dad-ddewiswch hwn yn lle dileu "
 "cyfrifon."
 
-#: contrib/auth/models.py:382
 msgid "date joined"
 msgstr "dyddiad ymuno"
 
-#: contrib/auth/models.py:390
 msgid "user"
 msgstr "defnyddiwr"
 
-#: contrib/auth/models.py:391
 msgid "users"
 msgstr "defnyddwyr"
 
-#: contrib/auth/templates/registration/password_reset_subject.txt:2
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Ailosod cyfrinar ar %(site_name)s"
 
-#: contrib/auth/tests/test_forms.py:387
-msgid "Enter a valid email address."
-msgstr "Rhowch gyfeiriad ebost dilys."
-
-#: contrib/auth/views.py:92
 msgid "Logged out"
 msgstr "Allgofnodwyd"
 
-#: contrib/auth/views.py:169
 msgid "Password reset"
 msgstr "Ailosod cyfrinair"
 
-#: contrib/auth/views.py:181
-msgid "Password reset successful"
-msgstr "Ailosod cyfrinair yn llwyddianus"
+msgid "Password reset sent"
+msgstr ""
 
-#: contrib/auth/views.py:216
 msgid "Enter new password"
 msgstr "Rhowch gyfrinair newydd"
 
-#: contrib/auth/views.py:227
 msgid "Password reset unsuccessful"
 msgstr "Ailosod y cyfrinair yn aflwyddiannus"
 
-#: contrib/auth/views.py:244
 msgid "Password reset complete"
 msgstr "Cwblhawyd ailosod y cyfrinair"
 
-#: contrib/auth/views.py:278
 msgid "Password change"
 msgstr "Newid cyfrinair"
 
-#: contrib/auth/views.py:291
 msgid "Password change successful"
 msgstr "Newid cyfrinair yn llwyddianus"

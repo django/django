@@ -5,6 +5,7 @@ import calendar
 import datetime
 import re
 import sys
+import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
@@ -32,6 +33,11 @@ ASCTIME_DATE = re.compile(r'^\w{3} %s %s %s %s$' % (__M, __D2, __T, __Y))
 
 RFC3986_GENDELIMS = str(":/?#[]@")
 RFC3986_SUBDELIMS = str("!$&'()*+,;=")
+
+PROTOCOL_TO_PORT = {
+    'http': 80,
+    'https': 443,
+}
 
 
 def urlquote(url, safe='/'):
@@ -253,8 +259,10 @@ def same_origin(url1, url2):
     """
     p1, p2 = urlparse(url1), urlparse(url2)
     try:
-        return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)
-    except ValueError:
+        o1 = (p1.scheme, p1.hostname, p1.port or PROTOCOL_TO_PORT[p1.scheme])
+        o2 = (p2.scheme, p2.hostname, p2.port or PROTOCOL_TO_PORT[p2.scheme])
+        return o1 == o2
+    except (ValueError, KeyError):
         return False
 
 
@@ -265,9 +273,10 @@ def is_safe_url(url, host=None):
 
     Always returns ``False`` on an empty url.
     """
+    if url is not None:
+        url = url.strip()
     if not url:
         return False
-    url = url.strip()
     # Chrome treats \ completely as /
     url = url.replace('\\', '/')
     # Chrome considers any URL with more than two slashes to be absolute, but
@@ -280,6 +289,11 @@ def is_safe_url(url, host=None):
     # Chrome will still consider example.com to be the hostname, so we must not
     # allow this syntax.
     if not url_info.netloc and url_info.scheme:
+        return False
+    # Forbid URLs that start with control characters. Some browsers (like
+    # Chrome) ignore quite a few control characters at the start of a
+    # URL and might consider the URL as scheme relative.
+    if unicodedata.category(url[0])[0] == 'C':
         return False
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))

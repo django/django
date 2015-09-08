@@ -1,8 +1,6 @@
 import inspect
 from copy import copy
 
-from django.conf import settings
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
@@ -72,8 +70,13 @@ class Transform(RegisterLookupMixin):
     def output_field(self):
         return self.lhs.output_field
 
+    def copy(self):
+        return copy(self)
+
     def relabeled_clone(self, relabels):
-        return self.__class__(self.lhs.relabeled_clone(relabels))
+        copy = self.copy()
+        copy.lhs = self.lhs.relabeled_clone(relabels)
+        return copy
 
     def get_group_by_cols(self):
         return self.lhs.get_group_by_cols()
@@ -408,11 +411,6 @@ class Between(BuiltinLookup):
         return "BETWEEN %s AND %s" % (rhs, rhs)
 
 
-class Year(Between):
-    lookup_name = 'year'
-default_lookups['year'] = Year
-
-
 class Range(BuiltinLookup):
     lookup_name = 'range'
 
@@ -428,57 +426,6 @@ class Range(BuiltinLookup):
             return super(Range, self).process_rhs(compiler, connection)
 
 default_lookups['range'] = Range
-
-
-class DateLookup(BuiltinLookup):
-    def process_lhs(self, compiler, connection, lhs=None):
-        from django.db.models import DateTimeField
-        lhs, params = super(DateLookup, self).process_lhs(compiler, connection, lhs)
-        if isinstance(self.lhs.output_field, DateTimeField):
-            tzname = timezone.get_current_timezone_name() if settings.USE_TZ else None
-            sql, tz_params = connection.ops.datetime_extract_sql(self.extract_type, lhs, tzname)
-            return connection.ops.lookup_cast(self.lookup_name) % sql, tz_params
-        else:
-            return connection.ops.date_extract_sql(self.lookup_name, lhs), []
-
-    def get_rhs_op(self, connection, rhs):
-        return '= %s' % rhs
-
-
-class Month(DateLookup):
-    lookup_name = 'month'
-    extract_type = 'month'
-default_lookups['month'] = Month
-
-
-class Day(DateLookup):
-    lookup_name = 'day'
-    extract_type = 'day'
-default_lookups['day'] = Day
-
-
-class WeekDay(DateLookup):
-    lookup_name = 'week_day'
-    extract_type = 'week_day'
-default_lookups['week_day'] = WeekDay
-
-
-class Hour(DateLookup):
-    lookup_name = 'hour'
-    extract_type = 'hour'
-default_lookups['hour'] = Hour
-
-
-class Minute(DateLookup):
-    lookup_name = 'minute'
-    extract_type = 'minute'
-default_lookups['minute'] = Minute
-
-
-class Second(DateLookup):
-    lookup_name = 'second'
-    extract_type = 'second'
-default_lookups['second'] = Second
 
 
 class IsNull(BuiltinLookup):

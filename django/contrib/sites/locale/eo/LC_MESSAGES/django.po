@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 14:05+0000\n"
-"Last-Translator: Baptiste Darthenay <baptiste+transifex@darthenay.fr>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Esperanto (http://www.transifex.com/projects/p/django/"
 "language/eo/)\n"
 "MIME-Version: 1.0\n"
@@ -19,26 +19,20 @@ msgstr ""
 "Language: eo\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/sites/apps.py:8
 msgid "Sites"
 msgstr "Retejoj"
 
-#: contrib/sites/models.py:30
 msgid "The domain name cannot contain any spaces or tabs."
 msgstr "Tiu domajna nomo ne povas enteni nek spacojn nek tabojn."
 
-#: contrib/sites/models.py:67
 msgid "domain name"
 msgstr "domajna nomo"
 
-#: contrib/sites/models.py:69
 msgid "display name"
 msgstr "vidiga nomo"
 
-#: contrib/sites/models.py:74
 msgid "site"
 msgstr "retejo"
 
-#: contrib/sites/models.py:75
 msgid "sites"
 msgstr "retejoj"

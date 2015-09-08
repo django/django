@@ -311,3 +311,24 @@ class BasicSyntaxTests(SimpleTestCase):
         """
         output = self.engine.render_to_string('basic-syntax38', {"var": {"callable": lambda: "foo bar"}})
         self.assertEqual(output, 'foo bar')
+
+    @setup({'template': '{% block content %}'})
+    def test_unclosed_block(self):
+        msg = "Unclosed tag 'block'. Looking for one of: endblock."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'template': '{% if a %}'})
+    def test_unclosed_block2(self):
+        msg = "Unclosed tag 'if'. Looking for one of: elif, else, endif."
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            self.engine.render_to_string('template')
+
+    @setup({'tpl-str': '%s', 'tpl-percent': '%%', 'tpl-weird-percent': '% %s'})
+    def test_ignores_strings_that_look_like_format_interpolation(self):
+        output = self.engine.render_to_string('tpl-str')
+        self.assertEqual(output, '%s')
+        output = self.engine.render_to_string('tpl-percent')
+        self.assertEqual(output, '%%')
+        output = self.engine.render_to_string('tpl-weird-percent')
+        self.assertEqual(output, '% %s')

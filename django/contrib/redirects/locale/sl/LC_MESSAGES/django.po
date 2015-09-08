@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-20 09:45+0000\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Slovenian (http://www.transifex.com/projects/p/django/"
 "language/sl/)\n"
@@ -18,15 +18,12 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
 "%100==4 ? 2 : 3);\n"
 
-#: contrib/redirects/apps.py:8
 msgid "Redirects"
 msgstr ""
 
-#: contrib/redirects/models.py:10
 msgid "redirect from"
 msgstr "preusmeri iz"
 
-#: contrib/redirects/models.py:11
 msgid ""
 "This should be an absolute path, excluding the domain name. Example: '/"
 "events/search/'."
@@ -34,11 +31,9 @@ msgstr ""
 "Pot mora biti navedena absolutno in brez imena domene. Primer: '/events/"
 "search/'."
 
-#: contrib/redirects/models.py:12
 msgid "redirect to"
 msgstr "preusmeri na"
 
-#: contrib/redirects/models.py:13
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
 "'http://'."
@@ -46,10 +41,8 @@ msgstr ""
 "Pot je lahko navedena absolutno (kot zgoraj) ali pa kot popoln naslov URL, "
 "začet z 'http://'."
 
-#: contrib/redirects/models.py:16
 msgid "redirect"
 msgstr "preusmeri"
 
-#: contrib/redirects/models.py:17
 msgid "redirects"
 msgstr "preusmeritve"

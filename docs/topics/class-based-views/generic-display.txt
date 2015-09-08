@@ -1,7 +1,7 @@
 .. _Generic views:
 
 ==================================
-Built-in Class-based generic views
+Built-in class-based generic views
 ==================================
 
 Writing Web applications can be monotonous, because we repeat certain patterns
@@ -104,7 +104,7 @@ We'll be using these models::
     class Book(models.Model):
         title = models.CharField(max_length=100)
         authors = models.ManyToManyField('Author')
-        publisher = models.ForeignKey(Publisher)
+        publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         publication_date = models.DateField()
 
 Now we need to define a view::

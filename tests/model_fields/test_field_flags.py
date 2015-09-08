@@ -31,20 +31,20 @@ RELATION_FIELDS = (
     GenericRelation,
 )
 
-ONE_TO_MANY_CLASSES = {
+MANY_TO_MANY_CLASSES = {
+    ManyToManyField,
+}
+
+MANY_TO_ONE_CLASSES = {
     ForeignObject,
     ForeignKey,
     GenericForeignKey,
 }
 
-MANY_TO_ONE_CLASSES = {
+ONE_TO_MANY_CLASSES = {
     ForeignObjectRel,
     ManyToOneRel,
     GenericRelation,
-}
-
-MANY_TO_MANY_CLASSES = {
-    ManyToManyField,
 }
 
 ONE_TO_ONE_CLASSES = {
@@ -72,7 +72,7 @@ FLAG_PROPERTIES_FOR_RELATIONS = (
 )
 
 
-class FieldFlagsTests(test.TestCase):
+class FieldFlagsTests(test.SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         super(FieldFlagsTests, cls).setUpClass()
@@ -146,16 +146,16 @@ class FieldFlagsTests(test.TestCase):
                 self.assertEqual(1, true_cardinality_flags)
 
     def test_cardinality_m2m(self):
-        m2m_type_fields = (
+        m2m_type_fields = [
             f for f in self.all_fields
             if f.is_relation and f.many_to_many
-        )
+        ]
         # Test classes are what we expect
         self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
 
         # Ensure all m2m reverses are m2m
         for field in m2m_type_fields:
-            reverse_field = field.rel
+            reverse_field = field.remote_field
             self.assertTrue(reverse_field.is_relation)
             self.assertTrue(reverse_field.many_to_many)
             self.assertTrue(reverse_field.related_model)
@@ -171,7 +171,7 @@ class FieldFlagsTests(test.TestCase):
         # Ensure all o2m reverses are m2o
         for field in o2m_type_fields:
             if field.concrete:
-                reverse_field = field.rel
+                reverse_field = field.remote_field
                 self.assertTrue(reverse_field.is_relation and reverse_field.many_to_one)
 
     def test_cardinality_m2o(self):
@@ -213,6 +213,12 @@ class FieldFlagsTests(test.TestCase):
         for field in AllFieldsModel._meta.get_fields():
             is_concrete_forward_field = field.concrete and field.related_model
             if is_concrete_forward_field:
-                reverse_field = field.rel
+                reverse_field = field.remote_field
                 self.assertEqual(field.model, reverse_field.related_model)
                 self.assertEqual(field.related_model, reverse_field.model)
+
+    def test_null(self):
+        # null isn't well defined for a ManyToManyField, but changing it to
+        # True causes backwards compatibility problems (#25320).
+        self.assertFalse(AllFieldsModel._meta.get_field('m2m').null)
+        self.assertTrue(AllFieldsModel._meta.get_field('reverse2').null)

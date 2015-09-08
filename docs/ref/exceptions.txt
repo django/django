@@ -2,9 +2,7 @@
 Django Exceptions
 =================
 
-
-Django raises some Django specific exceptions as well as many standard
-Python exceptions.
+Django raises some of its own exceptions as well as standard Python exceptions.
 
 Django Core Exceptions
 ======================
@@ -12,29 +10,23 @@ Django Core Exceptions
 .. module:: django.core.exceptions
     :synopsis: Django core exceptions
 
-Django core exception classes are defined in :mod:`django.core.exceptions`.
+Django core exception classes are defined in ``django.core.exceptions``.
 
-ObjectDoesNotExist and DoesNotExist
------------------------------------
-.. exception:: DoesNotExist
-
-    The ``DoesNotExist`` exception is raised when an object is not found for
-    the given parameters of a query. Django provides a ``DoesNotExist``
-    exception as an attribute of each model class to identify the class of
-    object that could not be found and to allow you to catch a particular model
-    class with ``try/except``.
+``ObjectDoesNotExist``
+----------------------
 
 .. exception:: ObjectDoesNotExist
 
-    The base class for ``DoesNotExist`` exceptions; a ``try/except`` for
-    ``ObjectDoesNotExist`` will catch ``DoesNotExist`` exceptions for all
-    models.
+    The base class for :exc:`~django.db.models.Model.DoesNotExist` exceptions;
+    a ``try/except`` for ``ObjectDoesNotExist`` will catch
+    :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`DoesNotExist`.
+    on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
 
-FieldDoesNotExist
------------------
+``FieldDoesNotExist``
+---------------------
+
 .. exception:: FieldDoesNotExist
 
     The ``FieldDoesNotExist`` exception is raised by a model's
@@ -46,8 +38,9 @@ FieldDoesNotExist
         This exception was previously defined only in
         ``django.db.models.fields`` and wasn't part of the public API.
 
-MultipleObjectsReturned
------------------------
+``MultipleObjectsReturned``
+---------------------------
+
 .. exception:: MultipleObjectsReturned
 
     The :exc:`MultipleObjectsReturned` exception is raised by a query if only
@@ -58,61 +51,66 @@ MultipleObjectsReturned
 
     See :meth:`~django.db.models.query.QuerySet.get()` for further information.
 
-SuspiciousOperation
--------------------
+``SuspiciousOperation``
+-----------------------
+
 .. exception:: SuspiciousOperation
 
     The :exc:`SuspiciousOperation` exception is raised when a user has
     performed an operation that should be considered suspicious from a security
     perspective, such as tampering with a session cookie. Subclasses of
-    SuspiciousOperation include:
+    ``SuspiciousOperation`` include:
 
-    * DisallowedHost
-    * DisallowedModelAdminLookup
-    * DisallowedModelAdminToField
-    * DisallowedRedirect
-    * InvalidSessionKey
-    * SuspiciousFileOperation
-    * SuspiciousMultipartForm
-    * SuspiciousSession
-    * WizardViewCookieModified
+    * ``DisallowedHost``
+    * ``DisallowedModelAdminLookup``
+    * ``DisallowedModelAdminToField``
+    * ``DisallowedRedirect``
+    * ``InvalidSessionKey``
+    * ``SuspiciousFileOperation``
+    * ``SuspiciousMultipartForm``
+    * ``SuspiciousSession``
 
     If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
     logged at the ``Error`` level and results in
     a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
 
-PermissionDenied
-----------------
+``PermissionDenied``
+--------------------
+
 .. exception:: PermissionDenied
 
     The :exc:`PermissionDenied` exception is raised when a user does not have
     permission to perform the action requested.
 
-ViewDoesNotExist
-----------------
+``ViewDoesNotExist``
+--------------------
+
 .. exception:: ViewDoesNotExist
 
     The :exc:`ViewDoesNotExist` exception is raised by
     :mod:`django.core.urlresolvers` when a requested view does not exist.
 
-MiddlewareNotUsed
------------------
+``MiddlewareNotUsed``
+---------------------
+
 .. exception:: MiddlewareNotUsed
 
     The :exc:`MiddlewareNotUsed` exception is raised when a middleware is not
     used in the server configuration.
 
-ImproperlyConfigured
---------------------
+``ImproperlyConfigured``
+------------------------
+
 .. exception:: ImproperlyConfigured
 
     The :exc:`ImproperlyConfigured` exception is raised when Django is
     somehow improperly configured -- for example, if a value in ``settings.py``
     is incorrect or unparseable.
 
-FieldError
-----------
+``FieldError``
+--------------
+
 .. exception:: FieldError
 
     The :exc:`FieldError` exception is raised when there is a problem with a
@@ -128,8 +126,9 @@ FieldError
     - A field name is invalid
     - A query contains invalid order_by arguments
 
-ValidationError
----------------
+``ValidationError``
+-------------------
+
 .. exception:: ValidationError
 
     The :exc:`ValidationError` exception is raised when data fails form or
@@ -138,8 +137,9 @@ ValidationError
     :ref:`Model Field Validation <validating-objects>` and the
     :doc:`Validator Reference </ref/validators>`.
 
-NON_FIELD_ERRORS
-~~~~~~~~~~~~~~~~
+``NON_FIELD_ERRORS``
+~~~~~~~~~~~~~~~~~~~~
+
 .. data:: NON_FIELD_ERRORS
 
 ``ValidationError``\s that don't belong to a particular field in a form
@@ -152,19 +152,21 @@ list of errors.
 URL Resolver exceptions
 =======================
 
-URL Resolver exceptions are defined in :mod:`django.core.urlresolvers`.
+URL Resolver exceptions are defined in ``django.core.urlresolvers``.
 
-Resolver404
---------------
+``Resolver404``
+---------------
+
 .. exception:: Resolver404
 
     The :exc:`Resolver404` exception is raised by
     :func:`django.core.urlresolvers.resolve()` if the path passed to
     ``resolve()`` doesn't map to a view. It's a subclass of
-    :class:`django.http.Http404`
+    :class:`django.http.Http404`.
 
-NoReverseMatch
---------------
+``NoReverseMatch``
+------------------
+
 .. exception:: NoReverseMatch
 
     The :exc:`NoReverseMatch` exception is raised by
@@ -176,7 +178,7 @@ NoReverseMatch
 Database Exceptions
 ===================
 
-Database exceptions are provided in :mod:`django.db`.
+Database exceptions may be imported from ``django.db``.
 
 Django wraps the standard database exceptions so that your Django code has a
 guaranteed common implementation of these classes.
@@ -212,22 +214,28 @@ of :exc:`IntegrityError`.
 Http Exceptions
 ===============
 
-Http exceptions are provided in :mod:`django.http`.
+Http exceptions may be imported from ``django.http``.
+
+``UnreadablePostError``
+-----------------------
 
 .. exception:: UnreadablePostError
 
-    The :exc:`UnreadablePostError` is raised when a user cancels an upload.
-
-.. currentmodule:: django.db.transaction
+    :exc:`UnreadablePostError` is raised when a user cancels an upload.
 
 Transaction Exceptions
 ======================
 
-Transaction exceptions are defined in :mod:`django.db.transaction`.
+.. currentmodule:: django.db.transaction
+
+Transaction exceptions are defined in ``django.db.transaction``.
+
+``TransactionManagementError``
+------------------------------
 
 .. exception:: TransactionManagementError
 
-    The :exc:`TransactionManagementError` is raised for any and all problems
+    :exc:`TransactionManagementError` is raised for any and all problems
     related to database transactions.
 
 .. currentmodule:: django.test
@@ -235,7 +243,10 @@ Transaction exceptions are defined in :mod:`django.db.transaction`.
 Testing Framework Exceptions
 ============================
 
-Exceptions provided by the :mod:`django.test` package.
+Exceptions provided by the ``django.test`` package.
+
+``RedirectCycleError``
+----------------------
 
 .. exception:: client.RedirectCycleError
 

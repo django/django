@@ -155,6 +155,21 @@ HStoreField
         valid for a given field. This can be done using the
         :class:`~django.contrib.postgres.validators.KeysValidator`.
 
+JSONField
+---------
+
+.. class:: JSONField
+
+    A field which accepts JSON encoded data for a
+    :class:`~django.contrib.postgres.fields.JSONField`. It is represented by an
+    HTML ``<textarea>``.
+
+    .. admonition:: User friendly forms
+
+        ``JSONField`` is not particularly user friendly in most cases, however
+        it is a useful way to format data from a client-side widget for
+        submission to the server.
+
 Range Fields
 ------------
 

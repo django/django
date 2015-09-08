@@ -36,7 +36,7 @@ class Command(BaseCommand):
             self.local = True
 
     def add_arguments(self, parser):
-        parser.add_argument('--noinput',
+        parser.add_argument('--noinput', '--no-input',
             action='store_false', dest='interactive', default=True,
             help="Do NOT prompt the user for input of any kind.")
         parser.add_argument('--no-post-process',
@@ -105,6 +105,14 @@ class Command(BaseCommand):
                 if prefixed_path not in found_files:
                     found_files[prefixed_path] = (storage, path)
                     handler(path, prefixed_path, storage)
+                else:
+                    self.log(
+                        "Found another file with the destination path '%s'. It "
+                        "will be ignored since only the first encountered file "
+                        "is collected. If this is not what you want, make sure "
+                        "every static file has a unique path." % prefixed_path,
+                        level=1,
+                    )
 
         # Here we check if the storage backend has a post_process
         # method and pass it the list of modified files.
@@ -199,6 +207,9 @@ class Command(BaseCommand):
         """
         Deletes the given relative path using the destination storage backend.
         """
+        if not self.storage.exists(path):
+            return
+
         dirs, files = self.storage.listdir(path)
         for f in files:
             fpath = os.path.join(path, f)

@@ -4,7 +4,7 @@ import inspect
 
 from django.core import exceptions, serializers
 from django.db import connection
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from .fields import CustomTypedField, Small
 from .models import ChoicesModel, DataModel, MyModel, OtherModel
@@ -123,7 +123,7 @@ class CustomField(TestCase):
             o.full_clean()
 
 
-class TestDbType(TestCase):
+class TestDbType(SimpleTestCase):
 
     def test_db_parameters_respects_db_type(self):
         f = CustomTypedField()

@@ -1,7 +1,7 @@
 """
 Classes that represent database functions.
 """
-from django.db.models import IntegerField
+from django.db.models import DateTimeField, IntegerField
 from django.db.models.expressions import Func, Value
 
 
@@ -47,7 +47,9 @@ class ConcatPair(Func):
         return super(ConcatPair, self).as_sql(compiler, connection)
 
     def as_mysql(self, compiler, connection):
-        self.coalesce()
+        # Use CONCAT_WS with an empty separator so that NULLs are ignored.
+        self.function = 'CONCAT_WS'
+        self.template = "%(function)s('', %(expressions)s)"
         return super(ConcatPair, self).as_sql(compiler, connection)
 
     def coalesce(self):
@@ -81,6 +83,46 @@ class Concat(Func):
         return ConcatPair(expressions[0], self._paired(expressions[1:]))
 
 
+class Greatest(Func):
+    """
+    Chooses the maximum expression and returns it.
+
+    If any expression is null the return value is database-specific:
+    On Postgres, the maximum not-null expression is returned.
+    On MySQL, Oracle, and SQLite, if any expression is null, null is returned.
+    """
+    function = 'GREATEST'
+
+    def __init__(self, *expressions, **extra):
+        if len(expressions) < 2:
+            raise ValueError('Greatest must take at least two expressions')
+        super(Greatest, self).__init__(*expressions, **extra)
+
+    def as_sqlite(self, compiler, connection):
+        """Use the MAX function on SQLite."""
+        return super(Greatest, self).as_sql(compiler, connection, function='MAX')
+
+
+class Least(Func):
+    """
+    Chooses the minimum expression and returns it.
+
+    If any expression is null the return value is database-specific:
+    On Postgres, the minimum not-null expression is returned.
+    On MySQL, Oracle, and SQLite, if any expression is null, null is returned.
+    """
+    function = 'LEAST'
+
+    def __init__(self, *expressions, **extra):
+        if len(expressions) < 2:
+            raise ValueError('Least must take at least two expressions')
+        super(Least, self).__init__(*expressions, **extra)
+
+    def as_sqlite(self, compiler, connection):
+        """Use the MIN function on SQLite."""
+        return super(Least, self).as_sql(compiler, connection, function='MIN')
+
+
 class Length(Func):
     """Returns the number of characters in the expression"""
     function = 'LENGTH'
@@ -99,6 +141,22 @@ class Lower(Func):
 
     def __init__(self, expression, **extra):
         super(Lower, self).__init__(expression, **extra)
+
+
+class Now(Func):
+    template = 'CURRENT_TIMESTAMP'
+
+    def __init__(self, output_field=None, **extra):
+        if output_field is None:
+            output_field = DateTimeField()
+        super(Now, self).__init__(output_field=output_field, **extra)
+
+    def as_postgresql(self, compiler, connection):
+        # Postgres' CURRENT_TIMESTAMP means "the time at the start of the
+        # transaction". We use STATEMENT_TIMESTAMP to be cross-compatible with
+        # other databases.
+        self.template = 'STATEMENT_TIMESTAMP()'
+        return self.as_sql(compiler, connection)
 
 
 class Substr(Func):

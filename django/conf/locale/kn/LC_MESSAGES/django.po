@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-08-23 14:10+0200\n"
-"PO-Revision-Date: 2014-08-24 08:52+0000\n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-18 08:44+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Kannada (http://www.transifex.com/projects/p/django/language/"
 "kn/)\n"
@@ -19,418 +19,320 @@ msgstr ""
 "Language: kn\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: conf/global_settings.py:51
 msgid "Afrikaans"
 msgstr ""
 
-#: conf/global_settings.py:52
 msgid "Arabic"
 msgstr "ಅರೇಬಿಕ್"
 
-#: conf/global_settings.py:53
 msgid "Asturian"
 msgstr ""
 
-#: conf/global_settings.py:53
 msgid "Azerbaijani"
 msgstr "ಆಜೆರ್ಬೈಜನಿ"
 
-#: conf/global_settings.py:54
 msgid "Bulgarian"
 msgstr "ಬಲ್ಗೇರಿಯನ್"
 
-#: conf/global_settings.py:55
 msgid "Belarusian"
 msgstr ""
 
-#: conf/global_settings.py:56
 msgid "Bengali"
 msgstr "ಬೆಂಗಾಲಿ"
 
-#: conf/global_settings.py:57
 msgid "Breton"
 msgstr ""
 
-#: conf/global_settings.py:58
 msgid "Bosnian"
 msgstr "ಬೋಸ್ನಿಯನ್"
 
-#: conf/global_settings.py:59
 msgid "Catalan"
 msgstr "ಕೆಟಲಾನ್"
 
-#: conf/global_settings.py:60
 msgid "Czech"
 msgstr "ಝೆಕ್"
 
-#: conf/global_settings.py:61
 msgid "Welsh"
 msgstr "ವೆಲ್ಷ್"
 
-#: conf/global_settings.py:62
 msgid "Danish"
 msgstr "ಡ್ಯಾನಿಷ್"
 
-#: conf/global_settings.py:63
 msgid "German"
 msgstr "ಜರ್ಮನ್"
 
-#: conf/global_settings.py:64
 msgid "Greek"
 msgstr "ಗ್ರೀಕ್"
 
-#: conf/global_settings.py:65
 msgid "English"
 msgstr "ಇಂಗ್ಲಿಷ್"
 
-#: conf/global_settings.py:66
 msgid "Australian English"
 msgstr ""
 
-#: conf/global_settings.py:67
 msgid "British English"
 msgstr "ಬ್ರಿಟೀಶ್ ಇಂಗ್ಲಿಷ್"
 
-#: conf/global_settings.py:68
 msgid "Esperanto"
 msgstr ""
 
-#: conf/global_settings.py:69
 msgid "Spanish"
 msgstr "ಸ್ಪ್ಯಾನಿಷ್"
 
-#: conf/global_settings.py:70
 msgid "Argentinian Spanish"
 msgstr "ಅರ್ಜೆಂಟಿನಿಯನ್ ಸ್ಪಾನಿಷ್"
 
-#: conf/global_settings.py:71
 msgid "Mexican Spanish"
 msgstr "ಮೆಕ್ಸಿಕನ್ ಸ್ಪಾನಿಷ್"
 
-#: conf/global_settings.py:72
 msgid "Nicaraguan Spanish"
 msgstr "nicarguan ಸ್ಪಾನಿಷ್"
 
-#: conf/global_settings.py:73
 msgid "Venezuelan Spanish"
 msgstr ""
 
-#: conf/global_settings.py:74
 msgid "Estonian"
 msgstr "ಎಷ್ಟೋನಿಯನ್"
 
-#: conf/global_settings.py:75
 msgid "Basque"
 msgstr "ಬಾಸ್ಕ್‍"
 
-#: conf/global_settings.py:76
 msgid "Persian"
 msgstr "ಪರ್ಶಿಯನ್"
 
-#: conf/global_settings.py:77
 msgid "Finnish"
 msgstr "ಫಿನ್ನಿಶ್"
 
-#: conf/global_settings.py:78
 msgid "French"
 msgstr "ಫ್ರೆಂಚ್"
 
-#: conf/global_settings.py:79
 msgid "Frisian"
 msgstr "ಫ್ರಿಸಿಯನ್"
 
-#: conf/global_settings.py:80
 msgid "Irish"
 msgstr "ಐರಿಶ್"
 
-#: conf/global_settings.py:81
 msgid "Galician"
 msgstr "ಗೆಲಿಶಿಯನ್"
 
-#: conf/global_settings.py:82
 msgid "Hebrew"
 msgstr "ಹೀಬ್ರೂ"
 
-#: conf/global_settings.py:83
 msgid "Hindi"
 msgstr "ಹಿಂದಿ"
 
-#: conf/global_settings.py:84
 msgid "Croatian"
 msgstr "ಕ್ರೊಯೇಶಿಯನ್"
 
-#: conf/global_settings.py:85
 msgid "Hungarian"
 msgstr "ಹಂಗೇರಿಯನ್"
 
-#: conf/global_settings.py:86
 msgid "Interlingua"
 msgstr ""
 
-#: conf/global_settings.py:87
 msgid "Indonesian"
 msgstr "ಇಂಡೋನಿಶಿಯನ್"
 
-#: conf/global_settings.py:88
 msgid "Ido"
 msgstr ""
 
-#: conf/global_settings.py:88
 msgid "Icelandic"
 msgstr "ಐಸ್‌ಲ್ಯಾಂಡಿಕ್"
 
-#: conf/global_settings.py:89
 msgid "Italian"
 msgstr "ಇಟಾಲಿಯನ್"
 
-#: conf/global_settings.py:90
 msgid "Japanese"
 msgstr "ಜಾಪನೀಸ್"
 
-#: conf/global_settings.py:91
 msgid "Georgian"
 msgstr "ಜಾರ್ಜೆಯನ್ "
 
-#: conf/global_settings.py:92
 msgid "Kazakh"
 msgstr ""
 
-#: conf/global_settings.py:93
 msgid "Khmer"
 msgstr "ಖಮೇರ್"
 
-#: conf/global_settings.py:94
 msgid "Kannada"
 msgstr "ಕನ್ನಡ"
 
-#: conf/global_settings.py:95
 msgid "Korean"
 msgstr "ಕೊರಿಯನ್"
 
-#: conf/global_settings.py:96
 msgid "Luxembourgish"
 msgstr ""
 
-#: conf/global_settings.py:97
 msgid "Lithuanian"
 msgstr "ಲಿತುವಾನಿಯನ್ "
 
-#: conf/global_settings.py:98
 msgid "Latvian"
 msgstr "ಲಾಟ್ವಿಯನ್"
 
-#: conf/global_settings.py:99
 msgid "Macedonian"
 msgstr "ಮೆಸಡೊನಿಯನ್"
 
-#: conf/global_settings.py:100
 msgid "Malayalam"
 msgstr "ಮಲಯಾಳಂ"
 
-#: conf/global_settings.py:101
 msgid "Mongolian"
 msgstr "ಮಂಗೊಲಿಯನ್"
 
-#: conf/global_settings.py:102
 msgid "Marathi"
 msgstr ""
 
-#: conf/global_settings.py:102
 msgid "Burmese"
 msgstr ""
 
-#: conf/global_settings.py:103
 msgid "Norwegian Bokmal"
 msgstr "ನಾರ್ವೇಜಿಯನ್ ಬೋಕ್ಮಲ್"
 
-#: conf/global_settings.py:104
 msgid "Nepali"
 msgstr ""
 
-#: conf/global_settings.py:105
 msgid "Dutch"
 msgstr "ಡಚ್"
 
-#: conf/global_settings.py:106
 msgid "Norwegian Nynorsk"
 msgstr "ನಾರ್ವೇಜಿಯನ್ ನಿನೋರ್ಕ್"
 
-#: conf/global_settings.py:107
 msgid "Ossetic"
 msgstr ""
 
-#: conf/global_settings.py:108
 msgid "Punjabi"
 msgstr "ಪಂಜಾಬಿ"
 
-#: conf/global_settings.py:109
 msgid "Polish"
 msgstr "ಪೋಲಿಷ್"
 
-#: conf/global_settings.py:110
 msgid "Portuguese"
 msgstr "ಪೋರ್ಚುಗೀಸ್"
 
-#: conf/global_settings.py:111
 msgid "Brazilian Portuguese"
 msgstr "ಬ್ರಜೀಲಿಯನ್ ಪೋರ್ಚುಗೀಸ್"
 
-#: conf/global_settings.py:112
 msgid "Romanian"
 msgstr "ರೋಮೇನಿಯನ್"
 
-#: conf/global_settings.py:113
 msgid "Russian"
 msgstr "ರಶಿಯನ್"
 
-#: conf/global_settings.py:114
 msgid "Slovak"
 msgstr "ಸ್ಲೋವಾಕ್"
 
-#: conf/global_settings.py:115
 msgid "Slovenian"
 msgstr "ಸ್ಲೋವೇನಿಯನ್"
 
-#: conf/global_settings.py:116
 msgid "Albanian"
 msgstr "ಅಲ್ಬೆನಿಯನ್ "
 
-#: conf/global_settings.py:117
 msgid "Serbian"
 msgstr "ಸರ್ಬಿಯನ್"
 
-#: conf/global_settings.py:118
 msgid "Serbian Latin"
 msgstr "ಸರ್ಬಿಯನ್ ಲ್ಯಾಟಿನ್"
 
-#: conf/global_settings.py:119
 msgid "Swedish"
 msgstr "ಸ್ವೀಡಿಷ್"
 
-#: conf/global_settings.py:120
 msgid "Swahili"
 msgstr ""
 
-#: conf/global_settings.py:121
 msgid "Tamil"
 msgstr "ತಮಿಳು"
 
-#: conf/global_settings.py:122
 msgid "Telugu"
 msgstr "ತೆಲುಗು"
 
-#: conf/global_settings.py:123
 msgid "Thai"
 msgstr "ಥಾಯ್"
 
-#: conf/global_settings.py:124
 msgid "Turkish"
 msgstr "ಟರ್ಕಿಶ್"
 
-#: conf/global_settings.py:125
 msgid "Tatar"
 msgstr ""
 
-#: conf/global_settings.py:126
 msgid "Udmurt"
 msgstr ""
 
-#: conf/global_settings.py:127
 msgid "Ukrainian"
 msgstr "ಉಕ್ರೇನಿಯನ್"
 
-#: conf/global_settings.py:128
 msgid "Urdu"
 msgstr "ಉರ್ದು"
 
-#: conf/global_settings.py:129
 msgid "Vietnamese"
 msgstr "ವಿಯೆತ್ನಾಮೀಸ್"
 
-#: conf/global_settings.py:130 conf/global_settings.py:131
 msgid "Simplified Chinese"
 msgstr "ಸರಳೀಕೃತ ಚೈನೀಸ್"
 
-#: conf/global_settings.py:132 conf/global_settings.py:133
 msgid "Traditional Chinese"
 msgstr "ಸಂಪ್ರದಾಯಿಕ ಚೈನೀಸ್ "
 
-#: contrib/sitemaps/apps.py:8
+msgid "Messages"
+msgstr ""
+
 msgid "Site Maps"
 msgstr ""
 
-#: contrib/staticfiles/apps.py:8
 msgid "Static Files"
 msgstr ""
 
-#: contrib/syndication/apps.py:8
 msgid "Syndication"
 msgstr ""
 
-#: contrib/webdesign/apps.py:8
 msgid "Web Design"
 msgstr ""
 
-#: core/validators.py:21
 msgid "Enter a valid value."
 msgstr "ಸಿಂಧುವಾದ ಮೌಲ್ಯವನ್ನು ನಮೂದಿಸಿ."
 
-#: core/validators.py:77 forms/fields.py:675
 msgid "Enter a valid URL."
 msgstr "ಸರಿಯಾದ ಒಂದು URL ಅನ್ನು ನಮೂದಿಸಿ."
 
-#: core/validators.py:115
 msgid "Enter a valid integer."
 msgstr ""
 
-#: core/validators.py:120
 msgid "Enter a valid email address."
 msgstr ""
 
-#: core/validators.py:185
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "ಅಕ್ಷರಗಳು, ಅಂಕೆಗಳು, ಅಡಿಗೆರೆಗಳು (ಅಂಡರ್ಸ್ಕೋರ್) ಹಾಗು ಅಡ್ಡಗೆರೆಗಳನ್ನು ಹೊಂದಿರುವ ಒಂದು "
 "ಸರಿಯಾದ 'slug' ಅನ್ನು ನಮೂದಿಸಿ."
 
-#: core/validators.py:188 core/validators.py:207
 msgid "Enter a valid IPv4 address."
 msgstr "ಒಂದು ಸರಿಯಾದ IPv4 ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ."
 
-#: core/validators.py:193 core/validators.py:208
 msgid "Enter a valid IPv6 address."
 msgstr "ಮಾನ್ಯವಾದ IPv6 ವಿಳಾಸ ದಾಖಲಿಸಿ"
 
-#: core/validators.py:203 core/validators.py:206
 msgid "Enter a valid IPv4 or IPv6 address."
 msgstr "ಮಾನ್ಯವಾದ IPv4 ಅಥವಾ IPv6 ವಿಳಾಸ ದಾಖಲಿಸಿ"
 
-#: core/validators.py:229 db/models/fields/__init__.py:1070
 msgid "Enter only digits separated by commas."
 msgstr "ಅಲ್ಪವಿರಾಮ(,)ಗಳಿಂದ ಬೇರ್ಪಟ್ಟ ಅಂಕೆಗಳನ್ನು ಮಾತ್ರ ಬರೆಯಿರಿ."
 
-#: core/validators.py:236
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
 "ಈ ಮೌಲ್ಯವು %(limit_value)s ಆಗಿದೆ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ (ಇದು %(show_value)s ಆಗಿದೆ)."
 
-#: core/validators.py:255
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 "ಈ ಮೌಲ್ಯವು %(limit_value)s ಕ್ಕಿಂತ ಕಡಿಮೆಯ ಅಥವ ಸಮನಾದ ಮೌಲ್ಯವಾಗಿದೆ ಎಂದು ಖಾತ್ರಿ "
 "ಮಾಡಿಕೊಳ್ಳಿ."
 
-#: core/validators.py:262
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr ""
 "ಈ ಮೌಲ್ಯವು %(limit_value)s ಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಅಥವ ಸಮನಾದ ಮೌಲ್ಯವಾಗಿದೆ ಎಂದು ಖಾತ್ರಿ "
 "ಮಾಡಿಕೊಳ್ಳಿ."
 
-#: core/validators.py:271
 #, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
@@ -440,7 +342,6 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
-#: core/validators.py:282
 #, python-format
 msgid ""
 "Ensure this value has at most %(limit_value)d character (it has "
@@ -450,29 +351,23 @@ msgid_plural ""
 "%(show_value)d)."
 msgstr[0] ""
 
-#: db/models/base.py:975 forms/models.py:718
 msgid "and"
 msgstr "ಮತ್ತು"
 
-#: db/models/base.py:977
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr ""
 
-#: db/models/fields/__init__.py:104
 #, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr ""
 
-#: db/models/fields/__init__.py:105
 msgid "This field cannot be null."
 msgstr "ಈ ಅಂಶವನ್ನು ಖಾಲಿ ಬಿಡುವಂತಿಲ್ಲ."
 
-#: db/models/fields/__init__.py:106
 msgid "This field cannot be blank."
 msgstr "ಈ ಸ್ಥಳವು ಖಾಲಿ ಇರುವಂತಿಲ್ಲ."
 
-#: db/models/fields/__init__.py:107
 #, python-format
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr ""
@@ -480,224 +375,190 @@ msgstr ""
 
 #. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
 #. Eg: "Title must be unique for pub_date year"
-#: db/models/fields/__init__.py:111
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
 
-#: db/models/fields/__init__.py:116
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "ಕ್ಷೇತ್ರದ ಬಗೆ: %(field_type)s"
 
-#: db/models/fields/__init__.py:847 db/models/fields/__init__.py:1573
 msgid "Integer"
 msgstr "ಪೂರ್ಣಾಂಕ"
 
-#: db/models/fields/__init__.py:851 db/models/fields/__init__.py:1571
 #, python-format
 msgid "'%(value)s' value must be an integer."
 msgstr ""
 
-#: db/models/fields/__init__.py:926
 #, python-format
 msgid "'%(value)s' value must be either True or False."
 msgstr ""
 
-#: db/models/fields/__init__.py:928
 msgid "Boolean (Either True or False)"
 msgstr "ಬೂಲಿಯನ್ (ಹೌದು ಅಥವ ಅಲ್ಲ)"
 
-#: db/models/fields/__init__.py:1004
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "ಪದಪುಂಜ (%(max_length)s ವರೆಗೆ)"
 
-#: db/models/fields/__init__.py:1065
 msgid "Comma-separated integers"
 msgstr "ಅಲ್ಪವಿರಾಮ(,) ದಿಂದ ಬೇರ್ಪಟ್ಟ ಪೂರ್ಣಸಂಖ್ಯೆಗಳು"
 
-#: db/models/fields/__init__.py:1080
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
 
-#: db/models/fields/__init__.py:1082 db/models/fields/__init__.py:1189
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
 
-#: db/models/fields/__init__.py:1085
 msgid "Date (without time)"
 msgstr "ದಿನಾಂಕ (ಸಮಯವಿಲ್ಲದೆ)"
 
-#: db/models/fields/__init__.py:1187
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in YYYY-MM-DD HH:MM[:ss[."
 "uuuuuu]][TZ] format."
 msgstr ""
 
-#: db/models/fields/__init__.py:1191
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD HH:MM[:ss[.uuuuuu]]"
 "[TZ]) but it is an invalid date/time."
 msgstr ""
 
-#: db/models/fields/__init__.py:1195
 msgid "Date (with time)"
 msgstr "ದಿನಾಂಕ (ಸಮಯದೊಂದಿಗೆ)"
 
-#: db/models/fields/__init__.py:1297
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
 msgstr ""
 
-#: db/models/fields/__init__.py:1299
 msgid "Decimal number"
 msgstr "ದಶಮಾನ ಸಂಖ್ಯೆ"
 
-#: db/models/fields/__init__.py:1444
+#, python-format
+msgid ""
+"'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
+"uuuuuu] format."
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
 msgid "Email address"
 msgstr ""
 
-#: db/models/fields/__init__.py:1470
 msgid "File path"
 msgstr "ಕಡತದ ಸ್ಥಾನಪಥ"
 
-#: db/models/fields/__init__.py:1537
 #, python-format
 msgid "'%(value)s' value must be a float."
 msgstr ""
 
-#: db/models/fields/__init__.py:1539
 msgid "Floating point number"
 msgstr "ತೇಲುವ-ಬಿಂದು ಸಂಖ್ಯೆ"
 
-#: db/models/fields/__init__.py:1623
 msgid "Big (8 byte) integer"
 msgstr "ಬೃಹತ್ (೮ ಬೈಟ್) ಪೂರ್ಣ ಸಂಖ್ಯೆ"
 
-#: db/models/fields/__init__.py:1638
 msgid "IPv4 address"
 msgstr "IPv4 ವಿಳಾಸ"
 
-#: db/models/fields/__init__.py:1668
 msgid "IP address"
 msgstr "IP ವಿಳಾಸ"
 
-#: db/models/fields/__init__.py:1747
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
 msgstr ""
 
-#: db/models/fields/__init__.py:1749
 msgid "Boolean (Either True, False or None)"
 msgstr "ಬೂಲಿಯನ್ (ನಿಜ, ಸುಳ್ಳು ಅಥವ ಯಾವುದೂ ಅಲ್ಲ ಇವುಗಳಲ್ಲಿ ಒಂದು)"
 
-#: db/models/fields/__init__.py:1809
 msgid "Positive integer"
 msgstr ""
 
-#: db/models/fields/__init__.py:1821
 msgid "Positive small integer"
 msgstr ""
 
-#: db/models/fields/__init__.py:1834
 #, python-format
 msgid "Slug (up to %(max_length)s)"
 msgstr ""
 
-#: db/models/fields/__init__.py:1863
 msgid "Small integer"
 msgstr ""
 
-#: db/models/fields/__init__.py:1870
 msgid "Text"
 msgstr "ಪಠ್ಯ"
 
-#: db/models/fields/__init__.py:1893
 #, python-format
 msgid ""
 "'%(value)s' value has an invalid format. It must be in HH:MM[:ss[.uuuuuu]] "
 "format."
 msgstr ""
 
-#: db/models/fields/__init__.py:1895
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (HH:MM[:ss[.uuuuuu]]) but it is an "
 "invalid time."
 msgstr ""
 
-#: db/models/fields/__init__.py:1898
 msgid "Time"
 msgstr "ಸಮಯ"
 
-#: db/models/fields/__init__.py:1977
 msgid "URL"
 msgstr "URL"
 
-#: db/models/fields/__init__.py:2000
 msgid "Raw binary data"
 msgstr ""
 
-#: db/models/fields/files.py:225
+#, python-format
+msgid "'%(value)s' is not a valid UUID."
+msgstr ""
+
 msgid "File"
 msgstr ""
 
-#: db/models/fields/files.py:375
 msgid "Image"
 msgstr ""
 
-#: db/models/fields/related.py:1580
 #, python-format
-msgid "%(model)s instance with pk %(pk)r does not exist."
+msgid "%(model)s instance with %(field)s %(value)r does not exist."
 msgstr ""
 
-#: db/models/fields/related.py:1582
 msgid "Foreign Key (type determined by related field)"
 msgstr "ಬಾಹ್ಯ ಕೀಲಿ (ಸಂಬಂಧಿತ ಸ್ಥಳದಿಂದ ಪ್ರಕಾರವನ್ನು ನಿರ್ಧರಿಸಲಾಗುತ್ತದೆ)"
 
-#: db/models/fields/related.py:1773
 msgid "One-to-one relationship"
 msgstr "ಒನ್-ಟು-ಒನ್ (ಪರಸ್ಪರ) ಸಂಬಂಧ"
 
-#: db/models/fields/related.py:1843
 msgid "Many-to-many relationship"
 msgstr "ಮೆನಿ-ಟು-ಮೆನಿ (ಸಾರ್ವಜನಿಕ) ಸಂಬಂಧ"
 
-#: forms/fields.py:55
 msgid "This field is required."
 msgstr "ಈ ಸ್ಥಳವು ಅಗತ್ಯವಿರುತ್ತದೆ."
 
-#: forms/fields.py:236
 msgid "Enter a whole number."
 msgstr "ಪೂರ್ಣಾಂಕವೊಂದನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:279 forms/fields.py:316
 msgid "Enter a number."
 msgstr "ಒಂದು ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:318
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] ""
 
-#: forms/fields.py:322
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] ""
 
-#: forms/fields.py:326
 #, python-format
 msgid ""
 "Ensure that there are no more than %(max)s digit before the decimal point."
@@ -705,46 +566,40 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 
-#: forms/fields.py:437 forms/fields.py:1139
 msgid "Enter a valid date."
 msgstr "ಸರಿಯಾದ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:461 forms/fields.py:1140
 msgid "Enter a valid time."
 msgstr "ಸರಿಯಾದ ಸಮಯವನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:483
 msgid "Enter a valid date/time."
 msgstr "ಸರಿಯಾದ ದಿನಾಂಕ/ಸಮಯವನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:564
+msgid "Enter a valid duration."
+msgstr ""
+
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr ""
 "ಯಾವದೇ ಕಡತವನ್ನೂ ಸಲ್ಲಿಸಲಾಗಿಲ್ಲ. ನಮೂನೆಯ ಮೇಲಿನ ಸಂಕೇತೀಕರಣ (ಎನ್ಕೋಡಿಂಗ್) ಬಗೆಯನ್ನು "
 "ಪರೀಕ್ಷಿಸಿ."
 
-#: forms/fields.py:565
 msgid "No file was submitted."
 msgstr "ಯಾವದೇ ಕಡತವನ್ನೂ ಸಲ್ಲಿಸಲಾಗಿಲ್ಲ."
 
-#: forms/fields.py:566
 msgid "The submitted file is empty."
 msgstr "ಸಲ್ಲಿಸಲಾದ ಕಡತ ಖಾಲಿ ಇದೆ."
 
-#: forms/fields.py:568
 #, python-format
 msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
 
-#: forms/fields.py:571
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
 "ದಯವಿಟ್ಟು ಕಡತವನ್ನು ಸಲ್ಲಿಸಿ ಅಥವ ಅಳಿಸುವ ಗುರುತುಚೌಕವನ್ನು ಗುರುತು ಹಾಕಿ, ಎರಡನ್ನೂ ಒಟ್ಟಿಗೆ "
 "ಮಾಡಬೇಡಿ."
 
-#: forms/fields.py:632
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
 "corrupted image."
@@ -752,25 +607,23 @@ msgstr ""
 "ಸರಿಯಾದ ಚಿತ್ರವನ್ನು ಸೇರಿಸಿ. ನೀವು ಸೇರಿಸಿದ ಕಡತವು ಚಿತ್ರವೇ ಅಲ್ಲ ಅಥವಾ ಅದು ಒಂದು ಹಾಳಾದ "
 "ಚಿತ್ರವಾಗಿದೆ. "
 
-#: forms/fields.py:782 forms/fields.py:871 forms/models.py:1192
 #, python-format
 msgid "Select a valid choice. %(value)s is not one of the available choices."
 msgstr "ಸರಿಯಾದ ಒಂದು ಆಯ್ಕೆಯನ್ನು ಆರಿಸಿ. %(value)s ಎನ್ನುವುದು ಲಭ್ಯವಿರುವ ಆಯ್ಕೆಗಳಲ್ಲಿ ಇಲ್ಲ."
 
-#: forms/fields.py:872 forms/fields.py:987 forms/models.py:1191
 msgid "Enter a list of values."
 msgstr "ಮೌಲ್ಯಗಳ ಒಂದು ಪಟ್ಟಿಯನ್ನು ನಮೂದಿಸಿ."
 
-#: forms/fields.py:988
 msgid "Enter a complete value."
 msgstr ""
 
+msgid "Enter a valid UUID."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
-#: forms/forms.py:122
 msgid ":"
 msgstr ""
 
-#: forms/forms.py:192
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
@@ -778,47 +631,38 @@ msgstr ""
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
 #. label
-#: forms/forms.py:620
 msgid ":?.!"
 msgstr ""
 
-#: forms/formsets.py:95
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
 
-#: forms/formsets.py:332
 #, python-format
 msgid "Please submit %d or fewer forms."
 msgid_plural "Please submit %d or fewer forms."
 msgstr[0] ""
 
-#: forms/formsets.py:339
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
 msgstr[0] ""
 
-#: forms/formsets.py:367 forms/formsets.py:369
 msgid "Order"
 msgstr "ಕ್ರಮ"
 
-#: forms/formsets.py:371
 msgid "Delete"
 msgstr "ಅಳಿಸಿಹಾಕಿ"
 
-#: forms/models.py:712
 #, python-format
 msgid "Please correct the duplicate data for %(field)s."
 msgstr "%(field)s ಗಾಗಿ ಎರಡು ಬಾರಿ ನಮೂದಿಸಲಾದ ಮಾಹಿತಿಯನ್ನು ಸರಿಪಡಿಸಿ."
 
-#: forms/models.py:716
 #, python-format
 msgid "Please correct the duplicate data for %(field)s, which must be unique."
 msgstr ""
 "%(field)s ಗಾಗಿ ಎರಡು ಬಾರಿ ನಮೂದಿಸಲಾದ ಮಾಹಿತಿಯನ್ನು ಸರಿಪಡಿಸಿ, ಇದರ ಮೌಲ್ಯವು "
 "ವಿಶಿಷ್ಟವಾಗಿರಬೇಕು."
 
-#: forms/models.py:722
 #, python-format
 msgid ""
 "Please correct the duplicate data for %(field_name)s which must be unique "
@@ -827,460 +671,353 @@ msgstr ""
 "%(field_name)s ಗಾಗಿ ಎರಡು ಬಾರಿ ನಮೂದಿಸಲಾದ ಮಾಹಿತಿಯನ್ನು ಸರಿಪಡಿಸಿ, %(date_field)s "
 "ನಲ್ಲಿನ %(lookup)s ಗಾಗಿ ಇದರ ಮೌಲ್ಯವು ವಿಶಿಷ್ಟವಾಗಿರಬೇಕು."
 
-#: forms/models.py:730
 msgid "Please correct the duplicate values below."
 msgstr "ದಯವಿಟ್ಟು ಈ ಕೆಳಗೆ ಎರಡು ಬಾರಿ ನಮೂದಿಸಲಾದ ಮೌಲ್ಯವನ್ನು ಸರಿಪಡಿಸಿ."
 
-#: forms/models.py:1028
 msgid "The inline foreign key did not match the parent instance primary key."
 msgstr "ಸಾಲಿನೊಳಗಿನ ಪ್ರಾಥಮಿಕ ಕೀಲಿಯು ಮೂಲ ಇನ್‌ಸ್ಟನ್ಸ್‍ ಪ್ರಾಥಮಿಕ ಕೀಲಿಗೆ ತಾಳೆಯಾಗುತ್ತಿಲ್ಲ."
 
-#: forms/models.py:1094
 msgid "Select a valid choice. That choice is not one of the available choices."
 msgstr "ಸರಿಯಾದ ಒಂದು ಆಯ್ಕೆಯನ್ನು ಆರಿಸಿ. ಆ ಆಯ್ಕೆಯು ಲಭ್ಯವಿರುವ ಆಯ್ಕೆಗಳಲ್ಲಿ ಇಲ್ಲ."
 
-#: forms/models.py:1194
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
 msgstr ""
 
-#: forms/models.py:1205
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
-msgstr ""
-"ಒಂದಕ್ಕಿಂತ ಹೆಚ್ಚನ್ನು ಆಯ್ದುಕೊಳ್ಳಲು ಮ್ಯಾಕ್ ಗಣಕದಲ್ಲಿನ \"ಕಂಟ್ರೋಲ್\", ಅಥವಾ \"ಕಮ್ಯಾಂಡ್\" ಅನ್ನು "
-"ಒತ್ತಿ ಹಿಡಿಯಿರಿ."
-
-#: forms/utils.py:148
 #, python-format
 msgid ""
 "%(datetime)s couldn't be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
 
-#: forms/widgets.py:350
 msgid "Currently"
 msgstr "ಪ್ರಸಕ್ತ"
 
-#: forms/widgets.py:351
 msgid "Change"
 msgstr "ಬದಲಾವಣೆ"
 
-#: forms/widgets.py:352
 msgid "Clear"
 msgstr "ಮುಕ್ತಗೊಳಿಸು"
 
-#: forms/widgets.py:546
 msgid "Unknown"
 msgstr "ಗೊತ್ತಿರದ"
 
-#: forms/widgets.py:547
 msgid "Yes"
 msgstr "ಹೌದು"
 
-#: forms/widgets.py:548
 msgid "No"
 msgstr "ಇಲ್ಲ"
 
-#: template/defaultfilters.py:855
 msgid "yes,no,maybe"
 msgstr "ಹೌದು,ಇಲ್ಲ,ಇರಬಹುದು"
 
-#: template/defaultfilters.py:884 template/defaultfilters.py:896
 #, python-format
 msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d ಬೈಟ್‌ಗಳು"
 
-#: template/defaultfilters.py:898
 #, python-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: template/defaultfilters.py:900
 #, python-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: template/defaultfilters.py:902
 #, python-format
 msgid "%s GB"
 msgstr "%s GB"
 
-#: template/defaultfilters.py:904
 #, python-format
 msgid "%s TB"
 msgstr "%s TB"
 
-#: template/defaultfilters.py:906
 #, python-format
 msgid "%s PB"
 msgstr "%s PB"
 
-#: utils/dateformat.py:59
 msgid "p.m."
 msgstr "ಅಪರಾಹ್ನ"
 
-#: utils/dateformat.py:60
 msgid "a.m."
 msgstr "ಪೂರ್ವಾಹ್ನ"
 
-#: utils/dateformat.py:65
 msgid "PM"
 msgstr "ಅಪರಾಹ್ನ"
 
-#: utils/dateformat.py:66
 msgid "AM"
 msgstr "ಪೂರ್ವಾಹ್ನ"
 
-#: utils/dateformat.py:149
 msgid "midnight"
 msgstr "ಮಧ್ಯರಾತ್ರಿ"
 
-#: utils/dateformat.py:151
 msgid "noon"
 msgstr "ಮಧ್ಯಾಹ್ನ"
 
-#: utils/dates.py:6
 msgid "Monday"
 msgstr "ಸೋಮವಾರ"
 
-#: utils/dates.py:6
 msgid "Tuesday"
 msgstr "ಮಂಗಳವಾರ"
 
-#: utils/dates.py:6
 msgid "Wednesday"
 msgstr "ಬುಧವಾರ"
 
-#: utils/dates.py:6
 msgid "Thursday"
 msgstr "ಗುರುವಾರ"
 
-#: utils/dates.py:6
 msgid "Friday"
 msgstr "ಶುಕ್ರವಾರ"
 
-#: utils/dates.py:7
 msgid "Saturday"
 msgstr "ಶನಿವಾರ"
 
-#: utils/dates.py:7
 msgid "Sunday"
 msgstr "ರವಿವಾರ"
 
-#: utils/dates.py:10
 msgid "Mon"
 msgstr "ಸೋಮ"
 
-#: utils/dates.py:10
 msgid "Tue"
 msgstr "ಮಂಗಳ"
 
-#: utils/dates.py:10
 msgid "Wed"
 msgstr "ಬುಧ"
 
-#: utils/dates.py:10
 msgid "Thu"
 msgstr "ಗುರು"
 
-#: utils/dates.py:10
 msgid "Fri"
 msgstr "ಶುಕ್ರ"
 
-#: utils/dates.py:11
 msgid "Sat"
 msgstr "ಶನಿ"
 
-#: utils/dates.py:11
 msgid "Sun"
 msgstr "ರವಿ"
 
-#: utils/dates.py:18
 msgid "January"
 msgstr "ಜನವರಿ"
 
-#: utils/dates.py:18
 msgid "February"
 msgstr "ಫೆಬ್ರುವರಿ"
 
-#: utils/dates.py:18
 msgid "March"
 msgstr "ಮಾರ್ಚ್"
 
-#: utils/dates.py:18
 msgid "April"
 msgstr "ಎಪ್ರಿಲ್"
 
-#: utils/dates.py:18
 msgid "May"
 msgstr "ಮೇ"
 
-#: utils/dates.py:18
 msgid "June"
 msgstr "ಜೂನ್"
 
-#: utils/dates.py:19
 msgid "July"
 msgstr "ಜುಲೈ"
 
-#: utils/dates.py:19
 msgid "August"
 msgstr "ಆಗಸ್ಟ್"
 
-#: utils/dates.py:19
 msgid "September"
 msgstr "ಸೆಪ್ಟೆಂಬರ್"
 
-#: utils/dates.py:19
 msgid "October"
 msgstr "ಅಕ್ಟೋಬರ್"
 
-#: utils/dates.py:19
 msgid "November"
 msgstr "ನವೆಂಬರ್"
 
-#: utils/dates.py:20
 msgid "December"
 msgstr "ಡಿಸೆಂಬರ್"
 
-#: utils/dates.py:23
 msgid "jan"
 msgstr "ಜನವರಿ"
 
-#: utils/dates.py:23
 msgid "feb"
 msgstr "ಫೆಬ್ರವರಿ"
 
-#: utils/dates.py:23
 msgid "mar"
 msgstr "ಮಾರ್ಚ್"
 
-#: utils/dates.py:23
 msgid "apr"
 msgstr "ಏಪ್ರಿಲ್"
 
-#: utils/dates.py:23
 msgid "may"
 msgstr "ಮೇ"
 
-#: utils/dates.py:23
 msgid "jun"
 msgstr "ಜೂನ್"
 
-#: utils/dates.py:24
 msgid "jul"
 msgstr "ಜುಲೈ"
 
-#: utils/dates.py:24
 msgid "aug"
 msgstr "ಆಗಸ್ಟ್‍"
 
-#: utils/dates.py:24
 msgid "sep"
 msgstr "ಸೆಪ್ಟೆಂಬರ್"
 
-#: utils/dates.py:24
 msgid "oct"
 msgstr "ಅಕ್ಟೋಬರ್"
 
-#: utils/dates.py:24
 msgid "nov"
 msgstr "ನವೆಂಬರ್"
 
-#: utils/dates.py:24
 msgid "dec"
 msgstr "ಡಿಸೆಂಬರ್"
 
-#: utils/dates.py:31
 msgctxt "abbrev. month"
 msgid "Jan."
 msgstr "ಜನ."
 
-#: utils/dates.py:32
 msgctxt "abbrev. month"
 msgid "Feb."
 msgstr "ಫೆಬ್ರ."
 
-#: utils/dates.py:33
 msgctxt "abbrev. month"
 msgid "March"
 msgstr "ಮಾರ್ಚ್"
 
-#: utils/dates.py:34
 msgctxt "abbrev. month"
 msgid "April"
 msgstr "ಏಪ್ರಿಲ್"
 
-#: utils/dates.py:35
 msgctxt "abbrev. month"
 msgid "May"
 msgstr "ಮೇ"
 
-#: utils/dates.py:36
 msgctxt "abbrev. month"
 msgid "June"
 msgstr "ಜೂನ್"
 
-#: utils/dates.py:37
 msgctxt "abbrev. month"
 msgid "July"
 msgstr "ಜುಲೈ"
 
-#: utils/dates.py:38
 msgctxt "abbrev. month"
 msgid "Aug."
 msgstr "ಆಗ."
 
-#: utils/dates.py:39
 msgctxt "abbrev. month"
 msgid "Sept."
 msgstr "ಸೆಪ್ಟೆ."
 
-#: utils/dates.py:40
 msgctxt "abbrev. month"
 msgid "Oct."
 msgstr "ಅಕ್ಟೋ."
 
-#: utils/dates.py:41
 msgctxt "abbrev. month"
 msgid "Nov."
 msgstr "ನವೆಂ."
 
-#: utils/dates.py:42
 msgctxt "abbrev. month"
 msgid "Dec."
 msgstr "ಡಿಸೆಂ."
 
-#: utils/dates.py:45
 msgctxt "alt. month"
 msgid "January"
 msgstr "ಜನವರಿ"
 
-#: utils/dates.py:46
 msgctxt "alt. month"
 msgid "February"
 msgstr "ಫೆಬ್ರವರಿ"
 
-#: utils/dates.py:47
 msgctxt "alt. month"
 msgid "March"
 msgstr "ಮಾರ್ಚ್"
 
-#: utils/dates.py:48
 msgctxt "alt. month"
 msgid "April"
 msgstr "ಏಪ್ರಿಲ್"
 
-#: utils/dates.py:49
 msgctxt "alt. month"
 msgid "May"
 msgstr "ಮೇ"
 
-#: utils/dates.py:50
 msgctxt "alt. month"
 msgid "June"
 msgstr "ಜೂನ್"
 
-#: utils/dates.py:51
 msgctxt "alt. month"
 msgid "July"
 msgstr "ಜುಲೈ"
 
-#: utils/dates.py:52
 msgctxt "alt. month"
 msgid "August"
 msgstr "ಆಗಸ್ಟ್‍"
 
-#: utils/dates.py:53
 msgctxt "alt. month"
 msgid "September"
 msgstr "ಸಪ್ಟೆಂಬರ್"
 
-#: utils/dates.py:54
 msgctxt "alt. month"
 msgid "October"
 msgstr "ಅಕ್ಟೋಬರ್"
 
-#: utils/dates.py:55
 msgctxt "alt. month"
 msgid "November"
 msgstr "ನವೆಂಬರ್"
 
-#: utils/dates.py:56
 msgctxt "alt. month"
 msgid "December"
 msgstr "ಡಿಸೆಂಬರ್"
 
-#: utils/ipv6.py:10
 msgid "This is not a valid IPv6 address."
 msgstr ""
 
-#: utils/text.py:76
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s..."
 msgstr ""
 
-#: utils/text.py:245
 msgid "or"
 msgstr "ಅಥವ"
 
 #. Translators: This string is used as a separator between list elements
-#: utils/text.py:264 utils/timesince.py:57
 msgid ", "
 msgstr ", "
 
-#: utils/timesince.py:25
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
 
-#: utils/timesince.py:26
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] ""
 
-#: utils/timesince.py:27
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
 
-#: utils/timesince.py:28
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] ""
 
-#: utils/timesince.py:29
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 
-#: utils/timesince.py:30
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 
-#: utils/timesince.py:46
 msgid "0 minutes"
 msgstr ""
 
-#: views/csrf.py:105
 msgid "Forbidden"
 msgstr ""
 
-#: views/csrf.py:106
 msgid "CSRF verification failed. Request aborted."
 msgstr ""
 
-#: views/csrf.py:110
 msgid ""
 "You are seeing this message because this HTTPS site requires a 'Referer "
 "header' to be sent by your Web browser, but none was sent. This header is "
@@ -1288,52 +1025,61 @@ msgid ""
 "hijacked by third parties."
 msgstr ""
 
-#: views/csrf.py:115
 msgid ""
 "If you have configured your browser to disable 'Referer' headers, please re-"
 "enable them, at least for this site, or for HTTPS connections, or for 'same-"
 "origin' requests."
 msgstr ""
 
-#: views/csrf.py:120
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
 "submitting forms. This cookie is required for security reasons, to ensure "
 "that your browser is not being hijacked by third parties."
 msgstr ""
 
-#: views/csrf.py:125
 msgid ""
 "If you have configured your browser to disable cookies, please re-enable "
 "them, at least for this site, or for 'same-origin' requests."
 msgstr ""
 
-#: views/csrf.py:129
 msgid "More information is available with DEBUG=True."
 msgstr ""
 
-#: views/generic/dates.py:43
+msgid "Welcome to Django"
+msgstr ""
+
+msgid "It worked!"
+msgstr ""
+
+msgid "Congratulations on your first Django-powered page."
+msgstr ""
+
+msgid ""
+"Of course, you haven't actually done any work yet. Next, start your first "
+"app by running <code>python manage.py startapp [app_label]</code>."
+msgstr ""
+
+msgid ""
+"You're seeing this message because you have <code>DEBUG = True</code> in "
+"your Django settings file and you haven't configured any URLs. Get to work!"
+msgstr ""
+
 msgid "No year specified"
 msgstr "ಯಾವುದೆ ವರ್ಷವನ್ನು ಸೂಚಿಲಾಗಿಲ್ಲ"
 
-#: views/generic/dates.py:99
 msgid "No month specified"
 msgstr "ಯಾವುದೆ ತಿಂಗಳನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
-#: views/generic/dates.py:158
 msgid "No day specified"
 msgstr "ಯಾವುದೆ ದಿನವನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
-#: views/generic/dates.py:214
 msgid "No week specified"
 msgstr "ಯಾವುದೆ ವಾರವನ್ನು ಸೂಚಿಸಲಾಗಿಲ್ಲ"
 
-#: views/generic/dates.py:369 views/generic/dates.py:397
 #, python-format
 msgid "No %(verbose_name_plural)s available"
 msgstr "ಯಾವುದೆ %(verbose_name_plural)s ಲಭ್ಯವಿಲ್ಲ"
 
-#: views/generic/dates.py:650
 #, python-format
 msgid ""
 "Future %(verbose_name_plural)s not available because %(class_name)s."
@@ -1342,42 +1088,34 @@ msgstr ""
 "ಭವಿಷ್ಯದ %(verbose_name_plural)s ಲಭ್ಯವಿಲ್ಲ ಏಕೆಂದರೆ %(class_name)s.allow_future "
 "ಎನ್ನುವುದು ಅಸತ್ಯವಾಗಿದೆ (ಫಾಲ್ಸ್‍) ಆಗಿದೆ."
 
-#: views/generic/dates.py:682
 #, python-format
 msgid "Invalid date string '%(datestr)s' given format '%(format)s'"
 msgstr ""
 "ಅಸಿಂಧುವಾದ '%(datestr)s' ದಿನಾಂಕ ಪದಪುಂಜ ಒದಗಿಸಲಾದ ವಿನ್ಯಾಸವು '%(format)s' ಆಗಿದೆ"
 
-#: views/generic/detail.py:54
 #, python-format
 msgid "No %(verbose_name)s found matching the query"
 msgstr "ಮನವಿಗೆ ತಾಳೆಯಾಗುವ ಯಾವುದೆ %(verbose_name)s ಕಂಡುಬಂದಿಲ್ಲ"
 
-#: views/generic/list.py:62
 msgid "Page is not 'last', nor can it be converted to an int."
 msgstr "ಪುಟವು 'ಕೊನೆಯ'ದಲ್ಲ, ಅಥವ ಅದನ್ನು ಒಂದು int ಆಗಿ ಮಾರ್ಪಡಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ."
 
-#: views/generic/list.py:67
 #, python-format
 msgid "Invalid page (%(page_number)s): %(message)s"
 msgstr ""
 
-#: views/generic/list.py:158
 #, python-format
 msgid "Empty list and '%(class_name)s.allow_empty' is False."
 msgstr ""
 "ಖಾಲಿ ಪಟ್ಟಿ ಹಾಗು '%(class_name)s.allow_empty' ಎನ್ನುವುದು ಅಸತ್ಯವಾಗಿದೆ (ಫಾಲ್ಸ್‍)."
 
-#: views/static.py:54
 msgid "Directory indexes are not allowed here."
 msgstr ""
 
-#: views/static.py:56
 #, python-format
 msgid "\"%(path)s\" does not exist"
 msgstr ""
 
-#: views/static.py:97
 #, python-format
 msgid "Index of %(directory)s"
 msgstr ""

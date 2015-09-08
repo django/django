@@ -1,16 +1,17 @@
 import warnings
 
 from django.conf.urls import include, patterns, url
-from django.utils.deprecation import RemovedInDjango20Warning
+from django.utils.deprecation import RemovedInDjango110Warning
 
 from .namespace_urls import URLObject
 from .views import view_class_instance
 
 testobj3 = URLObject('testapp', 'test-ns3')
+testobj4 = URLObject('testapp', 'test-ns4')
 
-# test deprecated patterns() function. convert to list of urls() in Django 2.0
+# test deprecated patterns() function. convert to list of urls() in Django 1.10
 with warnings.catch_warnings():
-    warnings.filterwarnings('ignore', category=RemovedInDjango20Warning)
+    warnings.filterwarnings('ignore', category=RemovedInDjango110Warning)
 
     urlpatterns = patterns('urlpatterns_reverse.views',
         url(r'^normal/$', 'empty_view', name='inc-normal-view'),
@@ -24,6 +25,7 @@ with warnings.catch_warnings():
         url(r'^view_class/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', view_class_instance, name='inc-view-class'),
 
         (r'^test3/', include(testobj3.urls)),
+        (r'^test4/', include(testobj4.urls)),
         (r'^ns-included3/', include('urlpatterns_reverse.included_urls', namespace='inc-ns3')),
         (r'^ns-included4/', include('urlpatterns_reverse.namespace_urls', namespace='inc-ns4')),
     )

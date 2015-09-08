@@ -10,7 +10,7 @@ reverse()
 If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following function:
 
-.. function:: reverse(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+.. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 ``viewname`` can be a string containing the Python path to the view object, a
 :ref:`URL pattern name <naming-url-patterns>`, or the callable view object.
@@ -26,6 +26,7 @@ you can use any of the following to reverse the URL::
     reverse('news_archive')
 
     # passing a callable object
+    # (This is discouraged because you can't reverse namespaced views this way.)
     from news import views
     reverse(views.archive)
 
@@ -97,7 +98,7 @@ reverse_lazy()
 
 A lazily evaluated version of `reverse()`_.
 
-.. function:: reverse_lazy(viewname, [urlconf=None, args=None, kwargs=None, current_app=None])
+.. function:: reverse_lazy(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 It is useful for when you need to use a URL reversal before your project's
 URLConf is loaded. Some common cases where this function is necessary are:
@@ -154,6 +155,15 @@ If the URL does not resolve, the function raises a
 
         The application namespace for the URL pattern that matches the
         URL.
+
+    .. attribute:: ResolverMatch.app_names
+
+        .. versionadded:: 1.9
+
+        The list of individual namespace components in the full
+        application namespace for the URL pattern that matches the URL.
+        For example, if the ``app_name`` is ``'foo:bar'``, then ``app_names``
+        will be ``['foo', 'bar']``.
 
     .. attribute:: ResolverMatch.namespace
 

@@ -1,8 +1,8 @@
 from django.db import models
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 
-class AbsoluteUrlOverrideTests(TestCase):
+class AbsoluteUrlOverrideTests(SimpleTestCase):
 
     def test_get_absolute_url(self):
         """

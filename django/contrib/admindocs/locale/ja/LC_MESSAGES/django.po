@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-06-28 14:21+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-01-18 08:34+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -19,49 +19,21 @@ msgstr ""
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: contrib/admindocs/apps.py:8
 msgid "Administrative Documentation"
 msgstr "管理用ドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:6
-#: contrib/admindocs/templates/admin_doc/index.html:6
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:6
-#: contrib/admindocs/templates/admin_doc/model_detail.html:14
-#: contrib/admindocs/templates/admin_doc/model_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_detail.html:6
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:7
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:7
-#: contrib/admindocs/templates/admin_doc/view_detail.html:6
-#: contrib/admindocs/templates/admin_doc/view_index.html:7
 msgid "Home"
 msgstr "ホーム"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:7
-#: contrib/admindocs/templates/admin_doc/index.html:10
-#: contrib/admindocs/templates/admin_doc/index.html:14
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:7
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:14
-#: contrib/admindocs/templates/admin_doc/model_detail.html:15
-#: contrib/admindocs/templates/admin_doc/model_index.html:9
-#: contrib/admindocs/templates/admin_doc/template_detail.html:7
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:8
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:8
-#: contrib/admindocs/templates/admin_doc/view_detail.html:7
-#: contrib/admindocs/templates/admin_doc/view_index.html:8
 msgid "Documentation"
 msgstr "ドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:8
-#: contrib/admindocs/templates/admin_doc/index.html:29
 msgid "Bookmarklets"
 msgstr "ブックマークレット"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:11
 msgid "Documentation bookmarklets"
 msgstr "ドキュメントへのブックマークレット"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:15
 msgid ""
 "\n"
 "<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
@@ -81,58 +53,44 @@ msgstr ""
 "参照していなければならないことがあります。内部ネットワークにあるかどうか不明"
 "な場合は、システム管理者に確認してください。</p>\n"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:25
 msgid "Documentation for this page"
 msgstr "このページのドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:26
 msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "各ページから、ページを生成したビューのドキュメントにジャンプします。"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:28
 msgid "Show object ID"
 msgstr "オブジェクト ID を表示"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:29
 msgid ""
 "Shows the content-type and unique ID for pages that represent a single "
 "object."
 msgstr ""
 "単一のオブジェクトを表示するページのコンテンツタイプと一意な IDを表示します。"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:31
 msgid "Edit this object (current window)"
 msgstr "オブジェクトを (現在のウィンドウで) 編集"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:32
 msgid "Jumps to the admin page for pages that represent a single object."
 msgstr "単一のオブジェクトを表示するページの管理ページへジャンプします。"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:34
 msgid "Edit this object (new window)"
 msgstr "オブジェクトを (新しいウィンドウで) 編集"
 
-#: contrib/admindocs/templates/admin_doc/bookmarklets.html:35
 msgid "As above, but opens the admin page in a new window."
 msgstr "上と同じですが、新しいウィンドウで管理ページを開きます。"
 
-#: contrib/admindocs/templates/admin_doc/index.html:17
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:9
 msgid "Tags"
 msgstr "タグ"
 
-#: contrib/admindocs/templates/admin_doc/index.html:18
 msgid "List of all the template tags and their functions."
 msgstr "すべてのテンプレートタグとその機能の一覧です。"
 
-#: contrib/admindocs/templates/admin_doc/index.html:20
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:9
 msgid "Filters"
 msgstr "フィルター"
 
-#: contrib/admindocs/templates/admin_doc/index.html:21
 msgid ""
 "Filters are actions which can be applied to variables in a template to alter "
 "the output."
@@ -140,14 +98,9 @@ msgstr ""
 "フィルタは、テンプレート内の変数に適用して出力を変更するためのアクションで"
 "す。"
 
-#: contrib/admindocs/templates/admin_doc/index.html:23
-#: contrib/admindocs/templates/admin_doc/model_detail.html:16
-#: contrib/admindocs/templates/admin_doc/model_index.html:10
-#: contrib/admindocs/templates/admin_doc/model_index.html:14
 msgid "Models"
 msgstr "モデル"
 
-#: contrib/admindocs/templates/admin_doc/index.html:24
 msgid ""
 "Models are descriptions of all the objects in the system and their "
 "associated fields. Each model has a list of fields which can be accessed as "
@@ -157,14 +110,9 @@ msgstr ""
 "す。各モデルは、テンプレート変数としてアクセスできるフィールドのリストを持っ"
 "ています。"
 
-#: contrib/admindocs/templates/admin_doc/index.html:26
-#: contrib/admindocs/templates/admin_doc/view_detail.html:8
-#: contrib/admindocs/templates/admin_doc/view_index.html:9
-#: contrib/admindocs/templates/admin_doc/view_index.html:12
 msgid "Views"
 msgstr "ビュー"
 
-#: contrib/admindocs/templates/admin_doc/index.html:27
 msgid ""
 "Each page on the public site is generated by a view. The view defines which "
 "template is used to generate the page and which objects are available to "
@@ -174,15 +122,12 @@ msgstr ""
 "使用されるテンプレートとそのテンプレートで利用できるオブジェクトが定義されて"
 "います。"
 
-#: contrib/admindocs/templates/admin_doc/index.html:30
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr "ブラウザから管理機能にすぐにアクセスするためのツールです。"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:10
 msgid "Please install docutils"
 msgstr "docutilsをインストールして下さい"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:17
 #, python-format
 msgid ""
 "The admin documentation system requires Python's <a href=\"%(link)s"
@@ -191,7 +136,6 @@ msgstr ""
 "管理ドキュメントシステムには、Pythonの <a href=\"%(link)s\">docutils</a> ライ"
 "ブラリが必要です。"
 
-#: contrib/admindocs/templates/admin_doc/missing_docutils.html:19
 #, python-format
 msgid ""
 "Please ask your administrators to install <a href=\"%(link)s\">docutils</a>."
@@ -199,76 +143,58 @@ msgstr ""
 "管理者に <a href=\"%(link)s\">docutils</a> のインストールについて問い合せて下"
 "さい。"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:21
 #, python-format
 msgid "Model: %(name)s"
 msgstr "モデル: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:35
 msgid "Field"
 msgstr "フィールド"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:36
 msgid "Type"
 msgstr "型"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:37
 msgid "Description"
 msgstr "説明"
 
-#: contrib/admindocs/templates/admin_doc/model_detail.html:52
 msgid "Back to Model Documentation"
 msgstr "モデルドキュメントに戻る"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:18
 msgid "Model documentation"
 msgstr "モデルドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/model_index.html:43
 msgid "Model groups"
 msgstr "モデルグループ"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:8
 msgid "Templates"
 msgstr "テンプレート"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:13
 #, python-format
 msgid "Template: %(name)s"
 msgstr "テンプレート: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:16
 #, python-format
 msgid "Template: \"%(name)s\""
 msgstr "テンプレート: \"%(name)s\""
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:18
 #, python-format
 msgid "Search path for template \"%(name)s\":"
 msgstr "テンプレートの検索パス \"%(name)s\":"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:21
 msgid "(does not exist)"
 msgstr "(存在しません)"
 
-#: contrib/admindocs/templates/admin_doc/template_detail.html:25
 msgid "Back to Documentation"
 msgstr "ドキュメントに戻る"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:12
 msgid "Template filters"
 msgstr "テンプレートフィルタ"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:16
 msgid "Template filter documentation"
 msgstr "テンプレートフィルタドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:43
 msgid "Built-in filters"
 msgstr "組み込みフィルタ"
 
-#: contrib/admindocs/templates/admin_doc/template_filter_index.html:23
 #, python-format
 msgid ""
 "To use these filters, put <code>%(code)s</code> in your template before "
@@ -277,20 +203,15 @@ msgstr ""
 "これらのフィルタを使用するには、テンプレート内でのフィルタの使用箇所より前に "
 "<code>%(code)s</code> を記述してください。"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:12
 msgid "Template tags"
 msgstr "テンプレートタグ"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:16
 msgid "Template tag documentation"
 msgstr "テンプレートタグドキュメント"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:22
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:43
 msgid "Built-in tags"
 msgstr "組み込みタグ"
 
-#: contrib/admindocs/templates/admin_doc/template_tag_index.html:23
 #, python-format
 msgid ""
 "To use these tags, put <code>%(code)s</code> in your template before using "
@@ -299,45 +220,35 @@ msgstr ""
 "これらのタグを使用するためには、タグの使用箇所より前に <code>%(code)s</code> "
 "をテンプレート内に記述します。"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:12
 #, python-format
 msgid "View: %(name)s"
 msgstr "ビュー: %(name)s"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:23
 msgid "Context:"
 msgstr "コンテキスト:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:28
 msgid "Templates:"
 msgstr "テンプレート:"
 
-#: contrib/admindocs/templates/admin_doc/view_detail.html:32
 msgid "Back to Views Documentation"
 msgstr "ビュードキュメントに戻る"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:16
 msgid "View documentation"
 msgstr "ビュードキュメント"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:22
 msgid "Jump to namespace"
 msgstr "ネームスペースへ移動"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:27
 msgid "Empty namespace"
 msgstr "空のネームスペース"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:40
 #, python-format
 msgid "Views by namespace %(name)s"
 msgstr "ネームスペース %(name)s のビュー"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:42
 msgid "Views by empty namespace"
 msgstr "空のネームスペースのよるビュー"
 
-#: contrib/admindocs/templates/admin_doc/view_index.html:49
 #, python-format
 msgid ""
 "\n"
@@ -347,74 +258,50 @@ msgstr ""
 "\n"
 "ビュー関数: <code>%(full_name)s</code>. 名前: <code>%(url_name)s</code>.\n"
 
-#: contrib/admindocs/tests/test_fields.py:32
 msgid "Boolean (Either True or False)"
 msgstr "ブール値 (真: True または偽: False)"
 
-#: contrib/admindocs/tests/test_fields.py:42
 #, python-format
 msgid "Field of type: %(field_type)s"
 msgstr "フィールドの型: %(field_type)s"
 
-#: contrib/admindocs/views.py:76 contrib/admindocs/views.py:78
-#: contrib/admindocs/views.py:80
 msgid "tag:"
 msgstr "タグ"
 
-#: contrib/admindocs/views.py:109 contrib/admindocs/views.py:111
-#: contrib/admindocs/views.py:113
 msgid "filter:"
 msgstr "フィルター"
 
-#: contrib/admindocs/views.py:160 contrib/admindocs/views.py:162
-#: contrib/admindocs/views.py:164
 msgid "view:"
 msgstr "ビュー"
 
-#: contrib/admindocs/views.py:191
 #, python-format
 msgid "App %(app_label)r not found"
 msgstr "アプリケーション %(app_label)r が見つかりません"
 
-#: contrib/admindocs/views.py:195
 #, python-format
 msgid "Model %(model_name)r not found in app %(app_label)r"
 msgstr ""
 "モデル %(model_name)r が %(app_label)r アプリケーションに見つかりません"
 
-#: contrib/admindocs/views.py:208
+msgid "model:"
+msgstr "モデル :"
+
 #, python-format
 msgid "the related `%(app_label)s.%(data_type)s` object"
 msgstr "`%(app_label)s.%(data_type)s` (関連オブジェクト)"
 
-#: contrib/admindocs/views.py:212 contrib/admindocs/views.py:232
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:251
-#: contrib/admindocs/views.py:265 contrib/admindocs/views.py:270
-msgid "model:"
-msgstr "モデル :"
-
-#: contrib/admindocs/views.py:228 contrib/admindocs/views.py:260
 #, python-format
 msgid "related `%(app_label)s.%(object_name)s` objects"
 msgstr "`%(app_label)s.%(object_name)s` (関連オブジェクト)"
 
-#: contrib/admindocs/views.py:232 contrib/admindocs/views.py:265
 #, python-format
 msgid "all %s"
 msgstr "全ての %s"
 
-#: contrib/admindocs/views.py:237 contrib/admindocs/views.py:270
 #, python-format
 msgid "number of %s"
 msgstr "%s の数"
 
-#. Translators: %s is an object type name
-#: contrib/admindocs/views.py:275
-#, python-format
-msgid "Attributes on %s objects"
-msgstr "%s オブジェクトの属性"
-
-#: contrib/admindocs/views.py:369
 #, python-format
 msgid "%s does not appear to be a urlpattern object"
 msgstr "%s はurlpatternオブジェクトでは無いようです"

@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-05-19 15:12+0200\n"
-"PO-Revision-Date: 2014-05-21 08:24+0000\n"
-"Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2014-10-05 20:11+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
 "Language-Team: Hebrew (http://www.transifex.com/projects/p/django/language/"
 "he/)\n"
 "MIME-Version: 1.0\n"
@@ -19,13 +19,11 @@ msgstr ""
 "Language: he\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:45
-#, c-format
+#, javascript-format
 msgid "Available %s"
 msgstr "%s זמינות"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:46
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
@@ -33,39 +31,31 @@ msgstr ""
 "זו רשימת %s הזמינים לבחירה. ניתן לבחור חלק ע\"י סימון בתיבה מתחת ולחיצה על "
 "חץ  \"בחר\" בין שתי התיבות."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:53
-#, c-format
+#, javascript-format
 msgid "Type into this box to filter down the list of available %s."
 msgstr "ניתן להקליד בתיבה זו כדי לסנן %s."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:57
 msgid "Filter"
 msgstr "סינון"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
 msgid "Choose all"
 msgstr "בחירת הכל"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:61
-#, c-format
+#, javascript-format
 msgid "Click to choose all %s at once."
 msgstr "בחירת כל ה%s בבת אחת."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:67
 msgid "Choose"
 msgstr "בחר"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:69
 msgid "Remove"
 msgstr "הסרה"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:75
-#, c-format
+#, javascript-format
 msgid "Chosen %s"
 msgstr "%s אשר נבחרו"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:76
-#, c-format
+#, javascript-format
 msgid ""
 "This is the list of chosen %s. You may remove some by selecting them in the "
 "box below and then clicking the \"Remove\" arrow between the two boxes."
@@ -73,24 +63,18 @@ msgstr ""
 "זו רשימת %s אשר נבחרו. ניתן להסיר חלק ע\"י בחירה בתיבה מתחת ולחיצה על חץ "
 "\"הסרה\" בין שתי התיבות."
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
 msgid "Remove all"
 msgstr "הסרת הכל"
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:80
-#, c-format
+#, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "הסרת כל %s אשר נבחרו בבת אחת."
 
-#: contrib/admin/static/admin/js/actions.js:22
-#: contrib/admin/static/admin/js/actions.min.js:1
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s מ %(cnt)s נבחרות"
 msgstr[1] "%(sel)s מ %(cnt)s נבחרות"
 
-#: contrib/admin/static/admin/js/actions.js:114
-#: contrib/admin/static/admin/js/actions.min.js:4
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
@@ -98,8 +82,6 @@ msgstr ""
 "יש לך שינויים שלא נשמרו על שדות יחידות.  אם אתה מפעיל פעולה, שינויים שלא "
 "נשמרו יאבדו."
 
-#: contrib/admin/static/admin/js/actions.js:126
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, but you haven't saved your changes to "
 "individual fields yet. Please click OK to save. You'll need to re-run the "
@@ -108,8 +90,6 @@ msgstr ""
 "בחרת פעולה, אבל עוד לא שמרת את השינויים לשדות בודדים. אנא לחץ על אישור כדי "
 "לשמור. יהיה עליך להפעיל את הפעולה עוד פעם."
 
-#: contrib/admin/static/admin/js/actions.js:128
-#: contrib/admin/static/admin/js/actions.min.js:5
 msgid ""
 "You have selected an action, and you haven't made any changes on individual "
 "fields. You're probably looking for the Go button rather than the Save "
@@ -118,85 +98,62 @@ msgstr ""
 "בחרת פעולה, ולא עשיתה שינויימ על שדות. אתה כנראה מחפש את הכפתור ללכת במקום "
 "הכפתור לשמור."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:79
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "הערה: את/ה %s שעה לפני זמן השרת."
 msgstr[1] "הערה: את/ה %s שעות לפני זמן השרת."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:87
-#, c-format
+#, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "הערה: את/ה %s שעה אחרי זמן השרת."
 msgstr[1] "הערה: את/ה %s שעות אחרי זמן השרת."
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:114
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:149
 msgid "Now"
 msgstr "כעת"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:118
 msgid "Clock"
 msgstr "שעון"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:146
 msgid "Choose a time"
 msgstr "בחירת שעה"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:150
 msgid "Midnight"
 msgstr "חצות"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:151
 msgid "6 a.m."
 msgstr "6 בבוקר"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:152
 msgid "Noon"
 msgstr "12 בצהריים"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:156
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:276
 msgid "Cancel"
 msgstr "ביטול"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:216
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:269
 msgid "Today"
 msgstr "היום"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:220
 msgid "Calendar"
 msgstr "לוח שנה"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:267
 msgid "Yesterday"
 msgstr "אתמול"
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:271
 msgid "Tomorrow"
 msgstr "מחר"
 
-#: contrib/admin/static/admin/js/calendar.js:8
 msgid ""
 "January February March April May June July August September October November "
 "December"
 msgstr ""
 "ינואר פברואר מרץ אפריל מאי יוני יולי אוגוסט ספטמבר אוקטובר נובמבר דצמבר"
 
-#: contrib/admin/static/admin/js/calendar.js:9
 msgid "S M T W T F S"
 msgstr "א ב ג ד ה ו ש"
 
-#: contrib/admin/static/admin/js/collapse.js:8
-#: contrib/admin/static/admin/js/collapse.js:19
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Show"
 msgstr "הצג"
 
-#: contrib/admin/static/admin/js/collapse.js:16
-#: contrib/admin/static/admin/js/collapse.min.js:1
 msgid "Hide"
 msgstr "הסתר"

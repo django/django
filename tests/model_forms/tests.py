@@ -11,14 +11,14 @@ from django.core.exceptions import (
 )
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import ValidationError
-from django.db import connection
+from django.db import connection, models
 from django.db.models.query import EmptyQuerySet
 from django.forms.models import (
     ModelFormMetaclass, construct_instance, fields_for_model, model_to_dict,
     modelform_factory,
 )
 from django.template import Context, Template
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils import six
 from django.utils._os import upath
 
@@ -28,8 +28,9 @@ from .models import (
     CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
     FlexibleDatePost, Homepage, ImprovedArticle, ImprovedArticleWithParentLink,
-    Inventory, Person, Photo, Post, Price, Product, Publication, Student,
-    StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
+    Inventory, Person, Photo, Post, Price, Product, Publication,
+    PublicationDefaults, StrictAssignmentAll, StrictAssignmentFieldSpecific,
+    Student, StumpJoke, TextFile, Triple, Writer, WriterProfile, test_images,
 )
 
 if test_images:
@@ -545,9 +546,12 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
                 )
             }
         }
+        field_classes = {
+            'url': forms.URLField,
+        }
 
 
-class TestFieldOverridesByFormMeta(TestCase):
+class TestFieldOverridesByFormMeta(SimpleTestCase):
     def test_widget_overrides(self):
         form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
@@ -588,7 +592,7 @@ class TestFieldOverridesByFormMeta(TestCase):
     def test_error_messages_overrides(self):
         form = FieldOverridesByFormMetaForm(data={
             'name': 'Category',
-            'url': '/category/',
+            'url': 'http://www.example.com/category/',
             'slug': '!%#*@',
         })
         form.full_clean()
@@ -598,6 +602,11 @@ class TestFieldOverridesByFormMeta(TestCase):
             "We said letters, numbers, underscores and hyphens only!",
         ]
         self.assertEqual(form.errors, {'slug': error})
+
+    def test_field_type_overrides(self):
+        form = FieldOverridesByFormMetaForm()
+        self.assertIs(Category._meta.get_field('url').__class__, models.CharField)
+        self.assertIsInstance(form.fields['url'], forms.URLField)
 
 
 class IncompleteCategoryFormWithFields(forms.ModelForm):
@@ -624,7 +633,7 @@ class IncompleteCategoryFormWithExclude(forms.ModelForm):
         model = Category
 
 
-class ValidationTest(TestCase):
+class ValidationTest(SimpleTestCase):
     def test_validates_with_replaced_field_not_specified(self):
         form = IncompleteCategoryFormWithFields(data={'name': 'some name', 'slug': 'some-slug'})
         assert form.is_valid()
@@ -1969,7 +1978,7 @@ class FileAndImageFieldTests(TestCase):
         form = FPForm()
         names = [p[1] for p in form['path'].field.choices]
         names.sort()
-        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'tests.py'])
+        self.assertEqual(names, ['---------', '__init__.py', 'models.py', 'test_uuid.py', 'tests.py'])
 
     @skipUnless(test_images, "Pillow not installed")
     def test_image_field(self):
@@ -2108,7 +2117,7 @@ class FileAndImageFieldTests(TestCase):
         instance.delete()
 
 
-class ModelOtherFieldTests(TestCase):
+class ModelOtherFieldTests(SimpleTestCase):
     def test_big_integer_field(self):
         bif = BigIntForm({'biggie': '-9223372036854775808'})
         self.assertTrue(bif.is_valid())
@@ -2127,24 +2136,28 @@ class ModelOtherFieldTests(TestCase):
                 model = CommaSeparatedInteger
                 fields = '__all__'
 
+        f = CommaSeparatedIntegerForm({'field': '1'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data, {'field': '1'})
+        f = CommaSeparatedIntegerForm({'field': '12'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data, {'field': '12'})
         f = CommaSeparatedIntegerForm({'field': '1,2,3'})
         self.assertTrue(f.is_valid())
         self.assertEqual(f.cleaned_data, {'field': '1,2,3'})
+        f = CommaSeparatedIntegerForm({'field': '10,32'})
+        self.assertTrue(f.is_valid())
+        self.assertEqual(f.cleaned_data, {'field': '10,32'})
         f = CommaSeparatedIntegerForm({'field': '1a,2'})
         self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
         f = CommaSeparatedIntegerForm({'field': ',,,,'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': ',,,,'})
+        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
         f = CommaSeparatedIntegerForm({'field': '1.2'})
         self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
         f = CommaSeparatedIntegerForm({'field': '1,a,2'})
         self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
         f = CommaSeparatedIntegerForm({'field': '1,,2'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '1,,2'})
-        f = CommaSeparatedIntegerForm({'field': '1'})
-        self.assertTrue(f.is_valid())
-        self.assertEqual(f.cleaned_data, {'field': '1'})
+        self.assertEqual(f.errors, {'field': ['Enter only digits separated by commas.']})
 
     def test_url_on_modelform(self):
         "Check basic URL field validation on model forms"
@@ -2274,8 +2287,46 @@ class OtherModelFormTests(TestCase):
         </select></p>"""
             % {'blue_pk': colour.pk})
 
+    def test_callable_field_default(self):
+        class PublicationDefaultsForm(forms.ModelForm):
+            class Meta:
+                model = PublicationDefaults
+                fields = '__all__'
 
-class ModelFormCustomErrorTests(TestCase):
+        self.maxDiff = 2000
+        form = PublicationDefaultsForm()
+        today_str = str(datetime.date.today())
+        self.assertHTMLEqual(
+            form.as_p(),
+            """<p><label for="id_title">Title:</label> <input id="id_title" maxlength="30" name="title" type="text" /></p>
+               <p><label for="id_date_published">Date published:</label>
+                    <input id="id_date_published" name="date_published" type="text" value="{0}" />
+                    <input id="initial-id_date_published" name="initial-date_published" type="hidden" value="{0}" /></p>
+               <p><label for="id_mode">Mode:</label> <select id="id_mode" name="mode">
+                    <option value="di" selected="selected">direct</option>
+                    <option value="de">delayed</option></select>
+                    <input id="initial-id_mode" name="initial-mode" type="hidden" value="di" /></p>
+               <p><label for="id_category">Category:</label> <select id="id_category" name="category">
+                    <option value="1">Games</option>
+                    <option value="2">Comics</option>
+                    <option value="3" selected="selected">Novel</option></select>
+                    <input id="initial-id_category" name="initial-category" type="hidden" value="3" />
+            """.format(today_str)
+        )
+        empty_data = {
+            'title': '',
+            'date_published': today_str,
+            'initial-date_published': today_str,
+            'mode': 'di',
+            'initial-mode': 'di',
+            'category': '3',
+            'initial-category': '3',
+        }
+        bound_form = PublicationDefaultsForm(empty_data)
+        self.assertFalse(bound_form.has_changed())
+
+
+class ModelFormCustomErrorTests(SimpleTestCase):
     def test_custom_error_messages(self):
         data = {'name1': '@#$!!**@#$', 'name2': '@#$!!**@#$'}
         errors = CustomErrorMessageForm(data).errors
@@ -2351,7 +2402,7 @@ class CustomCleanTests(TestCase):
         self.assertEqual(category.name, 'TEST')
 
 
-class ModelFormInheritanceTests(TestCase):
+class ModelFormInheritanceTests(SimpleTestCase):
     def test_form_subclass_inheritance(self):
         class Form(forms.Form):
             age = forms.IntegerField()
@@ -2462,7 +2513,7 @@ class LimitChoicesToTest(TestCase):
         self.assertEqual(f.fields['custom'].queryset, 42)
 
 
-class FormFieldCallbackTests(TestCase):
+class FormFieldCallbackTests(SimpleTestCase):
 
     def test_baseform_with_widgets_in_meta(self):
         """Regression for #13095: Using base forms with widgets defined in Meta should not raise errors."""
@@ -2580,7 +2631,45 @@ class CustomMetaclassForm(six.with_metaclass(CustomMetaclass, forms.ModelForm)):
     pass
 
 
-class CustomMetaclassTestCase(TestCase):
+class CustomMetaclassTestCase(SimpleTestCase):
     def test_modelform_factory_metaclass(self):
         new_cls = modelform_factory(Person, fields="__all__", form=CustomMetaclassForm)
         self.assertEqual(new_cls.base_fields, {})
+
+
+class StrictAssignmentTests(TestCase):
+    """
+    Should a model do anything special with __setattr__() or descriptors which
+    raise a ValidationError, a model form should catch the error (#24706).
+    """
+
+    def test_setattr_raises_validation_error_field_specific(self):
+        """
+        A model ValidationError using the dict form should put the error
+        message into the correct key of form.errors.
+        """
+        form_class = modelform_factory(model=StrictAssignmentFieldSpecific, fields=['title'])
+        form = form_class(data={'title': 'testing setattr'}, files=None)
+        # This line turns on the ValidationError; it avoids the model erroring
+        # when its own __init__() is called when creating form.instance.
+        form.instance._should_error = True
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {
+            'title': ['Cannot set attribute', 'This field cannot be blank.']
+        })
+
+    def test_setattr_raises_validation_error_non_field(self):
+        """
+        A model ValidationError not using the dict form should put the error
+        message into __all__ (i.e. non-field errors) on the form.
+        """
+        form_class = modelform_factory(model=StrictAssignmentAll, fields=['title'])
+        form = form_class(data={'title': 'testing setattr'}, files=None)
+        # This line turns on the ValidationError; it avoids the model erroring
+        # when its own __init__() is called when creating form.instance.
+        form.instance._should_error = True
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {
+            '__all__': ['Cannot set attribute'],
+            'title': ['This field cannot be blank.']
+        })

@@ -29,7 +29,7 @@ from django.forms.widgets import (
 from django.utils import formats, six
 from django.utils.dateparse import parse_duration
 from django.utils.deprecation import (
-    RemovedInDjango20Warning, RenameMethodsBase,
+    RemovedInDjango110Warning, RenameMethodsBase,
 )
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
@@ -50,7 +50,7 @@ __all__ = (
 
 class RenameFieldMethods(RenameMethodsBase):
     renamed_methods = (
-        ('_has_changed', 'has_changed', RemovedInDjango20Warning),
+        ('_has_changed', 'has_changed', RemovedInDjango110Warning),
     )
 
 
@@ -70,7 +70,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
     def __init__(self, required=True, widget=None, label=None, initial=None,
                  help_text='', error_messages=None, show_hidden_initial=False,
-                 validators=[], localize=False, label_suffix=None):
+                 validators=[], localize=False, disabled=False, label_suffix=None):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
         # widget -- A Widget class, or instance of a Widget class, that should
@@ -90,11 +90,14 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         #                        hidden widget with initial value after widget.
         # validators -- List of additional validators to use
         # localize -- Boolean that specifies if the field should be localized.
+        # disabled -- Boolean that specifies whether the field is disabled, that
+        #             is its widget is shown in the form but not editable.
         # label_suffix -- Suffix to be added to the label. Overrides
         #                 form's label_suffix.
         self.required, self.label, self.initial = required, label, initial
         self.show_hidden_initial = show_hidden_initial
         self.help_text = help_text
+        self.disabled = disabled
         self.label_suffix = label_suffix
         widget = widget or self.widget
         if isinstance(widget, type):
@@ -195,6 +198,7 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
             data = self.to_python(data)
             if hasattr(self, '_coerce'):
                 data = self._coerce(data)
+                initial_value = self._coerce(initial_value)
         except ValidationError:
             return True
         data_value = data if data is not None else ''
@@ -209,8 +213,10 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
 
 
 class CharField(Field):
-    def __init__(self, max_length=None, min_length=None, *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
+    def __init__(self, max_length=None, min_length=None, strip=True, *args, **kwargs):
+        self.max_length = max_length
+        self.min_length = min_length
+        self.strip = strip
         super(CharField, self).__init__(*args, **kwargs)
         if min_length is not None:
             self.validators.append(validators.MinLengthValidator(int(min_length)))
@@ -221,7 +227,10 @@ class CharField(Field):
         "Returns a Unicode object."
         if value in self.empty_values:
             return ''
-        return smart_text(value)
+        value = force_text(value)
+        if self.strip:
+            value = value.strip()
+        return value
 
     def widget_attrs(self, widget):
         attrs = super(CharField, self).widget_attrs(widget)
@@ -236,6 +245,7 @@ class IntegerField(Field):
     default_error_messages = {
         'invalid': _('Enter a whole number.'),
     }
+    re_decimal = re.compile(r'\.0*\s*$')
 
     def __init__(self, max_value=None, min_value=None, *args, **kwargs):
         self.max_value, self.min_value = max_value, min_value
@@ -259,8 +269,9 @@ class IntegerField(Field):
             return None
         if self.localize:
             value = formats.sanitize_separators(value)
+        # Strip trailing decimal and zeros.
         try:
-            value = int(str(value))
+            value = int(self.re_decimal.sub('', str(value)))
         except (ValueError, TypeError):
             raise ValidationError(self.error_messages['invalid'], code='invalid')
         return value
@@ -514,7 +525,9 @@ class DurationField(Field):
     }
 
     def prepare_value(self, value):
-        return duration_string(value)
+        if isinstance(value, datetime.timedelta):
+            return duration_string(value)
+        return value
 
     def to_python(self, value):
         if value in self.empty_values:
@@ -534,12 +547,13 @@ class RegexField(CharField):
         error_message is an optional error message to use, if
         'Enter a valid value' is too generic for you.
         """
+        kwargs.setdefault('strip', False)
         # error_message is just kept for backwards compatibility:
         if error_message is not None:
             warnings.warn(
                 "The 'error_message' argument is deprecated. Use "
                 "Field.error_messages['invalid'] instead.",
-                RemovedInDjango20Warning, stacklevel=2
+                RemovedInDjango110Warning, stacklevel=2
             )
             error_messages = kwargs.get('error_messages') or {}
             error_messages['invalid'] = error_message
@@ -678,7 +692,9 @@ class ImageField(FileField):
 
             # Annotating so subclasses can reuse it for their own validation
             f.image = image
-            f.content_type = Image.MIME[image.format]
+            # Pillow doesn't detect the MIME type of all formats. In those
+            # cases, content_type will be None.
+            f.content_type = Image.MIME.get(image.format)
         except Exception:
             # Pillow doesn't recognize it as an image.
             six.reraise(ValidationError, ValidationError(
@@ -1224,9 +1240,11 @@ class GenericIPAddressField(CharField):
 class SlugField(CharField):
     default_validators = [validators.validate_slug]
 
-    def clean(self, value):
-        value = self.to_python(value).strip()
-        return super(SlugField, self).clean(value)
+    def __init__(self, *args, **kwargs):
+        self.allow_unicode = kwargs.pop('allow_unicode', False)
+        if self.allow_unicode:
+            self.default_validators = [validators.validate_unicode_slug]
+        super(SlugField, self).__init__(*args, **kwargs)
 
 
 class UUIDField(CharField):

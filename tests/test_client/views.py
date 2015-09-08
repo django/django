@@ -11,6 +11,7 @@ from django.http import (
 )
 from django.shortcuts import render_to_response
 from django.template import Context, Template
+from django.test import Client
 from django.utils.decorators import method_decorator
 from django.utils.six.moves.urllib.parse import urlencode
 
@@ -307,6 +308,16 @@ def mass_mail_sending_view(request):
     c.send_messages([m1, m2])
 
     return HttpResponse("Mail sent")
+
+
+def nesting_exception_view(request):
+    """
+    A view that uses a nested client to call another view and then raises an
+    exception.
+    """
+    client = Client()
+    client.get('/get_view/')
+    raise Exception('exception message')
 
 
 def django_project_redirect(request):

@@ -224,7 +224,7 @@ method along with the request object.
 
 Here's the code for these beat-specific feeds::
 
-    from django.contrib.syndication.views import FeedDoesNotExist
+    from django.contrib.syndication.views import Feed
     from django.shortcuts import get_object_or_404
 
     class BeatFeed(Feed):
@@ -919,7 +919,10 @@ They share this interface:
     ``self.feed`` for use with `custom feed generators`_.
 
     All parameters should be Unicode objects, except ``categories``, which
-    should be a sequence of Unicode objects.
+    should be a sequence of Unicode objects. Beware that some control characters
+    are `not allowed <http://www.w3.org/International/questions/qa-controls>`_
+    in XML documents. If your content has some of them, you might encounter a
+    :exc:`ValueError` when producing the feed.
 
 :meth:`.SyndicationFeed.add_item`
     Add an item to the feed with the given parameters.

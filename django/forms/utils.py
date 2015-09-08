@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError  # backwards compatibility
 from django.utils import six, timezone
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, format_html, format_html_join
+from django.utils.html import escape, format_html, format_html_join, html_safe
 from django.utils.translation import ugettext_lazy as _
 
 try:
@@ -20,10 +20,12 @@ def flatatt(attrs):
     """
     Convert a dictionary of attributes to a single string.
     The returned string will contain a leading space followed by key="value",
-    XML-style pairs.  It is assumed that the keys do not need to be XML-escaped.
-    If the passed dictionary is empty, then return an empty string.
+    XML-style pairs. In the case of a boolean value, the key will appear
+    without a value. It is assumed that the keys do not need to be
+    XML-escaped. If the passed dictionary is empty, then return an empty
+    string.
 
-    The result is passed through 'mark_safe'.
+    The result is passed through 'mark_safe' (by way of 'format_html_join').
     """
     key_value_attrs = []
     boolean_attrs = []
@@ -40,6 +42,7 @@ def flatatt(attrs):
     )
 
 
+@html_safe
 @python_2_unicode_compatible
 class ErrorDict(dict):
     """
@@ -72,6 +75,7 @@ class ErrorDict(dict):
         return self.as_ul()
 
 
+@html_safe
 @python_2_unicode_compatible
 class ErrorList(UserList, list):
     """

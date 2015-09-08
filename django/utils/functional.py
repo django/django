@@ -1,7 +1,6 @@
 import copy
 import operator
-import sys
-from functools import wraps
+from functools import total_ordering, wraps
 
 from django.utils import six
 from django.utils.six.moves import copyreg
@@ -129,6 +128,11 @@ def lazy(func, *resultclasses):
             else:
                 return func(*self.__args, **self.__kw)
 
+        def __str__(self):
+            # object defines __str__(), so __prepare_class__() won't overload
+            # a __str__() method from the proxied class.
+            return str(self.__cast())
+
         def __ne__(self, other):
             if isinstance(other, Promise):
                 other = other.__cast()
@@ -184,7 +188,7 @@ def allow_lazy(func, *resultclasses):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        for arg in list(args) + list(six.itervalues(kwargs)):
+        for arg in list(args) + list(kwargs.values()):
             if isinstance(arg, Promise):
                 break
         else:
@@ -252,7 +256,7 @@ class LazyObject(object):
             self._setup()
         return self._wrapped.__dict__
 
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
+    # Python 3 will call __reduce__ when pickling; this method is needed
     # to serialize and deserialize correctly.
     @classmethod
     def __newobj__(cls, *args):
@@ -285,7 +289,7 @@ class LazyObject(object):
         __bool__ = new_method_proxy(bool)
     else:
         __str__ = new_method_proxy(str)
-        __unicode__ = new_method_proxy(unicode)
+        __unicode__ = new_method_proxy(unicode)  # NOQA: unicode undefined on PY3
         __nonzero__ = new_method_proxy(bool)
 
     # Introspection support
@@ -298,11 +302,11 @@ class LazyObject(object):
     __ne__ = new_method_proxy(operator.ne)
     __hash__ = new_method_proxy(hash)
 
-    # Dictionary methods support
+    # List/Tuple/Dictionary methods support
     __getitem__ = new_method_proxy(operator.getitem)
     __setitem__ = new_method_proxy(operator.setitem)
     __delitem__ = new_method_proxy(operator.delitem)
-
+    __iter__ = new_method_proxy(iter)
     __len__ = new_method_proxy(len)
     __contains__ = new_method_proxy(operator.contains)
 
@@ -385,36 +389,3 @@ def partition(predicate, values):
     for item in values:
         results[predicate(item)].append(item)
     return results
-
-if sys.version_info >= (2, 7, 2):
-    from functools import total_ordering
-else:
-    # For Python < 2.7.2. total_ordering in versions prior to 2.7.2 is buggy.
-    # See http://bugs.python.org/issue10042 for details. For these versions use
-    # code borrowed from Python 2.7.3.
-    def total_ordering(cls):
-        """Class decorator that fills in missing ordering methods"""
-        convert = {
-            '__lt__': [('__gt__', lambda self, other: not (self < other or self == other)),
-                       ('__le__', lambda self, other: self < other or self == other),
-                       ('__ge__', lambda self, other: not self < other)],
-            '__le__': [('__ge__', lambda self, other: not self <= other or self == other),
-                       ('__lt__', lambda self, other: self <= other and not self == other),
-                       ('__gt__', lambda self, other: not self <= other)],
-            '__gt__': [('__lt__', lambda self, other: not (self > other or self == other)),
-                       ('__ge__', lambda self, other: self > other or self == other),
-                       ('__le__', lambda self, other: not self > other)],
-            '__ge__': [('__le__', lambda self, other: (not self >= other) or self == other),
-                       ('__gt__', lambda self, other: self >= other and not self == other),
-                       ('__lt__', lambda self, other: not self >= other)]
-        }
-        roots = set(dir(cls)) & set(convert)
-        if not roots:
-            raise ValueError('must define at least one ordering operation: < > <= >=')
-        root = max(roots)       # prefer __lt__ to __le__ to __gt__ to __ge__
-        for opname, opfunc in convert[root]:
-            if opname not in roots:
-                opfunc.__name__ = opname
-                opfunc.__doc__ = getattr(int, opname).__doc__
-                setattr(cls, opname, opfunc)
-        return cls

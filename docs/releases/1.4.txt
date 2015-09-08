@@ -273,10 +273,10 @@ uses the PBKDF2_ algorithm (as recommended by NIST_). You can also easily choose
 a different algorithm (including the popular bcrypt_ algorithm). For more
 details, see :ref:`auth_password_storage`.
 
-.. _sha1: http://en.wikipedia.org/wiki/SHA1
-.. _pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
+.. _sha1: https://en.wikipedia.org/wiki/SHA1
+.. _pbkdf2: https://en.wikipedia.org/wiki/PBKDF2
 .. _nist: http://csrc.nist.gov/publications/nistpubs/800-132/nist-sp800-132.pdf
-.. _bcrypt: http://en.wikipedia.org/wiki/Bcrypt
+.. _bcrypt: https://en.wikipedia.org/wiki/Bcrypt
 
 HTML5 doctype
 ~~~~~~~~~~~~~
@@ -437,7 +437,7 @@ For example:
 No wrapping of exceptions in ``TEMPLATE_DEBUG`` mode
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-In previous versions of Django, whenever the :setting:`TEMPLATE_DEBUG` setting
+In previous versions of Django, whenever the ``TEMPLATE_DEBUG`` setting
 was ``True``, any exception raised during template rendering (even exceptions
 unrelated to template syntax) were wrapped in ``TemplateSyntaxError`` and
 re-raised. This was done in order to provide detailed template source location
@@ -446,7 +446,7 @@ information in the debug 500 page.
 In Django 1.4, exceptions are no longer wrapped. Instead, the original
 exception is annotated with the source information. This means that catching
 exceptions from template rendering is now consistent regardless of the value of
-:setting:`TEMPLATE_DEBUG`, and there's no need to catch and unwrap
+``TEMPLATE_DEBUG``, and there's no need to catch and unwrap
 ``TemplateSyntaxError`` in order to catch other errors.
 
 ``truncatechars`` template filter
@@ -483,7 +483,7 @@ Simple clickjacking protection
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 We've added a middleware to provide easy protection against `clickjacking
-<http://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
+<https://en.wikipedia.org/wiki/Clickjacking>`_ using the ``X-Frame-Options``
 header. It's not enabled by default for backwards compatibility reasons, but
 you'll almost certainly want to :doc:`enable it </ref/clickjacking/>` to help
 plug that security hole for browsers that support the header.

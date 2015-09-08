@@ -1,15 +1,18 @@
 from django.contrib.gis.geos import prototypes as capi
-from django.contrib.gis.geos.base import numpy
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.geometry import GEOSGeometry
+from django.contrib.gis.geos.geometry import (
+    GEOSGeometry, ProjectInterpolateMixin,
+)
 from django.contrib.gis.geos.point import Point
+from django.contrib.gis.shortcuts import numpy
 from django.utils.six.moves import range
 
 
-class LineString(GEOSGeometry):
+class LineString(ProjectInterpolateMixin, GEOSGeometry):
     _init_func = capi.create_linestring
     _minlength = 2
+    has_cs = True
 
     def __init__(self, *args, **kwargs):
         """
@@ -69,7 +72,7 @@ class LineString(GEOSGeometry):
                 cs[i] = coords[i]
 
         # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid', None)
+        srid = kwargs.get('srid')
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.

@@ -204,7 +204,7 @@ the foreign key relation to the model:
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
-        created_by = models.ForeignKey(User)
+        created_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
         # ...
 

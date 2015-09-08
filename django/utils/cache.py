@@ -19,17 +19,23 @@ An example: i18n middleware would need to distinguish caches by the
 from __future__ import unicode_literals
 
 import hashlib
+import logging
 import re
 import time
 
 from django.conf import settings
 from django.core.cache import caches
+from django.http import HttpResponse, HttpResponseNotModified
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
-from django.utils.http import http_date
+from django.utils.http import (
+    http_date, parse_etags, parse_http_date_safe, quote_etag,
+)
 from django.utils.timezone import get_current_timezone_name
 from django.utils.translation import get_language
 
 cc_delim_re = re.compile(r'\s*,\s*')
+
+logger = logging.getLogger('django.request')
 
 
 def patch_cache_control(response, **kwargs):
@@ -97,9 +103,99 @@ def get_max_age(response):
             pass
 
 
-def _set_response_etag(response):
+def set_response_etag(response):
     if not response.streaming:
-        response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
+        response['ETag'] = quote_etag(hashlib.md5(response.content).hexdigest())
+    return response
+
+
+def _precondition_failed(request):
+    logger.warning('Precondition Failed: %s', request.path,
+        extra={
+            'status_code': 412,
+            'request': request,
+        },
+    )
+    return HttpResponse(status=412)
+
+
+def _not_modified(request, response=None):
+    if response:
+        # We need to keep the cookies, see ticket #4994.
+        cookies = response.cookies
+        response = HttpResponseNotModified()
+        response.cookies = cookies
+        return response
+    else:
+        return HttpResponseNotModified()
+
+
+def get_conditional_response(request, etag=None, last_modified=None, response=None):
+    # Get HTTP request headers
+    if_modified_since = request.META.get('HTTP_IF_MODIFIED_SINCE')
+    if if_modified_since:
+        if_modified_since = parse_http_date_safe(if_modified_since)
+    if_unmodified_since = request.META.get('HTTP_IF_UNMODIFIED_SINCE')
+    if if_unmodified_since:
+        if_unmodified_since = parse_http_date_safe(if_unmodified_since)
+    if_none_match = request.META.get('HTTP_IF_NONE_MATCH')
+    if_match = request.META.get('HTTP_IF_MATCH')
+    etags = []
+    if if_none_match or if_match:
+        # There can be more than one ETag in the request, so we
+        # consider the list of values.
+        try:
+            etags = parse_etags(if_none_match or if_match)
+        except ValueError:
+            # In case of an invalid ETag, ignore all ETag headers.
+            # Apparently Opera sends invalidly quoted headers at times
+            # (we should be returning a 400 response, but that's a
+            # little extreme) -- this is bug #10681.
+            if_none_match = None
+            if_match = None
+
+    # If-None-Match must be ignored if original result would be anything
+    # other than a 2XX or 304 status. 304 status would result in no change.
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.26
+    if response and not (200 <= response.status_code < 300):
+        if_none_match = None
+        if_match = None
+
+    # If-Modified-Since must be ignored if the original result was not a 200.
+    # http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.25
+    if response and response.status_code != 200:
+        if_modified_since = None
+        if_unmodified_since = None
+
+    if not ((if_match and if_modified_since) or
+            (if_none_match and if_unmodified_since) or
+            (if_modified_since and if_unmodified_since) or
+            (if_match and if_none_match)):
+        # We only get here if no undefined combinations of headers are
+        # specified.
+        if ((if_none_match and (etag in etags or
+                '*' in etags and etag)) and
+                (not if_modified_since or
+                    (last_modified and if_modified_since and
+                    last_modified <= if_modified_since))):
+            if request.method in ('GET', 'HEAD'):
+                return _not_modified(request, response)
+            else:
+                return _precondition_failed(request)
+        elif (if_match and ((not etag and '*' in etags) or
+                (etag and etag not in etags) or
+                (last_modified and if_unmodified_since and
+                last_modified > if_unmodified_since))):
+            return _precondition_failed(request)
+        elif (not if_none_match and request.method in ('GET', 'HEAD') and
+                last_modified and if_modified_since and
+                last_modified <= if_modified_since):
+            return _not_modified(request, response)
+        elif (not if_match and
+                last_modified and if_unmodified_since and
+                last_modified > if_unmodified_since):
+            return _precondition_failed(request)
+
     return response
 
 
@@ -119,9 +215,9 @@ def patch_response_headers(response, cache_timeout=None):
         cache_timeout = 0  # Can't have max-age negative
     if settings.USE_ETAGS and not response.has_header('ETag'):
         if hasattr(response, 'render') and callable(response.render):
-            response.add_post_render_callback(_set_response_etag)
+            response.add_post_render_callback(set_response_etag)
         else:
-            response = _set_response_etag(response)
+            response = set_response_etag(response)
     if not response.has_header('Last-Modified'):
         response['Last-Modified'] = http_date()
     if not response.has_header('Expires'):
@@ -134,6 +230,7 @@ def add_never_cache_headers(response):
     Adds headers to a response to indicate that a page should never be cached.
     """
     patch_response_headers(response, cache_timeout=-1)
+    patch_cache_control(response, no_cache=True, no_store=True, must_revalidate=True)
 
 
 def patch_vary_headers(response, newheaders):
@@ -188,7 +285,7 @@ def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     ctx = hashlib.md5()
     for header in headerlist:
-        value = request.META.get(header, None)
+        value = request.META.get(header)
         if value is not None:
             ctx.update(force_bytes(value))
     url = hashlib.md5(force_bytes(iri_to_uri(request.build_absolute_uri())))
@@ -220,7 +317,7 @@ def get_cache_key(request, key_prefix=None, method='GET', cache=None):
     cache_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
-    headerlist = cache.get(cache_key, None)
+    headerlist = cache.get(cache_key)
     if headerlist is not None:
         return _generate_cache_key(request, method, headerlist, key_prefix)
     else:

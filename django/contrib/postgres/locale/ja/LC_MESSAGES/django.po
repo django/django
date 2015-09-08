@@ -1,0 +1,97 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Shinya Okano <tokibito@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"PO-Revision-Date: 2015-03-29 02:32+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"ja/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "PostgreSQL拡張"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "配列内のアイテム %(nth)s は検証できませんでした:"
+
+msgid "Nested arrays must have the same length."
+msgstr "ネストした配列は同じ長さにしなければなりません。"
+
+msgid "Map of strings to strings"
+msgstr "文字列と文字列のマップ"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "\"%(key)s\" の値は文字列ではありません。"
+
+msgid "Could not load JSON data."
+msgstr "JSONデータを読み込めませんでした。"
+
+msgid "Enter two valid values."
+msgstr "2つの値を正しく入力してください。"
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "範囲の開始は、範囲の終わりを超えてはなりません。"
+
+msgid "Enter two whole numbers."
+msgstr "2つの整数を入力してください。"
+
+msgid "Enter two numbers."
+msgstr "2つの数値を入力してください。"
+
+msgid "Enter two valid date/times."
+msgstr "2つの日付/時間を入力してください。"
+
+msgid "Enter two valid dates."
+msgstr "2つの日付を入力してください。"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"リストには%(show_value)d個のアイテムが含まれますが、%(limit_value)d個までしか"
+"含められません。"
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"リストには%(show_value)d個のアイテムが含まれますが、%(limit_value)d個までしか"
+"含められません。"
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "いくつかのキーが欠落しています: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "いくつかの不明なキーがあります: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "この範囲が完全に%(limit_value)s以下であることを確認してください。"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "この範囲が完全に%(limit_value)s以上であることを確認してください。"

@@ -42,7 +42,7 @@ class Article(models.Model):
 @python_2_unicode_compatible
 class Blog(models.Model):
     name = models.CharField(max_length=100)
-    featured = models.ForeignKey(Article, related_name='fixtures_featured_set')
+    featured = models.ForeignKey(Article, models.CASCADE, related_name='fixtures_featured_set')
     articles = models.ManyToManyField(Article, blank=True,
                                       related_name='fixtures_articles_set')
 
@@ -53,7 +53,7 @@ class Blog(models.Model):
 @python_2_unicode_compatible
 class Tag(models.Model):
     name = models.CharField(max_length=100)
-    tagged_type = models.ForeignKey(ContentType, related_name="fixtures_tag_set")
+    tagged_type = models.ForeignKey(ContentType, models.CASCADE, related_name="fixtures_tag_set")
     tagged_id = models.PositiveIntegerField(default=0)
     tagged = GenericForeignKey(ct_field='tagged_type', fk_field='tagged_id')
 
@@ -94,7 +94,7 @@ class Spy(Person):
 
 @python_2_unicode_compatible
 class Visa(models.Model):
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, models.CASCADE)
     permissions = models.ManyToManyField(Permission, blank=True)
 
     def __str__(self):

@@ -6,10 +6,10 @@ Form and field validation
 =========================
 
 Form validation happens when the data is cleaned. If you want to customize
-this process, there are various places you can change, each one serving a
+this process, there are various places to make changes, each one serving a
 different purpose. Three types of cleaning methods are run during form
 processing. These are normally executed when you call the ``is_valid()``
-method on a form. There are other things that can trigger cleaning and
+method on a form. There are other things that can also trigger cleaning and
 validation (accessing the ``errors`` attribute or calling ``full_clean()``
 directly), but normally they won't be needed.
 
@@ -25,35 +25,35 @@ reused easily. Validators are simple functions (or callables) that take a single
 argument and raise ``ValidationError`` on invalid input. Validators are run
 after the field's ``to_python`` and ``validate`` methods have been called.
 
-Validation of a Form is split into several steps, which can be customized or
+Validation of a form is split into several steps, which can be customized or
 overridden:
 
-* The ``to_python()`` method on a Field is the first step in every
-  validation. It coerces the value to correct datatype and raises
+* The ``to_python()`` method on a ``Field`` is the first step in every
+  validation. It coerces the value to a correct datatype and raises
   ``ValidationError`` if that is not possible. This method accepts the raw
   value from the widget and returns the converted value. For example, a
-  FloatField will turn the data into a Python ``float`` or raise a
+  ``FloatField`` will turn the data into a Python ``float`` or raise a
   ``ValidationError``.
 
-* The ``validate()`` method on a Field handles field-specific validation
+* The ``validate()`` method on a ``Field`` handles field-specific validation
   that is not suitable for a validator. It takes a value that has been
-  coerced to correct datatype and raises ``ValidationError`` on any error.
+  coerced to a correct datatype and raises ``ValidationError`` on any error.
   This method does not return anything and shouldn't alter the value. You
   should override it to handle validation logic that you can't or don't
   want to put in a validator.
 
-* The ``run_validators()`` method on a Field runs all of the field's
+* The ``run_validators()`` method on a ``Field`` runs all of the field's
   validators and aggregates all the errors into a single
   ``ValidationError``. You shouldn't need to override this method.
 
-* The ``clean()`` method on a Field subclass. This is responsible for
-  running ``to_python``, ``validate`` and ``run_validators`` in the correct
+* The ``clean()`` method on a ``Field`` subclass is responsible for running
+  ``to_python()``, ``validate()``, and ``run_validators()`` in the correct
   order and propagating their errors. If, at any time, any of the methods
   raise ``ValidationError``, the validation stops and that error is raised.
   This method returns the clean data, which is then inserted into the
   ``cleaned_data`` dictionary of the form.
 
-* The ``clean_<fieldname>()`` method in a form subclass -- where
+* The ``clean_<fieldname>()`` method is called on a form subclass -- where
   ``<fieldname>`` is replaced with the name of the form field attribute.
   This method does any cleaning that is specific to that particular
   attribute, unrelated to the type of field that it is. This method is not
@@ -70,15 +70,14 @@ overridden:
   formfield-specific piece of validation and, possibly,
   cleaning/normalizing the data.
 
-  This method should return the cleaned value obtained from cleaned_data,
+  This method should return the cleaned value obtained from ``cleaned_data``,
   regardless of whether it changed anything or not.
 
-* The Form subclass's ``clean()`` method. This method can perform
-  any validation that requires access to multiple fields from the form at
-  once. This is where you might put in things to check that if field ``A``
-  is supplied, field ``B`` must contain a valid email address and the
-  like. This method can return a completely different dictionary if it wishes,
-  which will be used as the ``cleaned_data``.
+* The form subclass's ``clean()`` method can perform validation that requires
+  access to multiple form fields. This is where you might put in checks such as
+  "if field ``A``is supplied, field ``B`` must contain a valid email address".
+  This method can return a completely different dictionary if it wishes, which
+  will be used as the ``cleaned_data``.
 
   Since the field validation methods have been run by the time ``clean()`` is
   called, you also have access to the form's ``errors`` attribute which
@@ -364,8 +363,10 @@ example::
             if cc_myself and subject:
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
-                    raise forms.ValidationError("Did not send for 'help' in "
-                            "the subject despite CC'ing yourself.")
+                    raise forms.ValidationError(
+                        "Did not send for 'help' in the subject despite "
+                        "CC'ing yourself."
+                    )
 
 In this code, if the validation error is raised, the form will display an
 error message at the top of the form (normally) describing the problem.

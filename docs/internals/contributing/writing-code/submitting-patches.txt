@@ -145,6 +145,8 @@ Regardless of the way you submit your work, follow these steps.
   obvious that the ticket includes a patch, and it will add the ticket to
   the `list of tickets with patches`_.
 
+.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
+.. _ticket tracker: https://code.djangoproject.com/newticket
 
 Non-trivial patches
 -------------------
@@ -236,48 +238,17 @@ Finally, there are a couple of updates to Django's documentation to make:
    the "Features deprecated in A.B" heading.
 
 #) Add an entry in the deprecation timeline (``docs/internals/deprecation.txt``)
-   under the ``A.B+2`` version describing what code will be removed.
+   under the appropriate version describing what code will be removed.
 
 Once you have completed these steps, you are finished with the deprecation.
-In each major release, all ``RemovedInDjangoXXWarning``\s matching the new
-version are removed.
+In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
+the new version are removed.
 
-Javascript patches
+JavaScript patches
 ------------------
 
-Django's admin system leverages the jQuery framework to increase the
-capabilities of the admin interface. In conjunction, there is an emphasis on
-admin javascript performance and minimizing overall admin media file size.
-Serving compressed or "minified" versions of javascript files is considered
-best practice in this regard.
-
-To that end, patches for javascript files should include both the original
-code for future development (e.g. ``foo.js``), and a compressed version for
-production use (e.g. ``foo.min.js``). Any links to the file in the codebase
-should point to the compressed version.
-
-Compressing JavaScript
-~~~~~~~~~~~~~~~~~~~~~~
-
-To simplify the process of providing optimized javascript code, Django
-includes a handy python script which should be used to create a "minified"
-version. To run it::
-
-    python django/contrib/admin/bin/compress.py
-
-Behind the scenes, ``compress.py`` is a front-end for Google's
-`Closure Compiler`_ which is written in Java. However, the Closure Compiler
-library is not bundled with Django directly, so those wishing to contribute
-complete javascript patches will need to download and install the library
-independently. The Closure Compiler library requires `Java`_ 7 or higher.
-
-Please don't forget to run ``compress.py`` and include the ``diff`` of the
-minified scripts when submitting patches for Django's javascript.
-
-.. _Closure Compiler: https://developers.google.com/closure/compiler/
-.. _list of tickets with patches: https://code.djangoproject.com/query?status=new&status=assigned&status=reopened&has_patch=1&order=priority
-.. _ticket tracker: https://code.djangoproject.com/newticket
-.. _Java: https://www.java.com
+For information on JavaScript patches, see the :ref:`javascript-patches`
+documentation.
 
 .. _patch-review-checklist:
 
