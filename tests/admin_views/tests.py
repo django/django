@@ -27,13 +27,14 @@ from django.forms.utils import ErrorList
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import (
-    SimpleTestCase, TestCase, modify_settings, override_settings,
-    skipUnlessDBFeature,
+    SimpleTestCase, TestCase, ignore_warnings, modify_settings,
+    override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import override_script_prefix, patch_logger
 from django.utils import formats, six, translation
 from django.utils._os import upath
 from django.utils.cache import get_max_age
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text, iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -4681,6 +4682,7 @@ class ReadonlyTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_get(self):
         response = self.client.get(reverse('admin:admin_views_post_add'))
         self.assertEqual(response.status_code, 200)
@@ -4699,6 +4701,8 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, "Multiline<br />test<br />string")
         self.assertContains(response, "<p>Multiline<br />html<br />content</p>", html=True)
         self.assertContains(response, "InlineMultiline<br />test<br />string")
+        # Remove only this last line when the deprecation completes.
+        self.assertContains(response, "<p>Multiline<br />html<br />content<br />with allow tags</p>", html=True)
 
         self.assertContains(response,
             formats.localize(datetime.date.today() - datetime.timedelta(days=7)))
@@ -4768,6 +4772,7 @@ class ReadonlyTest(TestCase):
         response = self.client.get(reverse('admin:admin_views_topping_add'))
         self.assertEqual(response.status_code, 200)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -5181,6 +5186,7 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.login(username='super', password='secret')
 
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_field_prefix_css_classes(self):
         """
         Ensure that fields have a CSS class name with a 'field-' prefix.

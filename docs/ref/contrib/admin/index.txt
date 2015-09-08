@@ -583,11 +583,9 @@ subclass::
       ``False``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable, Django will HTML-escape the output by default. If you'd
-      rather not escape the output of the method, give the method an
-      ``allow_tags`` attribute whose value is ``True``. However, to avoid an
-      XSS vulnerability, you should use :func:`~django.utils.html.format_html`
-      to escape user-provided inputs.
+      callable, Django will HTML-escape the output by default. To escape
+      user input and allow your own unescaped tags, use
+      :func:`~django.utils.html.format_html`.
 
       Here's a full example model::
 
@@ -606,10 +604,16 @@ subclass::
                                      self.first_name,
                                      self.last_name)
 
-              colored_name.allow_tags = True
-
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
+
+      .. deprecated:: 1.9
+
+          In older versions, you could add an ``allow_tags`` attribute to the
+          method to prevent auto-escaping. This attribute is deprecated as it's
+          safer to use :func:`~django.utils.html.format_html`,
+          :func:`~django.utils.html.format_html_join`, or
+          :func:`~django.utils.safestring.mark_safe` instead.
 
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
@@ -688,7 +692,6 @@ subclass::
                                    self.color_code,
                                    self.first_name)
 
-            colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
 
         class PersonAdmin(admin.ModelAdmin):
@@ -1095,12 +1098,10 @@ subclass::
                     mark_safe('<br/>'),
                     '{}',
                     ((line,) for line in instance.get_full_address()),
-                ) or "<span class='errors'>I can't determine this address.</span>"
+                ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
             # short_description functions like a model field's verbose_name
             address_report.short_description = "Address"
-            # in this example, we have used HTML tags in the output
-            address_report.allow_tags = True
 
 .. attribute:: ModelAdmin.save_as
 
