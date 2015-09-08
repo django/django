@@ -15,6 +15,8 @@ data model underlying Channels and how they're used inside Django.
 Then, read :doc:`getting-started` to see how to get up and running with
 WebSockets with only 30 lines of code.
 
+You can find the Channels repository `on GitHub <http://github.com/andrewgodwin/channels/>`_.
+
 Contents:
 
 .. toctree::

@@ -11,3 +11,5 @@ a bit as things develop.
 
 Documentation, installation and getting started instructions are at
 http://channels.readthedocs.org
+
+You can also install channels from PyPI as the ``channels`` package.
