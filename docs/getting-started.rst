@@ -331,9 +331,9 @@ Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request (we'll ignore auth for now)::
 
     from channels import Channel
-    from channels.decorators import consumer, channel_session
+    from channels.decorators import channel_session
 
-    @consumer("django.websocket.connect")
+    # Connected to django.websocket.connect
     @channel_session
     def ws_connect(message):
         # Work out room name from path (ignore slashes)
@@ -342,17 +342,17 @@ name in the path of your WebSocket request (we'll ignore auth for now)::
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
 
-    @consumer("django.websocket.keepalive")
+    # Connected to django.websocket.keepalive
     @channel_session
     def ws_add(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
-    @consumer("django.websocket.receive")
+    # Connected to django.websocket.receive
     @channel_session
     def ws_message(message):
         Group("chat-%s" % message.channel_session['room']).send(content)
 
-    @consumer("django.websocket.disconnect")
+    # Connected to django.websocket.disconnect
     @channel_session
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
@@ -387,10 +387,9 @@ Let's see what that looks like, assuming we
 have a ChatMessage model with ``message`` and ``room`` fields::
 
     from channels import Channel
-    from channels.decorators import consumer, channel_session
+    from channels.decorators import channel_session
     from .models import ChatMessage
 
-    @consumer("chat-messages")
     def msg_consumer(message):
         # Save to model
         ChatMessage.objects.create(
@@ -402,7 +401,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
             "content": message.content['message'],
         })
 
-    @consumer("django.websocket.connect")
+    # Connected to django.websocket.connect
     @channel_session
     def ws_connect(message):
         # Work out room name from path (ignore slashes)
@@ -411,12 +410,12 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
 
-    @consumer("django.websocket.keepalive")
+    # Connected to django.websocket.keepalive
     @channel_session
     def ws_add(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
-    @consumer("django.websocket.receive")
+    # Connected to django.websocket.receive
     @channel_session
     def ws_message(message):
         # Stick the message onto the processing queue
@@ -425,7 +424,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
             "message": content,
         })
 
-    @consumer("django.websocket.disconnect")
+    # Connected to django.websocket.disconnect
     @channel_session
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
