@@ -100,17 +100,17 @@ message and can write out zero to many other channel messages.
 
 Now, let's make a channel for requests (called ``django.wsgi.request``), 
 and a channel per client for responses (e.g. ``django.wsgi.response.o4F2h2Fd``),
-with the response channel a property (``send_channel``) of the request message.
+with the response channel a property (``reply_channel``) of the request message.
 Suddenly, a view is merely another example of a consumer::
 
     @consumer("django.wsgi.request")
-    def my_consumer(send_channel, **request_data):
+    def my_consumer(reply_channel, **request_data):
         # Decode the request from JSON-compat to a full object
         django_request = Request.decode(request_data)
         # Run view
         django_response = view(django_request)
         # Encode the response into JSON-compat format
-        Channel(send_channel).send(django_response.encode())
+        Channel(reply_channel).send(django_response.encode())
 
 In fact, this is how Channels works. The interface servers transform connections
 from the outside world (HTTP, WebSockets, etc.) into messages on channels,
@@ -177,16 +177,16 @@ set of channels (here, using Redis) to send updates to::
     @receiver(post_save, sender=BlogUpdate)
     def send_update(sender, instance, **kwargs):
         # Loop through all response channels and send the update
-        for send_channel in redis_conn.smembers("readers"):
-            Channel(send_channel).send(
+        for reply_channel in redis_conn.smembers("readers"):
+            Channel(reply_channel).send(
                 id=instance.id,
                 content=instance.content,
             )
 
     @consumer("django.websocket.connect")
-    def ws_connect(path, send_channel, **kwargs):
+    def ws_connect(path, reply_channel, **kwargs):
         # Add to reader set
-        redis_conn.sadd("readers", send_channel)
+        redis_conn.sadd("readers", reply_channel)
 
 While this will work, there's a small problem - we never remove people from
 the ``readers`` set when they disconnect. We could add a consumer that
@@ -221,9 +221,9 @@ we don't need to; Channels has it built in, as a feature called Groups::
 
     @consumer("django.websocket.connect")
     @consumer("django.websocket.keepalive")
-    def ws_connect(path, send_channel, **kwargs):
+    def ws_connect(path, reply_channel, **kwargs):
         # Add to reader group
-        Group("liveblog").add(send_channel)
+        Group("liveblog").add(reply_channel)
 
 Not only do groups have their own ``send()`` method (which backends can provide
 an efficient implementation of), they also automatically manage expiry of 

@@ -26,11 +26,13 @@ class Channel(object):
         else:
             self.channel_backend = channel_backends[alias]
 
-    def send(self, **kwargs):
+    def send(self, content):
         """
-        Send a message over the channel, taken from the kwargs.
+        Send a message over the channel - messages are always dicts.
         """
-        self.channel_backend.send(self.name, kwargs)
+        if not isinstance(content, dict):
+            raise ValueError("You can only send dicts as content on channels.")
+        self.channel_backend.send(self.name, content)
 
     @classmethod
     def new_name(self, prefix):
@@ -51,6 +53,9 @@ class Channel(object):
         from channels.adapters import view_producer
         return view_producer(self.name)
 
+    def __str__(self):
+        return self.name
+
 
 class Group(object):
     """
@@ -66,13 +71,19 @@ class Group(object):
             self.channel_backend = channel_backends[alias]
 
     def add(self, channel):
+        if isinstance(channel, Channel):
+            channel = channel.name
         self.channel_backend.group_add(self.name, channel)
 
     def discard(self, channel):
+        if isinstance(channel, Channel):
+            channel = channel.name
         self.channel_backend.group_discard(self.name, channel)
 
     def channels(self):
         self.channel_backend.group_channels(self.name)
 
-    def send(self, **kwargs):
-        self.channel_backend.send_group(self.name, kwargs)
+    def send(self, content):
+        if not isinstance(content, dict):
+            raise ValueError("You can only send dicts as content on channels.")
+        self.channel_backend.send_group(self.name, content)

@@ -23,30 +23,26 @@ class InterfaceProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
         # Make sending channel
-        self.send_channel = Channel.new_name("!django.websocket.send")
+        self.reply_channel = Channel.new_name("!django.websocket.send")
+        self.request_info["reply_channel"] = self.reply_channel
         self.last_keepalive = time.time()
-        self.factory.protocols[self.send_channel] = self
+        self.factory.protocols[self.reply_channel] = self
         # Send news that this channel is open
-        Channel("django.websocket.connect").send(
-            send_channel = self.send_channel,
-            **self.request_info
-        )
+        Channel("django.websocket.connect").send(self.request_info)
 
     def onMessage(self, payload, isBinary):
         if isBinary:
-            Channel("django.websocket.receive").send(
-                send_channel = self.send_channel,
+            Channel("django.websocket.receive").send(dict(
+                self.request_info,
                 content = payload,
                 binary = True,
-                **self.request_info
-            )
+            ))
         else:
-            Channel("django.websocket.receive").send(
-                send_channel = self.send_channel,
+            Channel("django.websocket.receive").send(dict(
+                self.request_info,
                 content = payload.decode("utf8"),
                 binary = False,
-                **self.request_info
-            )
+            ))
 
     def serverSend(self, content, binary=False, **kwargs):
         """
@@ -64,21 +60,15 @@ class InterfaceProtocol(WebSocketServerProtocol):
         self.sendClose()
 
     def onClose(self, wasClean, code, reason):
-        if hasattr(self, "send_channel"):
-            del self.factory.protocols[self.send_channel]
-            Channel("django.websocket.disconnect").send(
-                send_channel = self.send_channel,
-                **self.request_info
-            )
+        if hasattr(self, "reply_channel"):
+            del self.factory.protocols[self.reply_channel]
+            Channel("django.websocket.disconnect").send(self.request_info)
 
     def sendKeepalive(self):
         """
         Sends a keepalive packet on the keepalive channel.
         """
-        Channel("django.websocket.keepalive").send(
-            send_channel = self.send_channel,
-            **self.request_info
-        )
+        Channel("django.websocket.keepalive").send(self.request_info)
         self.last_keepalive = time.time()
 
 
@@ -94,7 +84,7 @@ class InterfaceFactory(WebSocketServerFactory):
         super(InterfaceFactory, self).__init__(*args, **kwargs)
         self.protocols = {}
 
-    def send_channels(self):
+    def reply_channels(self):
         return self.protocols.keys()
 
     def dispatch_send(self, channel, message):
@@ -128,7 +118,7 @@ class WebsocketTwistedInterface(object):
         Run in a separate thread; reads messages from the backend.
         """
         while True:
-            channels = self.factory.send_channels()
+            channels = self.factory.reply_channels()
             # Quit if reactor is stopping
             if not reactor.running:
                 return

@@ -26,16 +26,16 @@ Make a new project, a new app, and put this in a ``consumers.py`` file in the ap
     from channels import Channel
     from django.http import HttpResponse
 
-    def http_consumer(response_channel, path, **kwargs):
-        response = HttpResponse("Hello world! You asked for %s" % path)
-        Channel(response_channel).send(**response.channel_encode())
+    def http_consumer(message):
+        response = HttpResponse("Hello world! You asked for %s" % message.content['path'])
+        message.reply_channel.send(response.channel_encode())
 
 The most important thing to note here is that, because things we send in
 messages must be JSON-serialisable, the request and response messages
 are in a key-value format. There are ``channel_decode()`` and
 ``channel_encode()`` methods on both Django's request and response classes,
-but here we just take two of the request variables directly as keyword
-arguments for simplicity.
+but here we just use the message's ``content`` attribute directly for simplicity
+(message content is always a dict).
 
 Now, go into your ``settings.py`` file, and set up a channel backend; by default,
 Django will just use a local backend and route HTTP requests to the normal
@@ -72,8 +72,8 @@ do any time. Let's try some WebSockets, and make a basic chat server!
 Delete that consumer and its routing - we'll want the normal Django view layer to
 serve HTTP requests from now on - and make this WebSocket consumer instead::
 
-    def ws_add(channel, send_channel, **kwargs):
-        Group("chat").add(send_channel)
+    def ws_add(message):
+        Group("chat").add(message.reply_channel)
 
 Hook it up to the ``django.websocket.connect`` channel like this::
 
@@ -90,7 +90,7 @@ Now, let's look at what this is doing. It's tied to the
 ``django.websocket.connect`` channel, which means that it'll get a message
 whenever a new WebSocket connection is opened by a client.
 
-When it gets that message, it takes the ``send_channel`` key from it, which
+When it gets that message, it takes the ``reply_channel`` attribute from it, which
 is the unique response channel for that client, and adds it to the ``chat``
 group, which means we can send messages to all connected chat clients.
 
@@ -107,8 +107,8 @@ a group it's already in - similarly, it's safe to discard a channel from a
 group it's not in)::
 
     # Connected to django.websocket.keepalive
-    def ws_keepalive(channel, send_channel, **kwargs):
-        Group("chat").add(send_channel)
+    def ws_keepalive(message):
+        Group("chat").add(message.reply_channel)
 
 Of course, this is exactly the same code as the ``connect`` handler, so let's
 just route both channels to the same consumer::
@@ -125,8 +125,8 @@ handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
 
     # Connected to django.websocket.disconnect
-    def ws_disconnect(channel, send_channel, **kwargs):
-        Group("chat").discard(send_channel)
+    def ws_disconnect(message):
+        Group("chat").discard(message.reply_channel)
 
 Now, that's taken care of adding and removing WebSocket send channels for the
 ``chat`` group; all we need to do now is take care of message sending. For now,
@@ -136,16 +136,16 @@ any message sent in to all connected clients. Here's all the code::
     from channels import Channel, Group
 
     # Connected to django.websocket.connect and django.websocket.keepalive
-    def ws_add(channel, send_channel, **kwargs):
-        Group("chat").add(send_channel)
+    def ws_add(message):
+        Group("chat").add(message.reply_channel)
 
     # Connected to django.websocket.receive
-    def ws_message(channel, send_channel, content, **kwargs):
-        Group("chat").send(content=content)
+    def ws_message(message):
+        Group("chat").send(message.content)
 
     # Connected to django.websocket.disconnect
-    def ws_disconnect(channel, send_channel, **kwargs):
-        Group("chat").discard(send_channel)
+    def ws_disconnect(message):
+        Group("chat").discard(message.reply_channel)
 
 And what our routing should look like in ``settings.py``::
 
@@ -264,7 +264,7 @@ is much more portable, and works in development where you need to run a separate
 WebSocket server (by default, on port 9000).
 
 All we need to do is add the ``django_http_auth`` decorator to our views,
-and we'll get extra ``session`` and ``user`` keyword arguments we can use;
+and we'll get extra ``session`` and ``user`` keyword attributes on ``message`` we can use;
 let's make one where users can only chat to people with the same first letter
 of their username::
 
@@ -272,16 +272,16 @@ of their username::
     from channels.decorators import django_http_auth
 
     @django_http_auth
-    def ws_add(channel, send_channel, user, **kwargs):
-        Group("chat-%s" % user.username[0]).add(send_channel)
+    def ws_add(message):
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
 
     @django_http_auth
-    def ws_message(channel, send_channel, content, user, **kwargs):
-        Group("chat-%s" % user.username[0]).send(content=content)
+    def ws_message(message):
+        Group("chat-%s" % message.user.username[0]).send(message.content)
 
     @django_http_auth
-    def ws_disconnect(channel, send_channel, user, **kwargs):
-        Group("chat-%s" % user.username[0]).discard(send_channel)
+    def ws_disconnect(message):
+        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
 
 Now, when we connect to the WebSocket we'll have to remember to provide the
 Django session ID as part of the URL, like this::
@@ -293,10 +293,6 @@ Note that Channels can't work with signed cookie sessions - since only HTTP
 responses can set cookies, it needs a backend it can write to separately to
 store state.
 
-(Also note that we always end consumers with ``**kwargs``; this is to save us
-from writing out all variables we might get sent and to allow forwards-compatibility
-with any additions to the message formats in the future.)
-
 Persisting Data
 ---------------
 
@@ -307,7 +303,7 @@ should let them send this request in the initial WebSocket connection,
 check they're allowed to access it, and then remember which room a socket is
 connected to when they send a message in so we know which group to send it to.
 
-The ``send_channel`` is our unique pointer to the open WebSocket - as you've
+The ``reply_channel`` is our unique pointer to the open WebSocket - as you've
 seen, we do all our operations on it - but it's not something we can annotate
 with data; it's just a simple string, and even if we hack around and set
 attributes on it that's not going to carry over to other workers.
@@ -315,18 +311,18 @@ attributes on it that's not going to carry over to other workers.
 Instead, the solution is to persist information keyed by the send channel in
 some other data store - sound familiar? This is what Django's session framework
 does for HTTP requests, only there it uses cookies as the lookup key rather
-than the ``send_channel``.
+than the ``reply_channel``.
 
 Now, as you saw above, you can use the ``django_http_auth`` decorator to get
-both a ``user`` and a ``session`` variable in your message arguments - and,
-indeed, there is a ``websocket_session`` decorator that will just give you
+both a ``user`` and a ``session`` attribute on your message - and,
+indeed, there is a ``http_session`` decorator that will just give you
 the ``session`` attribute.
 
 However, that session is based on cookies, and so follows the user round the
 site - it's great for information that should persist across all WebSocket and
 HTTP connections, but not great for information that is specific to a single
 WebSocket (such as "which chatroom should this socket be connected to"). For
-this reason, Channels also provides a ``send_channel_session`` decorator,
+this reason, Channels also provides a ``channel_session`` decorator,
 which adds a ``channel_session`` attribute to the message; this works just like
 the normal ``session`` attribute, and persists to the same storage, but varies
 per-channel rather than per-cookie.
@@ -335,31 +331,31 @@ Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request (we'll ignore auth for now)::
 
     from channels import Channel
-    from channels.decorators import consumer, send_channel_session
+    from channels.decorators import consumer, channel_session
 
     @consumer("django.websocket.connect")
-    @send_channel_session
-    def ws_connect(channel, send_channel, path, channel_session, **kwargs):
+    @channel_session
+    def ws_connect(message):
         # Work out room name from path (ignore slashes)
-        room = path.strip("/")
+        room = message.content['path'].strip("/")
         # Save room in session and add us to the group
-        channel_session['room'] = room
-        Group("chat-%s" % room).add(send_channel)
+        message.channel_session['room'] = room
+        Group("chat-%s" % room).add(message.reply_channel)
 
     @consumer("django.websocket.keepalive")
-    @send_channel_session
-    def ws_add(channel, send_channel, channel_session, **kwargs):
-        Group("chat-%s" % channel_session['room']).add(send_channel)
+    @channel_session
+    def ws_add(message):
+        Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     @consumer("django.websocket.receive")
-    @send_channel_session
-    def ws_message(channel, send_channel, content, channel_session, **kwargs):
-        Group("chat-%s" % channel_session['room']).send(content=content)
+    @channel_session
+    def ws_message(message):
+        Group("chat-%s" % message.channel_session['room']).send(content)
 
     @consumer("django.websocket.disconnect")
-    @send_channel_session
-    def ws_disconnect(channel, send_channel, channel_session, **kwargs):
-        Group("chat-%s" % channel_session['room']).discard(send_channel)
+    @channel_session
+    def ws_disconnect(message):
+        Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
 
 If you play around with it from the console (or start building a simple
 JavaScript chat client that appends received messages to a div), you'll see
@@ -391,40 +387,48 @@ Let's see what that looks like, assuming we
 have a ChatMessage model with ``message`` and ``room`` fields::
 
     from channels import Channel
-    from channels.decorators import consumer, send_channel_session
+    from channels.decorators import consumer, channel_session
     from .models import ChatMessage
 
     @consumer("chat-messages")
-    def msg_consumer(channel, room, message):
+    def msg_consumer(message):
         # Save to model
-        ChatMessage.objects.create(room=room, message=message)
+        ChatMessage.objects.create(
+            room=message.content['room'],
+            message=message.content['message'],
+        )
         # Broadcast to listening sockets
-        Group("chat-%s" % room).send(message)
+        Group("chat-%s" % room).send({
+            "content": message.content['message'],
+        })
 
     @consumer("django.websocket.connect")
-    @send_channel_session
-    def ws_connect(channel, send_channel, path, channel_session, **kwargs):
+    @channel_session
+    def ws_connect(message):
         # Work out room name from path (ignore slashes)
-        room = path.strip("/")
+        room = message.content['path'].strip("/")
         # Save room in session and add us to the group
-        channel_session['room'] = room
-        Group("chat-%s" % room).add(send_channel)
+        message.channel_session['room'] = room
+        Group("chat-%s" % room).add(message.reply_channel)
 
     @consumer("django.websocket.keepalive")
-    @send_channel_session
-    def ws_add(channel, send_channel, channel_session, **kwargs):
-        Group("chat-%s" % channel_session['room']).add(send_channel)
+    @channel_session
+    def ws_add(message):
+        Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     @consumer("django.websocket.receive")
-    @send_channel_session
-    def ws_message(channel, send_channel, content, channel_session, **kwargs):
+    @channel_session
+    def ws_message(message):
         # Stick the message onto the processing queue
-        Channel("chat-messages").send(room=channel_session['room'], message=content)
+        Channel("chat-messages").send({
+            "room": channel_session['room'],
+            "message": content,
+        })
 
     @consumer("django.websocket.disconnect")
-    @send_channel_session
-    def ws_disconnect(channel, send_channel, channel_session, **kwargs):
-        Group("chat-%s" % channel_session['room']).discard(send_channel)
+    @channel_session
+    def ws_disconnect(message):
+        Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
 
 Note that we could add messages onto the ``chat-messages`` channel from anywhere;
 inside a View, inside another model's ``post_save`` signal, inside a management

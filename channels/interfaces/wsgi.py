@@ -15,7 +15,7 @@ class WSGIInterface(WSGIHandler):
         super(WSGIInterface, self).__init__(*args, **kwargs)
 
     def get_response(self, request):
-        request.response_channel = Channel.new_name("django.wsgi.response")
-        Channel("django.wsgi.request", channel_backend=self.channel_backend).send(**request.channel_encode())
-        channel, message = self.channel_backend.receive_many_blocking([request.response_channel])
+        request.reply_channel = Channel.new_name("django.wsgi.response")
+        Channel("django.wsgi.request", channel_backend=self.channel_backend).send(request.channel_encode())
+        channel, message = self.channel_backend.receive_many_blocking([request.reply_channel])
         return HttpResponse.channel_decode(message)

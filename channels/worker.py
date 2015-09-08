@@ -1,4 +1,5 @@
 import traceback
+from .message import Message
 
 
 class Worker(object):
@@ -17,12 +18,18 @@ class Worker(object):
         """
         channels = self.channel_backend.registry.all_channel_names()
         while True:
-            channel, message = self.channel_backend.receive_many_blocking(channels)
+            channel, content = self.channel_backend.receive_many_blocking(channels)
+            message = Message(
+                content=content,
+                channel=channel,
+                channel_backend=self.channel_backend,
+                reply_channel=content.get("reply_channel", None),
+            )
             # Handle the message
             consumer = self.channel_backend.registry.consumer_for_channel(channel)
             if self.callback:
                 self.callback(channel, message)
             try:
-                consumer(channel=channel, **message)
+                consumer(message)
             except:
                 traceback.print_exc()

@@ -62,7 +62,7 @@ Contains the following keys:
 * META: Same as ``request.META``
 * path: Same as ``request.path``
 * path_info: Same as  ``request.path_info``
-* send_channel: Channel name to send responses on
+* reply_channel: Channel name to send responses on
 
 
 WebSocket Receive
@@ -81,7 +81,7 @@ WebSocket Client Close
 
 Sent when the WebSocket is closed by either the client or the server.
 
-Contains the same keys as WebSocket Connection, including send_channel,
+Contains the same keys as WebSocket Connection, including reply_channel,
 though nothing should be sent on it.
 
 
