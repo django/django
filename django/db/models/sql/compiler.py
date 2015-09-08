@@ -336,9 +336,10 @@ class SQLCompiler(object):
         """
         if name in self.quote_cache:
             return self.quote_cache[name]
-        if ((name in self.query.alias_map and name not in self.query.table_map) or
+        tables = [getattr(t, 'table', None) for t in self.query.table_map]
+        if ((name in self.query.alias_map and name not in tables) or
                 name in self.query.extra_select or (
-                    name in self.query.external_aliases and name not in self.query.table_map)):
+                    name in self.query.external_aliases and name not in tables)):
             self.quote_cache[name] = name
             return name
         r = self.connection.ops.quote_name(name)
@@ -994,7 +995,10 @@ class SQLInsertCompiler(SQLCompiler):
         # going to be column names (so we can avoid the extra overhead).
         qn = self.connection.ops.quote_name
         opts = self.query.get_meta()
-        result = ['INSERT INTO %s' % qn(opts.db_table)]
+        sql, params = self.compile(opts.table_cls)
+        if params:
+            raise RuntimeError("Table %r doesn't support saving" % opts.table_cls)
+        result = ['INSERT INTO %s' % sql]
 
         has_fields = bool(self.query.fields)
         fields = self.query.fields if has_fields else [opts.pk]
@@ -1119,7 +1123,7 @@ class SQLUpdateCompiler(SQLCompiler):
             return '', ()
         table = self.query.tables[0]
         result = [
-            'UPDATE %s SET' % qn(table),
+            'UPDATE %s SET' % self.compile(self.query.alias_map[table])[0],
             ', '.join(values),
         ]
         where, params = self.compile(self.query.where)

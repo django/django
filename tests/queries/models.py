@@ -737,3 +737,57 @@ class RelatedIndividual(models.Model):
 
     class Meta:
         db_table = 'RelatedIndividual'
+
+
+class SchemaQualified(models.ModelTable):
+    def __init__(self, schema, table):
+        self.schema = schema
+        self.table = table
+
+    def as_sql(self, compiler, connection):
+        # Note that it would be easy to change the schema using thread locals
+        # if wanted.
+        return '%s.%s' % (connection.ops.quote_name(self.schema), connection.ops.quote_name(self.table)), []
+
+
+class SchemaQualified(models.Model):
+    val = models.TextField()
+
+    class Meta:
+        table_cls = SchemaQualified('other_schema', 'schema_qualified')
+        managed = False
+
+
+class DynamicQuery(models.ModelTable):
+    def as_sql(self, compiler, connection):
+        db_time = compiler.query.context.get('db_time')
+        if db_time:
+            return (
+                '(select * from shadow_queries_table '
+                ' where valid_from <= %s '
+                '       and (valid_until > %s or valid_until is null))',
+                [db_time, db_time])
+        return super(DynamicQuery, self).as_sql(compiler, connection)
+
+    def requires_alias(self, table_alias, compiler):
+        if compiler.query.context.get('db_time'):
+            return True
+        return super(DynamicQuery, self).requires_alias(table_alias, compiler)
+
+
+class Table(models.Model):
+    val = models.TextField()
+
+    class Meta:
+        table_cls = DynamicQuery('queries_table')
+
+
+class ShadowTable(models.Model):
+    shadow_pk = models.AutoField(primary_key=True)
+    id = models.IntegerField()
+    val = models.TextField()
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = 'shadow_queries_table'

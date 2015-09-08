@@ -23,7 +23,8 @@ class DeleteQuery(Query):
     compiler = 'SQLDeleteCompiler'
 
     def do_query(self, table, where, using):
-        self.tables = [table]
+        assert table.plain_table_ref, "Can only delete from plain tables"
+        self.tables = [table.table]
         self.where = where
         cursor = self.get_compiler(using).execute_sql(CURSOR)
         return cursor.rowcount if cursor else 0
@@ -43,7 +44,7 @@ class DeleteQuery(Query):
             self.where = self.where_class()
             self.add_q(Q(
                 **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
-            num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
+            num_deleted += self.do_query(self.get_meta().table_cls, self.where, using=using)
         return num_deleted
 
     def delete_qs(self, query, using):
