@@ -60,21 +60,25 @@ How do we use channels?
 -----------------------
 
 That's what a channel is, but how is Django using them? Well, inside Django
-you can connect a function to consume a channel, like so::
+you can write a function to consume a channel, like so::
 
-    from channels.decorators import consumer
-
-    @consumer("channel-name")
-    def my_consumer(something, **kwargs):
+    def my_consumer(message):
         pass
 
+And then assign a channel to it like this in the channel backend settings::
+
+    "ROUTING": {
+        "some-channel": "myapp.consumers.my_consumer",
+    }
+
 This means that for every message on the channel, Django will call that
-consumer function with the message as keyword arguments (messages are always
-a dict, and are mapped to keyword arguments for send/receive).
+consumer function with a message object (message objects have a "content"
+attribute which is always a dict of data, and a "channel" attribute which
+is the channel it came from, as well as some others).
 
 Django can do this as rather than run in a request-response mode, Channels
 changes Django so that it runs in a worker mode - it listens on all channels
-that have consumers declared, and when a message arrives on one, runs the
+that have consumers assigned, and when a message arrives on one, runs the
 relevant consumer.
 
 In fact, this is illustrative of the new way Django runs to enable Channels to
@@ -98,15 +102,15 @@ slightly more complex abstraction than that presented by Django views.
 A view takes a request and returns a response; a consumer takes a channel
 message and can write out zero to many other channel messages.
 
-Now, let's make a channel for requests (called ``django.wsgi.request``), 
+Now, let's make a channel for requests (called ``django.wsgi.request``),
 and a channel per client for responses (e.g. ``django.wsgi.response.o4F2h2Fd``),
 with the response channel a property (``reply_channel``) of the request message.
 Suddenly, a view is merely another example of a consumer::
 
-    @consumer("django.wsgi.request")
-    def my_consumer(reply_channel, **request_data):
+    # Listens on django.wsgi.request.
+    def my_consumer(message):
         # Decode the request from JSON-compat to a full object
-        django_request = Request.decode(request_data)
+        django_request = Request.decode(message.content)
         # Run view
         django_response = view(django_request)
         # Encode the response into JSON-compat format
@@ -171,7 +175,6 @@ Say I had a live blog where I wanted to push out updates whenever a new post is
 saved, I would register a handler for the ``post_save`` signal and keep a
 set of channels (here, using Redis) to send updates to::
 
-    
     redis_conn = redis.Redis("localhost", 6379)
 
     @receiver(post_save, sender=BlogUpdate)
@@ -183,10 +186,10 @@ set of channels (here, using Redis) to send updates to::
                 content=instance.content,
             )
 
-    @consumer("django.websocket.connect")
-    def ws_connect(path, reply_channel, **kwargs):
+    # Connected to django.websocket.connect
+    def ws_connect(message):
         # Add to reader set
-        redis_conn.sadd("readers", reply_channel)
+        redis_conn.sadd("readers", message.reply_channel.name)
 
 While this will work, there's a small problem - we never remove people from
 the ``readers`` set when they disconnect. We could add a consumer that
@@ -219,14 +222,13 @@ we don't need to; Channels has it built in, as a feature called Groups::
             content=instance.content,
         )
 
-    @consumer("django.websocket.connect")
-    @consumer("django.websocket.keepalive")
-    def ws_connect(path, reply_channel, **kwargs):
+    # Connected to django.websocket.connect and django.websocket.keepalive
+    def ws_connect(message):
         # Add to reader group
-        Group("liveblog").add(reply_channel)
+        Group("liveblog").add(message.reply_channel)
 
 Not only do groups have their own ``send()`` method (which backends can provide
-an efficient implementation of), they also automatically manage expiry of 
+an efficient implementation of), they also automatically manage expiry of
 the group members. You'll have to re-call ``Group.add()`` every so often to
 keep existing members from expiring, but that's easy, and can be done in the
 same handler for both ``connect`` and ``keepalive``, as you can see above.
