@@ -23,3 +23,6 @@ Bugfixes
 
 * Fixed crash when using a value in ``ModelAdmin.list_display`` that clashed
   with a reverse field on the model (:ticket:`25299`).
+
+* Fixed autocompletion for options of non-``argparse`` management commands
+  (:ticket:`25372`).
