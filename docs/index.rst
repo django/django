@@ -21,7 +21,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   
+
    concepts
    installation
    getting-started
@@ -30,3 +30,4 @@ Contents:
    message-standards
    scaling
    backends
+   faqs
