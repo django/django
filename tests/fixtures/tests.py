@@ -9,6 +9,7 @@ import warnings
 from django.apps import apps
 from django.contrib.sites.models import Site
 from django.core import management
+from django.core.files.temp import NamedTemporaryFile
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
@@ -295,22 +296,22 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         management.call_command('loaddata', 'fixture1.json', verbosity=0)
         new_io = six.StringIO()
         new_io.isatty = lambda: True
-        _, filename = tempfile.mkstemp()
-        options = {
-            'format': 'json',
-            'stdout': new_io,
-            'stderr': new_io,
-            'output': filename,
-        }
-        management.call_command('dumpdata', 'fixtures', **options)
-        self.assertTrue(new_io.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n'))
+        with NamedTemporaryFile() as file:
+            options = {
+                'format': 'json',
+                'stdout': new_io,
+                'stderr': new_io,
+                'output': file.name,
+            }
+            management.call_command('dumpdata', 'fixtures', **options)
+            self.assertTrue(new_io.getvalue().endswith('[' + '.' * ProgressBar.progress_width + ']\n'))
 
-        # Test no progress bar when verbosity = 0
-        options['verbosity'] = 0
-        new_io = six.StringIO()
-        new_io.isatty = lambda: True
-        management.call_command('dumpdata', 'fixtures', **options)
-        self.assertEqual(new_io.getvalue(), '')
+            # Test no progress bar when verbosity = 0
+            options['verbosity'] = 0
+            new_io = six.StringIO()
+            new_io.isatty = lambda: True
+            management.call_command('dumpdata', 'fixtures', **options)
+            self.assertEqual(new_io.getvalue(), '')
 
     def test_compress_format_loading(self):
         # Load fixture 4 (compressed), using format specification
