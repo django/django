@@ -253,7 +253,7 @@ class ManagementUtility(object):
                 options.extend((sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
                                parser._actions if s_opt.option_strings)
             else:
-                options.extend((s_opt.get_opt_string(), s_opt.nargs) for s_opt in
+                options.extend((s_opt.get_opt_string(), s_opt.nargs != 0) for s_opt in
                                parser.option_list)
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
