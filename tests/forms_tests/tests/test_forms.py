@@ -2301,8 +2301,8 @@ class FormsTestCase(SimpleTestCase):
         unless it is `None`.
         """
         class SomeForm(Form):
-            field = CharField(widget=forms.TextInput(attrs={'id': 'myCustomID'}))
-            field_none = CharField(widget=forms.TextInput(attrs={'id': None}))
+            field = CharField(widget=TextInput(attrs={'id': 'myCustomID'}))
+            field_none = CharField(widget=TextInput(attrs={'id': None}))
 
         form = SomeForm()
         self.assertEqual(form['field'].id_for_label, 'myCustomID')
