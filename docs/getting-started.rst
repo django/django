@@ -123,6 +123,8 @@ And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
 
+    from channels import Group
+
     # Connected to websocket.disconnect
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
