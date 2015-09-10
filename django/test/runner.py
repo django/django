@@ -95,11 +95,9 @@ class RemoteTestResult(object):
             pickle.dumps(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
-            original_exc_txt = textwrap.fill(original_exc_txt, 75)
-            original_exc_txt = textwrap.indent(original_exc_txt, '    ')
+            original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
             pickle_exc_txt = repr(exc)
-            pickle_exc_txt = textwrap.fill(pickle_exc_txt, 75)
-            pickle_exc_txt = textwrap.indent(pickle_exc_txt, '    ')
+            pickle_exc_txt = textwrap.fill(pickle_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
             if tblib is None:
                 print("""
 
