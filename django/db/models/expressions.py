@@ -584,6 +584,14 @@ class RawSQL(Expression):
         return [self]
 
 
+class Star(Expression):
+    def __repr__(self):
+        return "'*'"
+
+    def as_sql(self, compiler, connection):
+        return '*', []
+
+
 class Random(Expression):
     def __init__(self):
         super(Random, self).__init__(output_field=fields.FloatField())

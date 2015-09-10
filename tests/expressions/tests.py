@@ -877,6 +877,7 @@ class ReprTests(TestCase):
     def test_aggregates(self):
         self.assertEqual(repr(Avg('a')), "Avg(F(a))")
         self.assertEqual(repr(Count('a')), "Count(F(a), distinct=False)")
+        self.assertEqual(repr(Count('*')), "Count('*', distinct=False)")
         self.assertEqual(repr(Max('a')), "Max(F(a))")
         self.assertEqual(repr(Min('a')), "Min(F(a))")
         self.assertEqual(repr(StdDev('a')), "StdDev(F(a), sample=False)")

@@ -2,7 +2,7 @@
 Classes to represent the definitions of aggregate functions.
 """
 from django.core.exceptions import FieldError
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Func, Star
 from django.db.models.fields import FloatField, IntegerField
 
 __all__ = [
@@ -90,7 +90,7 @@ class Count(Aggregate):
 
     def __init__(self, expression, distinct=False, **extra):
         if expression == '*':
-            expression = Value(expression)
+            expression = Star()
         super(Count, self).__init__(
             expression, distinct='DISTINCT ' if distinct else '', output_field=IntegerField(), **extra)
 

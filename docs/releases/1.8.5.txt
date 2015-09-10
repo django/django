@@ -32,3 +32,7 @@ Bugfixes
 
 * Fixed migrations crash on MySQL when adding a text or a blob field with an
   unhashable default (:ticket:`25393`).
+
+* Changed ``Count`` queries to execute ``COUNT(*)`` instead of ``COUNT('*')``
+  as versions of Django before 1.8 did (:ticket:`25377`). This may fix a
+  performance regression on some databases.
