@@ -453,7 +453,17 @@ class DiscoverRunner(object):
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
         if self.parallel > 1:
-            suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
+            parallel_suite = self.parallel_test_suite(suite, self.parallel, self.failfast)
+
+            # Since tests are distributed across processes on a per-TestCase
+            # basis, there's no need for more processes than TestCases.
+            parallel_units = len(parallel_suite.subsuites)
+            if self.parallel > parallel_units:
+                self.parallel = parallel_units
+
+            # If there's only one TestCase, parallelization isn't needed.
+            if self.parallel > 1:
+                suite = parallel_suite
 
         return suite
 

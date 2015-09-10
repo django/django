@@ -1274,6 +1274,10 @@ By default ``--parallel`` runs one process per core according to
 either by providing it as the option's value, e.g. ``--parallel=4``, or by
 setting the ``DJANGO_TEST_PROCESSES`` environment variable.
 
+Django distributes test cases — :class:`unittest.TestCase` subclasses — to
+subprocesses. If there are fewer test cases than configured processes, Django
+will reduce the number of processes accordingly.
+
 Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
