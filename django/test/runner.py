@@ -171,7 +171,14 @@ failure and get a correct traceback.
         self.events.append(('addSkip', self.test_index, reason))
 
     def addExpectedFailure(self, test, err):
-        self.check_pickleable(test, err)
+        # If tblib isn't installed, pickling the traceback will always fail.
+        # However we don't want tblib to be required for running the tests
+        # when they pass or fail as expected. Drop the traceback when an
+        # expected failure occurs.
+        if tblib is None:
+            err = err[0], err[1], None
+        else:
+            self.check_pickleable(test, err)
         self.events.append(('addExpectedFailure', self.test_index, err))
 
     def addUnexpectedSuccess(self, test):
