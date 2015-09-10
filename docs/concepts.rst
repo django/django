@@ -53,7 +53,7 @@ and producers running in different processes or on different machines.
 
 Inside a network, we identify channels uniquely by a name string - you can
 send to any named channel from any machine connected to the same channel 
-backend. If two different machines both write to the ``django.wsgi.request``
+backend. If two different machines both write to the ``http.request``
 channel, they're writing into the same channel.
 
 How do we use channels?
@@ -102,12 +102,12 @@ slightly more complex abstraction than that presented by Django views.
 A view takes a request and returns a response; a consumer takes a channel
 message and can write out zero to many other channel messages.
 
-Now, let's make a channel for requests (called ``django.wsgi.request``),
-and a channel per client for responses (e.g. ``django.wsgi.response.o4F2h2Fd``),
+Now, let's make a channel for requests (called ``http.request``),
+and a channel per client for responses (e.g. ``http.response.o4F2h2Fd``),
 with the response channel a property (``reply_channel``) of the request message.
 Suddenly, a view is merely another example of a consumer::
 
-    # Listens on django.wsgi.request.
+    # Listens on http.request
     def my_consumer(message):
         # Decode the request from JSON-compat to a full object
         django_request = Request.decode(message.content)
@@ -154,7 +154,7 @@ to the channel server they're listening on.
 
 For this reason, Channels treats these as two different *channel types*, and
 denotes a *response channel* by having the first character of the channel name
-be the character ``!`` - e.g. ``!django.wsgi.response.f5G3fE21f``. *Normal
+be the character ``!`` - e.g. ``!http.response.f5G3fE21f``. *Normal
 channels* have no special prefix, but along with the rest of the response
 channel name, they must contain only the characters ``a-z A-Z 0-9 - _``,
 and be less than 200 characters long.
@@ -186,14 +186,14 @@ set of channels (here, using Redis) to send updates to::
                 content=instance.content,
             )
 
-    # Connected to django.websocket.connect
+    # Connected to websocket.connect
     def ws_connect(message):
         # Add to reader set
         redis_conn.sadd("readers", message.reply_channel.name)
 
 While this will work, there's a small problem - we never remove people from
 the ``readers`` set when they disconnect. We could add a consumer that
-listens to ``django.websocket.disconnect`` to do that, but we'd also need to
+listens to ``websocket.disconnect`` to do that, but we'd also need to
 have some kind of expiry in case an interface server is forced to quit or
 loses power before it can send disconnect signals - your code will never
 see any disconnect notification but the response channel is completely
@@ -222,7 +222,7 @@ we don't need to; Channels has it built in, as a feature called Groups::
             content=instance.content,
         )
 
-    # Connected to django.websocket.connect and django.websocket.keepalive
+    # Connected to websocket.connect and websocket.keepalive
     def ws_connect(message):
         # Add to reader group
         Group("liveblog").add(message.reply_channel)

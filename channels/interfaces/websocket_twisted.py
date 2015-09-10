@@ -11,7 +11,7 @@ from channels import Channel, channel_backends, DEFAULT_CHANNEL_BACKEND
 class InterfaceProtocol(WebSocketServerProtocol):
     """
     Protocol which supports WebSockets and forwards incoming messages to
-    the django.websocket channels.
+    the websocket channels.
     """
 
     def onConnect(self, request):
@@ -23,22 +23,22 @@ class InterfaceProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
         # Make sending channel
-        self.reply_channel = Channel.new_name("!django.websocket.send")
+        self.reply_channel = Channel.new_name("!websocket.send")
         self.request_info["reply_channel"] = self.reply_channel
         self.last_keepalive = time.time()
         self.factory.protocols[self.reply_channel] = self
         # Send news that this channel is open
-        Channel("django.websocket.connect").send(self.request_info)
+        Channel("websocket.connect").send(self.request_info)
 
     def onMessage(self, payload, isBinary):
         if isBinary:
-            Channel("django.websocket.receive").send(dict(
+            Channel("websocket.receive").send(dict(
                 self.request_info,
                 content = payload,
                 binary = True,
             ))
         else:
-            Channel("django.websocket.receive").send(dict(
+            Channel("websocket.receive").send(dict(
                 self.request_info,
                 content = payload.decode("utf8"),
                 binary = False,
@@ -62,13 +62,13 @@ class InterfaceProtocol(WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         if hasattr(self, "reply_channel"):
             del self.factory.protocols[self.reply_channel]
-            Channel("django.websocket.disconnect").send(self.request_info)
+            Channel("websocket.disconnect").send(self.request_info)
 
     def sendKeepalive(self):
         """
         Sends a keepalive packet on the keepalive channel.
         """
-        Channel("django.websocket.keepalive").send(self.request_info)
+        Channel("websocket.keepalive").send(self.request_info)
         self.last_keepalive = time.time()
 
 

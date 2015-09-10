@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django.http.cookie import SimpleCookie
 from six import PY3
 
 
@@ -12,7 +11,7 @@ def encode_response(response):
         "content": response.content,
         "status_code": response.status_code,
         "headers": list(response._headers.values()),
-        "cookies": {k: v.output(header="") for k, v in response.cookies.items()}
+        "cookies": [v.output(header="") for _, v in response.cookies.items()]
     }
     if PY3:
         value["content"] = value["content"].decode('utf8')
@@ -29,9 +28,9 @@ def decode_response(value):
         content_type = value['content_type'],
         status = value['status_code'],
     )
-    for cookie in value['cookies'].values():
+    for cookie in value['cookies']:
         response.cookies.load(cookie)
-    response._headers = {k.lower: (k, v) for k, v in value['headers']}
+    response._headers = {k.lower(): (k, v) for k, v in value['headers']}
     return response
 
 

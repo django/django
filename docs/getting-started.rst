@@ -12,7 +12,7 @@ First Consumers
 ---------------
 
 Now, by default, Django will run things through Channels but it will also
-tie in the URL router and view subsystem to the default ``django.wsgi.request``
+tie in the URL router and view subsystem to the default ``http.request``
 channel if you don't provide another consumer that listens to it - remember,
 only one consumer can listen to any given channel.
 
@@ -48,7 +48,7 @@ custom consumer we wrote above. Here's what that looks like::
         "default": {
             "BACKEND": "channels.backends.database.DatabaseChannelBackend",
             "ROUTING": {
-                "django.wsgi.request": "myproject.myapp.consumers.http_consumer",
+                "http.request": "myproject.myapp.consumers.http_consumer",
             },
         },
     }
@@ -74,19 +74,19 @@ serve HTTP requests from now on - and make this WebSocket consumer instead::
     def ws_add(message):
         Group("chat").add(message.reply_channel)
 
-Hook it up to the ``django.websocket.connect`` channel like this::
+Hook it up to the ``websocket.connect`` channel like this::
 
     CHANNEL_BACKENDS = {
         "default": {
             "BACKEND": "channels.backends.database.DatabaseChannelBackend",
             "ROUTING": {
-                "django.websocket.connect": "myproject.myapp.consumers.ws_add",
+                "websocket.connect": "myproject.myapp.consumers.ws_add",
             },
         },
     }
 
 Now, let's look at what this is doing. It's tied to the
-``django.websocket.connect`` channel, which means that it'll get a message
+``websocket.connect`` channel, which means that it'll get a message
 whenever a new WebSocket connection is opened by a client.
 
 When it gets that message, it takes the ``reply_channel`` attribute from it, which
@@ -100,12 +100,12 @@ don't keep track of the open/close states of the potentially thousands of
 connections you have open at any one time.
 
 The solution to this is that the WebSocket interface servers will send
-periodic "keepalive" messages on the ``django.websocket.keepalive`` channel,
+periodic "keepalive" messages on the ``websocket.keepalive`` channel,
 so we can hook that up to re-add the channel (it's safe to add the channel to
 a group it's already in - similarly, it's safe to discard a channel from a
 group it's not in)::
 
-    # Connected to django.websocket.keepalive
+    # Connected to websocket.keepalive
     def ws_keepalive(message):
         Group("chat").add(message.reply_channel)
 
@@ -114,8 +114,8 @@ just route both channels to the same consumer::
 
     ...
     "ROUTING": {
-        "django.websocket.connect": "myproject.myapp.consumers.ws_add",
-        "django.websocket.keepalive": "myproject.myapp.consumers.ws_add",
+        "websocket.connect": "myproject.myapp.consumers.ws_add",
+        "websocket.keepalive": "myproject.myapp.consumers.ws_add",
     },
     ...
 
@@ -123,7 +123,7 @@ And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
 
-    # Connected to django.websocket.disconnect
+    # Connected to websocket.disconnect
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
@@ -134,15 +134,15 @@ any message sent in to all connected clients. Here's all the code::
 
     from channels import Channel, Group
 
-    # Connected to django.websocket.connect and django.websocket.keepalive
+    # Connected to websocket.connect and websocket.keepalive
     def ws_add(message):
         Group("chat").add(message.reply_channel)
 
-    # Connected to django.websocket.receive
+    # Connected to websocket.receive
     def ws_message(message):
         Group("chat").send(message.content)
 
-    # Connected to django.websocket.disconnect
+    # Connected to websocket.disconnect
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
@@ -152,10 +152,10 @@ And what our routing should look like in ``settings.py``::
         "default": {
             "BACKEND": "channels.backends.database.DatabaseChannelBackend",
             "ROUTING": {
-                "django.websocket.connect": "myproject.myapp.consumers.ws_add",
-                "django.websocket.keepalive": "myproject.myapp.consumers.ws_add",
-                "django.websocket.receive": "myproject.myapp.consumers.ws_message",
-                "django.websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
+                "websocket.connect": "myproject.myapp.consumers.ws_add",
+                "websocket.keepalive": "myproject.myapp.consumers.ws_add",
+                "websocket.receive": "myproject.myapp.consumers.ws_message",
+                "websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
             },
         },
     }
@@ -332,7 +332,7 @@ name in the path of your WebSocket request (we'll ignore auth for now)::
     from channels import Channel
     from channels.decorators import channel_session
 
-    # Connected to django.websocket.connect
+    # Connected to websocket.connect
     @channel_session
     def ws_connect(message):
         # Work out room name from path (ignore slashes)
@@ -341,17 +341,17 @@ name in the path of your WebSocket request (we'll ignore auth for now)::
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
 
-    # Connected to django.websocket.keepalive
+    # Connected to websocket.keepalive
     @channel_session
     def ws_add(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
-    # Connected to django.websocket.receive
+    # Connected to websocket.receive
     @channel_session
     def ws_message(message):
         Group("chat-%s" % message.channel_session['room']).send(content)
 
-    # Connected to django.websocket.disconnect
+    # Connected to websocket.disconnect
     @channel_session
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
@@ -400,7 +400,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
             "content": message.content['message'],
         })
 
-    # Connected to django.websocket.connect
+    # Connected to websocket.connect
     @channel_session
     def ws_connect(message):
         # Work out room name from path (ignore slashes)
@@ -409,12 +409,12 @@ have a ChatMessage model with ``message`` and ``room`` fields::
         message.channel_session['room'] = room
         Group("chat-%s" % room).add(message.reply_channel)
 
-    # Connected to django.websocket.keepalive
+    # Connected to websocket.keepalive
     @channel_session
     def ws_add(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
-    # Connected to django.websocket.receive
+    # Connected to websocket.receive
     @channel_session
     def ws_message(message):
         # Stick the message onto the processing queue
@@ -423,7 +423,7 @@ have a ChatMessage model with ``message`` and ``room`` fields::
             "message": content,
         })
 
-    # Connected to django.websocket.disconnect
+    # Connected to websocket.disconnect
     @channel_session
     def ws_disconnect(message):
         Group("chat-%s" % message.channel_session['room']).discard(message.reply_channel)
