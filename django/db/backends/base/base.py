@@ -569,10 +569,10 @@ class BaseDatabaseWrapper(object):
             if must_close:
                 self.close()
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         """
-        Alternative connection to be used when there is no need to access
+        Return an alternative connection to be used when there is no need to access
         the main database, specifically for test db creation/deletion.
         This also prevents the production database from being exposed to
         potential child threads while (or after) the test database is destroyed.
