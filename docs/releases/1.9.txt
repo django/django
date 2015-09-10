@@ -135,9 +135,10 @@ Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
 
-This option is enabled by default for Django's own test suite on database
-backends that support it (this is all the built-in backends except for
-Oracle).
+This option is enabled by default for Django's own test suite provided:
+
+- the OS supports it (all but Windows)
+- the database backend supports it (all the built-in backends but Oracle)
 
 Minor features
 ~~~~~~~~~~~~~~
