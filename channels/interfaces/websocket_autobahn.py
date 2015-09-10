@@ -93,9 +93,9 @@ def get_factory(base):
             return self.protocols.keys()
 
         def dispatch_send(self, channel, message):
+            if message.get("content", None):
+                self.protocols[channel].serverSend(**message)
             if message.get("close", False):
                 self.protocols[channel].serverClose()
-            else:
-                self.protocols[channel].serverSend(**message)
 
     return InterfaceFactory
