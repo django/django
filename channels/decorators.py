@@ -26,17 +26,17 @@ def http_session(func):
     """
     @functools.wraps(func)
     def inner(message, *args, **kwargs):
-        if "COOKIES" not in message.content and "GET" not in message.content:
-            raise ValueError("No COOKIES or GET sent to consumer; this decorator can only be used on messages containing at least one.")
+        if "cookies" not in message.content and "get" not in message.content:
+            raise ValueError("No cookies or get sent to consumer; this decorator can only be used on messages containing at least one.")
         # Make sure there's a session key
         session_key = None
-        if "GET" in message.content:
+        if "get" in message.content:
             try:
-                session_key = message.content['GET'].get("session_key", [])[0]
+                session_key = message.content['get'].get("session_key", [])[0]
             except IndexError:
                 pass
-        if "COOKIES" in message.content and session_key is None:
-            session_key = message.content['COOKIES'].get(settings.SESSION_COOKIE_NAME)
+        if "cookies" in message.content and session_key is None:
+            session_key = message.content['cookies'].get(settings.SESSION_COOKIE_NAME)
         # Make a session storage
         if session_key:
             session_engine = import_module(settings.SESSION_ENGINE)

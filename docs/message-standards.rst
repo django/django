@@ -34,10 +34,10 @@ Standard channel name is ``http.request``.
 
 Contains the following keys:
 
-* GET: List of (key, value) tuples of GET variables (keys and values are strings)
-* POST: List of (key, value) tuples of POST variables (keys and values are strings)
-* COOKIES: Dict of cookies as {cookie_name: cookie_value} (names and values are strings)
-* META: Dict of HTTP headers and info as defined in the Django Request docs (names and values are strings)
+* get: List of (key, value) tuples of GET variables (keys and values are strings)
+* post: List of (key, value) tuples of POST variables (keys and values are strings)
+* cookies: Dict of cookies as {cookie_name: cookie_value} (names and values are strings)
+* meta: Dict of HTTP headers and info as defined in the Django Request docs (names and values are strings)
 * path: String, full path to the requested page, without query string or domain
 * path_info: String, like ``path`` but without any script prefix. Often just ``path``.
 * method: String, upper-cased HTTP method
