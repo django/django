@@ -670,7 +670,7 @@ a simple settings file containing info about the test database configure is the 
 
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'ENGINE': 'django.db.backends.postgresql',
             'USER': 'mydatabaseuser',
             'NAME': 'mydatabase',
             'TEST': {
