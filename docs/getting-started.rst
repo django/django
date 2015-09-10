@@ -44,21 +44,25 @@ For now, we want to override the *channel routing* so that, rather than going
 to the URL resolver and our normal view stack, all HTTP requests go to our
 custom consumer we wrote above. Here's what that looks like::
 
+    # In settings.py
     CHANNEL_BACKENDS = {
         "default": {
             "BACKEND": "channels.backends.database.DatabaseChannelBackend",
-            "ROUTING": {
-                "http.request": "myproject.myapp.consumers.http_consumer",
-            },
+            "ROUTING": "myproject.routing.channel_routing",
         },
+    }
+
+    # In routing.py
+    channel_routing = {
+        "http.request": "myproject.myapp.consumers.http_consumer",
     }
 
 As you can see, this is a little like Django's ``DATABASES`` setting; there are
 named channel backends, with a default one called ``default``. Each backend
 needs a class specified which powers it - we'll come to the options there later -
-and a routing scheme, which can either be defined directly as a dict or as
-a string pointing to a dict in another file (if you'd rather keep it outside
-settings).
+and a routing scheme, which points to a dict containing the routing settings.
+It's recommended you call this ``routing.py`` and put it alongside ``urls.py``
+in your project.
 
 If you start up ``python manage.py runserver`` and go to
 ``http://localhost:8000``, you'll see that, rather than a default Django page,
@@ -78,13 +82,8 @@ serve HTTP requests from now on - and make this WebSocket consumer instead::
 
 Hook it up to the ``websocket.connect`` channel like this::
 
-    CHANNEL_BACKENDS = {
-        "default": {
-            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
-            "ROUTING": {
-                "websocket.connect": "myproject.myapp.consumers.ws_add",
-            },
-        },
+    channel_routing = {
+        "websocket.connect": "myproject.myapp.consumers.ws_add",
     }
 
 Now, let's look at what this is doing. It's tied to the
@@ -116,12 +115,10 @@ group it's not in)::
 Of course, this is exactly the same code as the ``connect`` handler, so let's
 just route both channels to the same consumer::
 
-    ...
-    "ROUTING": {
+    channel_routing = {
         "websocket.connect": "myproject.myapp.consumers.ws_add",
         "websocket.keepalive": "myproject.myapp.consumers.ws_add",
-    },
-    ...
+    }
 
 And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
@@ -152,18 +149,13 @@ any message sent in to all connected clients. Here's all the code::
     def ws_disconnect(message):
         Group("chat").discard(message.reply_channel)
 
-And what our routing should look like in ``settings.py``::
+And what our routing should look like in ``routing.py``::
 
-    CHANNEL_BACKENDS = {
-        "default": {
-            "BACKEND": "channels.backends.database.DatabaseChannelBackend",
-            "ROUTING": {
-                "websocket.connect": "myproject.myapp.consumers.ws_add",
-                "websocket.keepalive": "myproject.myapp.consumers.ws_add",
-                "websocket.receive": "myproject.myapp.consumers.ws_message",
-                "websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
-            },
-        },
+    channel_routing = {
+        "websocket.connect": "myproject.myapp.consumers.ws_add",
+        "websocket.keepalive": "myproject.myapp.consumers.ws_add",
+        "websocket.receive": "myproject.myapp.consumers.ws_message",
+        "websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
     }
 
 With all that code in your ``consumers.py`` file, you now have a working
