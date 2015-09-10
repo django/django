@@ -267,7 +267,7 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
 
     # Connected to websocket.keepalive
     @channel_session
-    def ws_add(message):
+    def ws_keepalive(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     # Connected to websocket.receive
