@@ -183,6 +183,8 @@ Minor features
 
 * JavaScript slug generation now supports Romanian characters.
 
+* Post-save message now contains a link to the saved object's change form.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

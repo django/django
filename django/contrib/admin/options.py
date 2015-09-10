@@ -1058,13 +1058,14 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         pk_value = obj._get_pk_val()
         preserved_filters = self.get_preserved_filters(request)
-        obj_url = reverse('admin:%s_%s_change' %
-                          (opts.app_label, opts.model_name),
-                          args=(quote(pk_value),),
-                          current_app=self.admin_site.name)
+        obj_url = reverse(
+            'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+            args=(quote(pk_value),),
+            current_app=self.admin_site.name,
+        )
         msg_dict = {
             'name': force_text(opts.verbose_name),
-            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(obj_url), escape(obj))
+            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(obj_url), escape(obj)),
         }
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
@@ -1128,7 +1129,7 @@ class ModelAdmin(BaseModelAdmin):
 
         msg_dict = {
             'name': force_text(opts.verbose_name),
-            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(request.path), escape(obj))
+            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(request.path), escape(obj)),
         }
         if "_continue" in request.POST:
             msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
