@@ -71,6 +71,8 @@ do any time. Let's try some WebSockets, and make a basic chat server!
 Delete that consumer and its routing - we'll want the normal Django view layer to
 serve HTTP requests from now on - and make this WebSocket consumer instead::
 
+    from channels import Group
+
     def ws_add(message):
         Group("chat").add(message.reply_channel)
 
