@@ -3,7 +3,7 @@ import json
 import datetime
 
 from django.apps.registry import Apps
-from django.db import models, connections, DEFAULT_DB_ALIAS
+from django.db import models, connections, DEFAULT_DB_ALIAS, IntegrityError
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
@@ -71,6 +71,26 @@ class DatabaseChannelBackend(BaseChannelBackend):
                 editor.create_model(Group)
         return Group
 
+    @cached_property
+    def lock_model(self):
+        """
+        Initialises a new model to store groups; not done as part of a
+        models.py as we don't want to make it for most installs.
+        """
+        # Make the model class
+        class Lock(models.Model):
+            channel = models.CharField(max_length=200, unique=True)
+            expiry = models.DateTimeField(db_index=True)
+            class Meta:
+                apps = Apps()
+                app_label = "channels"
+                db_table = "django_channel_locks"
+        # Ensure its table exists
+        if Lock._meta.db_table not in self.connection.introspection.table_names(self.connection.cursor()):
+            with self.connection.schema_editor() as editor:
+                editor.create_model(Lock)
+        return Lock
+
     def send(self, channel, message):
         self.channel_model.objects.create(
             channel = channel,
@@ -97,6 +117,7 @@ class DatabaseChannelBackend(BaseChannelBackend):
         # Include a 10-second grace period because that solves some clock sync
         self.channel_model.objects.filter(expiry__lt=now() - datetime.timedelta(seconds=10)).delete()
         self.group_model.objects.filter(expiry__lt=now() - datetime.timedelta(seconds=10)).delete()
+        self.lock_model.objects.filter(expiry__lt=now() - datetime.timedelta(seconds=10)).delete()
 
     def group_add(self, group, channel, expiry=None):
         """
@@ -122,6 +143,28 @@ class DatabaseChannelBackend(BaseChannelBackend):
         """
         self._clean_expired()
         return list(self.group_model.objects.filter(group=group).values_list("channel", flat=True))
+
+    def lock_channel(self, channel, expiry=None):
+        """
+        Attempts to get a lock on the named channel. Returns True if lock
+        obtained, False if lock not obtained.
+        """
+        # We rely on the UNIQUE constraint for only-one-thread-wins on locks
+        try:
+            self.lock_model.objects.create(
+                channel = channel,
+                expiry = now() + datetime.timedelta(seconds=expiry or self.expiry),
+            )
+        except IntegrityError:
+            return False
+        else:
+            return True
+
+    def unlock_channel(self, channel):
+        """
+        Unlocks the named channel. Always succeeds.
+        """
+        self.lock_model.objects.filter(channel=channel).delete()
 
     def __str__(self):
         return "%s(alias=%s)" % (self.__class__.__name__, self.connection.alias)

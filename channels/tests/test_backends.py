@@ -10,7 +10,7 @@ class MemoryBackendTests(TestCase):
     backend_class = InMemoryChannelBackend
 
     def setUp(self):
-        self.backend = self.backend_class()
+        self.backend = self.backend_class(routing={})
 
     def test_send_recv(self):
         """
@@ -33,7 +33,7 @@ class MemoryBackendTests(TestCase):
         self.assertEqual(message, {"value": "red"})
 
     def test_message_expiry(self):
-        self.backend = self.backend_class(expiry=-100)
+        self.backend = self.backend_class(routing={}, expiry=-100)
         self.backend.send("test", {"value": "blue"})
         channel, message = self.backend.receive_many(["test"])
         self.assertIs(channel, None)
@@ -72,7 +72,7 @@ class MemoryBackendTests(TestCase):
         self.assertEqual(message, {"value": "orange"})
 
     def test_group_expiry(self):
-        self.backend = self.backend_class(expiry=-100)
+        self.backend = self.backend_class(routing={}, expiry=-100)
         self.backend.group_add("tgroup", "test")
         self.backend.group_add("tgroup", "test2")
         self.assertEqual(

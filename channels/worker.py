@@ -1,5 +1,6 @@
 import traceback
 from .message import Message
+from .utils import name_that_thing
 
 
 class Worker(object):
@@ -31,5 +32,8 @@ class Worker(object):
                 self.callback(channel, message)
             try:
                 consumer(message)
+            except Message.Requeue:
+                self.channel_backend.send(channel, content)
             except:
+                print("Error processing message with consumer {}:".format(name_that_thing(consumer)))
                 traceback.print_exc()

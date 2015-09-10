@@ -5,6 +5,7 @@ from .base import BaseChannelBackend
 
 queues = {}
 groups = {}
+locks = set()
 
 class InMemoryChannelBackend(BaseChannelBackend):
     """
@@ -72,3 +73,22 @@ class InMemoryChannelBackend(BaseChannelBackend):
         """
         self._clean_expired()
         return groups.get(group, {}).keys()
+
+    def lock_channel(self, channel):
+        """
+        Attempts to get a lock on the named channel. Returns True if lock
+        obtained, False if lock not obtained.
+        """
+        # Probably not perfect for race conditions, but close enough considering
+        # it shouldn't be used.
+        if channel not in locks:
+            locks.add(channel)
+            return True
+        else:
+            return False
+
+    def unlock_channel(self, channel):
+        """
+        Unlocks the named channel. Always succeeds.
+        """
+        locks.discard(channel)

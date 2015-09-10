@@ -8,6 +8,13 @@ you wish; the API is very simple and documented below.
 In-memory
 ---------
 
+The in-memory backend is the simplest, and not really a backend as such;
+it exists purely to enable Django to run in a "normal" mode where no Channels
+functionality is available, just normal HTTP request processing. You should
+never need to set it explicitly.
+
+This backend provides no network transparency or non-blocking guarantees.
+
 Database
 --------
 

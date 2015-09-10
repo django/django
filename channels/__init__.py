@@ -1,4 +1,4 @@
-__version__ = "0.1.1"
+__version__ = "0.8"
 
 # Load backends, using settings if available (else falling back to a default)
 DEFAULT_CHANNEL_BACKEND = "default"

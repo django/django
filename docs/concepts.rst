@@ -46,7 +46,7 @@ The channels have capacity, so a load of producers can write lots of messages
 into a channel with no consumers and then a consumer can come along later and
 will start getting served those queued messages.
 
-If you've used channels in Go, these are reasonably similar to those. The key
+If you've used `channels in Go <https://gobyexample.com/channels>`_, these are reasonably similar to those. The key
 difference is that these channels are network-transparent; the implementations
 of channels we provide are all accessible across a network to consumers
 and producers running in different processes or on different machines.
@@ -65,9 +65,9 @@ you can write a function to consume a channel, like so::
     def my_consumer(message):
         pass
 
-And then assign a channel to it like this in the channel backend settings::
+And then assign a channel to it like this in the channel routing::
 
-    "ROUTING": {
+    channel_routing = {
         "some-channel": "myapp.consumers.my_consumer",
     }
 
@@ -161,7 +161,7 @@ and be less than 200 characters long.
 
 It's optional for a backend implementation to understand this - after all,
 it's only important at scale, where you want to shard the two types differently
-- but it's present nonetheless. For more on scaling, and how to handle channel
+— but it's present nonetheless. For more on scaling, and how to handle channel
 types if you're writing a backend or interface server, read :doc:`scaling`.
 
 Groups

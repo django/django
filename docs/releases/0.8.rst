@@ -1,0 +1,22 @@
+0.8 (2015-09-10)
+----------------
+
+This release reworks a few of the core concepts to make the channel layer
+more efficient and user friendly:
+
+* Channel names now do not start with ``django``, and are instead just ``http.request``, etc.
+
+* HTTP headers/GET/etc are only sent with ``websocket.connect`` rather than all websocket requests,
+  to save a lot of bandwidth in the channel layer.
+
+* The session/user decorators were renamed, and a ``@channel_session_user`` and ``transfer_user`` set of functions
+  added to allow moving the user details from the HTTP session to the channel session in the ``connect`` consumer.
+
+* A ``@linearize`` decorator was added to help ensure a ``connect``/``receive`` pair are not executed
+  simultanously on two different workers.
+
+* Channel backends gained locking mechanisms to support the ``linearize`` feature.
+
+* ``runwsserver`` will use asyncio rather than Twisted if it's available.
+
+* Message formats have been made a bit more consistent.
