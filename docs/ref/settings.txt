@@ -665,8 +665,21 @@ TEST
 Default: ``{}``
 
 A dictionary of settings for test databases; for more details about the
-creation and use of test databases, see :ref:`the-test-database`. The
-following entries are available:
+creation and use of test databases, see :ref:`the-test-database`. An example of
+a simple settings file containing info about the test database configure is the following::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'USER': 'mydatabaseuser',
+            'NAME': 'mydatabase',
+            'TEST': {
+                'NAME': 'mytestdatabase',
+            }
+        }
+    }
+
+The following entries are available:
 
 .. setting:: TEST_CHARSET
 
