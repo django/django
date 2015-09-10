@@ -95,9 +95,11 @@ class RemoteTestResult(object):
             pickle.dumps(err)
         except Exception as exc:
             original_exc_txt = repr(err[1])
-            original_exc_txt = textwrap.fill(original_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
+            original_exc_txt = textwrap.fill(original_exc_txt, 75)
+            original_exc_txt = textwrap.indent(original_exc_txt, '    ')
             pickle_exc_txt = repr(exc)
-            pickle_exc_txt = textwrap.fill(pickle_exc_txt, 75, initial_indent='    ', subsequent_indent='    ')
+            pickle_exc_txt = textwrap.fill(pickle_exc_txt, 75)
+            pickle_exc_txt = textwrap.indent(pickle_exc_txt, '    ')
             if tblib is None:
                 print("""
 
@@ -177,8 +179,7 @@ failure and get a correct traceback.
         # expected failure occurs.
         if tblib is None:
             err = err[0], err[1], None
-        else:
-            self.check_pickleable(test, err)
+        self.check_pickleable(test, err)
         self.events.append(('addExpectedFailure', self.test_index, err))
 
     def addUnexpectedSuccess(self, test):
