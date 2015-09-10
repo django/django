@@ -125,6 +125,21 @@ degradation.
 
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
+Running tests in parallel
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :djadmin:`test` command now supports a :djadminopt:`--parallel` option to
+run a project's tests in multiple processes in parallel.
+
+Each process gets its own database. You must ensure that different test cases
+don't access the same resources. For instance, test cases that touch the
+filesystem should create a temporary directory for their own use.
+
+This option is enabled by default for Django's own test suite provided:
+
+- the OS supports it (all but Windows)
+- the database backend supports it (all the built-in backends but Oracle)
+
 Minor features
 ~~~~~~~~~~~~~~
 
@@ -675,6 +690,11 @@ Database backend API
   before 1.0, but hasn't been overridden by any core backend in years
   and hasn't been called anywhere in Django's code or tests.
 
+* In order to support test parallelization, you must implement the
+  ``DatabaseCreation._clone_test_db()`` method and set
+  ``DatabaseFeatures.can_clone_databases = True``. You may have to adjust
+  ``DatabaseCreation.get_test_db_clone_settings()``.
+
 Default settings that were tuples are now lists
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1040,6 +1060,9 @@ Miscellaneous
   argument of :meth:`~django.test.runner.DiscoverRunner.teardown_databases`
   changed. They used to be ``(old_names, mirrors)`` tuples. Now they're just
   the first item, ``old_names``.
+
+* By default :class:`~django.test.LiveServerTestCase` attempts to find an
+  available port in the 8081-8179 range instead of just trying port 8081.
 
 .. _deprecated-features-1.9:
 

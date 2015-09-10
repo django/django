@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import atexit
 import logging
 import os
 import shutil
@@ -11,8 +12,9 @@ from argparse import ArgumentParser
 import django
 from django.apps import apps
 from django.conf import settings
-from django.db import connection
+from django.db import connection, connections
 from django.test import TestCase, TransactionTestCase
+from django.test.runner import default_test_processes
 from django.test.utils import get_runner
 from django.utils import six
 from django.utils._os import upath
@@ -33,6 +35,12 @@ TMPDIR = tempfile.mkdtemp(prefix='django_')
 # Set the TMPDIR environment variable in addition to tempfile.tempdir
 # so that children processes inherit it.
 tempfile.tempdir = os.environ['TMPDIR'] = TMPDIR
+
+# Removing the temporary TMPDIR. Ensure we pass in unicode so that it will
+# successfully remove temp trees containing non-ASCII filenames on Windows.
+# (We're assuming the temp dir name itself only contains ASCII characters.)
+atexit.register(shutil.rmtree, six.text_type(TMPDIR))
+
 
 SUBDIRS_TO_SKIP = [
     'data',
@@ -93,9 +101,12 @@ def get_installed():
     return [app_config.name for app_config in apps.get_app_configs()]
 
 
-def setup(verbosity, test_labels):
+def setup(verbosity, test_labels, parallel):
     if verbosity >= 1:
-        print("Testing against Django installed in '%s'" % os.path.dirname(django.__file__))
+        msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
+        if parallel > 1:
+            msg += " with %d processes" % parallel
+        print(msg)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
     def no_available_apps(self):
@@ -218,22 +229,28 @@ def setup(verbosity, test_labels):
 
 
 def teardown(state):
-    try:
-        # Removing the temporary TMPDIR. Ensure we pass in unicode
-        # so that it will successfully remove temp trees containing
-        # non-ASCII filenames on Windows. (We're assuming the temp dir
-        # name itself does not contain non-ASCII characters.)
-        shutil.rmtree(six.text_type(TMPDIR))
-    except OSError:
-        print('Failed to remove temp directory: %s' % TMPDIR)
-
     # Restore the old settings.
     for key, value in state.items():
         setattr(settings, key, value)
 
 
-def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels, debug_sql):
-    state = setup(verbosity, test_labels)
+def actual_test_processes(parallel):
+    if parallel == 0:
+        # On Python 3.4+: if multiprocessing.get_start_method() != 'fork':
+        if not hasattr(os, 'fork'):
+            return 1
+        # This doesn't work before django.setup() on some databases.
+        elif all(conn.features.can_clone_databases for conn in connections.all()):
+            return default_test_processes()
+        else:
+            return 1
+    else:
+        return parallel
+
+
+def django_tests(verbosity, interactive, failfast, keepdb, reverse,
+                 test_labels, debug_sql, parallel):
+    state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
     # Run the test suite, including the extra validation tests.
@@ -248,6 +265,7 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse, test_labels,
         keepdb=keepdb,
         reverse=reverse,
         debug_sql=debug_sql,
+        parallel=actual_test_processes(parallel),
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -386,13 +404,18 @@ if __name__ == "__main__":
     parser.add_argument('--liveserver',
         help='Overrides the default address where the live server (used with '
              'LiveServerTestCase) is expected to run from. The default value '
-             'is localhost:8081.')
+             'is localhost:8081-8179.')
     parser.add_argument(
         '--selenium', action='store_true', dest='selenium', default=False,
-        help='Run the Selenium tests as well (if Selenium is installed)')
+        help='Run the Selenium tests as well (if Selenium is installed).')
     parser.add_argument(
         '--debug-sql', action='store_true', dest='debug_sql', default=False,
-        help='Turn on the SQL query logger within tests')
+        help='Turn on the SQL query logger within tests.')
+    parser.add_argument(
+        '--parallel', dest='parallel', nargs='?', default=0, type=int,
+        const=default_test_processes(),
+        help='Run tests in parallel processes.')
+
     options = parser.parse_args()
 
     # mock is a required dependency
@@ -429,6 +452,6 @@ if __name__ == "__main__":
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
                                 options.reverse, options.modules,
-                                options.debug_sql)
+                                options.debug_sql, options.parallel)
         if failures:
             sys.exit(bool(failures))

@@ -8,6 +8,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.test import TestCase
+from django.test.testcases import SerializeMixin
 from django.utils._os import upath
 
 try:
@@ -27,10 +28,12 @@ else:
     PersonTwoImages = Person
 
 
-class ImageFieldTestMixin(object):
+class ImageFieldTestMixin(SerializeMixin):
     """
     Mixin class to provide common functionality to ImageField test classes.
     """
+
+    lockfile = __file__
 
     # Person model to use for tests.
     PersonModel = PersonWithHeightAndWidth

@@ -31,6 +31,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_release_savepoints = True
     atomic_transactions = False
     supports_column_check_constraints = False
+    can_clone_databases = True
 
     @cached_property
     def _mysql_storage_engine(self):

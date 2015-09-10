@@ -1227,7 +1227,11 @@ provided by the :setting:`TEST_RUNNER` setting.
 
 The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
-expected to run from. The default value is ``localhost:8081``.
+expected to run from. The default value is ``localhost:8081-8179``.
+
+.. versionchanged:: 1.9
+
+    In earlier versions, the default value was ``localhost:8081``.
 
 .. django-admin-option:: --keepdb
 
@@ -1256,6 +1260,48 @@ this option.
 The ``--debug-sql`` option can be used to enable :ref:`SQL logging
 <django-db-logger>` for failing tests. If :djadminopt:`--verbosity` is ``2``,
 then queries in passing tests are also output.
+
+.. django-admin-option:: --parallel
+
+.. versionadded:: 1.9
+
+The ``--parallel`` option can be used to run tests in parallel in separate
+processes. Since modern processors have multiple cores, this allows running
+tests significantly faster.
+
+By default ``--parallel`` runs one process per core according to
+:func:`multiprocessing.cpu_count()`. You can adjust the number of processes
+either by providing it as the option's value, e.g. ``--parallel=4``, or by
+setting the ``DJANGO_TEST_PROCESSES`` environment variable.
+
+Django distributes test cases — :class:`unittest.TestCase` subclasses — to
+subprocesses. If there are fewer test cases than configured processes, Django
+will reduce the number of processes accordingly.
+
+Each process gets its own database. You must ensure that different test cases
+don't access the same resources. For instance, test cases that touch the
+filesystem should create a temporary directory for their own use.
+
+This option requires the third-party ``tblib`` package to display tracebacks
+correctly:
+
+.. code-block:: console
+
+    $ pip install tblib
+
+This feature isn't available on Windows. It doesn't work with the Oracle
+database backend either.
+
+.. warning::
+
+    When test parallelization is enabled and a test fails, Django may be
+    unable to display the exception traceback. This can make debugging
+    difficult. If you encounter this problem, run the affected test without
+    parallelization to see the traceback of the failure.
+
+    This is a known limitation. It arises from the need to serialize objects
+    in order to exchange them between processes. See
+    :ref:`python:pickle-picklable` for details.
 
 testserver <fixture fixture ...>
 --------------------------------
