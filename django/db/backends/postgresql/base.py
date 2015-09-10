@@ -232,7 +232,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             return True
 
-    @cached_property
+    @property
     def _nodb_connection(self):
         nodb_connection = super(DatabaseWrapper, self)._nodb_connection
         try:
