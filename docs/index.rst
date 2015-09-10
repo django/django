@@ -31,3 +31,4 @@ Contents:
    scaling
    backends
    faqs
+   releases/index
