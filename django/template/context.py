@@ -52,7 +52,13 @@ class BaseContext(object):
             yield d
 
     def push(self, *args, **kwargs):
-        return ContextDict(self, *args, **kwargs)
+        dicts = []
+        for d in args:
+            if isinstance(d, BaseContext):
+                dicts += d.dicts[1:]
+            else:
+                dicts.append(d)
+        return ContextDict(self, *dicts, **kwargs)
 
     def pop(self):
         if len(self.dicts) == 1:
@@ -175,6 +181,8 @@ class Context(BaseContext):
         "Pushes other_dict to the stack of dictionaries in the Context"
         if not hasattr(other_dict, '__getitem__'):
             raise TypeError('other_dict must be a mapping (dictionary-like) object.')
+        if isinstance(other_dict, BaseContext):
+            other_dict = other_dict.dicts[1:].pop()
         return ContextDict(self, other_dict)
 
 
