@@ -1289,7 +1289,8 @@ correctly:
 
     $ pip install tblib
 
-This feature isn't available on Oracle.
+This feature isn't available on Windows. It doesn't work with the Oracle
+database backend either.
 
 .. warning::
 

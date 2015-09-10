@@ -236,8 +236,11 @@ def teardown(state):
 
 def actual_test_processes(parallel):
     if parallel == 0:
+        # On Python 3.4+: if multiprocessing.get_start_method() != 'fork':
+        if not hasattr(os, 'fork'):
+            return 1
         # This doesn't work before django.setup() on some databases.
-        if all(conn.features.can_clone_databases for conn in connections.all()):
+        elif all(conn.features.can_clone_databases for conn in connections.all()):
             return default_test_processes()
         else:
             return 1
