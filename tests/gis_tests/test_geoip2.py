@@ -124,8 +124,8 @@ class GeoIPTest(unittest.TestCase):
     def test05_unicode_response(self):
         "GeoIP strings should be properly encoded (#16553)."
         g = GeoIP2()
-        d = g.city("duesseldorf.de")
-        self.assertEqual('Düsseldorf', d['city'])
+        d = g.city("nigde.edu.tr")
+        self.assertEqual('Niğde', d['city'])
         d = g.country('200.26.205.1')
         # Some databases have only unaccented countries
         self.assertIn(d['country_name'], ('Curaçao', 'Curacao'))
