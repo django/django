@@ -35,5 +35,5 @@ class Worker(object):
             except Message.Requeue:
                 self.channel_backend.send(channel, content)
             except:
-                print "Error processing message with consumer %s:" % name_that_thing(consumer)
+                print("Error processing message with consumer {}:".format(name_that_thing(consumer)))
                 traceback.print_exc()

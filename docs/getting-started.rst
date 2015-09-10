@@ -71,6 +71,8 @@ do any time. Let's try some WebSockets, and make a basic chat server!
 Delete that consumer and its routing - we'll want the normal Django view layer to
 serve HTTP requests from now on - and make this WebSocket consumer instead::
 
+    from channels import Group
+
     def ws_add(message):
         Group("chat").add(message.reply_channel)
 
@@ -105,6 +107,8 @@ so we can hook that up to re-add the channel (it's safe to add the channel to
 a group it's already in - similarly, it's safe to discard a channel from a
 group it's not in)::
 
+    from channels import Group
+
     # Connected to websocket.keepalive
     def ws_keepalive(message):
         Group("chat").add(message.reply_channel)
@@ -122,6 +126,8 @@ just route both channels to the same consumer::
 And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
+
+    from channels import Group
 
     # Connected to websocket.disconnect
     def ws_disconnect(message):
