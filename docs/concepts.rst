@@ -65,9 +65,9 @@ you can write a function to consume a channel, like so::
     def my_consumer(message):
         pass
 
-And then assign a channel to it like this in the channel backend settings::
+And then assign a channel to it like this in the channel routing::
 
-    "ROUTING": {
+    channel_routing = {
         "some-channel": "myapp.consumers.my_consumer",
     }
 
