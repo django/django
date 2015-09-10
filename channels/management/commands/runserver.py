@@ -4,7 +4,6 @@ from django.core.management.commands.runserver import Command as RunserverComman
 from django.core.management import CommandError
 from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.worker import Worker
-from channels.utils import auto_import_consumers
 from channels.adapters import UrlConsumer
 from channels.interfaces.wsgi import WSGIInterface
 
@@ -24,10 +23,9 @@ class Command(RunserverCommand):
     def inner_run(self, *args, **options):
         # Check a handler is registered for http reqs
         self.channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
-        auto_import_consumers()
-        if not self.channel_backend.registry.consumer_for_channel("django.wsgi.request"):
+        if not self.channel_backend.registry.consumer_for_channel("http.request"):
             # Register the default one
-            self.channel_backend.registry.add_consumer(UrlConsumer(), ["django.wsgi.request"])
+            self.channel_backend.registry.add_consumer(UrlConsumer(), ["http.request"])
         # Note that this is the right one on the console
         self.stdout.write("Worker thread running, channels enabled")
         if self.channel_backend.local_only:

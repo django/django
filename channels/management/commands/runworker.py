@@ -3,7 +3,6 @@ from wsgiref.simple_server import BaseHTTPRequestHandler
 from django.core.management import BaseCommand, CommandError
 from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.worker import Worker
-from channels.utils import auto_import_consumers
 
 
 class Command(BaseCommand):
@@ -11,7 +10,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Get the backend to use
         channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
-        auto_import_consumers()
         if channel_backend.local_only:
             raise CommandError(
                 "You have a process-local channel backend configured, and so cannot run separate workers.\n"
