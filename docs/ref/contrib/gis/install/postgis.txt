@@ -63,6 +63,9 @@ spatial functionality::
     $ psql <db name>
     > CREATE EXTENSION postgis;
 
+The database user must be a superuser in order to run
+``CREATE EXTENSION postgis;``.
+
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
 ``postgis_topology`` extension by issuing ``CREATE EXTENSION
