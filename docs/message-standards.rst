@@ -11,8 +11,7 @@ In addition to the standards outlined below, each message may contain a
 separate connection and data receiving messages (like WebSockets) will only
 contain the connection and detailed client information in the first message;
 use the ``@channel_session`` decorator to persist this data to consumers of
-the received data (the decorator will take care of handling persistence and
-ordering guarantees on messages).
+the received data (or something else based on ``reply_channel``).
 
 All messages must be able to be encoded as JSON; channel backends don't
 necessarily have to use JSON, but we consider it the lowest common denominator
