@@ -105,6 +105,8 @@ so we can hook that up to re-add the channel (it's safe to add the channel to
 a group it's already in - similarly, it's safe to discard a channel from a
 group it's not in)::
 
+    from channels import Group
+
     # Connected to websocket.keepalive
     def ws_keepalive(message):
         Group("chat").add(message.reply_channel)
