@@ -6,7 +6,7 @@ import os
 import re
 import unittest
 
-from django.contrib.admin import ModelAdmin
+from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.models import ADDITION, DELETION, LogEntry
 from django.contrib.admin.options import TO_FIELD_VAR
@@ -6128,14 +6128,15 @@ class AdminViewOnSiteTests(TestCase):
     def test_check(self):
         "Ensure that the view_on_site value is either a boolean or a callable"
         try:
+            admin = CityAdmin(City, AdminSite())
             CityAdmin.view_on_site = True
-            self.assertEqual(CityAdmin.check(City), [])
+            self.assertEqual(admin.check(), [])
             CityAdmin.view_on_site = False
-            self.assertEqual(CityAdmin.check(City), [])
+            self.assertEqual(admin.check(), [])
             CityAdmin.view_on_site = lambda obj: obj.get_absolute_url()
-            self.assertEqual(CityAdmin.check(City), [])
+            self.assertEqual(admin.check(), [])
             CityAdmin.view_on_site = []
-            self.assertEqual(CityAdmin.check(City), [
+            self.assertEqual(admin.check(), [
                 Error(
                     "The value of 'view_on_site' must be a callable or a boolean value.",
                     hint=None,

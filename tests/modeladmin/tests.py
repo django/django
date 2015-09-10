@@ -572,7 +572,8 @@ class CheckTestCase(SimpleTestCase):
     def assertIsInvalid(self, model_admin, model, msg,
             id=None, hint=None, invalid_obj=None):
         invalid_obj = invalid_obj or model_admin
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         expected = [
             Error(
                 msg,
@@ -589,7 +590,8 @@ class CheckTestCase(SimpleTestCase):
         Same as assertIsInvalid but treats the given msg as a regexp.
         """
         invalid_obj = invalid_obj or model_admin
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         self.assertEqual(len(errors), 1)
         error = errors[0]
         self.assertEqual(error.hint, hint)
@@ -598,7 +600,8 @@ class CheckTestCase(SimpleTestCase):
         six.assertRegex(self, error.msg, msg)
 
     def assertIsValid(self, model_admin, model):
-        errors = model_admin.check(model=model)
+        admin_obj = model_admin(model, AdminSite())
+        errors = admin_obj.check()
         expected = []
         self.assertEqual(errors, expected)
 

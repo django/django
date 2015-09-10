@@ -1064,6 +1064,9 @@ Miscellaneous
 * By default :class:`~django.test.LiveServerTestCase` attempts to find an
   available port in the 8081-8179 range instead of just trying port 8081.
 
+* The system checks for :class:`~django.contrib.admin.ModelAdmin` now check
+  instances rather than classes.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
