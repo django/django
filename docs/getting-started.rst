@@ -456,7 +456,67 @@ pass through it.
 Linearization
 -------------
 
-TODO
+There's one final concept we want to introduce you to before you go on to build
+sites with Channels - linearizing consumers.
+
+Because Channels is a distributed system that can have many workers, by default
+it's entirely feasible for a WebSocket interface server to send out a ``connect``
+and a ``receive`` message close enough together that a second worker will pick
+up and start processing the ``receive`` message before the first worker has
+finished processing the ``connect`` worker.
+
+This is particularly annoying if you're storing things in the session in the
+``connect`` consumer and trying to get them in the ``receive`` consumer - because
+the ``connect`` consumer hasn't exited, its session hasn't saved. You'd get the
+same effect if someone tried to request a view before the login view had finished
+processing, but there you're not expecting that page to run after the login,
+whereas you'd naturally expect ``receive`` to run after ``connect``.
+
+But, of course, Channels has a solution - the ``linearize`` decorator. Any
+handler decorated with this will use locking to ensure it does not run at the
+same time as any other view with ``linearize`` **on messages with the same reply channel**.
+That means your site will happily mutitask with lots of different people's messages,
+but if two happen to try to run at the same time for the same client, they'll
+be deconflicted.
+
+There's a small cost to using ``linearize``, which is why it's an optional
+decorator, but generally you'll want to use it for most session-based WebSocket
+and other "continuous protocol" things. Here's an example, improving our
+first-letter-of-username chat from earlier::
+
+    from channels import Channel, Group
+    from channels.decorators import channel_session, linearize
+    from channels.auth import http_session_user, channel_session_user, transfer_user
+
+    # Connected to websocket.connect
+    @linearize
+    @channel_session
+    @http_session_user
+    def ws_add(message):
+        # Copy user from HTTP to channel session
+        transfer_user(message.http_session, message.channel_session)
+        # Add them to the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.keepalive
+    # We don't linearize as we know this will happen a decent time after add
+    @channel_session_user
+    def ws_keepalive(message):
+        # Keep them in the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.receive
+    @linearize
+    @channel_session_user
+    def ws_message(message):
+        Group("chat-%s" % message.user.username[0]).send(message.content)
+
+    # Connected to websocket.disconnect
+    # We don't linearize as even if this gets an empty session, the group
+    # will auto-discard after the expiry anyway.
+    @channel_session_user
+    def ws_disconnect(message):
+        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
 
 
 Next Steps
