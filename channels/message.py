@@ -10,6 +10,13 @@ class Message(object):
     to use to reply to this message's end user, if that makes sense.
     """
 
+    class Requeue(Exception):
+        """
+        Raise this while processing a message to requeue it back onto the
+        channel. Useful if you're manually ensuring partial ordering, etc.
+        """
+        pass
+
     def __init__(self, content, channel, channel_backend, reply_channel=None):
         self.content = content
         self.channel = channel

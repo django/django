@@ -101,5 +101,20 @@ class RedisChannelBackend(BaseChannelBackend):
 
     # TODO: send_group efficient implementation using Lua
 
+    def lock_channel(self, channel, expiry=None):
+        """
+        Attempts to get a lock on the named channel. Returns True if lock
+        obtained, False if lock not obtained.
+        """
+        key = "%s:lock:%s" % (self.prefix, channel)
+        return bool(self.connection.setnx(key, "1"))
+
+    def unlock_channel(self, channel):
+        """
+        Unlocks the named channel. Always succeeds.
+        """
+        key = "%s:lock:%s" % (self.prefix, channel)
+        self.connection.delete(key)
+
     def __str__(self):
         return "%s(host=%s, port=%s)" % (self.__class__.__name__, self.host, self.port)
