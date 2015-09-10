@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import AdminSite
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.core import checks
 from django.test import SimpleTestCase, override_settings
@@ -32,8 +33,7 @@ class ValidFormFieldsets(admin.ModelAdmin):
 
 
 class MyAdmin(admin.ModelAdmin):
-    @classmethod
-    def check(cls, model, **kwargs):
+    def check(self, **kwargs):
         return ['error!']
 
 
@@ -73,7 +73,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             list_editable = ["original_release"]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "The value of 'list_editable[0]' refers to 'original_release', "
@@ -95,8 +96,8 @@ class SystemChecksTestCase(SimpleTestCase):
                     "fields": ["title", "original_release"],
                 }),
             ]
-
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 ("The value of 'list_editable[0]' refers to 'original_release', "
@@ -118,7 +119,8 @@ class SystemChecksTestCase(SimpleTestCase):
                 }),
             ]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_custom_modelforms_with_fields_fieldsets(self):
@@ -126,7 +128,8 @@ class SystemChecksTestCase(SimpleTestCase):
         # Regression test for #8027: custom ModelForms with fields/fieldsets
         """
 
-        errors = ValidFields.check(model=Song)
+        site = AdminSite()
+        errors = ValidFields(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_custom_get_form_with_fieldsets(self):
@@ -136,7 +139,8 @@ class SystemChecksTestCase(SimpleTestCase):
         Refs #19445.
         """
 
-        errors = ValidFormFieldsets.check(model=Song)
+        site = AdminSite()
+        errors = ValidFormFieldsets(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_fieldsets_fields_non_tuple(self):
@@ -152,7 +156,8 @@ class SystemChecksTestCase(SimpleTestCase):
                 }),
             ]
 
-        errors = NotATupleAdmin.check(model=Song)
+        site = AdminSite()
+        errors = NotATupleAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "The value of 'fieldsets[0][1]['fields']' must be a list or tuple.",
@@ -177,7 +182,8 @@ class SystemChecksTestCase(SimpleTestCase):
                 }),
             ]
 
-        errors = NotATupleAdmin.check(model=Song)
+        site = AdminSite()
+        errors = NotATupleAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "The value of 'fieldsets[1][1]['fields']' must be a list or tuple.",
@@ -196,7 +202,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class ExcludedFields1(admin.ModelAdmin):
             exclude = 'foo'
 
-        errors = ExcludedFields1.check(model=Book)
+        site = AdminSite()
+        errors = ExcludedFields1(Book, site).check()
         expected = [
             checks.Error(
                 "The value of 'exclude' must be a list or tuple.",
@@ -211,7 +218,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class ExcludedFields2(admin.ModelAdmin):
             exclude = ('name', 'name')
 
-        errors = ExcludedFields2.check(model=Book)
+        site = AdminSite()
+        errors = ExcludedFields2(Book, site).check()
         expected = [
             checks.Error(
                 "The value of 'exclude' contains duplicate field(s).",
@@ -231,7 +239,8 @@ class SystemChecksTestCase(SimpleTestCase):
             model = Album
             inlines = [ExcludedFieldsInline]
 
-        errors = ExcludedFieldsAlbumAdmin.check(model=Album)
+        site = AdminSite()
+        errors = ExcludedFieldsAlbumAdmin(Album, site).check()
         expected = [
             checks.Error(
                 "The value of 'exclude' must be a list or tuple.",
@@ -256,7 +265,8 @@ class SystemChecksTestCase(SimpleTestCase):
             model = Album
             inlines = [SongInline]
 
-        errors = AlbumAdmin.check(model=Album)
+        site = AdminSite()
+        errors = AlbumAdmin(Album, site).check()
         expected = [
             checks.Error(
                 ("Cannot exclude the field 'album', because it is the foreign key "
@@ -280,7 +290,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [InfluenceInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_generic_inline_model_admin_non_generic_model(self):
@@ -295,7 +306,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [BookInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "'admin_checks.Book' has no GenericForeignKey.",
@@ -316,7 +328,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [InfluenceInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "'ct_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
@@ -337,7 +350,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [InfluenceInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "'ct_fk_field' references 'nonexistent', which is not a field on 'admin_checks.Influence'.",
@@ -358,7 +372,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [InfluenceInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "'admin_checks.Influence' has no GenericForeignKey using content type field 'name' and object ID field 'object_id'.",
@@ -379,7 +394,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             inlines = [InfluenceInline]
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "'admin_checks.Influence' has no GenericForeignKey using content type field 'content_type' and object ID field 'name'.",
@@ -398,7 +414,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class RawIdNonexistingAdmin(admin.ModelAdmin):
             raw_id_fields = ('nonexisting',)
 
-        errors = RawIdNonexistingAdmin.check(model=Album)
+        site = AdminSite()
+        errors = RawIdNonexistingAdmin(Album, site).check()
         expected = [
             checks.Error(
                 ("The value of 'raw_id_fields[0]' refers to 'nonexisting', which is "
@@ -425,7 +442,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        errors = MyAdmin.check(model=Album)
+        site = AdminSite()
+        errors = MyAdmin(Album, site).check()
         self.assertEqual(errors, [])
 
     def test_inline_self_check(self):
@@ -435,7 +453,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        errors = MyAdmin.check(model=Album)
+        site = AdminSite()
+        errors = MyAdmin(Album, site).check()
         expected = [
             checks.Error(
                 "'admin_checks.TwoAlbumFKAndAnE' has more than one ForeignKey to 'admin_checks.Album'.",
@@ -454,14 +473,16 @@ class SystemChecksTestCase(SimpleTestCase):
         class MyAdmin(admin.ModelAdmin):
             inlines = [TwoAlbumFKAndAnEInline]
 
-        errors = MyAdmin.check(model=Album)
+        site = AdminSite()
+        errors = MyAdmin(Album, site).check()
         self.assertEqual(errors, [])
 
     def test_readonly(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title",)
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_readonly_on_method(self):
@@ -471,7 +492,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (my_function,)
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_readonly_on_modeladmin(self):
@@ -481,21 +503,39 @@ class SystemChecksTestCase(SimpleTestCase):
             def readonly_method_on_modeladmin(self, obj):
                 pass
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
+        self.assertEqual(errors, [])
+
+    def test_readonly_dynamic_attribute_on_modeladmin(self):
+        class SongAdmin(admin.ModelAdmin):
+            readonly_fields = ("dynamic_method",)
+
+            def __getattr__(self, item):
+                if item == "dynamic_method":
+                    def method(obj):
+                        pass
+                    return method
+                raise AttributeError
+
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_readonly_method_on_model(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("readonly_method_on_model",)
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_nonexistent_field(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = ("title", "nonexistent")
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         expected = [
             checks.Error(
                 ("The value of 'readonly_fields[1]' is not a callable, an attribute "
@@ -512,7 +552,8 @@ class SystemChecksTestCase(SimpleTestCase):
             model = City
             readonly_fields = ['i_dont_exist']  # Missing attribute
 
-        errors = CityInline.check(State)
+        site = AdminSite()
+        errors = CityInline(State, site).check()
         expected = [
             checks.Error(
                 ("The value of 'readonly_fields[0]' is not a callable, an attribute "
@@ -531,14 +572,16 @@ class SystemChecksTestCase(SimpleTestCase):
                     return "Best Ever!"
                 return "Status unknown."
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_readonly_lambda(self):
         class SongAdmin(admin.ModelAdmin):
             readonly_fields = (lambda obj: "test",)
 
-        errors = SongAdmin.check(model=Song)
+        site = AdminSite()
+        errors = SongAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_graceful_m2m_fail(self):
@@ -551,7 +594,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class BookAdmin(admin.ModelAdmin):
             fields = ['authors']
 
-        errors = BookAdmin.check(model=Book)
+        site = AdminSite()
+        errors = BookAdmin(Book, site).check()
         expected = [
             checks.Error(
                 ("The value of 'fields' cannot include the ManyToManyField 'authors', "
@@ -569,8 +613,8 @@ class SystemChecksTestCase(SimpleTestCase):
                 ('Header 1', {'fields': ('name',)}),
                 ('Header 2', {'fields': ('authors',)}),
             )
-
-        errors = FieldsetBookAdmin.check(model=Book)
+        site = AdminSite()
+        errors = FieldsetBookAdmin(Book, site).check()
         expected = [
             checks.Error(
                 ("The value of 'fieldsets[1][1][\"fields\"]' cannot include the ManyToManyField "
@@ -586,7 +630,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class NestedFieldsAdmin(admin.ModelAdmin):
             fields = ('price', ('name', 'subtitle'))
 
-        errors = NestedFieldsAdmin.check(model=Book)
+        site = AdminSite()
+        errors = NestedFieldsAdmin(Book, site).check()
         self.assertEqual(errors, [])
 
     def test_nested_fieldsets(self):
@@ -594,8 +639,8 @@ class SystemChecksTestCase(SimpleTestCase):
             fieldsets = (
                 ('Main', {'fields': ('price', ('name', 'subtitle'))}),
             )
-
-        errors = NestedFieldsetAdmin.check(model=Book)
+        site = AdminSite()
+        errors = NestedFieldsetAdmin(Book, site).check()
         self.assertEqual(errors, [])
 
     def test_explicit_through_override(self):
@@ -611,7 +656,8 @@ class SystemChecksTestCase(SimpleTestCase):
         class BookAdmin(admin.ModelAdmin):
             inlines = [AuthorsInline]
 
-        errors = BookAdmin.check(model=Book)
+        site = AdminSite()
+        errors = BookAdmin(Book, site).check()
         self.assertEqual(errors, [])
 
     def test_non_model_fields(self):
@@ -627,7 +673,8 @@ class SystemChecksTestCase(SimpleTestCase):
             form = SongForm
             fields = ['title', 'extra_data']
 
-        errors = FieldsOnFormOnlyAdmin.check(model=Song)
+        site = AdminSite()
+        errors = FieldsOnFormOnlyAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_non_model_first_field(self):
@@ -647,14 +694,16 @@ class SystemChecksTestCase(SimpleTestCase):
             form = SongForm
             fields = ['extra_data', 'title']
 
-        errors = FieldsOnFormOnlyAdmin.check(model=Song)
+        site = AdminSite()
+        errors = FieldsOnFormOnlyAdmin(Song, site).check()
         self.assertEqual(errors, [])
 
     def test_check_sublists_for_duplicates(self):
         class MyModelAdmin(admin.ModelAdmin):
             fields = ['state', ['state']]
 
-        errors = MyModelAdmin.check(model=Song)
+        site = AdminSite()
+        errors = MyModelAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "The value of 'fields' contains duplicate field(s).",
@@ -673,7 +722,8 @@ class SystemChecksTestCase(SimpleTestCase):
                 }),
             ]
 
-        errors = MyModelAdmin.check(model=Song)
+        site = AdminSite()
+        errors = MyModelAdmin(Song, site).check()
         expected = [
             checks.Error(
                 "There are duplicate field(s) in 'fieldsets[0][1]'.",
@@ -695,8 +745,9 @@ class SystemChecksTestCase(SimpleTestCase):
         # Temporarily pretending apps are not ready yet. This issue can happen
         # if the value of 'list_filter' refers to a 'through__field'.
         Book._meta.apps.ready = False
+        site = AdminSite()
         try:
-            errors = BookAdminWithListFilter.check(model=Book)
+            errors = BookAdminWithListFilter(Book, site).check()
             self.assertEqual(errors, [])
         finally:
             Book._meta.apps.ready = True
