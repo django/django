@@ -46,37 +46,11 @@ Setting Up
 Create a Spatial Database
 -------------------------
 
-.. note::
+Typically no special setup is required, so you can create a database as you
+would for any other project. We provide some tips for selected databases:
 
-    MySQL and Oracle users can skip this section because spatial types
-    are already built into the database.
-
-First, create a spatial database for your project.
-
-If you are using PostGIS, create the database from the :ref:`spatial database
-template <spatialdb_template>`:
-
-.. code-block:: console
-
-    $ createdb -T template_postgis geodjango
-
-.. note::
-
-    This command must be issued by a database user with enough privileges to
-    create a database.  To create a user with ``CREATE DATABASE`` privileges in
-    PostgreSQL, use the following commands:
-
-    .. code-block:: console
-
-        $ sudo su - postgres
-        $ createuser --createdb geo
-        $ exit
-
-    Replace ``geo`` with your Postgres database user's username.
-    (In PostgreSQL, this user will also be an OS-level user.)
-
-If you are using SQLite and SpatiaLite, consult the instructions on how
-to create a :ref:`SpatiaLite database <create_spatialite_db>`.
+* :doc:`install/postgis`
+* :doc:`install/spatialite`
 
 Create a New Project
 ------------------------
