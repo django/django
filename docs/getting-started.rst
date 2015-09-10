@@ -235,105 +235,31 @@ like, so you can understand when they're called. If you run three or four
 copies of ``runworker`` you'll probably be able to see the tasks running
 on different workers.
 
-Authentication
---------------
-
-Now, of course, a WebSocket solution is somewhat limited in scope without the
-ability to live with the rest of your website - in particular, we want to make
-sure we know what user we're talking to, in case we have things like private
-chat channels (we don't want a solution where clients just ask for the right
-channels, as anyone could change the code and just put in private channel names)
-
-It can also save you having to manually make clients ask for what they want to
-see; if I see you open a WebSocket to my "updates" endpoint, and I know which
-user ID, I can just auto-add that channel to all the relevant groups (mentions
-of that user, for example).
-
-Handily, as WebSockets start off using the HTTP protocol, they have a lot of
-familiar features, including a path, GET parameters, and cookies. We'd like to
-use these to hook into the familiar Django session and authentication systems;
-after all, WebSockets are no good unless we can identify who they belong to
-and do things securely.
-
-In addition, we don't want the interface servers storing data or trying to run
-authentication; they're meant to be simple, lean, fast processes without much
-state, and so we'll need to do our authentication inside our consumer functions.
-
-Fortunately, because Channels has standardised WebSocket event
-:doc:`message-standards`, it ships with decorators that help you with
-authentication, as well as using Django's session framework (which authentication
-relies on). Channels can use Django sessions either from cookies (if you're running your websocket
-server on the same port as your main site, which requires a reverse proxy that
-understands WebSockets), or from a ``session_key`` GET parameter, which
-is much more portable, and works in development where you need to run a separate
-WebSocket server (by default, on port 9000).
-
-All we need to do is add the ``django_http_auth`` decorator to our views,
-and we'll get extra ``session`` and ``user`` keyword attributes on ``message`` we can use;
-let's make one where users can only chat to people with the same first letter
-of their username::
-
-    from channels import Channel, Group
-    from channels.decorators import django_http_auth
-
-    @django_http_auth
-    def ws_add(message):
-        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
-
-    @django_http_auth
-    def ws_message(message):
-        Group("chat-%s" % message.user.username[0]).send(message.content)
-
-    @django_http_auth
-    def ws_disconnect(message):
-        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
-
-Now, when we connect to the WebSocket we'll have to remember to provide the
-Django session ID as part of the URL, like this::
-
-    socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
-
-You can get the current session key in a template with ``{{ request.session.session_key }}``.
-Note that Channels can't work with signed cookie sessions - since only HTTP
-responses can set cookies, it needs a backend it can write to separately to
-store state.
-
 Persisting Data
 ---------------
 
-Doing chatrooms by username first letter is a nice simple example, but it's
+Echoing messages is a nice simple example, but it's
 skirting around the real design pattern - persistent state for connections.
-A user may open our chat site and select the chatroom to join themselves, so we
-should let them send this request in the initial WebSocket connection,
-check they're allowed to access it, and then remember which room a socket is
-connected to when they send a message in so we know which group to send it to.
+Let's consider a basic chat site where a user requests a chat room upon initial
+connection, as part of the query string (e.g. ``http://host/websocket?room=abc``).
 
-The ``reply_channel`` is our unique pointer to the open WebSocket - as you've
-seen, we do all our operations on it - but it's not something we can annotate
-with data; it's just a simple string, and even if we hack around and set
-attributes on it that's not going to carry over to other workers.
+The ``reply_channel`` attribute you've seen before is our unique pointer to the
+open WebSocket - because it varies between different clients, it's how we can
+keep track of "who" a message is from. Remember, Channels is network-trasparent
+and can run on multiple workers, so you can't just store things locally in
+global variables or similar.
 
-Instead, the solution is to persist information keyed by the send channel in
+Instead, the solution is to persist information keyed by the ``reply_channel`` in
 some other data store - sound familiar? This is what Django's session framework
 does for HTTP requests, only there it uses cookies as the lookup key rather
 than the ``reply_channel``.
 
-Now, as you saw above, you can use the ``django_http_auth`` decorator to get
-both a ``user`` and a ``session`` attribute on your message - and,
-indeed, there is a ``http_session`` decorator that will just give you
-the ``session`` attribute.
-
-However, that session is based on cookies, and so follows the user round the
-site - it's great for information that should persist across all WebSocket and
-HTTP connections, but not great for information that is specific to a single
-WebSocket (such as "which chatroom should this socket be connected to"). For
-this reason, Channels also provides a ``channel_session`` decorator,
-which adds a ``channel_session`` attribute to the message; this works just like
-the normal ``session`` attribute, and persists to the same storage, but varies
-per-channel rather than per-cookie.
+Channels provides a ``channel_session`` decorator for this purpose - it
+provides you with an attribute called ``message.channel_session`` that acts
+just like a normal Django session.
 
 Let's use it now to build a chat server that expects you to pass a chatroom
-name in the path of your WebSocket request (we'll ignore auth for now)::
+name in the path of your WebSocket request (we'll ignore auth for now - that's next)::
 
     from channels import Channel
     from channels.decorators import channel_session
@@ -364,9 +290,102 @@ name in the path of your WebSocket request (we'll ignore auth for now)::
 
 If you play around with it from the console (or start building a simple
 JavaScript chat client that appends received messages to a div), you'll see
-that you can now request which chat room you want in the initial request. We
-could easily add in the auth decorator here too and do an initial check in
-``connect`` that the user had permission to join that chatroom.
+that you can now request which chat room you want in the initial request.
+
+Authentication
+--------------
+
+Now, of course, a WebSocket solution is somewhat limited in scope without the
+ability to live with the rest of your website - in particular, we want to make
+sure we know what user we're talking to, in case we have things like private
+chat channels (we don't want a solution where clients just ask for the right
+channels, as anyone could change the code and just put in private channel names)
+
+It can also save you having to manually make clients ask for what they want to
+see; if I see you open a WebSocket to my "updates" endpoint, and I know which
+user you are, I can just auto-add that channel to all the relevant groups (mentions
+of that user, for example).
+
+Handily, as WebSockets start off using the HTTP protocol, they have a lot of
+familiar features, including a path, GET parameters, and cookies. We'd like to
+use these to hook into the familiar Django session and authentication systems;
+after all, WebSockets are no good unless we can identify who they belong to
+and do things securely.
+
+In addition, we don't want the interface servers storing data or trying to run
+authentication; they're meant to be simple, lean, fast processes without much
+state, and so we'll need to do our authentication inside our consumer functions.
+
+Fortunately, because Channels has standardised WebSocket event
+:doc:`message-standards`, it ships with decorators that help you with
+both authentication and getting the underlying Django session (which is what
+Django authentication relies on).
+
+Channels can use Django sessions either from cookies (if you're running your websocket
+server on the same port as your main site, which requires a reverse proxy that
+understands WebSockets), or from a ``session_key`` GET parameter, which
+is much more portable, and works in development where you need to run a separate
+WebSocket server (by default, on port 9000).
+
+You get access to a user's normal Django session using the ``http_session``
+decorator - that gives you a ``message.http_session`` attribute that behaves
+just like ``request.session``. You can go one further and use ``http_session_user``
+which will provide a ``message.user`` attribute as well as the session attribute.
+
+Now, one thing to note is that you only get the detailed HTTP information
+during the ``connect`` message of a WebSocket connection (you can read more
+about what you get when in :doc:`message-standards`) - this means we're not
+wasting bandwidth sending the same information over the wire needlessly.
+
+This also means we'll have to grab the user in the connection handler and then
+store it in the session; thankfully, Channels ships with both a ``channel_session_user``
+decorator that works like the ``http_session_user`` decorator you saw above but
+loads the user from the *channel* session rather than the *HTTP* session,
+and a function called ``transfer_user`` which replicates a user from one session
+to another.
+
+Bringing that all together, let's make a chat server one where users can only
+chat to people with the same first letter of their username::
+
+    from channels import Channel, Group
+    from channels.decorators import channel_session
+    from channels.auth import http_session_user, channel_session_user, transfer_user
+
+    # Connected to websocket.connect
+    @channel_session
+    @http_session_user
+    def ws_add(message):
+        # Copy user from HTTP to channel session
+        transfer_user(message.http_session, message.channel_session)
+        # Add them to the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.keepalive
+    @channel_session_user
+    def ws_keepalive(message):
+        # Keep them in the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.receive
+    @channel_session_user
+    def ws_message(message):
+        Group("chat-%s" % message.user.username[0]).send(message.content)
+
+    # Connected to websocket.disconnect
+    @channel_session_user
+    def ws_disconnect(message):
+        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
+
+Now, when we connect to the WebSocket we'll have to remember to provide the
+Django session ID as part of the URL, like this::
+
+    socket = new WebSocket("ws://127.0.0.1:9000/?session_key=abcdefg");
+
+You can get the current session key in a template with ``{{ request.session.session_key }}``.
+Note that Channels can't work with signed cookie sessions - since only HTTP
+responses can set cookies, it needs a backend it can write to separately to
+store state.
+
 
 Models
 ------
@@ -439,6 +458,72 @@ inside a View, inside another model's ``post_save`` signal, inside a management
 command run via ``cron``. If we wanted to write a bot, too, we could put its
 listening logic inside the ``chat-messages`` consumer, as every message would
 pass through it.
+
+Linearization
+-------------
+
+There's one final concept we want to introduce you to before you go on to build
+sites with Channels - linearizing consumers.
+
+Because Channels is a distributed system that can have many workers, by default
+it's entirely feasible for a WebSocket interface server to send out a ``connect``
+and a ``receive`` message close enough together that a second worker will pick
+up and start processing the ``receive`` message before the first worker has
+finished processing the ``connect`` worker.
+
+This is particularly annoying if you're storing things in the session in the
+``connect`` consumer and trying to get them in the ``receive`` consumer - because
+the ``connect`` consumer hasn't exited, its session hasn't saved. You'd get the
+same effect if someone tried to request a view before the login view had finished
+processing, but there you're not expecting that page to run after the login,
+whereas you'd naturally expect ``receive`` to run after ``connect``.
+
+But, of course, Channels has a solution - the ``linearize`` decorator. Any
+handler decorated with this will use locking to ensure it does not run at the
+same time as any other view with ``linearize`` **on messages with the same reply channel**.
+That means your site will happily mutitask with lots of different people's messages,
+but if two happen to try to run at the same time for the same client, they'll
+be deconflicted.
+
+There's a small cost to using ``linearize``, which is why it's an optional
+decorator, but generally you'll want to use it for most session-based WebSocket
+and other "continuous protocol" things. Here's an example, improving our
+first-letter-of-username chat from earlier::
+
+    from channels import Channel, Group
+    from channels.decorators import channel_session, linearize
+    from channels.auth import http_session_user, channel_session_user, transfer_user
+
+    # Connected to websocket.connect
+    @linearize
+    @channel_session
+    @http_session_user
+    def ws_add(message):
+        # Copy user from HTTP to channel session
+        transfer_user(message.http_session, message.channel_session)
+        # Add them to the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.keepalive
+    # We don't linearize as we know this will happen a decent time after add
+    @channel_session_user
+    def ws_keepalive(message):
+        # Keep them in the right group
+        Group("chat-%s" % message.user.username[0]).add(message.reply_channel)
+
+    # Connected to websocket.receive
+    @linearize
+    @channel_session_user
+    def ws_message(message):
+        Group("chat-%s" % message.user.username[0]).send(message.content)
+
+    # Connected to websocket.disconnect
+    # We don't linearize as even if this gets an empty session, the group
+    # will auto-discard after the expiry anyway.
+    @channel_session_user
+    def ws_disconnect(message):
+        Group("chat-%s" % message.user.username[0]).discard(message.reply_channel)
+
 
 Next Steps
 ----------

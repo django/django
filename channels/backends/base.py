@@ -93,3 +93,16 @@ class BaseChannelBackend(object):
 
     def __str__(self):
         return self.__class__.__name__
+
+    def lock_channel(self, channel):
+        """
+        Attempts to get a lock on the named channel. Returns True if lock
+        obtained, False if lock not obtained.
+        """
+        raise NotImplementedError()
+
+    def unlock_channel(self, channel):
+        """
+        Unlocks the named channel. Always succeeds.
+        """
+        raise NotImplementedError()
