@@ -161,7 +161,7 @@ and be less than 200 characters long.
 
 It's optional for a backend implementation to understand this - after all,
 it's only important at scale, where you want to shard the two types differently
-- but it's present nonetheless. For more on scaling, and how to handle channel
+— but it's present nonetheless. For more on scaling, and how to handle channel
 types if you're writing a backend or interface server, read :doc:`scaling`.
 
 Groups
