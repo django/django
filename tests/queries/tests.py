@@ -751,7 +751,7 @@ class Queries1Tests(BaseQuerysetTest):
             3
         )
 
-        # Pickling of DateQuerySets used to fail
+        # Pickling of QuerySets used to fail
         qs = Item.objects.datetimes('created', 'month')
         pickle.loads(pickle.dumps(qs))
 
@@ -1302,7 +1302,7 @@ class Queries3Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(Valid.objects.all(), [])
 
     def test_ticket8683(self):
-        # Raise proper error when a DateQuerySet gets passed a wrong type of
+        # Raise proper error when a QuerySet gets passed a wrong type of
         # field
         self.assertRaisesMessage(
             AssertionError,
