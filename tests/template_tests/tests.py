@@ -74,7 +74,7 @@ class TemplateTests(SimpleTestCase):
 
         self.assertEqual(
             e.exception.args[0],
-            "Invalid block tag: 'endblock', expected 'elif', 'else' or 'endif'",
+            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' or 'endif'",
         )
 
     def test_compile_filter_expression_error(self):
