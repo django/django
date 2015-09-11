@@ -346,7 +346,10 @@ class RelatedField(Field):
         return None
 
     def set_attributes_from_rel(self):
-        self.name = self.name or (self.remote_field.model._meta.model_name + '_' + self.remote_field.model._meta.pk.name)
+        self.name = (
+            self.name or
+            (self.remote_field.model._meta.model_name + '_' + self.remote_field.model._meta.pk.name)
+        )
         if self.verbose_name is None:
             self.verbose_name = self.remote_field.model._meta.verbose_name
         self.remote_field.set_field_name()
@@ -830,7 +833,9 @@ def create_foreign_related_manager(superclass, rel):
                     if self.field.get_local_related_value(obj) == val:
                         old_ids.add(obj.pk)
                     else:
-                        raise self.field.remote_field.model.DoesNotExist("%r is not related to %r." % (obj, self.instance))
+                        raise self.field.remote_field.model.DoesNotExist(
+                            "%r is not related to %r." % (obj, self.instance)
+                        )
                 self._clear(self.filter(pk__in=old_ids), bulk)
             remove.alters_data = True
 
@@ -955,7 +960,8 @@ def create_many_related_manager(superclass, rel, reverse):
 
             self.core_filters = {}
             for lh_field, rh_field in self.source_field.related_fields:
-                self.core_filters['%s__%s' % (self.query_field_name, rh_field.name)] = getattr(instance, rh_field.attname)
+                core_filter_key = '%s__%s' % (self.query_field_name, rh_field.name)
+                self.core_filters[core_filter_key] = getattr(instance, rh_field.attname)
 
             self.related_val = self.source_field.get_foreign_related_value(instance)
             if None in self.related_val:
@@ -1688,7 +1694,10 @@ class ForeignObject(RelatedField):
         if isinstance(self.remote_field.model, six.string_types):
             kwargs['to'] = self.remote_field.model
         else:
-            kwargs['to'] = "%s.%s" % (self.remote_field.model._meta.app_label, self.remote_field.model._meta.object_name)
+            kwargs['to'] = "%s.%s" % (
+                self.remote_field.model._meta.app_label,
+                self.remote_field.model._meta.object_name,
+            )
         # If swappable is True, then see if we're actually pointing to the target
         # of a swap.
         swappable_setting = self.swappable_setting
@@ -1999,7 +2008,8 @@ class ForeignKey(ForeignObject):
             kwargs['db_constraint'] = self.db_constraint
         # Rel needs more work.
         to_meta = getattr(self.remote_field.model, "_meta", None)
-        if self.remote_field.field_name and (not to_meta or (to_meta.pk and self.remote_field.field_name != to_meta.pk.name)):
+        if self.remote_field.field_name and (
+                not to_meta or (to_meta.pk and self.remote_field.field_name != to_meta.pk.name)):
             kwargs['to_field'] = self.remote_field.field_name
         return name, path, args, kwargs
 

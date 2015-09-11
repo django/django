@@ -164,7 +164,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E003',
             )
@@ -182,7 +185,10 @@ class GenericForeignKeyTests(IsolatedModelsTestCase):
         expected = [
             checks.Error(
                 "'Model.content_type' is not a ForeignKey to 'contenttypes.ContentType'.",
-                hint="GenericForeignKeys must use a ForeignKey to 'contenttypes.ContentType' as the 'content_type' field.",
+                hint=(
+                    "GenericForeignKeys must use a ForeignKey to "
+                    "'contenttypes.ContentType' as the 'content_type' field."
+                ),
                 obj=Model.content_object,
                 id='contenttypes.E004',
             )

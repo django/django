@@ -119,7 +119,10 @@ class MigrationLoader(object):
                 if hasattr(migration_module.Migration, "forwards"):
                     south_style_migrations = True
                     break
-                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(migration_name, app_config.label)
+                self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(
+                    migration_name,
+                    app_config.label,
+                )
             if south_style_migrations:
                 self.unmigrated_apps.add(app_config.label)
 

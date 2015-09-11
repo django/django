@@ -1337,7 +1337,10 @@ class AutodetectorTests(TestCase):
         self.assertOperationTypes(changes, 'testapp', 0, ["AlterField"])
         self.assertOperationAttributes(changes, 'testapp', 0, 0, model_name="author", name='user')
         fk_field = changes['testapp'][0].operations[0].field
-        to_model = '%s.%s' % (fk_field.remote_field.model._meta.app_label, fk_field.remote_field.model._meta.object_name)
+        to_model = '%s.%s' % (
+            fk_field.remote_field.model._meta.app_label,
+            fk_field.remote_field.model._meta.object_name,
+        )
         self.assertEqual(to_model, 'thirdapp.CustomUser')
 
     def test_add_field_with_default(self):

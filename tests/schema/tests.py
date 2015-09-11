@@ -336,7 +336,10 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         # BooleanField are stored as TINYINT(1) on MySQL.
         field_type = columns['awesome'][0]
-        self.assertEqual(field_type, connection.features.introspected_boolean_field_type(new_field, created_separately=True))
+        self.assertEqual(
+            field_type,
+            connection.features.introspected_boolean_field_type(new_field, created_separately=True)
+        )
 
     def test_add_field_default_transform(self):
         """
@@ -1097,7 +1100,9 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(TagM2MTest)
             editor.create_model(UniqueTest)
         # Ensure the M2M exists and points to TagM2MTest
-        constraints = self.get_constraints(LocalBookWithM2M._meta.get_field("tags").remote_field.through._meta.db_table)
+        constraints = self.get_constraints(
+            LocalBookWithM2M._meta.get_field("tags").remote_field.through._meta.db_table
+        )
         if connection.features.supports_foreign_keys:
             for name, details in constraints.items():
                 if details['columns'] == ["tagm2mtest_id"] and details['foreign_key']:
@@ -1113,7 +1118,10 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field)
         # Ensure old M2M is gone
-        self.assertRaises(DatabaseError, self.column_classes, LocalBookWithM2M._meta.get_field("tags").remote_field.through)
+        self.assertRaises(
+            DatabaseError,
+            self.column_classes, LocalBookWithM2M._meta.get_field("tags").remote_field.through
+        )
         # Ensure the new M2M exists and points to UniqueTest
         constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:

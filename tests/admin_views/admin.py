@@ -587,7 +587,9 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(request, queryset, search_term)
+        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(
+            request, queryset, search_term
+        )
         try:
             search_term_as_int = int(search_term)
             queryset |= self.model.objects.filter(age=search_term_as_int)

@@ -856,9 +856,18 @@ class TemplateTests(TestCase):
         }
         templates = {
             'notag': Template("{% load tz %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}"),
-            'noarg': Template("{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'on': Template("{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
-            'off': Template("{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"),
+            'noarg': Template(
+                "{% load tz %}{% localtime %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
+            'on': Template(
+                "{% load tz %}{% localtime on %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
+            'off': Template(
+                "{% load tz %}{% localtime off %}{{ dt }}|{{ dt|localtime }}|"
+                "{{ dt|utc }}|{{ dt|timezone:ICT }}{% endlocaltime %}"
+            ),
         }
 
         # Transform a list of keys in 'datetimes' to the expected template
@@ -978,7 +987,10 @@ class TemplateTests(TestCase):
         )
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 10, 20, 30, tzinfo=UTC),
                        'tz1': ICT, 'tz2': None})
-        self.assertEqual(tpl.render(ctx), "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00")
+        self.assertEqual(
+            tpl.render(ctx),
+            "2011-09-01T13:20:30+03:00|2011-09-01T17:20:30+07:00|2011-09-01T13:20:30+03:00"
+        )
 
     @requires_pytz
     def test_timezone_templatetag_with_pytz(self):
@@ -1014,7 +1026,10 @@ class TemplateTests(TestCase):
         with timezone.override(UTC):
             self.assertEqual(tpl.render(Context()), "UTC")
 
-        tpl = Template("{% load tz %}{% timezone tz %}{% get_current_timezone as time_zone %}{% endtimezone %}{{ time_zone }}")
+        tpl = Template(
+            "{% load tz %}{% timezone tz %}{% get_current_timezone as time_zone %}"
+            "{% endtimezone %}{{ time_zone }}"
+        )
 
         self.assertEqual(tpl.render(Context({'tz': ICT})), "+0700")
         with timezone.override(UTC):
@@ -1029,7 +1044,11 @@ class TemplateTests(TestCase):
         with timezone.override(pytz.timezone('Europe/Paris')):
             self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
-        tpl = Template("{% load tz %}{% timezone 'Europe/Paris' %}{% get_current_timezone as time_zone %}{% endtimezone %}{{ time_zone }}")
+        tpl = Template(
+            "{% load tz %}{% timezone 'Europe/Paris' %}"
+            "{% get_current_timezone as time_zone %}{% endtimezone %}"
+            "{{ time_zone }}"
+        )
         self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
     def test_get_current_timezone_templatetag_invalid_argument(self):
@@ -1056,7 +1075,10 @@ class TemplateTests(TestCase):
             self.assertEqual(tpl.render(ctx), "2011-09-02 at 03:20:20")
 
     def test_date_and_time_template_filters_honor_localtime(self):
-        tpl = Template("{% load tz %}{% localtime off %}{{ dt|date:'Y-m-d' }} at {{ dt|time:'H:i:s' }}{% endlocaltime %}")
+        tpl = Template(
+            "{% load tz %}{% localtime off %}{{ dt|date:'Y-m-d' }} at "
+            "{{ dt|time:'H:i:s' }}{% endlocaltime %}"
+        )
         ctx = Context({'dt': datetime.datetime(2011, 9, 1, 20, 20, 20, tzinfo=UTC)})
         self.assertEqual(tpl.render(ctx), "2011-09-01 at 20:20:20")
         with timezone.override(ICT):

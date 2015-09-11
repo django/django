@@ -517,7 +517,10 @@ class OperationTests(OperationTestBase):
         self.assertNotIn(("test_rmwsrf", "rider"), new_state.models)
         self.assertIn(("test_rmwsrf", "horserider"), new_state.models)
         # Remember, RenameModel also repoints all incoming FKs and M2Ms
-        self.assertEqual("test_rmwsrf.HorseRider", new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model)
+        self.assertEqual(
+            "test_rmwsrf.HorseRider",
+            new_state.models["test_rmwsrf", "horserider"].fields[2][1].remote_field.model
+        )
         # Test the database alteration
         self.assertTableExists("test_rmwsrf_rider")
         self.assertTableNotExists("test_rmwsrf_horserider")
@@ -889,7 +892,9 @@ class OperationTests(OperationTestBase):
         self.assertFalse(Pony._meta.get_field('stables').blank)
 
         project_state = self.apply_operations("test_alflmm", project_state, operations=[
-            migrations.AlterField("Pony", "stables", models.ManyToManyField(to="Stable", related_name="ponies", blank=True))
+            migrations.AlterField(
+                "Pony", "stables", models.ManyToManyField(to="Stable", related_name="ponies", blank=True)
+            )
         ])
         Pony = project_state.apps.get_model("test_alflmm", "Pony")
         self.assertTrue(Pony._meta.get_field('stables').blank)
@@ -939,7 +944,10 @@ class OperationTests(OperationTestBase):
                 ("pony", models.ForeignKey('test_rmflmmwt.Pony', models.CASCADE)),
                 ("stable", models.ForeignKey('test_rmflmmwt.Stable', models.CASCADE)),
             ]),
-            migrations.AddField("Pony", "stables", models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt.PonyStables'))
+            migrations.AddField(
+                "Pony", "stables",
+                models.ManyToManyField("Stable", related_name="ponies", through='test_rmflmmwt.PonyStables')
+            )
         ])
         self.assertTableExists("test_rmflmmwt_ponystables")
 
@@ -1323,8 +1331,13 @@ class OperationTests(OperationTestBase):
         self.assertEqual(operation.describe(), "Set order_with_respect_to on Rider to pony")
         new_state = project_state.clone()
         operation.state_forwards("test_alorwrtto", new_state)
-        self.assertEqual(project_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), None)
-        self.assertEqual(new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None), "pony")
+        self.assertIsNone(
+            project_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None)
+        )
+        self.assertEqual(
+            new_state.models["test_alorwrtto", "rider"].options.get("order_with_respect_to", None),
+            "pony"
+        )
         # Make sure there's no matching index
         self.assertColumnNotExists("test_alorwrtto_rider", "_order")
         # Create some rows before alteration

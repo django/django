@@ -352,7 +352,7 @@ class XmlSerializerTestCase(SerializersTestBase, TestCase):
     <field name="categories" rel="ManyToManyRel" to="serializers.category"><object pk="%(first_category_pk)s"></object><object pk="%(second_category_pk)s"></object></field>
     <field name="meta_data" rel="ManyToManyRel" to="serializers.categorymetadata"></field>
   </object>
-</django-objects>"""
+</django-objects>"""  # NOQA
 
     @staticmethod
     def _comparison_value(value):

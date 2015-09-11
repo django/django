@@ -138,9 +138,13 @@ class IntrospectionTests(TransactionTestCase):
     def test_get_relations_alt_format(self):
         """With SQLite, foreign keys can be added with different syntaxes."""
         with connection.cursor() as cursor:
-            cursor.fetchone = mock.Mock(return_value=[
-                "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES %s(id));" % Article._meta.db_table
-            ])
+            cursor.fetchone = mock.Mock(
+                return_value=[
+                    "CREATE TABLE track(id, art_id INTEGER, FOREIGN KEY(art_id) REFERENCES {}(id));".format(
+                        Article._meta.db_table
+                    )
+                ]
+            )
             relations = connection.introspection.get_relations(cursor, 'mocked_table')
         self.assertEqual(relations, {'art_id': ('id', Article._meta.db_table)})
 

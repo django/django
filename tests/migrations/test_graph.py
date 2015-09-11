@@ -47,7 +47,10 @@ class GraphTests(SimpleTestCase):
         # Test whole graph
         self.assertEqual(
             graph.forwards_plan(("app_a", "0004")),
-            [('app_b', '0001'), ('app_b', '0002'), ('app_a', '0001'), ('app_a', '0002'), ('app_a', '0003'), ('app_a', '0004')],
+            [
+                ('app_b', '0001'), ('app_b', '0002'), ('app_a', '0001'),
+                ('app_a', '0002'), ('app_a', '0003'), ('app_a', '0004'),
+            ],
         )
         # Test reverse to b:0002
         self.assertEqual(
@@ -101,12 +104,19 @@ class GraphTests(SimpleTestCase):
         # Test whole graph
         self.assertEqual(
             graph.forwards_plan(("app_a", "0004")),
-            [('app_b', '0001'), ('app_c', '0001'), ('app_a', '0001'), ('app_a', '0002'), ('app_c', '0002'), ('app_b', '0002'), ('app_a', '0003'), ('app_a', '0004')],
+            [
+                ('app_b', '0001'), ('app_c', '0001'), ('app_a', '0001'),
+                ('app_a', '0002'), ('app_c', '0002'), ('app_b', '0002'),
+                ('app_a', '0003'), ('app_a', '0004'),
+            ],
         )
         # Test reverse to b:0001
         self.assertEqual(
             graph.backwards_plan(("app_b", "0001")),
-            [('app_a', '0004'), ('app_c', '0002'), ('app_c', '0001'), ('app_a', '0003'), ('app_b', '0002'), ('app_b', '0001')],
+            [
+                ('app_a', '0004'), ('app_c', '0002'), ('app_c', '0001'),
+                ('app_a', '0003'), ('app_b', '0002'), ('app_b', '0001'),
+            ],
         )
         # Test roots and leaves
         self.assertEqual(

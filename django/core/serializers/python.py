@@ -124,14 +124,15 @@ def Deserializer(object_list, **options):
 
             # Handle M2M relations
             if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
-                if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
+                model = field.remote_field.model
+                if hasattr(model._default_manager, 'get_by_natural_key'):
                     def m2m_convert(value):
                         if hasattr(value, '__iter__') and not isinstance(value, six.text_type):
-                            return field.remote_field.model._default_manager.db_manager(db).get_by_natural_key(*value).pk
+                            return model._default_manager.db_manager(db).get_by_natural_key(*value).pk
                         else:
-                            return force_text(field.remote_field.model._meta.pk.to_python(value), strings_only=True)
+                            return force_text(model._meta.pk.to_python(value), strings_only=True)
                 else:
-                    m2m_convert = lambda v: force_text(field.remote_field.model._meta.pk.to_python(v), strings_only=True)
+                    m2m_convert = lambda v: force_text(model._meta.pk.to_python(v), strings_only=True)
 
                 try:
                     m2m_data[field.name] = []
@@ -142,21 +143,24 @@ def Deserializer(object_list, **options):
 
             # Handle FK fields
             elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
+                model = field.remote_field.model
                 if field_value is not None:
                     try:
-                        if hasattr(field.remote_field.model._default_manager, 'get_by_natural_key'):
+                        default_manager = model._default_manager
+                        field_name = field.remote_field.field_name
+                        if hasattr(default_manager, 'get_by_natural_key'):
                             if hasattr(field_value, '__iter__') and not isinstance(field_value, six.text_type):
-                                obj = field.remote_field.model._default_manager.db_manager(db).get_by_natural_key(*field_value)
+                                obj = default_manager.db_manager(db).get_by_natural_key(*field_value)
                                 value = getattr(obj, field.remote_field.field_name)
                                 # If this is a natural foreign key to an object that
                                 # has a FK/O2O as the foreign key, use the FK value
-                                if field.remote_field.model._meta.pk.remote_field:
+                                if model._meta.pk.remote_field:
                                     value = value.pk
                             else:
-                                value = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                                value = model._meta.get_field(field_name).to_python(field_value)
                             data[field.attname] = value
                         else:
-                            data[field.attname] = field.remote_field.model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                            data[field.attname] = model._meta.get_field(field_name).to_python(field_value)
                     except Exception as e:
                         raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), field_value)
                 else:

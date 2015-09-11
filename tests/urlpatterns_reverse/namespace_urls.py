@@ -49,7 +49,10 @@ urlpatterns = [
     url(r'^inc(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_urls', namespace='inc-ns5')),
     url(r'^included/([0-9]+)/', include('urlpatterns_reverse.included_namespace_urls')),
 
-    url(r'^ns-outer/(?P<outer>[0-9]+)/', include('urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')),
+    url(
+        r'^ns-outer/(?P<outer>[0-9]+)/',
+        include('urlpatterns_reverse.included_namespace_urls', namespace='inc-outer')
+    ),
 
     url(r'^\+\\\$\*/', include('urlpatterns_reverse.namespace_urls', namespace='special')),
 ]

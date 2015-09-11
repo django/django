@@ -341,7 +341,9 @@ class TestMigrations(TransactionTestCase):
 
 
 class TestSerialization(PostgreSQLTestCase):
-    test_data = '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
+    test_data = (
+        '[{"fields": {"field": "[\\"1\\", \\"2\\"]"}, "model": "postgres_tests.integerarraymodel", "pk": null}]'
+    )
 
     def test_dumping(self):
         instance = IntegerArrayModel(field=[1, 2])
@@ -360,7 +362,10 @@ class TestValidation(PostgreSQLTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean([1, None], None)
         self.assertEqual(cm.exception.code, 'item_invalid')
-        self.assertEqual(cm.exception.message % cm.exception.params, 'Item 1 in the array did not validate: This field cannot be null.')
+        self.assertEqual(
+            cm.exception.message % cm.exception.params,
+            'Item 1 in the array did not validate: This field cannot be null.'
+        )
 
     def test_blank_true(self):
         field = ArrayField(models.IntegerField(blank=True, null=True))
@@ -388,7 +393,10 @@ class TestValidation(PostgreSQLTestCase):
         with self.assertRaises(exceptions.ValidationError) as cm:
             field.clean([0], None)
         self.assertEqual(cm.exception.code, 'item_invalid')
-        self.assertEqual(cm.exception.messages[0], 'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.')
+        self.assertEqual(
+            cm.exception.messages[0],
+            'Item 0 in the array did not validate: Ensure this value is greater than or equal to 1.'
+        )
 
 
 class TestSimpleFormField(PostgreSQLTestCase):
