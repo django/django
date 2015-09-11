@@ -103,11 +103,12 @@ class AdminSite(object):
                     options['__module__'] = __name__
                     admin_class = type("%sAdmin" % model.__name__, (admin_class,), options)
 
-                if admin_class is not ModelAdmin and settings.DEBUG:
-                    system_check_errors.extend(admin_class.check(model))
-
                 # Instantiate the admin class to save in the registry
-                self._registry[model] = admin_class(model, self)
+                admin_obj = admin_class(model, self)
+                if admin_class is not ModelAdmin and settings.DEBUG:
+                    system_check_errors.extend(admin_obj.check())
+
+                self._registry[model] = admin_obj
 
     def unregister(self, model_or_iterable):
         """

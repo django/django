@@ -109,9 +109,8 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
 
-    @classmethod
-    def check(cls, model, **kwargs):
-        return cls.checks_class().check(cls, model, **kwargs)
+    def check(self, **kwargs):
+        return self.checks_class().check(self, **kwargs)
 
     def __init__(self):
         overrides = FORMFIELD_FOR_DBFIELD_DEFAULTS.copy()
