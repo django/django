@@ -93,7 +93,6 @@
 }
 
 #changelist #toolbar form #searchbar:focus {
-    outline: none;
     border-color: #999;
 }
 
@@ -108,6 +107,7 @@
     color: #333;
 }
 
+#changelist #toolbar form input[type="submit"]:focus,
 #changelist #toolbar form input[type="submit"]:hover {
     border-color: #999;
 }
@@ -168,10 +168,6 @@
     color: #999;
 }
 
-#changelist-filter a:hover {
-    color: #036;
-}
-
 #changelist-filter li.selected {
     border-left: 5px solid #eaeaea;
     padding-left: 10px;
@@ -180,6 +176,12 @@
 
 #changelist-filter li.selected a {
     color: #5b80b2;
+}
+
+#changelist-filter a:focus, #changelist-filter a:hover,
+#changelist-filter li.selected a:focus,
+#changelist-filter li.selected a:hover {
+    color: #036;
 }
 
 /* DATE DRILLDOWN */
@@ -203,6 +205,7 @@
     color: #999;
 }
 
+.change-list ul.toplinks .date-back a:focus,
 .change-list ul.toplinks .date-back a:hover {
     color: #036;
 }
@@ -232,7 +235,7 @@
     color: #5b80b2;
 }
 
-.paginator a.showall:hover {
+.paginator a.showall:focus, .paginator a.showall:hover {
     background: none;
     color: #036;
 }
@@ -248,7 +251,7 @@
     vertical-align: top;
 }
 
-.paginator a:hover {
+.paginator a:focus, .paginator a:hover {
     color: white;
     background: #036;
 }
@@ -309,6 +312,10 @@
     margin-left: 10px;
 }
 
+#changelist .actions select:focus {
+    border-color: #999;
+}
+
 #changelist .actions label {
     display: inline-block;
     vertical-align: middle;
@@ -329,6 +336,6 @@
     color: #333;
 }
 
-#changelist .actions .button:hover {
+#changelist .actions .button:focus, #changelist .actions .button:hover {
     border-color: #999;
 }
