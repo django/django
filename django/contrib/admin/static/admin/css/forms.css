@@ -53,7 +53,6 @@ form ul.radiolist label {
 form ul.radiolist input[type="radio"] {
     margin: -2px 4px 0 0;
     padding: 0;
-    outline: none;
 }
 
 form ul.inline {
@@ -276,6 +275,7 @@ body.popup .submit-row {
     color: #fff;
 }
 
+.submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: #a41515;
@@ -460,7 +460,6 @@ body.popup .submit-row {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
     padding-left: 16px;
     font-size: 12px;
-    outline: 0; /* Remove dotted border around link */
 }
 
 .empty-form {
