@@ -751,7 +751,7 @@ class Queries1Tests(BaseQuerysetTest):
             3
         )
 
-        # Pickling of DateQuerySets used to fail
+        # Pickling of QuerySets using datetimes() should work.
         qs = Item.objects.datetimes('created', 'month')
         pickle.loads(pickle.dumps(qs))
 
@@ -1302,8 +1302,8 @@ class Queries3Tests(BaseQuerysetTest):
         self.assertQuerysetEqual(Valid.objects.all(), [])
 
     def test_ticket8683(self):
-        # Raise proper error when a DateQuerySet gets passed a wrong type of
-        # field
+        # An error should be raised when QuerySet.datetimes() is passed the
+        # wrong type of field.
         self.assertRaisesMessage(
             AssertionError,
             "'name' isn't a DateTimeField.",

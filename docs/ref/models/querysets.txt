@@ -646,9 +646,9 @@ dates
 
 .. method:: dates(field, kind, order='ASC')
 
-Returns a ``DateQuerySet`` — a ``QuerySet`` that evaluates to a list of
-:class:`datetime.date` objects representing all available dates of a
-particular kind within the contents of the ``QuerySet``.
+Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.date`
+objects representing all available dates of a particular kind within the
+contents of the ``QuerySet``.
 
 ``field`` should be the name of a ``DateField`` of your model.
 ``kind`` should be either ``"year"``, ``"month"`` or ``"day"``. Each
