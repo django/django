@@ -214,16 +214,12 @@ Mac OS X
 Because of the variety of packaging systems available for OS X, users have
 several different options for installing GeoDjango. These options are:
 
+* :ref:`postgresapp` (easiest and recommended)
 * :ref:`homebrew`
 * :ref:`kyngchaos`
 * :ref:`fink`
 * :ref:`macports`
 * :ref:`build_from_source`
-
-.. note::
-
-    Currently, the easiest and recommended approach for installing GeoDjango
-    on OS X is to use the KyngChaos packages.
 
 This section also includes instructions for installing an upgraded version
 of :ref:`macosx_python` from packages provided by the Python Software
@@ -251,6 +247,26 @@ __ https://python.org/ftp/python/3.3.2/
     ``python`` is entered at the command-line::
 
         export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
+
+.. _postgresapp:
+
+Postgres.app
+^^^^^^^^^^^^
+
+`Postgres.app <http://postgresapp.com/>`_ is a standalone PostgreSQL server
+that includes the PostGIS extension. You will also need to install ``gdal`` and
+``libgeoip`` with :ref:`homebrew`.
+
+After installing Postgres.app, add the following to your ``.bash_profile`` so
+you can run the package's programs from the command-line. Replace ``X.Y`` with
+the version of PostgreSQL in the Postgres.app you installed:
+
+.. code-block:: bash
+
+    export PATH=$PATH:/Applications/Postgres.app/Contents/Versions/X.Y/bin
+
+You can check if the path is set up correctly by typing ``which psql`` at a
+terminal prompt.
 
 .. _homebrew:
 
