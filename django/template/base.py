@@ -903,7 +903,7 @@ class Variable(object):
                                 raise
         except Exception as e:
             template_name = getattr(context, 'template_name', 'unknown')
-            logger.debug('{} - {}'.format(template_name, e))
+            logger.debug('%s - %s', template_name, e)
 
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
