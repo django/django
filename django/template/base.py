@@ -470,7 +470,7 @@ class Parser(object):
                 self.extend_nodelist(nodelist, TextNode(token.contents), token)
             elif token.token_type == 1:  # TOKEN_VAR
                 if not token.contents:
-                    raise self.error(token, 'Empty variable tag')
+                    raise self.error(token, 'Empty variable tag on line %d' % token.lineno)
                 try:
                     filter_expression = self.compile_filter(token.contents)
                 except TemplateSyntaxError as e:
@@ -481,7 +481,7 @@ class Parser(object):
                 try:
                     command = token.contents.split()[0]
                 except IndexError:
-                    raise self.error(token, 'Empty block tag')
+                    raise self.error(token, 'Empty block tag on line %d' % token.lineno)
                 if command in parse_until:
                     # A matching token has been reached. Return control to
                     # the caller. Put the token back on the token list so the
@@ -545,13 +545,23 @@ class Parser(object):
 
     def invalid_block_tag(self, token, command, parse_until=None):
         if parse_until:
-            raise self.error(token, "Invalid block tag: '%s', expected %s" %
-                (command, get_text_list(["'%s'" % p for p in parse_until])))
-        raise self.error(token, "Invalid block tag: '%s'" % command)
+            raise self.error(
+                token,
+                "Invalid block tag on line %d: '%s', expected %s" % (
+                    token.lineno,
+                    command,
+                    get_text_list(["'%s'" % p for p in parse_until]),
+                ),
+            )
+        raise self.error(token, "Invalid block tag on line %d: '%s'" % (token.lineno, command))
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()
-        msg = "Unclosed tag '%s'. Looking for one of: %s." % (command, ', '.join(parse_until))
+        msg = "Unclosed tag on line %d: '%s'. Looking for one of: %s." % (
+            token.lineno,
+            command,
+            ', '.join(parse_until),
+        )
         raise self.error(token, msg)
 
     def next_token(self):
