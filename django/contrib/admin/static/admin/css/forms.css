@@ -276,6 +276,7 @@ body.popup .submit-row {
     color: #fff;
 }
 
+.submit-row a.deletelink:focus,
 .submit-row a.deletelink:hover,
 .submit-row a.deletelink:active {
     background: #a41515;
