@@ -204,13 +204,14 @@ Methods
 
 .. method:: AppConfig.get_models()
 
-    Returns an iterable of :class:`~django.db.models.Model` classes.
+    Returns an iterable of :class:`~django.db.models.Model` classes for this
+    application.
 
 .. method:: AppConfig.get_model(model_name)
 
     Returns the :class:`~django.db.models.Model` with the given
-    ``model_name``. Raises :exc:`LookupError` if no such model exists.
-    ``model_name`` is case-insensitive.
+    ``model_name``. Raises :exc:`LookupError` if no such model exists in this
+    application. ``model_name`` is case-insensitive.
 
 .. method:: AppConfig.ready()
 
