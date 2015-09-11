@@ -248,13 +248,12 @@ class RelationTreeTests(SimpleTestCase):
         self.assertEqual(
             sorted([field.related_query_name() for field in BasePerson._meta._relation_tree]),
             sorted([
-                '+', '_relating_basepeople_hidden_+', 'BasePerson_following_abstract+', 'BasePerson_following_abstract+',
-                'BasePerson_following_base+', 'BasePerson_following_base+', 'BasePerson_friends_abstract+',
-                'BasePerson_friends_abstract+', 'BasePerson_friends_base+', 'BasePerson_friends_base+',
-                'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
-                'Relating_basepeople_hidden+', 'followers_abstract',
-                'followers_base', 'friends_abstract_rel_+', 'friends_base_rel_+',
-                'person', 'relating_basepeople', 'relating_baseperson',
+                '+', '_relating_basepeople_hidden_+', 'BasePerson_following_abstract+',
+                'BasePerson_following_abstract+', 'BasePerson_following_base+', 'BasePerson_following_base+',
+                'BasePerson_friends_abstract+', 'BasePerson_friends_abstract+', 'BasePerson_friends_base+',
+                'BasePerson_friends_base+', 'BasePerson_m2m_abstract+', 'BasePerson_m2m_base+', 'Relating_basepeople+',
+                'Relating_basepeople_hidden+', 'followers_abstract', 'followers_base', 'friends_abstract_rel_+',
+                'friends_base_rel_+', 'person', 'relating_basepeople', 'relating_baseperson',
             ])
         )
         self.assertEqual([field.related_query_name() for field in AbstractPerson._meta._relation_tree], [])

@@ -3,7 +3,8 @@ from django.test.runner import DiscoverRunner
 
 class CustomOptionsTestRunner(DiscoverRunner):
 
-    def __init__(self, verbosity=1, interactive=True, failfast=True, option_a=None, option_b=None, option_c=None, **kwargs):
+    def __init__(self, verbosity=1, interactive=True, failfast=True,
+            option_a=None, option_b=None, option_c=None, **kwargs):
         super(CustomOptionsTestRunner, self).__init__(verbosity=verbosity, interactive=interactive,
                                                       failfast=failfast)
         self.option_a = option_a

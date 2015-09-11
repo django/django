@@ -216,8 +216,14 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         res = self.client.get('/dates/books/2006/sortedbyname/')
         self.assertEqual(res.status_code, 200)
         self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
-        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
-        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('name')))
+        self.assertEqual(
+            list(res.context['book_list']),
+            list(Book.objects.filter(pubdate__year=2006).order_by('name'))
+        )
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(pubdate__year=2006).order_by('name'))
+        )
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
     def test_year_view_two_custom_sort_orders(self):
@@ -225,9 +231,18 @@ class YearArchiveViewTests(TestDataMixin, TestCase):
         Book.objects.create(name="Hunting Hippos", pages=400, pubdate=datetime.date(2006, 3, 1))
         res = self.client.get('/dates/books/2006/sortedbypageandnamedec/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['date_list']), [datetime.date(2006, 3, 1), datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)])
-        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
-        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name')))
+        self.assertEqual(
+            list(res.context['date_list']),
+            [datetime.date(2006, 3, 1), datetime.date(2006, 5, 1), datetime.date(2006, 9, 1)]
+        )
+        self.assertEqual(
+            list(res.context['book_list']),
+            list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name'))
+        )
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(pubdate__year=2006).order_by('pages', '-name'))
+        )
         self.assertTemplateUsed(res, 'generic_views/book_archive_year.html')
 
     def test_year_view_invalid_pattern(self):
@@ -327,8 +342,14 @@ class MonthArchiveViewTests(TestDataMixin, TestCase):
     def test_month_view_paginated(self):
         res = self.client.get('/dates/books/2008/oct/paginated/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2008, pubdate__month=10)))
-        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2008, pubdate__month=10)))
+        self.assertEqual(
+            list(res.context['book_list']),
+            list(Book.objects.filter(pubdate__year=2008, pubdate__month=10))
+        )
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(pubdate__year=2008, pubdate__month=10))
+        )
         self.assertTemplateUsed(res, 'generic_views/book_archive_month.html')
 
     def test_custom_month_format(self):
@@ -450,8 +471,14 @@ class WeekArchiveViewTests(TestDataMixin, TestCase):
         week_end = week_start + datetime.timedelta(days=7)
         res = self.client.get('/dates/books/2008/week/39/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__gte=week_start, pubdate__lt=week_end)))
-        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__gte=week_start, pubdate__lt=week_end)))
+        self.assertEqual(
+            list(res.context['book_list']),
+            list(Book.objects.filter(pubdate__gte=week_start, pubdate__lt=week_end))
+        )
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(pubdate__gte=week_start, pubdate__lt=week_end))
+        )
         self.assertTemplateUsed(res, 'generic_views/book_archive_week.html')
 
     def test_week_view_invalid_pattern(self):
@@ -551,8 +578,14 @@ class DayArchiveViewTests(TestDataMixin, TestCase):
     def test_day_view_paginated(self):
         res = self.client.get('/dates/books/2008/oct/1/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(list(res.context['book_list']), list(Book.objects.filter(pubdate__year=2008, pubdate__month=10, pubdate__day=1)))
-        self.assertEqual(list(res.context['object_list']), list(Book.objects.filter(pubdate__year=2008, pubdate__month=10, pubdate__day=1)))
+        self.assertEqual(
+            list(res.context['book_list']),
+            list(Book.objects.filter(pubdate__year=2008, pubdate__month=10, pubdate__day=1))
+        )
+        self.assertEqual(
+            list(res.context['object_list']),
+            list(Book.objects.filter(pubdate__year=2008, pubdate__month=10, pubdate__day=1))
+        )
         self.assertTemplateUsed(res, 'generic_views/book_archive_day.html')
 
     def test_next_prev_context(self):

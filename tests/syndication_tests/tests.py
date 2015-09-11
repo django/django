@@ -58,7 +58,10 @@ class FeedTestCase(TestCase):
                 elem.getElementsByTagName(k)[0].firstChild.wholeText, v)
 
     def assertCategories(self, elem, expected):
-        self.assertEqual(set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'), set(expected))
+        self.assertEqual(
+            set(i.firstChild.wholeText for i in elem.childNodes if i.nodeName == 'category'),
+            set(expected)
+        )
 
 ######################################
 # Feed view
@@ -101,7 +104,12 @@ class SyndicationFeedTest(FeedTestCase):
         d = Entry.objects.latest('published').published
         last_build_date = rfc2822_date(timezone.make_aware(d, TZ))
 
-        self.assertChildNodes(chan, ['title', 'link', 'description', 'language', 'lastBuildDate', 'item', 'atom:link', 'ttl', 'copyright', 'category'])
+        self.assertChildNodes(
+            chan, [
+                'title', 'link', 'description', 'language', 'lastBuildDate',
+                'item', 'atom:link', 'ttl', 'copyright', 'category',
+            ]
+        )
         self.assertChildNodeContent(chan, {
             'title': 'My blog',
             'description': 'A more thorough description of my blog.',
@@ -197,7 +205,12 @@ class SyndicationFeedTest(FeedTestCase):
         chan_elem = feed.getElementsByTagName('channel')
         self.assertEqual(len(chan_elem), 1)
         chan = chan_elem[0]
-        self.assertChildNodes(chan, ['title', 'link', 'description', 'language', 'lastBuildDate', 'item', 'atom:link', 'ttl', 'copyright', 'category'])
+        self.assertChildNodes(
+            chan, [
+                'title', 'link', 'description', 'language', 'lastBuildDate',
+                'item', 'atom:link', 'ttl', 'copyright', 'category',
+            ]
+        )
 
         # Ensure the content of the channel is correct
         self.assertChildNodeContent(chan, {
@@ -232,7 +245,10 @@ class SyndicationFeedTest(FeedTestCase):
 
         self.assertEqual(feed.nodeName, 'feed')
         self.assertEqual(feed.getAttribute('xmlns'), 'http://www.w3.org/2005/Atom')
-        self.assertChildNodes(feed, ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'rights', 'category', 'author'])
+        self.assertChildNodes(
+            feed,
+            ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'rights', 'category', 'author']
+        )
         for link in feed.getElementsByTagName('link'):
             if link.getAttribute('rel') == 'self':
                 self.assertEqual(link.getAttribute('href'), 'http://example.com/syndication/atom/')
@@ -299,7 +315,10 @@ class SyndicationFeedTest(FeedTestCase):
 
         self.assertEqual(feed.nodeName, 'feed')
         self.assertEqual(feed.getAttribute('django'), 'rocks')
-        self.assertChildNodes(feed, ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'spam', 'rights', 'category', 'author'])
+        self.assertChildNodes(
+            feed,
+            ['title', 'subtitle', 'link', 'id', 'updated', 'entry', 'spam', 'rights', 'category', 'author']
+        )
 
         entries = feed.getElementsByTagName('entry')
         self.assertEqual(len(entries), Entry.objects.count())

@@ -147,9 +147,15 @@ class TestUtilsHtml(SimpleTestCase):
         items = (
             ('"double quotes" and \'single quotes\'', '\\u0022double quotes\\u0022 and \\u0027single quotes\\u0027'),
             (r'\ : backslashes, too', '\\u005C : backslashes, too'),
-            ('and lots of whitespace: \r\n\t\v\f\b', 'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'),
+            (
+                'and lots of whitespace: \r\n\t\v\f\b',
+                'and lots of whitespace: \\u000D\\u000A\\u0009\\u000B\\u000C\\u0008'
+            ),
             (r'<script>and this</script>', '\\u003Cscript\\u003Eand this\\u003C/script\\u003E'),
-            ('paragraph separator:\u2029and line separator:\u2028', 'paragraph separator:\\u2029and line separator:\\u2028'),
+            (
+                'paragraph separator:\u2029and line separator:\u2028',
+                'paragraph separator:\\u2029and line separator:\\u2028'
+            ),
         )
         for value, output in items:
             self.check_output(f, value, output)

@@ -278,8 +278,11 @@ urlpatterns = [
     url(r'^dates/books/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/(?P<day>[0-9]{1,2})/byslug/(?P<slug>[\w-]+)/$',
         views.BookDetail.as_view()),
 
-    url(r'^dates/books/get_object_custom_queryset/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/(?P<day>[0-9]{1,2})/(?P<pk>[0-9]+)/$',
-        views.BookDetailGetObjectCustomQueryset.as_view()),
+    url(
+        r'^dates/books/get_object_custom_queryset/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/(?P<day>[0-9]{1,2})/'
+        r'(?P<pk>[0-9]+)/$',
+        views.BookDetailGetObjectCustomQueryset.as_view(),
+    ),
 
     url(r'^dates/booksignings/(?P<year>[0-9]{4})/(?P<month>[a-z]{3})/(?P<day>[0-9]{1,2})/(?P<pk>[0-9]+)/$',
         views.BookSigningDetail.as_view()),

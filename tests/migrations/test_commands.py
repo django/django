@@ -505,8 +505,10 @@ class MakeMigrationsTests(MigrationTestBase):
                     self.assertIn('ÚÑÍ¢ÓÐÉ', content)  # title.verbose_name
                     self.assertIn('“Ðjáñgó”', content)  # title.default
                 else:
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)  # Meta.verbose_name
-                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)  # Meta.verbose_name_plural
+                    # Meta.verbose_name
+                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8', content)
+                    # Meta.verbose_name_plural
+                    self.assertIn('\\xfa\\xf1\\xed\\xa9\\xf3\\xf0\\xe9 \\xb5\\xf3\\xf0\\xe9\\xf8\\xdf', content)
                     self.assertIn('\\xda\\xd1\\xcd\\xa2\\xd3\\xd0\\xc9', content)  # title.verbose_name
                     self.assertIn('\\u201c\\xd0j\\xe1\\xf1g\\xf3\\u201d', content)  # title.default
 
@@ -878,7 +880,8 @@ class MakeMigrationsTests(MigrationTestBase):
                 app_label = "migrations"
 
         out = six.StringIO()
-        with self.temporary_migration_module(module="migrations.test_migrations_path_doesnt_exist.foo.bar") as migration_dir:
+        migration_module = "migrations.test_migrations_path_doesnt_exist.foo.bar"
+        with self.temporary_migration_module(module=migration_module) as migration_dir:
             call_command("makemigrations", "migrations", stdout=out)
 
             # Migrations file is actually created in the expected path.

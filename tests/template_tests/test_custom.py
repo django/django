@@ -162,7 +162,10 @@ class InclusionTagTests(TagTestCase):
                 'inclusion_params_and_context - Expected result (context value: 42): 37\n'),
             ('{% load inclusion %}{% inclusion_two_params 37 42 %}',
                 'inclusion_two_params - Expected result: 37, 42\n'),
-            ('{% load inclusion %}{% inclusion_one_default 37 %}', 'inclusion_one_default - Expected result: 37, hi\n'),
+            (
+                '{% load inclusion %}{% inclusion_one_default 37 %}',
+                'inclusion_one_default - Expected result: 37, hi\n'
+            ),
             ('{% load inclusion %}{% inclusion_one_default 37 two="hello" %}',
                 'inclusion_one_default - Expected result: 37, hello\n'),
             ('{% load inclusion %}{% inclusion_one_default one=99 two="hello" %}',

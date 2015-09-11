@@ -37,7 +37,8 @@ class ValidationTestModel(models.Model):
     is_active = models.BooleanField(default=False)
     pub_date = models.DateTimeField()
     band = models.ForeignKey(Band, models.CASCADE)
-    no = models.IntegerField(verbose_name="Number", blank=True, null=True)  # This field is intentionally 2 characters long. See #16080.
+    # This field is intentionally 2 characters long (#16080).
+    no = models.IntegerField(verbose_name="Number", blank=True, null=True)
 
     def decade_published_in(self):
         return self.pub_date.strftime('%Y')[:3] + "0's"

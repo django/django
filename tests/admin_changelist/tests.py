@@ -227,12 +227,23 @@ class ChangeListTests(TestCase):
         context = Context({'cl': cl})
         table_output = template.render(context)
         # make sure that hidden fields are in the correct place
-        hiddenfields_div = '<div class="hiddenfields"><input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /></div>' % new_child.id
+        hiddenfields_div = (
+            '<div class="hiddenfields">'
+            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" />'
+            '</div>'
+        ) % new_child.id
         self.assertInHTML(hiddenfields_div, table_output, msg_prefix='Failed to find hidden fields')
 
         # make sure that list editable fields are rendered in divs correctly
-        editable_name_field = '<input name="form-0-name" value="name" class="vTextField" maxlength="30" type="text" id="id_form-0-name" />'
-        self.assertInHTML('<td class="field-name">%s</td>' % editable_name_field, table_output, msg_prefix='Failed to find "name" list_editable field')
+        editable_name_field = (
+            '<input name="form-0-name" value="name" class="vTextField" '
+            'maxlength="30" type="text" id="id_form-0-name" />'
+        )
+        self.assertInHTML(
+            '<td class="field-name">%s</td>' % editable_name_field,
+            table_output,
+            msg_prefix='Failed to find "name" list_editable field',
+        )
 
     def test_result_list_editable(self):
         """

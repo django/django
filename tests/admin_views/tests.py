@@ -300,7 +300,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         A smoke test to ensure POST on edit_view works.
         """
-        response = self.client.post(reverse('admin:admin_views_section_change', args=(self.s1.pk,)), self.inline_post_data)
+        url = reverse('admin:admin_views_section_change', args=(self.s1.pk,))
+        response = self.client.post(url, self.inline_post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_edit_save_as(self):
@@ -600,7 +601,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         link1 = reverse('admin:admin_views_fabric_change', args=(self.fab1.pk,))
         link2 = reverse('admin:admin_views_fabric_change', args=(self.fab2.pk,))
         response = self.client.get(reverse('admin:admin_views_fabric_changelist'))
-        fail_msg = "Changelist table isn't showing the right human-readable values set by a model field 'choices' option named group."
+        fail_msg = (
+            "Changelist table isn't showing the right human-readable values "
+            "set by a model field 'choices' option named group."
+        )
         self.assertContains(response, '<a href="%s">Horizontal</a>' % link1, msg_prefix=fail_msg, html=True)
         self.assertContains(response, '<a href="%s">Vertical</a>' % link2, msg_prefix=fail_msg, html=True)
 
@@ -610,7 +614,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         been used in the choices option of a model field.
         """
         response = self.client.get(reverse('admin:admin_views_fabric_changelist'))
-        fail_msg = "Changelist filter isn't showing options contained inside a model field 'choices' option named group."
+        fail_msg = (
+            "Changelist filter isn't showing options contained inside a model "
+            "field 'choices' option named group."
+        )
         self.assertContains(response, '<div id="changelist-filter">')
         self.assertContains(response,
             '<a href="?surface__exact=x">Horizontal</a>', msg_prefix=fail_msg, html=True)
@@ -684,7 +691,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_disallowed_to_field(self):
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            response = self.client.get(reverse('admin:admin_views_section_changelist'), {TO_FIELD_VAR: 'missing_field'})
+            url = reverse('admin:admin_views_section_changelist')
+            response = self.client.get(url, {TO_FIELD_VAR: 'missing_field'})
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
@@ -726,12 +734,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
         section = Section.objects.create()
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            response = self.client.post(reverse('admin:admin_views_section_change', args=(section.pk,)), {TO_FIELD_VAR: 'name'})
+            url = reverse('admin:admin_views_section_change', args=(section.pk,))
+            response = self.client.post(url, {TO_FIELD_VAR: 'name'})
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
-            response = self.client.post(reverse('admin:admin_views_section_delete', args=(section.pk,)), {TO_FIELD_VAR: 'name'})
+            url = reverse('admin:admin_views_section_delete', args=(section.pk,))
+            response = self.client.post(url, {TO_FIELD_VAR: 'name'})
             self.assertEqual(response.status_code, 400)
             self.assertEqual(len(calls), 1)
 
@@ -742,7 +752,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         can break.
         """
         # Filters should be allowed if they are defined on a ForeignKey pointing to this model
-        response = self.client.get("%s?leader__name=Palin&leader__age=27" % reverse('admin:admin_views_inquisition_changelist'))
+        url = "%s?leader__name=Palin&leader__age=27" % reverse('admin:admin_views_inquisition_changelist')
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_popup_dismiss_related(self):
@@ -1787,24 +1798,24 @@ class AdminViewPermissionsTest(TestCase):
         rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
         for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
             self.client.post(login_url, login_dict)
-            response = self.client.get(reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,)))
+            url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 403)
 
-            response = self.client.get(reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,)))
+            url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,))
+            response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
             self.client.get(reverse('admin:logout'))
 
         for login_dict in [self.joepublic_login, self.no_username_login]:
             self.client.post(login_url, login_dict)
-            response = self.client.get(
-                reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,)), follow=True
-            )
+            url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
+            response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
-            response = self.client.get(
-                reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,)), follow=True
-            )
+            url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,))
+            response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
 
@@ -2118,11 +2129,15 @@ class AdminViewDeletedObjectsTest(TestCase):
         Objects should be nested to display the relationships that
         cause them to be scheduled for deletion.
         """
-        pattern = re.compile(force_bytes(
-            r'<li>Plot: <a href="%s">World Domination</a>\s*<ul>\s*<li>Plot details: <a href="%s">almost finished</a>' % (
-                reverse('admin:admin_views_plot_change', args=(self.pl1.pk,)),
-                reverse('admin:admin_views_plotdetails_change', args=(self.pd1.pk,)))
-        ))
+        pattern = re.compile(
+            force_bytes(
+                r'<li>Plot: <a href="%s">World Domination</a>\s*<ul>\s*'
+                r'<li>Plot details: <a href="%s">almost finished</a>' % (
+                    reverse('admin:admin_views_plot_change', args=(self.pl1.pk,)),
+                    reverse('admin:admin_views_plotdetails_change', args=(self.pd1.pk,)),
+                )
+            )
+        )
         response = self.client.get(reverse('admin:admin_views_villain_delete', args=(self.v1.pk,)))
         six.assertRegex(self, response.content, pattern)
 
@@ -2210,7 +2225,9 @@ class AdminViewDeletedObjectsTest(TestCase):
         """
         should_contain = [
             '<li>Villain: <a href="%s">Bob</a>' % reverse('admin:admin_views_villain_change', args=(self.sv1.pk,)),
-            '<li>Super villain: <a href="%s">Bob</a>' % reverse('admin:admin_views_supervillain_change', args=(self.sv1.pk,)),
+            '<li>Super villain: <a href="%s">Bob</a>' % reverse(
+                'admin:admin_views_supervillain_change', args=(self.sv1.pk,)
+            ),
             '<li>Secret hideout: floating castle',
             '<li>Super secret hideout: super floating castle!',
         ]
@@ -2324,7 +2341,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             content='<p>Newest content</p>', date=datetime.datetime(2009, 3, 18, 11, 54, 58), section=cls.s1
         )
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
-        cls.pk = """abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 -_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+        cls.pk = (
+            "abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890 "
+            """-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
+        )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
         LogEntry.objects.log_action(100, content_type_pk, cls.pk, cls.pk, 2, change_message='Changed something')
@@ -2389,7 +2409,10 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             counted_presence_after)
 
     def test_logentry_get_admin_url(self):
-        "LogEntry.get_admin_url returns a URL to edit the entry's object or None for non-existent (possibly deleted) models"
+        """
+        LogEntry.get_admin_url returns a URL to edit the entry's object or
+        None for non-existent (possibly deleted) models.
+        """
         log_entry_model = "modelwithstringprimarykey"  # capitalized in Recent Actions
         logentry = LogEntry.objects.get(content_type__model__iexact=log_entry_model)
         desired_admin_url = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
@@ -2418,7 +2441,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
-        response = self.client.get(reverse('admin:admin_views_modelwithstringprimarykey_delete', args=(quote(self.pk),)))
+        url = reverse('admin:admin_views_modelwithstringprimarykey_delete', args=(quote(self.pk),))
+        response = self.client.get(url)
         # this URL now comes through reverse(), thus url quoting and iri_to_uri encoding
         change_url = reverse(
             'admin:admin_views_modelwithstringprimarykey_change', args=('__fk__',)
@@ -3028,11 +3052,22 @@ class AdminViewListEditable(TestCase):
             Refs #12475.
         """
         story1 = Story.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
-        story2 = Story.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        story2 = Story.objects.create(
+            title='Crouching Tiger, Hidden Python',
+            content='The Python was sneaking into...',
+        )
         response = self.client.get(reverse('admin:admin_views_story_changelist'))
-        self.assertContains(response, 'id="id_form-0-id"', 1)  # Only one hidden field, in a separate place than the table.
+        # Only one hidden field, in a separate place than the table.
+        self.assertContains(response, 'id="id_form-0-id"', 1)
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
+        self.assertContains(
+            response,
+            '<div class="hiddenfields">\n'
+            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" />'
+            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>'
+            % (story2.id, story1.id),
+            html=True
+        )
         self.assertContains(response, '<td class="field-id">%d</td>' % story1.id, 1)
         self.assertContains(response, '<td class="field-id">%d</td>' % story2.id, 1)
 
@@ -3041,14 +3076,28 @@ class AdminViewListEditable(TestCase):
             referenced in list_display_links.
             Refs #12475.
         """
-        story1 = OtherStory.objects.create(title='The adventures of Guido', content='Once upon a time in Djangoland...')
-        story2 = OtherStory.objects.create(title='Crouching Tiger, Hidden Python', content='The Python was sneaking into...')
+        story1 = OtherStory.objects.create(
+            title='The adventures of Guido',
+            content='Once upon a time in Djangoland...',
+        )
+        story2 = OtherStory.objects.create(
+            title='Crouching Tiger, Hidden Python',
+            content='The Python was sneaking into...',
+        )
         link1 = reverse('admin:admin_views_otherstory_change', args=(story1.pk,))
         link2 = reverse('admin:admin_views_otherstory_change', args=(story2.pk,))
         response = self.client.get(reverse('admin:admin_views_otherstory_changelist'))
-        self.assertContains(response, 'id="id_form-0-id"', 1)  # Only one hidden field, in a separate place than the table.
+        # Only one hidden field, in a separate place than the table.
+        self.assertContains(response, 'id="id_form-0-id"', 1)
         self.assertContains(response, 'id="id_form-1-id"', 1)
-        self.assertContains(response, '<div class="hiddenfields">\n<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" /><input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>' % (story2.id, story1.id), html=True)
+        self.assertContains(
+            response,
+            '<div class="hiddenfields">\n'
+            '<input type="hidden" name="form-0-id" value="%d" id="id_form-0-id" />'
+            '<input type="hidden" name="form-1-id" value="%d" id="id_form-1-id" />\n</div>'
+            % (story2.id, story1.id),
+            html=True
+        )
         self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link1, story1.id), 1)
         self.assertContains(response, '<th class="field-id"><a href="%s">%d</a></th>' % (link2, story2.id), 1)
 
@@ -3850,9 +3899,11 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name. The ugly(!)
         # instance representation is set by six.text_type()
         self.assertContains(
-            response,
-            '<li class="success">The short message &quot;ShortMessage_Deferred_timestamp object&quot; was changed successfully.</li>',
-            html=True
+            response, (
+                '<li class="success">The short message '
+                '&quot;ShortMessage_Deferred_timestamp object&quot; was '
+                'changed successfully.</li>'
+            ), html=True
         )
 
     def test_edit_model_modeladmin_only_qs(self):
@@ -4462,9 +4513,15 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-pubdate').send_keys('2011-12-17')
         self.get_select_option('#id_relatedprepopulated_set-0-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-name').send_keys(' here is a sŤāÇkeð   inline !  ')
-        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-0-slug2').get_attribute('value')
+        self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-0-name'
+        ).send_keys(' here is a sŤāÇkeð   inline !  ')
+        slug1 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-0-slug1'
+        ).get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-0-slug2'
+        ).get_attribute('value')
         self.assertEqual(slug1, 'here-stacked-inline-2011-12-17')
         self.assertEqual(slug2, 'option-one-here-stacked-inline')
 
@@ -4472,19 +4529,34 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[0].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-pubdate').send_keys('1999-01-25')
         self.get_select_option('#id_relatedprepopulated_set-1-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... ')
-        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-slug2').get_attribute('value')
-        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo')  # 50 characters maximum for slug1 field
-        self.assertEqual(slug2, 'option-two-now-you-have-another-stacked-inline-very-looooooo')  # 60 characters maximum for slug2 field
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-1-name').send_keys(
+            ' now you haVe anöther   sŤāÇkeð  inline with a very ... '
+            'loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooog text... '
+        )
+        slug1 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-1-slug1'
+        ).get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-1-slug2'
+        ).get_attribute('value')
+        # 50 characters maximum for slug1 field
+        self.assertEqual(slug1, 'now-you-have-another-stacked-inline-very-loooooooo')
+        # 60 characters maximum for slug2 field
+        self.assertEqual(slug2, 'option-two-now-you-have-another-stacked-inline-very-looooooo')
 
         # Tabular inlines ----------------------------------------------------
         # Initial inline
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-pubdate').send_keys('1234-12-07')
         self.get_select_option('#id_relatedprepopulated_set-2-0-status', 'option two').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-name').send_keys('And now, with a tÃbűlaŘ inline !!!')
-        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-0-slug2').get_attribute('value')
+        self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-2-0-name'
+        ).send_keys('And now, with a tÃbűlaŘ inline !!!')
+        slug1 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-2-0-slug1'
+        ).get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-2-0-slug2'
+        ).get_attribute('value')
         self.assertEqual(slug1, 'and-now-tabular-inline-1234-12-07')
         self.assertEqual(slug2, 'option-two-and-now-tabular-inline')
 
@@ -4492,9 +4564,15 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.find_elements_by_link_text('Add another Related prepopulated')[1].click()
         self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-pubdate').send_keys('1981-08-22')
         self.get_select_option('#id_relatedprepopulated_set-2-1-status', 'option one').click()
-        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys('a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters')
-        slug1 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug1').get_attribute('value')
-        slug2 = self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-slug2').get_attribute('value')
+        self.selenium.find_element_by_css_selector('#id_relatedprepopulated_set-2-1-name').send_keys(
+            'a tÃbűlaŘ inline with ignored ;"&*^\%$#@-/`~ characters'
+        )
+        slug1 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-2-1-slug1'
+        ).get_attribute('value')
+        slug2 = self.selenium.find_element_by_css_selector(
+            '#id_relatedprepopulated_set-2-1-slug2'
+        ).get_attribute('value')
         self.assertEqual(slug1, 'tabular-inline-ignored-characters-1981-08-22')
         self.assertEqual(slug2, 'option-one-tabular-inline-ignored-characters')
 
@@ -4518,7 +4596,8 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
             slug2='option-one-here-stacked-inline',
         )
         RelatedPrepopulated.objects.get(
-            name=' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo',  # 75 characters in name field
+            # 75 characters in name field
+            name=' now you haVe anöther   sŤāÇkeð  inline with a very ... loooooooooooooooooo',
             pubdate='1999-01-25',
             status='option two',
             slug1='now-you-have-another-stacked-inline-very-loooooooo',
@@ -4713,9 +4792,21 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<div class="form-row field-value">')
         self.assertContains(response, '<div class="form-row">')
         self.assertContains(response, '<p class="help">', 3)
-        self.assertContains(response, '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>', html=True)
-        self.assertContains(response, '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>', html=True)
-        self.assertContains(response, '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>', html=True)
+        self.assertContains(
+            response,
+            '<p class="help">Some help text for the title (with unicode ŠĐĆŽćžšđ)</p>',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<p class="help">Some help text for the content (with unicode ŠĐĆŽćžšđ)</p>',
+            html=True
+        )
+        self.assertContains(
+            response,
+            '<p class="help">Some help text for the date (with unicode ŠĐĆŽćžšđ)</p>',
+            html=True
+        )
 
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
@@ -5741,20 +5832,30 @@ class AdminKeepChangeListFiltersTests(TestCase):
         # Test equality.
         change_user_url = reverse('admin:auth_user_change', args=(self.u5.pk,))
         self.assertURLEqual(
-            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url),
-            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url)
+            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
+                change_user_url
+            ),
+            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
+                change_user_url
+            )
         )
 
         # Test inequality.
         with self.assertRaises(AssertionError):
             self.assertURLEqual(
-                'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url),
-                'http://testserver{}?_changelist_filters=is_staff__exact%3D1%26is_superuser__exact%3D1'.format(change_user_url)
+                'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
+                    change_user_url
+                ),
+                'http://testserver{}?_changelist_filters=is_staff__exact%3D1%26is_superuser__exact%3D1'.format(
+                    change_user_url
+                )
             )
 
         # Ignore scheme and host.
         self.assertURLEqual(
-            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url),
+            'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
+                change_user_url
+            ),
             '{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(change_user_url)
         )
 
