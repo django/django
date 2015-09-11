@@ -596,8 +596,15 @@ Templates
 * Added a :meth:`Context.setdefault() <django.template.Context.setdefault>`
   method.
 
-* A warning will now be logged for missing context variables. These messages
-  will be logged to the :ref:`django.template <django-template-logger>` logger.
+* The :ref:`django.template <django-template-logger>` logger was added and
+  includes the following messages:
+
+  * A ``DEBUG`` level message for missing context variables.
+
+  * A ``WARNING`` level message for uncaught exceptions raised
+    during the rendering of an ``{% include %}`` when debug mode is off
+    (helpful since ``{% include %}`` silences the exception and returns an
+    empty string).
 
 * The :ttag:`firstof` template tag supports storing the output in a variable
   using 'as'.
