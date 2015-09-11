@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.template import Engine, Variable, VariableDoesNotExist
+from django.template import Context, Engine, Variable, VariableDoesNotExist
 from django.test import SimpleTestCase
 
 
@@ -15,17 +15,21 @@ class TestHandler(logging.Handler):
         self.log_record = record
 
 
-class VariableResolveLoggingTests(SimpleTestCase):
+class BaseTemplateLoggingTestCase(SimpleTestCase):
     def setUp(self):
         self.test_handler = TestHandler()
         self.logger = logging.getLogger('django.template')
         self.original_level = self.logger.level
         self.logger.addHandler(self.test_handler)
-        self.logger.setLevel(logging.DEBUG)
+        self.logger.setLevel(self.loglevel)
 
     def tearDown(self):
         self.logger.removeHandler(self.test_handler)
         self.logger.level = self.original_level
+
+
+class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
+    loglevel = logging.DEBUG
 
     def test_log_on_variable_does_not_exist_silent(self):
         class TestObject(object):
@@ -78,3 +82,44 @@ class VariableResolveLoggingTests(SimpleTestCase):
     def test_no_log_when_variable_exists(self):
         Variable('article.section').resolve({'article': {'section': 'News'}})
         self.assertIsNone(self.test_handler.log_record)
+
+
+class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
+    loglevel = logging.WARN
+
+    @classmethod
+    def setUpClass(cls):
+        super(IncludeNodeLoggingTests, cls).setUpClass()
+        cls.engine = Engine(loaders=[
+            ('django.template.loaders.locmem.Loader', {
+                'child': '{{ raises_exception }}',
+            }),
+        ], debug=False)
+
+        def error_method():
+            raise IndexError("some generic exception")
+
+        cls.ctx = Context({'raises_exception': error_method})
+
+    def test_logs_exceptions_during_rendering_with_debug_disabled(self):
+        template = self.engine.from_string('{% include "child" %}')
+        template.name = 'template_name'
+        self.assertEqual(template.render(self.ctx), '')
+        self.assertEqual(
+            self.test_handler.log_record.getMessage(),
+            "Exception raised while rendering {% include %} for template "
+            "'template_name'. Empty string rendered instead."
+        )
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        self.assertEqual(self.test_handler.log_record.levelno, logging.WARN)
+
+    def test_logs_exceptions_during_rendering_with_no_template_name(self):
+        template = self.engine.from_string('{% include "child" %}')
+        self.assertEqual(template.render(self.ctx), '')
+        self.assertEqual(
+            self.test_handler.log_record.getMessage(),
+            "Exception raised while rendering {% include %} for template "
+            "'unknown'. Empty string rendered instead."
+        )
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        self.assertEqual(self.test_handler.log_record.levelno, logging.WARN)
