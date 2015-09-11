@@ -135,7 +135,7 @@ Now, that's taken care of adding and removing WebSocket send channels for the
 we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
 
-    from channels import Channel, Group
+    from channels import Group
 
     # Connected to websocket.connect and websocket.keepalive
     def ws_add(message):
@@ -253,7 +253,7 @@ just like a normal Django session.
 Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request (we'll ignore auth for now - that's next)::
 
-    from channels import Channel
+    from channels import Group
     from channels.decorators import channel_session
 
     # Connected to websocket.connect
@@ -267,13 +267,13 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
 
     # Connected to websocket.keepalive
     @channel_session
-    def ws_add(message):
+    def ws_keepalive(message):
         Group("chat-%s" % message.channel_session['room']).add(message.reply_channel)
 
     # Connected to websocket.receive
     @channel_session
     def ws_message(message):
-        Group("chat-%s" % message.channel_session['room']).send(content)
+        Group("chat-%s" % message.channel_session['room']).send(message.content)
 
     # Connected to websocket.disconnect
     @channel_session
