@@ -49,7 +49,7 @@ ArchiveIndexView
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`QuerySet<django.db.models.query.QuerySet.dates>` object
       containing all years that have objects available according to
       ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
@@ -129,7 +129,7 @@ YearArchiveView
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`QuerySet<django.db.models.query.QuerySet.dates>` object
       containing all months that have objects available according to
       ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
@@ -224,7 +224,7 @@ MonthArchiveView
     context will be:
 
     * ``date_list``: A
-      :meth:`DateQuerySet<django.db.models.query.QuerySet.dates>` object
+      :meth:`QuerySet<django.db.models.query.QuerySet.dates>` object
       containing all days that have objects available in the given month,
       according to ``queryset``, represented as
       :class:`datetime.datetime<python:datetime.datetime>` objects, in
