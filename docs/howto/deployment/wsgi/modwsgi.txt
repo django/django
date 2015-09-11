@@ -125,6 +125,47 @@ mode`_.
 
 .. _details on setting up daemon mode: http://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide#Delegation_To_Daemon_Process
 
+Apache environment variables
+============================
+
+If you want to specify a different Django settings file or additional variables
+for your Django application via the Apache configuration, you would do it like
+this:
+
+.. code-block:: apache
+
+    SetEnv DB_USER dbusername
+    SetEnv DJANGO_SETTINGS_MODULE mysite.alternate-settings
+
+The ``SetEnv`` directive creates Apache environment variables instead of OS
+environment variables, so you will need to replace the default ``wsgi.py`` file
+with::
+
+    import os
+
+    from django.core.wsgi import get_wsgi_application
+
+    # A tuple of Apache environment variables to pass through to Django.
+    env_variables_to_pass = ('DB_USER', )
+
+    def application(environ, start_response):
+        """
+        Wrapper for the WSGI application that passes environment variables.
+        """
+        os.environ['DJANGO_SETTINGS_MODULE'] = environ.get('DJANGO_SETTINGS_MODULE', 'mysite.settings')
+        for var in env_variables_to_pass:
+            os.environ[var] = environ.get(var, '')
+        return get_wsgi_application()(environ, start_response)
+
+Now you can specify a new settings file in Apache using the
+``SetEnv DJANGO_SETTINGS_MODULE ...`` line, and if that setting isn't
+specified, it uses ``'mysite.settings'`` as a default. You'll want to change
+``mysite.settings`` to reference your own ``settings.py`` module.
+
+Additionally, you can use the ``env_variables_to_pass`` tuple to specify any
+other Apache environment variables, such as database login credentials, that
+should be passed along to the Django application as OS environment variables.
+
 .. _serving-files:
 
 Serving files
