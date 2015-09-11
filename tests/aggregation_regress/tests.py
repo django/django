@@ -568,7 +568,7 @@ class AggregationTests(TestCase):
             lambda b: b.name
         )
 
-        # Regression for #10248 - Annotations work with DateQuerySets
+        # Regression for #10248 - Annotations work with dates()
         qs = Book.objects.annotate(num_authors=Count('authors')).filter(num_authors=2).dates('pubdate', 'day')
         self.assertQuerysetEqual(
             qs, [
