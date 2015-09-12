@@ -33,11 +33,6 @@ Django core exception classes are defined in ``django.core.exceptions``.
     ``_meta.get_field()`` method when the requested field does not exist on the
     model or on the model's parents.
 
-    .. versionchanged:: 1.8
-
-        This exception was previously defined only in
-        ``django.db.models.fields`` and wasn't part of the public API.
-
 ``MultipleObjectsReturned``
 ---------------------------
 
@@ -249,8 +244,6 @@ Exceptions provided by the ``django.test`` package.
 ----------------------
 
 .. exception:: client.RedirectCycleError
-
-    .. versionadded:: 1.8
 
     :exc:`~client.RedirectCycleError` is raised when the test client detects a
     loop or an overly long chain of redirects.

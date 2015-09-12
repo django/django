@@ -160,8 +160,3 @@ Creating a spatial database for SpatiaLite
 When running ``manage.py migrate`` with a SQLite or SpatiaLite database, the
 database file will be automatically created if it doesn't exist. Django will
 also ensure that the spatial metadata are initialized in the database.
-
-.. versionchanged:: 1.8
-
-    Prior to Django 1.8, you had to initialize spatial metadata tables yourself
-    by manually running the "SELECT InitSpatialMetaData();" query.

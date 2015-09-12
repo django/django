@@ -100,8 +100,6 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.default_related_name
 
-    .. versionadded:: 1.8
-
     The name that will be used by default for the relation from a related object
     back to this one. The default is ``<model_name>_set``.
 

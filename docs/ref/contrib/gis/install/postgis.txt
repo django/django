@@ -64,7 +64,8 @@ spatial functionality::
     > CREATE EXTENSION postgis;
 
 The database user must be a superuser in order to run
-``CREATE EXTENSION postgis;``.
+``CREATE EXTENSION postgis;``. The command is run during the :djadmin:`migrate`
+process.
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.
 If you plan to use those features at some point, you can also install the
@@ -72,12 +73,6 @@ If you plan to use those features at some point, you can also install the
 postgis_topology;``.
 
 __ http://postgis.net/docs/Topology.html
-
-.. versionchanged:: 1.8
-
-    The ``CREATE EXTENSION postgis`` command is now automatically run during
-    the :djadmin:`migrate` process. You can still create it manually if you
-    wish.
 
 Managing the database
 ---------------------

@@ -60,10 +60,6 @@ inheriting from the standard ``models.Model``.
 The first manager in the list will be the default manager for this model during
 migrations.
 
-.. versionchanged:: 1.8
-
-    The ``managers`` argument was added.
-
 DeleteModel
 -----------
 
@@ -131,8 +127,6 @@ should be a dictionary mapping option names to values.
 
 AlterModelManagers
 ------------------
-
-.. versionadded:: 1.8
 
 .. class:: AlterModelManagers(name, managers)
 
@@ -244,16 +238,7 @@ The optional ``hints`` argument will be passed as ``**hints`` to the
 routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
 
-.. versionchanged:: 1.8
-
-    The ability to pass parameters to the ``sql`` and ``reverse_sql`` queries
-    was added.
-
-    The ``hints`` argument was added.
-
 .. attribute:: RunSQL.noop
-
-    .. versionadded:: 1.8
 
     Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
     want the operation not to do anything in the given direction. This is
@@ -281,10 +266,6 @@ The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
 routing decision. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
-
-.. versionadded:: 1.8
-
-    The ``hints`` argument was added.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
@@ -369,8 +350,6 @@ attribute.
     argument to your function).
 
 .. staticmethod:: RunPython.noop
-
-    .. versionadded:: 1.8
 
     Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
     you want the operation not to do anything in the given direction. This is

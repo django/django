@@ -915,8 +915,6 @@ subclass::
                   ('is_staff', admin.BooleanFieldListFilter),
               )
 
-      .. versionadded:: 1.8
-
       You can now limit the choices of a related model to the objects
       involved in that relation using ``RelatedOnlyFieldListFilter``::
 
@@ -1199,8 +1197,6 @@ subclass::
     search behavior.
 
 .. attribute:: ModelAdmin.show_full_result_count
-
-    .. versionadded:: 1.8
 
     Set ``show_full_result_count`` to control whether the full count of objects
     should be displayed on a filtered admin page (e.g. ``99 results (103 total)``).
@@ -1711,8 +1707,6 @@ templates used by the :class:`ModelAdmin` views:
 
 .. method:: ModelAdmin.has_module_permission(request)
 
-    .. versionadded:: 1.8
-
     Should return ``True`` if displaying the module on the admin index page and
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
@@ -1787,10 +1781,6 @@ templates used by the :class:`ModelAdmin` views:
 
     ``obj_id`` is the serialized identifier used to retrieve the object to be
     deleted.
-
-    .. versionadded:: 1.8
-
-        The ``obj_id`` parameter was added.
 
 .. method:: ModelAdmin.get_changeform_initial_data(request)
 
@@ -1894,10 +1884,6 @@ To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
 (version 2.1.4) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
-
-.. versionchanged:: 1.8
-
-    The embedded jQuery has been upgraded from 1.9.1 to 1.11.2.
 
 .. versionchanged:: 1.9
 
@@ -2118,8 +2104,6 @@ The ``InlineModelAdmin`` class adds:
     Defaults to ``True``.
 
 .. attribute:: InlineModelAdmin.show_change_link
-
-    .. versionadded:: 1.8
 
     Specifies whether or not inline objects that can be changed in the
     admin have a link to the change form. Defaults to ``False``.
@@ -2519,8 +2503,6 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_url
 
-    .. versionadded:: 1.8
-
     The URL for the "View site" link at the top of each admin page. By default,
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
 
@@ -2602,10 +2584,6 @@ Templates can override or extend base admin templates as described in
       * ``perms``: a ``dict`` tracking ``add``, ``change``, and ``delete`` permissions
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
-
-    .. versionchanged:: 1.8
-
-        The ``request`` argument and the ``has_permission`` variable were added.
 
     .. versionchanged:: 1.9
 
@@ -2731,12 +2709,6 @@ a pattern for your new view.
     template. It should be set to either ``self.name`` if your view is on an
     ``AdminSite`` or ``self.admin_site.name`` if your view is on a
     ``ModelAdmin``.
-
-    .. versionchanged:: 1.8
-
-       In previous versions of Django, you had to provide the ``current_app``
-       argument to :class:`~django.template.RequestContext` or
-       :class:`~django.template.Context` when rendering the template.
 
 .. _auth_password_reset:
 

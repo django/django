@@ -18,11 +18,6 @@ Helper function to return a URL pattern for serving files in debug mode::
         # ... the rest of your URLconf goes here ...
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-.. versionchanged:: 1.8
-
-    The ``view`` argument changed from a string
-    (``'django.views.static.serve'``) to the function.
-
 url()
 -----
 

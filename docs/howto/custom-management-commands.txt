@@ -136,11 +136,6 @@ because some commands shipped with Django perform several tasks (for example,
 user-facing content rendering and database population) that require a
 project-neutral string language.
 
-.. versionchanged:: 1.8
-
-    In previous versions, Django forced the "en-us" locale instead of
-    deactivating translations.
-
 If, for some reason, your custom management command needs to use a fixed locale,
 you should manually activate and deactivate it in your
 :meth:`~BaseCommand.handle` method using the functions provided by the I18N
@@ -226,8 +221,6 @@ All attributes can be set in your derived class and can be used in
 
 .. attribute:: BaseCommand.missing_args_message
 
-    .. versionadded:: 1.8
-
     If your command defines mandatory positional arguments, you can customize
     the message error returned in the case of missing arguments. The default is
     output by :py:mod:`argparse` ("too few arguments").
@@ -280,8 +273,6 @@ the :meth:`~BaseCommand.handle` method must be implemented.
                 # ...
 
 .. method:: BaseCommand.add_arguments(parser)
-
-    .. versionadded:: 1.8
 
     Entry point to add parser arguments to handle command line arguments passed
     to the command. Custom commands should override this method to add both

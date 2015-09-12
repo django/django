@@ -24,10 +24,6 @@ variables, and even other expressions.
 Some examples
 =============
 
-.. versionchanged:: 1.8
-
-    Some of the examples rely on functionality that is new in Django 1.8.
-
 .. code-block:: python
 
     from django.db.models import F, Count
@@ -211,8 +207,6 @@ directly support ``output_field`` you will need to wrap the expression with
 ``Func()`` expressions
 ----------------------
 
-.. versionadded:: 1.8
-
 ``Func()`` expressions are the base type of all expressions that involve
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
 They can be used directly::
@@ -322,17 +316,8 @@ should define the desired ``output_field``. For example, adding an
 ``IntegerField()`` and a ``FloatField()`` together should probably have
 ``output_field=FloatField()`` defined.
 
-.. versionchanged:: 1.8
-
-    ``output_field`` is a new parameter.
-
 The ``**extra`` kwargs are ``key=value`` pairs that can be interpolated
 into the ``template`` attribute.
-
-.. versionadded:: 1.8
-
-    Aggregate functions can now use arithmetic and reference multiple
-    model fields in a single function.
 
 Creating your own Aggregate Functions
 -------------------------------------
@@ -390,8 +375,6 @@ output value.
 
 .. class:: ExpressionWrapper(expression, output_field)
 
-.. versionadded:: 1.8
-
 ``ExpressionWrapper`` simply surrounds another expression and provides access
 to properties, such as ``output_field``, that may not be available on other
 expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
@@ -401,16 +384,12 @@ expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
 Conditional expressions
 -----------------------
 
-.. versionadded:: 1.8
-
 Conditional expressions allow you to use :keyword:`if` ... :keyword:`elif` ...
 :keyword:`else` logic in queries. Django natively supports SQL ``CASE``
 expressions. For more details see :doc:`conditional-expressions`.
 
 Raw SQL expressions
 -------------------
-
-.. versionadded:: 1.8
 
 .. currentmodule:: django.db.models.expressions
 

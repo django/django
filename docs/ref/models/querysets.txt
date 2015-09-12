@@ -114,8 +114,6 @@ described here.
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
 
-    .. versionadded:: 1.8
-
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to
     unpickle a queryset in a Django version that is different than the one in
@@ -230,12 +228,6 @@ reference to a field on the model (or any related models), or an aggregate
 expression (averages, sums, etc) that has been computed over the objects that
 are related to the objects in the ``QuerySet``.
 
-.. versionadded:: 1.8
-
-    Previous versions of Django only allowed aggregate functions to be used as
-    annotations. It is now possible to annotate a model with all kinds of
-    expressions.
-
 Each argument to ``annotate()`` is an annotation that will be added
 to each object in the ``QuerySet`` that is returned.
 
@@ -334,10 +326,6 @@ calling ``asc()`` or ``desc()`` on the expression::
 
     Entry.objects.order_by(Coalesce('summary', 'headline').desc())
 
-.. versionadded:: 1.8
-
-    Ordering by query expressions was added.
-
 Be cautious when ordering by fields in related models if you are also using
 :meth:`distinct()`. See the note in :meth:`distinct` for an explanation of how
 related model ordering can change the expected results.
@@ -380,10 +368,6 @@ You can order by a field converted to lowercase with
 ordering::
 
     Entry.objects.order_by(Lower('headline').desc())
-
-.. versionadded:: 1.8
-
-    The ability to order by expressions like ``Lower`` was added.
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call :meth:`order_by()` with no parameters.
@@ -1223,10 +1207,6 @@ of the arguments is required, but you should use at least one of them.
 
   If you need to use a literal ``%s`` inside your select string, use
   the sequence ``%%s``.
-
-  .. versionchanged:: 1.8
-
-      Prior to 1.8, you were unable to escape a literal ``%s``.
 
 * ``where`` / ``tables``
 
@@ -2868,20 +2848,11 @@ All aggregates have the following parameters in common:
 A string that references a field on the model, or a :doc:`query expression
 </ref/models/expressions>`.
 
-.. versionadded:: 1.8
-
-    Aggregate functions are now able to reference multiple fields in complex
-    computations.
-
 ``output_field``
 ~~~~~~~~~~~~~~~~
 
 An optional argument that represents the :doc:`model field </ref/models/fields>`
 of the return value
-
-.. versionadded:: 1.8
-
-    The ``output_field`` argument was added.
 
 .. note::
 

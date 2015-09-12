@@ -207,12 +207,6 @@ level:
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-.. versionchanged:: 1.8
-
-    Previous versions of Django had some ``Ignore*DeprecationWarningsMixin``
-    classes to prevent warnings from appearing. These have been replaced by the
-    ``ignore_warnings`` decorator.
-
 You can also add a test for the deprecation warning. You'll have to disable the
 "warning as error" behavior in your test by doing::
 

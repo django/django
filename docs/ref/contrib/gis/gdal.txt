@@ -1090,8 +1090,6 @@ the same coordinate transformation repeatedly on different geometries::
 Raster Data Objects
 ===================
 
-.. versionadded:: 1.8
-
 ``GDALRaster``
 ----------------
 

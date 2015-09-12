@@ -282,10 +282,6 @@ combine this with ``--verbosity=2``, all SQL queries will be output::
 
     $ ./runtests.py basic --debug-sql
 
-.. versionadded:: 1.8
-
-    The ``--reverse`` and ``--debug-sql`` options were added.
-
 By default tests are run in parallel with one process per core. You can adjust
 this behavior with the ``--parallel`` option::
 

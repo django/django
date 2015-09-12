@@ -67,8 +67,6 @@ Customizing model loading
 
 .. classmethod:: Model.from_db(db, field_names, values)
 
-.. versionadded:: 1.8
-
 The ``from_db()`` method can be used to customize model instance creation
 when loading from the database.
 
@@ -120,8 +118,6 @@ Refreshing objects from database
 ================================
 
 .. method:: Model.refresh_from_db(using=None, fields=None, **kwargs)
-
-.. versionadded:: 1.8
 
 If you need to reload a model's values from the database, you can use the
 ``refresh_from_db()`` method. When this method is called without arguments the
@@ -177,8 +173,6 @@ all of the instance's fields when a deferred field is reloaded::
             super(ExampleModel, self).refresh_from_db(using, fields, **kwargs)
 
 .. method:: Model.get_deferred_fields()
-
-.. versionadded:: 1.8
 
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
@@ -581,8 +575,6 @@ the data that's currently in the database.
     version N, there is no guarantee that pickle will be readable with
     Django version N+1. Pickles should not be used as part of a long-term
     archival strategy.
-
-    .. versionadded:: 1.8
 
     Since pickle compatibility errors can be difficult to diagnose, such as
     silently corrupted objects, a ``RuntimeWarning`` is raised when you try to

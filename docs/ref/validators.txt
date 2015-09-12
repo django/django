@@ -163,11 +163,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 
-    .. versionchanged:: 1.8
-
-        Support for IPv6 addresses, unicode domains, and URLs containing
-        authentication data was added.
-
 ``validate_email``
 ------------------
 
@@ -242,10 +237,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_value'`` if ``value`` is greater than ``max_value``.
 
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
-
 ``MinValueValidator``
 ---------------------
 
@@ -253,10 +244,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_value'`` if ``value`` is less than ``min_value``.
-
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
 
 ``MaxLengthValidator``
 ----------------------
@@ -266,10 +253,6 @@ to, or in lieu of custom ``field.clean()`` methods.
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'max_length'`` if the length of ``value`` is greater than ``max_length``.
 
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
-
 ``MinLengthValidator``
 ----------------------
 
@@ -277,10 +260,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'min_length'`` if the length of ``value`` is less than ``min_length``.
-
-    .. versionchanged:: 1.8
-
-       The ``message`` parameter was added.
 
 ``DecimalValidator``
 --------------------

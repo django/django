@@ -243,8 +243,6 @@ Sitemap class reference
 
     .. attribute:: Sitemap.i18n
 
-        .. versionadded:: 1.8
-
         **Optional.**
 
         A boolean attribute that defines if the URLs of this sitemap should

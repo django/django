@@ -273,11 +273,6 @@ that piece of middleware from the middleware process and a debug message will
 be logged to the ``django.request`` logger when :setting:`DEBUG` is set to
 ``True``.
 
-.. versionchanged:: 1.8
-
-    Previously, :exc:`~django.core.exceptions.MiddlewareNotUsed` exceptions
-    weren't logged.
-
 Guidelines
 ----------
 

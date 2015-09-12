@@ -124,8 +124,6 @@ We've specified ``auto_id=False`` to simplify the output::
 
 .. attribute:: Field.label_suffix
 
-.. versionadded:: 1.8
-
 The ``label_suffix`` argument lets you override the form's
 :attr:`~django.forms.Form.label_suffix` on a per-field basis::
 
@@ -319,10 +317,6 @@ Checking if the field data has changed
 
 .. method:: Field.has_changed()
 
-.. versionchanged:: 1.8
-
-    This method was renamed from ``_has_changed()``.
-
 The ``has_changed()`` method is used to determine if the field value has changed
 from the initial value. Returns ``True`` or ``False``.
 
@@ -411,10 +405,6 @@ For each field, we describe the default widget used if you don't specify
         model field. See the :ref:`model field reference documentation on
         choices <field-choices>` for more details. If the argument is a
         callable, it is evaluated each time the field's form is initialized.
-
-        .. versionchanged:: 1.8
-
-            The ability to pass a callable to ``choices`` was added.
 
 ``TypedChoiceField``
 ~~~~~~~~~~~~~~~~~~~~
@@ -561,8 +551,6 @@ For each field, we describe the default widget used if you don't specify
 ``DurationField``
 ~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 1.8
-
 .. class:: DurationField(**kwargs)
 
     * Default widget: :class:`TextInput`
@@ -707,11 +695,6 @@ For each field, we describe the default widget used if you don't specify
     `Image`_ instance used to check if the file was a valid image. Also,
     ``UploadedFile.content_type`` will be updated with the image's content type
     if Pillow can determine it, otherwise it will be set to ``None``.
-
-    .. versionchanged:: 1.8
-
-        The ``image`` and ``content_type`` attributes described in the last
-        paragraph were added.
 
 .. _Pillow: http://pillow.readthedocs.org/en/latest/
 .. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
@@ -921,8 +904,6 @@ For each field, we describe the default widget used if you don't specify
 
 ``UUIDField``
 ~~~~~~~~~~~~~
-
-.. versionadded:: 1.8
 
 .. class:: UUIDField(**kwargs)
 

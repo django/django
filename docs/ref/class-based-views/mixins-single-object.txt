@@ -53,8 +53,6 @@ SingleObjectMixin
 
     .. attribute:: query_pk_and_slug
 
-        .. versionadded:: 1.8
-
         If ``True``, causes :meth:`get_object()` to perform its lookup using
         both the primary key and the slug. Defaults to ``False``.
 
@@ -81,10 +79,8 @@ SingleObjectMixin
         :attr:`slug_url_kwarg` argument, and performs a slug lookup using the
         :attr:`slug_field`.
 
-        .. versionchanged:: 1.8
-
-            When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
-            perform its lookup using both the primary key and the slug.
+        When :attr:`query_pk_and_slug` is ``True``, ``get_object()`` will
+        perform its lookup using both the primary key and the slug.
 
     .. method:: get_queryset()
 

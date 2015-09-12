@@ -208,8 +208,6 @@ All attributes should be considered read-only, unless stated otherwise below.
 
 .. attribute:: HttpRequest.current_app
 
-    .. versionadded:: 1.8
-
     Not defined by Django itself, but if set, the :ttag:`url` template tag
     will use its value as the ``current_app`` argument to
     :func:`~django.core.urlresolvers.reverse()`.
@@ -400,10 +398,6 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Strings for setting both keys and values will be converted from ``encoding``
     to unicode. If encoding is not set, it defaults to :setting:`DEFAULT_CHARSET`.
-
-    .. versionchanged:: 1.8
-
-        In previous versions, ``query_string`` was a required positional argument.
 
 .. method:: QueryDict.__getitem__(key)
 
@@ -650,8 +644,6 @@ Attributes
 
 .. attribute:: HttpResponse.charset
 
-    .. versionadded:: 1.8
-
     A string denoting the charset in which the response will be encoded. If not
     given at ``HttpResponse`` instantiation time, it will be extracted from
     ``content_type`` and if that is unsuccessful, the
@@ -690,8 +682,6 @@ Attributes
 
 .. attribute:: HttpResponse.closed
 
-    .. versionadded:: 1.8
-
     ``True`` if the response has been closed.
 
 Methods
@@ -722,10 +712,6 @@ Methods
     given it will be extracted from ``content_type``, and if that
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
 
-    .. versionadded:: 1.8
-
-        The ``charset`` parameter was added.
-
 .. method:: HttpResponse.__setitem__(header, value)
 
     Sets the given header name to the given value. Both ``header`` and
@@ -746,8 +732,6 @@ Methods
     header with the given name.
 
 .. method:: HttpResponse.setdefault(header, value)
-
-    .. versionadded:: 1.8
 
     Sets a header unless it has already been set.
 
@@ -820,21 +804,15 @@ Methods
 
 .. method:: HttpResponse.getvalue()
 
-    .. versionadded:: 1.8
-
     Returns the value of :attr:`HttpResponse.content`. This method makes
     an :class:`HttpResponse` instance a stream-like object.
 
 .. method:: HttpResponse.writable()
 
-    .. versionadded:: 1.8
-
     Always ``True``. This method makes an :class:`HttpResponse` instance a
     stream-like object.
 
 .. method:: HttpResponse.writelines(lines)
-
-    .. versionadded:: 1.8
 
     Writes a list of lines to the response. Line separators are not added. This
     method makes an :class:`HttpResponse` instance a stream-like object.

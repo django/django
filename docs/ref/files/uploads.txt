@@ -86,10 +86,6 @@ Here are some useful attributes of ``UploadedFile``:
 
     .. _universal newlines: https://www.python.org/dev/peps/pep-0278
 
-    .. versionchanged:: 1.8
-
-        Previously lines were only split on the Unix end-of-line ``'\n'``.
-
 Subclasses of ``UploadedFile`` include:
 
 .. class:: TemporaryUploadedFile

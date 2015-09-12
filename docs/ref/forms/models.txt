@@ -46,11 +46,6 @@ Model Form API reference. For introductory material about model forms, see the
     information. Omitting any definition of the fields to use will result in
     an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
-    .. versionchanged:: 1.8
-
-        Previously, omitting the list of fields was allowed and resulted in
-        a form with all fields of the model.
-
     .. versionadded:: 1.9
 
         The ``field_classes`` keyword argument was added.

@@ -228,11 +228,6 @@ The default value is used when new model instances are created and a value
 isn't provided for the field. When the field is a primary key, the default is
 also used when the field is set to ``None``.
 
-.. versionchanged:: 1.8
-
-    The default wasn't used for ``None`` primary key values in previous
-    versions.
-
 ``editable``
 ------------
 
@@ -574,8 +569,6 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 ``DurationField``
 -----------------
 
-.. versionadded:: 1.8
-
 .. class:: DurationField(**options)
 
 A field for storing periods of time - modeled in Python by
@@ -596,11 +589,6 @@ SECOND(6)``. Otherwise a ``bigint`` of microseconds is used.
 
 A :class:`CharField` that checks that the value is a valid email address. It
 uses :class:`~django.core.validators.EmailValidator` to validate the input.
-
-.. versionchanged:: 1.8
-
-    The default ``max_length`` was increased from 75 to 254 in order to be
-    compliant with RFC3696/5321.
 
 ``FileField``
 -------------
@@ -1078,8 +1066,6 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 
 ``UUIDField``
 -------------
-
-.. versionadded:: 1.8
 
 .. class:: UUIDField(**options)
 
@@ -1757,8 +1743,6 @@ Field API reference
 
     .. method:: from_db_value(value, expression, connection, context)
 
-        .. versionadded:: 1.8
-
         Converts a value as returned by the database to a Python object. It is
         the reverse of :meth:`get_prep_value`.
 
@@ -1877,8 +1861,6 @@ Field API reference
 =========================
 Field attribute reference
 =========================
-
-.. versionadded:: 1.8
 
 Every ``Field`` instance contains several attributes that allow
 introspecting its behavior. Use these attributes instead of ``isinstance``

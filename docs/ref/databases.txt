@@ -544,15 +544,6 @@ executing a command like::
 or using a :class:`~django.db.migrations.operations.RunSQL` operation in a
 :ref:`data migration <data-migrations>`.
 
-.. versionchanged:: 1.8
-
-    Previously, Django truncated fractional seconds from ``datetime`` and
-    ``time`` values when using the MySQL backend. Now it lets the database
-    decide whether it should drop that part of the value or not. By default, new
-    ``DateTimeField`` or ``TimeField`` columns are now created with fractional
-    seconds support on MySQL 5.6.4 or later with either mysqlclient or
-    MySQLdb 1.2.5 or later.
-
 ``TIMESTAMP`` columns
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -755,12 +746,6 @@ WITH ADMIN OPTION is not usually sufficient for running tests.
 Some test suites also create views; to run these, the user also needs
 the CREATE VIEW WITH ADMIN OPTION privilege. In particular, this is needed
 for Django's own test suite.
-
-.. versionchanged:: 1.8
-
-    Prior to Django 1.8, the test user was granted the CONNECT and RESOURCE
-    roles, so the extra privileges required for running the test suite were
-    different.
 
 All of these privileges are included in the DBA role, which is appropriate
 for use on a private developer's database.

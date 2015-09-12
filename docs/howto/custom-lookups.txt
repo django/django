@@ -52,10 +52,6 @@ Lookup registration can also be done using a decorator pattern::
     class NotEqualLookup(Lookup):
         # ...
 
-.. versionchanged:: 1.8
-
-    The ability to use the decorator pattern was added.
-
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You
 could place the implementation in a ``models.py`` file, or register the lookup

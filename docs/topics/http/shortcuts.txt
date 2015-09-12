@@ -56,10 +56,6 @@ Optional arguments
     The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
     loading the template.
 
-.. versionchanged:: 1.8
-
-    The ``using`` parameter was added.
-
 Example
 -------
 
@@ -120,10 +116,6 @@ Optional arguments
 ``using``
     The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
     loading the template.
-
-.. versionchanged:: 1.8
-
-   The ``status`` and ``using`` parameters were added.
 
 Example
 -------
