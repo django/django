@@ -623,8 +623,6 @@ Python logging module.
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 
-        .. versionadded:: 1.8
-
         Sends emails to admin users. To customize this behavior, you can
         subclass the :class:`~django.utils.log.AdminEmailHandler` class and
         override this method.

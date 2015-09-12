@@ -50,8 +50,6 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
 .. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
 
-    .. versionadded:: 1.8
-
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
 
@@ -600,12 +598,6 @@ processors::
         'django.contrib.messages.context_processors.messages',
     ]
 
-.. versionchanged:: 1.8
-
-    Built-in template context processors were moved from
-    ``django.core.context_processors`` to
-    ``django.template.context_processors`` in Django 1.8.
-
 In addition to these, :class:`RequestContext` always enables
 ``'django.template.context_processors.csrf'``.  This is a security related
 context processor required by the admin and other contrib apps, and, in case
@@ -774,10 +766,6 @@ way of specifying template directories is by using the :setting:`DIRS
 The :setting:`DIRS <TEMPLATES-DIRS>` option
 -------------------------------------------
 
-.. versionchanged:: 1.8
-
-    This value used to be defined by the ``TEMPLATE_DIRS`` setting.
-
 Tell Django what your template directories are by using the :setting:`DIRS
 <TEMPLATES-DIRS>` option in the :setting:`TEMPLATES` setting in your settings
 file — or the ``dirs`` argument of :class:`~django.template.Engine`. This
@@ -931,8 +919,6 @@ loaders that come with Django:
     This loader is disabled by default.
 
 ``django.template.loaders.locmem.Loader``
-
-.. versionadded:: 1.8
 
 .. class:: locmem.Loader
 

@@ -509,10 +509,6 @@ Finally, to avoid repetitive fallback code, the framework provides a
     :class:`~django.contrib.sites.requests.RequestSite` which will always
     use the unmodified host.
 
-    .. versionchanged:: 1.8
-
-        Looking up the current site based on ``request.get_host()`` was added.
-
     .. versionchanged:: 1.9
 
         Retrying the lookup with the port stripped was added.

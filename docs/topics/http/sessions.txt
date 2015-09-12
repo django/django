@@ -226,12 +226,6 @@ You can edit it multiple times.
       can't be accessed again from the user's browser (for example, the
       :func:`django.contrib.auth.logout()` function calls it).
 
-      .. versionchanged:: 1.8
-
-          Deletion of the session cookie is a behavior new in Django 1.8.
-          Previously, the behavior was to regenerate the session key value that
-          was sent back to the user in the cookie.
-
     .. method:: set_test_cookie()
 
       Sets a test cookie to determine whether the user's browser supports

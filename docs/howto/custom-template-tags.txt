@@ -340,8 +340,6 @@ Template filter code falls into one of two situations:
 
 .. warning:: Avoiding XSS vulnerabilities when reusing built-in filters
 
-    .. versionchanged:: 1.8
-
     Django's built-in filters have ``autoescape=True`` by default in order to
     get the proper autoescaping behavior and avoid a cross-site script
     vulnerability.
@@ -848,15 +846,6 @@ template yourself. For example::
     def render(self, context):
         t = context.template.engine.get_template('small_fragment.html')
         return t.render(Context({'var': obj}, autoescape=context.autoescape))
-
-.. versionchanged:: 1.8
-
-    The ``template`` attribute of ``Context`` objects was added in Django 1.8.
-    :meth:`context.template.engine.get_template
-    <django.template.Engine.get_template>` must be used instead of
-    :func:`django.template.loader.get_template` because the latter now returns
-    a wrapper whose ``render`` method doesn't accept a
-    :class:`~django.template.Context`.
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been

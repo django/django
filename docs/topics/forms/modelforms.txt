@@ -436,12 +436,6 @@ In addition, Django applies the following rule: if you set ``editable=False`` on
 the model field, *any* form created from the model via ``ModelForm`` will not
 include that field.
 
-.. versionchanged:: 1.8
-
-    In older versions, omitting both ``fields`` and ``exclude`` resulted in
-    a form with all the model's fields. Doing this now raises an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
-
 .. note::
 
     Any fields not included in a form by the above logic
@@ -744,12 +738,6 @@ Alternatively, you can take an "opt-out" approach, specifying which fields to
 exclude::
 
     >>> AuthorFormSet = modelformset_factory(Author, exclude=('birth_date',))
-
-.. versionchanged:: 1.8
-
-    In older versions, omitting both ``fields`` and ``exclude`` resulted in
-    a formset with all the model's fields. Doing this now raises an
-    :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
 
 This will create a formset that is capable of working with the data associated
 with the ``Author`` model. It works just like a regular formset::

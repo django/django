@@ -142,10 +142,6 @@ created within a specified period of time::
         otherwise raises ``SignatureExpired``. The ``max_age`` parameter can
         accept an integer or a :py:class:`datetime.timedelta` object.
 
-        .. versionchanged:: 1.8
-
-            Previously, the ``max_age`` parameter only accepted an integer.
-
 Protecting complex data structures
 ----------------------------------
 

@@ -777,10 +777,6 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktrans %}Copyright {{ current_year }}{% endblocktrans %}
 
-.. versionadded:: 1.8
-
-The ability to use the "as" syntax was added.
-
 .. templatetag:: regroup
 
 regroup
@@ -1679,10 +1675,7 @@ For example::
 If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
 
-.. versionchanged:: 1.8
-
-    The filter returns ``0`` for an undefined variable. Previously, it returned
-    an empty string.
+The filter returns ``0`` for an undefined variable.
 
 .. templatefilter:: length_is
 
@@ -2238,12 +2231,6 @@ This template tag works on links prefixed with ``http://``, ``https://``, or
 It also supports domain-only links ending in one of the original top level
 domains (``.com``, ``.edu``, ``.gov``, ``.int``, ``.mil``, ``.net``, and
 ``.org``). For example, ``djangoproject.com`` gets converted.
-
-.. versionchanged:: 1.8
-
-    Support for domain-only links that include characters after the top-level
-    domain (e.g. ``djangoproject.com/`` and ``djangoproject.com/download/``)
-    was added.
 
 Links can have trailing punctuation (periods, commas, close-parens) and leading
 punctuation (opening parens), and ``urlize`` will still do the right thing.

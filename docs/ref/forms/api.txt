@@ -185,8 +185,6 @@ Note that ``Form.add_error()`` automatically removes the relevant field from
 
 .. method:: Form.has_error(field, code=None)
 
-.. versionadded:: 1.8
-
 This method returns a boolean designating whether a field has an error with
 a specific error ``code``. If ``code`` is ``None``, it will return ``True``
 if the field contains any errors at all.
@@ -570,11 +568,6 @@ classes, as needed. The HTML will look something like::
     >>> f['subject'].label_tag(attrs={'class': 'foo'})
     <label for="id_subject" class="foo required">Subject:</label>
 
-.. versionchanged:: 1.8
-
-    The ``required_css_class`` will also be added to the ``<label>`` tag as
-    seen above.
-
 .. _ref-forms-api-configuring-label:
 
 Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
@@ -692,8 +685,6 @@ It's possible to customize that character, or omit it entirely, using the
 Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
 or ``:``).
-
-.. versionadded:: 1.8
 
 Fields can also define their own :attr:`~django.forms.Field.label_suffix`.
 This will take precedence over :attr:`Form.label_suffix
@@ -989,10 +980,6 @@ Methods of ``BoundField``
     suffix. For example, you can use an empty string to hide the label on selected
     fields. If you need to do this in a template, you could write a custom
     filter to allow passing parameters to ``label_tag``.
-
-    .. versionchanged:: 1.8
-
-        The label includes :attr:`~Form.required_css_class` if applicable.
 
 .. method:: BoundField.value()
 

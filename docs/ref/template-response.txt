@@ -90,10 +90,6 @@ Methods
         The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
         loading the template.
 
-    .. versionchanged:: 1.8
-
-        The ``charset`` and ``using`` parameters were added.
-
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
     Preprocesses context data that will be used for rendering a template.
@@ -188,10 +184,6 @@ Methods
     ``using``
         The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
         loading the template.
-
-    .. versionchanged:: 1.8
-
-        The ``charset`` and ``using`` parameters were added.
 
 The rendering process
 =====================

@@ -99,8 +99,6 @@ make the following call::
         # ... perform compatibility checks and collect errors
         return errors
 
-.. versionadded:: 1.8
-
 You can register "deployment checks" that are only relevant to a production
 settings file like this::
 
@@ -120,10 +118,6 @@ The code below is equivalent to the code above::
     def my_check(app_configs, **kwargs):
         ...
     register(my_check, Tags.security, deploy=True)
-
-.. versionchanged:: 1.8
-
-    The ability to use register as a function was added.
 
 .. _field-checking:
 

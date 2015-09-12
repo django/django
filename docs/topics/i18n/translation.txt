@@ -872,10 +872,6 @@ If you enable the ``django.template.context_processors.i18n`` context processor
 then each ``RequestContext`` will have access to ``LANGUAGES``,
 ``LANGUAGE_CODE``, and ``LANGUAGE_BIDI`` as defined above.
 
-.. versionchanged:: 1.8
-
-    The ``i18n`` context processor is not enabled by default for new projects.
-
 .. templatetag:: get_language_info
 
 ``get_language_info``

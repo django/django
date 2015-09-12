@@ -33,11 +33,6 @@ returned.
 When you need more fine-grained control you may use per-view conditional
 processing functions.
 
-.. versionchanged:: 1.8
-
-    Support for the ``If-unmodified-since`` header was added to conditional
-    view processing.
-
 .. _conditional-decorators:
 
 The ``condition`` decorator

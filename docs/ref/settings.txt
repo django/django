@@ -802,10 +802,6 @@ This is an Oracle-specific setting.
 The name of the tablespace that will be used when running tests. If not
 provided, Django will use ``'test_' + USER``.
 
-.. versionchanged:: 1.8
-
-    Previously Django used ``'test_' + NAME`` if not provided.
-
 .. setting:: TEST_TBLSPACE_TMP
 
 TBLSPACE_TMP
@@ -818,16 +814,10 @@ This is an Oracle-specific setting.
 The name of the temporary tablespace that will be used when running tests. If
 not provided, Django will use ``'test_' + USER + '_temp'``.
 
-.. versionchanged:: 1.8
-
-    Previously Django used ``'test_' + NAME + '_temp'`` if not provided.
-
 .. setting:: DATAFILE
 
 DATAFILE
 ^^^^^^^^
-
-.. versionadded:: 1.8
 
 Default: ``None``
 
@@ -841,8 +831,6 @@ use ``TBLSPACE + '.dbf'``.
 DATAFILE_TMP
 ^^^^^^^^^^^^
 
-.. versionadded:: 1.8
-
 Default: ``None``
 
 This is an Oracle-specific setting.
@@ -855,13 +843,7 @@ will use ``TBLSPACE_TMP + '.dbf'``.
 DATAFILE_MAXSIZE
 ^^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.8
-
 Default: ``'500M'``
-
-.. versionchanged:: 1.8
-
-    The previous value was 200M and was not user customizable.
 
 This is an Oracle-specific setting.
 
@@ -872,13 +854,7 @@ The maximum size that the DATAFILE is allowed to grow to.
 DATAFILE_TMP_MAXSIZE
 ^^^^^^^^^^^^^^^^^^^^
 
-.. versionadded:: 1.8
-
 Default: ``'500M'``
-
-.. versionchanged:: 1.8
-
-    The previous value was 200M and was not user customizable.
 
 This is an Oracle-specific setting.
 
@@ -1261,8 +1237,6 @@ exclusive, so only set one of those settings to ``True``.
 EMAIL_SSL_CERTFILE
 ------------------
 
-.. versionadded:: 1.8
-
 Default: ``None``
 
 If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
@@ -1273,8 +1247,6 @@ for the SSL connection.
 
 EMAIL_SSL_KEYFILE
 -----------------
-
-.. versionadded:: 1.8
 
 Default: ``None``
 
@@ -1292,8 +1264,6 @@ file and private key file are handled.
 
 EMAIL_TIMEOUT
 -------------
-
-.. versionadded:: 1.8
 
 Default: ``None``
 
@@ -1463,19 +1433,17 @@ like::
                 __init__.py
                 formats.py
 
-.. versionchanged:: 1.8
+You can also set this setting to a list of Python paths, for example::
 
-    You can also set this setting to a list of Python paths, for example::
+    FORMAT_MODULE_PATH = [
+        'mysite.formats',
+        'some_app.formats',
+    ]
 
-        FORMAT_MODULE_PATH = [
-            'mysite.formats',
-            'some_app.formats',
-        ]
-
-    When Django searches for a certain format, it will go through all given
-    Python paths until it finds a module that actually defines the given
-    format. This means that formats defined in packages farther up in the list
-    will take precedence over the same formats in packages farther down.
+When Django searches for a certain format, it will go through all given Python
+paths until it finds a module that actually defines the given format. This
+means that formats defined in packages farther up in the list will take
+precedence over the same formats in packages farther down.
 
 Available formats are :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`,
 :setting:`DATETIME_FORMAT`, :setting:`YEAR_MONTH_FORMAT`,
@@ -1579,10 +1547,6 @@ It serves two purposes:
   user's preferred language can't be determined or is not supported by the Web
   site. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
-
-.. versionchanged:: 1.8
-
-    The fallback for translation literals was added.
 
 See :ref:`how-django-discovers-language-preference` for more details.
 
@@ -1967,8 +1931,6 @@ affect them.
 SECURE_BROWSER_XSS_FILTER
 -------------------------
 
-.. versionadded:: 1.8
-
 Default: ``False``
 
 If ``True``, the :class:`~django.middleware.security.SecurityMiddleware` sets
@@ -1978,8 +1940,6 @@ the :ref:`x-xss-protection` header on all responses that do not already have it.
 
 SECURE_CONTENT_TYPE_NOSNIFF
 ---------------------------
-
-.. versionadded:: 1.8
 
 Default: ``False``
 
@@ -1991,8 +1951,6 @@ already have it.
 
 SECURE_HSTS_INCLUDE_SUBDOMAINS
 ------------------------------
-
-.. versionadded:: 1.8
 
 Default: ``False``
 
@@ -2010,8 +1968,6 @@ non-zero value.
 
 SECURE_HSTS_SECONDS
 -------------------
-
-.. versionadded:: 1.8
 
 Default: ``0``
 
@@ -2090,8 +2046,6 @@ available in ``request.META``.)
 SECURE_REDIRECT_EXEMPT
 ----------------------
 
-.. versionadded:: 1.8
-
 Default: ``[]`` (Empty list)
 
 If a URL path matches a regular expression in this list, the request will not be
@@ -2102,8 +2056,6 @@ setting has no effect.
 
 SECURE_SSL_HOST
 ---------------
-
-.. versionadded:: 1.8
 
 Default: ``None``
 
@@ -2116,8 +2068,6 @@ setting has no effect.
 
 SECURE_SSL_REDIRECT
 -------------------
-
-.. versionadded:: 1.8
 
 Default: ``False``.
 
@@ -2224,8 +2174,6 @@ See also the :doc:`/ref/checks` documentation.
 
 TEMPLATES
 ---------
-
-.. versionadded:: 1.8
 
 Default: ``[]`` (Empty list)
 

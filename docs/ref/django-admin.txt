@@ -132,8 +132,6 @@ List all available tags.
 
 .. django-admin-option:: --deploy
 
-.. versionadded:: 1.8
-
 The ``--deploy`` option activates some additional checks that are only relevant
 in a deployment setting.
 
@@ -171,10 +169,6 @@ into compiled files.
 
     ``compilemessages`` now matches the operation of :djadmin:`makemessages`,
     scanning the project tree for ``.po`` files to compile.
-
-.. versionchanged:: 1.8
-
-    Added ``--exclude`` and ``--use-fuzzy`` options.
 
 Example usage::
 
@@ -312,8 +306,6 @@ one model.
 
 .. django-admin-option:: --output
 
-.. versionadded:: 1.8
-
 By default ``dumpdata`` will output all the serialized data to standard output.
 This option allows you to specify the file to which the data is to be written.
 When this option is set and the verbosity is greater than 0 (the default), a
@@ -417,10 +409,6 @@ models that may have been removed since the fixture was originally generated.
 
 The :djadminopt:`--app` option can be used to specify a single app to look
 for fixtures in rather than looking through all apps.
-
-.. versionchanged:: 1.8
-
-    ``--ignorenonexistent`` also ignores non-existent models.
 
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
@@ -587,8 +575,6 @@ Separate multiple extensions with commas or use -e or --extension multiple times
 Use the :djadminopt:`--locale` option (or its shorter version ``-l``) to
 specify the locale(s) to process.
 
-.. versionadded:: 1.8
-
 Use the :djadminopt:`--exclude` option (or its shorter version ``-x``) to
 specify the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
@@ -698,14 +684,10 @@ The ``--merge`` option enables fixing of migration conflicts.
 
 .. django-admin-option:: --name, -n
 
-.. versionadded:: 1.8
-
 The ``--name`` option allows you to give the migration(s) a custom name instead
 of a generated one.
 
 .. django-admin-option:: --exit, -e
-
-.. versionadded:: 1.8
 
 The ``--exit`` option will cause ``makemigrations`` to exit with error code 1
 when no migrations are created (or would have been created, if combined with
@@ -748,8 +730,6 @@ table into a state where manual recovery will be needed to make migrations
 run correctly.
 
 .. django-admin-option:: --fake-initial
-
-.. versionadded:: 1.8
 
 The ``--fake-initial`` option can be used to allow Django to skip an app's
 initial migration if all database tables with the names of all models created
@@ -969,8 +949,6 @@ showmigrations [<app_label> [<app_label>]]
 ------------------------------------------
 
 .. django-admin:: showmigrations
-
-.. versionadded:: 1.8
 
 Shows all migrations in a project.
 
@@ -1238,8 +1216,6 @@ expected to run from. The default value is ``localhost:8081-8179``.
 
 .. django-admin-option:: --keepdb
 
-.. versionadded:: 1.8
-
 The ``--keepdb`` option can be used to preserve the test database between test
 runs. This has the advantage of skipping both the create and destroy actions
 which can greatly decrease the time to run tests, especially those in a large
@@ -1249,16 +1225,12 @@ be applied to the test database before running the test suite.
 
 .. django-admin-option:: --reverse
 
-.. versionadded:: 1.8
-
 The ``--reverse`` option can be used to sort test cases in the opposite order.
 This may help in debugging the side effects of tests that aren't properly
 isolated. :ref:`Grouping by test class <order-of-tests>` is preserved when using
 this option.
 
 .. django-admin-option:: --debug-sql
-
-.. versionadded:: 1.8
 
 The ``--debug-sql`` option can be used to enable :ref:`SQL logging
 <django-db-logger>` for failing tests. If :djadminopt:`--verbosity` is ``2``,
@@ -1427,8 +1399,6 @@ it when running interactively.
 
 Use the ``--database`` option to specify the database into which the superuser
 object will be saved.
-
-.. versionadded:: 1.8
 
 You can subclass the management command and override ``get_input_data()`` if you
 want to customize data input and validation. Consult the source code for
@@ -1766,13 +1736,6 @@ Named arguments can be passed by using either one of the following syntaxes::
 
       # `use_natural_foreign_keys` is the option destination variable
       management.call_command('dumpdata', use_natural_foreign_keys=True)
-
-.. versionchanged:: 1.8
-
-    The first syntax is now supported thanks to management commands using the
-    :py:mod:`argparse` module. For the second syntax, Django previously passed
-    the option name as-is to the command, now it is always using the ``dest``
-    variable name (which may or may not be the same as the option name).
 
 Command options which take multiple options are passed a list::
 

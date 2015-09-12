@@ -237,10 +237,6 @@ Use the ``django.test.Client`` class to make requests.
         You may also provide any file-like object (e.g., :class:`~io.StringIO` or
         :class:`~io.BytesIO`) as a file handle.
 
-        .. versionadded:: 1.8
-
-            The ability to use a file-like object was added.
-
         Note that if you wish to use the same file handle for multiple
         ``post()`` calls then you will need to manually reset the file
         pointer between posts. The easiest way to do this is to
@@ -320,8 +316,6 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`Client.get`.
 
     .. method:: Client.trace(path, follow=False, secure=False, **extra)
-
-        .. versionadded:: 1.8
 
         Makes a TRACE request on the provided ``path`` and returns a
         ``Response`` object. Useful for simulating diagnostic probes.
@@ -495,8 +489,6 @@ Specifically, a ``Response`` object has the following attributes:
         ``'admin/index.html'``.)
 
     .. attribute:: resolver_match
-
-       .. versionadded:: 1.8
 
         An instance of :class:`~django.core.urlresolvers.ResolverMatch` for the
         response. You can use the
@@ -698,14 +690,6 @@ transaction, as is required when using
 :meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
 you should use ``TransactionTestCase``.
 
-.. versionchanged:: 1.8
-
-    In older versions of Django, the effects of transaction commit and rollback
-    could not be tested within a ``TestCase``.  With the completion of the
-    deprecation cycle of the old-style transaction management in Django 1.8,
-    transaction management commands (e.g. ``transaction.commit()``) are no
-    longer disabled within ``TestCase``.
-
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code
 to test the effects of commit and rollback:
@@ -758,8 +742,6 @@ additions, including:
   errors.
 
 .. classmethod:: TestCase.setUpTestData()
-
-    .. versionadded:: 1.8
 
     The class-level ``atomic`` block described above allows the creation of
     initial data at the class level, once for the whole ``TestCase``. This
@@ -1433,11 +1415,9 @@ your test suite.
 
     The name is a string such as ``'admin/index.html'``.
 
-    .. versionadded:: 1.8
-
-        The count argument is an integer indicating the number of times the
-        template should be rendered. Default is ``None``, meaning that the
-        template should be rendered one or more times.
+    The count argument is an integer indicating the number of times the
+    template should be rendered. Default is ``None``, meaning that the template
+    should be rendered one or more times.
 
     You can use this as a context manager, like this::
 
@@ -1561,8 +1541,6 @@ your test suite.
     Output in case of error can be customized with the ``msg`` argument.
 
 .. method:: SimpleTestCase.assertJSONNotEqual(raw, expected_data, msg=None)
-
-    .. versionadded:: 1.8
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are *not* equal.
     See :meth:`~SimpleTestCase.assertJSONEqual` for further details.
@@ -1724,10 +1702,6 @@ it would under MySQL with MyISAM tables)::
             # ... conditional test code
             pass
 
-.. versionchanged:: 1.8
-
-    ``skipIfDBFeature`` can accept multiple feature strings.
-
 .. function:: skipUnlessDBFeature(*feature_name_strings)
 
 Skip the decorated test or ``TestCase`` if any of the named database features
@@ -1742,7 +1716,3 @@ under MySQL with MyISAM tables)::
         def test_transaction_behavior(self):
             # ... conditional test code
             pass
-
-.. versionchanged:: 1.8
-
-    ``skipUnlessDBFeature`` can accept multiple feature strings.

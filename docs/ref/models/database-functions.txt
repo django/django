@@ -5,8 +5,6 @@ Database Functions
 .. module:: django.db.models.functions
     :synopsis: Database Functions
 
-.. versionadded:: 1.8
-
 The classes documented below provide a way for users to use functions provided
 by the underlying database as annotations, aggregations, or filters in Django.
 Functions are also :doc:`expressions <expressions>`, so they can be used and

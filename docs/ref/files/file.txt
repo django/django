@@ -53,15 +53,6 @@ The ``File`` Class
 
         Iterate over the file yielding one line at a time.
 
-        .. versionchanged:: 1.8
-
-            ``File`` now uses `universal newlines`_. The following are
-            recognized as ending a line: the Unix end-of-line convention
-            ``'\n'``, the Windows convention ``'\r\n'``, and the old Macintosh
-            convention ``'\r'``.
-
-            .. _universal newlines: https://www.python.org/dev/peps/pep-0278
-
     .. method:: chunks(chunk_size=None)
 
         Iterate over the file yielding "chunks" of a given size. ``chunk_size``

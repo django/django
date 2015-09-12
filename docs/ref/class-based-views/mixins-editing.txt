@@ -114,11 +114,6 @@ ModelFormMixin
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception will be
     raised.
 
-    .. versionchanged:: 1.8
-
-        Previously if both ``fields`` and ``form_class`` were specified,
-        ``fields`` was silently ignored.
-
     **Mixins**
 
     * :class:`django.views.generic.edit.FormMixin`
@@ -141,11 +136,6 @@ ModelFormMixin
         automatically (e.g. using ``model``). Omitting this attribute will
         result in an :exc:`~django.core.exceptions.ImproperlyConfigured`
         exception.
-
-        .. versionchanged:: 1.8
-
-            Previously, omitting this attribute was allowed and resulted in
-            a form with all fields of the model.
 
     .. attribute:: success_url
 

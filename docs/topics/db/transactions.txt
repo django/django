@@ -202,11 +202,6 @@ Django provides a single API to control database transactions.
     You may use ``atomic`` when autocommit is turned off. It will only use
     savepoints, even for the outermost block.
 
-    .. versionchanged:: 1.8.5
-
-        Previously the outermost atomic block couldn't be declared with
-        ``savepoint=False`` when autocommit was turned off.
-
 .. admonition:: Performance considerations
 
     Open transactions have a performance cost for your database server. To

@@ -83,11 +83,6 @@ Fields
 
         A datetime of the user's last login.
 
-        .. versionchanged:: 1.8
-
-            This field will be ``null`` if the user has never logged in.
-            Previously it was set to the current date/time by default.
-
     .. attribute:: date_joined
 
         A datetime designating when the account was created. Is set to the
@@ -285,11 +280,6 @@ Anonymous users
       :meth:`~django.db.models.Model.save` and
       :meth:`~django.db.models.Model.delete()` raise :exc:`NotImplementedError`.
 
-    .. versionadded:: 1.8
-
-      ``AnonymousUser.get_username()`` has been added to
-      better mirror :class:`django.contrib.auth.models.User`.
-
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
 they're used by Web requests, as explained in the next section.
@@ -310,10 +300,6 @@ fields:
     .. attribute:: name
 
         Required. 255 characters or fewer. Example: ``'Can vote'``.
-
-        .. versionchanged:: 1.8
-
-            The ``max_length`` increased from 50 to 255 characters.
 
     .. attribute:: content_type
 
@@ -459,8 +445,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         authenticated user or ``None``.
 
     .. method:: get_user_permissions(user_obj, obj=None)
-
-        .. versionadded:: 1.8
 
         Returns the set of permission strings the ``user_obj`` has from their
         own user permissions. Returns an empty set if

@@ -138,8 +138,6 @@ The functions defined in this module share the following properties:
 
 .. function:: parse_duration(value)
 
-    .. versionadded:: 1.8
-
     Parses a string and returns a :class:`datetime.timedelta`.
 
     Expects data in the format ``"DD HH:MM:SS.uuuuuu"`` or as specified by ISO
@@ -277,8 +275,6 @@ The functions defined in this module share the following properties:
 
 .. function:: uri_to_iri(uri)
 
-    .. versionadded:: 1.8
-
     Converts a Uniform Resource Identifier into an Internationalized Resource
     Identifier.
 
@@ -300,8 +296,6 @@ The functions defined in this module share the following properties:
     Returns an ASCII string containing the encoded result.
 
 .. function:: escape_uri_path(path)
-
-    .. versionadded:: 1.8
 
     Escapes the unsafe characters from the path portion of a Uniform Resource
     Identifier (URI).
@@ -510,8 +504,6 @@ Atom1Feed
     database by some other process in the brief interval between subsequent
     invocations of a method on the same instance.
 
-    .. versionadded:: 1.8
-
     You can use the ``name`` argument to make cached properties of other
     methods. For example, if you had an expensive ``get_friends()`` method and
     wanted to allow calling it without retrieving the cached value, you could
@@ -656,8 +648,6 @@ escaping HTML.
     <https://pypi.python.org/pypi/bleach>`_ Python library.
 
 .. function:: html_safe()
-
-    .. versionadded:: 1.8
 
     The ``__html__()`` method on a class helps non-Django templates detect
     classes whose output doesn't require HTML escaping.
@@ -916,9 +906,7 @@ appropriate entities.
     ``None``, the :ref:`current time zone <default-current-time-zone>` is unset
     on entry with :func:`deactivate()` instead.
 
-    .. versionchanged:: 1.8
-
-        ``override`` is now usable as a function decorator.
+    ``override`` is also usable as a function decorator.
 
 .. function:: localtime(value, timezone=None)
 
@@ -979,10 +967,6 @@ appropriate entities.
 
     ``is_dst`` has no effect when ``pytz`` is not installed.
 
-    .. versionchanged:: 1.8
-
-        In older versions of Django, ``timezone`` was a required argument.
-
     .. versionchanged:: 1.9
 
         The ``is_dst`` argument was added.
@@ -993,10 +977,6 @@ appropriate entities.
     ``timezone``  the same point in time as ``value``, ``value`` being an
     aware :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
-
-    .. versionchanged:: 1.8
-
-        In older versions of Django, ``timezone`` was a required argument.
 
 .. _pytz: http://pytz.sourceforge.net/
 
@@ -1095,20 +1075,13 @@ For a complete discussion on the usage of the following see the
     is ``True``. If you pass ``None`` as the language argument, a
     ``NullTranslations()`` instance is activated within the context.
 
-    .. versionchanged:: 1.8
-
-        ``override`` is now usable as a function decorator.
+    ``override`` is also usable as a function decorator.
 
 .. function:: get_language()
 
     Returns the currently selected language code. Returns ``None`` if
     translations are temporarily deactivated (by :func:`deactivate_all()` or
     when ``None`` is passed to :func:`override()`).
-
-    .. versionchanged:: 1.8
-
-        Before Django 1.8, ``get_language()`` always returned
-        :setting:`LANGUAGE_CODE` when translations were deactivated.
 
 .. function:: get_language_bidi()
 

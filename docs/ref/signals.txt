@@ -496,10 +496,6 @@ Arguments sent with this signal:
 ``environ``
     The ``environ`` dictionary provided to the request.
 
-.. versionchanged:: 1.8
-
-    The ``environ`` argument was added.
-
 request_finished
 ----------------
 
@@ -561,10 +557,6 @@ distinguish between the two.
 
 You can also import this signal from ``django.core.signals`` to avoid importing
 from ``django.test`` in non-test situations.
-
-.. versionchanged:: 1.8
-
-    The signal was moved to ``django.core.signals`` as described above.
 
 Arguments sent with this signal:
 
