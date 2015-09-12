@@ -29,3 +29,6 @@ Bugfixes
 
 * Alphabetized ordering of imports in ``from django.db import migrations,
   models`` statement in newly created migrations (:ticket:`25384`).
+
+* Fixed migrations crash on MySQL when adding a text or a blob field with an
+  unhashable default (:ticket:`25393`).
