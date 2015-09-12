@@ -93,7 +93,6 @@
 }
 
 #changelist #toolbar form #searchbar:focus {
-    outline: none;
     border-color: #999;
 }
 

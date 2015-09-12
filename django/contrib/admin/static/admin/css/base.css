@@ -25,7 +25,6 @@ a:focus, a:hover {
 }
 
 a:focus {
-    outline: none;
     text-decoration: underline;
 }
 
@@ -418,7 +417,6 @@ input[type=number], textarea, select, .vTextField {
     border-radius: 4px;
     padding: 5px 6px;
     margin-top: 0;
-    outline: none;
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
@@ -441,7 +439,6 @@ select[multiple] {
     background: #79aec8;
     padding: 10px 15px;
     border: none;
-    outline: none;
     border-radius: 4px;
     color: #fff;
     cursor: pointer;

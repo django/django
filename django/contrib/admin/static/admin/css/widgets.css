@@ -539,7 +539,6 @@ ul.timelist, .timelist li {
     width: 16px;
     height: 16px;
     border: 0px none;
-    outline: 0; /* Remove dotted border around link */
 }
 
 .inline-deletelink:focus, .inline-deletelink:hover {
