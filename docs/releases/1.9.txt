@@ -473,6 +473,9 @@ Migrations
   applied and others are being unapplied. This was never officially supported
   and never had a public API that supports this behavior.
 
+* The :djadmin:`squashmigrations` command now supports specifying the starting
+  migration from which migrations will be squashed.
+
 Models
 ^^^^^^
 
