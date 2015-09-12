@@ -2335,7 +2335,10 @@ OPTIONS
 Default: ``{}`` (Empty dict)
 
 Extra parameters to pass to the template backend. Available parameters vary
-depending on the template backend.
+depending on the template backend. See
+:class:`~django.template.backends.django.DjangoTemplates` and
+:class:`~django.template.backends.jinja2.Jinja2` for the options of the
+built-in backends.
 
 .. setting:: TEMPLATE_CONTEXT_PROCESSORS
 
