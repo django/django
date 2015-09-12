@@ -1850,14 +1850,16 @@ Default::
 
     {}  # empty dictionary
 
-A dictionary specifying the package where migration modules can be found on a per-app basis. The default value
-of this setting is an empty dictionary, but the default package name for migration modules is ``migrations``.
+A dictionary specifying the package where migration modules can be found on a
+per-app basis. The default value of this setting is an empty dictionary, but
+the default package name for migration modules is ``migrations``.
 
 Example::
 
     {'blog': 'blog.db_migrations'}
 
-In this case, migrations pertaining to the ``blog`` app will be contained in the ``blog.db_migrations`` package.
+In this case, migrations pertaining to the ``blog`` app will be contained in
+the ``blog.db_migrations`` package.
 
 If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
