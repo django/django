@@ -109,7 +109,7 @@ class SplitArrayWidget(forms.Widget):
             id_ += '_0'
         return id_
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         if self.is_localized:
             self.widget.is_localized = self.is_localized
         value = value or []

@@ -43,7 +43,7 @@ class BaseGeometryWidget(Widget):
             logger.error("Error creating geometry from value '%s' (%s)", value, err)
         return None
 
-    def render(self, name, value, attrs=None):
+    def render(self, name, value, attrs=None, renderer=None):
         # If a string reaches here (via a validation error on another
         # field) then just reconstruct the Geometry.
         if isinstance(value, six.string_types):
@@ -62,15 +62,18 @@ class BaseGeometryWidget(Widget):
                         value.srid, self.map_srid, err
                     )
 
-        context = self.build_attrs(
-            attrs,
+        if attrs is None:
+            attrs = {}
+
+        context = self.build_attrs(self.attrs, dict(
             name=name,
             module='geodjango_%s' % name.replace('-', '_'),  # JS-safe
             serialized=self.serialize(value),
             geom_type=gdal.OGRGeomType(self.attrs['geom_type']),
             STATIC_URL=settings.STATIC_URL,
             LANGUAGE_BIDI=translation.get_language_bidi(),
-        )
+            **attrs
+        ))
         return loader.render_to_string(self.template_name, context)
 
 

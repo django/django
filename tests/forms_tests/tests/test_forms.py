@@ -17,6 +17,8 @@ from django.forms import (
     SplitDateTimeField, SplitHiddenDateTimeWidget, Textarea, TextInput,
     TimeField, ValidationError, forms,
 )
+from django.forms.renderers import get_default_renderer
+from django.forms.renderers.templates import TemplateRenderer
 from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
@@ -675,6 +677,42 @@ Java</label></li>
 <div><label><input type="radio" name="name" value="george" /> George</label></div>
 <div><label><input type="radio" name="name" value="ringo" /> Ringo</label></div>"""
         )
+
+    def test_form_with_iterable_boundfield_id(self):
+        class BeatleForm(Form):
+            name = ChoiceField(
+                choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')],
+                widget=RadioSelect,
+            )
+        fields = list(BeatleForm()['name'])
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].id_for_label, 'id_name_0')
+        self.assertEqual(fields[0].choice_label, 'John')
+        self.assertHTMLEqual(fields[0].tag(), '<input type="radio" name="name" value="john" id="id_name_0" />')
+        self.assertHTMLEqual(
+            str(fields[0]),
+            '<label for="id_name_0"><input type="radio" name="name" value="john" id="id_name_0" /> John</label>',
+        )
+
+        self.assertEqual(fields[1].id_for_label, 'id_name_1')
+        self.assertEqual(fields[1].choice_label, 'Paul')
+        self.assertHTMLEqual(fields[1].tag(), '<input type="radio" name="name" value="paul" id="id_name_1" />')
+        self.assertHTMLEqual(
+            str(fields[1]),
+            '<label for="id_name_1"><input type="radio" name="name" value="paul" id="id_name_1" /> Paul</label>',
+        )
+
+    def test_iterable_boundfield_select(self):
+        class BeatleForm(Form):
+            name = ChoiceField(choices=[('john', 'John'), ('paul', 'Paul'), ('george', 'George'), ('ringo', 'Ringo')])
+        fields = list(BeatleForm(auto_id=False)['name'])
+        self.assertEqual(len(fields), 4)
+
+        self.assertEqual(fields[0].id_for_label, 'id_name_0')
+        self.assertEqual(fields[0].choice_label, 'John')
+        self.assertHTMLEqual(fields[0].tag(), '<option value="john">John</option>')
+        self.assertHTMLEqual(str(fields[0]), '<option value="john">John</option>')
 
     def test_form_with_noniterable_boundfield(self):
         # You can iterate over any BoundField, not just those with widget=RadioSelect.
@@ -1951,8 +1989,9 @@ Password: <input type="password" name="password" required /></li>
         doesn't lose it's safe string status (#22950).
         """
         class CustomWidget(TextInput):
-            def render(self, name, value, attrs=None):
-                return format_html(str('<input{} required />'), ' id=custom')
+            def render(self, name, value, attrs=None, choices=None,
+                       renderer=None, extra_context=None):
+                return format_html(str('<input{} />'), ' id=custom')
 
         class SampleForm(Form):
             name = CharField(widget=CustomWidget)
@@ -3474,3 +3513,51 @@ Good luck picking a username that doesn&#39;t already exist.</p>
             '<option value="J">Java</option>'
             '</select></td></tr>',
         )
+
+
+class RendererTests(SimpleTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super(RendererTests, cls).setUpClass()
+
+        class CustomRenderer(TemplateRenderer):
+            pass
+
+        cls.custom_renderer = CustomRenderer
+
+    def test_default(self):
+        form = Form()
+        self.assertEqual(form.renderer, get_default_renderer())
+
+    def test_kwarg_instance(self):
+        custom = self.custom_renderer()
+        form = Form(renderer=custom)
+        self.assertEqual(form.renderer, custom)
+
+    def test_kwarg_class(self):
+        custom = self.custom_renderer
+        form = Form(renderer=custom)
+        self.assertEqual(form.renderer, custom)
+
+    def test_attribute_instance(self):
+        class CustomForm(Form):
+            default_renderer = TemplateRenderer()
+
+        form = CustomForm()
+        self.assertEqual(form.renderer, CustomForm.default_renderer)
+
+    def test_attribute_class(self):
+        class CustomForm(Form):
+            default_renderer = self.custom_renderer
+
+        form = CustomForm()
+        self.assertTrue(isinstance(form.renderer, CustomForm.default_renderer))
+
+    def test_attribute_override(self):
+        class CustomForm(Form):
+            default_renderer = TemplateRenderer()
+
+        custom = self.custom_renderer()
+        form = CustomForm(renderer=custom)
+        self.assertEqual(form.renderer, custom)

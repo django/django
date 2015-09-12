@@ -1,14 +1,17 @@
 from __future__ import unicode_literals
 
 import datetime
+import warnings
 
 from django.forms.utils import flatatt, pretty_name
 from django.forms.widgets import Textarea, TextInput
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import (
     force_text, python_2_unicode_compatible, smart_text,
 )
 from django.utils.html import conditional_escape, format_html, html_safe
+from django.utils.inspect import func_supports_parameter
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -44,15 +47,17 @@ class BoundField(object):
 
     def __iter__(self):
         """
-        Yields rendered strings that comprise all widgets in this BoundField.
-
-        This really is only useful for RadioSelect widgets, so that you can
-        iterate over individual radio buttons in a template.
+        Yields subwidgets of the current widget. This is useful for iterating
+        through choice widgets.
         """
         id_ = self.field.widget.attrs.get('id') or self.auto_id
         attrs = {'id': id_} if id_ else {}
-        for subwidget in self.field.widget.subwidgets(self.html_name, self.value(), attrs):
-            yield subwidget
+        for widget in self.field.widget.subwidgets(
+            name=self.html_name,
+            value=self.value(),
+            attrs=attrs,
+        ):
+            yield BoundWidget(self.field.widget, widget, self.form.renderer)
 
     def __len__(self):
         return len(list(self.__iter__()))
@@ -100,7 +105,24 @@ class BoundField(object):
             name = self.html_name
         else:
             name = self.html_initial_name
-        return force_text(widget.render(name, self.value(), attrs=attrs))
+
+        kwargs = {
+            'name': name,
+            'value': self.value(),
+            'attrs': attrs,
+        }
+        if func_supports_parameter(widget.render, 'renderer'):
+            kwargs['renderer'] = self.form.renderer
+        else:
+            warnings.warn(
+                'Backwards compatibility for widgets without support for the '
+                '`renderer` argument in Widget.render() will be removed in'
+                'Django 2.0',
+                RemovedInDjango20Warning, stacklevel=2,
+            )
+
+        html = widget.render(**kwargs)
+        return force_text(html)
 
     def as_text(self, attrs=None, **kwargs):
         """
@@ -227,3 +249,51 @@ class BoundField(object):
         widget = self.field.widget
         id_ = widget.attrs.get('id') or self.auto_id
         return widget.id_for_label(id_)
+
+
+@html_safe
+@python_2_unicode_compatible
+class BoundWidget(object):
+    """
+    A container class used when iterating over widgets. This is useful for
+    widgets that have choices. For example, the following can be used in a
+    template:
+
+    {% for radio in myform.beatles %}
+      <label for="{{ radio.id_for_label }}">
+        {{ radio.choice_label }}
+        <span class="radio">{{ radio.tag }}</span>
+      </label>
+    {% endfor %}
+    """
+
+    def __init__(self, parent_widget, data, renderer):
+        self.parent_widget = parent_widget
+        self.data = data
+        self.renderer = renderer
+
+    def __str__(self):
+        return self.tag(wrap_label=True)
+
+    def tag(self, wrap_label=False):
+        context = {
+            'widget': self.data,
+            'wrap_label': wrap_label,
+        }
+        return self.parent_widget._render(
+            self.template_name, context, self.renderer,
+        )
+
+    @property
+    def template_name(self):
+        if 'template_name' in self.data:
+            return self.data['template_name']
+        return self.parent_widget.template_name
+
+    @property
+    def id_for_label(self):
+        return 'id_%s_%s' % (self.data['name'], self.data['index'])
+
+    @property
+    def choice_label(self):
+        return self.data['label']

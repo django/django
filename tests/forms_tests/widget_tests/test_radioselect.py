@@ -4,10 +4,10 @@ from .base import WidgetTest
 
 
 class RadioSelectTest(WidgetTest):
-    widget = RadioSelect()
+    widget = RadioSelect
 
     def test_render(self):
-        self.check_html(self.widget, 'beatle', 'J', choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', html=(
             """<ul>
             <li><label><input checked="checked" type="radio" name="beatle" value="J" /> John</label></li>
             <li><label><input type="radio" name="beatle" value="P" /> Paul</label></li>
@@ -44,7 +44,7 @@ class RadioSelectTest(WidgetTest):
         </ul>
         """
         self.check_html(
-            self.widget, 'nestchoice', 'dvd', choices=nested_choices,
+            self.widget(choices=nested_choices), 'nestchoice', 'dvd',
             attrs={'id': 'media'}, html=html,
         )
 
@@ -53,7 +53,7 @@ class RadioSelectTest(WidgetTest):
         Attributes provided at instantiation are passed to the constituent
         inputs.
         """
-        widget = RadioSelect(attrs={'id': 'foo'})
+        widget = RadioSelect(attrs={'id': 'foo'}, choices=self.beatles)
         html = """
         <ul id="foo">
         <li>
@@ -64,7 +64,7 @@ class RadioSelectTest(WidgetTest):
         <li><label for="foo_3"><input type="radio" id="foo_3" value="R" name="beatle" /> Ringo</label></li>
         </ul>
         """
-        self.check_html(widget, 'beatle', 'J', choices=self.beatles, html=html)
+        self.check_html(widget, 'beatle', 'J', html=html)
 
     def test_render_attrs(self):
         """
@@ -81,4 +81,4 @@ class RadioSelectTest(WidgetTest):
         <li><label for="bar_3"><input type="radio" id="bar_3" value="R" name="beatle" /> Ringo</label></li>
         </ul>
         """
-        self.check_html(self.widget, 'beatle', 'J', choices=self.beatles, attrs={'id': 'bar'}, html=html)
+        self.check_html(self.widget(choices=self.beatles), 'beatle', 'J', attrs={'id': 'bar'}, html=html)

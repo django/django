@@ -1,0 +1,118 @@
+======================
+The form rendering API
+======================
+
+Django form widgets are rendered using the Django template backend system.
+By default, if Jinja2 is installed, the Jinja2 backend is used. Otherwise,
+forms are rendered with the DjangoTemplates backend.
+
+The form rendering process is customizable at multiple levels:
+
+* Widgets can specify custom template names
+* Forms and widgets can specify custom renderer classes
+* Built-in templates can be overridden within a project or application
+
+The low-level render API
+------------------------
+
+Widget templates are stored in the ``django/forms/widgets`` path. A project
+can provide a custom template for ``input.html`` by defining
+``django/forms/widgets/input.html``, for example.
+
+.. note::
+
+    While form rendering should work out of the box, to override templates
+    in your project requires some configuration.
+
+.. module:: django.forms.renderers.templates
+
+.. class:: TemplateRenderer
+
+.. attribute:: loader
+
+    A property that returns a template loading method. This method receives
+    the widget template name.
+
+.. method:: render(template_name, context, request=None)
+
+    Renders the ``template_name`` and ``context`` using the configured
+    template engine.
+
+How rendering is configured
+
+1. At the first ``render`` call, ``TemplateRenderer`` looks at the configured
+   project settings. It checks for the following requirements:
+
+   * ``django.forms`` is added to ``INSTALLED_APPS``
+
+   And one of:
+
+   * An engine with ``APP_DIRS=True`` is configured or
+   * A ``DjangoTemplates`` engine using the ``app_directories.Loader`` is
+     configured.
+
+   If these are satisfied, the template is loaded using the
+   ``django.template.loader`` API. Consequently, you can directly override
+   templates in your project.
+
+   Note: Since ``django.forms`` is in ``INSTALLED_APPS``, the order it appears
+   relative to other applications is important. Applications farther in the
+   list have less priority than applications near the front.
+
+   If the above requirements are not met, a default engine is configured. This
+   uses ``Jinja2`` to be as fast as possible.
+
+Alternatively, a custom renderer can be specified by updating the
+``FORM_RENDERER`` setting. This value defaults to:
+
+``django.forms.renderers.templates.TemplateRenderer``
+
+If you want to use a custom engine altogether, you could create a custom
+subclass like::
+
+    from django.utils.functional import cached_property
+
+    class MyRenderer(object):
+        engine_name = None
+
+        @cached_property
+        def engine(self):
+            return Jinja2({
+                'APP_DIRS': False,
+                'DIRS': ['/path/to/templates/'],
+                'NAME': 'djangoforms',
+                'OPTIONS': {},
+            })
+
+Customizing widget rendering
+----------------------------
+
+Form widgets are rendered with the Django template system. This gives you full
+control of widget output.
+
+Each widget has a ``template_name`` attribute, such as
+``django/forms/widgets/textarea.html``. When rendered, this template receives
+a context from ``Widget.get_context()``. By default, widgets receive a single
+value in the context, ``widget``. This is a dictionary that contains values
+like:
+
+``name``
+``value``
+``attrs``
+``is_hidden``
+``template_name``
+
+Some widgets add further information to the context. For instance, all widgets
+that subclass ``Input`` define ``widget['type']``, whereas ``MultiWidgets``
+define ``widget['subwidgets']`` for looping purposes.
+
+To override templates in your project, follow the instructions in the form
+rendering docs.
+
+Public methods/attributes:
+
+    template_name: The name of the template used to render this widget.
+
+    get_context: Returns values used in the template context.
+
+    format_value: Formats a given value for use in the template.

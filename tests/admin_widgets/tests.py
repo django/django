@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import gettext
 import os
+import re
 from datetime import datetime, timedelta
 from importlib import import_module
 from unittest import skipIf
@@ -350,34 +351,57 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
 
     def test_render_quoting(self):
-        # WARNING: Don't use assertHTMLEqual in that testcase!
-        # assertHTMLEqual will get rid of some escapes which are tested here!
+        """
+        WARNING: This test doesn't use assertHTMLEqual since it will get rid
+        of some escapes which are tested here!
+        """
+        HREF_RE = re.compile('href="([^"]+)"')
+        VALUE_RE = re.compile('value="([^"]+)"')
+        TEXT_RE = re.compile('<a[^>]+>([^>]+)</a>')
+
         w = widgets.AdminURLFieldWidget()
+
+        output = w.render('test', 'http://example.com/<sometag>some text</sometag>')
         self.assertEqual(
-            w.render('test', 'http://example.com/<sometag>some text</sometag>'),
-            '<p class="url">Currently: '
-            '<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">'
-            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />'
-            'Change: <input class="vURLField" name="test" type="url" '
-            'value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+            HREF_RE.search(output).groups()[0],
+            'http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E',
         )
         self.assertEqual(
-            w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>'),
-            '<p class="url">Currently: '
-            '<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">'
-            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />'
-            'Change: <input class="vURLField" name="test" type="url" '
-            'value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+            TEXT_RE.search(output).groups()[0],
+            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
         )
         self.assertEqual(
-            w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"'),
-            '<p class="url">Currently: '
-            '<a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">'
+            VALUE_RE.search(output).groups()[0],
+            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+        )
+
+        output = w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>')
+        self.assertEqual(
+            HREF_RE.search(output).groups()[0],
+            'http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E',
+        )
+        self.assertEqual(
+            TEXT_RE.search(output).groups()[0],
+            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+        )
+        self.assertEqual(
+            VALUE_RE.search(output).groups()[0],
+            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;',
+        )
+
+        output = w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"')
+        self.assertEqual(
+            HREF_RE.search(output).groups()[0],
+            'http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22',
+        )
+        self.assertEqual(
+            TEXT_RE.search(output).groups()[0],
             'http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;'
-            'alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />'
-            'Change: <input class="vURLField" name="test" type="url" '
-            'value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;'
-            'alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
+            'alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;'
+        )
+        self.assertEqual(
+            VALUE_RE.search(output).groups()[0],
+            'http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;',
         )
 
 

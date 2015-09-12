@@ -83,6 +83,8 @@ class FilePathFieldTest(SimpleTestCase):
             ('/django/forms/forms.py', 'forms.py'),
             ('/django/forms/formsets.py', 'formsets.py'),
             ('/django/forms/models.py', 'models.py'),
+            ('/django/forms/renderers/__init__.py', 'renderers/__init__.py'),
+            ('/django/forms/renderers/templates.py', 'renderers/templates.py'),
             ('/django/forms/utils.py', 'utils.py'),
             ('/django/forms/widgets.py', 'widgets.py')
         ]

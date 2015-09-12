@@ -239,6 +239,25 @@ foundation for custom widgets.
             In older versions, this method is a private API named
             ``_format_value()``. The old name will work until Django 2.0.
 
+    .. method:: get_context(name, value, attrs=None)
+
+        .. versionadded:: 1.10
+
+        Returns a dictionary of values to use when rendering the widget
+        template. By default, this contains a single value, ``widget``. This
+        is a dictionary representation of the widget containing the following
+        keys:
+
+        * ``'name'``: The ``name`` argument.
+        * ``'is_hidden'``: A boolean. Whether this widget is hidden or not.
+        * ``'required'``: A boolean. Whether this widget is required or not.
+        * ``'value'``: The value as returned by ``format_value()``.
+        * ``'attrs'``: The combination of ``self.attrs`` and ``attrs``.
+        * ``'template_name'``: The value of self.template_name.
+
+        Subclasses of ``Widget`` can provide custom context values by
+        overriding this method.
+
     .. method:: id_for_label(self, id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
@@ -249,14 +268,14 @@ foundation for custom widgets.
         return an ID value that corresponds to the first ID in the widget's
         tags.
 
-    .. method:: render(name, value, attrs=None)
+    .. method:: render(name, value, attrs=None, renderer=None)
 
-        Returns HTML for the widget, as a Unicode string. This method must be
-        implemented by the subclass, otherwise ``NotImplementedError`` will be
-        raised.
+        Renders a widget to HTML using the given renderer. If a renderer is
+        ``None``, the default renderer is used.
 
-        The 'value' given is not guaranteed to be valid input, therefore
-        subclass implementations should program defensively.
+        .. versionchanged:: 1.10
+
+            The ``renderer`` argument was added.
 
     .. method:: value_from_datadict(data, files, name)
 
@@ -319,40 +338,20 @@ foundation for custom widgets.
             with the opposite responsibility - to combine cleaned values of
             all member fields into one.
 
+    Custom context variables:
+
+    .. method:: get_context(name, value, attrs=None)
+
+        In addition to the standard ``widget`` value, ``MultiValueWidget`` adds
+        in a ``widget['subwidgets']`` parameter.
+
+        These can be looped over in the widget template::
+
+            {% for subwidget in widget.subwidgets %}
+                {% include widget.template_name with widget=subwidget %}
+            {% endfor %}
+
     Other methods that may be useful to override include:
-
-    .. method:: render(name, value, attrs=None)
-
-        Argument ``value`` is handled differently in this method from the
-        subclasses of :class:`~Widget` because it has to figure out how to
-        split a single value for display in multiple widgets.
-
-        The ``value`` argument used when rendering can be one of two things:
-
-        * A ``list``.
-        * A single value (e.g., a string) that is the "compressed" representation
-          of a ``list`` of values.
-
-        If ``value`` is a list, the output of :meth:`~MultiWidget.render` will
-        be a concatenation of rendered child widgets. If ``value`` is not a
-        list, it will first be processed by the method
-        :meth:`~MultiWidget.decompress()` to create the list and then rendered.
-
-        When ``render()`` executes its HTML rendering, each value in the list
-        is rendered with the corresponding widget -- the first value is
-        rendered in the first widget, the second value is rendered in the
-        second widget, etc.
-
-        Unlike in the single value widgets, method :meth:`~MultiWidget.render`
-        need not be implemented in the subclasses.
-
-    .. method:: format_output(rendered_widgets)
-
-        Given a list of rendered widgets (as strings), returns a Unicode string
-        representing the HTML for the whole lot.
-
-        This hook allows you to format the HTML design of the widgets any way
-        you'd like.
 
     Here's an example widget which subclasses :class:`MultiWidget` to display
     a date with the day, month, and year in different select boxes. This widget
@@ -380,9 +379,6 @@ foundation for custom widgets.
                     return [value.day, value.month, value.year]
                 return [None, None, None]
 
-            def format_output(self, rendered_widgets):
-                return ''.join(rendered_widgets)
-
             def value_from_datadict(self, data, files, name):
                 datelist = [
                     widget.value_from_datadict(data, files, name + '_%s' % i)
@@ -400,11 +396,6 @@ foundation for custom widgets.
 
     The constructor creates several :class:`Select` widgets in a tuple. The
     ``super`` class uses this tuple to setup the widget.
-
-    The :meth:`~MultiWidget.format_output` method is fairly vanilla here (in
-    fact, it's the same as what's been implemented as the default for
-    ``MultiWidget``), but the idea is that you could add custom HTML between
-    the widgets should you wish.
 
     The required method :meth:`~MultiWidget.decompress` breaks up a
     ``datetime.date`` value into the day, month, and year values corresponding
@@ -444,14 +435,18 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: TextInput
 
-    Text input: ``<input type="text" ...>``
+    * input_type: ``text``
+    * template_name: ``django/forms/widgets/text.html``
+    * Text input: ``<input type="text" ...>``
 
 ``NumberInput``
 ~~~~~~~~~~~~~~~
 
 .. class:: NumberInput
 
-    Text input: ``<input type="number" ...>``
+    * input_type: ``number``
+    * template_name: ``django/forms/widgets/number.html``
+    * Text input: ``<input type="number" ...>``
 
     Beware that not all browsers support entering localized numbers in
     ``number`` input types. Django itself avoids using them for fields having
@@ -462,21 +457,27 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: EmailInput
 
-    Text input: ``<input type="email" ...>``
+    * input_type: ``email``
+    * template_name: ``django/forms/widgets/email.html``
+    * Text input: ``<input type="email" ...>``
 
 ``URLInput``
 ~~~~~~~~~~~~
 
 .. class:: URLInput
 
-    Text input: ``<input type="url" ...>``
+    * input_type: ``url``
+    * template_name: ``django/forms/widgets/url.html``
+    * Text input: ``<input type="url" ...>``
 
 ``PasswordInput``
 ~~~~~~~~~~~~~~~~~
 
 .. class:: PasswordInput
 
-    Password input: ``<input type='password' ...>``
+    * input_type: ``password``
+    * template_name: ``django/forms/widgets/password.html``
+    * Password input: ``<input type='password' ...>``
 
     Takes one optional argument:
 
@@ -490,7 +491,9 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: HiddenInput
 
-    Hidden input: ``<input type='hidden' ...>``
+    * input_type: ``hidden``
+    * template_name: ``django/forms/widgets/hidden.html``
+    * Hidden input: ``<input type='hidden' ...>``
 
     Note that there also is a :class:`MultipleHiddenInput` widget that
     encapsulates a set of hidden input elements.
@@ -499,6 +502,9 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 ~~~~~~~~~~~~~
 
 .. class:: DateInput
+
+    * input_type: ``text``
+    * template_name: ``django/forms/widgets/date.html``
 
     Date input as a simple text box: ``<input type='text' ...>``
 
@@ -516,6 +522,9 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 ~~~~~~~~~~~~~~~~~
 
 .. class:: DateTimeInput
+
+    * input_type: ``text``
+    * template_name: ``django/forms/widgets/datetime.html``
 
     Date/time input as a simple text box: ``<input type='text' ...>``
 
@@ -538,6 +547,9 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: TimeInput
 
+    * input_type: ``text``
+    * template_name: ``django/forms/widgets/time.html``
+
     Time input as a simple text box: ``<input type='text' ...>``
 
     Takes same arguments as :class:`TextInput`, with one more optional argument:
@@ -557,7 +569,22 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
 .. class:: Textarea
 
-    Text area: ``<textarea>...</textarea>``
+    * template_name: ``django/forms/widgets/textarea.html``
+    * Text area: ``<textarea>...</textarea>``
+
+    .. attribute:: rows
+
+        The number of rows to render the textarea with. Defaults to ``10``.
+
+    .. attribute:: cols
+
+        The number of cols to render the textarea with. Defaults to ``40``.
+
+    .. method:: __init__(attrs)
+
+        Sets ``rows`` and ``cols`` in the default widget attributes. These
+        values can be overridden by subclassing ``Textarea`` or passing the
+        ``attrs`` argument with ``rows`` and ``cols`` already specified.
 
 .. _selector-widgets:
 
@@ -569,7 +596,9 @@ Selector and checkbox widgets
 
 .. class:: CheckboxInput
 
-    Checkbox: ``<input type='checkbox' ...>``
+    * input_type: ``checkbox``
+    * template_name: ``django/forms/widgets/checkbox.html``
+    * Checkbox: ``<input type='checkbox' ...>``
 
     Takes one optional argument:
 
@@ -583,7 +612,8 @@ Selector and checkbox widgets
 
 .. class:: Select
 
-    Select widget: ``<select><option ...>...</select>``
+    * template_name: ``django/forms/widgets/select.html``
+    * Select widget: ``<select><option ...>...</select>``
 
     .. attribute:: Select.choices
 
@@ -596,12 +626,16 @@ Selector and checkbox widgets
 
 .. class:: NullBooleanSelect
 
+    * template_name: ``django/forms/widgets/select.html``
+
     Select widget with options 'Unknown', 'Yes' and 'No'
 
 ``SelectMultiple``
 ~~~~~~~~~~~~~~~~~~
 
 .. class:: SelectMultiple
+
+    * template_name: ``django/forms/widgets/select.html``
 
     Similar to :class:`Select`, but allows multiple selection:
     ``<select multiple='multiple'>...</select>``
@@ -610,6 +644,8 @@ Selector and checkbox widgets
 ~~~~~~~~~~~~~~~
 
 .. class:: RadioSelect
+
+    * template_name: ``django/forms/widgets/radio.html``
 
     Similar to :class:`Select`, but rendered as a list of radio buttons within
     ``<li>`` tags:
@@ -703,6 +739,8 @@ Selector and checkbox widgets
 
 .. class:: CheckboxSelectMultiple
 
+    * template_name: ``django/forms/widgets/checkbox_select.html``
+
     Similar to :class:`SelectMultiple`, but rendered as a list of check
     buttons:
 
@@ -733,12 +771,15 @@ File upload widgets
 
 .. class:: FileInput
 
-    File upload input: ``<input type='file' ...>``
+    * template_name: ``django/forms/widgets/file.html``
+    * File upload input: ``<input type='file' ...>``
 
 ``ClearableFileInput``
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: ClearableFileInput
+
+    * template_name: ``django/forms/widgets/clearable_file_input.html``
 
     File upload input: ``<input type='file' ...>``, with an additional checkbox
     input to clear the field's value, if the field is not required and has
@@ -753,6 +794,9 @@ Composite widgets
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: MultipleHiddenInput
+
+    * template_name: ``django/forms/widgets/multiple_hidden.html``
+    * Multiple ``<input type='hidden' ...>`` widgets.
 
     Multiple ``<input type='hidden' ...>`` widgets.
 
@@ -769,6 +813,8 @@ Composite widgets
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SplitDateTimeWidget
+
+    * template_name: ``django/forms/widgets/splitdatetime.html``
 
     Wrapper (using :class:`MultiWidget`) around two widgets: :class:`DateInput`
     for the date, and :class:`TimeInput` for the time.
@@ -788,6 +834,8 @@ Composite widgets
 
 .. class:: SplitHiddenDateTimeWidget
 
+    * template_name: ``django/forms/widgets/splithiddendatetime.html``
+
     Similar to :class:`SplitDateTimeWidget`, but uses :class:`HiddenInput` for
     both date and time.
 
@@ -795,6 +843,8 @@ Composite widgets
 ~~~~~~~~~~~~~~~~~~~~
 
 .. class:: SelectDateWidget
+
+    * template_name: ``django/forms/widgets/select_date.html``
 
     Wrapper around three :class:`~django.forms.Select` widgets: one each for
     month, day, and year.

@@ -1936,7 +1936,7 @@ class FileAndImageFieldTests(TestCase):
 
         doc = Document.objects.create()
         form = DocumentForm(instance=doc)
-        self.assertEqual(
+        self.assertHTMLEqual(
             str(form['myfile']),
             '<input id="id_myfile" name="myfile" type="file" />'
         )

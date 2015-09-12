@@ -4,10 +4,10 @@ from .base import WidgetTest
 
 
 class CheckboxSelectMultipleTest(WidgetTest):
-    widget = CheckboxSelectMultiple()
+    widget = CheckboxSelectMultiple
 
     def test_render_value(self):
-        self.check_html(self.widget, 'beatles', ['J'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['J'], html=(
             """<ul>
             <li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
             <li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
@@ -17,7 +17,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         ))
 
     def test_render_value_multiple(self):
-        self.check_html(self.widget, 'beatles', ['J', 'P'], choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', ['J', 'P'], html=(
             """<ul>
             <li><label><input checked="checked" type="checkbox" name="beatles" value="J" /> John</label></li>
             <li><label><input checked="checked" type="checkbox" name="beatles" value="P" /> Paul</label></li>
@@ -30,7 +30,7 @@ class CheckboxSelectMultipleTest(WidgetTest):
         """
         If the value is None, none of the options are selected.
         """
-        self.check_html(self.widget, 'beatles', None, choices=self.beatles, html=(
+        self.check_html(self.widget(choices=self.beatles), 'beatles', None, html=(
             """<ul>
             <li><label><input type="checkbox" name="beatles" value="J" /> John</label></li>
             <li><label><input type="checkbox" name="beatles" value="P" /> Paul</label></li>
@@ -73,8 +73,8 @@ class CheckboxSelectMultipleTest(WidgetTest):
         </ul>
         """
         self.check_html(
-            self.widget, 'nestchoice', ('vinyl', 'dvd'),
-            choices=nested_choices, attrs={'id': 'media'}, html=html,
+            self.widget(choices=nested_choices), 'nestchoice', ('vinyl', 'dvd'),
+            attrs={'id': 'media'}, html=html,
         )
 
     def test_separate_ids(self):
@@ -93,14 +93,13 @@ class CheckboxSelectMultipleTest(WidgetTest):
         </li>
         </ul>
         """
-        self.check_html(self.widget, 'letters', ['a', 'c'], choices=choices, attrs={'id': 'abc'}, html=html)
+        self.check_html(self.widget(choices=choices), 'letters', ['a', 'c'], attrs={'id': 'abc'}, html=html)
 
     def test_separate_ids_constructor(self):
         """
         Each input gets a separate ID when the ID is passed to the constructor.
         """
-        widget = CheckboxSelectMultiple(attrs={'id': 'abc'})
-        choices = [('a', 'A'), ('b', 'B'), ('c', 'C')]
+        widget = CheckboxSelectMultiple(attrs={'id': 'abc'}, choices=[('a', 'A'), ('b', 'B'), ('c', 'C')])
         html = """
         <ul id="abc">
         <li>
@@ -112,4 +111,4 @@ class CheckboxSelectMultipleTest(WidgetTest):
         </li>
         </ul>
         """
-        self.check_html(widget, 'letters', ['a', 'c'], choices=choices, html=html)
+        self.check_html(widget, 'letters', ['a', 'c'], html=html)
