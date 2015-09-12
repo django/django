@@ -104,8 +104,9 @@ def get_installed():
 def setup(verbosity, test_labels, parallel):
     if verbosity >= 1:
         msg = "Testing against Django installed in '%s'" % os.path.dirname(django.__file__)
-        if parallel > 1:
-            msg += " with %d processes" % parallel
+        max_parallel = default_test_processes() if parallel == 0 else parallel
+        if max_parallel > 1:
+            msg += " with up to %d processes" % max_parallel
         print(msg)
 
     # Force declaring available_apps in TransactionTestCase for faster tests.
