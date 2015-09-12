@@ -26,3 +26,6 @@ Bugfixes
 
 * Fixed autocompletion for options of non-``argparse`` management commands
   (:ticket:`25372`).
+
+* Alphabetized ordering of imports in ``from django.db import migrations,
+  models`` statement in newly created migrations (:ticket:`25384`).
