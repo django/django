@@ -1862,6 +1862,15 @@ In this case, migrations pertaining to the ``blog`` app will be contained in the
 If you provide the ``app_label`` argument, :djadmin:`makemigrations` will
 automatically create the package if it doesn't already exist.
 
+.. versionadded:: 1.9
+
+When you supply ``None`` as a value for an app, Django will consider the app as
+an app without migrations regardless of an existing ``migrations`` submodule.
+This can be used, for example, in a test settings file to skip migrations while
+testing (tables will still be created for the apps' models). If this is used in
+your general project settings, remember to use the migrate
+:djadminopt:`--run-syncdb` option if you want to create tables for the app.
+
 .. setting:: MONTH_DAY_FORMAT
 
 MONTH_DAY_FORMAT

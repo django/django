@@ -446,6 +446,9 @@ Migrations
 
 * Added support for serialization of ``functools.partial`` objects.
 
+* When supplying ``None`` as a value in :setting:`MIGRATION_MODULES`, Django
+  will consider the app an app without migrations.
+
 Models
 ^^^^^^
 
