@@ -11,3 +11,7 @@ class Category(models.Model):
 class Thing(models.Model):
     name = models.CharField(max_length=100)
     category = models.ForeignKey(Category)
+
+
+class CategoryInfo(models.Model):
+    category = models.OneToOneField(Category)

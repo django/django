@@ -6,7 +6,6 @@ from functools import wraps
 
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango19Warning
-from django.utils.six.moves import copyreg
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -268,32 +267,30 @@ class LazyObject(object):
         raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
 
     # Because we have messed with __class__ below, we confuse pickle as to what
-    # class we are pickling. It also appears to stop __reduce__ from being
-    # called. So, we define __getstate__ in a way that cooperates with the way
-    # that pickle interprets this class.  This fails when the wrapped class is
-    # a builtin, but it is better than nothing.
-    def __getstate__(self):
+    # class we are pickling. We're going to have to initialize the wrapped
+    # object to successfully pickle it, so we might as well just pickle the
+    # wrapped object since they're supposed to act the same way.
+    #
+    # Unfortunately, if we try to simply act like the wrapped object, the ruse
+    # will break down when pickle gets our id(). Thus we end up with pickle
+    # thinking, in effect, that we are a distinct object from the wrapped
+    # object, but with the same __dict__. This can cause problems (see #25389).
+    #
+    # So instead, we define our own __reduce__ method and custom unpickler. We
+    # pickle the wrapped object as the unpickler's argument, so that pickle
+    # will pickle it normally, and then the unpickler simply returns its
+    # argument.
+    def __reduce__(self):
         if self._wrapped is empty:
             self._setup()
-        return self._wrapped.__dict__
+        return (unpickle_lazyobject, (self._wrapped,))
 
-    # Python 3.3 will call __reduce__ when pickling; this method is needed
-    # to serialize and deserialize correctly.
-    @classmethod
-    def __newobj__(cls, *args):
-        return cls.__new__(cls, *args)
-
-    def __reduce_ex__(self, proto):
-        if proto >= 2:
-            # On Py3, since the default protocol is 3, pickle uses the
-            # ``__newobj__`` method (& more efficient opcodes) for writing.
-            return (self.__newobj__, (self.__class__,), self.__getstate__())
-        else:
-            # On Py2, the default protocol is 0 (for back-compat) & the above
-            # code fails miserably (see regression test). Instead, we return
-            # exactly what's returned if there's no ``__reduce__`` method at
-            # all.
-            return (copyreg._reconstructor, (self.__class__, object, None), self.__getstate__())
+    # We have to explicitly override __getstate__ so that older versions of
+    # pickle don't try to pickle the __dict__ (which in the case of a
+    # SimpleLazyObject may contain a lambda). The value will end up being
+    # ignored by our __reduce__ and custom unpickler.
+    def __getstate__(self):
+        return {}
 
     def __deepcopy__(self, memo):
         if self._wrapped is empty:
@@ -330,6 +327,15 @@ class LazyObject(object):
 
     __len__ = new_method_proxy(len)
     __contains__ = new_method_proxy(operator.contains)
+
+
+def unpickle_lazyobject(wrapped):
+    """
+    Used to unpickle lazy objects. Just return its argument, which will be the
+    wrapped object.
+    """
+    return wrapped
+unpickle_lazyobject.__safe_for_unpickling__ = True
 
 
 # Workaround for http://bugs.python.org/issue12370
