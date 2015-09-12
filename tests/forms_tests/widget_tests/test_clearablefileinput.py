@@ -49,11 +49,19 @@ class ClearableFileInputTest(WidgetTest):
 
         widget = ClearableFileInput()
         field = StrangeFieldFile()
-        output = widget.render('my<div>file', field)
+        output = widget.render('my<div>file', field, renderer=self.django_renderer)
         self.assertNotIn(field.url, output)
         self.assertIn('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"', output)
         self.assertNotIn(six.text_type(field), output)
         self.assertIn('something&lt;div onclick=&quot;alert(&#39;oops&#39;)&quot;&gt;.jpg', output)
+        self.assertIn('my&lt;div&gt;file', output)
+        self.assertNotIn('my<div>file', output)
+
+        output = widget.render('my<div>file', field, renderer=self.jinja2_renderer)
+        self.assertNotIn(field.url, output)
+        self.assertIn('href="something?chapter=1&amp;sect=2&amp;copy=3&amp;lang=en"', output)
+        self.assertNotIn(six.text_type(field), output)
+        self.assertIn('something&lt;div onclick=&#34;alert(&#39;oops&#39;)&#34;&gt;.jpg', output)
         self.assertIn('my&lt;div&gt;file', output)
         self.assertNotIn('my<div>file', output)
 

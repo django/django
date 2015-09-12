@@ -21,6 +21,8 @@ from django.utils.html import conditional_escape, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
+from .renderers import get_default_renderer
+
 __all__ = ('BaseForm', 'Form')
 
 
@@ -68,10 +70,11 @@ class BaseForm(object):
     # class, not to the Form class.
     field_order = None
     prefix = None
+    default_renderer = None
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList, label_suffix=None,
-                 empty_permitted=False, field_order=None):
+                 empty_permitted=False, field_order=None, renderer=None):
         self.is_bound = data is not None or files is not None
         self.data = data or {}
         self.files = files or {}
@@ -93,6 +96,18 @@ class BaseForm(object):
         self.fields = copy.deepcopy(self.base_fields)
         self._bound_fields_cache = {}
         self.order_fields(self.field_order if field_order is None else field_order)
+
+        # Initialize form renderer. Use a global default if not specified
+        # either as an argument or as self.default_renderer.
+        if renderer is None:
+            if self.default_renderer is None:
+                renderer = get_default_renderer()
+            else:
+                if isinstance(self.default_renderer, type):
+                    renderer = self.default_renderer()
+                else:
+                    renderer = self.default_renderer
+        self.renderer = renderer
 
     def order_fields(self, field_order):
         """
@@ -251,6 +266,7 @@ class BaseForm(object):
                 # If there aren't any rows in the output, just append the
                 # hidden fields.
                 output.append(str_hidden)
+
         return mark_safe('\n'.join(output))
 
     def as_table(self):

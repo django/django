@@ -66,7 +66,7 @@ class DateFieldTest(SimpleTestCase):
             'mydate_year': '2008',
             'mydate_month': '4',
             'mydate_day': '1',
-            'initial-mydate': HiddenInput()._format_value(date(2008, 4, 1)),
+            'initial-mydate': HiddenInput().format_value(date(2008, 4, 1)),
         }, initial={'mydate': date(2008, 4, 1)})
         self.assertFalse(b.has_changed())
 
@@ -74,7 +74,7 @@ class DateFieldTest(SimpleTestCase):
             'mydate_year': '2008',
             'mydate_month': '4',
             'mydate_day': '22',
-            'initial-mydate': HiddenInput()._format_value(date(2008, 4, 1)),
+            'initial-mydate': HiddenInput().format_value(date(2008, 4, 1)),
         }, initial={'mydate': date(2008, 4, 1)})
         self.assertTrue(b.has_changed())
 
@@ -82,7 +82,7 @@ class DateFieldTest(SimpleTestCase):
             'mydate_year': '2008',
             'mydate_month': '4',
             'mydate_day': '22',
-            'initial-mydate': HiddenInput()._format_value(date(2008, 4, 1)),
+            'initial-mydate': HiddenInput().format_value(date(2008, 4, 1)),
         }, initial={'mydate': date(2008, 4, 22)})
         self.assertTrue(b.has_changed())
 
@@ -90,7 +90,7 @@ class DateFieldTest(SimpleTestCase):
             'mydate_year': '2008',
             'mydate_month': '4',
             'mydate_day': '22',
-            'initial-mydate': HiddenInput()._format_value(date(2008, 4, 22)),
+            'initial-mydate': HiddenInput().format_value(date(2008, 4, 22)),
         }, initial={'mydate': date(2008, 4, 1)})
         self.assertFalse(b.has_changed())
 

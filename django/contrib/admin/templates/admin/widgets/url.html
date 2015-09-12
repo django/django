@@ -1,0 +1,1 @@
+{% if widget.value %}<p class="url">{{ current_label }} <a href="{{ widget.href }}">{{ widget.value }}</a><br />{{ change_label }} {% endif %}{% include "django/forms/widgets/input.html" %}{% if widget.value %}</p>{% endif %}

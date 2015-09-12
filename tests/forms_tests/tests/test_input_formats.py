@@ -26,7 +26,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '13:30:05')
 
         # Parse a time in a valid, but non-default format, get a parsed result
@@ -34,7 +34,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
         # ISO formats are accepted, even if not specified in formats.py
@@ -52,7 +52,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '13:30:05')
 
         # Parse a time in a valid format, get a parsed result
@@ -60,7 +60,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
     def test_timeField_with_inputformat(self):
@@ -75,7 +75,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid format, get a parsed result
@@ -83,7 +83,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
     def test_localized_timeField_with_inputformat(self):
@@ -98,7 +98,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid format, get a parsed result
@@ -106,7 +106,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
 
@@ -123,7 +123,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '01:30:05 PM')
 
         # Parse a time in a valid, but non-default format, get a parsed result
@@ -131,7 +131,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM")
 
     def test_localized_timeField(self):
@@ -145,7 +145,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '01:30:05 PM')
 
         # Parse a time in a valid format, get a parsed result
@@ -153,7 +153,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM")
 
     def test_timeField_with_inputformat(self):
@@ -168,7 +168,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:05 PM")
 
         # Parse a time in a valid format, get a parsed result
@@ -176,7 +176,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM")
 
     def test_localized_timeField_with_inputformat(self):
@@ -191,7 +191,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:05 PM")
 
         # Parse a time in a valid format, get a parsed result
@@ -199,7 +199,7 @@ class CustomTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM")
 
 
@@ -215,7 +215,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid, but non-default format, get a parsed result
@@ -223,7 +223,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
     def test_localized_timeField(self):
@@ -237,7 +237,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid format, get a parsed result
@@ -245,7 +245,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
     def test_timeField_with_inputformat(self):
@@ -259,7 +259,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid format, get a parsed result
@@ -267,7 +267,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
     def test_localized_timeField_with_inputformat(self):
@@ -281,7 +281,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:05")
 
         # Parse a time in a valid format, get a parsed result
@@ -289,7 +289,7 @@ class SimpleTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, time(13, 30, 0))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "13:30:00")
 
 
@@ -315,7 +315,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010')
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -323,7 +323,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_localized_dateField(self):
@@ -337,7 +337,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010')
 
         # Parse a date in a valid format, get a parsed result
@@ -345,7 +345,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_dateField_with_inputformat(self):
@@ -361,7 +361,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -369,7 +369,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_localized_dateField_with_inputformat(self):
@@ -385,7 +385,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -393,7 +393,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
 
@@ -410,7 +410,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010')
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -418,7 +418,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_localized_dateField(self):
@@ -432,7 +432,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010')
 
         # Parse a date in a valid format, get a parsed result
@@ -440,7 +440,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_dateField_with_inputformat(self):
@@ -455,7 +455,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -463,7 +463,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
     def test_localized_dateField_with_inputformat(self):
@@ -478,7 +478,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -486,7 +486,7 @@ class CustomDateInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010")
 
 
@@ -502,7 +502,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -510,7 +510,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
     def test_localized_dateField(self):
@@ -524,7 +524,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
         # Parse a date in a valid format, get a parsed result
@@ -532,7 +532,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
     def test_dateField_with_inputformat(self):
@@ -546,7 +546,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
         # Parse a date in a valid format, get a parsed result
@@ -554,7 +554,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
     def test_localized_dateField_with_inputformat(self):
@@ -568,7 +568,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
         # Parse a date in a valid format, get a parsed result
@@ -576,7 +576,7 @@ class SimpleDateFormatTests(SimpleTestCase):
         self.assertEqual(result, date(2010, 12, 21))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21")
 
 
@@ -602,7 +602,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010 13:30:05')
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -610,7 +610,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:00")
 
     def test_localized_dateTimeField(self):
@@ -624,7 +624,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '21.12.2010 13:30:05')
 
         # Parse a date in a valid format, get a parsed result
@@ -632,7 +632,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:00")
 
     def test_dateTimeField_with_inputformat(self):
@@ -648,7 +648,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:05")
 
         # Parse a date in a valid format, get a parsed result
@@ -656,7 +656,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:00")
 
     def test_localized_dateTimeField_with_inputformat(self):
@@ -672,7 +672,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:05")
 
         # Parse a date in a valid format, get a parsed result
@@ -680,7 +680,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
@@ -697,7 +697,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '01:30:05 PM 21/12/2010')
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -705,7 +705,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
 
     def test_localized_dateTimeField(self):
@@ -719,7 +719,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, '01:30:05 PM 21/12/2010')
 
         # Parse a date in a valid format, get a parsed result
@@ -727,7 +727,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
 
     def test_dateTimeField_with_inputformat(self):
@@ -742,7 +742,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:05 PM 21/12/2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -750,7 +750,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
 
     def test_localized_dateTimeField_with_inputformat(self):
@@ -765,7 +765,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:05 PM 21/12/2010")
 
         # Parse a date in a valid format, get a parsed result
@@ -773,7 +773,7 @@ class CustomDateTimeInputFormatsTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "01:30:00 PM 21/12/2010")
 
 
@@ -789,7 +789,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
         # Parse a date in a valid, but non-default format, get a parsed result
@@ -797,7 +797,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
     def test_localized_dateTimeField(self):
@@ -811,7 +811,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
         # Parse a date in a valid format, get a parsed result
@@ -819,7 +819,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
     def test_dateTimeField_with_inputformat(self):
@@ -833,7 +833,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
         # Parse a date in a valid format, get a parsed result
@@ -841,7 +841,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:00")
 
     def test_localized_dateTimeField_with_inputformat(self):
@@ -855,7 +855,7 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30, 5))
 
         # Check that the parsed result does a round trip to the same format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:05")
 
         # Parse a date in a valid format, get a parsed result
@@ -863,5 +863,5 @@ class SimpleDateTimeFormatTests(SimpleTestCase):
         self.assertEqual(result, datetime(2010, 12, 21, 13, 30))
 
         # Check that the parsed result does a round trip to default format
-        text = f.widget._format_value(result)
+        text = f.widget.format_value(result)
         self.assertEqual(text, "2010-12-21 13:30:00")
