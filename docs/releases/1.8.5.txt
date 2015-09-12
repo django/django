@@ -56,3 +56,5 @@ Bugfixes
 * Fixed incorrect queries with multiple many-to-many fields on a model with the
   same 'to' model and with ``related_name`` set to '+' (:ticket:`24505`,
   :ticket:`25486`).
+
+* Fixed pickling a ``SimpleLazyObject`` wrapping a model (:ticket:`25389`).
