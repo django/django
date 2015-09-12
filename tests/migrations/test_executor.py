@@ -125,6 +125,7 @@ class ExecutorTests(MigrationTestBase):
             'Unapplied migration migrations.0001_squashed_0002 on database default',
             'Marked migration migrations.0001_initial as unapplied',
             'Marked migration migrations.0002_second as unapplied',
+            'Marked migration migrations.0001_squashed_0002 as unapplied',
         ])
 
     @override_settings(MIGRATION_MODULES={
