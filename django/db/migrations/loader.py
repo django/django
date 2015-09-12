@@ -66,6 +66,9 @@ class MigrationLoader(object):
         for app_config in apps.get_app_configs():
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
+            if module_name is None:
+                self.unmigrated_apps.add(app_config.label)
+                continue
             was_loaded = module_name in sys.modules
             try:
                 module = import_module(module_name)

@@ -179,6 +179,29 @@ class LoaderTests(TestCase):
                 "App missing __init__.py in migrations module not in unmigrated apps."
             )
 
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+    )
+    def test_marked_as_migrated(self):
+        """
+        Undefined MIGRATION_MODULES implies default migration module.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, {'migrated_app'})
+        self.assertEqual(migration_loader.unmigrated_apps, set())
+
+    @override_settings(
+        INSTALLED_APPS=['migrations.migrations_test_apps.migrated_app'],
+        MIGRATION_MODULES={"migrated_app": None},
+    )
+    def test_marked_as_unmigrated(self):
+        """
+        MIGRATION_MODULES allows disabling of migrations for a particular app.
+        """
+        migration_loader = MigrationLoader(connection)
+        self.assertEqual(migration_loader.migrated_apps, set())
+        self.assertEqual(migration_loader.unmigrated_apps, {'migrated_app'})
+
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_loading_squashed(self):
         "Tests loading a squashed migration"
