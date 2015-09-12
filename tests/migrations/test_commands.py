@@ -1070,3 +1070,34 @@ class SquashMigrationsTests(MigrationTestBase):
             call_command("squashmigrations", "migrations", "0002",
                          interactive=False, verbosity=1, no_optimize=True, stdout=out)
         self.assertIn("Skipping optimization", force_text(out.getvalue()))
+
+    def test_squashmigrations_valid_start(self):
+        """
+        squashmigrations accepts a starting migration.
+        """
+        out = six.StringIO()
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes") as migration_dir:
+            call_command("squashmigrations", "migrations", "0002", "0003",
+                         interactive=False, verbosity=1, stdout=out)
+
+            squashed_migration_file = os.path.join(migration_dir, "0002_second_squashed_0003_third.py")
+            with codecs.open(squashed_migration_file, "r", encoding="utf-8") as fp:
+                content = fp.read()
+                self.assertIn("        ('migrations', '0001_initial')", content)
+                self.assertNotIn("initial = True", content)
+        out = force_text(out.getvalue())
+        self.assertNotIn(" - 0001_initial", out)
+        self.assertIn(" - 0002_second", out)
+        self.assertIn(" - 0003_third", out)
+
+    def test_squashmigrations_invalid_start(self):
+        """
+        squashmigrations doesn't accept a starting migration after the ending migration.
+        """
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            msg = (
+                "The migration 'migrations.0003_third' cannot be found. Maybe "
+                "it comes after the migration 'migrations.0002_second'"
+            )
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("squashmigrations", "migrations", "0003", "0002", interactive=False, verbosity=0)
