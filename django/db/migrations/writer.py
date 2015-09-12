@@ -241,6 +241,13 @@ class MigrationWriter(object):
     def basedir(self):
         migrations_package_name = MigrationLoader.migrations_module(self.migration.app_label)
 
+        if migrations_package_name is None:
+            raise ValueError(
+                "Django can't create migrations for app '%s' because "
+                "migrations have been disabled via the MIGRATION_MODULES "
+                "setting." % self.migration.app_label
+            )
+
         # See if we can import the migrations module directly
         try:
             migrations_module = import_module(migrations_package_name)
