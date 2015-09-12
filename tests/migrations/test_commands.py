@@ -593,6 +593,19 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertIn('dependencies=[\n]', content)
                 self.assertIn('operations=[\n]', content)
 
+    @override_settings(MIGRATION_MODULES={"migrations": None})
+    def test_makemigrations_disabled_migrations_for_app(self):
+        """
+        makemigrations raises a nice error when migrations are disabled for an
+        app.
+        """
+        msg = (
+            "Django can't create migrations for app 'migrations' because migrations "
+            "have been disabled via the MIGRATION_MODULES setting."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            call_command("makemigrations", "migrations", empty=True, verbosity=0)
+
     def test_makemigrations_no_changes_no_apps(self):
         """
         Makes sure that makemigrations exits when there are no changes and no apps are specified.
