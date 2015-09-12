@@ -517,6 +517,17 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
+.. _django-db-migrations-logger:
+
+``django.db.migrations``
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Logs which migration has been applied or unapplied, if the migration has been
+faked, and which (additional) migrations have been recorded as applied or
+unapplied, in case of squashed migrations.
+
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
 
