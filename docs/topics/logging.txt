@@ -466,33 +466,6 @@ Django provides several built-in loggers.
 ``django`` is the catch-all logger. No messages are posted directly to
 this logger.
 
-.. _django-request-logger:
-
-``django.request``
-~~~~~~~~~~~~~~~~~~
-
-Log messages related to the handling of requests. 5XX responses are
-raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages.
-
-Messages to this logger have the following extra context:
-
-* ``status_code``: The HTTP response code associated with the
-  request.
-
-* ``request``: The request object that generated the logging
-  message.
-
-.. _django-template-logger:
-
-``django.template``
-~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 1.9
-
-Log messages related to the rendering of templates. Missing context variables
-are logged as ``DEBUG`` messages if :setting:`DEBUG` is `True`.
-
 .. _django-db-logger:
 
 ``django.db.backends``
@@ -517,6 +490,13 @@ This logging does not include framework-level initialization (e.g.
 ``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
 wish to view all database queries.
 
+``django.db.backends.schema``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Logs the SQL queries that are executed during schema changes to the database by
+the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
+queries executed by :class:`~django.db.migrations.operations.RunPython`.
+
 .. _django-db-migrations-logger:
 
 ``django.db.migrations``
@@ -527,6 +507,23 @@ wish to view all database queries.
 Logs which migration has been applied or unapplied, if the migration has been
 faked, and which (additional) migrations have been recorder as applied or
 unapplied, in case of squashed migrations.
+
+.. _django-request-logger:
+
+``django.request``
+~~~~~~~~~~~~~~~~~~
+
+Log messages related to the handling of requests. 5XX responses are
+raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
+messages.
+
+Messages to this logger have the following extra context:
+
+* ``status_code``: The HTTP response code associated with the
+  request.
+
+* ``request``: The request object that generated the logging
+  message.
 
 ``django.security.*``
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -558,12 +555,15 @@ specific logger following this example:
         },
     },
 
-``django.db.backends.schema``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. _django-template-logger:
 
-Logs the SQL queries that are executed during schema changes to the database by
-the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
+``django.template``
+~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 1.9
+
+Log messages related to the rendering of templates. Missing context variables
+are logged as ``DEBUG`` messages if :setting:`DEBUG` is `True`.
 
 Handlers
 --------
