@@ -211,6 +211,11 @@ def default_test_processes():
     """
     Default number of test processes when using the --parallel option.
     """
+    # The current implementation of the parallel test runner requires
+    # multiprocessing to start subprocesses with fork().
+    # On Python 3.4+: if multiprocessing.get_start_method() != 'fork':
+    if not hasattr(os, 'fork'):
+        return 1
     try:
         return int(os.environ['DJANGO_TEST_PROCESSES'])
     except KeyError:
