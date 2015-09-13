@@ -26,7 +26,6 @@ from django.test import (
     SimpleTestCase, TestCase, TransactionTestCase, mock, override_settings,
     skipIfDBFeature, skipUnlessDBFeature,
 )
-from django.test.utils import str_prefix
 from django.utils import six
 from django.utils.six.moves import range
 
@@ -388,8 +387,19 @@ class LastExecutedQueryTest(TestCase):
         # This shouldn't raise an exception
         query = "SELECT strftime('%Y', 'now');"
         connection.cursor().execute(query)
-        self.assertEqual(connection.queries[-1]['sql'],
-            str_prefix("QUERY = %(_)s\"SELECT strftime('%%Y', 'now');\" - PARAMS = ()"))
+        self.assertEqual(connection.queries[-1]['sql'], query)
+
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_parameter_quoting_on_sqlite(self):
+        # The implementation of last_executed_queries isn't optimal. It's
+        # worth testing that parameters are quoted. See #14091.
+        query = "SELECT %s"
+        params = ["\"'\\"]
+        connection.cursor().execute(query, params)
+        # Note that the single quote is repeated
+        substituted = "SELECT '\"''\\'"
+        self.assertEqual(connection.queries[-1]['sql'], substituted)
 
 
 class ParameterHandlingTest(TestCase):

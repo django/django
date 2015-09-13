@@ -510,6 +510,8 @@ Models
 
 * Added support for referencing annotations in ``QuerySet.distinct()``.
 
+* ``connection.queries`` shows queries with substituted parameters on SQLite.
+
 CSRF
 ^^^^
 
