@@ -173,7 +173,8 @@ class MultiPartParser(object):
                 if item_type == FIELD:
                     # avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS
                     num_inserted_fields += 1
-                    if settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_inserted_fields:
+                    if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
+                    settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_inserted_fields):
                         raise SuspiciousOperation('Too many fields')
 
                     # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
@@ -192,7 +193,8 @@ class MultiPartParser(object):
                         data = field_stream.read(**read_kwargs)
 
                     self._data_size += len(field_name) + len(data) + 2
-                    if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and field_stream.read(1):
+                    if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
+                    (self._data_size > settings.DATA_UPLOAD_MAX_MEMORY_SIZE or field_stream.read(1))):
                         raise SuspiciousOperation('Request data too large')
 
                     self._post.appendlist(field_name,

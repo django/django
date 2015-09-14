@@ -865,17 +865,36 @@ class DataUploadMaxMemorySizePostTests(SimpleTestCase):
         })
 
     def test_size_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=4):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10):
             with self.assertRaisesMessage(SuspiciousOperation, 'Request data too large'):
                 self.request._load_post_and_files()
 
     def test_size_not_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=5):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=11):
             self.request._load_post_and_files()
 
     def test_no_limit(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
             self.request._load_post_and_files()
+
+    def test_file_passes(self):
+        payload = FakePayload("\r\n".join([
+            '--boundary',
+            'Content-Disposition: form-data; name="file1"; filename="test.file"',
+            '',
+            'value',
+            '--boundary--'
+            ''
+        ]))
+        request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'multipart/form-data; boundary=boundary',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=1):
+            request._load_post_and_files()
+            self.assertIn('file1', request.FILES, "Upload file not present")
 
 
 class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):
@@ -900,12 +919,12 @@ class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):
         })
 
     def test_number_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
             with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
                 self.request._load_post_and_files()
 
     def test_number_not_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=3):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
             self.request._load_post_and_files()
 
     def test_no_limit(self):
@@ -927,12 +946,12 @@ class DataUploadMaxNumberOfFieldsFPost(SimpleTestCase):
         })
 
     def test_number_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
             with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
                 self.request._load_post_and_files()
 
     def test_number_not_exceeded(self):
-        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=3):
             self.request._load_post_and_files()
 
     def test_no_limit(self):
