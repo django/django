@@ -225,13 +225,12 @@ method along with the request object.
 Here's the code for these beat-specific feeds::
 
     from django.contrib.syndication.views import Feed
-    from django.shortcuts import get_object_or_404
 
     class BeatFeed(Feed):
         description_template = 'feeds/beat_description.html'
 
         def get_object(self, request, beat_id):
-            return get_object_or_404(Beat, pk=beat_id)
+            return Beat.objects.get(pk=beat_id)
 
         def title(self, obj):
             return "Police beat central: Crimes for beat %s" % obj.beat
