@@ -6,6 +6,7 @@ import warnings
 
 from admin_scripts.tests import AdminScriptTestCase
 
+from django.conf import settings
 from django.core import mail
 from django.core.files.temp import NamedTemporaryFile
 from django.test import RequestFactory, SimpleTestCase, override_settings
@@ -13,7 +14,8 @@ from django.test.utils import LoggingCaptureMixin, patch_logger
 from django.utils.deprecation import RemovedInNextVersionWarning
 from django.utils.encoding import force_text
 from django.utils.log import (
-    AdminEmailHandler, CallbackFilter, RequireDebugFalse, RequireDebugTrue,
+    DEFAULT_LOGGING, AdminEmailHandler, CallbackFilter, RequireDebugFalse,
+    RequireDebugTrue,
 )
 from django.utils.six import StringIO
 
@@ -67,6 +69,17 @@ class LoggingFiltersTest(SimpleTestCase):
 
 class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        super(DefaultLoggingTest, cls).setUpClass()
+        cls._logging = settings.LOGGING
+        logging.config.dictConfig(DEFAULT_LOGGING)
+
+    @classmethod
+    def tearDownClass(cls):
+        super(DefaultLoggingTest, cls).tearDownClass()
+        logging.config.dictConfig(cls._logging)
+
     def test_django_logger(self):
         """
         The 'django' base logger only output anything when DEBUG=True.
@@ -77,6 +90,21 @@ class DefaultLoggingTest(LoggingCaptureMixin, SimpleTestCase):
         with self.settings(DEBUG=True):
             self.logger.error("Hey, this is an error.")
             self.assertEqual(self.logger_output.getvalue(), 'Hey, this is an error.\n')
+
+    def test_django_logger_warning(self):
+        with self.settings(DEBUG=True):
+            self.logger.warning('warning')
+            self.assertEqual(self.logger_output.getvalue(), 'warning\n')
+
+    def test_django_logger_info(self):
+        with self.settings(DEBUG=True):
+            self.logger.info('info')
+            self.assertEqual(self.logger_output.getvalue(), 'info\n')
+
+    def test_django_logger_debug(self):
+        with self.settings(DEBUG=True):
+            self.logger.debug('debug')
+            self.assertEqual(self.logger_output.getvalue(), '')
 
 
 class WarningLoggerTests(SimpleTestCase):
