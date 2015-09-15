@@ -34,7 +34,7 @@ _urlconfs = local()
 
 
 class ResolverMatch(object):
-    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None):
+    def __init__(self, func, args, kwargs, url_name=None, app_names=None, namespaces=None, tags=None):
         self.func = func
         self.args = args
         self.kwargs = kwargs
@@ -61,12 +61,14 @@ class ResolverMatch(object):
         view_path = url_name or self._func_path
         self.view_name = ':'.join(self.namespaces + [view_path])
 
+        self.tags = set(tags or [])
+
     def __getitem__(self, index):
         return (self.func, self.args, self.kwargs)[index]
 
     def __repr__(self):
-        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s)" % (
-            self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces)
+        return "ResolverMatch(func=%s, args=%s, kwargs=%s, url_name=%s, app_names=%s, namespaces=%s, tags=%s)" % (
+            self._func_path, self.args, self.kwargs, self.url_name, self.app_names, self.namespaces, self.tags)
 
 
 class Resolver404(Http404):
@@ -188,14 +190,15 @@ class LocaleRegexProvider(object):
 
 
 class RegexURLPattern(LocaleRegexProvider):
-    def __init__(self, regex, callback, default_args=None, name=None):
+    def __init__(self, regex, callback, default_args=None, name=None, tags=None):
         LocaleRegexProvider.__init__(self, regex)
         self.callback = callback  # the view
         self.default_args = default_args or {}
         self.name = name
+        self.tags = tags
 
     def __repr__(self):
-        return force_str('<%s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern))
+        return force_str('<%s %s %s %s>' % (self.__class__.__name__, self.name, self.regex.pattern, self.tags))
 
     def resolve(self, path):
         match = self.regex.search(path)
@@ -211,7 +214,7 @@ class RegexURLPattern(LocaleRegexProvider):
             # In both cases, pass any extra_kwargs as **kwargs.
             kwargs.update(self.default_args)
 
-            return ResolverMatch(self.callback, args, kwargs, self.name)
+            return ResolverMatch(self.callback, args, kwargs, self.name, tags=self.tags)
 
     @cached_property
     def lookup_str(self):
@@ -229,7 +232,7 @@ class RegexURLPattern(LocaleRegexProvider):
 
 
 class RegexURLResolver(LocaleRegexProvider):
-    def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None):
+    def __init__(self, regex, urlconf_name, default_kwargs=None, app_name=None, namespace=None, tags=None):
         LocaleRegexProvider.__init__(self, regex)
         # urlconf_name is the dotted Python path to the module defining
         # urlpatterns. It may also be an object with an urlpatterns attribute
@@ -239,6 +242,7 @@ class RegexURLResolver(LocaleRegexProvider):
         self.default_kwargs = default_kwargs or {}
         self.namespace = namespace
         self.app_name = app_name
+        self.tags = set(tags or [])
         self._reverse_dict = {}
         self._namespace_dict = {}
         self._app_dict = {}
@@ -360,7 +364,8 @@ class RegexURLResolver(LocaleRegexProvider):
                             sub_match_dict,
                             sub_match.url_name,
                             [self.app_name] + sub_match.app_names,
-                            [self.namespace] + sub_match.namespaces
+                            [self.namespace] + sub_match.namespaces,
+                            tags=self.tags.union(sub_match.tags)  # Apply tags to included patterns
                         )
                     tried.append([pattern])
             raise Resolver404({'tried': tried, 'path': new_path})
