@@ -827,7 +827,8 @@ Changes to the default logging configuration
 
 To make it easier to write custom logging configurations, Django's default
 logging configuration no longer defines 'django.request' and 'django.security'
-loggers. Instead, it defines a single 'django' logger with two handlers:
+loggers. Instead, it defines a single 'django' logger, filtered at the ``INFO``
+level, with two handlers:
 
 * 'console': filtered at the ``INFO`` level and only active if ``DEBUG=True``.
 * 'mail_admins': filtered at the ``ERROR`` level and only active if
