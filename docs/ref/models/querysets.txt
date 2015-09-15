@@ -2802,7 +2802,7 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
 
-    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+    SELECT ... WHERE REGEXP_LIKE(title, '^(An?|The) +', 'c'); -- Oracle
 
     SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
 
