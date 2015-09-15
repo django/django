@@ -18,9 +18,9 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
-from django.utils.http import is_same_domain
+from django.utils.http import is_same_domain, parse_qsl2, parse_qsl3
 from django.utils.six.moves.urllib.parse import (
-    parse_qsl, quote, urlencode, urljoin, urlsplit,
+    quote, urlencode, urljoin, urlsplit,
 )
 
 RAISE_ERROR = object()
@@ -38,62 +38,6 @@ class RawPostDataException(Exception):
     FILES, etc..
     """
     pass
-
-
-class LimitChecker(object):
-    """
-    Stateful counter for enforcing a maximum number of parameters
-    """
-    def __init__(self, limit):
-        self.limit = limit
-        self.count = 0
-
-    def incr(self):
-        self.count += 1
-        if self.count > self.limit:
-            raise SuspiciousOperation('Too many fields')
-
-    def active(self):
-        return self.limit is not None
-
-    def start_split(self):
-        if self.count > 0:
-            self.count -= 1
-
-
-class SplitWrapper(str):
-    """
-    Exposes a custom split implementation when a max element
-    limit is configured that raises a SuspiciousOperation
-    exception when the limit is breached.
-    """
-
-    delims = ('&', ';')
-
-    def __new__(cls, query_string, limit_checker):
-        obj = str.__new__(cls, query_string)
-        obj.limit_checker = limit_checker
-        return obj
-
-    def __custom_split(self, sep):
-        sepsize = len(sep)
-        start = 0
-        result = []
-        self.limit_checker.start_split()
-        while True:
-            self.limit_checker.incr()
-            idx = self.__str__().find(sep, start)
-            if idx == -1:
-                result.append(SplitWrapper(self.__str__()[start:], self.limit_checker))
-                return result
-            result.append(SplitWrapper(self.__str__()[start:idx], self.limit_checker))
-            start = idx + sepsize
-
-    def split(self, sep=' ', maxsplit=-1):
-        if self.limit_checker.active() and sep in SplitWrapper.delims:
-            return self.__custom_split(sep)
-        else:
-            return super(SplitWrapper, self).split(sep, maxsplit)
 
 
 class HttpRequest(object):
@@ -437,7 +381,6 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
-        limit_checker = LimitChecker(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS)
         if six.PY3:
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
@@ -446,13 +389,19 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
-            for key, value in parse_qsl(SplitWrapper(query_string or '', limit_checker),
-                                        keep_blank_values=True,
-                                        encoding=encoding):
+            for key, value in parse_qsl3(query_string or '',
+                                         keep_blank_values=True,
+                                         encoding=encoding,
+                                         fields_limit=(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS if
+                                                       settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
+                                                       else 0)):
                 self.appendlist(key, value)
         else:
-            for key, value in parse_qsl(SplitWrapper(query_string or '', limit_checker),
-                                        keep_blank_values=True):
+            for key, value in parse_qsl2(query_string or '',
+                                         keep_blank_values=True,
+                                         fields_limit=(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS if
+                                                       settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
+                                                       else 0)):
                 try:
                     value = value.decode(encoding)
                 except UnicodeDecodeError:

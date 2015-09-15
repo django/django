@@ -150,6 +150,8 @@ class MultiPartParser(object):
         # To count the number of fields
         num_inserted_fields = 0
 
+        read_kwargs = {}
+
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
                 if old_field_name:
@@ -180,8 +182,7 @@ class MultiPartParser(object):
                     # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
                         read_kwargs = {'size': settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size}
-                    else:
-                        read_kwargs = {}
+
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
                         raw_data = field_stream.read(**read_kwargs)

@@ -9,6 +9,7 @@ import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
+from django.core.exceptions import SuspiciousOperation
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
@@ -310,3 +311,140 @@ def is_safe_url(url, host=None):
         return False
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))
+
+# Functions lifted from their respective modules in order to implement
+# several checks which were not possible with the stdlib
+
+
+def parse_qsl2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=0):
+    """Parse a query given as a string argument. Lifted from
+    urlparse.
+
+    Arguments:
+
+    qs: percent-encoded query string to be parsed
+
+    keep_blank_values: flag indicating whether blank values in
+        percent-encoded queries should be treated as blank strings.  A
+        true value indicates that blanks should be retained as blank
+        strings.  The default false value indicates that blank values
+        are to be ignored and treated as if they were  not included.
+
+    strict_parsing: flag indicating what to do with parsing errors. If
+        false (the default), errors are silently ignored. If true,
+        errors raise a ValueError exception.
+
+    fields_limit: maximum number of fields parsed, or an exception
+        is raised. 0 means no limit and is the default.
+
+    Returns a list, as G-d intended.
+    """
+    pairs = re.split('[&;]', qs, fields_limit)
+    if fields_limit > 0 and len(pairs) > fields_limit:
+        raise SuspiciousOperation('Too many fields')
+    r = []
+    for name_value in pairs:
+        if not name_value and not strict_parsing:
+            continue
+        nv = name_value.split(b'=', 1)
+        if len(nv) != 2:
+            if strict_parsing:
+                raise ValueError("bad query field: %r" % (name_value,))
+            # Handle case of a control-name with no equal sign
+            if keep_blank_values:
+                nv.append(b'')
+            else:
+                continue
+        if len(nv[1]) or keep_blank_values:
+            name = unquote(nv[0].replace(b'+', b' '))
+            value = unquote(nv[1].replace(b'+', b' '))
+            r.append((name, value))
+
+    return r
+
+
+_implicit_encoding = 'ascii'
+_implicit_errors = 'strict'
+
+
+def _noop(obj):
+    return obj
+
+
+def _encode_result(obj, encoding=_implicit_encoding, errors=_implicit_errors):
+    return obj.encode(encoding, errors)
+
+
+def _decode_args(args, encoding=_implicit_encoding, errors=_implicit_errors):
+    return tuple(x.decode(encoding, errors) if x else '' for x in args)
+
+
+def _coerce_args(*args):
+    # Invokes decode if necessary to create str args
+    # and returns the coerced inputs along with
+    # an appropriate result coercion function
+    #   - noop for str inputs
+    #   - encoding function otherwise
+    str_input = isinstance(args[0], str)
+    for arg in args[1:]:
+        # We special-case the empty string to support the
+        # "scheme=''" default argument to some functions
+        if arg and isinstance(arg, str) != str_input:
+            raise TypeError("Cannot mix str and non-str arguments")
+    if str_input:
+        return args + (_noop,)
+    return _decode_args(args) + (_encode_result,)
+
+
+def parse_qsl3(qs, keep_blank_values=False, strict_parsing=False,
+               encoding='utf-8', errors='replace', fields_limit=0):
+    """Parse a query given as a string argument. Lifted from urllib.
+
+    Arguments:
+
+    qs: percent-encoded query string to be parsed
+
+    keep_blank_values: flag indicating whether blank values in
+        percent-encoded queries should be treated as blank strings.  A
+        true value indicates that blanks should be retained as blank
+        strings.  The default false value indicates that blank values
+        are to be ignored and treated as if they were  not included.
+
+    strict_parsing: flag indicating what to do with parsing errors. If
+        false (the default), errors are silently ignored. If true,
+        errors raise a ValueError exception.
+
+    encoding and errors: specify how to decode percent-encoded sequences
+        into Unicode characters, as accepted by the bytes.decode() method.
+
+    fields_limit: maximum number of fields parsed, or an exception
+        is raised. 0 means no limit and is the default.
+
+    Returns a list, as G-d intended.
+    """
+    qs, _coerce_result = _coerce_args(qs)
+    pairs = re.split('[&;]', qs, fields_limit)
+    if fields_limit > 0 and len(pairs) > fields_limit:
+        raise SuspiciousOperation('Too many fields')
+    r = []
+    for name_value in pairs:
+        if not name_value and not strict_parsing:
+            continue
+        nv = name_value.split('=', 1)
+        if len(nv) != 2:
+            if strict_parsing:
+                raise ValueError("bad query field: %r" % (name_value,))
+            # Handle case of a control-name with no equal sign
+            if keep_blank_values:
+                nv.append('')
+            else:
+                continue
+        if len(nv[1]) or keep_blank_values:
+            name = nv[0].replace('+', ' ')
+            name = unquote(name, encoding=encoding, errors=errors)
+            name = _coerce_result(name)
+            value = nv[1].replace('+', ' ')
+            value = unquote(value, encoding=encoding, errors=errors)
+            value = _coerce_result(value)
+            r.append((name, value))
+    return r
