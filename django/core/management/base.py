@@ -175,6 +175,7 @@ class BaseCommand(object):
         This is the list of ``optparse`` options which will be fed
         into the command's ``OptionParser`` for parsing arguments.
         Deprecated and will be removed in Django 1.10.
+        Use ``add_arguments`` instead.
 
     ``output_transaction``
         A boolean indicating whether the command outputs SQL
