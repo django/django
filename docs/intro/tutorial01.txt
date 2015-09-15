@@ -201,8 +201,9 @@ and creates any necessary database tables according to the database settings
 in your :file:`mysite/settings.py` file and the database migrations shipped
 with the app (we'll cover those later). You'll see a message for each
 migration it applies. If you're interested, run the command-line client for your
-database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), or
-``.schema`` (SQLite) to display the tables Django created.
+database and type ``\dt`` (PostgreSQL), ``SHOW TABLES;`` (MySQL), ``.schema``
+(SQLite), or ``SELECT TABLE_NAME FROM USER_TABLES;`` (Oracle) to display the
+tables Django created.
 
 .. admonition:: For the minimalists
 
@@ -518,7 +519,7 @@ Note the following:
 * It's tailored to the database you're using, so database-specific field types
   such as ``auto_increment`` (MySQL), ``serial`` (PostgreSQL), or ``integer
   primary key autoincrement`` (SQLite) are handled for you automatically. Same
-  goes for the quoting of field names -- e.g., using double quotes or 
+  goes for the quoting of field names -- e.g., using double quotes or
   single quotes.
 
 * The :djadmin:`sqlmigrate` command doesn't actually run the migration on your
@@ -565,9 +566,9 @@ but for now, remember the three-step guide to making model changes:
 * Run :djadmin:`python manage.py migrate <migrate>` to apply those changes to
   the database.
 
-The reason that there are separate commands to make and apply migrations is 
-because you'll commit migrations to your version control system and ship them 
-with your app; they not only make your development easier, they're also 
+The reason that there are separate commands to make and apply migrations is
+because you'll commit migrations to your version control system and ship them
+with your app; they not only make your development easier, they're also
 useable by other developers and in production.
 
 Read the :doc:`django-admin documentation </ref/django-admin>` for full
