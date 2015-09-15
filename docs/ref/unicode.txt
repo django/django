@@ -23,11 +23,17 @@ able to store certain characters in the database, and information will be lost.
 * PostgreSQL users, refer to the `PostgreSQL manual`_ (section 22.3.2 in
   PostgreSQL 9) for details on creating databases with the correct encoding.
 
+* Oracle users, refer to the `Oracle manual`_ for details on how to set
+  (`section 2`_) or alter (`section 11`_) the database character set encoding.
+
 * SQLite users, there is nothing you need to do. SQLite always uses UTF-8
   for internal encoding.
 
 .. _MySQL manual: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
 .. _PostgreSQL manual: http://www.postgresql.org/docs/current/static/multibyte.html
+.. _Oracle manual: http://docs.oracle.com/cd/E11882_01/server.112/e10729/toc.htm
+.. _section 2: http://docs.oracle.com/cd/E11882_01/server.112/e10729/ch2charset.htm#NLSPG002
+.. _section 11: http://docs.oracle.com/cd/E11882_01/server.112/e10729/ch11charsetmig.htm#NLSPG011
 
 All of Django's database backends automatically convert Unicode strings into
 the appropriate encoding for talking to the database. They also automatically
