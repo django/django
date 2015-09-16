@@ -33,7 +33,8 @@ class Command(BaseCommand):
         parser.add_argument('--%s' % self.UserModel.USERNAME_FIELD,
             dest=self.UserModel.USERNAME_FIELD, default=None,
             help='Specifies the login for the superuser.')
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+        parser.add_argument('--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
             help=('Tells Django to NOT prompt the user for input of any kind. '
                   'You must use --%s with --noinput, along with an option for '
                   'any other required field. Superusers created with --noinput will '

@@ -199,14 +199,14 @@ But first we need to tell our project that the ``polls`` app is installed.
     Django installation.
 
 Edit the :file:`mysite/settings.py` file again, and change the
-:setting:`INSTALLED_APPS` setting to include the string ``'polls'``. So it'll
-look like this:
+:setting:`INSTALLED_APPS` setting to include the string
+``'polls.apps.PollsConfig'``. It'll look like this:
 
 .. snippet::
     :filename: mysite/settings.py
 
     INSTALLED_APPS = [
-        'polls',
+        'polls.apps.PollsConfig',
         'django.contrib.admin',
         'django.contrib.auth',
         'django.contrib.contenttypes',

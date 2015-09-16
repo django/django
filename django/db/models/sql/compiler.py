@@ -484,7 +484,10 @@ class SQLCompiler(object):
         if obj.low_mark == 0 and obj.high_mark is None and not self.query.distinct_fields:
             # If there is no slicing in use, then we can safely drop all ordering
             obj.clear_ordering(True)
-        return obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        nested_sql = obj.get_compiler(connection=self.connection).as_sql(subquery=True)
+        if nested_sql == ('', ()):
+            raise EmptyResultSet
+        return nested_sql
 
     def get_default_columns(self, start_alias=None, opts=None, from_parent=None):
         """
@@ -995,7 +998,7 @@ class SQLDeleteCompiler(SQLCompiler):
         Creates the SQL for this query. Returns the SQL string and list of
         parameters.
         """
-        assert len(self.query.tables) == 1, \
+        assert len([t for t in self.query.tables if self.query.alias_refcount[t] > 0]) == 1, \
             "Can only delete from one table at a time."
         qn = self.quote_name_unless_alias
         result = ['DELETE FROM %s' % qn(self.query.tables[0])]

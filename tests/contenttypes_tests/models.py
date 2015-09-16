@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+from django.contrib.contenttypes.fields import (
+    GenericForeignKey, GenericRelation,
+)
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import urlquote
@@ -76,3 +80,38 @@ class FooWithBrokenAbsoluteUrl(FooWithoutUrl):
 
     def get_absolute_url(self):
         return "/users/%s/" % self.unknown_field
+
+
+class Question(models.Model):
+    text = models.CharField(max_length=200)
+    answer_set = GenericRelation('Answer')
+
+
+@python_2_unicode_compatible
+class Answer(models.Model):
+    text = models.CharField(max_length=200)
+    content_type = models.ForeignKey(ContentType, models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    question = GenericForeignKey()
+
+    class Meta:
+        order_with_respect_to = 'question'
+
+    def __str__(self):
+        return self.text
+
+
+@python_2_unicode_compatible
+class Post(models.Model):
+    """An ordered tag on an item."""
+    title = models.CharField(max_length=200)
+    content_type = models.ForeignKey(ContentType, models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    parent = GenericForeignKey()
+    children = GenericRelation('Post')
+
+    class Meta:
+        order_with_respect_to = 'parent'
+
+    def __str__(self):
+        return self.title

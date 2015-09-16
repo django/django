@@ -127,7 +127,9 @@ class UrlTagTests(SimpleTestCase):
     @ignore_warnings(category=RemovedInDjango110Warning)
     @setup({'url19': '{% url named_url client.id %}'})
     def test_url19(self):
-        output = self.engine.render_to_string('url19', {'client': {'id': 1}, 'named_url': 'template_tests.views.client'})
+        output = self.engine.render_to_string(
+            'url19', {'client': {'id': 1}, 'named_url': 'template_tests.views.client'}
+        )
         self.assertEqual(output, '/client/1/')
 
     @setup({'url20': '{% url url_name_in_var client.id %}'})

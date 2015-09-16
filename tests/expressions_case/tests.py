@@ -689,7 +689,15 @@ class CaseExpressionTests(TestCase):
         )
         self.assertQuerysetEqual(
             CaseTestModel.objects.all().order_by('pk'),
-            [(1, Decimal('1.1')), (2, Decimal('2.2')), (3, None), (2, Decimal('2.2')), (3, None), (3, None), (4, None)],
+            [
+                (1, Decimal('1.1')),
+                (2, Decimal('2.2')),
+                (3, None),
+                (2, Decimal('2.2')),
+                (3, None),
+                (3, None),
+                (4, None)
+            ],
             transform=attrgetter('integer', 'decimal')
         )
 
@@ -934,8 +942,13 @@ class CaseExpressionTests(TestCase):
         self.assertQuerysetEqual(
             CaseTestModel.objects.all().order_by('pk'),
             [
-                (1, UUID('11111111111111111111111111111111')), (2, UUID('22222222222222222222222222222222')), (3, None),
-                (2, UUID('22222222222222222222222222222222')), (3, None), (3, None), (4, None)
+                (1, UUID('11111111111111111111111111111111')),
+                (2, UUID('22222222222222222222222222222222')),
+                (3, None),
+                (2, UUID('22222222222222222222222222222222')),
+                (3, None),
+                (3, None),
+                (4, None),
             ],
             transform=attrgetter('integer', 'uuid')
         )

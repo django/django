@@ -16,6 +16,7 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
+from django.utils.http import is_same_domain
 from django.utils.six.moves.urllib.parse import (
     parse_qsl, quote, urlencode, urljoin, urlsplit,
 )
@@ -68,8 +69,11 @@ class HttpRequest(object):
             '<%s: %s %r>' % (self.__class__.__name__, self.method, force_str(self.get_full_path()))
         )
 
-    def get_host(self):
-        """Returns the HTTP host using the environment or request headers."""
+    def _get_raw_host(self):
+        """
+        Return the HTTP host using the environment or request headers. Skip
+        allowed hosts protection, so may return an insecure host.
+        """
         # We try three options, in order of decreasing preference.
         if settings.USE_X_FORWARDED_HOST and (
                 'HTTP_X_FORWARDED_HOST' in self.META):
@@ -82,6 +86,11 @@ class HttpRequest(object):
             server_port = self.get_port()
             if server_port != ('443' if self.is_secure() else '80'):
                 host = '%s:%s' % (host, server_port)
+        return host
+
+    def get_host(self):
+        """Return the HTTP host using the environment or request headers."""
+        host = self._get_raw_host()
 
         # There is no hostname validation when DEBUG=True
         if settings.DEBUG:
@@ -137,6 +146,17 @@ class HttpRequest(object):
             else:
                 raise
         return value
+
+    def get_raw_uri(self):
+        """
+        Return an absolute URI from variables available in this request. Skip
+        allowed hosts protection, so may return insecure URI.
+        """
+        return '{scheme}://{host}{path}'.format(
+            scheme=self.scheme,
+            host=self._get_raw_host(),
+            path=self.get_full_path(),
+        )
 
     def build_absolute_uri(self, location=None):
         """
@@ -457,7 +477,6 @@ class QueryDict(MultiValueDict):
                 'next=%2Fa%26b%2F'
                 >>> q.urlencode(safe='/')
                 'next=/a%26b/'
-
         """
         output = []
         if safe:
@@ -524,20 +543,11 @@ def validate_host(host, allowed_hosts):
     already had the port, if any, stripped off.
 
     Return ``True`` for a valid host, ``False`` otherwise.
-
     """
     host = host[:-1] if host.endswith('.') else host
 
     for pattern in allowed_hosts:
-        pattern = pattern.lower()
-        match = (
-            pattern == '*' or
-            pattern.startswith('.') and (
-                host.endswith(pattern) or host == pattern[1:]
-            ) or
-            pattern == host
-        )
-        if match:
+        if pattern == '*' or is_same_domain(host, pattern):
             return True
 
     return False

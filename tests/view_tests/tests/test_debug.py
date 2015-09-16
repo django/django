@@ -439,6 +439,14 @@ class ExceptionReporterTests(SimpleTestCase):
             "Evaluation exception reason not mentioned in traceback"
         )
 
+    @override_settings(ALLOWED_HOSTS='example.com')
+    def test_disallowed_host(self):
+        "An exception report can be generated even for a disallowed host."
+        request = self.rf.get('/', HTTP_HOST='evil.com')
+        reporter = ExceptionReporter(request, None, None, None)
+        html = reporter.get_traceback_html()
+        self.assertIn("http://evil.com/", html)
+
 
 class PlainTextReportTests(SimpleTestCase):
     rf = RequestFactory()
@@ -494,6 +502,14 @@ class PlainTextReportTests(SimpleTestCase):
     def test_message_only(self):
         reporter = ExceptionReporter(None, None, "I'm a little teapot", None)
         reporter.get_traceback_text()
+
+    @override_settings(ALLOWED_HOSTS='example.com')
+    def test_disallowed_host(self):
+        "An exception report can be generated even for a disallowed host."
+        request = self.rf.get('/', HTTP_HOST='evil.com')
+        reporter = ExceptionReporter(request, None, None, None)
+        text = reporter.get_traceback_text()
+        self.assertIn("http://evil.com/", text)
 
 
 class ExceptionReportTestMixin(object):

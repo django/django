@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import collections
 from datetime import datetime
 from operator import attrgetter
 from unittest import skipUnless
@@ -75,6 +76,8 @@ class LookupTests(TestCase):
     def test_iterator(self):
         # Each QuerySet gets iterator(), which is a generator that "lazily"
         # returns results using database-level iteration.
+        self.assertIsInstance(Article.objects.iterator(), collections.Iterator)
+
         self.assertQuerysetEqual(Article.objects.iterator(),
             [
                 'Article 5',
@@ -226,7 +229,11 @@ class LookupTests(TestCase):
                 {'name': self.au2.name, 'article__headline': self.a7.headline},
             ], transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            (
+                Author.objects
+                .values('name', 'article__headline', 'article__tag__name')
+                .order_by('name', 'article__headline', 'article__tag__name')
+            ),
             [
                 {'name': self.au1.name, 'article__headline': self.a1.headline, 'article__tag__name': self.t1.name},
                 {'name': self.au1.name, 'article__headline': self.a2.headline, 'article__tag__name': self.t1.name},
@@ -308,7 +315,11 @@ class LookupTests(TestCase):
             ],
             transform=identity)
         self.assertQuerysetEqual(
-            Author.objects.values_list('name', 'article__headline', 'article__tag__name').order_by('name', 'article__headline', 'article__tag__name'),
+            (
+                Author.objects
+                .values_list('name', 'article__headline', 'article__tag__name')
+                .order_by('name', 'article__headline', 'article__tag__name')
+            ),
             [
                 (self.au1.name, self.a1.headline, self.t1.name),
                 (self.au1.name, self.a2.headline, self.t1.name),

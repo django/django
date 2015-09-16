@@ -156,14 +156,18 @@ class FileUploadTests(TestCase):
         (#22971).
         """
         payload = client.FakePayload()
-        payload.write('\r\n'.join([
-            '--' + client.BOUNDARY,
-            'Content-Disposition: form-data; name*=UTF-8\'\'file_unicode; filename*=UTF-8\'\'%s' % urlquote(UNICODE_FILENAME),
-            'Content-Type: application/octet-stream',
-            '',
-            'You got pwnd.\r\n',
-            '\r\n--' + client.BOUNDARY + '--\r\n'
-        ]))
+        payload.write(
+            '\r\n'.join([
+                '--' + client.BOUNDARY,
+                'Content-Disposition: form-data; name*=UTF-8\'\'file_unicode; filename*=UTF-8\'\'%s' % urlquote(
+                    UNICODE_FILENAME
+                ),
+                'Content-Type: application/octet-stream',
+                '',
+                'You got pwnd.\r\n',
+                '\r\n--' + client.BOUNDARY + '--\r\n'
+            ])
+        )
 
         r = {
             'CONTENT_LENGTH': len(payload),

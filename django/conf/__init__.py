@@ -42,6 +42,14 @@ class LazySettings(LazyObject):
 
         self._wrapped = Settings(settings_module)
 
+    def __repr__(self):
+        # Hardcode the class name as otherwise it yields 'Settings'.
+        if self._wrapped is empty:
+            return '<LazySettings [Unevaluated]>'
+        return '<LazySettings "%(settings_module)s">' % {
+            'settings_module': self._wrapped.SETTINGS_MODULE,
+        }
+
     def __getattr__(self, name):
         if self._wrapped is empty:
             self._setup(name)
@@ -136,6 +144,12 @@ class Settings(BaseSettings):
     def is_overridden(self, setting):
         return setting in self._explicit_settings
 
+    def __repr__(self):
+        return '<%(cls)s "%(settings_module)s">' % {
+            'cls': self.__class__.__name__,
+            'settings_module': self.SETTINGS_MODULE,
+        }
+
 
 class UserSettingsHolder(BaseSettings):
     """
@@ -175,5 +189,10 @@ class UserSettingsHolder(BaseSettings):
         set_locally = (setting in self.__dict__)
         set_on_default = getattr(self.default_settings, 'is_overridden', lambda s: False)(setting)
         return (deleted or set_locally or set_on_default)
+
+    def __repr__(self):
+        return '<%(cls)s>' % {
+            'cls': self.__class__.__name__,
+        }
 
 settings = LazySettings()

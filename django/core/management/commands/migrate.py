@@ -33,7 +33,8 @@ class Command(BaseCommand):
                 'migration. Use the name "zero" to unapply all migrations.'
             ),
         )
-        parser.add_argument('--noinput', action='store_false', dest='interactive', default=True,
+        parser.add_argument('--noinput', '--no-input',
+            action='store_false', dest='interactive', default=True,
             help='Tells Django to NOT prompt the user for input of any kind.')
         parser.add_argument('--database', action='store', dest='database',
             default=DEFAULT_DB_ALIAS, help='Nominates a database to synchronize. '
@@ -46,6 +47,8 @@ class Command(BaseCommand):
                  'flag. Django will only check for an existing table name.')
         parser.add_argument('--list', '-l', action='store_true', dest='list', default=False,
             help='Show a list of all known migrations and which are applied.')
+        parser.add_argument('--run-syncdb', action='store_true', dest='run_syncdb',
+            help='Creates tables for apps without migrations.')
 
     def handle(self, *args, **options):
 
@@ -94,7 +97,8 @@ class Command(BaseCommand):
                 for app, names in conflicts.items()
             )
             raise CommandError(
-                "Conflicting migrations detected (%s).\nTo fix them run "
+                "Conflicting migrations detected; multiple leaf nodes in the "
+                "migration graph: (%s).\nTo fix them run "
                 "'python manage.py makemigrations --merge'" % name_str
             )
 

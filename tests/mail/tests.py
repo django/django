@@ -81,16 +81,28 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(email.recipients(), ['to@example.com', 'cc@example.com'])
 
         # Test multiple CC with multiple To
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'], cc=['cc@example.com', 'cc.other@example.com'])
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'],
+            cc=['cc@example.com', 'cc.other@example.com']
+        )
         message = email.message()
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
-        self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com'])
+        self.assertEqual(
+            email.recipients(),
+            ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com']
+        )
 
         # Testing with Bcc
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'], cc=['cc@example.com', 'cc.other@example.com'], bcc=['bcc@example.com'])
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ['to@example.com', 'other@example.com'],
+            cc=['cc@example.com', 'cc.other@example.com'], bcc=['bcc@example.com']
+        )
         message = email.message()
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
-        self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com'])
+        self.assertEqual(
+            email.recipients(),
+            ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
+        )
 
     def test_reply_to(self):
         email = EmailMessage(
@@ -108,10 +120,16 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertEqual(message['Reply-To'], 'reply_to1@example.com, reply_to2@example.com')
 
     def test_recipients_as_tuple(self):
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ('to@example.com', 'other@example.com'), cc=('cc@example.com', 'cc.other@example.com'), bcc=('bcc@example.com',))
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com', ('to@example.com', 'other@example.com'),
+            cc=('cc@example.com', 'cc.other@example.com'), bcc=('bcc@example.com',)
+        )
         message = email.message()
         self.assertEqual(message['Cc'], 'cc@example.com, cc.other@example.com')
-        self.assertEqual(email.recipients(), ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com'])
+        self.assertEqual(
+            email.recipients(),
+            ['to@example.com', 'other@example.com', 'cc@example.com', 'cc.other@example.com', 'bcc@example.com']
+        )
 
     def test_recipients_as_string(self):
         with self.assertRaisesMessage(TypeError, '"to" argument must be a list or tuple'):
@@ -126,17 +144,27 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_header_injection(self):
         email = EmailMessage('Subject\nInjection Test', 'Content', 'from@example.com', ['to@example.com'])
         self.assertRaises(BadHeaderError, email.message)
-        email = EmailMessage(ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage(
+            ugettext_lazy('Subject\nInjection Test'), 'Content', 'from@example.com', ['to@example.com']
+        )
         self.assertRaises(BadHeaderError, email.message)
 
     def test_space_continuation(self):
         """
         Test for space continuation character in long (ASCII) subject headers (#7747)
         """
-        email = EmailMessage('Long subject lines that get wrapped should contain a space continuation character to get expected behavior in Outlook and Thunderbird', 'Content', 'from@example.com', ['to@example.com'])
+        email = EmailMessage(
+            'Long subject lines that get wrapped should contain a space '
+            'continuation character to get expected behavior in Outlook and Thunderbird',
+            'Content', 'from@example.com', ['to@example.com']
+        )
         message = email.message()
         # Note that in Python 3, maximum line length has increased from 76 to 78
-        self.assertEqual(message['Subject'].encode(), b'Long subject lines that get wrapped should contain a space continuation\n character to get expected behavior in Outlook and Thunderbird')
+        self.assertEqual(
+            message['Subject'].encode(),
+            b'Long subject lines that get wrapped should contain a space continuation\n'
+            b' character to get expected behavior in Outlook and Thunderbird'
+        )
 
     def test_message_header_overrides(self):
         """
@@ -161,7 +189,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         """
         Make sure we can manually set the From header (#9214)
         """
-        email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         message = email.message()
         self.assertEqual(message['From'], 'from@example.com')
 
@@ -199,7 +230,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         Regression for #13259 - Make sure that headers are not changed when
         calling EmailMessage.message()
         """
-        email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         message = email.message()
         self.assertEqual(message['From'], 'from@example.com')
         message = email.message()
@@ -211,10 +245,22 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         make sure the email addresses are parsed correctly (especially with
         regards to commas)
         """
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ['"Firstname Sürname" <to@example.com>', 'other@example.com'])
-        self.assertEqual(email.message()['To'], '=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com')
-        email = EmailMessage('Subject', 'Content', 'from@example.com', ['"Sürname, Firstname" <to@example.com>', 'other@example.com'])
-        self.assertEqual(email.message()['To'], '=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com')
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com',
+            ['"Firstname Sürname" <to@example.com>', 'other@example.com'],
+        )
+        self.assertEqual(
+            email.message()['To'],
+            '=?utf-8?q?Firstname_S=C3=BCrname?= <to@example.com>, other@example.com'
+        )
+        email = EmailMessage(
+            'Subject', 'Content', 'from@example.com',
+            ['"Sürname, Firstname" <to@example.com>', 'other@example.com'],
+        )
+        self.assertEqual(
+            email.message()['To'],
+            '=?utf-8?q?S=C3=BCrname=2C_Firstname?= <to@example.com>, other@example.com'
+        )
 
     def test_unicode_headers(self):
         email = EmailMessage("Gżegżółka", "Content", "from@example.com", ["to@example.com"],
@@ -274,7 +320,9 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             ('MIME-Version', '1.0'),
             ('Content-Type', 'text/html; charset="iso-8859-1"'),
             ('Content-Transfer-Encoding', 'quoted-printable')})
-        self.assertTrue(payload1.as_bytes().endswith(b'\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>'))
+        self.assertTrue(
+            payload1.as_bytes().endswith(b'\n\n<p>Firstname S=FCrname is a <strong>great</strong> guy.</p>')
+        )
 
     def test_attachments(self):
         """Regression test for #9367"""
@@ -341,7 +389,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         Make sure that dummy backends returns correct number of sent messages
         """
         connection = dummy.EmailBackend()
-        email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         self.assertEqual(connection.send_messages([email, email, email]), 3)
 
     def test_arbitrary_keyword(self):
@@ -356,19 +407,31 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         """Test custom backend defined in this suite."""
         conn = mail.get_connection('mail.custombackend.EmailBackend')
         self.assertTrue(hasattr(conn, 'test_outbox'))
-        email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         conn.send_messages([email])
         self.assertEqual(len(conn.test_outbox), 1)
 
     def test_backend_arg(self):
         """Test backend argument of mail.get_connection()"""
         self.assertIsInstance(mail.get_connection('django.core.mail.backends.smtp.EmailBackend'), smtp.EmailBackend)
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.locmem.EmailBackend'), locmem.EmailBackend)
+        self.assertIsInstance(
+            mail.get_connection('django.core.mail.backends.locmem.EmailBackend'),
+            locmem.EmailBackend
+        )
         self.assertIsInstance(mail.get_connection('django.core.mail.backends.dummy.EmailBackend'), dummy.EmailBackend)
-        self.assertIsInstance(mail.get_connection('django.core.mail.backends.console.EmailBackend'), console.EmailBackend)
+        self.assertIsInstance(
+            mail.get_connection('django.core.mail.backends.console.EmailBackend'),
+            console.EmailBackend
+        )
         tmp_dir = tempfile.mkdtemp()
         try:
-            self.assertIsInstance(mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir), filebased.EmailBackend)
+            self.assertIsInstance(
+                mail.get_connection('django.core.mail.backends.filebased.EmailBackend', file_path=tmp_dir),
+                filebased.EmailBackend
+            )
         finally:
             shutil.rmtree(tmp_dir)
         self.assertIsInstance(mail.get_connection(), locmem.EmailBackend)
@@ -413,29 +476,44 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
     def test_dont_mangle_from_in_body(self):
         # Regression for #13433 - Make sure that EmailMessage doesn't mangle
         # 'From ' in message body.
-        email = EmailMessage('Subject', 'From the future', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'From the future', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         self.assertNotIn(b'>From the future', email.message().as_bytes())
 
     def test_dont_base64_encode(self):
         # Ticket #3472
         # Shouldn't use Base64 encoding at all
-        msg = EmailMessage('Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage(
+            'Subject', 'UTF-8 encoded body', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         self.assertNotIn(b'Content-Transfer-Encoding: base64', msg.message().as_bytes())
 
         # Ticket #11212
         # Shouldn't use quoted printable, should detect it can represent content with 7 bit data
-        msg = EmailMessage('Subject', 'Body with only ASCII characters.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage(
+            'Subject', 'Body with only ASCII characters.', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         s = msg.message().as_bytes()
         self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 7bit', s)
 
         # Shouldn't use quoted printable, should detect it can represent content with 8 bit data
-        msg = EmailMessage('Subject', 'Body with latin characters: àáä.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage(
+            'Subject', 'Body with latin characters: àáä.', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         s = msg.message().as_bytes()
         self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
 
-        msg = EmailMessage('Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage(
+            'Subject', 'Body with non latin characters: А Б В Г Д Е Ж Ѕ З И І К Л М Н О П.', 'bounce@example.com',
+            ['to@example.com'], headers={'From': 'from@example.com'},
+        )
         s = msg.message().as_bytes()
         self.assertNotIn(b'Content-Transfer-Encoding: quoted-printable', s)
         self.assertIn(b'Content-Transfer-Encoding: 8bit', s)
@@ -444,11 +522,17 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         # Ticket #18967
         # Shouldn't use base64 encoding for a child EmailMessage attachment.
         # Create a child message first
-        child_msg = EmailMessage('Child Subject', 'Some body of child message', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        child_msg = EmailMessage(
+            'Child Subject', 'Some body of child message', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         child_s = child_msg.message().as_string()
 
         # Now create a parent
-        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        parent_msg = EmailMessage(
+            'Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
 
         # Attach to parent as a string
         parent_msg.attach(content=child_s, mimetype='message/rfc822')
@@ -458,7 +542,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching email.Message object directly to the mail.
-        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        parent_msg = EmailMessage(
+            'Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         parent_msg.attach(content=child_msg.message(), mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
@@ -466,7 +553,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
         self.assertIn(str('Child Subject'), parent_s)
 
         # Feature test: try attaching Django's EmailMessage object directly to the mail.
-        parent_msg = EmailMessage('Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        parent_msg = EmailMessage(
+            'Parent Subject', 'Some parent body', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         parent_msg.attach(content=child_msg, mimetype='message/rfc822')
         parent_s = parent_msg.message().as_string()
 
@@ -769,7 +859,10 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
         """
         connection = locmem.EmailBackend()
         connection2 = locmem.EmailBackend()
-        email = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        email = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         connection.send_messages([email])
         connection2.send_messages([email])
         self.assertEqual(len(mail.outbox), 2)
@@ -808,7 +901,10 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
 
     def test_file_sessions(self):
         """Make sure opening a connection creates a new file"""
-        msg = EmailMessage('Subject', 'Content', 'bounce@example.com', ['to@example.com'], headers={'From': 'from@example.com'})
+        msg = EmailMessage(
+            'Subject', 'Content', 'bounce@example.com', ['to@example.com'],
+            headers={'From': 'from@example.com'},
+        )
         connection = mail.get_connection()
         connection.send_messages([msg])
 

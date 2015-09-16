@@ -330,13 +330,13 @@ subclass::
                 }),
                 ('Advanced options', {
                     'classes': ('collapse',),
-                    'fields': ('enable_comments', 'registration_required', 'template_name')
+                    'fields': ('registration_required', 'template_name'),
                 }),
             )
 
     This results in an admin page that looks like:
 
-    .. image:: _images/flatfiles_admin.png
+    .. image:: _images/fieldsets.png
 
     If neither ``fieldsets`` nor :attr:`~ModelAdmin.fields` options are present,
     Django will default to displaying each field that isn't an ``AutoField`` and
@@ -583,11 +583,9 @@ subclass::
       ``False``.
 
     * If the string given is a method of the model, ``ModelAdmin`` or a
-      callable, Django will HTML-escape the output by default. If you'd
-      rather not escape the output of the method, give the method an
-      ``allow_tags`` attribute whose value is ``True``. However, to avoid an
-      XSS vulnerability, you should use :func:`~django.utils.html.format_html`
-      to escape user-provided inputs.
+      callable, Django will HTML-escape the output by default. To escape
+      user input and allow your own unescaped tags, use
+      :func:`~django.utils.html.format_html`.
 
       Here's a full example model::
 
@@ -606,10 +604,16 @@ subclass::
                                      self.first_name,
                                      self.last_name)
 
-              colored_name.allow_tags = True
-
           class PersonAdmin(admin.ModelAdmin):
               list_display = ('first_name', 'last_name', 'colored_name')
+
+      .. deprecated:: 1.9
+
+          In older versions, you could add an ``allow_tags`` attribute to the
+          method to prevent auto-escaping. This attribute is deprecated as it's
+          safer to use :func:`~django.utils.html.format_html`,
+          :func:`~django.utils.html.format_html_join`, or
+          :func:`~django.utils.safestring.mark_safe` instead.
 
     * If the value of a field is ``None``, an empty string, or an iterable
       without elements, Django will display ``-`` (a dash). You can override
@@ -688,7 +692,6 @@ subclass::
                                    self.color_code,
                                    self.first_name)
 
-            colored_first_name.allow_tags = True
             colored_first_name.admin_order_field = 'first_name'
 
         class PersonAdmin(admin.ModelAdmin):
@@ -799,7 +802,7 @@ subclass::
     Set ``list_filter`` to activate filters in the right sidebar of the change
     list page of the admin, as illustrated in the following screenshot:
 
-    .. image:: _images/users_changelist.png
+    .. image:: _images/list_filter.png
 
     ``list_filter`` should be a list or tuple of elements, where each element
     should be of one of the following types:
@@ -1095,12 +1098,10 @@ subclass::
                     mark_safe('<br/>'),
                     '{}',
                     ((line,) for line in instance.get_full_address()),
-                ) or "<span class='errors'>I can't determine this address.</span>"
+                ) or mark_safe("<span class='errors'>I can't determine this address.</span>")
 
             # short_description functions like a model field's verbose_name
             address_report.short_description = "Address"
-            # in this example, we have used HTML tags in the output
-            address_report.allow_tags = True
 
 .. attribute:: ModelAdmin.save_as
 
@@ -1887,13 +1888,19 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 1.11.2) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 2.1.4) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views.
 
 .. versionchanged:: 1.8
 
     The embedded jQuery has been upgraded from 1.9.1 to 1.11.2.
+
+.. versionchanged:: 1.9
+
+    The embedded jQuery has been upgraded from 1.11.2 to 2.1.4. This drops
+    support for Internet Explorer 8 and below. You can restore support by
+    :ref:`including your own version of jQuery 1.X <admin-browser-support-19>`.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have

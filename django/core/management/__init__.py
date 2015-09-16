@@ -14,7 +14,7 @@ from django.core.management.base import (
     BaseCommand, CommandError, CommandParser, handle_default_options,
 )
 from django.core.management.color import color_style
-from django.utils import lru_cache, six
+from django.utils import autoreload, lru_cache, six
 from django.utils._os import npath, upath
 
 
@@ -253,7 +253,7 @@ class ManagementUtility(object):
                 options.extend((sorted(s_opt.option_strings)[0], s_opt.nargs != 0) for s_opt in
                                parser._actions if s_opt.option_strings)
             else:
-                options.extend((s_opt.get_opt_string(), s_opt.nargs) for s_opt in
+                options.extend((s_opt.get_opt_string(), s_opt.nargs != 0) for s_opt in
                                parser.option_list)
             # filter out previously specified options from available options
             prev_opts = [x.split('=')[0] for x in cwords[1:cword - 1]]
@@ -308,7 +308,20 @@ class ManagementUtility(object):
                 settings.configure()
 
         if settings.configured:
-            django.setup()
+            # Start the auto-reloading dev server even if the code is broken.
+            # The hardcoded condition is a code smell but we can't rely on a
+            # flag on the command class because we haven't located it yet.
+            if subcommand == 'runserver' and '--noreload' not in self.argv:
+                try:
+                    autoreload.check_errors(django.setup)()
+                except Exception:
+                    # The exception will be raised later in the child process
+                    # started by the autoreloader.
+                    pass
+
+            # In all other cases, django.setup() is required to succeed.
+            else:
+                django.setup()
 
         self.autocomplete()
 

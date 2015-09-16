@@ -214,6 +214,5 @@ def load_handler(path, *args, **kwargs):
         >>> request = HttpRequest()
         >>> load_handler('django.core.files.uploadhandler.TemporaryFileUploadHandler', request)
         <TemporaryFileUploadHandler object at 0x...>
-
     """
     return import_string(path)(*args, **kwargs)

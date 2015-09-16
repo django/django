@@ -184,7 +184,6 @@ def resolve_url(to, *args, **kwargs):
           be used to reverse-resolve the name.
 
         * A URL, which will be returned as-is.
-
     """
     # If it's a model, use get_absolute_url()
     if hasattr(to, 'get_absolute_url'):

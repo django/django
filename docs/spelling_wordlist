@@ -644,6 +644,7 @@ refactoring
 refactorings
 refactors
 referer
+referers
 reflow
 regex
 regexes
@@ -777,6 +778,7 @@ substring
 Substring
 subtemplate
 subtemplates
+subtransactions
 subtree
 subtype
 subviews
@@ -867,6 +869,7 @@ unglamorous
 ungrouped
 unhandled
 unharmful
+unhashable
 unicode
 uninstall
 uninstalling

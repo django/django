@@ -90,8 +90,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_process_view_token_too_long(self):
         """
-        Check that if the token is longer than expected, it is ignored and
-        a new token is created.
+        If the token is longer than expected, it is ignored and a new token is
+        created.
         """
         req = self._get_GET_no_csrf_cookie_request()
         req.COOKIES[settings.CSRF_COOKIE_NAME] = 'x' * 10000000
@@ -295,7 +295,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         csrf_cookie = resp2.cookies[settings.CSRF_COOKIE_NAME]
         self._check_token_present(resp, csrf_id=csrf_cookie.value)
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    @override_settings(DEBUG=True)
     def test_https_bad_referer(self):
         """
         Test that a POST HTTPS request with a bad referer is rejected
@@ -304,32 +304,55 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req._is_secure_override = True
         req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'https://www.evil.org/somepage'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertIsNotNone(req2)
-        self.assertEqual(403, req2.status_code)
+        req.META['SERVER_PORT'] = '443'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response,
+            'Referer checking failed - https://www.evil.org/somepage does not '
+            'match any trusted origins.',
+            status_code=403,
+        )
 
-    @override_settings(ALLOWED_HOSTS=['www.example.com'])
+    @override_settings(DEBUG=True)
     def test_https_malformed_referer(self):
         """
-        Test that a POST HTTPS request with a bad referer is rejected
+        A POST HTTPS request with a bad referer is rejected.
         """
+        malformed_referer_msg = 'Referer checking failed - Referer is malformed.'
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
-        req.META['HTTP_HOST'] = 'www.example.com'
         req.META['HTTP_REFERER'] = 'http://http://www.example.com/'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertIsNotNone(req2)
-        self.assertEqual(403, req2.status_code)
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response,
+            'Referer checking failed - Referer is insecure while host is secure.',
+            status_code=403,
+        )
+        # Empty
+        req.META['HTTP_REFERER'] = ''
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
         # Non-ASCII
         req.META['HTTP_REFERER'] = b'\xd8B\xf6I\xdf'
-        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
-        self.assertIsNotNone(req2)
-        self.assertEqual(403, req2.status_code)
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
+        # missing scheme
+        # >>> urlparse('//example.com/')
+        # ParseResult(scheme='', netloc='example.com', path='/', params='', query='', fragment='')
+        req.META['HTTP_REFERER'] = '//example.com/'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
+        # missing netloc
+        # >>> urlparse('https://')
+        # ParseResult(scheme='https', netloc='', path='', params='', query='', fragment='')
+        req.META['HTTP_REFERER'] = 'https://'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(response, malformed_referer_msg, status_code=403)
 
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer(self):
         """
-        Test that a POST HTTPS request with a good referer is accepted
+        A POST HTTPS request with a good referer is accepted.
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True
@@ -341,8 +364,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS=['www.example.com'])
     def test_https_good_referer_2(self):
         """
-        Test that a POST HTTPS request with a good referer is accepted
-        where the referer contains no trailing slash
+        A POST HTTPS request with a good referer is accepted where the referer
+        contains no trailing slash.
         """
         # See ticket #15617
         req = self._get_POST_request_with_token()
@@ -352,10 +375,78 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
         req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
         self.assertIsNone(req2)
 
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['dashboard.example.com'])
+    def test_https_csrf_trusted_origin_allowed(self):
+        """
+        A POST HTTPS request with a referer added to the CSRF_TRUSTED_ORIGINS
+        setting is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        req2 = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(req2)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_TRUSTED_ORIGINS=['.example.com'])
+    def test_https_csrf_wildcard_trusted_origin_allowed(self):
+        """
+        A POST HTTPS request with a referer that matches a CSRF_TRUSTED_ORIGINS
+        wilcard is accepted.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://dashboard.example.com'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com')
+    def test_https_good_referer_matches_cookie_domain(self):
+        """
+        A POST HTTPS request with a good referer should be accepted from a
+        subdomain that's allowed by CSRF_COOKIE_DOMAIN.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_REFERER'] = 'https://foo.example.com/'
+        req.META['SERVER_PORT'] = '443'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+
+    @override_settings(ALLOWED_HOSTS=['www.example.com'], CSRF_COOKIE_DOMAIN='.example.com')
+    def test_https_good_referer_matches_cookie_domain_with_different_port(self):
+        """
+        A POST HTTPS request with a good referer should be accepted from a
+        subdomain that's allowed by CSRF_COOKIE_DOMAIN and a non-443 port.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_HOST'] = 'www.example.com'
+        req.META['HTTP_REFERER'] = 'https://foo.example.com:4443/'
+        req.META['SERVER_PORT'] = '4443'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertIsNone(response)
+
+    @override_settings(CSRF_COOKIE_DOMAIN='.example.com', DEBUG=True)
+    def test_https_reject_insecure_referer(self):
+        """
+        A POST HTTPS request from an insecure referer should be rejected.
+        """
+        req = self._get_POST_request_with_token()
+        req._is_secure_override = True
+        req.META['HTTP_REFERER'] = 'http://example.com/'
+        req.META['SERVER_PORT'] = '443'
+        response = CsrfViewMiddleware().process_view(req, post_form_view, (), {})
+        self.assertContains(
+            response,
+            'Referer checking failed - Referer is insecure while host is secure.',
+            status_code=403,
+        )
+
     def test_ensures_csrf_cookie_no_middleware(self):
         """
-        Tests that ensures_csrf_cookie decorator fulfils its promise
-        with no middleware
+        The ensure_csrf_cookie() decorator works without middleware.
         """
         @ensure_csrf_cookie
         def view(request):
@@ -369,8 +460,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_ensures_csrf_cookie_with_middleware(self):
         """
-        Tests that ensures_csrf_cookie decorator fulfils its promise
-        with the middleware enabled.
+        The ensure_csrf_cookie() decorator works with the CsrfViewMiddleware
+        enabled.
         """
         @ensure_csrf_cookie
         def view(request):
@@ -386,7 +477,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_ensures_csrf_cookie_no_logging(self):
         """
-        Tests that ensure_csrf_cookie doesn't log warnings. See #19436.
+        ensure_csrf_cookie() doesn't log warnings (#19436).
         """
         @ensure_csrf_cookie
         def view(request):
@@ -412,8 +503,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_csrf_cookie_age(self):
         """
-        Test to verify CSRF cookie age can be set using
-        settings.CSRF_COOKIE_AGE.
+        CSRF cookie age can be set using settings.CSRF_COOKIE_AGE.
         """
         req = self._get_GET_no_csrf_cookie_request()
 
@@ -434,8 +524,8 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
 
     def test_csrf_cookie_age_none(self):
         """
-        Test to verify CSRF cookie age does not have max age set and therefore
-        uses session-based cookies.
+        CSRF cookie age does not have max age set and therefore uses
+        session-based cookies.
         """
         req = self._get_GET_no_csrf_cookie_request()
 

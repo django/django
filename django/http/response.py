@@ -173,7 +173,6 @@ class HttpResponseBase(six.Iterator):
         - a naive ``datetime.datetime`` object in UTC,
         - an aware ``datetime.datetime`` object in any time zone.
         If it is a ``datetime.datetime`` object then ``max_age`` will be calculated.
-
         """
         value = force_str(value)
         self.cookies[key] = value

@@ -92,7 +92,10 @@ class Command(BaseCommand):
                             extra_params['unique'] = True
 
                     if is_relation:
-                        rel_to = "self" if relations[column_name][1] == table_name else table2model(relations[column_name][1])
+                        rel_to = (
+                            "self" if relations[column_name][1] == table_name
+                            else table2model(relations[column_name][1])
+                        )
                         if rel_to in known_models:
                             field_type = 'ForeignKey(%s' % rel_to
                         else:

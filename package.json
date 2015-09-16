@@ -2,7 +2,7 @@
   "name": "Django",
   "private": true,
   "scripts": {
-    "pretest": "eslint django/",
+    "pretest": "eslint django/ js_tests/admin/",
     "test": "grunt test --verbose"
   },
   "devDependencies": {

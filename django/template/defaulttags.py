@@ -642,7 +642,6 @@ def cycle(parser, token):
             {% cycle 'row1' 'row2' as rowcolors silent %}
             <tr class="{{ rowcolors }}">{% include "subtemplate.html " %}</tr>
         {% endfor %}
-
     """
     # Note: This returns the exact same node on each {% cycle name %} call;
     # that is, the node object returned from {% cycle a b c as name %} and the
@@ -791,7 +790,6 @@ def firstof(parser, token):
     Or if only some variables should be escaped, you can use::
 
         {% firstof var1 var2|safe var3 "<strong>fallback value</strong>"|safe %}
-
     """
     bits = token.split_contents()[1:]
     asvar = None
@@ -866,7 +864,6 @@ def do_for(parser, token):
         ``forloop.parentloop``      For nested loops, this is the loop "above" the
                                     current one
         ==========================  ================================================
-
     """
     bits = token.split_contents()
     if len(bits) < 4:
@@ -1177,7 +1174,6 @@ def load(parser, token):
     a library::
 
         {% load byline from news %}
-
     """
     # token.split_contents() isn't useful here because this tag doesn't accept variable as arguments
     bits = token.contents.split()
@@ -1310,7 +1306,6 @@ def regroup(parser, token):
     before using it, i.e.::
 
         {% regroup people|dictsort:"gender" by gender as grouped %}
-
     """
     bits = token.split_contents()
     if len(bits) != 6:
@@ -1462,7 +1457,6 @@ def url(parser, token):
         {% with url_name="client-detail-view" %}
         {% url url_name client.id %}
         {% endwith %}
-
     """
     bits = token.split_contents()
     if len(bits) < 2:

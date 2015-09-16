@@ -231,17 +231,13 @@ class Collector(object):
                         field.remote_field.on_delete(self, field, sub_objs, self.using)
             for field in model._meta.virtual_fields:
                 if hasattr(field, 'bulk_related_objects'):
-                    # Its something like generic foreign key.
+                    # It's something like generic foreign key.
                     sub_objs = field.bulk_related_objects(new_objs, self.using)
-                    self.collect(sub_objs,
-                                 source=model,
-                                 source_attr=field.remote_field.related_name,
-                                 nullable=True)
+                    self.collect(sub_objs, source=model, nullable=True)
 
     def related_objects(self, related, objs):
         """
         Gets a QuerySet of objects related to ``objs`` via the relation ``related``.
-
         """
         return related.related_model._base_manager.using(self.using).filter(
             **{"%s__in" % related.field.name: objs}

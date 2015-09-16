@@ -18,6 +18,7 @@ from django.core import validators
 from django.core.exceptions import ValidationError
 # Provide this import for backwards compatibility.
 from django.core.validators import EMPTY_VALUES  # NOQA
+from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
     FILE_INPUT_CONTRADICTION, CheckboxInput, ClearableFileInput, DateInput,
@@ -203,6 +204,13 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
             return True
         data_value = data if data is not None else ''
         return initial_value != data_value
+
+    def get_bound_field(self, form, field_name):
+        """
+        Return a BoundField instance that will be used when accessing the form
+        field in a template.
+        """
+        return BoundField(form, self, field_name)
 
     def __deepcopy__(self, memo):
         result = copy.copy(self)

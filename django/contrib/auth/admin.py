@@ -24,6 +24,7 @@ csrf_protect_m = method_decorator(csrf_protect)
 sensitive_post_parameters_m = method_decorator(sensitive_post_parameters())
 
 
+@admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     ordering = ('name',)
@@ -39,6 +40,7 @@ class GroupAdmin(admin.ModelAdmin):
             db_field, request=request, **kwargs)
 
 
+@admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     add_form_template = 'admin/auth/user/add_form.html'
     change_user_password_template = None
@@ -81,7 +83,11 @@ class UserAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         return [
-            url(r'^(.+)/password/$', self.admin_site.admin_view(self.user_change_password), name='auth_user_password_change'),
+            url(
+                r'^(.+)/password/$',
+                self.admin_site.admin_view(self.user_change_password),
+                name='auth_user_password_change',
+            ),
         ] + super(UserAdmin, self).get_urls()
 
     def lookup_allowed(self, lookup, value):
@@ -196,6 +202,3 @@ class UserAdmin(admin.ModelAdmin):
             request.POST['_continue'] = 1
         return super(UserAdmin, self).response_add(request, obj,
                                                    post_url_continue)
-
-admin.site.register(Group, GroupAdmin)
-admin.site.register(User, UserAdmin)

@@ -129,11 +129,25 @@ class BookAdmin(ModelAdmin):
 
 
 class BookAdminWithTupleBooleanFilter(BookAdmin):
-    list_filter = ('year', 'author', 'contributors', ('is_best_seller', BooleanFieldListFilter), 'date_registered', 'no')
+    list_filter = (
+        'year',
+        'author',
+        'contributors',
+        ('is_best_seller', BooleanFieldListFilter),
+        'date_registered',
+        'no',
+    )
 
 
 class BookAdminWithUnderscoreLookupAndTuple(BookAdmin):
-    list_filter = ('year', ('author__email', AllValuesFieldListFilter), 'contributors', 'is_best_seller', 'date_registered', 'no')
+    list_filter = (
+        'year',
+        ('author__email', AllValuesFieldListFilter),
+        'contributors',
+        'is_best_seller',
+        'date_registered',
+        'no',
+    )
 
 
 class BookAdminWithCustomQueryset(ModelAdmin):
@@ -231,10 +245,22 @@ class ListFiltersTests(TestCase):
         self.lisa = User.objects.create_user('lisa', 'lisa@example.com')
 
         # Books
-        self.djangonaut_book = Book.objects.create(title='Djangonaut: an art of living', year=2009, author=self.alfred, is_best_seller=True, date_registered=self.today)
-        self.bio_book = Book.objects.create(title='Django: a biography', year=1999, author=self.alfred, is_best_seller=False, no=207)
-        self.django_book = Book.objects.create(title='The Django Book', year=None, author=self.bob, is_best_seller=None, date_registered=self.today, no=103)
-        self.gipsy_book = Book.objects.create(title='Gipsy guitar for dummies', year=2002, is_best_seller=True, date_registered=self.one_week_ago)
+        self.djangonaut_book = Book.objects.create(
+            title='Djangonaut: an art of living', year=2009,
+            author=self.alfred, is_best_seller=True, date_registered=self.today,
+        )
+        self.bio_book = Book.objects.create(
+            title='Django: a biography', year=1999, author=self.alfred,
+            is_best_seller=False, no=207,
+        )
+        self.django_book = Book.objects.create(
+            title='The Django Book', year=None, author=self.bob,
+            is_best_seller=None, date_registered=self.today, no=103,
+        )
+        self.gipsy_book = Book.objects.create(
+            title='Gipsy guitar for dummies', year=2002, is_best_seller=True,
+            date_registered=self.one_week_ago,
+        )
         self.gipsy_book.contributors = [self.bob, self.lisa]
         self.gipsy_book.save()
 
@@ -247,9 +273,13 @@ class ListFiltersTests(TestCase):
         self.jack = Employee.objects.create(name='Jack Red', department=self.design)
 
     def get_changelist(self, request, model, modeladmin):
-        return ChangeList(request, model, modeladmin.list_display, modeladmin.list_display_links,
-            modeladmin.list_filter, modeladmin.date_hierarchy, modeladmin.search_fields,
-            modeladmin.list_select_related, modeladmin.list_per_page, modeladmin.list_max_show_all, modeladmin.list_editable, modeladmin)
+        return ChangeList(
+            request, model, modeladmin.list_display,
+            modeladmin.list_display_links, modeladmin.list_filter,
+            modeladmin.date_hierarchy, modeladmin.search_fields,
+            modeladmin.list_select_related, modeladmin.list_per_page,
+            modeladmin.list_max_show_all, modeladmin.list_editable, modeladmin,
+        )
 
     def test_datefieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
@@ -523,6 +553,16 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choice['selected'], True)
         self.assertEqual(choice['query_string'], '?books_contributed__id__exact=%d' % self.django_book.pk)
 
+        # With one book, the list filter should appear because there is also a
+        # (None) option.
+        Book.objects.exclude(pk=self.djangonaut_book.pk).delete()
+        filterspec = changelist.get_filters(request)[0]
+        self.assertEqual(len(filterspec), 2)
+        # With no books remaining, no list filters should appear.
+        Book.objects.all().delete()
+        filterspec = changelist.get_filters(request)[0]
+        self.assertEqual(len(filterspec), 0)
+
     def test_relatedonlyfieldlistfilter_foreignkey(self):
         modeladmin = BookAdminRelatedOnlyFilter(Book, site)
 
@@ -720,7 +760,10 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[3]['display'], 'the 2000\'s')
         self.assertEqual(choices[3]['selected'], True)
-        self.assertEqual(choices[3]['query_string'], '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk)
+        self.assertEqual(
+            choices[3]['query_string'],
+            '?author__id__exact=%s&publication-decade=the+00s' % self.alfred.pk
+        )
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(force_text(filterspec.title), 'Verbose Author')

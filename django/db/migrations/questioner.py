@@ -9,7 +9,7 @@ from django.db.models.fields import NOT_PROVIDED
 from django.utils import datetime_safe, six, timezone
 from django.utils.six.moves import input
 
-from .loader import MIGRATIONS_MODULE_NAME
+from .loader import MigrationLoader
 
 
 class MigrationQuestioner(object):
@@ -37,7 +37,7 @@ class MigrationQuestioner(object):
             app_config = apps.get_app_config(app_label)
         except LookupError:         # It's a fake app.
             return self.defaults.get("ask_initial", False)
-        migrations_import_path = "%s.%s" % (app_config.name, MIGRATIONS_MODULE_NAME)
+        migrations_import_path = MigrationLoader.migrations_module(app_config.label)
         try:
             migrations_module = importlib.import_module(migrations_import_path)
         except ImportError:

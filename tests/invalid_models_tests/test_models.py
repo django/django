@@ -436,6 +436,25 @@ class FieldNamesTests(IsolatedModelsTestCase):
 
 class ShadowingFieldsTests(IsolatedModelsTestCase):
 
+    def test_field_name_clash_with_child_accessor(self):
+        class Parent(models.Model):
+            pass
+
+        class Child(Parent):
+            child = models.CharField(max_length=100)
+
+        errors = Child.check()
+        expected = [
+            Error(
+                "The field 'child' clashes with the field "
+                "'child' from model 'invalid_models_tests.parent'.",
+                hint=None,
+                obj=Child._meta.get_field('child'),
+                id='models.E006',
+            )
+        ]
+        self.assertEqual(errors, expected)
+
     def test_multiinheritance_clash(self):
         class Mother(models.Model):
             clash = models.IntegerField()

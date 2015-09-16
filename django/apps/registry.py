@@ -260,6 +260,28 @@ class Apps(object):
                 "Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
+    @lru_cache.lru_cache(maxsize=None)
+    def get_swappable_settings_name(self, to_string):
+        """
+        For a given model string (e.g. "auth.User"), return the name of the
+        corresponding settings name if it refers to a swappable model. If the
+        referred model is not swappable, return None.
+
+        This method is decorated with lru_cache because it's performance
+        critical when it comes to migrations. Since the swappable settings don't
+        change after Django has loaded the settings, there is no reason to get
+        the respective settings attribute over and over again.
+        """
+        for model in self.get_models(include_swapped=True):
+            swapped = model._meta.swapped
+            # Is this model swapped out for the model given by to_string?
+            if swapped and swapped == to_string:
+                return model._meta.swappable
+            # Is this model swappable and the one given by to_string?
+            if model._meta.swappable and model._meta.label == to_string:
+                return model._meta.swappable
+        return None
+
     def set_available_apps(self, available):
         """
         Restricts the set of installed apps used by get_app_config[s].

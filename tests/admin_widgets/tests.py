@@ -189,7 +189,10 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
                              filter_vertical=['companies'])
         ma = AdvisorAdmin(models.Advisor, admin.site)
         f = ma.formfield_for_dbfield(models.Advisor._meta.get_field('companies'), request=None)
-        self.assertEqual(six.text_type(f.help_text), 'Hold down "Control", or "Command" on a Mac, to select more than one.')
+        self.assertEqual(
+            six.text_type(f.help_text),
+            'Hold down "Control", or "Command" on a Mac, to select more than one.'
+        )
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
@@ -327,7 +330,11 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminSplitDateTime()
         self.assertHTMLEqual(
             w.render('test', datetime(2007, 12, 1, 9, 30)),
-            '<p class="datetime">Date: <input value="2007-12-01" type="text" class="vDateField" name="test_0" size="10" /><br />Time: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+            '<p class="datetime">'
+            'Date: <input value="2007-12-01" type="text" class="vDateField" '
+            'name="test_0" size="10" /><br />'
+            'Time: <input value="09:30:00" type="text" class="vTimeField" '
+            'name="test_1" size="8" /></p>'
         )
 
     def test_localization(self):
@@ -337,7 +344,11 @@ class AdminSplitDateTimeWidgetTest(SimpleTestCase):
             w.is_localized = True
             self.assertHTMLEqual(
                 w.render('test', datetime(2007, 12, 1, 9, 30)),
-                '<p class="datetime">Datum: <input value="01.12.2007" type="text" class="vDateField" name="test_0" size="10" /><br />Zeit: <input value="09:30:00" type="text" class="vTimeField" name="test_1" size="8" /></p>',
+                '<p class="datetime">'
+                'Datum: <input value="01.12.2007" type="text" '
+                'class="vDateField" name="test_0"size="10" /><br />'
+                'Zeit: <input value="09:30:00" type="text" class="vTimeField" '
+                'name="test_1" size="8" /></p>'
             )
 
 
@@ -350,14 +361,20 @@ class AdminURLWidgetTest(SimpleTestCase):
         )
         self.assertHTMLEqual(
             w.render('test', 'http://example.com'),
-            '<p class="url">Currently:<a href="http://example.com">http://example.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example.com" /></p>'
+            '<p class="url">Currently:<a href="http://example.com">'
+            'http://example.com</a><br />'
+            'Change:<input class="vURLField" name="test" type="url" '
+            'value="http://example.com" /></p>'
         )
 
     def test_render_idn(self):
         w = widgets.AdminURLFieldWidget()
         self.assertHTMLEqual(
             w.render('test', 'http://example-äüö.com'),
-            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">http://example-äüö.com</a><br />Change:<input class="vURLField" name="test" type="url" value="http://example-äüö.com" /></p>'
+            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com">'
+            'http://example-äüö.com</a><br />'
+            'Change:<input class="vURLField" name="test" type="url" '
+            'value="http://example-äüö.com" /></p>'
         )
 
     def test_render_quoting(self):
@@ -366,15 +383,29 @@ class AdminURLWidgetTest(SimpleTestCase):
         w = widgets.AdminURLFieldWidget()
         self.assertEqual(
             w.render('test', 'http://example.com/<sometag>some text</sometag>'),
-            '<p class="url">Currently: <a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+            '<p class="url">Currently: '
+            '<a href="http://example.com/%3Csometag%3Esome%20text%3C/sometag%3E">'
+            'http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />'
+            'Change: <input class="vURLField" name="test" type="url" '
+            'value="http://example.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
         )
         self.assertEqual(
             w.render('test', 'http://example-äüö.com/<sometag>some text</sometag>'),
-            '<p class="url">Currently: <a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
+            '<p class="url">Currently: '
+            '<a href="http://xn--example--7za4pnc.com/%3Csometag%3Esome%20text%3C/sometag%3E">'
+            'http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;</a><br />'
+            'Change: <input class="vURLField" name="test" type="url" '
+            'value="http://example-äüö.com/&lt;sometag&gt;some text&lt;/sometag&gt;" /></p>'
         )
         self.assertEqual(
             w.render('test', 'http://www.example.com/%C3%A4"><script>alert("XSS!")</script>"'),
-            '<p class="url">Currently: <a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />Change: <input class="vURLField" name="test" type="url" value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
+            '<p class="url">Currently: '
+            '<a href="http://www.example.com/%C3%A4%22%3E%3Cscript%3Ealert(%22XSS!%22)%3C/script%3E%22">'
+            'http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;'
+            'alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;</a><br />'
+            'Change: <input class="vURLField" name="test" type="url" '
+            'value="http://www.example.com/%C3%A4&quot;&gt;&lt;script&gt;'
+            'alert(&quot;XSS!&quot;)&lt;/script&gt;&quot;" /></p>'
         )
 
 
@@ -447,11 +478,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
 
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', band.pk, attrs={}), (
-                '<input type="text" name="test" value="%(bandpk)s" class="vForeignKeyRawIdAdminField" />'
-                '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
-                '&nbsp;<strong>Linkin Park</strong>'
-            ) % {'bandpk': band.pk}
+            w.render('test', band.pk, attrs={}),
+            '<input type="text" name="test" value="%(bandpk)s" '
+            'class="vForeignKeyRawIdAdminField" />'
+            '<a href="/admin_widgets/band/?_to_field=id" class="related-lookup" '
+            'id="lookup_id_test" title="Lookup"></a>&nbsp;<strong>Linkin Park</strong>'
+            % {'bandpk': band.pk}
         )
 
     def test_relations_to_non_primary_key(self):
@@ -465,11 +497,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         rel = models.Inventory._meta.get_field('parent').remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
-            w.render('test', core.parent_id, attrs={}), (
-                '<input type="text" name="test" value="86" class="vForeignKeyRawIdAdminField" />'
-                '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
-                '</a>&nbsp;<strong>Apple</strong>'
-            )
+            w.render('test', core.parent_id, attrs={}),
+            '<input type="text" name="test" value="86" '
+            'class="vForeignKeyRawIdAdminField" />'
+            '<a href="/admin_widgets/inventory/?_to_field=barcode" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            '&nbsp;<strong>Apple</strong>'
         )
 
     def test_fk_related_model_not_in_admin(self):
@@ -482,7 +515,9 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('honeycomb_widget', big_honeycomb.pk, attrs={}),
-            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />&nbsp;<strong>Honeycomb object</strong>' % {'hcombpk': big_honeycomb.pk}
+            '<input type="text" name="honeycomb_widget" value="%(hcombpk)s" />'
+            '&nbsp;<strong>Honeycomb object</strong>'
+            % {'hcombpk': big_honeycomb.pk}
         )
 
     def test_fk_to_self_model_not_in_admin(self):
@@ -495,7 +530,9 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
         self.assertHTMLEqual(
             w.render('individual_widget', subject1.pk, attrs={}),
-            '<input type="text" name="individual_widget" value="%(subj1pk)s" />&nbsp;<strong>Individual object</strong>' % {'subj1pk': subject1.pk}
+            '<input type="text" name="individual_widget" value="%(subj1pk)s" />'
+            '&nbsp;<strong>Individual object</strong>'
+            % {'subj1pk': subject1.pk}
         )
 
     def test_proper_manager_for_label_lookup(self):
@@ -510,11 +547,11 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             barcode=94, name='Child of hidden', parent=hidden
         )
         self.assertHTMLEqual(
-            w.render('test', child_of_hidden.parent_id, attrs={}), (
-                '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
-                '<a href="/admin_widgets/inventory/?_to_field=barcode" class="related-lookup" id="lookup_id_test" title="Lookup">'
-                '</a>&nbsp;<strong>Hidden</strong>'
-            )
+            w.render('test', child_of_hidden.parent_id, attrs={}),
+            '<input type="text" name="test" value="93" class="vForeignKeyRawIdAdminField" />'
+            '<a href="/admin_widgets/inventory/?_to_field=barcode" '
+            'class="related-lookup" id="lookup_id_test" title="Lookup"></a>'
+            '&nbsp;<strong>Hidden</strong>'
         )
 
 
@@ -766,13 +803,8 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
 
                 # Click on the calendar icon
                 self.selenium.find_element_by_id('calendarlink0').click()
-
-                # Get the calendar caption
-                calendar0 = self.selenium.find_element_by_id('calendarin0')
-                caption = calendar0.find_element_by_tag_name('caption')
-
                 # Make sure that the right month and year are displayed
-                self.assertEqual(caption.text, expected_caption)
+                self.wait_for_text('#calendarin0 caption', expected_caption)
 
 
 class DateTimePickerSeleniumChromeTests(DateTimePickerSeleniumFirefoxTests):
@@ -849,6 +881,21 @@ class DateTimePickerShortcutsSeleniumChromeTests(DateTimePickerShortcutsSelenium
 
 
 class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
+# The above tests run with Asia/Singapore which are on the positive side of
+# UTC. Here we test with a timezone on the negative side.
+@override_settings(TIME_ZONE='US/Eastern')
+class DateTimePickerAltTimezoneSeleniumFirefoxTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    pass
+
+
+class DateTimePickerAltTimezoneSeleniumChromeTests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class DateTimePickerAltTimezoneSeleniumIETests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
@@ -1130,8 +1177,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_main_band')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
@@ -1142,8 +1189,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_main_band').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_main_band')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
@@ -1165,8 +1212,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Open the popup window and click on a band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_supporting_bands')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Bogey Blues')
         self.assertIn('/band/42/', link.get_attribute('href'))
         link.click()
@@ -1177,8 +1224,8 @@ class AdminRawIdWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDr
 
         # Reopen the popup window and click on another band
         self.selenium.find_element_by_id('lookup_id_supporting_bands').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_supporting_bands')
-        self.wait_page_loaded()
         link = self.selenium.find_element_by_link_text('Green Potatoes')
         self.assertIn('/band/98/', link.get_attribute('href'))
         link.click()
@@ -1211,8 +1258,8 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         main_window = self.selenium.current_window_handle
         # Click the Add User button to add new
         self.selenium.find_element_by_id('add_id_user').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1228,8 +1275,8 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
 
         # Click the Change User button to change it
         self.selenium.find_element_by_id('change_id_user').click()
+        self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
-        self.wait_page_loaded()
 
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'

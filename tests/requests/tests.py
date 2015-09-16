@@ -88,10 +88,20 @@ class RequestsTests(SimpleTestCase):
         Refs #20169.
         """
         # With trailing slash
-        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': '/somepath/',
+            'SCRIPT_NAME': '/PREFIX/',
+            'REQUEST_METHOD': 'get',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(request.path, '/PREFIX/somepath/')
         # Without trailing slash
-        request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+        request = WSGIRequest({
+            'PATH_INFO': '/somepath/',
+            'SCRIPT_NAME': '/PREFIX',
+            'REQUEST_METHOD': 'get',
+            'wsgi.input': BytesIO(b''),
+        })
         self.assertEqual(request.path, '/PREFIX/somepath/')
 
     def test_wsgirequest_with_force_script_name(self):
@@ -101,7 +111,12 @@ class RequestsTests(SimpleTestCase):
         Refs #20169.
         """
         with override_settings(FORCE_SCRIPT_NAME='/FORCED_PREFIX/'):
-            request = WSGIRequest({'PATH_INFO': '/somepath/', 'SCRIPT_NAME': '/PREFIX/', 'REQUEST_METHOD': 'get', 'wsgi.input': BytesIO(b'')})
+            request = WSGIRequest({
+                'PATH_INFO': '/somepath/',
+                'SCRIPT_NAME': '/PREFIX/',
+                'REQUEST_METHOD': 'get',
+                'wsgi.input': BytesIO(b''),
+            })
             self.assertEqual(request.path, '/FORCED_PREFIX/somepath/')
 
     def test_wsgirequest_path_with_force_script_name_trailing_slash(self):
@@ -501,6 +516,18 @@ class RequestsTests(SimpleTestCase):
 
         with self.assertRaises(UnreadablePostError):
             request.FILES
+
+    @override_settings(ALLOWED_HOSTS=['example.com'])
+    def test_get_raw_uri(self):
+        factory = RequestFactory(HTTP_HOST='evil.com')
+        request = factory.get('////absolute-uri')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com//absolute-uri')
+
+        request = factory.get('/?foo=bar')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com/?foo=bar')
+
+        request = factory.get('/path/with:colons')
+        self.assertEqual(request.get_raw_uri(), 'http://evil.com/path/with:colons')
 
 
 class HostValidationTests(SimpleTestCase):

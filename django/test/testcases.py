@@ -20,6 +20,7 @@ from django.apps import apps
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.files import locks
 from django.core.handlers.wsgi import WSGIHandler, get_path_info
 from django.core.management import call_command
 from django.core.management.color import no_style
@@ -654,7 +655,6 @@ class SimpleTestCase(unittest.TestCase):
             field_args: the args passed to instantiate the field
             field_kwargs: the kwargs passed to instantiate the field
             empty_value: the expected clean output for inputs in empty_values
-
         """
         if field_args is None:
             field_args = []
@@ -940,10 +940,19 @@ class TransactionTestCase(SimpleTestCase):
         # when flushing only a subset of the apps
         for db_name in self._databases_names(include_mirrors=False):
             # Flush the database
+            inhibit_post_migrate = (
+                self.available_apps is not None
+                or (
+                    # Inhibit the post_migrate signal when using serialized
+                    # rollback to avoid trying to recreate the serialized data.
+                    self.serialized_rollback and
+                    hasattr(connections[db_name], '_test_serialized_contents')
+                )
+            )
             call_command('flush', verbosity=0, interactive=False,
                          database=db_name, reset_sequences=False,
                          allow_cascade=self.available_apps is not None,
-                         inhibit_post_migrate=self.available_apps is not None)
+                         inhibit_post_migrate=inhibit_post_migrate)
 
     def assertQuerysetEqual(self, qs, values, transform=repr, ordered=True, msg=None):
         items = six.moves.map(transform, qs)
@@ -1243,8 +1252,7 @@ class LiveServerThread(threading.Thread):
             # one that is free to use for the WSGI server.
             for index, port in enumerate(self.possible_ports):
                 try:
-                    self.httpd = WSGIServer(
-                        (self.host, port), QuietWSGIRequestHandler)
+                    self.httpd = self._create_server(port)
                 except socket.error as e:
                     if (index + 1 < len(self.possible_ports) and
                             e.errno == errno.EADDRINUSE):
@@ -1267,6 +1275,9 @@ class LiveServerThread(threading.Thread):
         except Exception as e:
             self.error = e
             self.is_ready.set()
+
+    def _create_server(self, port):
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
@@ -1308,7 +1319,7 @@ class LiveServerTestCase(TransactionTestCase):
 
         # Launch the live server's thread
         specified_address = os.environ.get(
-            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081')
+            'DJANGO_LIVE_TEST_SERVER_ADDRESS', 'localhost:8081-8179')
 
         # The specified ports may be of the form '8000-8010,8080,9200-9300'
         # i.e. a comma-separated list of ports or ranges of ports, so we break
@@ -1330,9 +1341,7 @@ class LiveServerTestCase(TransactionTestCase):
         except Exception:
             msg = 'Invalid address ("%s") for live server.' % specified_address
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(msg), sys.exc_info()[2])
-        cls.server_thread = LiveServerThread(host, possible_ports,
-                                             cls.static_handler,
-                                             connections_override=connections_override)
+        cls.server_thread = cls._create_server_thread(host, possible_ports, connections_override)
         cls.server_thread.daemon = True
         cls.server_thread.start()
 
@@ -1343,6 +1352,15 @@ class LiveServerTestCase(TransactionTestCase):
             # case of errors.
             cls._tearDownClassInternal()
             raise cls.server_thread.error
+
+    @classmethod
+    def _create_server_thread(cls, host, possible_ports, connections_override):
+        return LiveServerThread(
+            host,
+            possible_ports,
+            cls.static_handler,
+            connections_override=connections_override,
+        )
 
     @classmethod
     def _tearDownClassInternal(cls):
@@ -1362,3 +1380,31 @@ class LiveServerTestCase(TransactionTestCase):
     def tearDownClass(cls):
         cls._tearDownClassInternal()
         super(LiveServerTestCase, cls).tearDownClass()
+
+
+class SerializeMixin(object):
+    """
+    Mixin to enforce serialization of TestCases that share a common resource.
+
+    Define a common 'lockfile' for each set of TestCases to serialize. This
+    file must exist on the filesystem.
+
+    Place it early in the MRO in order to isolate setUpClass / tearDownClass.
+    """
+
+    lockfile = None
+
+    @classmethod
+    def setUpClass(cls):
+        if cls.lockfile is None:
+            raise ValueError(
+                "{}.lockfile isn't set. Set it to a unique value "
+                "in the base class.".format(cls.__name__))
+        cls._lockfile = open(cls.lockfile)
+        locks.lock(cls._lockfile, locks.LOCK_EX)
+        super(SerializeMixin, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        super(SerializeMixin, cls).tearDownClass()
+        cls._lockfile.close()

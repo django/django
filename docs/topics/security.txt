@@ -134,12 +134,12 @@ server, there are some additional steps you may need:
   in CSRF vulnerabilities, and failure to do it correctly can also be
   dangerous!
 
-* Set up redirection so that requests over HTTP are redirected to HTTPS.
+* Set :setting:`SECURE_SSL_REDIRECT` to ``True``, so that requests over HTTP
+  are redirected to HTTPS.
 
-  This could be done using a custom middleware. Please note the caveats under
-  :setting:`SECURE_PROXY_SSL_HEADER`. For the case of a reverse proxy, it may be
-  easier or more secure to configure the main Web server to do the redirect to
-  HTTPS.
+  Please note the caveats under :setting:`SECURE_PROXY_SSL_HEADER`. For the
+  case of a reverse proxy, it may be easier or more secure to configure the
+  main Web server to do the redirect to HTTPS.
 
 * Use 'secure' cookies.
 
@@ -152,13 +152,14 @@ server, there are some additional steps you may need:
   any POST data being accepted over HTTP (which will be fine if you are
   redirecting all HTTP traffic to HTTPS).
 
-* Use HTTP Strict Transport Security (HSTS)
+* Use :ref:`http-strict-transport-security` (HSTS)
 
   HSTS is an HTTP header that informs a browser that all future connections
   to a particular site should always use HTTPS. Combined with redirecting
   requests over HTTP to HTTPS, this will ensure that connections always enjoy
   the added security of SSL provided one successful connection has occurred.
-  HSTS is usually configured on the web server.
+  HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS` and
+  :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS` or on the Web server.
 
 .. _host-headers-virtual-hosting:
 

@@ -18,15 +18,16 @@ from django.core.mail import EmailMessage
 from django.db import models
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, StreamingHttpResponse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.six import StringIO
 
 from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Album, Answer, Article, BarAccount, Book,
-    Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice, City,
-    Collector, Color, Color2, ComplexSortedPerson, CoverLetter, CustomArticle,
-    CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
+    Bookmark, Category, Chapter, ChapterXtra1, Child, ChildOfReferer, Choice,
+    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
+    CustomArticle, CyclicOne, CyclicTwo, DependentChild, DooHickey, EmptyModel,
     EmptyModelHidden, EmptyModelMixin, EmptyModelVisible, ExplicitlyProvidedPK,
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gadget, Gallery,
@@ -169,7 +170,11 @@ class ThingAdmin(admin.ModelAdmin):
 
 
 class InquisitionAdmin(admin.ModelAdmin):
-    list_display = ('leader', 'country', 'expected')
+    list_display = ('leader', 'country', 'expected', 'sketch')
+
+    def sketch(self, obj):
+        # A method with the same name as a reverse accessor.
+        return 'list-display-sketch'
 
 
 class SketchAdmin(admin.ModelAdmin):
@@ -425,7 +430,8 @@ class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'public']
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
-        'multiline', 'multiline_html', lambda obj: "foo"
+        'multiline', 'multiline_html', lambda obj: "foo",
+        'multiline_html_allow_tags',
     )
 
     inlines = [
@@ -440,15 +446,17 @@ class PostAdmin(admin.ModelAdmin):
 
     def value(self, instance):
         return 1000
+    value.short_description = 'Value in $US'
 
     def multiline(self, instance):
         return "Multiline\ntest\nstring"
 
     def multiline_html(self, instance):
         return mark_safe("Multiline<br>\nhtml<br>\ncontent")
-    multiline_html.allow_tags = True
 
-    value.short_description = 'Value in $US'
+    def multiline_html_allow_tags(self, instance):
+        return "Multiline<br>html<br>content<br>with allow tags"
+    multiline_html_allow_tags.allow_tags = True
 
 
 class FieldOverridePostForm(forms.ModelForm):
@@ -570,8 +578,7 @@ class ComplexSortedPersonAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
     def colored_name(self, obj):
-        return '<span style="color: #%s;">%s</span>' % ('ff00ff', obj.name)
-    colored_name.allow_tags = True
+        return format_html('<span style="color: #ff00ff;">{}</span>', obj.name)
     colored_name.admin_order_field = 'name'
 
 
@@ -580,7 +587,9 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
     def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(request, queryset, search_term)
+        queryset, use_distinct = super(PluggableSearchPersonAdmin, self).get_search_results(
+            request, queryset, search_term
+        )
         try:
             search_term_as_int = int(search_term)
             queryset |= self.model.objects.filter(age=search_term_as_int)
@@ -908,6 +917,7 @@ site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
 site.register(PlotDetails)
+site.register(Bookmark)
 site.register(CyclicOne)
 site.register(CyclicTwo)
 site.register(WorkHour, WorkHourAdmin)

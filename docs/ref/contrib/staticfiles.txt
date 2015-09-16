@@ -90,7 +90,12 @@ Some commonly used options are:
 
 .. django-admin-option:: --noinput
 
-    Do NOT prompt the user for input of any kind.
+    Do NOT prompt the user for input of any kind. You can use ``--no-input``
+    as an alias for this option.
+
+    .. versionchanged:: 1.9
+
+        The ``--no-input`` alias was added.
 
 .. django-admin-option:: -i <pattern>
 .. django-admin-option:: --ignore <pattern>

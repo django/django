@@ -2,7 +2,6 @@
 # Unit and doctests for specific database backends.
 from __future__ import unicode_literals
 
-import copy
 import datetime
 import re
 import threading
@@ -10,7 +9,6 @@ import unittest
 import warnings
 from decimal import Decimal, Rounded
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.color import no_style
 from django.db import (
@@ -159,7 +157,11 @@ class PostgreSQLTests(TestCase):
         self.assert_parses("EnterpriseDB 9.3", 90300)
         self.assert_parses("PostgreSQL 9.3.6", 90306)
         self.assert_parses("PostgreSQL 9.4beta1", 90400)
-        self.assert_parses("PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)", 90301)
+        self.assert_parses(
+            "PostgreSQL 9.3.1 on i386-apple-darwin9.2.2, compiled by GCC "
+            "i686-apple-darwin9-gcc-4.0.1 (GCC) 4.0.1 (Apple Inc. build 5478)",
+            90301
+        )
 
     def test_nodb_connection(self):
         """
@@ -175,15 +177,13 @@ class PostgreSQLTests(TestCase):
         self.assertIsNone(nodb_conn.settings_dict['NAME'])
 
         # Now assume the 'postgres' db isn't available
-        del connection._nodb_connection
         with warnings.catch_warnings(record=True) as w:
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
                 nodb_conn = connection._nodb_connection
-        del connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
-        self.assertEqual(nodb_conn.settings_dict['NAME'], settings.DATABASES[DEFAULT_DB_ALIAS]['NAME'])
-        # Check a RuntimeWarning nas been emitted
+        self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])
+        # Check a RuntimeWarning has been emitted
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0].message.__class__, RuntimeWarning)
 
@@ -219,9 +219,7 @@ class PostgreSQLTests(TestCase):
         PostgreSQL shouldn't roll back SET TIME ZONE, even if the first
         transaction is rolled back (#17062).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         try:
             # Ensure the database default time zone is different than
@@ -258,10 +256,9 @@ class PostgreSQLTests(TestCase):
         The connection wrapper shouldn't believe that autocommit is enabled
         after setting the time zone when AUTOCOMMIT is False (#21452).
         """
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['AUTOCOMMIT'] = False
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['AUTOCOMMIT'] = False
+
         try:
             # Open a database connection.
             new_connection.cursor()
@@ -285,10 +282,8 @@ class PostgreSQLTests(TestCase):
         # Check the level on the psycopg2 connection, not the Django wrapper.
         self.assertEqual(connection.connection.isolation_level, read_committed)
 
-        databases = copy.deepcopy(settings.DATABASES)
-        databases[DEFAULT_DB_ALIAS]['OPTIONS']['isolation_level'] = serializable
-        new_connections = ConnectionHandler(databases)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
+        new_connection.settings_dict['OPTIONS']['isolation_level'] = serializable
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
@@ -340,7 +335,6 @@ class DateQuotingTest(TestCase):
         #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -353,7 +347,6 @@ class DateQuotingTest(TestCase):
         which clash with strings passed to it (e.g. 'day') - see #12818__.
 
         __: http://code.djangoproject.com/ticket/12818
-
         """
         updated = datetime.datetime(2010, 2, 20)
         models.SchoolClass.objects.create(year=2009, last_updated=updated)
@@ -430,13 +423,19 @@ class LongNameTest(TransactionTestCase):
         models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
 
     def test_sequence_name_length_limits_m2m(self):
-        """Test an m2m save of a model with a long name and a long m2m field name doesn't error as on Django >=1.2 this now uses object saves. Ref #8901"""
+        """
+        An m2m save of a model with a long name and a long m2m field name
+        doesn't error (#8901).
+        """
         obj = models.VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ.objects.create()
         rel_obj = models.Person.objects.create(first_name='Django', last_name='Reinhardt')
         obj.m2m_also_quite_long_zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.add(rel_obj)
 
     def test_sequence_name_length_limits_flush(self):
-        """Test that sequence resetting as part of a flush with model with long name and long pk name doesn't error. Ref #8901"""
+        """
+        Sequence resetting as part of a flush with model with long name and
+        long pk name doesn't error (#8901).
+        """
         # A full flush is expensive to the full test, so we dig into the
         # internals to generate the likely offending SQL and run it manually
 
@@ -750,8 +749,7 @@ class BackendTestCase(TransactionTestCase):
         """
         old_queries_limit = BaseDatabaseWrapper.queries_limit
         BaseDatabaseWrapper.queries_limit = 3
-        new_connections = ConnectionHandler(settings.DATABASES)
-        new_connection = new_connections[DEFAULT_DB_ALIAS]
+        new_connection = connection.copy()
 
         # Initialize the connection and clear initialization statements.
         with new_connection.cursor():
@@ -846,11 +844,16 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_disable_constraint_checks_manually(self):
         """
-        When constraint checks are disabled, should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled, should be able to write bad data
+        without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -864,11 +867,16 @@ class FkConstraintsTests(TransactionTestCase):
 
     def test_disable_constraint_checks_context_manager(self):
         """
-        When constraint checks are disabled (using context manager), should be able to write bad data without IntegrityErrors.
+        When constraint checks are disabled (using context manager), should be
+        able to write bad data without IntegrityErrors.
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
@@ -885,7 +893,11 @@ class FkConstraintsTests(TransactionTestCase):
         """
         with transaction.atomic():
             # Create an Article.
-            models.Article.objects.create(headline="Test article", pub_date=datetime.datetime(2010, 9, 4), reporter=self.r)
+            models.Article.objects.create(
+                headline="Test article",
+                pub_date=datetime.datetime(2010, 9, 4),
+                reporter=self.r,
+            )
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30

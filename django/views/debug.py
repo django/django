@@ -669,7 +669,7 @@ TECHNICAL_500_TEMPLATE = ("""
     </tr>
     <tr>
       <th>Request URL:</th>
-      <td>{{ request.build_absolute_uri|escape }}</td>
+      <td>{{ request.get_raw_uri|escape }}</td>
     </tr>
 {% endif %}
     <tr>
@@ -849,7 +849,7 @@ Environment:
 
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.build_absolute_uri|escape }}
+Request URL: {{ request.get_raw_uri|escape }}
 {% endif %}
 Django Version: {{ django_version_info }}
 Python Version: {{ sys_version_info }}
@@ -862,12 +862,12 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}"""
+"""    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.
-{% endif %}
-{% endif %}{% if template_info %}
+{% endif %}{% endif %}{% if template_info %}
 Template error:
 In template {{ template_info.name }}, error at line {{ template_info.line }}
    {{ template_info.message }}"""
@@ -1044,11 +1044,12 @@ Exception Value: {{ exception_value|force_escape }}
 </html>
 """)
 
-TECHNICAL_500_TEXT_TEMPLATE = ("""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
+TECHNICAL_500_TEXT_TEMPLATE = (""""""
+"""{% firstof exception_type 'Report' %}{% if request %} at {{ request.path_info }}{% endif %}
 {% firstof exception_value 'No exception message supplied' %}
 {% if request %}
 Request Method: {{ request.META.REQUEST_METHOD }}
-Request URL: {{ request.build_absolute_uri }}{% endif %}
+Request URL: {{ request.get_raw_uri }}{% endif %}
 Django Version: {{ django_version_info }}
 Python Executable: {{ sys_executable }}
 Python Version: {{ sys_version_info }}
@@ -1062,7 +1063,8 @@ Installed Middleware:
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
 Using engine {{ entry.backend.name }}:
-{% if entry.tried %}{% for attempt in entry.tried %}    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
+{% if entry.tried %}{% for attempt in entry.tried %}"""
+"""    * {{ attempt.0.loader_name }}: {{ attempt.0.name }} ({{ attempt.1 }})
 {% endfor %}{% else %}    This engine did not provide a list of tried templates.
 {% endif %}{% endfor %}
 {% else %}No templates were found because your 'TEMPLATES' setting is not configured.

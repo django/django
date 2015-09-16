@@ -557,6 +557,15 @@ class SuperSecretHideout(models.Model):
 
 
 @python_2_unicode_compatible
+class Bookmark(models.Model):
+    name = models.CharField(max_length=60)
+    tag = GenericRelation(FunkyTag, related_query_name='bookmark')
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class CyclicOne(models.Model):
     name = models.CharField(max_length=25)
     two = models.ForeignKey('CyclicTwo', models.CASCADE)

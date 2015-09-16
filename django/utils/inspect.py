@@ -43,6 +43,44 @@ def get_func_args(func):
     ]
 
 
+def get_func_full_args(func):
+    """
+    Return a list of (argument name, default value) tuples. If the argument
+    does not have a default value, omit it in the tuple. Arguments such as
+    *args and **kwargs are also included.
+    """
+    if six.PY2:
+        argspec = inspect.getargspec(func)
+        args = argspec.args[1:]  # ignore 'self'
+        defaults = argspec.defaults or []
+        # Split args into two lists depending on whether they have default value
+        no_default = args[:len(args) - len(defaults)]
+        with_default = args[len(args) - len(defaults):]
+        # Join the two lists and combine it with default values
+        args = [(arg,) for arg in no_default] + zip(with_default, defaults)
+        # Add possible *args and **kwargs and prepend them with '*' or '**'
+        varargs = [('*' + argspec.varargs,)] if argspec.varargs else []
+        kwargs = [('**' + argspec.keywords,)] if argspec.keywords else []
+        return args + varargs + kwargs
+
+    sig = inspect.signature(func)
+    args = []
+    for arg_name, param in sig.parameters.items():
+        name = arg_name
+        # Ignore 'self'
+        if name == 'self':
+            continue
+        if param.kind == inspect.Parameter.VAR_POSITIONAL:
+            name = '*' + name
+        elif param.kind == inspect.Parameter.VAR_KEYWORD:
+            name = '**' + name
+        if param.default != inspect.Parameter.empty:
+            args.append((name, param.default))
+        else:
+            args.append((name,))
+    return args
+
+
 def func_accepts_kwargs(func):
     if six.PY2:
         # Not all callables are inspectable with getargspec, so we'll
@@ -64,10 +102,23 @@ def func_accepts_kwargs(func):
     )
 
 
+def func_accepts_var_args(func):
+    """
+    Return True if function 'func' accepts positional arguments *args.
+    """
+    if six.PY2:
+        return inspect.getargspec(func)[1] is not None
+
+    return any(
+        p for p in inspect.signature(func).parameters.values()
+        if p.kind == p.VAR_POSITIONAL
+    )
+
+
 def func_has_no_args(func):
     args = inspect.getargspec(func)[0] if six.PY2 else [
         p for p in inspect.signature(func).parameters.values()
-        if p.kind == p.POSITIONAL_OR_KEYWORD and p.default is p.empty
+        if p.kind == p.POSITIONAL_OR_KEYWORD
     ]
     return len(args) == 1
 

@@ -39,9 +39,9 @@ transaction. If the response is produced without problems, Django commits the
 transaction. If the view produces an exception, Django rolls back the
 transaction.
 
-You may perform partial commits and rollbacks in your view code, typically with
-the :func:`atomic` context manager. However, at the end of the view, either
-all the changes will be committed, or none of them.
+You may perform subtransactions using savepoints in your view code, typically
+with the :func:`atomic` context manager. However, at the end of the view,
+either all or none of the changes will be committed.
 
 .. warning::
 

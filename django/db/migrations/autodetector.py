@@ -11,6 +11,7 @@ from django.db.migrations.migration import Migration
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
+from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import six
 
 from .topological_sort import stable_topological_sort
@@ -62,6 +63,8 @@ class MigrationAutodetector(object):
                 key: self.deep_deconstruct(value)
                 for key, value in obj.items()
             }
+        elif isinstance(obj, COMPILED_REGEX_TYPE):
+            return RegexObject(obj)
         elif isinstance(obj, type):
             # If this is a type that implements 'deconstruct' as an instance method,
             # avoid treating this as being deconstructible itself - see #22951
@@ -465,7 +468,11 @@ class MigrationAutodetector(object):
                                 )
                             )
                             self.renamed_models[app_label, model_name] = rem_model_name
-                            self.renamed_models_rel['%s.%s' % (rem_model_state.app_label, rem_model_state.name)] = '%s.%s' % (model_state.app_label, model_state.name)
+                            renamed_models_rel_key = '%s.%s' % (rem_model_state.app_label, rem_model_state.name)
+                            self.renamed_models_rel[renamed_models_rel_key] = '%s.%s' % (
+                                model_state.app_label,
+                                model_state.name,
+                            )
                             self.old_model_keys.remove((rem_app_label, rem_model_name))
                             self.old_model_keys.append((app_label, model_name))
                             break
@@ -502,7 +509,8 @@ class MigrationAutodetector(object):
                             related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
+                    if (getattr(field.remote_field, "through", None)
+                            and not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model_opts.local_many_to_many:
                 if field.remote_field.model:
@@ -678,7 +686,8 @@ class MigrationAutodetector(object):
                         related_fields[field.name] = field
                     # through will be none on M2Ms on swapped-out models;
                     # we can treat lack of through as auto_created=True, though.
-                    if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
+                    if (getattr(field.remote_field, "through", None)
+                            and not field.remote_field.through._meta.auto_created):
                         related_fields[field.name] = field
             for field in model._meta.local_many_to_many:
                 if field.remote_field.model:

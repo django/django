@@ -546,7 +546,6 @@ def language(parser, token):
         {% language "de" %}
             This is {{ bar }} and {{ boo }}.
         {% endlanguage %}
-
     """
     bits = token.split_contents()
     if len(bits) != 2:

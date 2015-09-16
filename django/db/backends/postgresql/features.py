@@ -28,3 +28,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_case_insensitive_like = False
     requires_sqlparse_for_splitting = False
     greatest_least_ignores_nulls = True
+    can_clone_databases = True

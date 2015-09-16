@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 from django.core.exceptions import ImproperlyConfigured
@@ -46,6 +47,39 @@ class DatabaseCreation(BaseDatabaseCreation):
                     print("Tests cancelled.")
                     sys.exit(1)
         return test_database_name
+
+    def get_test_db_clone_settings(self, number):
+        orig_settings_dict = self.connection.settings_dict
+        source_database_name = orig_settings_dict['NAME']
+        if self.connection.is_in_memory_db(source_database_name):
+            return orig_settings_dict
+        else:
+            new_settings_dict = orig_settings_dict.copy()
+            root, ext = os.path.splitext(orig_settings_dict['NAME'])
+            new_settings_dict['NAME'] = '{}_{}.{}'.format(root, number, ext)
+            return new_settings_dict
+
+    def _clone_test_db(self, number, verbosity, keepdb=False):
+        source_database_name = self.connection.settings_dict['NAME']
+        target_database_name = self.get_test_db_clone_settings(number)['NAME']
+        # Forking automatically makes a copy of an in-memory database.
+        if not self.connection.is_in_memory_db(source_database_name):
+            # Erase the old test database
+            if os.access(target_database_name, os.F_OK):
+                if keepdb:
+                    return
+                if verbosity >= 1:
+                    print("Destroying old test database '%s'..." % target_database_name)
+                try:
+                    os.remove(target_database_name)
+                except Exception as e:
+                    sys.stderr.write("Got an error deleting the old test database: %s\n" % e)
+                    sys.exit(2)
+            try:
+                shutil.copy(source_database_name, target_database_name)
+            except Exception as e:
+                sys.stderr.write("Got an error cloning the test database: %s\n" % e)
+                sys.exit(2)
 
     def _destroy_test_db(self, test_database_name, verbosity):
         if test_database_name and not self.connection.is_in_memory_db(test_database_name):

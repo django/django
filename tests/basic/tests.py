@@ -25,7 +25,7 @@ class ModelInstanceCreationTests(TestCase):
     def test_object_is_not_written_to_database_until_save_was_called(self):
         a = Article(
             id=None,
-            headline='Area man programs in Python',
+            headline='Parrot programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         self.assertIsNone(a.id)
@@ -130,7 +130,7 @@ class ModelInstanceCreationTests(TestCase):
 
     def test_querysets_checking_for_membership(self):
         headlines = [
-            'Area man programs in Python', 'Second article', 'Third article']
+            'Parrot programs in Python', 'Second article', 'Third article']
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
@@ -437,7 +437,7 @@ class ModelLookupTest(TestCase):
         # Create an Article.
         self.a = Article(
             id=None,
-            headline='Area woman programs in Python',
+            headline='Swallow programs in Python',
             pub_date=datetime(2005, 7, 28),
         )
         # Save it into the database. You have to call save() explicitly.
@@ -445,17 +445,17 @@ class ModelLookupTest(TestCase):
 
     def test_all_lookup(self):
         # Change values by changing the attributes, then calling save().
-        self.a.headline = 'Area man programs in Python'
+        self.a.headline = 'Parrot programs in Python'
         self.a.save()
 
         # Article.objects.all() returns all the articles in the database.
         self.assertQuerysetEqual(Article.objects.all(),
-            ['<Article: Area man programs in Python>'])
+            ['<Article: Parrot programs in Python>'])
 
     def test_rich_lookup(self):
         # Django provides a rich database lookup API.
         self.assertEqual(Article.objects.get(id__exact=self.a.id), self.a)
-        self.assertEqual(Article.objects.get(headline__startswith='Area woman'), self.a)
+        self.assertEqual(Article.objects.get(headline__startswith='Swallow'), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7), self.a)
         self.assertEqual(Article.objects.get(pub_date__year=2005, pub_date__month=7, pub_date__day=28), self.a)
@@ -464,11 +464,11 @@ class ModelLookupTest(TestCase):
     def test_equal_lookup(self):
         # The "__exact" lookup type can be omitted, as a shortcut.
         self.assertEqual(Article.objects.get(id=self.a.id), self.a)
-        self.assertEqual(Article.objects.get(headline='Area woman programs in Python'), self.a)
+        self.assertEqual(Article.objects.get(headline='Swallow programs in Python'), self.a)
 
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2005),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2004),
@@ -476,12 +476,12 @@ class ModelLookupTest(TestCase):
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__year=2005, pub_date__month=7),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
 
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__week_day=5),
-            ['<Article: Area woman programs in Python>'],
+            ['<Article: Swallow programs in Python>'],
         )
         self.assertQuerysetEqual(
             Article.objects.filter(pub_date__week_day=6),
@@ -522,7 +522,7 @@ class ModelLookupTest(TestCase):
 
         # pk can be used as a shortcut for the primary key name in any query.
         self.assertQuerysetEqual(Article.objects.filter(pk__in=[self.a.id]),
-            ["<Article: Area woman programs in Python>"])
+            ["<Article: Swallow programs in Python>"])
 
         # Model instances of the same type and same ID are considered equal.
         a = Article.objects.get(pk=self.a.id)
@@ -533,7 +533,7 @@ class ModelLookupTest(TestCase):
         # Create a very similar object
         a = Article(
             id=None,
-            headline='Area man programs in Python',
+            headline='Swallow bites Python',
             pub_date=datetime(2005, 7, 28),
         )
         a.save()
@@ -547,7 +547,7 @@ class ModelLookupTest(TestCase):
             MultipleObjectsReturned,
             "get\(\) returned more than one Article -- it returned 2!",
             Article.objects.get,
-            headline__startswith='Area',
+            headline__startswith='Swallow',
         )
         six.assertRaisesRegex(
             self,

@@ -95,7 +95,8 @@ class CustomColumnsTests(TestCase):
     def test_filter_on_nonexistent_field(self):
         self.assertRaisesMessage(
             FieldError,
-            "Cannot resolve keyword 'firstname' into field. Choices are: Author_ID, article, first_name, last_name, primary_set",
+            "Cannot resolve keyword 'firstname' into field. Choices are: "
+            "Author_ID, article, first_name, last_name, primary_set",
             Author.objects.filter,
             firstname__exact='John'
         )

@@ -33,7 +33,12 @@ Django settings files, use ``django-admin`` with
 option.
 
 The command-line examples throughout this document use ``django-admin`` to
-be consistent, but any example can use ``manage.py`` just as well.
+be consistent, but any example can use ``manage.py`` or ``python -m django``
+just as well.
+
+.. versionadded:: 1.9
+
+    ``python -m django`` was added.
 
 Usage
 =====
@@ -42,6 +47,7 @@ Usage
 
     $ django-admin <command> [options]
     $ manage.py <command> [options]
+    $ python -m django <command> [options]
 
 ``command`` should be one of the commands listed in this document.
 ``options``, which is optional, should be zero or more of the options available
@@ -741,9 +747,9 @@ be warned that using ``--fake`` runs the risk of putting the migration state
 table into a state where manual recovery will be needed to make migrations
 run correctly.
 
-.. versionadded:: 1.8
-
 .. django-admin-option:: --fake-initial
+
+.. versionadded:: 1.8
 
 The ``--fake-initial`` option can be used to allow Django to skip an app's
 initial migration if all database tables with the names of all models created
@@ -753,6 +759,14 @@ migrations against a database that preexisted the use of migrations. This
 option does not, however, check for matching database schema beyond matching
 table names and so is only safe to use if you are confident that your existing
 schema matches what is recorded in your initial migration.
+
+.. django-admin-option:: --run-syncdb
+
+.. versionadded:: 1.9
+
+The ``--run-syncdb`` option allows creating tables for apps without migrations.
+While this isn't recommended, the migrations framework is sometimes too slow
+on large projects with hundreds of models.
 
 .. deprecated:: 1.8
 
@@ -1214,7 +1228,11 @@ provided by the :setting:`TEST_RUNNER` setting.
 
 The ``--liveserver`` option can be used to override the default address where
 the live server (used with :class:`~django.test.LiveServerTestCase`) is
-expected to run from. The default value is ``localhost:8081``.
+expected to run from. The default value is ``localhost:8081-8179``.
+
+.. versionchanged:: 1.9
+
+    In earlier versions, the default value was ``localhost:8081``.
 
 .. django-admin-option:: --keepdb
 
@@ -1243,6 +1261,48 @@ this option.
 The ``--debug-sql`` option can be used to enable :ref:`SQL logging
 <django-db-logger>` for failing tests. If :djadminopt:`--verbosity` is ``2``,
 then queries in passing tests are also output.
+
+.. django-admin-option:: --parallel
+
+.. versionadded:: 1.9
+
+The ``--parallel`` option can be used to run tests in parallel in separate
+processes. Since modern processors have multiple cores, this allows running
+tests significantly faster.
+
+By default ``--parallel`` runs one process per core according to
+:func:`multiprocessing.cpu_count()`. You can adjust the number of processes
+either by providing it as the option's value, e.g. ``--parallel=4``, or by
+setting the ``DJANGO_TEST_PROCESSES`` environment variable.
+
+Django distributes test cases — :class:`unittest.TestCase` subclasses — to
+subprocesses. If there are fewer test cases than configured processes, Django
+will reduce the number of processes accordingly.
+
+Each process gets its own database. You must ensure that different test cases
+don't access the same resources. For instance, test cases that touch the
+filesystem should create a temporary directory for their own use.
+
+This option requires the third-party ``tblib`` package to display tracebacks
+correctly:
+
+.. code-block:: console
+
+    $ pip install tblib
+
+This feature isn't available on Windows. It doesn't work with the Oracle
+database backend either.
+
+.. warning::
+
+    When test parallelization is enabled and a test fails, Django may be
+    unable to display the exception traceback. This can make debugging
+    difficult. If you encounter this problem, run the affected test without
+    parallelization to see the traceback of the failure.
+
+    This is a known limitation. It arises from the need to serialize objects
+    in order to exchange them between processes. See
+    :ref:`python:pickle-picklable` for details.
 
 testserver <fixture fixture ...>
 --------------------------------
@@ -1539,7 +1599,12 @@ If not provided all locales are processed.
 
 Use the ``--noinput`` option to suppress all user prompting, such as "Are
 you sure?" confirmation messages. This is useful if ``django-admin`` is
-being executed as an unattended, automated script.
+being executed as an unattended, automated script. You can use ``--no-input``
+as an alias for this option.
+
+.. versionchanged:: 1.9
+
+    The ``--no-input`` alias was added.
 
 Extra niceties
 ==============

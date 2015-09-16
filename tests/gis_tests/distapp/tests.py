@@ -430,7 +430,7 @@ ST_Distance(geom1, geom2, use_ellipsoid=True)   |    N/A             |      OK (
 
 ST_Distance(geom1, geom2, use_ellipsoid=False)  |    N/A             |      OK (meters), less accurate, quick
 
-'''
+'''  # NOQA
 
 
 @skipUnlessDBFeature("gis_enabled")

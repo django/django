@@ -1,5 +1,5 @@
 # This code was mostly based on ipaddr-py
-# Copyright 2007 Google Inc. http://code.google.com/p/ipaddr-py/
+# Copyright 2007 Google Inc. https://github.com/google/ipaddr-py
 # Licensed under the Apache License, Version 2.0 (the "License").
 from django.core.exceptions import ValidationError
 from django.utils.six.moves import range
@@ -25,7 +25,6 @@ def clean_ipv6_address(ip_str, unpack_ipv4=False,
 
     Returns:
         A compressed IPv6 address, or the same value
-
     """
     best_doublecolon_start = -1
     best_doublecolon_len = 0
@@ -153,7 +152,6 @@ def is_valid_ipv6_address(ip_str):
 
     Returns:
         A boolean, True if this is a valid IPv6 address.
-
     """
     from django.core.validators import validate_ipv4_address
 
@@ -218,7 +216,6 @@ def _explode_shorthand_ip_string(ip_str):
 
     Returns:
         A string, the expanded IPv6 address.
-
     """
     if not _is_shorthand_ip(ip_str):
         # We've already got a longhand ip_str.
@@ -262,7 +259,6 @@ def _is_shorthand_ip(ip_str):
 
     Returns:
         A boolean, True if the address is shortened.
-
     """
     if ip_str.count('::') == 1:
         return True
