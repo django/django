@@ -81,6 +81,7 @@ Django's system checks are organized using the following tags:
 * ``security``: Checks security related configuration.
 * ``templates``: Checks template related configuration.
 * ``caches``: Checks cache related configuration.
+* ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -580,3 +581,18 @@ configured:
 
 * **caches.E001**: You must define a ``'default'`` cache in your
   :setting:`CACHES` setting.
+
+URLs
+----
+
+The following checks are performed on your URL configuration:
+
+* **urls.W001**: Your URL pattern ``<pattern>`` uses
+  :func:`~django.conf.urls.include` with a ``regex`` ending with a
+  ``$``. Remove the dollar from the ``regex`` to avoid problems
+  including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
+  beginning with a ``/``. Remove this slash as it is unnecessary.
+* **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
+  including a ``:``. Remove the colon, to avoid ambiguous namespace
+  references.
