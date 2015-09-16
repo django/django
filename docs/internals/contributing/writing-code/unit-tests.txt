@@ -192,9 +192,10 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-To run coverage on the Django test suite using the standard test settings::
+Coverage should be run in a single process to obtain accurate statistics. To
+run coverage on the Django test suite using the standard test settings::
 
-   $ coverage run ./runtests.py --settings=test_sqlite
+   $ coverage run ./runtests.py --settings=test_sqlite --parallel=1
 
 After running coverage, generate the html report by running::
 
