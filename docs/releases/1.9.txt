@@ -641,6 +641,8 @@ URLs
   of (<list of patterns>, <application namespace>) as the first argument to
   :func:`~django.conf.urls.include`.
 
+* System checks have been added for common URL pattern mistakes.
+
 Validators
 ^^^^^^^^^^
 
