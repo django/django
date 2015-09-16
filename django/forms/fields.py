@@ -204,6 +204,14 @@ class Field(six.with_metaclass(RenameFieldMethods, object)):
         data_value = data if data is not None else ''
         return initial_value != data_value
 
+    def get_bound_field(self, form, field_name):
+        """
+        Return a BoundField instance that will be used when accessing the form
+        field in a template.
+        """
+        from django.forms.forms import BoundField
+        return BoundField(form, self, field_name)
+
     def __deepcopy__(self, memo):
         result = copy.copy(self)
         memo[id(self)] = result

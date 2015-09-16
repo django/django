@@ -364,6 +364,9 @@ Forms
 * Form fields now support the :attr:`~django.forms.Field.disabled` argument,
   allowing the field widget to be displayed disabled by browsers.
 
+* It's now possible to customize bound fields by overriding a field's
+  :meth:`~django.forms.Field.get_bound_field()` method.
+
 Generic Views
 ^^^^^^^^^^^^^
 

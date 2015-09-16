@@ -152,7 +152,7 @@ class BaseForm(object):
             raise KeyError(
                 "Key %r not found in '%s'" % (name, self.__class__.__name__))
         if name not in self._bound_fields_cache:
-            self._bound_fields_cache[name] = BoundField(self, field, name)
+            self._bound_fields_cache[name] = field.get_bound_field(self, name)
         return self._bound_fields_cache[name]
 
     @property
