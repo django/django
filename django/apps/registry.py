@@ -381,6 +381,10 @@ class Apps(object):
 
             def function(model):
                 next_function = partial(supplied_fn, model)
+                # Annotate the function with its field for retrieval in
+                # migrations.state.StateApps.
+                if getattr(supplied_fn, 'keywords', None):
+                    next_function.field = supplied_fn.keywords.get('field')
                 self.lazy_model_operation(next_function, *more_models)
 
         # If the model is already loaded, pass it to the function immediately.

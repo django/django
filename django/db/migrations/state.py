@@ -244,11 +244,9 @@ class StateApps(Apps):
         has a keyword argument called 'field'.
         """
         def extract_field(operation):
-            # Expect a functools.partial() with a kwarg called 'field' applied.
-            try:
-                return operation.func.keywords['field']
-            except (AttributeError, KeyError):
-                return None
+            # operation is annotated with the field in
+            # apps.register.Apps.lazy_model_operation().
+            return getattr(operation, 'field', None)
 
         def extract_field_names(operations):
             return (str(field) for field in map(extract_field, operations) if field)
