@@ -17,6 +17,7 @@ class Tags(object):
     security = 'security'
     signals = 'signals'
     templates = 'templates'
+    urls = 'urls'
 
 
 class CheckRegistry(object):
