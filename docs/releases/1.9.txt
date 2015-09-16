@@ -161,6 +161,22 @@ Minor features
   changing the ``select_related()`` values used in the admin's changelist query
   based on the request.
 
+* Added ``view`` permission to the
+  :attr:`~django.db.models.Options.default_permissions`.
+  This allows to define read only access to the models and admin pages.
+  The :meth:`ModelAdmin.has_view_permission()
+  <django.contrib.admin.ModelAdmin.has_view_permission>` function was introduced.
+
+  The ``view`` permission has been made with backward compatibility in mind, so
+  ``change`` permission imply that user can also view objects. The ``change``
+  permission is newly needed to triger :doc:`/ref/contrib/admin/actions` by user (
+  previously they couldn't be even accessed in admin without ``change``
+  permission).
+
+  The related objects in inlines will not be displayed without ``change``
+  permission. This is consistent with current Django limitations -
+  inlines are not displayed if user has only ``delete`` permission.
+
 * The ``available_apps`` context variable, which lists the available
   applications for the current user, has been added to the
   :meth:`AdminSite.each_context() <django.contrib.admin.AdminSite.each_context>`
