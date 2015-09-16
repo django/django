@@ -53,7 +53,7 @@ Kansas. LJWorld.com focuses on news, while Lawrence.com focuses on local
 entertainment. But sometimes editors want to publish an article on *both*
 sites.
 
-The brain-dead way of solving the problem would be to require site producers to
+The naive way of solving the problem would be to require site producers to
 publish the same story twice: once for LJWorld.com and again for Lawrence.com.
 But that's inefficient for site producers, and it's redundant to store
 multiple copies of the same story in the database.
