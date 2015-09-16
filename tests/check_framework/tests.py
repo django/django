@@ -15,7 +15,7 @@ from django.test.utils import override_settings, override_system_checks
 from django.utils.encoding import force_text
 from django.utils.six import StringIO
 
-from .models import SimpleModel
+from .models import SimpleModel, my_check
 
 
 class DummyObj(object):
@@ -308,3 +308,8 @@ class CheckFrameworkReservedNamesTests(IsolateModelsMixin, SimpleTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+
+class ChecksRunDuringTests(SimpleTestCase):
+    def test_registered_check_did_run(self):
+        self.assertTrue(my_check.did_run)
