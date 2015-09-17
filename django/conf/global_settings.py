@@ -292,7 +292,7 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 
 # Maximum number of keys in a POST request that will be allowed before raising
 # a SuspiciousOperation.
-DATA_UPLOAD_MAX_NUMBER_FIELDS = 100
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
