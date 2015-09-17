@@ -18,7 +18,7 @@ class Command(BaseCommand):
                 "Configure a network-based backend in CHANNEL_BACKENDS to use this command."
             )
         # Run the interface
-        port = options.get("port", None) or 9000
+        port = int(options.get("port", None) or 9000)
         try:
             import asyncio
         except ImportError:
