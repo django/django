@@ -53,6 +53,16 @@ class DisallowedRedirect(SuspiciousOperation):
     pass
 
 
+class TooManyFieldsSent(SuspiciousOperation):
+    """Request has too many fields to parse"""
+    pass
+
+
+class RequestBodyTooBig(SuspiciousOperation):
+    """Request is too big to parse"""
+    pass
+
+
 class PermissionDenied(Exception):
     """The user did not have permission to do that"""
     pass

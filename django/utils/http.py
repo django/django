@@ -9,7 +9,7 @@ import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
 
-from django.core.exceptions import SuspiciousOperation
+from django.core.exceptions import TooManyFieldsSent
 from django.utils import six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, force_str, force_text
@@ -345,7 +345,7 @@ def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limi
     fields_limit = fields_limit or 0
     pairs = re.split('[&;]', qs, fields_limit)
     if fields_limit > 0 and len(pairs) > fields_limit:
-        raise SuspiciousOperation('Too many fields')
+        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
     r = []
     for name_value in pairs:
         if not name_value and not strict_parsing:
@@ -431,7 +431,7 @@ def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
     qs, _coerce_result = _coerce_args(qs)
     pairs = re.split('[&;]', qs, fields_limit)
     if fields_limit > 0 and len(pairs) > fields_limit:
-        raise SuspiciousOperation('Too many fields')
+        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
     r = []
     for name_value in pairs:
         if not name_value and not strict_parsing:

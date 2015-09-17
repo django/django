@@ -12,7 +12,9 @@ import cgi
 import sys
 
 from django.conf import settings
-from django.core.exceptions import SuspiciousMultipartForm, SuspiciousOperation
+from django.core.exceptions import (
+    RequestBodyTooBig, SuspiciousMultipartForm, TooManyFieldsSent
+)
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
@@ -177,7 +179,7 @@ class MultiPartParser(object):
                     num_post_keys += 1
                     if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
                             settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys):
-                        raise SuspiciousOperation('Too many fields')
+                        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
 
                     # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
@@ -198,7 +200,7 @@ class MultiPartParser(object):
                     self._data_size += len(field_name) + len(data) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
                     (self._data_size > settings.DATA_UPLOAD_MAX_MEMORY_SIZE or field_stream.read(1))):
-                        raise SuspiciousOperation('Request data too large')
+                        raise RequestBodyTooBig('Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
                     self._post.appendlist(field_name,
                                           force_text(data, encoding, errors='replace'))

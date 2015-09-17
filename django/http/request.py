@@ -9,7 +9,7 @@ from itertools import chain
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
-    DisallowedHost, ImproperlyConfigured, SuspiciousOperation,
+    DisallowedHost, ImproperlyConfigured, RequestBodyTooBig, SuspiciousOperation
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError
@@ -301,7 +301,7 @@ class HttpRequest(object):
 
                 if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
                         and content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
-                    raise SuspiciousOperation('Request data too large')
+                    raise RequestBodyTooBig('Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.')
 
                 self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
             else:
