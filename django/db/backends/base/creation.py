@@ -47,7 +47,7 @@ class BaseDatabaseCreation(object):
                 action = "Using existing"
 
             print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+                action, test_database_name, test_db_repr))
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. This is to handle the case
@@ -174,7 +174,7 @@ class BaseDatabaseCreation(object):
                     try:
                         if verbosity >= 1:
                             print("Destroying old test database '%s'..."
-                                  % self.connection.alias)
+                                  % test_database_name)
                         cursor.execute(
                             "DROP DATABASE %s" % qn(test_database_name))
                         cursor.execute(
@@ -248,7 +248,7 @@ class BaseDatabaseCreation(object):
             if keepdb:
                 action = 'Preserving'
             print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+                action, test_database_name, test_db_repr))
 
         # if we want to preserve the database
         # skip the actual destroying piece.
