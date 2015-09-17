@@ -57,6 +57,55 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(companies['result'], 2395)
 
+    def test_direct_filter(self):
+        class Equal(models.Expression):
+            # If want of the inputs to Equal is null, then the whole
+            # expression will not match.
+            coalescing = False
+
+            # A poor man's version of Django's equals method. Intentionally
+            # left as a not-totally-functional one.
+            def __init__(self, lhs, rhs):
+                self.lhs = lhs
+                self.rhs = rhs
+
+            def as_sql(self, compiler, connection):
+                lhs_sql, lhs_params = compiler.compile(self.lhs)
+                rhs_sql, rhs_params = compiler.compile(self.rhs)
+                return '%s = %s' % (lhs_sql, rhs_sql), lhs_params + rhs_params
+
+            def set_source_expressions(self, expressions):
+                self.lhs, self.rhs = expressions
+
+            def get_source_expressions(self):
+                return [self.lhs, self.rhs]
+
+        e = Employee.objects.create(firstname="Jack", alias='Joe', lastname="Smith", salary=20)
+        Company.objects.create(
+            name="Example Inc. 2", num_employees=2300, num_chairs=5,
+            ceo=e,
+            point_of_contact=e
+        )
+
+        qs = Company.objects.filter(Equal(F('point_of_contact__salary'), Value(20)))
+        self.assertNotIn('LEFT OUTER', str(qs.query))
+        self.assertIn('INNER JOIN', str(qs.query))
+        self.assertQuerysetEqual(qs, ['Example Inc. 2'], lambda x: x.name)
+
+        qs = Company.objects.filter(Equal(Coalesce('point_of_contact__salary', 'ceo__salary'), Value(10)))
+        # Point of contact is LEFT OUTER, ceo is INNER (ceo can't have null values so no
+        # point in LEFT JOINing it)
+        self.assertIn('LEFT OUTER', str(qs.query))
+        self.assertIn('INNER JOIN', str(qs.query))
+        self.assertQuerysetEqual(qs, ['Example Inc.'], lambda x: x.name)
+
+        # Two references to the same relation means we can use INNER JOIN
+        # Joe doesn't have alias, so he matches, and Jack has an alias of Joe, so he matches, too.
+        qs = Company.objects.filter(Equal(Coalesce('ceo__alias', 'ceo__firstname'), Value('Joe'))).order_by('name')
+        self.assertNotIn('LEFT OUTER', str(qs.query))
+        self.assertIn('INNER JOIN', str(qs.query))
+        self.assertQuerysetEqual(qs, ['Example Inc.', 'Example Inc. 2'], lambda x: x.name)
+
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater

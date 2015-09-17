@@ -7,12 +7,35 @@ from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db import models
+from django.db.models import Value
+from django.db.models.expressions import E
+from django.db.models.lookups import Exact
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
 
 
 class LookupTests(TestCase):
+    def test_foobar(self):
+        from django.db.models import F
+        print(Article.objects.filter(Exact(F('headline'), Value('Article1'))).query)
+
+        @models.CharField.register_lookup
+        class Collate(models.Transform):
+            lookup_name = 'collate'
+            bilateral = True
+
+            def __init__(self, lhs, lookups, lang):
+                super(Collate, self).__init__(lhs, lookups)
+                self.lang = lang
+                self.args = (lang,)
+
+            def as_sql(self, compiler, connection):
+                lhs, lhs_params = compiler.compile(self.lhs)
+                return 'collate(%s, %%s)' % lhs, lhs_params + [self.lang]
+
+        print(Article.objects.filter(E('headline').collate('fi') == 'Article1').query)
 
     def setUp(self):
         # Create a few Authors.

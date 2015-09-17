@@ -4,7 +4,6 @@ import datetime
 from django.conf import settings
 from django.core.exceptions import FieldError
 from django.db.backends import utils as backend_utils
-from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q, refs_aggregate
 from django.utils import six, timezone
@@ -125,6 +124,15 @@ class BaseExpression(object):
 
     # aggregate specific fields
     is_summary = False
+    # An expression is coalescing if it produces results
+    # when some of its inputs are null. This affects join
+    # promotion. If coalescing is False, then we can
+    # generate inner joins.
+    # The example is Coalesce(best_friend__name, mother__name).
+    # Even when best_friend isn't set, the expression can produce
+    # results.
+
+    coalescing = True
 
     def __init__(self, output_field=None):
         self._output_field = output_field
@@ -202,6 +210,22 @@ class BaseExpression(object):
             for expr in c.get_source_expressions()
         ])
         return c
+
+    def get_wanted_inner_joins(self):
+        if hasattr(self, '_used_joins'):
+            return set(self._used_joins)
+        if self.coalescing:
+            source_expressions = self.get_source_expressions()
+            if not source_expressions:
+                return set()
+            joins = source_expressions[0].get_wanted_inner_joins()
+            for source in source_expressions[1:]:
+                joins &= source.get_wanted_inner_joins()
+            return joins
+        used_joins = set()
+        for se in self.get_source_expressions():
+            used_joins.update(se.get_wanted_inner_joins())
+        return used_joins
 
     def _prepare(self):
         """
@@ -970,3 +994,38 @@ class OrderBy(BaseExpression):
 
     def desc(self):
         self.descending = True
+
+
+class E(object):
+    def __init__(self, ref):
+        self.lookups = []
+        self.ref = F(ref)
+
+    def __getattr__(self, attr):
+        if not attr.startswith('_'):
+            def callme(*args, **kwargs):
+                self.lookups.append((attr, args, kwargs))
+                return self
+            return callme
+        return super().__getattr__(attr)
+
+    def __eq__(self, other):
+        self.lookups.append(('exact', (other,), {}))
+        return self
+
+    def resolve_expression(self, *args, **kwargs):
+        lhs = self.ref.resolve_expression(*args, **kwargs)
+        for pos, (attr, args, kwargs) in enumerate(self.lookups):
+            last = pos == len(self.lookups) - 1
+            if last:
+                next = lhs.get_lookup(attr)
+                if next:
+                    return next(lhs, *args, **kwargs)
+            next = lhs.get_transform(attr)
+            if next:
+                lhs = next(lhs, [], *args, **kwargs)
+            else:
+                raise Exception("Transform %s not found from %s" % (attr, lhs))
+        return lhs
+
+from django.db.models import fields
