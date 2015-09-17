@@ -35,7 +35,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         cursor = self._maindb_connection.cursor()
         if self._test_database_create():
             try:
-                self._execute_test_db_creation(cursor, parameters, verbosity)
+                self._execute_test_db_creation(cursor, parameters, verbosity, keepdb)
             except Exception as e:
                 # if we want to keep the db, then no need to do any of the below,
                 # just return and skip it all.
@@ -63,7 +63,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         sys.stderr.write("Got an error destroying the old test database: %s\n" % e)
                         sys.exit(2)
                     try:
-                        self._execute_test_db_creation(cursor, parameters, verbosity)
+                        self._execute_test_db_creation(cursor, parameters, verbosity, keepdb)
                     except Exception as e:
                         sys.stderr.write("Got an error recreating the test database: %s\n" % e)
                         sys.exit(2)
@@ -75,8 +75,12 @@ class DatabaseCreation(BaseDatabaseCreation):
             if verbosity >= 1:
                 print("Creating test user...")
             try:
-                self._create_test_user(cursor, parameters, verbosity)
+                self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
+                # if we want to keep the db then we want also to keep user,
+                # then no need to do any of the below, just return and skip it all.
+                if keepdb:
+                    return
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
                 if not autoclobber:
                     confirm = input(
@@ -89,7 +93,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                         self._destroy_test_user(cursor, parameters, verbosity)
                         if verbosity >= 1:
                             print("Creating test user...")
-                        self._create_test_user(cursor, parameters, verbosity)
+                        self._create_test_user(cursor, parameters, verbosity, keepdb)
                     except Exception as e:
                         sys.stderr.write("Got an error recreating the test user: %s\n" % e)
                         sys.exit(2)
@@ -184,7 +188,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             self._execute_test_db_destruction(cursor, parameters, verbosity)
         self._maindb_connection.close()
 
-    def _execute_test_db_creation(self, cursor, parameters, verbosity):
+    def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
             print("_create_test_db(): dbname = %s" % parameters['user'])
         statements = [
@@ -197,9 +201,16 @@ class DatabaseCreation(BaseDatabaseCreation):
                REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize_tmp)s
             """,
         ]
-        self._execute_statements(cursor, statements, parameters, verbosity)
+        try:
+            # Statement can fail when keepdb is on
+            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=keepdb)
+        except DatabaseError as err:
+            description = str(err)
+            # Avoid tablespace already exists error when keepdb is on
+            if 'ORA-01543' not in description or not keepdb:
+                raise
 
-    def _create_test_user(self, cursor, parameters, verbosity):
+    def _create_test_user(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
             print("_create_test_user(): username = %s" % parameters['user'])
         statements = [
@@ -216,7 +227,15 @@ class DatabaseCreation(BaseDatabaseCreation):
                      CREATE TRIGGER
                TO %(user)s""",
         ]
-        self._execute_statements(cursor, statements, parameters, verbosity)
+        try:
+            # Statement can fail when keepdb is on
+            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=keepdb)
+        except DatabaseError as err:
+            description = str(err)
+            # Avoid tablespace already exists error when keepdb is on
+            if 'ORA-01920' not in description or not keepdb:
+                raise
+
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"
         try:
