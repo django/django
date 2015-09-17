@@ -21,6 +21,20 @@ Database
 Redis
 -----
 
+To use the Redis backend you have to install the redis package::
+
+    pip install -U redis
+
+Also you need to set the following in the ``CHANNEL_BACKENDS`` setting::
+
+    CHANNEL_BACKENDS = {
+        "default": {
+            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
+            "HOST": "redis-hostname",
+        },
+    }
+
+
 Writing Custom Backends
 -----------------------
 

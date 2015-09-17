@@ -36,10 +36,15 @@ here's an example for a remote Redis server::
 
     CHANNEL_BACKENDS = {
         "default": {
-            "BACKEND": "channels.backends.redis.RedisChannelBackend",
+            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
             "HOST": "redis-channel",
         },
     }
+
+To use the Redis backend you have to install the redis package::
+
+    pip install -U redis
+
 
 Make sure the same setting file is used across all your workers, interfaces
 and WSGI apps; without it, they won't be able to talk to each other and things
