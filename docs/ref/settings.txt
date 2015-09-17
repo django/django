@@ -895,7 +895,7 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS
 
 .. versionadded:: 1.9
 
-Default: ``100``
+Default: ``1000``
 
 The maximum number of parameters received either via GET, or FORM POST before a
 :exc:`~django.core.exceptions.SuspiciousOperation` is raised. You can set it to
