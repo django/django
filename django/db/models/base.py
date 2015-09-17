@@ -643,6 +643,9 @@ class Model(six.with_metaclass(ModelBase)):
                 # constraints aren't supported by the database, there's the
                 # unavoidable risk of data corruption.
                 if obj and obj.pk is None:
+                    # Remove the object from a related instance cache.
+                    if not field.remote_field.multiple:
+                        delattr(obj, field.remote_field.get_cache_name())
                     raise ValueError(
                         "save() prohibited to prevent data loss due to "
                         "unsaved related object '%s'." % field.name
