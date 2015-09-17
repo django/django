@@ -98,9 +98,8 @@ class BaseSpatialFeatures(object):
         m = re.match(r'has_(\w*)_function$', name)
         if m:
             func_name = m.group(1)
-            if func_name not in self.connection.ops.unsupported_functions:
-                return True
-        return False
+            return func_name not in self.connection.ops.unsupported_functions
+        raise AttributeError
 
     def has_ops_method(self, method):
         return getattr(self.connection.ops, method, False)
