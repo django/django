@@ -27,6 +27,10 @@ class RedisChannelBackend(BaseChannelBackend):
         return redis.Redis(host=self.host, port=self.port)
 
     def send(self, channel, message):
+        # if channel is no str (=> bytes) convert it
+        if not isinstance(channel, str):
+            channel = channel.decode('utf-8')
+
         # Write out message into expiring key (avoids big items in list)
         key = self.prefix + uuid.uuid4().get_hex()
         self.connection.set(
@@ -59,7 +63,7 @@ class RedisChannelBackend(BaseChannelBackend):
                 content = self.connection.get(result[1])
                 if content is None:
                     continue
-                return result[0][len(self.prefix):], json.loads(content)
+                return result[0][len(self.prefix):].decode("utf-8"), json.loads(content.decode("utf-8"))
             else:
                 return None, None
 
