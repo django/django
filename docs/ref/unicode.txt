@@ -23,8 +23,8 @@ able to store certain characters in the database, and information will be lost.
 * PostgreSQL users, refer to the `PostgreSQL manual`_ (section 22.3.2 in
   PostgreSQL 9) for details on creating databases with the correct encoding.
 
-* Oracle users, refer to the `Oracle manual`_ for details on how to set (`section 2`_)
-  or alter (`section 11`_) database character set encoding.
+* Oracle users, refer to the `Oracle manual`_ for details on how to set
+  (`section 2`_) or alter (`section 11`_) database character set encoding.
 
 * SQLite users, there is nothing you need to do. SQLite always uses UTF-8
   for internal encoding.
