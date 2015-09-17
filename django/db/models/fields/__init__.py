@@ -207,6 +207,7 @@ class Field(RegisterLookupMixin):
         errors = []
         errors.extend(self._check_field_name())
         errors.extend(self._check_choices())
+        errors.extend(self._check_default())
         errors.extend(self._check_db_index())
         errors.extend(self._check_null_allowed_for_primary_keys())
         errors.extend(self._check_backend_specific_checks(**kwargs))
@@ -282,6 +283,22 @@ class Field(RegisterLookupMixin):
                 return []
         else:
             return []
+
+    def _check_default(self):
+        if self.has_default():
+            default = self.get_default()
+            try:
+                self.clean(default, None)
+            except exceptions.ValidationError as messages:
+                return [
+                    checks.Error(
+                        "Invalid 'default' value: %s" % message,
+                        hint=None,
+                        obj=self,
+                        id='fields.E008',
+                    ) for message in messages
+                ]
+        return []
 
     def _check_db_index(self):
         if self.db_index not in (None, True, False):

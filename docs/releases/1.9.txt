@@ -512,6 +512,9 @@ Models
 
 * ``connection.queries`` shows queries with substituted parameters on SQLite.
 
+* Added a new model field check that makes sure
+  :attr:`~django.db.models.Field.default` is a valid value.
+
 CSRF
 ^^^^
 
