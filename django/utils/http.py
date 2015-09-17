@@ -314,7 +314,11 @@ def is_safe_url(url, host=None):
 
 
 # Functions lifted from their respective modules in order to implement
-# several checks which were not possible with the stdlib
+# several checks which were not possible with the stdlib, namely limiting
+# the number of fields that will be parsed.
+#
+# Copyright (C) 2013 Python Software Foundation, see license.python.txt for
+# details.
 def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=None):
     """
     Parse a query given as a string argument and return a list.
