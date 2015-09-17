@@ -150,7 +150,7 @@ class MultiPartParser(object):
         # To count the number of keys in the request.
         num_post_keys = 0
         # To limit the amount of data read from the request.
-        read_kwargs = {}
+        read_size = None
 
         try:
             for item_type, meta_data, field_stream in Parser(stream, self._boundary):
@@ -181,17 +181,17 @@ class MultiPartParser(object):
 
                     # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
-                        read_kwargs = {'size': settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size}
+                        read_size = settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size
 
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
-                        raw_data = field_stream.read(**read_kwargs)
+                        raw_data = field_stream.read(size=read_size)
                         try:
                             data = base64.b64decode(raw_data)
                         except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
-                        data = field_stream.read(**read_kwargs)
+                        data = field_stream.read(size=read_size)
 
                     self._data_size += len(field_name) + len(data) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
