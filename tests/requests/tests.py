@@ -811,42 +811,6 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
 
-class DataUploadMaxMemorySizeGetTests(SimpleTestCase):
-
-    def _test_data_upload_max_memory_size_exceeded(self, content_length_header):
-        request = WSGIRequest({
-            'REQUEST_METHOD': 'GET',
-            'wsgi.input': BytesIO(b''),
-            content_length_header: 3,
-        })
-
-        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=2):
-            with self.assertRaisesMessage(SuspiciousOperation, 'Request data too large'):
-                request.body
-
-        # no problem for body <= DATA_UPLOAD_MAX_MEMORY_SIZE
-        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=3):
-            request.body
-
-        # After a successful read, attributes on request are cached so need to
-        # create a new one.
-        request = WSGIRequest({
-            'REQUEST_METHOD': 'GET',
-            'wsgi.input': BytesIO(b''),
-            content_length_header: 3,
-        })
-
-        # no problem for DATA_UPLOAD_MAX_MEMORY_SIZE=None
-        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
-            request.body
-
-    def test_data_upload_max_memory_size_exceeded_http_content_length(self):
-        self._test_data_upload_max_memory_size_exceeded('HTTP_CONTENT_LENGTH')
-
-    def test_data_upload_max_memory_size_exceeded_content_length(self):
-        self._test_data_upload_max_memory_size_exceeded('CONTENT_LENGTH')
-
-
 class DataUploadMaxMemorySizePostTests(SimpleTestCase):
     def setUp(self):
         payload = FakePayload("\r\n".join([
@@ -895,6 +859,28 @@ class DataUploadMaxMemorySizePostTests(SimpleTestCase):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=1):
             request._load_post_and_files()
             self.assertIn('file1', request.FILES, "Upload file not present")
+
+
+class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
+
+    def test_get_max_fields_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
+            with self.assertRaisesMessage(SuspiciousOperation, 'Too many fields'):
+                request = WSGIRequest({
+                    'REQUEST_METHOD': 'GET',
+                    'wsgi.input': BytesIO(b''),
+                    'QUERY_STRING': 'a=1&a=2;a=3',
+                })
+                request.GET['a']
+
+    def test_get_max_fields_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=3):
+            request = WSGIRequest({
+                'REQUEST_METHOD': 'GET',
+                'wsgi.input': BytesIO(b''),
+                'QUERY_STRING': 'a=1&a=2;a=3',
+            })
+            request.GET['a']
 
 
 class DataUploadMaxNumberOfFieldsMPost(SimpleTestCase):

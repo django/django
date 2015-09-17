@@ -264,18 +264,8 @@ class HttpRequest(object):
             if self._read_started:
                 raise RawPostDataException("You cannot access body after reading from request's data stream")
 
-            # Limit the maximum request data size that will be handled in-memory.
             try:
-                content_length = int(self.META.get('HTTP_CONTENT_LENGTH', self.META.get('CONTENT_LENGTH', 0)))
-            except (ValueError, TypeError):
-                content_length = 0
-
-            if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
-                    and content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
-                raise SuspiciousOperation('Request data too large')
-
-            try:
-                self._body = self.read(size=content_length)
+                self._body = self.read()
             except IOError as e:
                 six.reraise(UnreadablePostError, UnreadablePostError(*e.args), sys.exc_info()[2])
             self._stream = BytesIO(self._body)
@@ -304,6 +294,15 @@ class HttpRequest(object):
                     data = self
                 self._post, self._files = self.parse_file_upload(self.META, data)
             elif self.content_type == 'application/x-www-form-urlencoded':
+                try:
+                    content_length = int(self.META.get('HTTP_CONTENT_LENGTH', self.META.get('CONTENT_LENGTH', 0)))
+                except (ValueError, TypeError):
+                    content_length = 0
+
+                if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None
+                        and content_length > settings.DATA_UPLOAD_MAX_MEMORY_SIZE):
+                    raise SuspiciousOperation('Request data too large')
+
                 self._post, self._files = QueryDict(self.body, encoding=self._encoding), MultiValueDict()
             else:
                 self._post, self._files = QueryDict(encoding=self._encoding), MultiValueDict()
