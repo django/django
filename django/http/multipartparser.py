@@ -103,7 +103,7 @@ class MultiPartParser(object):
         self._encoding = encoding or settings.DEFAULT_CHARSET
         self._content_length = content_length
         self._upload_handlers = upload_handlers
-
+        # Number of bytes that have been read.
         self._data_size = 0
 
     def parse(self):
@@ -147,9 +147,9 @@ class MultiPartParser(object):
         old_field_name = None
         counters = [0] * len(handlers)
 
-        # To count the number of fields
-        num_inserted_fields = 0
-
+        # To count the number of keys in the request.
+        num_post_keys = 0
+        # To limit the amount of data read from the request.
         read_kwargs = {}
 
         try:
@@ -173,13 +173,13 @@ class MultiPartParser(object):
                 field_name = force_text(field_name, encoding, errors='replace')
 
                 if item_type == FIELD:
-                    # avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS
-                    num_inserted_fields += 1
+                    # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FIELDS
+                    num_post_keys += 1
                     if (settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None and
-                    settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_inserted_fields):
+                            settings.DATA_UPLOAD_MAX_NUMBER_FIELDS < num_post_keys):
                         raise SuspiciousOperation('Too many fields')
 
-                    # avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
+                    # Avoid reading more than DATA_UPLOAD_MAX_MEMORY_SIZE
                     if settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None:
                         read_kwargs = {'size': settings.DATA_UPLOAD_MAX_MEMORY_SIZE - self._data_size}
 

@@ -18,7 +18,7 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
-from django.utils.http import is_same_domain, parse_qsl2, parse_qsl3
+from django.utils.http import is_same_domain, limited_parse_qsl_py2, limited_parse_qsl_py3
 from django.utils.six.moves.urllib.parse import (
     quote, urlencode, urljoin, urlsplit,
 )
@@ -381,7 +381,13 @@ class QueryDict(MultiValueDict):
         if not encoding:
             encoding = settings.DEFAULT_CHARSET
         self.encoding = encoding
+        query_string = query_string or ''
+        parse_qsl_kwargs = {
+            'keep_blank_values': True,
+            'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
+        }
         if six.PY3:
+            parse_qsl_kwargs['encoding'] = encoding
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
                 try:
@@ -389,19 +395,10 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
-            for key, value in parse_qsl3(query_string or '',
-                                         keep_blank_values=True,
-                                         encoding=encoding,
-                                         fields_limit=(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS if
-                                                       settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
-                                                       else 0)):
+            for key, value in limited_parse_qsl_py3(query_string, **parse_qsl_kwargs):
                 self.appendlist(key, value)
         else:
-            for key, value in parse_qsl2(query_string or '',
-                                         keep_blank_values=True,
-                                         fields_limit=(settings.DATA_UPLOAD_MAX_NUMBER_FIELDS if
-                                                       settings.DATA_UPLOAD_MAX_NUMBER_FIELDS is not None
-                                                       else 0)):
+            for key, value in limited_parse_qsl_py2(query_string, **parse_qsl_kwargs):
                 try:
                     value = value.decode(encoding)
                 except UnicodeDecodeError:

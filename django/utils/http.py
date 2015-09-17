@@ -312,13 +312,14 @@ def is_safe_url(url, host=None):
     return ((not url_info.netloc or url_info.netloc == host) and
             (not url_info.scheme or url_info.scheme in ['http', 'https']))
 
+
 # Functions lifted from their respective modules in order to implement
 # several checks which were not possible with the stdlib
+def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=None):
+    """
+    Parse a query given as a string argument and return a list.
 
-
-def parse_qsl2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=0):
-    """Parse a query given as a string argument. Lifted from
-    urlparse.
+    Lifted from urlparse with an additional "fields_limit" argument.
 
     Arguments:
 
@@ -335,10 +336,9 @@ def parse_qsl2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=0):
         errors raise a ValueError exception.
 
     fields_limit: maximum number of fields parsed, or an exception
-        is raised. 0 means no limit and is the default.
-
-    Returns a list, as G-d intended.
+        is raised. None means no limit and is the default.
     """
+    fields_limit = fields_limit or 0
     pairs = re.split('[&;]', qs, fields_limit)
     if fields_limit > 0 and len(pairs) > fields_limit:
         raise SuspiciousOperation('Too many fields')
@@ -396,9 +396,12 @@ def _coerce_args(*args):
     return _decode_args(args) + (_encode_result,)
 
 
-def parse_qsl3(qs, keep_blank_values=False, strict_parsing=False,
-               encoding='utf-8', errors='replace', fields_limit=0):
-    """Parse a query given as a string argument. Lifted from urllib.
+def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
+               encoding='utf-8', errors='replace', fields_limit=None):
+    """
+    Parse a query given as a string argument and return a list.
+
+    Lifted from urlparse with an additional "fields_limit" argument.
 
     Arguments:
 
@@ -417,11 +420,10 @@ def parse_qsl3(qs, keep_blank_values=False, strict_parsing=False,
     encoding and errors: specify how to decode percent-encoded sequences
         into Unicode characters, as accepted by the bytes.decode() method.
 
-    fields_limit: maximum number of fields parsed, or an exception
-        is raised. 0 means no limit and is the default.
-
-    Returns a list, as G-d intended.
+    fields_limit: maximum number of fields parsed or an exception
+        is raised. None means no limit and is the default.
     """
+    fields_limit = fields_limit or 0
     qs, _coerce_result = _coerce_args(qs)
     pairs = re.split('[&;]', qs, fields_limit)
     if fields_limit > 0 and len(pairs) > fields_limit:
