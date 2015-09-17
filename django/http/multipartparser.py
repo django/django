@@ -13,7 +13,7 @@ import sys
 
 from django.conf import settings
 from django.core.exceptions import (
-    RequestBodyTooBig, SuspiciousMultipartForm, TooManyFieldsSent
+    RequestBodyTooBig, SuspiciousMultipartForm, TooManyFieldsSent,
 )
 from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,

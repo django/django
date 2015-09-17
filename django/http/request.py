@@ -9,7 +9,8 @@ from itertools import chain
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
-    DisallowedHost, ImproperlyConfigured, RequestBodyTooBig, SuspiciousOperation
+    DisallowedHost, ImproperlyConfigured, RequestBodyTooBig,
+    SuspiciousOperation,
 )
 from django.core.files import uploadhandler
 from django.http.multipartparser import MultiPartParser, MultiPartParserError

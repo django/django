@@ -7,7 +7,7 @@ from io import BytesIO
 from itertools import chain
 
 from django.core.exceptions import (
-    RequestBodyTooBig, SuspiciousOperation, TooManyFieldsSent
+    RequestBodyTooBig, SuspiciousOperation, TooManyFieldsSent,
 )
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
