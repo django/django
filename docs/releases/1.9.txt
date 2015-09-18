@@ -776,6 +776,12 @@ Dropped support for PostgreSQL 9.0
 Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
 Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
 
+Dropped support for Oracle 11.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for Oracle 11.1 ended in August 2015. As a consequence, Django
+1.9 sets 11.2 as the minimum Oracle version it officially supports.
+
 Bulk behavior of ``add()`` method of related managers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
