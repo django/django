@@ -578,4 +578,4 @@ The following checks verify that your :setting:`CACHES` setting is correctly
 configured:
 
 * **cache.E001**: You have not included a ``'default'`` key in your
-:setting:`TEMPLATES` setting.
+  :setting:`TEMPLATES` setting.
