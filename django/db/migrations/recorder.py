@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.apps.registry import Apps
 from django.db import models
 from django.db.utils import DatabaseError
@@ -7,6 +9,8 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 
 from .exceptions import MigrationSchemaMissing
+
+logger = logging.getLogger('django.db.migrations')
 
 
 class MigrationRecorder(object):
@@ -71,6 +75,7 @@ class MigrationRecorder(object):
         """
         self.ensure_schema()
         self.migration_qs.create(app=app, name=name)
+        logger.info('Marked migration %s.%s as applied' % (app, name))
 
     def record_unapplied(self, app, name):
         """
@@ -78,6 +83,7 @@ class MigrationRecorder(object):
         """
         self.ensure_schema()
         self.migration_qs.filter(app=app, name=name).delete()
+        logger.info('Marked migration %s.%s as unapplied' % (app, name))
 
     def flush(self):
         """

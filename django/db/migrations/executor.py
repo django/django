@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.apps.registry import apps as global_apps
 from django.db import migrations
 
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
+
+logger = logging.getLogger('django.db.migrations')
 
 
 class MigrationExecutor(object):
@@ -146,12 +150,14 @@ class MigrationExecutor(object):
                 # Alright, do it normally
                 with self.connection.schema_editor() as schema_editor:
                     state = migration.apply(state, schema_editor)
+                    logger.info('Applied migration %s on database %s' % (migration, self.connection.alias))
+        if fake:
+            logger.info('Fake applied migration %s on database %s' % (migration, self.connection.alias))
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_applied(app_label, name)
-        else:
-            self.recorder.record_applied(migration.app_label, migration.name)
+        self.recorder.record_applied(migration.app_label, migration.name)
         # Report progress
         if self.progress_callback:
             self.progress_callback("apply_success", migration, fake)
@@ -166,12 +172,14 @@ class MigrationExecutor(object):
         if not fake:
             with self.connection.schema_editor() as schema_editor:
                 state = migration.unapply(state, schema_editor)
+                logger.info('Unapplied migration %s on database %s' % (migration, self.connection.alias))
+        else:
+            logger.info('Fake unapplied migration %s on database %s' % (migration, self.connection.alias))
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:
                 self.recorder.record_unapplied(app_label, name)
-        else:
-            self.recorder.record_unapplied(migration.app_label, migration.name)
+        self.recorder.record_unapplied(migration.app_label, migration.name)
         # Report progress
         if self.progress_callback:
             self.progress_callback("unapply_success", migration, fake)
