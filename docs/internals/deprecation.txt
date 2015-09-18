@@ -94,6 +94,9 @@ details on these changes.
 * The ``callable_obj`` keyword argument to
   ``SimpleTestCase.assertRaisesMessage()`` will be removed.
 
+* The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` will be
+  removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
