@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.conf import settings
+from django.core.cache import DEFAULT_CACHE_ALIAS
 
 from . import Error, Tags, register
 
