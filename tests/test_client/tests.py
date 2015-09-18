@@ -26,6 +26,7 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.core import mail
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
@@ -622,6 +623,14 @@ class ClientTest(TestCase):
         self.assertEqual(mail.outbox[0].from_email, 'from@example.com')
         self.assertEqual(mail.outbox[0].to[0], 'first@example.com')
         self.assertEqual(mail.outbox[0].to[1], 'second@example.com')
+
+    def test_reverse_lazy_decodes(self):
+        "Ensure reverse_lazy works in the test client"
+        data = {'var': 'data'}
+        response = self.client.get(reverse_lazy('get_view'), data)
+
+        # Check some response details
+        self.assertContains(response, 'This is a test')
 
     def test_mass_mail_sending(self):
         "Test that mass mail is redirected to a dummy outbox during test setup"
