@@ -32,7 +32,7 @@ class RedisChannelBackend(BaseChannelBackend):
             channel = channel.decode('utf-8')
 
         # Write out message into expiring key (avoids big items in list)
-        key = self.prefix + uuid.uuid4().get_hex()
+        key = self.prefix + str(uuid.uuid4())
         self.connection.set(
             key,
             json.dumps(message),
