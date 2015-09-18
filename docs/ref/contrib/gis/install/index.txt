@@ -60,7 +60,7 @@ Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
 PostgreSQL          GEOS, PROJ.4, PostGIS           9.1+                Requires PostGIS.
 MySQL               GEOS                            5.5+                Not OGC-compliant; :ref:`limited functionality <mysql-spatial-limitations>`.
-Oracle              GEOS                            11.1+               XE not supported.
+Oracle              GEOS                            11.2+               XE not supported.
 SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires SpatiaLite 2.3+, pysqlite2 2.5+
 ==================  ==============================  ==================  =========================================
 
@@ -294,7 +294,7 @@ William Kyngesburye provides a number of `geospatial library binary packages`__
 that make it simple to get GeoDjango installed on OS X without compiling
 them from source.  However, the `Apple Developer Tools`_ are still necessary
 for compiling the Python database adapters :ref:`psycopg2_kyngchaos` (for PostGIS)
-and :ref:`pysqlite2` (for SpatiaLite).
+and `pysqlite2 <https://pypi.python.org/pypi/pysqlite>`_ (for SpatiaLite).
 
 .. note::
 

@@ -219,11 +219,12 @@ Runs the command-line client for the database engine specified in your
 * For PostgreSQL, this runs the ``psql`` command-line client.
 * For MySQL, this runs the ``mysql`` command-line client.
 * For SQLite, this runs the ``sqlite3`` command-line client.
+* For Oracle, this runs the ``sqlplus`` command-line client.
 
 This command assumes the programs are on your ``PATH`` so that a simple call to
-the program name (``psql``, ``mysql``, ``sqlite3``) will find the program in
-the right place. There's no way to specify the location of the program
-manually.
+the program name (``psql``, ``mysql``, ``sqlite3``, ``sqlplus``) will find the
+program in the right place. There's no way to specify the location of the
+program manually.
 
 The :djadminopt:`--database` option can be used to specify the database
 onto which to open a shell.
