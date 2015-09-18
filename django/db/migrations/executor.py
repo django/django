@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
+import logging
+
 from django.apps.registry import apps as global_apps
 from django.db import migrations
 
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
+
+logger = logging.getLogger('django.db.migrations')
 
 
 class MigrationExecutor(object):
@@ -146,6 +150,10 @@ class MigrationExecutor(object):
                 # Alright, do it normally
                 with self.connection.schema_editor() as schema_editor:
                     state = migration.apply(state, schema_editor)
+        logger.debug(
+            "%s migration %s on database %r",
+            "Fake applied" if fake else "Applied", migration, self.connection.alias
+        )
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:
@@ -166,6 +174,10 @@ class MigrationExecutor(object):
         if not fake:
             with self.connection.schema_editor() as schema_editor:
                 state = migration.unapply(state, schema_editor)
+        logger.debug(
+            "%s migration %s on database %r",
+            "Fake unapplied" if fake else "Unapplied", migration, self.connection.alias
+        )
         # For replacement migrations, record individual statuses
         if migration.replaces:
             for app_label, name in migration.replaces:

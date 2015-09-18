@@ -5,6 +5,7 @@ from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
 from django.db.utils import DatabaseError
 from django.test import TestCase, modify_settings, override_settings
+from django.test.utils import patch_logger
 
 from .test_base import MigrationTestBase
 
@@ -39,10 +40,17 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
         # Alright, let's try running it
-        executor.migrate([("migrations", "0002_second")])
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([("migrations", "0002_second")])
         # Are the tables there now?
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_book")
+        self.assertEqual(logs, [
+            "Applied migration migrations.0001_initial on database 'default'",
+            "Marked migration migrations.0001_initial as applied",
+            "Applied migration migrations.0002_second on database 'default'",
+            "Marked migration migrations.0002_second as applied",
+        ])
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Alright, let's undo what we did
@@ -54,10 +62,17 @@ class ExecutorTests(MigrationTestBase):
                 (executor.loader.graph.nodes["migrations", "0001_initial"], True),
             ],
         )
-        executor.migrate([("migrations", None)])
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([("migrations", None)])
         # Are the tables gone?
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
+        self.assertEqual(logs, [
+            "Unapplied migration migrations.0002_second on database 'default'",
+            "Marked migration migrations.0002_second as unapplied",
+            "Unapplied migration migrations.0001_initial on database 'default'",
+            "Marked migration migrations.0001_initial as unapplied",
+        ])
 
     @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"})
     def test_run_with_squashed(self):
@@ -80,10 +95,17 @@ class ExecutorTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
         # Alright, let's try running it
-        executor.migrate([("migrations", "0001_squashed_0002")])
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([("migrations", "0001_squashed_0002")])
         # Are the tables there now?
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_book")
+        self.assertEqual(logs, [
+            "Applied migration migrations.0001_squashed_0002 on database 'default'",
+            "Marked migration migrations.0001_initial as applied",
+            "Marked migration migrations.0002_second as applied",
+            "Marked migration migrations.0001_squashed_0002 as applied",
+        ])
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Alright, let's undo what we did. Should also just use squashed.
@@ -94,10 +116,16 @@ class ExecutorTests(MigrationTestBase):
                 (executor.loader.graph.nodes["migrations", "0001_squashed_0002"], True),
             ],
         )
-        executor.migrate([("migrations", None)])
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([("migrations", None)])
         # Are the tables gone?
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_book")
+        self.assertEqual(logs, [
+            "Unapplied migration migrations.0001_squashed_0002 on database 'default'",
+            "Marked migration migrations.0001_initial as unapplied",
+            "Marked migration migrations.0002_second as unapplied",
+        ])
 
     @override_settings(MIGRATION_MODULES={
         "migrations": "migrations.test_migrations",
@@ -128,10 +156,19 @@ class ExecutorTests(MigrationTestBase):
             ],
         )
         # Fake-apply all migrations
-        executor.migrate([
-            ("migrations", "0002_second"),
-            ("migrations2", "0001_initial")
-        ], fake=True)
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([
+                ("migrations", "0002_second"),
+                ("migrations2", "0001_initial")
+            ], fake=True)
+        self.assertEqual(logs, [
+            "Fake applied migration migrations.0001_initial on database 'default'",
+            "Marked migration migrations.0001_initial as applied",
+            "Fake applied migration migrations.0002_second on database 'default'",
+            "Marked migration migrations.0002_second as applied",
+            "Fake applied migration migrations2.0001_initial on database 'default'",
+            "Marked migration migrations2.0001_initial as applied",
+        ])
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Now plan a second time and make sure it's empty
@@ -174,10 +211,15 @@ class ExecutorTests(MigrationTestBase):
         # Rebuild the graph to reflect the new DB state
         executor.loader.build_graph()
         # Fake-reverse that
-        executor.migrate([("migrations", None)], fake=True)
+        with patch_logger('django.db.migrations', 'debug') as logs:
+            executor.migrate([("migrations", None)], fake=True)
         # Are the tables still there?
         self.assertTableExists("migrations_author")
         self.assertTableExists("migrations_tribble")
+        self.assertEqual(logs, [
+            "Fake unapplied migration migrations.0001_initial on database 'default'",
+            "Marked migration migrations.0001_initial as unapplied",
+        ])
         # Make sure that was faked
         self.assertEqual(state["faked"], True)
         # Finally, migrate forwards; this should fake-apply our initial migration

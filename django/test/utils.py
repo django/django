@@ -463,22 +463,26 @@ class ignore_warnings(object):
 
 
 @contextmanager
-def patch_logger(logger_name, log_level):
+def patch_logger(logger_name, *log_levels):
     """
     Context manager that takes a named logger and the logging level
     and provides a simple mock-like list of messages received
     """
     calls = []
+    originals = []
 
     def replacement(msg, *args, **kwargs):
         calls.append(msg % args)
+
     logger = logging.getLogger(logger_name)
-    orig = getattr(logger, log_level)
-    setattr(logger, log_level, replacement)
+    for level in log_levels:
+        originals.append(getattr(logger, level))
+        setattr(logger, level, replacement)
     try:
         yield calls
     finally:
-        setattr(logger, log_level, orig)
+        for level, orig in zip(log_levels, originals):
+            setattr(logger, level, orig)
 
 
 # On OSes that don't provide tzset (Windows), we can't set the timezone
