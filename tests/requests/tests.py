@@ -813,7 +813,35 @@ class HostValidationTests(SimpleTestCase):
             request.get_host()
 
 
-class DataUploadMaxMemorySizePostTests(SimpleTestCase):
+class DataUploadMaxMemorySizeFPostTests(SimpleTestCase):
+    def setUp(self):
+        payload = FakePayload("\r\n".join([
+            'a=1&a=2;a=3',
+            ''
+        ]))
+        self.request = WSGIRequest({
+            'REQUEST_METHOD': 'POST',
+            'CONTENT_TYPE': 'application/x-www-form-urlencoded',
+            'CONTENT_LENGTH': len(payload),
+            'wsgi.input': payload,
+        })
+
+    def test_size_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=12):
+            with self.assertRaisesMessage(RequestBodyTooBig,
+                                          'Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.'):
+                self.request._load_post_and_files()
+
+    def test_size_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=13):
+            self.request._load_post_and_files()
+
+    def test_no_limit(self):
+        with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=None):
+            self.request._load_post_and_files()
+
+
+class DataUploadMaxMemorySizeMPostTests(SimpleTestCase):
     def setUp(self):
         payload = FakePayload("\r\n".join([
             '--boundary',
