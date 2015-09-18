@@ -45,8 +45,22 @@ def method_decorator(decorator, name=''):
         else:
             func = obj
 
+        # helper function to manage the iterable decorator case
+        def decorate(function):
+            if hasattr(decorator, "__iter__"):
+                # we assume it respects the sequence protocol and
+                # excuse if we are wrong.
+                try:
+                    decorators = decorator[::-1]
+                except TypeError:
+                    decorators = tuple(decorator)[::-1]
+                for dec in decorators:
+                    function = dec(function)
+                return function
+            return decorator(function)
+
         def _wrapper(self, *args, **kwargs):
-            @decorator
+            @decorate
             def bound_func(*args2, **kwargs2):
                 return func.__get__(self, type(self))(*args2, **kwargs2)
             # bound_func has the signature that 'decorator' expects i.e.  no
@@ -57,7 +71,7 @@ def method_decorator(decorator, name=''):
         # want to copy those. We don't have access to bound_func in this scope,
         # but we can cheat by using it on a dummy function.
 
-        @decorator
+        @decorate
         def dummy(*args, **kwargs):
             pass
         update_wrapper(_wrapper, dummy)
@@ -69,8 +83,9 @@ def method_decorator(decorator, name=''):
             return obj
 
         return _wrapper
-
-    update_wrapper(_dec, decorator, assigned=available_attrs(decorator))
+    # we really don't care to make _dec look similar to an iterable, it is rather meaningless
+    if not hasattr(decorator, "__iter__"):
+        update_wrapper(_dec, decorator, assigned=available_attrs(decorator))
     # Change the name to aid debugging.
     if hasattr(decorator, '__name__'):
         _dec.__name__ = 'method_decorator(%s)' % decorator.__name__
