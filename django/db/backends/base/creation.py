@@ -39,15 +39,12 @@ class BaseDatabaseCreation(object):
         test_database_name = self._get_test_db_name()
 
         if verbosity >= 1:
-            test_db_repr = ''
             action = 'Creating'
-            if verbosity >= 2:
-                test_db_repr = " ('%s')" % test_database_name
             if keepdb:
                 action = "Using existing"
 
-            print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+            print("%s test database for alias %s..." % (
+                action, self._database_display_str(verbosity, test_database_name)))
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. This is to handle the case
@@ -132,6 +129,16 @@ class BaseDatabaseCreation(object):
         for obj in serializers.deserialize("json", data, using=self.connection.alias):
             obj.save()
 
+    def _database_display_str(self, verbosity, database_name):
+        """
+        Internal implementation - get display string for a database for use
+        in various actions.
+        """
+        test_db_repr = ''
+        if verbosity >= 2:
+            test_db_repr = " ('%s')" % database_name
+        return "'%s'%s" % (self.connection.alias, test_db_repr)
+
     def _get_test_db_name(self):
         """
         Internal implementation - returns the name of the test DB that will be
@@ -173,11 +180,8 @@ class BaseDatabaseCreation(object):
                 if autoclobber or confirm == 'yes':
                     try:
                         if verbosity >= 1:
-                            test_db_repr = ''
-                            if verbosity >= 2:
-                                test_db_repr = " ('%s')" % test_database_name
-                            print("Destroying old test database for alias '%s'%s..."
-                                  % (self.connection.alias, test_db_repr))
+                            print("Destroying old test database for alias %s..."
+                                  % self._database_display_str(verbosity, test_database_name))
                         cursor.execute(
                             "DROP DATABASE %s" % qn(test_database_name))
                         cursor.execute(
@@ -200,13 +204,11 @@ class BaseDatabaseCreation(object):
         source_database_name = self.connection.settings_dict['NAME']
 
         if verbosity >= 1:
-            test_db_repr = ''
             action = 'Cloning test database'
-            if verbosity >= 2:
-                test_db_repr = " ('%s')" % source_database_name
             if keepdb:
                 action = 'Using existing clone'
-            print("%s for alias '%s'%s..." % (action, self.connection.alias, test_db_repr))
+            print("%s for alias %s..." % (
+                action, self._database_display_str(verbosity, source_database_name)))
 
         # We could skip this call if keepdb is True, but we instead
         # give it the keepdb param. See create_test_db for details.
@@ -244,14 +246,11 @@ class BaseDatabaseCreation(object):
             test_database_name = self.get_test_db_clone_settings(number)['NAME']
 
         if verbosity >= 1:
-            test_db_repr = ''
             action = 'Destroying'
-            if verbosity >= 2:
-                test_db_repr = " ('%s')" % test_database_name
             if keepdb:
                 action = 'Preserving'
-            print("%s test database for alias '%s'%s..." % (
-                action, self.connection.alias, test_db_repr))
+            print("%s test database for alias %s..." % (
+                action, self._database_display_str(verbosity, test_database_name)))
 
         # if we want to preserve the database
         # skip the actual destroying piece.
