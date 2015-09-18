@@ -718,7 +718,7 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
-    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/B19306_01/server.102/b14225/ch4datetime.htm#i1006667
+    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/E11882_01/server.112/e10729/ch4datetime.htm#NLSPG258
     .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 none
@@ -2802,7 +2802,7 @@ SQL equivalents::
 
     SELECT ... WHERE title REGEXP BINARY '^(An?|The) +'; -- MySQL
 
-    SELECT ... WHERE REGEXP_LIKE(title, '^(an?|the) +', 'c'); -- Oracle
+    SELECT ... WHERE REGEXP_LIKE(title, '^(An?|The) +', 'c'); -- Oracle
 
     SELECT ... WHERE title ~ '^(An?|The) +'; -- PostgreSQL
 
