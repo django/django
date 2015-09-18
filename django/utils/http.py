@@ -40,6 +40,7 @@ PROTOCOL_TO_PORT = {
     'https': 443,
 }
 
+FIELDS_MATCH = re.compile('[&;]')
 
 @keep_lazy_text
 def urlquote(url, safe='/'):
@@ -342,10 +343,13 @@ def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limi
     fields_limit: maximum number of fields parsed, or an exception
         is raised. None means no limit and is the default.
     """
-    fields_limit = fields_limit or 0
-    pairs = re.split('[&;]', qs, fields_limit)
-    if fields_limit > 0 and len(pairs) > fields_limit:
-        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+
+    if fields_limit:
+        pairs = FIELDS_MATCH.split(qs, fields_limit)
+        if len(pairs) > fields_limit:
+             raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+    else:
+        pairs = FIELDS_MATCH.split(qs)
     r = []
     for name_value in pairs:
         if not name_value and not strict_parsing:
@@ -427,11 +431,13 @@ def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
     fields_limit: maximum number of fields parsed or an exception
         is raised. None means no limit and is the default.
     """
-    fields_limit = fields_limit or 0
     qs, _coerce_result = _coerce_args(qs)
-    pairs = re.split('[&;]', qs, fields_limit)
-    if fields_limit > 0 and len(pairs) > fields_limit:
-        raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+    if fields_limit:
+        pairs = FIELDS_MATCH.split(qs, fields_limit)
+        if len(pairs) > fields_limit:
+             raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+    else:
+        pairs = FIELDS_MATCH.split(qs)
     r = []
     for name_value in pairs:
         if not name_value and not strict_parsing:
