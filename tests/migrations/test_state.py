@@ -903,6 +903,7 @@ class ModelStateTests(SimpleTestCase):
         self.assertEqual(getattr(class_obj, 'mixin_attr', False), 'mixin')
         self.assertEqual(getattr(class_obj, 'dummy_attr', False), 'dummy')
 
+
 class RelatedModelsTests(SimpleTestCase):
 
     def setUp(self):
