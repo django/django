@@ -148,6 +148,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
         if instance is None:
             return self
 
+        # The related instance is loaded from the database and then cached in
+        # the attribute defined in self.cache_name. It can also be pre-cached
+        # by the reverse accessor (SingleRelatedObjectDescriptor).
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -159,6 +162,9 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 qs = qs.filter(**self.field.get_reverse_related_filter(instance))
                 # Assuming the database enforces foreign keys, this won't fail.
                 rel_obj = qs.get()
+                # If this is a one-to-one relation, set the reverse accessor
+                # cache on the related object to the current instance to avoid
+                # an extra SQL query if it's accessed later on.
                 if not self.field.remote_field.multiple:
                     setattr(rel_obj, self.field.remote_field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
@@ -232,10 +238,13 @@ class ReverseSingleRelatedObjectDescriptor(object):
             for lh_field, rh_field in self.field.related_fields:
                 setattr(instance, lh_field.attname, getattr(value, rh_field.attname))
 
-        # Since we already know what the related object is, seed the related
-        # object caches now, too. This avoids another db hit if you get the
-        # object you just set.
+        # Set the related instance cache used by __get__ to avoid a SQL query
+        # when accessing the attribute we just set.
         setattr(instance, self.cache_name, value)
+
+        # If this is a one-to-one relation, set the reverse accessor cache on
+        # the related object to the current instance to avoid an extra SQL
+        # query if it's accessed later on.
         if value is not None and not self.field.remote_field.multiple:
             setattr(value, self.field.remote_field.get_cache_name(), instance)
 
@@ -312,6 +321,9 @@ class SingleRelatedObjectDescriptor(object):
         if instance is None:
             return self
 
+        # The related instance is loaded from the database and then cached in
+        # the attribute defined in self.cache_name. It can also be pre-cached
+        # by the forward accessor (ReverseSingleRelatedObjectDescriptor).
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -325,6 +337,9 @@ class SingleRelatedObjectDescriptor(object):
                 except self.related.related_model.DoesNotExist:
                     rel_obj = None
                 else:
+                    # Set the forward accessor cache on the related object to
+                    # the current instance to avoid an extra SQL query if it's
+                    # accessed later on.
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
 
@@ -386,10 +401,12 @@ class SingleRelatedObjectDescriptor(object):
         for index, field in enumerate(self.related.field.local_related_fields):
             setattr(value, field.attname, related_pk[index])
 
-        # Since we already know what the related object is, seed the related
-        # object caches now, too. This avoids another db hit if you get the
-        # object you just set.
+        # Set the related instance cache used by __get__ to avoid a SQL query
+        # when accessing the attribute we just set.
         setattr(instance, self.cache_name, value)
+
+        # Set the forward accessor cache on the related object to the current
+        # instance to avoid an extra SQL query if it's accessed later on.
         setattr(value, self.related.field.get_cache_name(), instance)
 
 
