@@ -405,10 +405,11 @@ class BaseModelForm(BaseForm):
         opts = self._meta
 
         exclude = self._get_validation_exclusions()
-        # a subset of `exclude` which won't have the InlineForeignKeyField
-        # if we're adding a new object since that value doesn't exist
-        # until after the new instance is saved to the database.
-        construct_instance_exclude = list(exclude)
+
+        try:
+            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
+        except ValidationError as e:
+            self._update_errors(e)
 
         # Foreign Keys being used to represent inline relationships
         # are excluded from basic field value validation. This is for two
@@ -419,12 +420,7 @@ class BaseModelForm(BaseForm):
         # so this can't be part of _get_validation_exclusions().
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
-                if self.cleaned_data.get(name) is not None and self.cleaned_data[name]._state.adding:
-                    construct_instance_exclude.append(name)
                 exclude.append(name)
-
-        # Update the model instance with self.cleaned_data.
-        self.instance = construct_instance(self, self.instance, opts.fields, construct_instance_exclude)
 
         try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
