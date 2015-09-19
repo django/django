@@ -387,6 +387,7 @@ class QueryDict(MultiValueDict):
         parse_qsl_kwargs = {
             'keep_blank_values': True,
             'fields_limit': settings.DATA_UPLOAD_MAX_NUMBER_FIELDS,
+            'encoding': encoding,
         }
         if six.PY3:
             parse_qsl_kwargs['encoding'] = encoding

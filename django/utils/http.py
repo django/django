@@ -320,7 +320,7 @@ def is_safe_url(url, host=None):
 #
 # Copyright (C) 2013 Python Software Foundation, see license.python.txt for
 # details.
-def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limit=None):
+def limited_parse_qsl_py2(qs, encoding, keep_blank_values=0, strict_parsing=0, fields_limit=None):
     """
     Parse a query given as a string argument and return a list.
 
@@ -329,6 +329,8 @@ def limited_parse_qsl_py2(qs, keep_blank_values=0, strict_parsing=0, fields_limi
     Arguments:
 
     qs: percent-encoded query string to be parsed
+
+    encoding: ignored value
 
     keep_blank_values: flag indicating whether blank values in
         percent-encoded queries should be treated as blank strings.  A
