@@ -534,12 +534,6 @@ class SingleRelatedObjectDescriptor(object):
                     raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
         related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        if None in related_pk:
-            raise ValueError(
-                'Cannot assign "%r": "%s" instance isn\'t saved in the database.' %
-                (value, instance._meta.object_name)
-            )
-
         # Set the value of the related field to the value of the related object's related field
         for index, field in enumerate(self.related.field.local_related_fields):
             setattr(value, field.attname, related_pk[index])
