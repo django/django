@@ -43,3 +43,6 @@ Bugfixes
 * Moved the :ref:`unsaved model instance assignment data loss check
   <unsaved-model-instance-check-18>` on reverse relations to ``Model.save()``
   (:ticket:`25160`).
+
+* Readded inline foreign keys to form instances when validating model formsets
+  (:ticket:`25431`).
