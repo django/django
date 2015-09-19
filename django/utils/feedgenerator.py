@@ -427,7 +427,7 @@ class Atom1Feed(SyndicationFeed):
             handler.addQuickElement("summary", item['description'], {"type": "html"})
 
         # Enclosures.
-        for enclosure in item.get('enclosures') or []:
+        for enclosure in item['enclosures']:
             handler.addQuickElement('link', '', {
                 'rel': 'enclosure',
                 'href': enclosure.url,

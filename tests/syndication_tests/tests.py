@@ -300,7 +300,7 @@ class SyndicationFeedTest(FeedTestCase):
         self.assertNotEqual(published, updated)
 
     def test_atom_single_enclosure(self):
-        response = self.client.get('/syndication/rss2/single-enclosure/')
+        response = self.client.get('/syndication/atom/single-enclosure/')
         feed = minidom.parseString(response.content).firstChild
         items = feed.getElementsByTagName('entry')
         for item in items:
@@ -309,7 +309,7 @@ class SyndicationFeedTest(FeedTestCase):
             self.assertEqual(len(links), 1)
 
     def test_atom_multiple_enclosures(self):
-        response = self.client.get('/syndication/rss2/single-enclosure/')
+        response = self.client.get('/syndication/atom/multiple-enclosure/')
         feed = minidom.parseString(response.content).firstChild
         items = feed.getElementsByTagName('entry')
         for item in items:
