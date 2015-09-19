@@ -39,3 +39,7 @@ Bugfixes
 
 * Fixed custom queryset chaining with ``values()`` and ``values_list()``
   (:ticket:`20625`).
+
+* Moved the :ref:`unsaved model instance assignment data loss check
+  <unsaved-model-instance-check-18>` on reverse relations to ``Model.save()``
+  (:ticket:`25160`).
