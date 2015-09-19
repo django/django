@@ -1,3 +1,60 @@
+"""
+Accessors for related objects.
+
+When a field defines a relation between two models, each model class provides
+an attribute to access related instances of the other model class (unless the
+reverse accessor has been disabled with related_name='+').
+
+Accessors are implemented as descriptors in order to customize access and
+assignment. This module defines the descriptor classes.
+
+Forward accessors follow foreign keys. Reverse accessors trace them back. For
+example, with the following models::
+
+    class Parent(Model):
+        pass
+
+    class Child(Model):
+        parent = ForeignKey(Parent, related_name='children')
+
+ ``child.parent`` is a forward many-to-one relation. ``parent.children`` is a
+reverse many-to-one relation.
+
+There are three types of relations (many-to-one, one-to-one, and many-to-many)
+and two directions (forward and reverse) for a total of six combinations.
+However only four accessor classes are required.
+
+1. Related instance on the forward side of a many-to-one or one-to-one
+   relation: ``ReverseSingleRelatedObjectDescriptor``.
+
+   Uniqueness of foreign key values is irrelevant to accessing the related
+   instance, making the many-to-one and one-to-one cases identical as far as
+   the descriptor is concerned. The constraint is checked upstream (unicity
+   validation in forms) or downstream (unique indexes in the database).
+
+2. Related instance on the reverse side of a one-to-one relation:
+   ``SingleRelatedObjectDescriptor``.
+
+   One-to-one relations are asymmetrical, despite the apparent symmetry of the
+   name, because they're implemented in the database with a foreign key from
+   one table to another. As a consequence ``SingleRelatedObjectDescriptor`` is
+   slightly different from ``ReverseSingleRelatedObjectDescriptor``.
+
+3. Related objects manager for related instances on the reverse side of a
+   many-to-one relation: ``ForeignRelatedObjectsDescriptor``.
+
+   Unlike the previous two classes, this one provides access to a collection
+   of objects. It returns a manager rather than an instance.
+
+4. Related objects manager for related instances on the forward or reverse
+   sides of a many-to-many relation: ``ManyRelatedObjectsDescriptor``.
+
+   Many-to-many relations are symmetrical. The syntax of Django models
+   requires declaring them on one side but that's an implementation detail.
+   They could be declared on the other side without any change in behavior.
+   Therefore the forward and reverse descriptors can be the same.
+"""
+
 from __future__ import unicode_literals
 
 from operator import attrgetter
@@ -15,10 +72,10 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
     In the example::
 
-        class Choice(Model):
-            poll = ForeignKey(Place, related_name='choices')
+        class Child(Model):
+            parent = ForeignKey(Parent, related_name='children')
 
-    `choice.poll` is a ReverseSingleRelatedObjectDescriptor instance.
+    ``child.parent`` is a ``ReverseSingleRelatedObjectDescriptor`` instance.
     """
 
     def __init__(self, field_with_rel):
@@ -79,8 +136,18 @@ class ReverseSingleRelatedObjectDescriptor(object):
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
+        """
+        Get the related instance through the forward relation.
+
+        With the example above, when getting ``child.parent``:
+
+        - ``self`` is the descriptor managing the ``parent`` attribute
+        - ``instance`` is the ``child`` instance
+        - ``instance_type`` in the ``Child`` class (we don't need it)
+        """
         if instance is None:
             return self
+
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -95,6 +162,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
                 if not self.field.remote_field.multiple:
                     setattr(rel_obj, self.field.remote_field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
+
         if rel_obj is None and not self.field.null:
             raise self.RelatedObjectDoesNotExist(
                 "%s has no %s." % (self.field.model.__name__, self.field.name)
@@ -103,6 +171,15 @@ class ReverseSingleRelatedObjectDescriptor(object):
             return rel_obj
 
     def __set__(self, instance, value):
+        """
+        Set the related instance through the forward relation.
+
+        With the example above, when setting ``child.parent = parent``:
+
+        - ``self`` is the descriptor managing the ``parent`` attribute
+        - ``instance`` is the ``child`` instance
+        - ``value`` in the ``parent`` instance on the right of the equal sign
+        """
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
         if value is None and self.field.null is False:
@@ -221,8 +298,20 @@ class SingleRelatedObjectDescriptor(object):
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
     def __get__(self, instance, instance_type=None):
+        """
+        Get the related instance through the reverse relation.
+
+        With the example above, when getting ``place.restaurant``:
+
+        - ``self`` is the descriptor managing the ``restaurant`` attribute
+        - ``instance`` is the ``place`` instance
+        - ``instance_type`` in the ``Place`` class (we don't need it)
+
+        Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
+        """
         if instance is None:
             return self
+
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -238,6 +327,7 @@ class SingleRelatedObjectDescriptor(object):
                 else:
                     setattr(rel_obj, self.related.field.get_cache_name(), instance)
             setattr(instance, self.cache_name, rel_obj)
+
         if rel_obj is None:
             raise self.RelatedObjectDoesNotExist(
                 "%s has no %s." % (
@@ -249,6 +339,17 @@ class SingleRelatedObjectDescriptor(object):
             return rel_obj
 
     def __set__(self, instance, value):
+        """
+        Set the related instance through the reverse relation.
+
+        With the example above, when setting ``place.restaurant = restaurant``:
+
+        - ``self`` is the descriptor managing the ``restaurant`` attribute
+        - ``instance`` is the ``place`` instance
+        - ``value`` in the ``restaurant`` instance on the right of the equal sign
+
+        Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
+        """
         # The similarity of the code below to the code in
         # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
@@ -299,10 +400,13 @@ class ForeignRelatedObjectsDescriptor(object):
 
     In the example::
 
-        class Choice(Model):
-            poll = ForeignKey(Place, related_name='choices')
+        class Child(Model):
+            parent = ForeignKey(Parent, related_name='children')
 
-    ``poll.choices`` is a ``ForeignRelatedObjectsDescriptor`` instance.
+    ``parent.children`` is a ``ForeignRelatedObjectsDescriptor`` instance.
+
+    Most of the implementation is delegated to a dynamically defined manager
+    class built by ``create_many_related_manager()`` which is defined below.
     """
 
     def __init__(self, rel):
@@ -317,21 +421,40 @@ class ForeignRelatedObjectsDescriptor(object):
         )
 
     def __get__(self, instance, instance_type=None):
+        """
+        Get the related objects through the reverse relation.
+
+        With the example above, when getting ``parent.children``:
+
+        - ``self`` is the descriptor managing the ``children`` attribute
+        - ``instance`` is the ``parent`` instance
+        - ``instance_type`` in the ``Parent`` class (we don't need it)
+        """
         if instance is None:
             return self
 
         return self.related_manager_cls(instance)
 
     def __set__(self, instance, value):
+        """
+        Set the related objects through the reverse relation.
+
+        With the example above, when setting ``parent.children = children``:
+
+        - ``self`` is the descriptor managing the ``children`` attribute
+        - ``instance`` is the ``parent`` instance
+        - ``value`` in the ``children`` sequence on the right of the equal sign
+        """
         manager = self.__get__(instance)
         manager.set(value)
 
 
 def create_foreign_related_manager(superclass, rel):
     """
-    Factory function to create a manager that subclasses another manager
-    (generally the default manager of a given model) and adds behaviors
-    specific to many-to-one relations.
+    Create a manager for the reverse side of a many-to-one relation.
+
+    This manager subclasses another manager, generally the default manager of
+    the related model, and adds behaviors specific to many-to-one relations.
     """
 
     class RelatedManager(superclass):
@@ -520,8 +643,11 @@ class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
         class Pizza(Model):
             toppings = ManyToManyField(Topping, related_name='pizzas')
 
-    ``pizza.toppings`` and ``topping.pizzas`` are ManyRelatedObjectsDescriptor
-    instances.
+    ``pizza.toppings`` and ``topping.pizzas`` are
+    ``ManyRelatedObjectsDescriptor`` instances.
+
+    Most of the implementation is delegated to a dynamically defined manager
+    class built by ``create_many_related_manager()`` which is defined below.
     """
 
     def __init__(self, rel, reverse=False):
@@ -548,9 +674,10 @@ class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
 
 def create_many_related_manager(superclass, rel, reverse):
     """
-    Factory function to create a manager that subclasses another manager
-    (generally the default manager of a given model) and adds behaviors
-    specific to many-to-many relations.
+    Create a manager for the either side of a many-to-many relation.
+
+    This manager subclasses another manager, generally the default manager of
+    the related model, and adds behaviors specific to many-to-many relations.
     """
 
     class ManyRelatedManager(superclass):
