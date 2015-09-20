@@ -70,7 +70,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     extent = 'SDO_AGGR_MBR'
     intersection = 'SDO_GEOM.SDO_INTERSECTION'
     length = 'SDO_GEOM.SDO_LENGTH'
-    num_geom = 'SDO_UTIL.GETNUMELEM'
     num_points = 'SDO_UTIL.GETNUMVERTICES'
     perimeter = length
     point_on_surface = 'SDO_GEOM.SDO_POINTONSURFACE'
@@ -79,6 +78,23 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     transform = 'SDO_CS.TRANSFORM'
     union = 'SDO_GEOM.SDO_UNION'
     unionagg = 'SDO_AGGR_UNION'
+
+    function_names = {
+        'Area': 'SDO_GEOM.SDO_AREA',
+        'Centroid': 'SDO_GEOM.SDO_CENTROID',
+        'Difference': 'SDO_GEOM.SDO_DIFFERENCE',
+        'Distance': 'SDO_GEOM.SDO_DISTANCE',
+        'Intersection': 'SDO_GEOM.SDO_INTERSECTION',
+        'Length': 'SDO_GEOM.SDO_LENGTH',
+        'NumGeometries': 'SDO_UTIL.GETNUMELEM',
+        'NumPoints': 'SDO_UTIL.GETNUMVERTICES',
+        'Perimeter': 'SDO_GEOM.SDO_LENGTH',
+        'PointOnSurface': 'SDO_GEOM.SDO_POINTONSURFACE',
+        'Reverse': 'SDO_UTIL.REVERSE_LINESTRING',
+        'SymDifference': 'SDO_GEOM.SDO_XOR',
+        'Transform': 'SDO_CS.TRANSFORM',
+        'Union': 'SDO_GEOM.SDO_UNION',
+    }
 
     # We want to get SDO Geometries as WKT because it is much easier to
     # instantiate GEOS proxies from WKT than SDO_GEOMETRY(...) strings.
@@ -108,6 +124,13 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     }
 
     truncate_params = {'relate': None}
+
+    unsupported_functions = {
+        'AsGeoHash', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
+        'BoundingCircle', 'Envelope',
+        'ForceRHR', 'MemSize', 'Scale',
+        'SnapToGrid', 'Translate', 'GeoHash',
+    }
 
     def geo_quote_name(self, name):
         return super(OracleOperations, self).geo_quote_name(name).upper()
