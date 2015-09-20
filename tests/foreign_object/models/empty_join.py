@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models.fields.related import (
-    ForeignObjectRel, ForeignRelatedObjectsDescriptor,
+    ForeignObjectRel, ReverseManyToOneDescriptor,
 )
 from django.db.models.lookups import StartsWith
 from django.db.models.query_utils import PathInfo
@@ -10,7 +10,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class CustomForeignObjectRel(ForeignObjectRel):
     """
     Define some extra Field methods so this Rel acts more like a Field, which
-    lets us use ForeignRelatedObjectsDescriptor in both directions.
+    lets us use ReverseManyToOneDescriptor in both directions.
     """
     @property
     def foreign_related_fields(self):
@@ -24,7 +24,7 @@ class StartsWithRelation(models.ForeignObject):
     """
     A ForeignObject that uses StartsWith operator in its joins instead of
     the default equality operator. This is logically a many-to-many relation
-    and creates a ForeignRelatedObjectsDescriptor in both directions.
+    and creates a ReverseManyToOneDescriptor in both directions.
     """
     auto_created = False
 
@@ -42,7 +42,7 @@ class StartsWithRelation(models.ForeignObject):
     @property
     def field(self):
         """
-        Makes ForeignRelatedObjectsDescriptor work in both directions.
+        Makes ReverseManyToOneDescriptor work in both directions.
         """
         return self.remote_field
 
@@ -66,7 +66,7 @@ class StartsWithRelation(models.ForeignObject):
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(StartsWithRelation, self).contribute_to_class(cls, name, virtual_only)
-        setattr(cls, self.name, ForeignRelatedObjectsDescriptor(self))
+        setattr(cls, self.name, ReverseManyToOneDescriptor(self))
 
 
 class BrokenContainsRelation(StartsWithRelation):

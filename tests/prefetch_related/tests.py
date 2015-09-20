@@ -595,7 +595,7 @@ class CustomPrefetchTests(TestCase):
         self.assertEqual(lst2[0].houses_lst[0].rooms_lst[0].main_room_of, self.house1)
         self.assertEqual(len(lst2[1].houses_lst), 0)
 
-        # Test ReverseSingleRelatedObjectDescriptor.
+        # Test ForwardManyToOneDescriptor.
         houses = House.objects.select_related('owner')
         with self.assertNumQueries(6):
             rooms = Room.objects.all().prefetch_related('house')
@@ -624,7 +624,7 @@ class CustomPrefetchTests(TestCase):
         with self.assertNumQueries(3):
             getattr(rooms.first().house, 'address')
 
-        # Test SingleRelatedObjectDescriptor.
+        # Test ReverseOneToOneDescriptor.
         houses = House.objects.select_related('owner')
         with self.assertNumQueries(6):
             rooms = Room.objects.all().prefetch_related('main_room_of')

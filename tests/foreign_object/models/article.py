@@ -1,11 +1,10 @@
 from django.db import models
-from django.db.models.fields.related import \
-    ReverseSingleRelatedObjectDescriptor
+from django.db.models.fields.related import ForwardManyToOneDescriptor
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import get_language
 
 
-class ArticleTranslationDescriptor(ReverseSingleRelatedObjectDescriptor):
+class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):
     """
     The set of articletranslation should not set any local fields.
     """
