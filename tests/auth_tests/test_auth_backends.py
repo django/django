@@ -456,9 +456,6 @@ class PermissionDeniedBackend(object):
     """
     Always raises PermissionDenied in `authenticate`, `has_perm` and `has_module_perms`.
     """
-    supports_object_permissions = True
-    supports_anonymous_user = True
-    supports_inactive_user = True
 
     def authenticate(self, username=None, password=None):
         raise PermissionDenied
@@ -560,9 +557,6 @@ class TypeErrorBackend(object):
     """
     Always raises TypeError.
     """
-    supports_object_permissions = True
-    supports_anonymous_user = True
-    supports_inactive_user = True
 
     def authenticate(self, username=None, password=None):
         raise TypeError
