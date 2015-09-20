@@ -1,3 +1,14 @@
+"""
+"Rel objects" for related fields.
+
+"Rel objects" (for lack of a better name) carry information about the relation
+modeled by a related field and provide some utility functions. They're stored
+in the ``remote_field`` attribute of the field.
+
+They also act as reverse fields for the purposes of the Meta API because
+they're the closest concept currently available.
+"""
+
 from __future__ import unicode_literals
 
 import warnings
