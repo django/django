@@ -108,14 +108,15 @@ class BaseModelBackendTest(object):
         self.assertEqual(user.has_perms(['auth.test2', 'auth.test3']), False)
 
     def test_has_no_object_perm(self):
-        """Regressiontest for #12462"""
+        """Regressiontest for #12462, then changed later in #13539"""
         user = self.UserModel._default_manager.get(pk=self.user.pk)
         content_type = ContentType.objects.get_for_model(Group)
         perm = Permission.objects.create(name='test', content_type=content_type, codename='test')
         user.user_permissions.add(perm)
 
-        self.assertEqual(user.has_perm('auth.test', 'object'), False)
-        self.assertEqual(user.get_all_permissions('object'), set())
+        # Used to return False before Django 1.9
+        self.assertEqual(user.has_perm('auth.test', 'object'), True)
+        self.assertEqual(user.get_all_permissions('object'), {'auth.test'})
         self.assertEqual(user.has_perm('auth.test'), True)
         self.assertEqual(user.get_all_permissions(), {'auth.test'})
 

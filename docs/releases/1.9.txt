@@ -1085,6 +1085,12 @@ Miscellaneous
   performance reasons. Mixed plans consist of a list of migrations where some
   are being applied and others are being unapplied.
 
+* Passing an object to the various permission retrieving methods of the default
+  :class:`~django.contrib.auth.backends.ModelBackend`, and by extension the
+  permission methods of the default user model (like
+  :meth:`~django.contrib.auth.models.User.has_perm()`) will now return the same
+  response as if no object were passed.
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
