@@ -1,0 +1,382 @@
+=============================================
+Django 1.10 release notes - UNDER DEVELOPMENT
+=============================================
+
+Welcome to Django 1.10!
+
+These release notes cover the `new features`_, as well as some `backwards
+incompatible changes`_ you'll want to be aware of when upgrading from Django
+1.9 or older versions. We've :ref:`dropped some features<removed-features-1.10>`
+that have reached the end of their deprecation cycle, and we've `begun the
+deprecation process for some features`_.
+
+.. _`new features`: `What's new in Django 1.10`_
+.. _`backwards incompatible changes`: `Backwards incompatible changes in 1.10`_
+.. _`dropped some features`: `Features removed in 1.10`_
+.. _`begun the deprecation process for some features`: `Features deprecated in 1.10`_
+
+Python compatibility
+====================
+
+Like Django 1.9, Django 1.10 requires Python 2.7, 3.4, or 3.5. We **highly
+recommend** and only officially support the latest release of each series.
+
+What's new in Django 1.10
+=========================
+
+...
+
+Minor features
+~~~~~~~~~~~~~~
+
+:mod:`django.contrib.admin`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.admindocs`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.auth`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.contenttypes`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.gis`
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.messages`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.postgres`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.redirects`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sessions`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.sites`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+:mod:`django.contrib.syndication`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Cache
+^^^^^
+
+* ...
+
+CSRF
+^^^^
+
+* ...
+
+Database backends
+^^^^^^^^^^^^^^^^^
+
+* ...
+
+Email
+^^^^^
+
+* ...
+
+File Storage
+^^^^^^^^^^^^
+
+* ...
+
+File Uploads
+^^^^^^^^^^^^
+
+* ...
+
+Forms
+^^^^^
+
+* ...
+
+Generic Views
+^^^^^^^^^^^^^
+
+* ...
+
+Internationalization
+^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Management Commands
+^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Migrations
+^^^^^^^^^^
+
+* ...
+
+Models
+^^^^^^
+
+* ...
+
+Requests and Responses
+^^^^^^^^^^^^^^^^^^^^^^
+
+* ...
+
+Signals
+^^^^^^^
+
+* ...
+
+Templates
+^^^^^^^^^
+
+* ...
+
+Tests
+^^^^^
+
+* ...
+
+URLs
+^^^^
+
+* ...
+
+Validators
+^^^^^^^^^^
+
+* ...
+
+Backwards incompatible changes in 1.10
+======================================
+
+.. warning::
+
+    In addition to the changes outlined in this section, be sure to review the
+    :ref:`removed-features-1.10` for the features that have reached the end of
+    their deprecation cycle and therefore been removed. If you haven't updated
+    your code within the deprecation timeline for a given feature, its removal
+    may appear as a backwards incompatible change.
+
+Database backend API
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* ...
+
+.. _deprecated-features-1.10:
+
+Features deprecated in 1.10
+===========================
+
+Miscellaneous
+~~~~~~~~~~~~~
+
+* ...
+
+.. _removed-features-1.10:
+
+Features removed in 1.10
+========================
+
+These features have reached the end of their deprecation cycle and so have been
+removed in Django 1.10 (please see the :ref:`deprecation timeline
+<deprecation-removed-in-1.10>` for more details):
+
+* Support for calling a ``SQLCompiler`` directly as an alias for calling its
+  ``quote_name_unless_alias`` method is removed.
+
+* The ``cycle`` and ``firstof`` template tags are removed from the ``future``
+  template tag library.
+
+* ``django.conf.urls.patterns()`` is removed.
+
+* Support for the ``prefix`` argument to
+  ``django.conf.urls.i18n.i18n_patterns()`` is removed.
+
+* ``SimpleTestCase.urls`` is removed.
+
+* Using an incorrect count of unpacked values in the ``for`` template tag
+  raises an exception rather than failing silently.
+
+* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
+  Python path is removed.
+
+* Support for ``optparse`` is dropped for custom management commands.
+
+* The class ``django.core.management.NoArgsCommand`` is removed.
+
+* ``django.core.context_processors`` module is removed.
+
+* ``django.db.models.sql.aggregates`` module is removed.
+
+* ``django.contrib.gis.db.models.sql.aggregates`` module is removed.
+
+* The following methods and properties of ``django.db.sql.query.Query`` are
+  removed:
+
+  * Properties: ``aggregates`` and ``aggregate_select``
+  * Methods: ``add_aggregate``, ``set_aggregate_mask``, and
+    ``append_aggregate_mask``.
+
+* ``django.template.resolve_variable`` is removed.
+
+* The following private APIs are removed from
+  :class:`django.db.models.options.Options` (``Model._meta``):
+
+  * ``get_field_by_name()``
+  * ``get_all_field_names()``
+  * ``get_fields_with_model()``
+  * ``get_concrete_fields_with_model()``
+  * ``get_m2m_with_model()``
+  * ``get_all_related_objects()``
+  * ``get_all_related_objects_with_model()``
+  * ``get_all_related_many_to_many_objects()``
+  * ``get_all_related_m2m_objects_with_model()``
+
+* The ``error_message`` argument of ``django.forms.RegexField`` is removed.
+
+* The ``unordered_list`` filter no longer supports old style lists.
+
+* Support for string ``view`` arguments to ``url()`` is removed.
+
+* The backward compatible shim  to rename ``django.forms.Form._has_changed()``
+  to ``has_changed()`` is removed.
+
+* The ``removetags`` template filter is removed.
+
+* The ``remove_tags()`` and ``strip_entities()`` functions in
+  ``django.utils.html`` is removed.
+
+* The ``is_admin_site`` argument to
+  ``django.contrib.auth.views.password_reset()`` is removed.
+
+* ``django.db.models.field.subclassing.SubfieldBase`` is removed.
+
+* ``django.utils.checksums`` is removed.
+
+* The ``original_content_type_id`` attribute on
+  ``django.contrib.admin.helpers.InlineAdminForm`` is removed.
+
+* The backwards compatibility shim to allow ``FormMixin.get_form()`` to be
+  defined with no default value for its ``form_class`` argument is removed.
+
+* The following settings are removed:
+
+  * ``ALLOWED_INCLUDE_ROOTS``
+  * ``TEMPLATE_CONTEXT_PROCESSORS``
+  * ``TEMPLATE_DEBUG``
+  * ``TEMPLATE_DIRS``
+  * ``TEMPLATE_LOADERS``
+  * ``TEMPLATE_STRING_IF_INVALID``
+
+* The backwards compatibility alias ``django.template.loader.BaseLoader`` is
+  removed.
+
+* Django template objects returned by
+  :func:`~django.template.loader.get_template` and
+  :func:`~django.template.loader.select_template` no longer accept a
+  :class:`~django.template.Context` in their
+  :meth:`~django.template.backends.base.Template.render()` method.
+
+* :doc:`Template response APIs </ref/template-response>` enforce the use of
+  :class:`dict` and backend-dependent template objects instead of
+  :class:`~django.template.Context` and :class:`~django.template.Template`
+  respectively.
+
+* The ``current_app`` parameter for the following function and classes is
+  removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.template.Context()``
+  * ``django.template.RequestContext()``
+  * ``django.template.response.TemplateResponse()``
+
+* The ``dictionary`` and ``context_instance`` parameters for the following
+  functions are removed:
+
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+  * ``django.template.loader.render_to_string()``
+
+* The ``dirs`` parameter for the following functions is removed:
+
+  * ``django.template.loader.get_template()``
+  * ``django.template.loader.select_template()``
+  * ``django.shortcuts.render()``
+  * ``django.shortcuts.render_to_response()``
+
+* Session verification is enabled regardless of whether or not
+  ``'django.contrib.auth.middleware.SessionAuthenticationMiddleware'`` is in
+  ``MIDDLEWARE_CLASSES``.
+
+* Private attribute ``django.db.models.Field.related`` is removed.
+
+* The ``--list`` option of the ``migrate`` management command is removed.
+
+* The ``ssi`` template tag is removed.
+
+* Support for the ``=`` comparison operator in the ``if`` template tag is
+  removed.
+
+* The backwards compatibility shims to allow ``Storage.get_available_name()``
+  and ``Storage.save()`` to be defined without a ``max_length`` argument are
+  removed.
+
+* Support for the legacy ``%(<foo>)s`` syntax in ``ModelFormMixin.success_url``
+  is removed.
+
+* ``GeoQuerySet`` aggregate methods ``collect()``, ``extent()``, ``extent3d()``,
+  ``make_line()``, and ``unionagg()`` are removed.
+
+* The ability to specify ``ContentType.name`` when creating a content type
+  instance is removed.
+
+* Support for the old signature of ``allow_migrate`` is removed.
+
+* Support for the syntax of ``{% cycle %}`` that uses comma-separated arguments
+  is removed.
+
+* The warning that :class:`~django.core.signing.Signer` issued when given an
+  invalid separator is now a ``ValueError``.
