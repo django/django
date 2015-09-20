@@ -615,7 +615,7 @@ class GeoQuerySetTest(TestCase):
         if oracle:
             # No precision parameter for Oracle :-/
             gml_regex = re.compile(
-                r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml">'
+                r'^<gml:Point srsName="EPSG:4326" xmlns:gml="http://www.opengis.net/gml">'
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
             )

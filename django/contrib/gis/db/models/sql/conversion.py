@@ -2,6 +2,7 @@
 This module holds simple classes to convert geospatial values from the
 database.
 """
+from __future__ import unicode_literals
 
 from django.contrib.gis.db.models.fields import GeoSelectFormatMixin
 from django.contrib.gis.geometry.backend import Geometry
@@ -24,6 +25,8 @@ class AreaField(BaseField):
         self.area_att = area_att
 
     def from_db_value(self, value, expression, connection, context):
+        if connection.features.interprets_empty_strings_as_nulls and value == '':
+            value = None
         if value is not None:
             value = Area(**{self.area_att: value})
         return value
