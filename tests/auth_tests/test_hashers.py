@@ -45,7 +45,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password('', blank_encoded))
         self.assertFalse(check_password(' ', blank_encoded))
 
-    def test_pkbdf2(self):
+    def test_pbkdf2(self):
         encoded = make_password('lètmein', 'seasalt', 'pbkdf2_sha256')
         self.assertEqual(encoded,
             'pbkdf2_sha256$24000$seasalt$V9DfCAVoweeLwxC/L2mb+7swhzF0XYdyQMqmusZqiTc=')
@@ -240,7 +240,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(is_password_usable('lètmein_badencoded'))
         self.assertFalse(is_password_usable(''))
 
-    def test_low_level_pkbdf2(self):
+    def test_low_level_pbkdf2(self):
         hasher = PBKDF2PasswordHasher()
         encoded = hasher.encode('lètmein', 'seasalt2')
         self.assertEqual(encoded,
