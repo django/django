@@ -94,6 +94,9 @@ details on these changes.
 * The ``callable_obj`` keyword argument to
   ``SimpleTestCase.assertRaisesMessage()`` will be removed.
 
+* Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods will be
+  removed.
+
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` will be
   removed.
 
@@ -267,9 +270,6 @@ details on these changes.
 
 * The warning that :class:`~django.core.signing.Signer` issues when given an
   invalid separator will become an exception.
-
-* Support for the ``allow_tags`` attribute on ``ModelAdmin`` methods will be
-  removed.
 
 .. _deprecation-removed-in-1.9:
 
