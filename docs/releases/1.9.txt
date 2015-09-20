@@ -251,11 +251,6 @@ Minor features
 * The new :class:`~django.contrib.gis.geoip2.GeoIP2` class allows using
   MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
 
-:mod:`django.contrib.messages`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
-
 :mod:`django.contrib.postgres`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -273,11 +268,6 @@ Minor features
 * Added the :class:`~django.contrib.postgres.functions.TransactionNow` database
   function.
 
-:mod:`django.contrib.redirects`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
-
 :mod:`django.contrib.sessions`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -285,11 +275,6 @@ Minor features
   ``cached_db`` backends are refactored to allow a custom database session
   backend to build upon them. See
   :ref:`extending-database-backed-session-engines` for more details.
-
-:mod:`django.contrib.sitemaps`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
 
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -299,11 +284,6 @@ Minor features
   ``example.com:80``. If the lookup fails because the host does not match a
   record in the database and the host has a port, the port is stripped and the
   lookup is retried with the domain part only.
-
-:mod:`django.contrib.staticfiles`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* ...
 
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -342,11 +322,6 @@ Database backends
   available as ``django.db.backends.postgresql``. The old name will continue to
   be available for backwards compatibility.
 
-Email
-^^^^^
-
-* ...
-
 File Storage
 ^^^^^^^^^^^^
 
@@ -356,11 +331,6 @@ File Storage
 
 * :class:`~django.core.files.File` now has the ``seekable()`` method when using
   Python 3.
-
-File Uploads
-^^^^^^^^^^^^
-
-* ...
 
 Forms
 ^^^^^
@@ -604,11 +574,6 @@ Requests and Responses
   ignores 404s when the referer is equal to the requested URL. To circumvent
   the empty referer check already implemented, some Web bots set the referer to
   the requested URL.
-
-Signals
-^^^^^^^
-
-* ...
 
 Templates
 ^^^^^^^^^
