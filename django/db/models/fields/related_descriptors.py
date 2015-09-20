@@ -22,37 +22,42 @@ reverse many-to-one relation.
 
 There are three types of relations (many-to-one, one-to-one, and many-to-many)
 and two directions (forward and reverse) for a total of six combinations.
-However only four accessor classes are required.
 
 1. Related instance on the forward side of a many-to-one or one-to-one
-   relation: ``ReverseSingleRelatedObjectDescriptor``.
+   relation: ``ForwardManyToOneDescriptor``.
 
    Uniqueness of foreign key values is irrelevant to accessing the related
    instance, making the many-to-one and one-to-one cases identical as far as
    the descriptor is concerned. The constraint is checked upstream (unicity
    validation in forms) or downstream (unique indexes in the database).
 
+   If you're looking for ``ForwardOneToOneDescriptor``, use
+   ``ForwardManyToOneDescriptor`` instead.
+
 2. Related instance on the reverse side of a one-to-one relation:
-   ``SingleRelatedObjectDescriptor``.
+   ``ReverseOneToOneDescriptor``.
 
    One-to-one relations are asymmetrical, despite the apparent symmetry of the
    name, because they're implemented in the database with a foreign key from
-   one table to another. As a consequence ``SingleRelatedObjectDescriptor`` is
-   slightly different from ``ReverseSingleRelatedObjectDescriptor``.
+   one table to another. As a consequence ``ReverseOneToOneDescriptor`` is
+   slightly different from ``ForwardManyToOneDescriptor``.
 
 3. Related objects manager for related instances on the reverse side of a
-   many-to-one relation: ``ForeignRelatedObjectsDescriptor``.
+   many-to-one relation: ``ReverseManyToOneDescriptor``.
 
    Unlike the previous two classes, this one provides access to a collection
    of objects. It returns a manager rather than an instance.
 
 4. Related objects manager for related instances on the forward or reverse
-   sides of a many-to-many relation: ``ManyRelatedObjectsDescriptor``.
+   sides of a many-to-many relation: ``ManyToManyDescriptor``.
 
    Many-to-many relations are symmetrical. The syntax of Django models
    requires declaring them on one side but that's an implementation detail.
    They could be declared on the other side without any change in behavior.
    Therefore the forward and reverse descriptors can be the same.
+
+   If you're looking for ``ForwardManyToManyDescriptor`` or
+   ``ReverseManyToManyDescriptor``, use ``ManyToManyDescriptor`` instead.
 """
 
 from __future__ import unicode_literals
@@ -65,7 +70,7 @@ from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
 
 
-class ReverseSingleRelatedObjectDescriptor(object):
+class ForwardManyToOneDescriptor(object):
     """
     Accessor to the related object on the forward side of a many-to-one or
     one-to-one relation.
@@ -75,7 +80,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
         class Child(Model):
             parent = ForeignKey(Parent, related_name='children')
 
-    ``child.parent`` is a ``ReverseSingleRelatedObjectDescriptor`` instance.
+    ``child.parent`` is a ``ForwardManyToOneDescriptor`` instance.
     """
 
     def __init__(self, field_with_rel):
@@ -150,7 +155,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
 
         # The related instance is loaded from the database and then cached in
         # the attribute defined in self.cache_name. It can also be pre-cached
-        # by the reverse accessor (SingleRelatedObjectDescriptor).
+        # by the reverse accessor (ReverseOneToOneDescriptor).
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -249,7 +254,7 @@ class ReverseSingleRelatedObjectDescriptor(object):
             setattr(value, self.field.remote_field.get_cache_name(), instance)
 
 
-class SingleRelatedObjectDescriptor(object):
+class ReverseOneToOneDescriptor(object):
     """
     Accessor to the related object on the reverse side of a one-to-one
     relation.
@@ -259,7 +264,7 @@ class SingleRelatedObjectDescriptor(object):
         class Restaurant(Model):
             place = OneToOneField(Place, related_name='restaurant')
 
-    ``place.restaurant`` is a ``SingleRelatedObjectDescriptor`` instance.
+    ``place.restaurant`` is a ``ReverseOneToOneDescriptor`` instance.
     """
 
     def __init__(self, related):
@@ -269,7 +274,7 @@ class SingleRelatedObjectDescriptor(object):
     @cached_property
     def RelatedObjectDoesNotExist(self):
         # The exception isn't created at initialization time for the sake of
-        # consistency with `ReverseSingleRelatedObjectDescriptor`.
+        # consistency with `ForwardManyToOneDescriptor`.
         return type(
             str('RelatedObjectDoesNotExist'),
             (self.related.related_model.DoesNotExist, AttributeError),
@@ -323,7 +328,7 @@ class SingleRelatedObjectDescriptor(object):
 
         # The related instance is loaded from the database and then cached in
         # the attribute defined in self.cache_name. It can also be pre-cached
-        # by the forward accessor (ReverseSingleRelatedObjectDescriptor).
+        # by the forward accessor (ForwardManyToOneDescriptor).
         try:
             rel_obj = getattr(instance, self.cache_name)
         except AttributeError:
@@ -366,7 +371,7 @@ class SingleRelatedObjectDescriptor(object):
         Keep in mind that ``Restaurant`` holds the foreign key to ``Place``.
         """
         # The similarity of the code below to the code in
-        # ReverseSingleRelatedObjectDescriptor is annoying, but there's a bunch
+        # ForwardManyToOneDescriptor is annoying, but there's a bunch
         # of small differences that would make a common base class convoluted.
 
         # If null=True, we can assign null here, but otherwise the value needs
@@ -410,7 +415,7 @@ class SingleRelatedObjectDescriptor(object):
         setattr(value, self.related.field.get_cache_name(), instance)
 
 
-class ForeignRelatedObjectsDescriptor(object):
+class ReverseManyToOneDescriptor(object):
     """
     Accessor to the related objects manager on the reverse side of a
     many-to-one relation.
@@ -420,10 +425,10 @@ class ForeignRelatedObjectsDescriptor(object):
         class Child(Model):
             parent = ForeignKey(Parent, related_name='children')
 
-    ``parent.children`` is a ``ForeignRelatedObjectsDescriptor`` instance.
+    ``parent.children`` is a ``ReverseManyToOneDescriptor`` instance.
 
     Most of the implementation is delegated to a dynamically defined manager
-    class built by ``create_many_related_manager()`` which is defined below.
+    class built by ``create_forward_many_to_many_manager()`` defined below.
     """
 
     def __init__(self, rel):
@@ -432,7 +437,7 @@ class ForeignRelatedObjectsDescriptor(object):
 
     @cached_property
     def related_manager_cls(self):
-        return create_foreign_related_manager(
+        return create_reverse_many_to_one_manager(
             self.rel.related_model._default_manager.__class__,
             self.rel,
         )
@@ -466,7 +471,7 @@ class ForeignRelatedObjectsDescriptor(object):
         manager.set(value)
 
 
-def create_foreign_related_manager(superclass, rel):
+def create_reverse_many_to_one_manager(superclass, rel):
     """
     Create a manager for the reverse side of a many-to-one relation.
 
@@ -488,7 +493,7 @@ def create_foreign_related_manager(superclass, rel):
             # We use **kwargs rather than a kwarg argument to enforce the
             # `manager='manager_name'` syntax.
             manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_foreign_related_manager(manager.__class__, rel)
+            manager_class = create_reverse_many_to_one_manager(manager.__class__, rel)
             return manager_class(self.instance)
         do_not_call_in_templates = True
 
@@ -650,7 +655,7 @@ def create_foreign_related_manager(superclass, rel):
     return RelatedManager
 
 
-class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
+class ManyToManyDescriptor(ReverseManyToOneDescriptor):
     """
     Accessor to the related objects manager on the forward and reverse sides of
     a many-to-many relation.
@@ -660,15 +665,15 @@ class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
         class Pizza(Model):
             toppings = ManyToManyField(Topping, related_name='pizzas')
 
-    ``pizza.toppings`` and ``topping.pizzas`` are
-    ``ManyRelatedObjectsDescriptor`` instances.
+    ``pizza.toppings`` and ``topping.pizzas`` are ``ManyToManyDescriptor``
+    instances.
 
     Most of the implementation is delegated to a dynamically defined manager
-    class built by ``create_many_related_manager()`` which is defined below.
+    class built by ``create_forward_many_to_many_manager()`` defined below.
     """
 
     def __init__(self, rel, reverse=False):
-        super(ManyRelatedObjectsDescriptor, self).__init__(rel)
+        super(ManyToManyDescriptor, self).__init__(rel)
 
         self.reverse = reverse
 
@@ -682,14 +687,14 @@ class ManyRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
     @cached_property
     def related_manager_cls(self):
         model = self.rel.related_model if self.reverse else self.rel.model
-        return create_many_related_manager(
+        return create_forward_many_to_many_manager(
             model._default_manager.__class__,
             self.rel,
             reverse=self.reverse,
         )
 
 
-def create_many_related_manager(superclass, rel, reverse):
+def create_forward_many_to_many_manager(superclass, rel, reverse):
     """
     Create a manager for the either side of a many-to-many relation.
 
@@ -746,7 +751,7 @@ def create_many_related_manager(superclass, rel, reverse):
             # We use **kwargs rather than a kwarg argument to enforce the
             # `manager='manager_name'` syntax.
             manager = getattr(self.model, kwargs.pop('manager'))
-            manager_class = create_many_related_manager(manager.__class__, rel, reverse)
+            manager_class = create_forward_many_to_many_manager(manager.__class__, rel, reverse)
             return manager_class(instance=self.instance)
         do_not_call_in_templates = True
 

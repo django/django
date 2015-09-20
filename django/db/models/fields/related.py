@@ -25,8 +25,8 @@ from . import (
     PositiveSmallIntegerField,
 )
 from .related_descriptors import (
-    ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor,
-    ReverseSingleRelatedObjectDescriptor, SingleRelatedObjectDescriptor,
+    ForwardManyToOneDescriptor, ManyToManyDescriptor,
+    ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
@@ -432,7 +432,7 @@ class ForeignObject(RelatedField):
     one_to_one = False
 
     requires_unique_target = True
-    related_accessor_class = ForeignRelatedObjectsDescriptor
+    related_accessor_class = ReverseManyToOneDescriptor
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
@@ -684,7 +684,7 @@ class ForeignObject(RelatedField):
 
     def contribute_to_class(self, cls, name, virtual_only=False):
         super(ForeignObject, self).contribute_to_class(cls, name, virtual_only=virtual_only)
-        setattr(cls, self.name, ReverseSingleRelatedObjectDescriptor(self))
+        setattr(cls, self.name, ForwardManyToOneDescriptor(self))
 
     def contribute_to_related_class(self, cls, related):
         # Internal FK's - i.e., those with a related name ending with '+' -
@@ -974,7 +974,7 @@ class OneToOneField(ForeignKey):
     one_to_many = False
     one_to_one = True
 
-    related_accessor_class = SingleRelatedObjectDescriptor
+    related_accessor_class = ReverseOneToOneDescriptor
     rel_class = OneToOneRel
 
     description = _("One-to-one relationship")
@@ -1560,7 +1560,7 @@ class ManyToManyField(RelatedField):
                 self.remote_field.through = create_many_to_many_intermediary_model(self, cls)
 
         # Add the descriptor for the m2m relation.
-        setattr(cls, self.name, ManyRelatedObjectsDescriptor(self.remote_field, reverse=False))
+        setattr(cls, self.name, ManyToManyDescriptor(self.remote_field, reverse=False))
 
         # Set up the accessor for the m2m table name for the relation.
         self.m2m_db_table = curry(self._get_m2m_db_table, cls._meta)
@@ -1569,7 +1569,7 @@ class ManyToManyField(RelatedField):
         # Internal M2Ms (i.e., those with a related name ending with '+')
         # and swapped models don't get a related descriptor.
         if not self.remote_field.is_hidden() and not related.related_model._meta.swapped:
-            setattr(cls, related.get_accessor_name(), ManyRelatedObjectsDescriptor(self.remote_field, reverse=True))
+            setattr(cls, related.get_accessor_name(), ManyToManyDescriptor(self.remote_field, reverse=True))
 
         # Set up the accessors for the column names on the m2m table.
         self.m2m_column_name = curry(self._get_m2m_attr, related, 'column')

@@ -9,7 +9,7 @@ from django.db import DEFAULT_DB_ALIAS, connection, models, router, transaction
 from django.db.models import DO_NOTHING, signals
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.related import (
-    ForeignObject, ForeignObjectRel, ForeignRelatedObjectsDescriptor,
+    ForeignObject, ForeignObjectRel, ReverseManyToOneDescriptor,
     lazy_related_operation,
 )
 from django.db.models.query_utils import PathInfo
@@ -24,8 +24,7 @@ class GenericForeignKey(object):
     ``object_id`` fields.
 
     This class also doubles as an accessor to the related object (similar to
-    ReverseSingleRelatedObjectDescriptor) by adding itself as a model
-    attribute.
+    ForwardManyToOneDescriptor) by adding itself as a model attribute.
     """
 
     # Field flags
@@ -381,7 +380,7 @@ class GenericRelation(ForeignObject):
         kwargs['virtual_only'] = True
         super(GenericRelation, self).contribute_to_class(cls, name, **kwargs)
         self.model = cls
-        setattr(cls, self.name, ReverseGenericRelatedObjectsDescriptor(self.remote_field))
+        setattr(cls, self.name, ReverseGenericManyToOneDescriptor(self.remote_field))
 
         # Add get_RELATED_order() and set_RELATED_order() methods if the model
         # on the other end of this relation is ordered with respect to this.
@@ -430,7 +429,7 @@ class GenericRelation(ForeignObject):
         })
 
 
-class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
+class ReverseGenericManyToOneDescriptor(ReverseManyToOneDescriptor):
     """
     Accessor to the related objects manager on the one-to-many relation created
     by GenericRelation.
@@ -440,7 +439,7 @@ class ReverseGenericRelatedObjectsDescriptor(ForeignRelatedObjectsDescriptor):
         class Post(Model):
             comments = GenericRelation(Comment)
 
-    ``post.comments`` is a ReverseGenericRelatedObjectsDescriptor instance.
+    ``post.comments`` is a ReverseGenericManyToOneDescriptor instance.
     """
 
     @cached_property
