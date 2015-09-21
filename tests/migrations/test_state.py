@@ -879,7 +879,6 @@ class ModelStateTests(SimpleTestCase):
 
         class DummyMetaClass(type):
             dummy_attr = 'dummy'
-            pass
 
         class Mixin(six.with_metaclass(DummyMetaClass, object)):
             mixin_attr = 'mixin'
