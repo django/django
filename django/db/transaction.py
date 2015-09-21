@@ -156,13 +156,6 @@ class Atomic(ContextDecorator):
                     raise TransactionManagementError(
                         "Your database backend doesn't behave properly when "
                         "autocommit is off. Turn it on before using 'atomic'.")
-                # When entering an atomic block with autocommit turned off,
-                # Django should only use savepoints and shouldn't commit.
-                # This requires at least a savepoint for the outermost block.
-                if not self.savepoint:
-                    raise TransactionManagementError(
-                        "The outermost 'atomic' block cannot use "
-                        "savepoint = False when autocommit is off.")
                 # Pretend we're already in an atomic block to bypass the code
                 # that disables autocommit to enter a transaction, and make a
                 # note to deal with this case in __exit__.
