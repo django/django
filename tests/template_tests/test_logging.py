@@ -34,7 +34,7 @@ class VariableResolveLoggingTests(SimpleTestCase):
 
             @property
             def template_name(self):
-                return "template"
+                return "template_name"
 
             @property
             def template(self):
@@ -51,19 +51,28 @@ class VariableResolveLoggingTests(SimpleTestCase):
                 return self.__dict__[item]
 
         Variable('article').resolve(TestObject())
+
         self.assertEqual(
-            self.test_handler.log_record.msg,
-            'template - Attribute does not exist.'
+            self.test_handler.log_record.getMessage(),
+            "Exception while resolving variable 'article' in template 'template_name'."
         )
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        raised_exception = self.test_handler.log_record.exc_info[1]
+        self.assertEqual(str(raised_exception), 'Attribute does not exist.')
 
     def test_log_on_variable_does_not_exist_not_silent(self):
         with self.assertRaises(VariableDoesNotExist):
             Variable('article.author').resolve({'article': {'section': 'News'}})
 
         self.assertEqual(
-            self.test_handler.log_record.msg,
-            'unknown - Failed lookup for key [author] in %r' %
-            ("{%r: %r}" % ('section', 'News'), )
+            self.test_handler.log_record.getMessage(),
+            "Exception while resolving variable 'author' in template 'unknown'."
+        )
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        raised_exception = self.test_handler.log_record.exc_info[1]
+        self.assertEqual(
+            str(raised_exception),
+            'Failed lookup for key [author] in %r' % ("{%r: %r}" % ('section', 'News'))
         )
 
     def test_no_log_when_variable_exists(self):
