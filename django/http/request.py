@@ -390,7 +390,6 @@ class QueryDict(MultiValueDict):
             'encoding': encoding,
         }
         if six.PY3:
-            parse_qsl_kwargs['encoding'] = encoding
             if isinstance(query_string, bytes):
                 # query_string normally contains URL-encoded data, a subset of ASCII.
                 try:
