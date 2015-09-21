@@ -55,9 +55,18 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
                 return self.__dict__[item]
 
         Variable('article').resolve(TestObject())
+
         self.assertEqual(
             self.test_handler.log_record.getMessage(),
-            'template - Attribute does not exist.'
+            'Exception raised while resolving variable '
+            'article in template template.'
+        )
+
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        raised_exception = self.test_handler.log_record.exc_info[1]
+        self.assertEqual(
+            str(raised_exception),
+            'Attribute does not exist.'
         )
 
     def test_log_on_variable_does_not_exist_not_silent(self):
@@ -66,7 +75,15 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
 
         self.assertEqual(
             self.test_handler.log_record.getMessage(),
-            'unknown - Failed lookup for key [author] in %r' %
+            'Exception raised while resolving variable '
+            'author in template unknown.'
+        )
+
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        raised_exception = self.test_handler.log_record.exc_info[1]
+        self.assertEqual(
+            str(raised_exception),
+            'Failed lookup for key [author] in %r' %
             ("{%r: %r}" % ('section', 'News'), )
         )
 
@@ -78,7 +95,7 @@ class VariableResolveLoggingTests(BaseTemplateLoggingTestCase):
 class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
     loglevel = logging.WARN
 
-    def test_logs_exceptions_during_rendering_with_debug_disabled(self):
+    def _create_template_with_include(self, template_name):
         engine = Engine(loaders=[
             ('django.template.loaders.locmem.Loader', {
                 'child': '{{ raises_exception }}',
@@ -90,13 +107,32 @@ class IncludeNodeLoggingTests(BaseTemplateLoggingTestCase):
 
         ctx = Context({'raises_exception': error_method})
         named_template = engine.from_string('{% include "child" %}')
-        named_template.name = "template_name"
+        named_template.name = template_name
 
+        return named_template, ctx
+
+    def test_logs_exceptions_during_rendering_with_debug_disabled(self):
+        named_template, ctx = self._create_template_with_include(
+            template_name='template_name'
+        )
         self.assertEqual(named_template.render(ctx), '')
         self.assertEqual(
             self.test_handler.log_record.getMessage(),
             'Exception raised while rendering {% include %} for template '
             'template_name. Empty string rendered instead.'
+        )
+        self.assertIsNotNone(self.test_handler.log_record.exc_info)
+        self.assertEqual(self.test_handler.log_record.levelno, logging.WARN)
+
+    def test_logs_exceptions_during_rendering_with_no_template_name(self):
+        named_template, ctx = self._create_template_with_include(
+            template_name=None
+        )
+        self.assertEqual(named_template.render(ctx), '')
+        self.assertEqual(
+            self.test_handler.log_record.getMessage(),
+            'Exception raised while rendering {% include %} for template '
+            'unknown. Empty string rendered instead.'
         )
         self.assertIsNotNone(self.test_handler.log_record.exc_info)
         self.assertEqual(self.test_handler.log_record.levelno, logging.WARN)
