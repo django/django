@@ -367,40 +367,7 @@ def limited_parse_qsl_py2(qs, encoding, keep_blank_values=0, fields_limit=None):
     return r
 
 
-_implicit_encoding = 'ascii'
-_implicit_errors = 'strict'
-
-
-def _noop(obj):
-    return obj
-
-
-def _encode_result(obj, encoding=_implicit_encoding, errors=_implicit_errors):
-    return obj.encode(encoding, errors)
-
-
-def _decode_args(args, encoding=_implicit_encoding, errors=_implicit_errors):
-    return tuple(x.decode(encoding, errors) if x else '' for x in args)
-
-
-def _coerce_args(*args):
-    # Invokes decode if necessary to create str args
-    # and returns the coerced inputs along with
-    # an appropriate result coercion function
-    #   - noop for str inputs
-    #   - encoding function otherwise
-    str_input = isinstance(args[0], str)
-    for arg in args[1:]:
-        # We special-case the empty string to support the
-        # "scheme=''" default argument to some functions
-        if arg and isinstance(arg, str) != str_input:
-            raise TypeError("Cannot mix str and non-str arguments")
-    if str_input:
-        return args + (_noop,)
-    return _decode_args(args) + (_encode_result,)
-
-
-def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
+def limited_parse_qsl_py3(qs, keep_blank_values=False,
                encoding='utf-8', errors='replace', fields_limit=None):
     """
     Parse a query given as a string argument and return a list.
@@ -417,17 +384,12 @@ def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
         strings.  The default false value indicates that blank values
         are to be ignored and treated as if they were  not included.
 
-    strict_parsing: flag indicating what to do with parsing errors. If
-        false (the default), errors are silently ignored. If true,
-        errors raise a ValueError exception.
-
     encoding and errors: specify how to decode percent-encoded sequences
         into Unicode characters, as accepted by the bytes.decode() method.
 
     fields_limit: maximum number of fields parsed or an exception
         is raised. None means no limit and is the default.
     """
-    qs, _coerce_result = _coerce_args(qs)
     if fields_limit:
         pairs = FIELDS_MATCH.split(qs, fields_limit)
         if len(pairs) > fields_limit:
@@ -436,12 +398,10 @@ def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
         pairs = FIELDS_MATCH.split(qs)
     r = []
     for name_value in pairs:
-        if not name_value and not strict_parsing:
+        if not name_value:
             continue
         nv = name_value.split('=', 1)
         if len(nv) != 2:
-            if strict_parsing:
-                raise ValueError("bad query field: %r" % (name_value,))
             # Handle case of a control-name with no equal sign
             if keep_blank_values:
                 nv.append('')
@@ -450,9 +410,7 @@ def limited_parse_qsl_py3(qs, keep_blank_values=False, strict_parsing=False,
         if len(nv[1]) or keep_blank_values:
             name = nv[0].replace('+', ' ')
             name = unquote(name, encoding=encoding, errors=errors)
-            name = _coerce_result(name)
             value = nv[1].replace('+', ' ')
             value = unquote(value, encoding=encoding, errors=errors)
-            value = _coerce_result(value)
             r.append((name, value))
     return r
