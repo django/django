@@ -12,7 +12,7 @@ def check_url_config(app_configs, **kwargs):
 
 def check_resolver(resolver):
     """
-    Recursively check the resolver
+    Recursively check the resolver.
     """
     from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
     warnings = []
@@ -31,7 +31,7 @@ def check_resolver(resolver):
 
 def describe_pattern(pattern):
     """
-    Formats the URL pattern for display in warning messages
+    Format the URL pattern for display in warning messages.
     """
     description = "'{}'".format(pattern.regex.pattern)
     if getattr(pattern, 'name', False):
@@ -41,7 +41,7 @@ def describe_pattern(pattern):
 
 def check_include_trailing_dollar(pattern):
     """
-    Checks that include is not used with a regex ending with a dollar.
+    Check that include is not used with a regex ending with a dollar.
     """
     regex_pattern = pattern.regex.pattern
     if regex_pattern.endswith('$') and not regex_pattern.endswith('\$'):
@@ -58,7 +58,7 @@ def check_include_trailing_dollar(pattern):
 
 def check_pattern_startswith_slash(pattern):
     """
-    Checks that the pattern does not begin with a forward slash
+    Check that the pattern does not begin with a forward slash.
     """
     regex_pattern = pattern.regex.pattern
     if regex_pattern.startswith('/') or regex_pattern.startswith('^/'):
@@ -74,7 +74,7 @@ def check_pattern_startswith_slash(pattern):
 
 def check_pattern_name(pattern):
     """
-    Checks that the pattern name does not contain a colon
+    Check that the pattern name does not contain a colon.
     """
     if pattern.name is not None and ":" in pattern.name:
         warning = Warning(
