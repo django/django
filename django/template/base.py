@@ -902,8 +902,13 @@ class Variable(object):
                             else:
                                 raise
         except Exception as e:
-            template_name = getattr(context, 'template_name', 'unknown')
-            logger.debug('{} - {}'.format(template_name, e))
+            template_name = getattr(context, 'template_name', None) or 'unknown'
+            logger.debug(
+                "Exception while resolving variable '%s' in template '%s'.",
+                bit,
+                template_name,
+                exc_info=True,
+            )
 
             if getattr(e, 'silent_variable_failure', False):
                 current = context.template.engine.string_if_invalid
