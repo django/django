@@ -76,6 +76,7 @@ LIGHT_PALETTE = 'light'
 PALETTES = {
     NOCOLOR_PALETTE: {
         'ERROR': {},
+        'SUCCESS': {},
         'WARNING': {},
         'NOTICE': {},
         'SQL_FIELD': {},
@@ -96,6 +97,7 @@ PALETTES = {
     },
     DARK_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
         'NOTICE': {'fg': 'red'},
         'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
@@ -116,6 +118,7 @@ PALETTES = {
     },
     LIGHT_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
+        'SUCCESS': {'fg': 'green', 'opts': ('bold',)},
         'WARNING': {'fg': 'yellow', 'opts': ('bold',)},
         'NOTICE': {'fg': 'red'},
         'SQL_FIELD': {'fg': 'green', 'opts': ('bold',)},
