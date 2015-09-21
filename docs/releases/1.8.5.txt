@@ -46,3 +46,7 @@ Bugfixes
 
 * Readded inline foreign keys to form instances when validating model formsets
   (:ticket:`25431`).
+
+* Allowed using ORM write methods after disabling autocommit with
+  :func:`set_autocommit(False) <django.db.transaction.set_autocommit>`
+  (:ticket:`24921`).
