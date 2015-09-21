@@ -673,9 +673,14 @@ if it's missing or has syntax errors), the behavior varies depending on the
 :class:`template engine's <django.template.Engine>` ``debug`` option (if not
 set, this option defaults to the value of :setting:`DEBUG`). When debug mode is
 turned on, an exception like :exc:`~django.template.TemplateDoesNotExist` or
-:exc:`~django.template.TemplateSyntaxError` will be raised; otherwise
-``{% include %}`` silences any exception that happens while rendering the
-included template and returns an empty string.
+:exc:`~django.template.TemplateSyntaxError` will be raised. When debug mode
+is turned off, ``{% include %}`` logs a warning to the ``django.template``
+logger with the exception that happens while rendering the included template
+and returns an empty string.
+
+.. versionchanged:: 1.9
+
+    Template logging now includes the warning logging mentioned above.
 
 .. note::
     The :ttag:`include` tag should be considered as an implementation of
