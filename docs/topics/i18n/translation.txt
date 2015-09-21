@@ -1451,8 +1451,8 @@ multiple times::
 .. admonition:: Using Jinja2 templates?
 
     :djadmin:`makemessages` doesn't understand the syntax of Jinja2 templates.
-    To extract strings from a project containing Jinja2 templates, use Babel_
-    instead.
+    To extract strings from a project containing Jinja2 templates, use `Message
+    Extracting`_ from Babel_ instead.
 
     Here's an example ``babel.cfg`` configuration file::
 
@@ -1471,6 +1471,7 @@ multiple times::
     in general, and doesn't depend on ``gettext``. For more information, read
     its documentation about `working with message catalogs`_.
 
+    .. _Message extracting: http://babel.pocoo.org/docs/messages/#message-extraction
     .. _Babel: http://babel.pocoo.org/
     .. _working with message catalogs: http://babel.pocoo.org/docs/messages/
 
