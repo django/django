@@ -232,7 +232,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=keepdb)
         except DatabaseError as err:
             description = str(err)
-            # Avoid tablespace already exists error when keepdb is on
+            # Avoid user already exists error when keepdb is on
             if 'ORA-01920' not in description or not keepdb:
                 raise
 
