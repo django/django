@@ -57,6 +57,14 @@ subclass for that application.
 If there is no ``default_app_config``, Django uses the base
 :class:`~django.apps.AppConfig` class.
 
+``default_app_config`` allows applications that predate Django 1.7 such as
+``django.contrib.admin`` to opt-in to :class:`~django.apps.AppConfig` features
+without requiring users to update their :setting:`INSTALLED_APPS`.
+
+New applications should avoid ``default_app_config``. Instead they should
+require the dotted path to the appropriate :class:`~django.apps.AppConfig`
+subclass to be configured explicitly in :setting:`INSTALLED_APPS`.
+
 For application authors
 -----------------------
 
