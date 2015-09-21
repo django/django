@@ -19,9 +19,7 @@ from django.utils.datastructures import ImmutableList, MultiValueDict
 from django.utils.encoding import (
     escape_uri_path, force_bytes, force_str, force_text, iri_to_uri,
 )
-from django.utils.http import (
-    is_same_domain, limited_parse_qsl_py2, limited_parse_qsl_py3,
-)
+from django.utils.http import is_same_domain, limited_parse_qsl
 from django.utils.six.moves.urllib.parse import (
     quote, urlencode, urljoin, urlsplit,
 )
@@ -397,10 +395,10 @@ class QueryDict(MultiValueDict):
                 except UnicodeDecodeError:
                     # ... but some user agents are misbehaving :-(
                     query_string = query_string.decode('iso-8859-1')
-            for key, value in limited_parse_qsl_py3(query_string, **parse_qsl_kwargs):
+            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
                 self.appendlist(key, value)
         else:
-            for key, value in limited_parse_qsl_py2(query_string, **parse_qsl_kwargs):
+            for key, value in limited_parse_qsl(query_string, **parse_qsl_kwargs):
                 try:
                     value = value.decode(encoding)
                 except UnicodeDecodeError:
