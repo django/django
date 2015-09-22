@@ -9,7 +9,8 @@ def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     Creates content types for models in the given app, removing any model
     entries that no longer have a matching model class.
     """
-    if not app_config.models_module:
+    
+    if not getattr(app_config, "models_module", None):
         return
 
     try:
