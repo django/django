@@ -8,6 +8,7 @@ from django.db.migrations.operations import (
 from django.db.migrations.state import (
     ModelState, ProjectState, get_related_models_recursive,
 )
+from django.db.models.base import ModelBase
 from django.test import SimpleTestCase, override_settings
 from django.utils import six
 
@@ -907,6 +908,37 @@ class ModelStateTests(SimpleTestCase):
         # The default manager is used in migrations
         self.assertEqual([name for name, mgr in food_state.managers], ['food_mgr'])
         self.assertEqual(food_state.managers[0][1].args, ('a', 'b', 1, 2))
+
+    def test_metaclass_conflict(self):
+        """
+        Test making class with complex metadata inheritance
+        """
+        new_apps = Apps(['migrations'])
+
+        class DummyMetaClass(type):
+            dummy_attr = 'dummy'
+
+        class Mixin(six.with_metaclass(DummyMetaClass, object)):
+            mixin_attr = 'mixin'
+
+        class IntermediateMetaClass(DummyMetaClass, ModelBase):
+            pass
+
+        # Create the same Model without metaclassmaker as you would normally do.
+        class MetaclassTestModel(six.with_metaclass(IntermediateMetaClass, Mixin, models.Model)):
+            class Meta:
+                app_label = "migrations"
+                apps = new_apps
+
+        # Reset apps to be able to render __fake__ modules.
+        new_apps = Apps(['migrations'])
+        model_state = ModelState.from_model(MetaclassTestModel)
+
+        # This raises metaclass conflict if it's not done properly.
+        class_obj = model_state.render(new_apps)
+
+        self.assertEqual(getattr(class_obj, 'mixin_attr', False), 'mixin')
+        self.assertEqual(getattr(class_obj, 'dummy_attr', False), 'dummy')
 
 
 class RelatedModelsTests(SimpleTestCase):
