@@ -6,7 +6,7 @@ import sys
 import warnings
 
 from django.core.files.temp import NamedTemporaryFile
-from django.db import DJANGO_VERSION_PICKLE_KEY, models
+from django.db import models
 from django.test import TestCase, mock
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
@@ -25,10 +25,8 @@ class ModelPickleTestCase(TestCase):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
-                reduce_list = super(MissingDjangoVersion, self).__reduce__()
-                data = reduce_list[-1]
-                del data[DJANGO_VERSION_PICKLE_KEY]
-                return reduce_list
+                unpickler, args, data = super(MissingDjangoVersion, self).__reduce__()
+                return unpickler, args[:-1], data
 
         p = MissingDjangoVersion(title="FooBar")
         with warnings.catch_warnings(record=True) as recorded:
@@ -46,10 +44,9 @@ class ModelPickleTestCase(TestCase):
             title = models.CharField(max_length=10)
 
             def __reduce__(self):
-                reduce_list = super(DifferentDjangoVersion, self).__reduce__()
-                data = reduce_list[-1]
-                data[DJANGO_VERSION_PICKLE_KEY] = '1.0'
-                return reduce_list
+                unpickler, args, data = super(DifferentDjangoVersion, self).__reduce__()
+                args = args[:-1] + ('1.0',)
+                return unpickler, args, data
 
         p = DifferentDjangoVersion(title="FooBar")
         with warnings.catch_warnings(record=True) as recorded:
