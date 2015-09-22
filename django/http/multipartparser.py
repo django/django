@@ -188,16 +188,18 @@ class MultiPartParser(object):
                     # This is a post field, we can just set it in the post
                     if transfer_encoding == 'base64':
                         raw_data = field_stream.read(size=read_size)
+                        self._data_size += len(raw_data)
                         try:
                             data = base64.b64decode(raw_data)
                         except _BASE64_DECODE_ERROR:
                             data = raw_data
                     else:
                         data = field_stream.read(size=read_size)
+                        self._data_size += len(data)
 
                     # We add 2 here to make the check consistent with the GET
                     # check that also includes '&='
-                    self._data_size += len(field_name) + len(data) + 2
+                    self._data_size += len(field_name) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
                             (self._data_size > settings.DATA_UPLOAD_MAX_MEMORY_SIZE or field_stream.read(1))):
                         raise RequestBodyTooBig('Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.')
