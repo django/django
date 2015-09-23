@@ -547,3 +547,97 @@ class FunctionTests(TestCase):
             ['How to Time Travel'],
             lambda a: a.title
         )
+
+    def test_length_transform(self):
+        try:
+            CharField.register_lookup(Length, 'length')
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__length__gt=7)
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith',
+                ],
+                lambda a: a.name
+            )
+        finally:
+            CharField._unregister_lookup(Length, 'length')
+
+    def test_lower_transform(self):
+        try:
+            CharField.register_lookup(Lower, 'lower')
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__lower__exact='john smith')
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith',
+                ],
+                lambda a: a.name
+            )
+        finally:
+            CharField._unregister_lookup(Lower, 'lower')
+
+    def test_upper_transform(self):
+        try:
+            CharField.register_lookup(Upper, 'upper')
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__upper__exact='JOHN SMITH')
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith',
+                ],
+                lambda a: a.name
+            )
+        finally:
+            CharField._unregister_lookup(Upper, 'upper')
+
+    def test_func_transform_bilateral(self):
+        class UpperBilateral(Upper):
+            bilateral = True
+
+        try:
+            CharField.register_lookup(UpperBilateral, 'upper')
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__upper__exact='john smith')
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith',
+                ],
+                lambda a: a.name
+            )
+        finally:
+            CharField._unregister_lookup(UpperBilateral, 'upper')
+
+    def test_func_transform_bilateral_multivalue(self):
+        class UpperBilateral(Upper):
+            bilateral = True
+
+        try:
+            CharField.register_lookup(UpperBilateral, 'upper')
+            Author.objects.create(name='John Smith', alias='smithj')
+            Author.objects.create(name='Rhonda')
+            authors = Author.objects.filter(name__upper__in=['john smith', 'rhonda'])
+            self.assertQuerysetEqual(
+                authors.order_by('name'), [
+                    'John Smith',
+                    'Rhonda',
+                ],
+                lambda a: a.name
+            )
+        finally:
+            CharField._unregister_lookup(UpperBilateral, 'upper')
+
+    def test_function_as_filter(self):
+        Author.objects.create(name='John Smith', alias='SMITHJ')
+        Author.objects.create(name='Rhonda')
+        self.assertQuerysetEqual(
+            Author.objects.filter(alias=Upper(V('smithj'))),
+            ['John Smith'], lambda x: x.name
+        )
+        self.assertQuerysetEqual(
+            Author.objects.exclude(alias=Upper(V('smithj'))),
+            ['Rhonda'], lambda x: x.name
+        )

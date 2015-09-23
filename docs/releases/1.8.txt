@@ -702,6 +702,9 @@ Assigning unsaved objects to relations raises an error
         ...
         ValueError: save() prohibited to prevent data loss due to unsaved related object 'author'.
 
+    A similar check on assignment to reverse one-to-one relations was removed
+    in Django 1.8.5.
+
 Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, and
 :class:`~django.db.models.OneToOneField` now raises a :exc:`ValueError`.

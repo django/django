@@ -286,9 +286,29 @@ of the method to be decorated as the keyword argument ``name``::
     class ProtectedView(TemplateView):
         template_name = 'secret.html'
 
+If you have a set of common decorators used in several places, you can define
+a list or tuple of decorators and use this instead of invoking
+``method_decorator()`` multiple times. These two classes are equivalent::
+
+    decorators = [never_cache, login_required]
+
+    @method_decorator(decorators, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+    @method_decorator(never_cache, name='dispatch')
+    @method_decorator(login_required, name='dispatch')
+    class ProtectedView(TemplateView):
+        template_name = 'secret.html'
+
+The decorators will process a request in the order they are passed to the
+decorator. In the example, ``never_cache()`` will process the request before
+``login_required()``.
+
 .. versionchanged:: 1.9
 
-    The ability to use ``method_decorator()`` on a class was added.
+    The ability to use ``method_decorator()`` on a class and the ability for
+    it to accept a list or tuple of decorators were added.
 
 In this example, every instance of ``ProtectedView`` will have login protection.
 

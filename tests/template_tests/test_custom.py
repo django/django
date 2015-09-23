@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+from unittest import skipUnless
 
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
@@ -380,3 +381,9 @@ class TemplateTagLoadingTests(SimpleTestCase):
                 'working_egg': 'tagsegg.templatetags.working_egg',
             })
             engine.from_string(ttext)
+
+    @skipUnless(six.PY3, "Python 3 only -- Python 2 doesn't have annotations.")
+    def test_load_annotated_function(self):
+        Engine(libraries={
+            'annotated_tag_function': 'template_tests.annotated_tag_function',
+        })

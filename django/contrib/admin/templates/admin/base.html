@@ -12,7 +12,7 @@
 {% load i18n %}
 
 <body class="{% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %}"
-  data-admin-utc-offset="{% filter escapejs %}{% now "Z" %}{% endfilter %}">
+  data-admin-utc-offset="{% now "Z" %}">
 
 <!-- Container -->
 <div id="container">

@@ -329,7 +329,7 @@ class GenericRelationsTests(TestCase):
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse GFK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ManyRelatedObjectsDescriptor.__set__. Refs #19816.
+        # ManyToManyDescriptor.__set__. Refs #19816.
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         bacon.tags.create(tag="fatty")
         bacon.tags.create(tag="salty")

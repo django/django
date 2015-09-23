@@ -218,8 +218,8 @@ queries and parameters in the same way as :ref:`cursor.execute()
 <executing-custom-sql>`. These three operations are equivalent::
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
-    migrations.RunSQL(["INSERT INTO musician (name) VALUES ('Reinhardt');", None])
-    migrations.RunSQL(["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
@@ -228,8 +228,8 @@ The ``reverse_sql`` queries are executed when the migration is unapplied, so
 you can reverse the changes done in the forwards queries::
 
     migrations.RunSQL(
-        ["INSERT INTO musician (name) VALUES (%s);", ['Reinhardt']],
-        ["DELETE FROM musician where name=%s;", ['Reinhardt']],
+        [("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
+        [("DELETE FROM musician where name=%s;", ['Reinhardt'])],
     )
 
 The ``state_operations`` argument is so you can supply operations that are

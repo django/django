@@ -704,22 +704,12 @@ can use the "pyformat" parameter style, where placeholders in the query
 are given as ``'%(name)s'`` and the parameters are passed as a dictionary
 rather than a list. SQLite does not support this.
 
-.. _sqlite-connection-queries:
-
-Parameters not quoted in ``connection.queries``
------------------------------------------------
-
-``sqlite3`` does not provide a way to retrieve the SQL after quoting and
-substituting the parameters. Instead, the SQL in ``connection.queries`` is
-rebuilt with a simple string interpolation. It may be incorrect. Make sure
-you add quotes where necessary before copying a query into an SQLite shell.
-
 .. _oracle-notes:
 
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 11.1 and higher. Version
+Django supports `Oracle Database Server`_ versions 11.2 and higher. Version
 4.3.1 or higher of the `cx_Oracle`_ Python driver is required, although we
 recommend version 5.1.3 or later as these versions support Python 3.
 
@@ -775,13 +765,15 @@ for Django's own test suite.
 All of these privileges are included in the DBA role, which is appropriate
 for use on a private developer's database.
 
-The Oracle database backend uses the ``SYS.DBMS_LOB`` package, so your user
-will require execute permissions on it. It's normally accessible to all users
-by default, but in case it is not, you'll need to grant permissions like so:
+The Oracle database backend uses the ``SYS.DBMS_LOB`` and ``SYS.DBMS_RANDOM``
+packages, so your user will require execute permissions on it. It's normally
+accessible to all users by default, but in case it is not, you'll need to grant
+permissions like so:
 
 .. code-block:: sql
 
     GRANT EXECUTE ON SYS.DBMS_LOB TO user;
+    GRANT EXECUTE ON SYS.DBMS_RANDOM TO user;
 
 Connecting to the database
 --------------------------
@@ -905,10 +897,10 @@ some limitations on the usage of such LOB columns in general:
 
 * LOB columns may not be used in a ``SELECT DISTINCT`` list. This means that
   attempting to use the ``QuerySet.distinct`` method on a model that
-  includes ``TextField`` columns will result in an error when run against
-  Oracle. As a workaround, use the ``QuerySet.defer`` method in conjunction
-  with ``distinct()`` to prevent ``TextField`` columns from being included in
-  the ``SELECT DISTINCT`` list.
+  includes ``TextField`` columns will result in an ``ORA-00932`` error when
+  run against Oracle. As a workaround, use the ``QuerySet.defer`` method in
+  conjunction with ``distinct()`` to prevent ``TextField`` columns from being
+  included in the ``SELECT DISTINCT`` list.
 
 .. _third-party-notes:
 

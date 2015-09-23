@@ -9,12 +9,6 @@ class PostgresSimpleLookup(Lookup):
         return '%s %s %s' % (lhs, self.operator, rhs), params
 
 
-class FunctionTransform(Transform):
-    def as_sql(self, qn, connection):
-        lhs, params = qn.compile(self.lhs)
-        return "%s(%s)" % (self.function, lhs), params
-
-
 class DataContains(PostgresSimpleLookup):
     lookup_name = 'contains'
     operator = '@>'
@@ -45,7 +39,7 @@ class HasAnyKeys(PostgresSimpleLookup):
     operator = '?|'
 
 
-class Unaccent(FunctionTransform):
+class Unaccent(Transform):
     bilateral = True
     lookup_name = 'unaccent'
     function = 'UNACCENT'

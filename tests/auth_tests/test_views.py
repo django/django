@@ -174,6 +174,18 @@ class PasswordResetTest(AuthViewsTestCase):
         # default functionality is 100% the same
         self.assertFalse(mail.outbox[0].message().is_multipart())
 
+    def test_extra_email_context(self):
+        """
+        extra_email_context should be available in the email template context.
+        """
+        response = self.client.post(
+            '/password_reset_extra_email_context/',
+            {'email': 'staffmember@example.com'},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Email email context: "Hello!"', mail.outbox[0].body)
+
     def test_html_mail_template(self):
         """
         A multipart email with text/plain and text/html is sent

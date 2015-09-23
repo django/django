@@ -253,17 +253,23 @@ def quote_etag(etag):
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
 
-def same_origin(url1, url2):
+def is_same_domain(host, pattern):
     """
-    Checks if two URLs are 'same-origin'
+    Return ``True`` if the host is either an exact match or a match
+    to the wildcard pattern.
+
+    Any pattern beginning with a period matches a domain and all of its
+    subdomains. (e.g. ``.example.com`` matches ``example.com`` and
+    ``foo.example.com``). Anything else is an exact string match.
     """
-    p1, p2 = urlparse(url1), urlparse(url2)
-    try:
-        o1 = (p1.scheme, p1.hostname, p1.port or PROTOCOL_TO_PORT[p1.scheme])
-        o2 = (p2.scheme, p2.hostname, p2.port or PROTOCOL_TO_PORT[p2.scheme])
-        return o1 == o2
-    except (ValueError, KeyError):
+    if not pattern:
         return False
+
+    pattern = pattern.lower()
+    return (
+        pattern[0] == '.' and (host.endswith(pattern) or host == pattern[1:]) or
+        pattern == host
+    )
 
 
 def is_safe_url(url, host=None):

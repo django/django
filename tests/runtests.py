@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import atexit
+import copy
 import logging
 import os
 import shutil
@@ -154,7 +155,7 @@ def setup(verbosity, test_labels, parallel):
         'contenttypes': 'contenttypes_tests.migrations',
         'sessions': 'sessions_tests.migrations',
     }
-    log_config = DEFAULT_LOGGING
+    log_config = copy.deepcopy(DEFAULT_LOGGING)
     # Filter out non-error logging so we don't have to capture it in lots of
     # tests.
     log_config['loggers']['django']['level'] = 'ERROR'

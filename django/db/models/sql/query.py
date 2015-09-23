@@ -8,7 +8,7 @@ all about the internals of models in order to get the information it needs.
 """
 import copy
 import warnings
-from collections import Iterator, Mapping, OrderedDict
+from collections import Counter, Iterator, Mapping, OrderedDict
 from itertools import chain, count, product
 from string import ascii_uppercase
 
@@ -1105,9 +1105,9 @@ class Query(object):
         Helper method for build_lookup. Tries to fetch and initialize
         a transform for name parameter from lhs.
         """
-        next = lhs.get_transform(name)
-        if next:
-            return next(lhs, rest_of_lookups)
+        transform_class = lhs.get_transform(name)
+        if transform_class:
+            return transform_class(lhs)
         else:
             raise FieldError(
                 "Unsupported lookup '%s' for %s or join on the field not "
@@ -2035,16 +2035,14 @@ class JoinPromoter(object):
         self.num_children = num_children
         # Maps of table alias to how many times it is seen as required for
         # inner and/or outer joins.
-        self.outer_votes = {}
-        self.inner_votes = {}
+        self.votes = Counter()
 
-    def add_votes(self, inner_votes):
+    def add_votes(self, votes):
         """
-        Add single vote per item to self.inner_votes. Parameter can be any
+        Add single vote per item to self.votes. Parameter can be any
         iterable.
         """
-        for voted in inner_votes:
-            self.inner_votes[voted] = self.inner_votes.get(voted, 0) + 1
+        self.votes.update(votes)
 
     def update_join_types(self, query):
         """
@@ -2057,7 +2055,7 @@ class JoinPromoter(object):
         to_demote = set()
         # The effective_connector is used so that NOT (a AND b) is treated
         # similarly to (a OR b) for join promotion.
-        for table, votes in self.inner_votes.items():
+        for table, votes in self.votes.items():
             # We must use outer joins in OR case when the join isn't contained
             # in all of the joins. Otherwise the INNER JOIN itself could remove
             # valid results. Consider the case where a model with rel_a and

@@ -88,8 +88,29 @@ class ArticlesFeed(TestRss2Feed):
         return Article.objects.all()
 
 
-class TestEnclosureFeed(TestRss2Feed):
-    pass
+class TestSingleEnclosureRSSFeed(TestRss2Feed):
+    """
+    A feed to test that RSS feeds work with a single enclosure.
+    """
+    def item_enclosure_url(self, item):
+        return 'http://example.com'
+
+    def item_enclosure_size(self, item):
+        return 0
+
+    def item_mime_type(self, item):
+        return 'image/png'
+
+
+class TestMultipleEnclosureRSSFeed(TestRss2Feed):
+    """
+    A feed to test that RSS feeds raise an exception with multiple enclosures.
+    """
+    def item_enclosures(self, item):
+        return [
+            feedgenerator.Enclosure('http://example.com/hello.png', 0, 'image/png'),
+            feedgenerator.Enclosure('http://example.com/goodbye.png', 0, 'image/png'),
+        ]
 
 
 class TemplateFeed(TestRss2Feed):
@@ -165,3 +186,28 @@ class MyCustomAtom1Feed(feedgenerator.Atom1Feed):
 
 class TestCustomFeed(TestAtomFeed):
     feed_type = MyCustomAtom1Feed
+
+
+class TestSingleEnclosureAtomFeed(TestAtomFeed):
+    """
+    A feed to test that Atom feeds work with a single enclosure.
+    """
+    def item_enclosure_url(self, item):
+        return 'http://example.com'
+
+    def item_enclosure_size(self, item):
+        return 0
+
+    def item_mime_type(self, item):
+        return 'image/png'
+
+
+class TestMultipleEnclosureAtomFeed(TestAtomFeed):
+    """
+    A feed to test that Atom feeds work with multiple enclosures.
+    """
+    def item_enclosures(self, item):
+        return [
+            feedgenerator.Enclosure('http://example.com/hello.png', '0', 'image/png'),
+            feedgenerator.Enclosure('http://example.com/goodbye.png', '0', 'image/png'),
+        ]

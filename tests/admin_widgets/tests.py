@@ -884,6 +884,21 @@ class DateTimePickerShortcutsSeleniumIETests(DateTimePickerShortcutsSeleniumFire
     webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
 
 
+# The above tests run with Asia/Singapore which are on the positive side of
+# UTC. Here we test with a timezone on the negative side.
+@override_settings(TIME_ZONE='US/Eastern')
+class DateTimePickerAltTimezoneSeleniumFirefoxTests(DateTimePickerShortcutsSeleniumFirefoxTests):
+    pass
+
+
+class DateTimePickerAltTimezoneSeleniumChromeTests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
+
+
+class DateTimePickerAltTimezoneSeleniumIETests(DateTimePickerAltTimezoneSeleniumFirefoxTests):
+    webdriver_class = 'selenium.webdriver.ie.webdriver.WebDriver'
+
+
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF='admin_widgets.urls')
 class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriverTestCase):

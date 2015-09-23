@@ -80,6 +80,8 @@ Django's system checks are organized using the following tags:
 * ``compatibility``: Flagging potential problems with version upgrades.
 * ``security``: Checks security related configuration.
 * ``templates``: Checks template related configuration.
+* ``caches``: Checks cache related configuration.
+* ``urls``: Checks URL configuration.
 
 Some checks may be registered with multiple tags.
 
@@ -139,6 +141,7 @@ Fields
   human readable name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
+* **fields.E008**: Invalid ``default`` value.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values.
 * **fields.E120**: ``CharField``\s must define a ``max_length`` attribute.
@@ -569,3 +572,27 @@ configured:
 * **templates.E001**: You have ``'APP_DIRS': True`` in your
   :setting:`TEMPLATES` but also specify ``'loaders'`` in ``OPTIONS``. Either
   remove ``APP_DIRS`` or remove the ``'loaders'`` option.
+
+Caches
+------
+
+The following checks verify that your :setting:`CACHES` setting is correctly
+configured:
+
+* **caches.E001**: You must define a ``'default'`` cache in your
+  :setting:`CACHES` setting.
+
+URLs
+----
+
+The following checks are performed on your URL configuration:
+
+* **urls.W001**: Your URL pattern ``<pattern>`` uses
+  :func:`~django.conf.urls.include` with a ``regex`` ending with a
+  ``$``. Remove the dollar from the ``regex`` to avoid problems
+  including URLs.
+* **urls.W002**: Your URL pattern ``<pattern>`` has a ``regex``
+  beginning with a ``/``. Remove this slash as it is unnecessary.
+* **urls.W003**: Your URL pattern ``<pattern>`` has a ``name``
+  including a ``:``. Remove the colon, to avoid ambiguous namespace
+  references.

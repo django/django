@@ -36,3 +36,17 @@ Bugfixes
 * Changed ``Count`` queries to execute ``COUNT(*)`` instead of ``COUNT('*')``
   as versions of Django before 1.8 did (:ticket:`25377`). This may fix a
   performance regression on some databases.
+
+* Fixed custom queryset chaining with ``values()`` and ``values_list()``
+  (:ticket:`20625`).
+
+* Moved the :ref:`unsaved model instance assignment data loss check
+  <unsaved-model-instance-check-18>` on reverse relations to ``Model.save()``
+  (:ticket:`25160`).
+
+* Readded inline foreign keys to form instances when validating model formsets
+  (:ticket:`25431`).
+
+* Allowed using ORM write methods after disabling autocommit with
+  :func:`set_autocommit(False) <django.db.transaction.set_autocommit>`
+  (:ticket:`24921`).

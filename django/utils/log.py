@@ -42,6 +42,7 @@ DEFAULT_LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console', 'mail_admins'],
+            'level': 'INFO',
         },
         'py.warnings': {
             'handlers': ['console'],

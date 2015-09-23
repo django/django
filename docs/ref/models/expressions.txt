@@ -5,10 +5,14 @@ Query Expressions
 .. currentmodule:: django.db.models
 
 Query expressions describe a value or a computation that can be used as part of
-a filter, order by, annotation, or aggregate. There are a number of built-in
-expressions (documented below) that can be used to help you write queries.
-Expressions can be combined, or in some cases nested, to form more complex
-computations.
+an update, create, filter, order by, annotation, or aggregate. There are a
+number of built-in expressions (documented below) that can be used to help you
+write queries. Expressions can be combined, or in some cases nested, to form
+more complex computations.
+
+.. versionchanged:: 1.9
+
+    Support for using expressions when creating new model instances was added.
 
 Supported arithmetic
 ====================
@@ -27,7 +31,7 @@ Some examples
 .. code-block:: python
 
     from django.db.models import F, Count
-    from django.db.models.functions import Length
+    from django.db.models.functions import Length, Upper, Value
 
     # Find companies that have more employees than chairs.
     Company.objects.filter(num_employees__gt=F('num_chairs'))
@@ -48,6 +52,13 @@ Some examples
     50
     >>> company.chairs_needed
     70
+
+    # Create a new company using expressions.
+    >>> company = Company.objects.create(name='Google', ticker=Upper(Value('goog')))
+    # Be sure to refresh it if you need to access the field.
+    >>> company.refresh_from_db()
+    >>> company.ticker
+    'GOOG'
 
     # Annotate models with an aggregated value. Both forms
     # below are equivalent.
@@ -122,6 +133,8 @@ and describe the operation.
    will need to be reloaded::
 
        reporter = Reporters.objects.get(pk=reporter.pk)
+       # Or, more succinctly:
+       reporter.refresh_from_db()
 
 As well as being used in operations on single instances as above, ``F()`` can
 be used on ``QuerySets`` of object instances, with ``update()``. This reduces
@@ -356,7 +369,10 @@ boolean, or string within an expression, you can wrap that value within a
 
 You will rarely need to use ``Value()`` directly. When you write the expression
 ``F('field') + 1``, Django implicitly wraps the ``1`` in a ``Value()``,
-allowing simple values to be used in more complex expressions.
+allowing simple values to be used in more complex expressions. You will need to
+use ``Value()`` when you want to pass a string to an expression. Most
+expressions interpret a string argument as the name of a field, like
+``Lower('name')``.
 
 The ``value`` argument describes the value to be included in the expression,
 such as ``1``, ``True``, or ``None``. Django knows how to convert these Python
