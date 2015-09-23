@@ -41,6 +41,13 @@ lower level APIs:
 Configuring an engine
 =====================
 
+If you are simply using the
+:class:`~django.template.backends.django.DjangoTemplates` backend, this
+probably isn't the documentation you're looking for. An instance of the
+``Engine`` class described below is accessible using the ``engine`` attribute
+of that backend and any attribute defaults mentioned below are overridden by
+what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
+
 .. class:: Engine(dirs=None, app_dirs=False, allowed_include_roots=None, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8')
 
     .. versionadded:: 1.8
