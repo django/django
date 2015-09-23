@@ -688,8 +688,8 @@ By default, Django configures the following logging:
 
 When :setting:`DEBUG` is ``True``:
 
-* The ``django`` catch-all logger sends all messages at the ``INFO`` level or
-  higher to the console. Django doesn't make any such logging calls at this
+* The ``django`` catch-all logger sends all messages at the ``WARNING`` level
+  or higher to the console. Django doesn't make any such logging calls at this
   time (all logging is at the ``DEBUG`` level or handled by the
   ``django.request`` and ``django.security`` loggers).
 
