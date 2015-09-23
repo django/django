@@ -197,7 +197,7 @@ class MultiPartParser(object):
                         data = field_stream.read(size=read_size)
                         self._data_size += len(data)
 
-                    # We add 2 here to make the check consistent with the GET
+                    # We add 2 here to make the check consistent with the x-www-form-urlencoded
                     # check that also includes '&='
                     self._data_size += len(field_name) + 2
                     if (settings.DATA_UPLOAD_MAX_MEMORY_SIZE is not None and
