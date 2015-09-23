@@ -13,8 +13,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist, ValidationError,
 )
 from django.db import (
-    DEFAULT_DB_ALIAS, DJANGO_VERSION_PICKLE_KEY, DatabaseError, connections,
-    router, transaction,
+    DEFAULT_DB_ALIAS, DatabaseError, connections, router, transaction,
 )
 from django.db.models import signals
 from django.db.models.constants import LOOKUP_SEP
@@ -491,11 +490,10 @@ class Model(six.with_metaclass(ModelBase)):
         need to do things manually, as they're dynamically created classes and
         only module-level classes can be pickled by the default path.
         """
-        data = self.__dict__
-        data[DJANGO_VERSION_PICKLE_KEY] = get_version()
+        pickled_version = get_version()
         if not self._deferred:
             class_id = self._meta.app_label, self._meta.object_name
-            return model_unpickle, (class_id, [], simple_class_factory), data
+            return model_unpickle, (class_id, [], simple_class_factory, pickled_version), self.__dict__
         defers = []
         for field in self._meta.fields:
             if isinstance(self.__class__.__dict__.get(field.attname),
@@ -503,24 +501,7 @@ class Model(six.with_metaclass(ModelBase)):
                 defers.append(field.attname)
         model = self._meta.proxy_for_model
         class_id = model._meta.app_label, model._meta.object_name
-        return (model_unpickle, (class_id, defers, deferred_class_factory), data)
-
-    def __setstate__(self, state):
-        msg = None
-        pickled_version = state.get(DJANGO_VERSION_PICKLE_KEY)
-        if pickled_version:
-            current_version = get_version()
-            if current_version != pickled_version:
-                msg = ("Pickled model instance's Django version %s does"
-                    " not match the current version %s."
-                    % (pickled_version, current_version))
-        else:
-            msg = "Pickled model instance's Django version is not specified."
-
-        if msg:
-            warnings.warn(msg, RuntimeWarning, stacklevel=2)
-
-        self.__dict__.update(state)
+        return (model_unpickle, (class_id, defers, deferred_class_factory, pickled_version), self.__dict__)
 
     def _get_pk_val(self, meta=None):
         if not meta:
@@ -1689,10 +1670,23 @@ def simple_class_factory(model, attrs):
     return model
 
 
-def model_unpickle(model_id, attrs, factory):
+def model_unpickle(model_id, attrs, factory, pickled_version=None):
     """
     Used to unpickle Model subclasses with deferred fields.
     """
+    msg = None
+    if pickled_version:
+        current_version = get_version()
+        if current_version != pickled_version:
+            msg = ("Pickled model instance's Django version %s does"
+                   " not match the current version %s."
+                   % (pickled_version, current_version))
+    else:
+        msg = "Pickled model instance's Django version is not specified."
+
+    if msg:
+        warnings.warn(msg, RuntimeWarning, stacklevel=2)
+
     if isinstance(model_id, tuple):
         if not apps.ready:
             apps.populate(settings.INSTALLED_APPS)
