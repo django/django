@@ -37,7 +37,7 @@ a.section:link, a.section:visited {
     text-decoration: none;
 }
 
-a.section:link:focus, a.section:hover {
+a.section:focus, a.section:hover {
     text-decoration: underline;
 }
 
