@@ -1180,13 +1180,57 @@ documentation <custom-template-loaders>`.
 Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The instance namespace part of passing a tuple as the first argument has been
-replaced by passing the ``namespace`` argument to ``include()``. The
-``app_name`` argument to ``include()`` has been replaced by passing a 2-tuple,
-or passing an object or module with an ``app_name`` attribute.
+The instance namespace part of passing a tuple as an argument to ``include()``
+has been replaced by passing the ``namespace`` argument to ``include()``. For
+example::
 
-If the ``app_name`` is set in this new way, the ``namespace`` argument is no
-longer required. It will default to the value of ``app_name``.
+    polls_patterns = [
+         url(...),
+    ]
+
+    urlpatterns = [
+        url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
+    ]
+
+becomes::
+
+    polls_patterns = ([
+         url(...),
+    ], 'polls')  # 'polls' is the app_name
+
+    urlpatterns = [
+        url(r'^polls/', include(polls_patterns, namespace='author-polls')),
+    ]
+
+The ``app_name`` argument to ``include()`` has been replaced by passing a
+2-tuple (as above), or passing an object or module with an ``app_name``
+attribute (as below). If the ``app_name`` is set in this new way, the
+``namespace`` argument is no longer required. It will default to the value of
+``app_name``. For example, the URL patterns in the tutorial are changed from:
+
+.. snippet::
+    :filename: mysite/urls.py
+
+    urlpatterns = [
+        url(r'^polls/', include('polls.urls', namespace="polls")),
+        ...
+    ]
+
+to:
+
+.. snippet::
+    :filename: mysite/urls.py
+
+    urlpatterns = [
+        url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
+        ...
+    ]
+
+.. snippet::
+    :filename: polls/urls.py
+
+    app_name = 'polls'  # added
+    urlpatterns = [...]
 
 This change also means that the old way of including an ``AdminSite`` instance
 is deprecated. Instead, pass ``admin.site.urls`` directly to
