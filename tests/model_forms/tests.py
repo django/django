@@ -1885,6 +1885,19 @@ class FileAndImageFieldTests(TestCase):
         self.assertIn('something.txt', rendered)
         self.assertIn('myfile-clear', rendered)
 
+    def test_render_empty_file_field(self):
+        class DocumentForm(forms.ModelForm):
+            class Meta:
+                model = Document
+                fields = '__all__'
+
+        doc = Document.objects.create()
+        form = DocumentForm(instance=doc)
+        self.assertEqual(
+            str(form['myfile']),
+            '<input id="id_myfile" name="myfile" type="file" />'
+        )
+
     def test_file_field_data(self):
         # Test conditions when files is either not given or empty.
         f = TextFileForm(data={'description': 'Assistance'})
