@@ -87,14 +87,20 @@ class GISLookup(Lookup):
         rhs = connection.ops.get_geom_placeholder(self.lhs.output_field, geom, compiler)
         return rhs, rhs_params
 
+    def get_rhs_op(self, connection, rhs):
+        # Unlike BuiltinLookup, the GIS get_rhs_op() implementation should return
+        # an object (SpatialOperator) with an as_sql() method to allow for more
+        # complex computations (where the lhs part can be mixed in).
+        return connection.ops.gis_operators[self.lookup_name]
+
     def as_sql(self, compiler, connection):
         lhs_sql, sql_params = self.process_lhs(compiler, connection)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         sql_params.extend(rhs_params)
 
         template_params = {'lhs': lhs_sql, 'rhs': rhs_sql}
-        backend_op = connection.ops.gis_operators[self.lookup_name]
-        return backend_op.as_sql(connection, self, template_params, sql_params)
+        rhs_op = self.get_rhs_op(connection, rhs_sql)
+        return rhs_op.as_sql(connection, self, template_params, sql_params)
 
 
 # ------------------
