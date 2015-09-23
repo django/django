@@ -790,7 +790,7 @@ For each field, we describe the default widget used if you don't specify
     The ``invalid_choice`` error message may contain ``%(value)s``, which will be
     replaced with the selected choice.
 
-    Takes one extra required argument, ``choices``, as for ``ChoiceField``.
+    Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
 
 ``TypedMultipleChoiceField``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -811,7 +811,8 @@ For each field, we describe the default widget used if you don't specify
     The ``invalid_choice`` error message may contain ``%(value)s``, which will be
     replaced with the selected choice.
 
-    Takes two extra arguments, ``coerce`` and ``empty_value``, as for ``TypedChoiceField``.
+    Takes two extra arguments, ``coerce`` and ``empty_value``, as for
+    :class:`TypedChoiceField`.
 
 ``NullBooleanField``
 ~~~~~~~~~~~~~~~~~~~~
@@ -843,7 +844,7 @@ For each field, we describe the default widget used if you don't specify
         expression object.
 
     Also takes ``max_length``, ``min_length``, and ``strip``, which work just
-    as they do for ``CharField``.
+    as they do for :class:`CharField`.
 
     .. attribute:: strip
 
@@ -1076,7 +1077,7 @@ Slightly complex built-in ``Field`` classes
         ``datetime.date`` object.
 
     If no ``input_date_formats`` argument is provided, the default input formats
-    for ``DateField`` are used.
+    for :class:`DateField` are used.
 
     .. attribute:: input_time_formats
 
@@ -1084,7 +1085,7 @@ Slightly complex built-in ``Field`` classes
         ``datetime.time`` object.
 
     If no ``input_time_formats`` argument is provided, the default input formats
-    for ``TimeField`` are used.
+    for :class:`TimeField` are used.
 
 Fields which handle relationships
 ---------------------------------
