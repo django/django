@@ -88,7 +88,7 @@ Set the place back again, using assignment in the reverse direction::
     <Restaurant: Demon Dogs the restaurant>
 
 Note that you must save an object before it can be assigned to a one-to-one
-relationship. For example, creating an ``Restaurant`` with unsaved ``Place``
+relationship. For example, creating a ``Restaurant`` with unsaved ``Place``
 raises ``ValueError``::
 
     >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
