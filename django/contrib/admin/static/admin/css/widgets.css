@@ -106,7 +106,7 @@
     background: url(../img/selector-icons.svg) 0 -96px no-repeat;
 }
 
-.selector-add:focus, .selector-add:hover {
+.active.selector-add:focus, .active.selector-add:hover {
     background-position: 0 -112px;
 }
 
@@ -114,7 +114,7 @@
     background: url(../img/selector-icons.svg) 0 -64px no-repeat;
 }
 
-.selector-remove:focus, .selector-remove:hover {
+.active.selector-remove:focus, .active.selector-remove:hover {
     background-position: 0 -80px;
 }
 
@@ -131,8 +131,8 @@ a.selector-chooseall, a.selector-clearall {
     opacity: 0.3;
 }
 
-a.selector-chooseall:focus, a.selector-clearall:focus,
-a.selector-chooseall:hover, a.selector-clearall:hover {
+a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
+a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
     color: #447e9b;
 }
 
@@ -150,7 +150,7 @@ a.selector-chooseall {
     cursor: default;
 }
 
-a.selector-chooseall:focus, a.selector-chooseall:hover {
+a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
@@ -160,7 +160,7 @@ a.selector-clearall {
     cursor: default;
 }
 
-a.selector-clearall:focus, a.selector-clearall:hover {
+a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
