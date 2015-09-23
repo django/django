@@ -818,12 +818,12 @@ Maximum size of a request body is now limited
 The new :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` setting limits the size that a
 request body may be before a
 :exc:`~django.core.exceptions.SuspiciousOperation` is raised. File uploads do
-not count towards this limit. Since frontend servers typically do not do deep
+not count towards this limit. Since web servers typically do not do deep
 request inspection it's not possible to limit there the amount of data Django
 would have to process excluding file uploads. This amount of data is directly
 correlated to the amount of memory needed to process the request and populate
 the GET and POST dictionaries. As such, it could be used as an attack vector
-if left unchecked. Instalations that are supposed to receive form posts with
+if left unchecked. Installations that are supposed to receive form posts with
 large values should review the default value of this setting.
 
 Maximum number of form parameters is now limited
@@ -831,7 +831,7 @@ Maximum number of form parameters is now limited
 
 The new :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` setting limits the number of
 form fields parsed before a
-:exc:`~django.core.exceptions.SuspiciousOperation` is raised. Since frontend
+:exc:`~django.core.exceptions.SuspiciousOperation` is raised. Since web
 servers typically do not do deep request inspection it's not possible to limit
 there the amount of parameters Django would have to process. This number of
 parameters is directly correlated to the amount of time needed to process the
