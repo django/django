@@ -153,7 +153,7 @@ class Command(BaseCommand):
                     try:
                         validate_password(password2, self.UserModel(**fake_user_data))
                     except exceptions.ValidationError as err:
-                        self.stderr.write(', '.join(err.messages))
+                        self.stderr.write('\n'.join(err.messages))
                         password = None
 
             except KeyboardInterrupt:

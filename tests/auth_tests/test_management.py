@@ -160,7 +160,7 @@ class ChangepasswordManagementCommandTestCase(TestCase):
         abort_msg = "Aborting password change for user 'joe' after 3 attempts"
         with self.assertRaisesMessage(CommandError, abort_msg):
             command.execute(username="joe", stdout=self.stdout, stderr=self.stderr)
-        self.assertIn('This password is entirely numeric.', self.stdout.getvalue())
+        self.assertIn('This password is entirely numeric.', self.stderr.getvalue())
 
     def test_that_changepassword_command_works_with_nonascii_output(self):
         """
