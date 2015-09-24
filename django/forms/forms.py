@@ -8,6 +8,8 @@ import copy
 from collections import OrderedDict
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+# BoundField is imported for backwards compatibility in Django 1.9
+from django.forms.boundfield import BoundField  # NOQA
 from django.forms.fields import Field, FileField
 # pretty_name is imported for backwards compatibility in Django 1.9
 from django.forms.utils import ErrorDict, ErrorList, pretty_name  # NOQA
