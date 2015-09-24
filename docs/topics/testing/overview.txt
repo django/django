@@ -46,6 +46,17 @@ automatically build a test suite out of those test cases, and run that suite.
 
 For more details about :mod:`unittest`, see the Python documentation.
 
+.. admonition:: Where should the tests live?
+
+    The default :djadmin:`startapp` template creates a ``tests.py`` file in the
+    new application. This might be fine if you only have a few tests, but as
+    your test suite grows you'll likely want to restructure it into a tests
+    package so you can split your tests into different submodules such as
+    ``test_models.py``, ``test_views.py``, ``test_forms.py``, etc. Feel free to
+    pick whatever organizational scheme you like.
+
+    See also :ref:`testing-reusable-applications`.
+
 .. warning::
 
     If your tests rely on database access such as creating or querying models,
@@ -59,7 +70,6 @@ For more details about :mod:`unittest`, see the Python documentation.
     isolation but fail when run in a suite.
 
 .. _running-tests:
-
 
 Running tests
 =============
