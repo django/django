@@ -162,13 +162,11 @@ class Engine(object):
             template = Template(template, origin, template_name, engine=self)
         return template
 
-    # This method was originally a function defined in django.template.loader.
-    # It was moved here in Django 1.8 when encapsulating the Django template
-    # engine in this Engine class. It's still called by deprecated code but it
-    # will be removed in Django 1.10. It's superseded by a new render_to_string
-    # function in django.template.loader.
-
     def render_to_string(self, template_name, context=None):
+        """
+        Render the template specified by template_name with the given context.
+        For use in Django's test suite.
+        """
         if isinstance(template_name, (list, tuple)):
             t = self.select_template(template_name)
         else:
