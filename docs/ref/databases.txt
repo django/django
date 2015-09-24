@@ -626,7 +626,7 @@ SQLite 3.6.23.1 was released in March 2010, and most current binary
 distributions for different platforms include a newer version of SQLite, with
 the notable exception of the Python 2.7 installers for Windows.
 
-As of this writing, the latest release for Windows - Python 2.7.9 - includes
+As of this writing, the latest release for Windows - Python 2.7.10 - includes
 SQLite 3.6.21. You can install ``pysqlite2`` or replace ``sqlite3.dll`` (by
 default installed in ``C:\Python27\DLLs``) with a newer version from
 http://www.sqlite.org/ to remedy this issue.
