@@ -256,6 +256,21 @@ If a function, attribute, etc. is added, it's also okay to use a
 We can simply remove the ``.. versionadded:: A.B`` annotation without any
 indentation changes when the time comes.
 
+Minimizing images
+-----------------
+
+Optimize image compression where possible. For PNG files, use OptiPNG and
+AdvanceCOMP's ``advpng``:
+
+.. code-block:: console
+
+   $ cd docs/
+   $ optipng -o7 -zm1-9 -i0 -strip all `find . -type f -not -path "./_build/*" -name "*.png"`
+   $ advpng -z4 `find . -type f -not -path "./_build/*" -name "*.png"`
+
+This is based on OptiPNG version 0.7.5. Older versions may complain about the
+``--strip all`` option being lossy.
+
 An example
 ----------
 
