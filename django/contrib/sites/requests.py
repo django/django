@@ -14,6 +14,7 @@ class RequestSite(object):
     """
     def __init__(self, request):
         self.domain = self.name = request.get_host()
+        self.urlconf = ''
 
     def __str__(self):
         return self.domain

@@ -164,7 +164,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             ['fixtures.Category', 'sites'],
             '[{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
             '"News Stories"}}, {"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": '
-            '"example.com"}}]'
+            '"example.com", "urlconf": ""}}]'
         )
 
         # Load fixture 2. JSON file imported by default. Overwrites some existing objects
@@ -334,24 +334,25 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         # Excluding fixtures app should only leave sites
         self._dumpdata_assert(
             ['sites', 'fixtures'],
-            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}]',
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com", '
+            '"urlconf": ""}}]',
             exclude_list=['fixtures'])
 
         # Excluding fixtures.Article/Book should leave fixtures.Category
         self._dumpdata_assert(
             ['sites', 'fixtures'],
-            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, '
-            '{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
-            '"News Stories"}}]',
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com", '
+            '"urlconf": ""}}, {"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news '
+            'stories", "title": "News Stories"}}]',
             exclude_list=['fixtures.Article', 'fixtures.Book']
         )
 
         # Excluding fixtures and fixtures.Article/Book should be a no-op
         self._dumpdata_assert(
             ['sites', 'fixtures'],
-            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com"}}, '
-            '{"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news stories", "title": '
-            '"News Stories"}}]',
+            '[{"pk": 1, "model": "sites.site", "fields": {"domain": "example.com", "name": "example.com", '
+            '"urlconf": ""}}, {"pk": 1, "model": "fixtures.category", "fields": {"description": "Latest news '
+            'stories", "title": "News Stories"}}]',
             exclude_list=['fixtures.Article', 'fixtures.Book']
         )
 

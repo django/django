@@ -33,6 +33,14 @@ The sites framework is mainly based on a simple model:
 
         A human-readable "verbose" name for the Web site.
 
+    .. attribute:: urlconf
+
+        .. versionadded:: 1.9
+
+        A dotted module path pointing to a URLconf to use for the
+        current site as determined by the
+        :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`.
+
 The :setting:`SITE_ID` setting specifies the database ID of the
 :class:`~django.contrib.sites.models.Site` object associated with that
 particular settings file. If the setting is omitted, the
@@ -407,6 +415,11 @@ there is simple way to avoid repetitions. Add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
 :setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
 every request object, so you can use ``request.site`` to get the current site.
+
+The middleware will also set ``request.urlconf`` using the value
+stored in :attr:`~django.contrib.sites.models.Site.urlconf` allowing for
+per-site configuration of URLconf. If the attribute is blank, the
+:setting:`ROOT_URLCONF` setting will be used as normal.
 
 How Django uses the sites framework
 ===================================

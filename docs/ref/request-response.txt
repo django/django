@@ -198,6 +198,11 @@ All attributes should be considered read-only, unless stated otherwise below.
         Setting ``urlconf=None`` raised
         :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
 
+        ``urlconf`` can also be set automatically for the current site by
+        assigning a value to :attr:`Site.urlconf
+        <django.contrib.sites.models.Site.urlconf>` and activating the
+        :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`.
+
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing

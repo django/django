@@ -11,6 +11,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest
+from django.template import engines
+from django.template.response import TemplateResponse
 from django.test import TestCase, modify_settings, override_settings
 from django.test.utils import captured_stdout
 
@@ -263,11 +265,69 @@ class CreateDefaultSiteTests(TestCase):
         self.assertEqual(Site.objects.get().pk, 1)
 
 
+@modify_settings(INSTALLED_APPS={'append': 'django.contrib.sites'})
 class MiddlewareTest(TestCase):
 
-    def test_request(self):
-        """ Makes sure that the request has correct `site` attribute. """
+    def tearDown(self):
+        Site.objects.clear_cache()
+
+    def test_request_site(self):
+        """ Makes sure that the request has a correct `site` attribute. """
         middleware = CurrentSiteMiddleware()
         request = HttpRequest()
+
+        # Attribute should not exist before processing request:
+        self.assertFalse(hasattr(request, 'site'))
+
+        # Attribute should be of type Site after processing request:
         middleware.process_request(request)
+        self.assertIsInstance(request.site, Site)
         self.assertEqual(request.site.id, settings.SITE_ID)
+
+        # Attribute should be of type RequestSite after processing request:
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
+            request = HttpRequest()
+            request.META = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+            middleware.process_request(request)
+            self.assertIsInstance(request.site, RequestSite)
+
+    def test_request_urlconf(self):
+        """ Makes sure that the request has a correct `urlconf` attribute. """
+        middleware = CurrentSiteMiddleware()
+
+        Site.objects.create(
+            pk=999,
+            domain='example.net',
+            name='example.net',
+            urlconf='special.urls',
+        )
+
+        def process():
+            request = HttpRequest()
+            request.META = {'SERVER_NAME': 'example.com', 'SERVER_PORT': '80'}
+            middleware.process_request(request)
+            template = engines['django'].from_string('This is a test')
+            response = TemplateResponse(request, template)
+            middleware.process_response(request, response)
+            return request, response
+
+        # Ensure urlconf attribute not added if blank attribute on Site:
+        request, response = process()
+        self.assertEqual(request.site.urlconf, '')
+        self.assertFalse(hasattr(request, 'urlconf'))
+        self.assertFalse(response.has_header('Vary'))
+
+        # Ensure urlconf attribute added if attribute not blank on Site:
+        with override_settings(SITE_ID=999):
+            request, response = process()
+            self.assertEqual(request.site.urlconf, 'special.urls')
+            self.assertEqual(request.site.urlconf, request.urlconf)
+            self.assertTrue(response.has_header('Vary'))
+            self.assertEqual(response['Vary'], 'Host')
+
+        # Ensure urlconf attribute not added for RequestSite:
+        with self.modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'}):
+            request, response = process()
+            self.assertEqual(request.site.urlconf, '')
+            self.assertFalse(hasattr(request, 'urlconf'))
+            self.assertFalse(response.has_header('Vary'))
