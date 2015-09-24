@@ -27,10 +27,6 @@ class Aggregate(Func):
         return c
 
     @property
-    def input_field(self):
-        return self.source_expressions[0]
-
-    @property
     def default_alias(self):
         expressions = self.get_source_expressions()
         if len(expressions) == 1 and hasattr(expressions[0], 'name'):
