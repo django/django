@@ -293,7 +293,7 @@ class ReverseOneToOneDescriptor(object):
             manager = self.related.related_model._base_manager
         return manager.db_manager(hints=hints).all()
 
-    def get_prefetch_queryset(self, instances, queryset=None):
+    def get_prefetch_queryset(self, instances, queryset=None, filter_on_instances=True):
         if queryset is None:
             queryset = self.get_queryset()
         queryset._add_hints(instance=instances[0])
@@ -790,7 +790,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-    
+
             if filter_on_instances:
                 query = {'%s__in' % self.query_field_name: instances}
                 queryset = queryset._next_is_sticky().filter(**query)
