@@ -790,8 +790,8 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-            
-            filter_on_instances:
+    
+            if filter_on_instances:
                 query = {'%s__in' % self.query_field_name: instances}
                 queryset = queryset._next_is_sticky().filter(**query)
 
