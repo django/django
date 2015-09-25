@@ -515,15 +515,12 @@ as there's no general notion of what it means to delete a form.
 ~~~~~~~~~~~~~~~~~~~~
 
 .. attribute:: BaseFormSet.can_delete_extra
+.. versionadded:: 1.10
 
 Default: ``True``
 
 While setting ``can_delete=True``, specifying ``can_delete_extra=False`` will
 remove the option to delete extra forms.
-
-.. versionadded:: 1.10
-
-    The ``can_delete_extra`` argument was added.
 
 Adding additional fields to a formset
 -------------------------------------

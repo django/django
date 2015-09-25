@@ -552,7 +552,6 @@ class FormsFormsetTestCase(SimpleTestCase):
             extra=2)
 
         # Instantiate formset and check DELETE fields do not exist
-
         formset = GenericFormFormset()
 
         self.assertEqual(len(formset), 2)
@@ -561,7 +560,6 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertNotIn('DELETE', formset.forms[1].fields)
 
         # Instantiate formset with initial data, check DELETE's do not exist
-
         formset = GenericFormFormset(initial=[{'foo': 'bar'}])
 
         self.assertEqual(len(formset), 3)
@@ -571,7 +569,6 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertNotIn('DELETE', formset.forms[2].fields)
 
         # Ensure validation behaviour of formsets works correctly
-
         formset = GenericFormFormset(data={
             'form-0-foo': 'bar',
             'form-0-DELETE': 'on',
@@ -582,7 +579,6 @@ class FormsFormsetTestCase(SimpleTestCase):
         }, initial=[{'foo': 'bar'}])
 
         # Check correct cleaned data from the formset
-
         self.assertEqual(formset.cleaned_data, [
             {'foo': 'bar', 'DELETE': True},
             {'foo': 'baz'},
@@ -590,7 +586,6 @@ class FormsFormsetTestCase(SimpleTestCase):
         ])
 
         # Ensure deletion flag is correctly detected by formset method
-
         self.assertTrue(formset._should_delete_form(formset.forms[0]))
         self.assertFalse(formset._should_delete_form(formset.forms[1]))
         self.assertFalse(formset._should_delete_form(formset.forms[2]))
