@@ -146,7 +146,7 @@ The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is adding a non-nullable field to a table and needs
-a default value to put into existing rows. It does not effect the behavior
+a default value to put into existing rows. It does not affect the behavior
 of setting defaults in the database directly - Django never sets database
 defaults and always applies them in the Django ORM code.
 
@@ -174,7 +174,7 @@ The ``preserve_default`` argument indicates whether the field's default
 value is permanent and should be baked into the project state (``True``),
 or if it is temporary and just for this migration (``False``) - usually
 because the migration is altering a nullable field to a non-nullable one and
-needs a default value to put into existing rows. It does not effect the
+needs a default value to put into existing rows. It does not affect the
 behavior of setting defaults in the database directly - Django never sets
 database defaults and always applies them in the Django ORM code.
 
