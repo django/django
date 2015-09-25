@@ -109,7 +109,7 @@ class ForwardManyToOneDescriptor(object):
             manager = self.field.remote_field.model._base_manager
         return manager.db_manager(hints=hints).all()
 
-    def get_prefetch_queryset(self, instances, queryset=None):
+    def get_prefetch_queryset(self, instances, queryset=None, filter_on_instances=True):
         if queryset is None:
             queryset = self.get_queryset()
         queryset._add_hints(instance=instances[0])
@@ -125,11 +125,12 @@ class ForwardManyToOneDescriptor(object):
         # (related_name ends with a '+'). Refs #21410.
         # The check for len(...) == 1 is a special case that allows the query
         # to be join-less and smaller. Refs #21760.
-        if self.field.remote_field.is_hidden() or len(self.field.foreign_related_fields) == 1:
-            query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
-        else:
-            query = {'%s__in' % self.field.related_query_name(): instances}
-        queryset = queryset.filter(**query)
+        if filter_on_instances:
+            if self.field.remote_field.is_hidden() or len(self.field.foreign_related_fields) == 1:
+                query = {'%s__in' % related_field.name: set(instance_attr(inst)[0] for inst in instances)}
+            else:
+                query = {'%s__in' % self.field.related_query_name(): instances}
+            queryset = queryset.filter(**query)
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -300,8 +301,9 @@ class ReverseOneToOneDescriptor(object):
         rel_obj_attr = attrgetter(self.related.field.attname)
         instance_attr = lambda obj: obj._get_pk_val()
         instances_dict = {instance_attr(inst): inst for inst in instances}
-        query = {'%s__in' % self.related.field.name: instances}
-        queryset = queryset.filter(**query)
+        if filter_on_instances:
+            query = {'%s__in' % self.related.field.name: instances}
+            queryset = queryset.filter(**query)
 
         # Since we're going to assign directly in the cache,
         # we must manage the reverse relation cache manually.
@@ -515,7 +517,7 @@ def create_reverse_many_to_one_manager(superclass, rel):
                 qs._known_related_objects = {self.field: {self.instance.pk: self.instance}}
                 return qs
 
-        def get_prefetch_queryset(self, instances, queryset=None):
+        def get_prefetch_queryset(self, instances, queryset=None, filter_on_instances=True):
             if queryset is None:
                 queryset = super(RelatedManager, self).get_queryset()
 
@@ -525,8 +527,9 @@ def create_reverse_many_to_one_manager(superclass, rel):
             rel_obj_attr = self.field.get_local_related_value
             instance_attr = self.field.get_foreign_related_value
             instances_dict = {instance_attr(inst): inst for inst in instances}
-            query = {'%s__in' % self.field.name: instances}
-            queryset = queryset.filter(**query)
+            if filter_on_instances:
+                query = {'%s__in' % self.field.name: instances}
+                queryset = queryset.filter(**query)
 
             # Since we just bypassed this class' get_queryset(), we must manage
             # the reverse relation manually.
@@ -781,15 +784,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                     qs = qs.using(self._db)
                 return qs._next_is_sticky().filter(**self.core_filters)
 
-        def get_prefetch_queryset(self, instances, queryset=None):
+        def get_prefetch_queryset(self, instances, queryset=None, filter_on_instances=True):
             if queryset is None:
                 queryset = super(ManyRelatedManager, self).get_queryset()
 
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
-
-            query = {'%s__in' % self.query_field_name: instances}
-            queryset = queryset._next_is_sticky().filter(**query)
+            
+            filter_on_instances:
+                query = {'%s__in' % self.query_field_name: instances}
+                queryset = queryset._next_is_sticky().filter(**query)
 
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
