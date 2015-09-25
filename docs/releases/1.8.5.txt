@@ -51,4 +51,4 @@ Bugfixes
   :func:`set_autocommit(False) <django.db.transaction.set_autocommit>`
   (:ticket:`24921`).
 
-* Fixed test --keepdb option on Oracle (:ticket:`25421`).
+* Fixed test :djadminopt:`--keepdb` option on Oracle (:ticket:`25421`).
