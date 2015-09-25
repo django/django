@@ -77,8 +77,7 @@ class DatabaseCreation(BaseDatabaseCreation):
             try:
                 self._create_test_user(cursor, parameters, verbosity, keepdb)
             except Exception as e:
-                # if we want to keep the db then we want also to keep user,
-                # then no need to do any of the below, just return and skip it all.
+                # if we want to keep the db then we want also to keep user
                 if keepdb:
                     return
                 sys.stderr.write("Got an error creating the test user: %s\n" % e)
@@ -201,14 +200,11 @@ class DatabaseCreation(BaseDatabaseCreation):
                REUSE AUTOEXTEND ON NEXT 10M MAXSIZE %(maxsize_tmp)s
             """,
         ]
-        try:
-            # Statement can fail when keepdb is on
-            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=keepdb)
-        except DatabaseError as err:
-            description = str(err)
+        acceptable_ora_err = None
+        if keepdb:
             # Avoid tablespace already exists error when keepdb is on
-            if 'ORA-01543' not in description or not keepdb:
-                raise
+            acceptable_ora_err = 'ORA-01543'
+        self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
 
     def _create_test_user(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
@@ -227,26 +223,14 @@ class DatabaseCreation(BaseDatabaseCreation):
                      CREATE TRIGGER
                TO %(user)s""",
         ]
-        try:
-            # Statement can fail when keepdb is on
-            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=keepdb)
-        except DatabaseError as err:
-            description = str(err)
+        acceptable_ora_err = None
+        if keepdb:
             # Avoid user already exists error when keepdb is on
-            if 'ORA-01920' not in description or not keepdb:
-                raise
-
+            acceptable_ora_err = 'ORA-01920'
+        self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"
-        try:
-            self._execute_statements(cursor, [extra], parameters, verbosity, allow_quiet_fail=True)
-        except DatabaseError as err:
-            description = str(err)
-            if 'ORA-01031' in description:
-                if verbosity >= 2:
-                    print("Failed to grant CREATE VIEW permission to test user. This may be ok.")
-            else:
-                raise
+        self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
@@ -276,6 +260,22 @@ class DatabaseCreation(BaseDatabaseCreation):
             except Exception as err:
                 if (not allow_quiet_fail) or verbosity >= 2:
                     sys.stderr.write("Failed (%s)\n" % (err))
+                raise
+
+    def _execute_allow_fail_statements(self, cursor, statements, parameters, verbosity, acceptable_ora_err):
+        """
+        Execute db statement, that can fail only when acceptacle db error is raised.
+        """
+        try:
+            # Statement can fail when acceptable_ora_err is not None
+            allow_quiet_fail = False
+            if acceptable_ora_err is not None and len(acceptable_ora_err) > 0:
+                allow_quiet_fail = True
+            self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=allow_quiet_fail)
+        except DatabaseError as err:
+            description = str(err)
+            if acceptable_ora_err is None or acceptable_ora_err not in description:
+                sys.stderr.write("Failed (%s)\n" % (description))
                 raise
 
     def _get_test_db_params(self):
