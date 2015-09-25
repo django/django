@@ -1318,7 +1318,7 @@ class Prefetch(object):
         self.to_attr = to_attr
         self.filter_on_instances = filter_on_instances
         if not self.filter_on_instances and not self.queryset:
-            raise AttributeError("Must specify 'queryset' when 'filter_on_instances' is False")
+            raise ValueError("Must specify 'queryset' when 'filter_on_instances' is False")
 
     def add_prefix(self, prefix):
         self.prefetch_through = LOOKUP_SEP.join([prefix, self.prefetch_through])
