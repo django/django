@@ -1306,7 +1306,7 @@ class RawQuerySet(object):
 
 
 class Prefetch(object):
-    def __init__(self, lookup, queryset=None, to_attr=None, filter_on_instances=False):
+    def __init__(self, lookup, queryset=None, to_attr=None, filter_on_instances=True):
         # `prefetch_through` is the path we traverse to perform the prefetch.
         self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
@@ -1317,8 +1317,8 @@ class Prefetch(object):
         self.queryset = queryset
         self.to_attr = to_attr
         self.filter_on_instances = filter_on_instances
-        if self.filter_on_instances and not self.queryset:
-            raise AttributeError("Must specify 'queryset' when 'filter_on_instances' is True")
+        if not self.filter_on_instances and not self.queryset:
+            raise AttributeError("Must specify 'queryset' when 'filter_on_instances' is False")
 
     def add_prefix(self, prefix):
         self.prefetch_through = LOOKUP_SEP.join([prefix, self.prefetch_through])
