@@ -68,6 +68,10 @@ class PasswordValidationTest(TestCase):
         self.assertEqual(help_text.count('<li>'), 2)
         self.assertIn('12 characters', help_text)
 
+    @override_settings(AUTH_PASSWORD_VALIDATORS=[])
+    def test_empty_password_validator_help_text_html(self):
+        self.assertEqual(password_validators_help_text_html(), '')
+
 
 class MinimumLengthValidatorTest(TestCase):
     def test_validate(self):
