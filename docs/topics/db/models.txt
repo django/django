@@ -756,9 +756,6 @@ You can override most of these -- see `overriding predefined model methods`_,
 below -- but there are a couple that you'll almost always want to define:
 
 :meth:`~Model.__str__` (Python 3)
-    Python 3 equivalent of ``__unicode__()``.
-
-:meth:`~Model.__unicode__` (Python 2)
     A Python "magic method" that returns a unicode "representation" of any
     object. This is what Python and Django will use whenever a model
     instance needs to be coerced and displayed as a plain string. Most
@@ -767,6 +764,9 @@ below -- but there are a couple that you'll almost always want to define:
 
     You'll always want to define this method; the default isn't very helpful
     at all.
+
+``__unicode__()`` (Python 2)
+    Python 2 equivalent of ``__str__()``.
 
 :meth:`~Model.get_absolute_url`
     This tells Django how to calculate the URL for an object. Django uses

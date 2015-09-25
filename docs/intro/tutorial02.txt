@@ -445,38 +445,24 @@ of this object. Let's fix that by editing the ``Question`` model (in the
     :filename: polls/models.py
 
     from django.db import models
+    from django.utils.encoding import python_2_unicode_compatible
 
+    @python_2_unicode_compatible  # only if you need to support Python 2
     class Question(models.Model):
         # ...
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.question_text
 
+    @python_2_unicode_compatible  # only if you need to support Python 2
     class Choice(models.Model):
         # ...
-        def __str__(self):              # __unicode__ on Python 2
+        def __str__(self):
             return self.choice_text
 
 It's important to add :meth:`~django.db.models.Model.__str__` methods to your
 models, not only for your own convenience when dealing with the interactive
 prompt, but also because objects' representations are used throughout Django's
 automatically-generated admin.
-
-.. admonition:: ``__str__`` or ``__unicode__``?
-
-    On Python 3, it's easy, just use
-    :meth:`~django.db.models.Model.__str__`.
-
-    On Python 2, you should define :meth:`~django.db.models.Model.__unicode__`
-    methods returning ``unicode`` values instead. Django models have a default
-    :meth:`~django.db.models.Model.__str__` method that calls
-    :meth:`~django.db.models.Model.__unicode__` and converts the result to a
-    UTF-8 bytestring. This means that ``unicode(p)`` will return a Unicode
-    string, and ``str(p)`` will return a bytestring, with characters encoded
-    as UTF-8. Python does the opposite: ``object`` has a ``__unicode__``
-    method that calls ``__str__`` and interprets the result as an ASCII
-    bytestring. This difference can create confusion.
-
-    If all of this is gibberish to you, just use Python 3.
 
 Note these are normal Python methods. Let's add a custom method, just for
 demonstration:
