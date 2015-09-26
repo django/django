@@ -25,11 +25,11 @@ from .models import (
     BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
     DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
     ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
-    FKDataNaturalKey, FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
+    FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
     FloatData, FloatPKData, GenericData, GenericIPAddressData,
     GenericIPAddressPKData, InheritAbstractModel, InheritBaseModel,
     IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
-    M2MIntermediateData, M2MSelfData, ModifyingSaveData, NaturalKeyAnchor,
+    M2MIntermediateData, M2MSelfData, ModifyingSaveData,
     NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
     PositiveSmallIntegerData, PositiveSmallIntegerPKData, ProxyBaseModel,
     ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
@@ -367,11 +367,6 @@ The end."""),
     (data_obj, 1005, LengthModel, 1),
 ]
 
-natural_key_test_data = [
-    (data_obj, 1100, NaturalKeyAnchor, "Natural Key Anghor"),
-    (fk_obj, 1101, FKDataNaturalKey, 1100),
-    (fk_obj, 1102, FKDataNaturalKey, None),
-]
 
 # Because Oracle treats the empty string as NULL, Oracle is expected to fail
 # when field.empty_strings_allowed is True and the value is None; skip these
@@ -390,9 +385,6 @@ if connection.features.allows_auto_pk_0:
         (data_obj, 0, Anchor, "Anchor 0"),
         (fk_obj, 465, FKData, 0),
     ])
-
-# Dynamically create serializer tests to ensure that all
-# registered serializers are automatically tested.
 
 
 @skipUnlessDBFeature('can_defer_constraint_checks')
@@ -465,36 +457,6 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 
-def naturalKeySerializerTest(format, self):
-    # Create all the objects defined in the test data
-    objects = []
-    instance_count = {}
-    for (func, pk, klass, datum) in natural_key_test_data:
-        with connection.constraint_checks_disabled():
-            objects.extend(func[0](pk, klass, datum))
-
-    # Get a count of the number of objects created for each class
-    for klass in instance_count:
-        instance_count[klass] = klass.objects.count()
-
-    # Serialize the test database
-    serialized_data = serializers.serialize(format, objects, indent=2,
-        use_natural_foreign_keys=True)
-
-    for obj in serializers.deserialize(format, serialized_data):
-        obj.save()
-
-    # Assert that the deserialized data is the same
-    # as the original source
-    for (func, pk, klass, datum) in natural_key_test_data:
-        func[1](self, pk, klass, datum)
-
-    # Assert that the number of objects deserialized is the
-    # same as the number that was serialized.
-    for klass, count in instance_count.items():
-        self.assertEqual(count, klass.objects.count())
-
-
 def fieldsTest(format, self):
     obj = ComplexModel(field1='first', field2='second', field3='third')
     obj.save_base(raw=True)
@@ -527,39 +489,9 @@ def streamTest(format, self):
             self.assertEqual(string_data, stream.content.decode('utf-8'))
 
 
-def naturalKeyTest(format, self):
-    book1 = {'data': '978-1590597255', 'title': 'The Definitive Guide to '
-             'Django: Web Development Done Right'}
-    book2 = {'data': '978-1590599969', 'title': 'Practical Django Projects'}
-
-    # Create the books.
-    adrian = NaturalKeyAnchor.objects.create(**book1)
-    james = NaturalKeyAnchor.objects.create(**book2)
-
-    # Serialize the books.
-    string_data = serializers.serialize(format, NaturalKeyAnchor.objects.all(),
-                                        indent=2, use_natural_foreign_keys=True,
-                                        use_natural_primary_keys=True)
-
-    # Delete one book (to prove that the natural key generation will only
-    # restore the primary keys of books found in the database via the
-    # get_natural_key manager method).
-    james.delete()
-
-    # Deserialize and test.
-    books = list(serializers.deserialize(format, string_data))
-    self.assertEqual(len(books), 2)
-    self.assertEqual(books[0].object.title, book1['title'])
-    self.assertEqual(books[0].object.pk, adrian.pk)
-    self.assertEqual(books[1].object.title, book2['title'])
-    self.assertEqual(books[1].object.pk, None)
-
-
 for format in [f for f in serializers.get_serializer_formats()
                if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
-    setattr(SerializerTests, 'test_' + format + '_natural_key_serializer', curry(naturalKeySerializerTest, format))
     setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
-    setattr(SerializerTests, 'test_' + format + '_serializer_natural_keys', curry(naturalKeyTest, format))
     if format != 'python':
         setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))

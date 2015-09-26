@@ -130,21 +130,6 @@ class Anchor(models.Model):
         ordering = ('id',)
 
 
-class NaturalKeyAnchorManager(models.Manager):
-    def get_by_natural_key(self, data):
-        return self.get(data=data)
-
-
-class NaturalKeyAnchor(models.Model):
-    objects = NaturalKeyAnchorManager()
-
-    data = models.CharField(max_length=100, unique=True)
-    title = models.CharField(max_length=100, null=True)
-
-    def natural_key(self):
-        return (self.data,)
-
-
 class UniqueAnchor(models.Model):
     """This is a model that can be used as
     something for other models to point at"""
@@ -154,10 +139,6 @@ class UniqueAnchor(models.Model):
 
 class FKData(models.Model):
     data = models.ForeignKey(Anchor, models.SET_NULL, null=True)
-
-
-class FKDataNaturalKey(models.Model):
-    data = models.ForeignKey(NaturalKeyAnchor, models.SET_NULL, null=True)
 
 
 class M2MData(models.Model):
