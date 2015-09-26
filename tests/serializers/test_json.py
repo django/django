@@ -6,7 +6,9 @@ import re
 
 from django.core import serializers
 from django.core.serializers.base import DeserializationError
-from django.test import TestCase, TransactionTestCase
+from django.core.serializers.json import DjangoJSONEncoder
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
+from django.utils.translation import override, ugettext_lazy
 
 from .models import Score
 from .tests import SerializersTestBase, SerializersTransactionTestBase
@@ -271,3 +273,16 @@ class JsonSerializerTransactionTestCase(SerializersTransactionTestBase, Transact
             "name": "Agnes"
         }
     }]"""
+
+
+class DjangoJSONEncoderTests(SimpleTestCase):
+    def test_lazy_string_encoding(self):
+        self.assertEqual(
+            json.dumps({'lang': ugettext_lazy("French")}, cls=DjangoJSONEncoder),
+            '{"lang": "French"}'
+        )
+        with override('fr'):
+            self.assertEqual(
+                json.dumps({'lang': ugettext_lazy("French")}, cls=DjangoJSONEncoder),
+                '{"lang": "Fran\\u00e7ais"}'
+            )

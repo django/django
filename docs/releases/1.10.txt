@@ -162,6 +162,12 @@ Requests and Responses
 
 * ...
 
+Serialization
+^^^^^^^^^^^^^
+
+* The ``django.core.serializers.json.DjangoJSONEncoder`` now knows how to
+  serialize lazy strings, typically used for translatable content.
+
 Signals
 ^^^^^^^
 
