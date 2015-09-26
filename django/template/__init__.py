@@ -58,7 +58,8 @@ from .exceptions import TemplateDoesNotExist, TemplateSyntaxError       # NOQA i
 
 # Template parts
 from .base import (                                                     # NOQA isort:skip
-    Context, Node, NodeList, Origin, RequestContext, Template, Variable,
+    Context, Node, NodeList, Origin, RequestContext, StringOrigin, Template,
+    Variable,
 )
 
 # Library management

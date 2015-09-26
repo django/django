@@ -1,4 +1,10 @@
+from django.utils import six
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInDjango20Warning,
+)
+
 from . import engines
+from .base import Origin
 from .exceptions import TemplateDoesNotExist
 
 
@@ -57,3 +63,8 @@ def render_to_string(template_name, context=None, request=None, using=None):
 
 def _engine_list(using=None):
     return engines.all() if using is None else [engines[using]]
+
+
+class LoaderOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+    alternative = 'django.template.Origin'
+    deprecation_warning = RemovedInDjango20Warning
