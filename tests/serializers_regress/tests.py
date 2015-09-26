@@ -14,7 +14,6 @@ import uuid
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import DeserializationError
 from django.db import connection, models
 from django.http import HttpResponse
 from django.test import TestCase, skipUnlessDBFeature
@@ -420,11 +419,6 @@ class SerializerTests(TestCase):
     def test_get_unknown_deserializer(self):
         with self.assertRaises(SerializerDoesNotExist):
             serializers.get_deserializer("nonsense")
-
-    def test_json_deserializer_exception(self):
-        with self.assertRaises(DeserializationError):
-            for obj in serializers.deserialize("json", """[{"pk":1}"""):
-                pass
 
     def test_serialize_proxy_model(self):
         BaseModel.objects.create(parent_data=1)
