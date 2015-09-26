@@ -818,7 +818,9 @@ debug as ``True``, an instance of ``django.template.loader.LoaderOrigin`` or
 ``django.template.base.StringOrigin`` was set as the origin attribute on the
 template object. These classes have been combined into
 :class:`~django.template.base.Origin` and is now always set regardless of the
-engine debug setting.
+engine debug setting. For a minimal level of backwards compatibility, the old
+class names will be kept as aliases to the new ``Origin`` class until
+Django 2.0.
 
 .. _default-logging-changes-19:
 
@@ -1334,6 +1336,10 @@ Miscellaneous
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` is
   deprecated. Use the new ``enclosures`` argument which accepts a list of
   ``Enclosure`` objects instead of a single one.
+
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` are deprecated.
 
 .. _removed-features-1.9:
 

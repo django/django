@@ -7,7 +7,9 @@ import warnings
 from django.test import SimpleTestCase
 from django.test.utils import reset_warning_registry
 from django.utils import six
-from django.utils.deprecation import RenameMethodsBase
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInNextVersionWarning, RenameMethodsBase,
+)
 from django.utils.encoding import force_text
 
 
@@ -197,3 +199,16 @@ class DeprecatingSimpleTestCaseUrls(unittest.TestCase):
                     "SimpleTestCase.urls is deprecated and will be removed in "
                     "Django 1.10. Use @override_settings(ROOT_URLCONF=...) "
                     "in TempTestCase instead.")
+
+
+class DeprecationInstanceCheckTest(SimpleTestCase):
+    def test_warning(self):
+        class Manager(six.with_metaclass(DeprecationInstanceCheck)):
+            alternative = 'fake.path.Foo'
+            deprecation_warning = RemovedInNextVersionWarning
+
+        msg = '`Manager` is deprecated, use `fake.path.Foo` instead.'
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', category=RemovedInNextVersionWarning)
+            with self.assertRaisesMessage(RemovedInNextVersionWarning, msg):
+                isinstance(object, Manager)

@@ -1,9 +1,14 @@
 import warnings
 
-from django.utils.deprecation import RemovedInDjango110Warning
+from django.utils import six
+from django.utils.deprecation import (
+    DeprecationInstanceCheck, RemovedInDjango20Warning,
+    RemovedInDjango110Warning,
+)
 
 from . import engines
 from .backends.django import DjangoTemplates
+from .base import Origin
 from .engine import (
     _context_instance_undefined, _dictionary_undefined, _dirs_undefined,
 )
@@ -147,3 +152,8 @@ class BaseLoader(base.Loader):
             "django.template.loaders.base.Loader.",
             RemovedInDjango110Warning, stacklevel=2)
         super(BaseLoader, self).__init__(*args, **kwargs)
+
+
+class LoaderOrigin(six.with_metaclass(DeprecationInstanceCheck, Origin)):
+    alternative = 'django.template.Origin'
+    deprecation_warning = RemovedInDjango20Warning

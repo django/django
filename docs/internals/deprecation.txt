@@ -100,6 +100,10 @@ details on these changes.
 * The ``enclosure`` keyword argument to ``SyndicationFeed.add_item()`` will be
   removed.
 
+* The ``django.template.loader.LoaderOrigin`` and
+  ``django.template.base.StringOrigin`` aliases for
+  ``django.template.base.Origin`` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
