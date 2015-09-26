@@ -230,7 +230,9 @@ class DatabaseCreation(BaseDatabaseCreation):
         self._execute_allow_fail_statements(cursor, statements, parameters, verbosity, acceptable_ora_err)
         # Most test-suites can be run without the create-view privilege. But some need it.
         extra = "GRANT CREATE VIEW TO %(user)s"
-        self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
+        result = self._execute_allow_fail_statements(cursor, [extra], parameters, verbosity, 'ORA-01031')
+        if not result and verbosity >= 2:
+            print("Failed to grant CREATE VIEW permission to test user. This may be ok.")
 
     def _execute_test_db_destruction(self, cursor, parameters, verbosity):
         if verbosity >= 2:
@@ -265,6 +267,7 @@ class DatabaseCreation(BaseDatabaseCreation):
     def _execute_allow_fail_statements(self, cursor, statements, parameters, verbosity, acceptable_ora_err):
         """
         Execute db statement, that can fail only when acceptacle db error is raised.
+        Return true if _execute_statements fail or false if _execute_statements end properly.
         """
         try:
             # Statement can fail when acceptable_ora_err is not None
@@ -272,11 +275,13 @@ class DatabaseCreation(BaseDatabaseCreation):
             if acceptable_ora_err is not None and len(acceptable_ora_err) > 0:
                 allow_quiet_fail = True
             self._execute_statements(cursor, statements, parameters, verbosity, allow_quiet_fail=allow_quiet_fail)
+            return True
         except DatabaseError as err:
             description = str(err)
             if acceptable_ora_err is None or acceptable_ora_err not in description:
                 sys.stderr.write("Failed (%s)\n" % (description))
                 raise
+            return False
 
     def _get_test_db_params(self):
         return {
