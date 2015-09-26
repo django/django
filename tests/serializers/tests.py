@@ -10,6 +10,7 @@ from django.test import (
     SimpleTestCase, mock, override_settings, skipUnlessDBFeature,
 )
 from django.test.utils import Approximate
+from django.utils.functional import curry
 from django.utils.six import StringIO
 
 from .models import (
@@ -317,3 +318,18 @@ class SerializersTransactionTestBase(object):
         art_obj = Article.objects.all()[0]
         self.assertEqual(art_obj.categories.all().count(), 1)
         self.assertEqual(art_obj.author.name, "Agnes")
+
+
+def register_tests(test_class, method_name, test_func, exclude=None):
+    """
+    Dynamically create serializer tests to ensure that all registered
+    serializers are automatically tested.
+    """
+    formats = [
+        f for f in serializers.get_serializer_formats()
+        if (not isinstance(serializers.get_serializer(f), serializers.BadSerializer)
+            and not f == 'geojson'
+            and (exclude is None or f not in exclude))
+    ]
+    for format_ in formats:
+        setattr(test_class, method_name % format_, curry(test_func, format_))
