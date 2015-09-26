@@ -159,6 +159,26 @@ class Player(models.Model):
         return '%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())
 
 
+class BaseModel(models.Model):
+    parent_data = models.IntegerField()
+
+
+class ProxyBaseModel(BaseModel):
+    class Meta:
+        proxy = True
+
+
+class ProxyProxyBaseModel(ProxyBaseModel):
+    class Meta:
+        proxy = True
+
+
+class ComplexModel(models.Model):
+    field1 = models.CharField(max_length=10)
+    field2 = models.CharField(max_length=10)
+    field3 = models.CharField(max_length=10)
+
+
 # ******** Models for test_natural.py ***********
 
 class NaturalKeyAnchorManager(models.Manager):

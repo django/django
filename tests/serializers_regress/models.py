@@ -261,11 +261,6 @@ class FKToUUID(models.Model):
     data = models.ForeignKey(UUIDData, models.CASCADE)
 
 
-class ComplexModel(models.Model):
-    field1 = models.CharField(max_length=10)
-    field2 = models.CharField(max_length=10)
-    field3 = models.CharField(max_length=10)
-
 # Tests for handling fields with pre_save functions, or
 # models with save functions that modify data
 
@@ -312,16 +307,6 @@ class InheritBaseModel(BaseModel):
 class ExplicitInheritBaseModel(BaseModel):
     parent = models.OneToOneField(BaseModel, models.CASCADE)
     child_data = models.IntegerField()
-
-
-class ProxyBaseModel(BaseModel):
-    class Meta:
-        proxy = True
-
-
-class ProxyProxyBaseModel(ProxyBaseModel):
-    class Meta:
-        proxy = True
 
 
 class LengthModel(models.Model):
