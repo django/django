@@ -13,16 +13,15 @@ import decimal
 import uuid
 
 from django.core import serializers
-from django.core.serializers import SerializerDoesNotExist
 from django.db import connection, models
 from django.http import HttpResponse
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase
 from django.utils import six
 from django.utils.functional import curry
 
 from .models import (
-    Anchor, AutoNowDateTimeData, BaseModel, BigIntegerData, BinaryData,
-    BooleanData, BooleanPKData, CharData, CharPKData, ComplexModel, DateData,
+    Anchor, AutoNowDateTimeData, BigIntegerData, BinaryData,
+    BooleanData, BooleanPKData, CharData, CharPKData, DateData,
     DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
     ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
     FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
@@ -31,9 +30,8 @@ from .models import (
     IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
     M2MIntermediateData, M2MSelfData, ModifyingSaveData,
     NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
-    PositiveSmallIntegerData, PositiveSmallIntegerPKData, ProxyBaseModel,
-    ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
-    TextData, TimeData, UniqueAnchor, UUIDData,
+    PositiveSmallIntegerData, PositiveSmallIntegerPKData, SlugData, SlugPKData,
+    SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor, UUIDData,
 )
 
 # A set of functions that can be used to recreate
@@ -387,42 +385,8 @@ if connection.features.allows_auto_pk_0:
     ])
 
 
-@skipUnlessDBFeature('can_defer_constraint_checks')
 class SerializerTests(TestCase):
-    def test_get_unknown_serializer(self):
-        """
-        #15889: get_serializer('nonsense') raises a SerializerDoesNotExist
-        """
-        with self.assertRaises(SerializerDoesNotExist):
-            serializers.get_serializer("nonsense")
-
-        with self.assertRaises(KeyError):
-            serializers.get_serializer("nonsense")
-
-        # SerializerDoesNotExist is instantiated with the nonexistent format
-        with self.assertRaises(SerializerDoesNotExist) as cm:
-            serializers.get_serializer("nonsense")
-        self.assertEqual(cm.exception.args, ("nonsense",))
-
-    def test_unregister_unknown_serializer(self):
-        with self.assertRaises(SerializerDoesNotExist):
-            serializers.unregister_serializer("nonsense")
-
-    def test_get_unknown_deserializer(self):
-        with self.assertRaises(SerializerDoesNotExist):
-            serializers.get_deserializer("nonsense")
-
-    def test_serialize_proxy_model(self):
-        BaseModel.objects.create(parent_data=1)
-        base_objects = BaseModel.objects.all()
-        proxy_objects = ProxyBaseModel.objects.all()
-        proxy_proxy_objects = ProxyProxyBaseModel.objects.all()
-        base_data = serializers.serialize("json", base_objects)
-        proxy_data = serializers.serialize("json", proxy_objects)
-        proxy_proxy_data = serializers.serialize("json", proxy_proxy_objects)
-        self.assertEqual(base_data, proxy_data.replace('proxy', ''))
-        self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
-
+    pass
 
 def serializerTest(format, self):
 
@@ -457,41 +421,6 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 
-def fieldsTest(format, self):
-    obj = ComplexModel(field1='first', field2='second', field3='third')
-    obj.save_base(raw=True)
-
-    # Serialize then deserialize the test database
-    serialized_data = serializers.serialize(format, [obj], indent=2, fields=('field1', 'field3'))
-    result = next(serializers.deserialize(format, serialized_data))
-
-    # Check that the deserialized object contains data in only the serialized fields.
-    self.assertEqual(result.object.field1, 'first')
-    self.assertEqual(result.object.field2, '')
-    self.assertEqual(result.object.field3, 'third')
-
-
-def streamTest(format, self):
-    obj = ComplexModel(field1='first', field2='second', field3='third')
-    obj.save_base(raw=True)
-
-    # Serialize the test database to a stream
-    for stream in (six.StringIO(), HttpResponse()):
-        serializers.serialize(format, [obj], indent=2, stream=stream)
-
-        # Serialize normally for a comparison
-        string_data = serializers.serialize(format, [obj], indent=2)
-
-        # Check that the two are the same
-        if isinstance(stream, six.StringIO):
-            self.assertEqual(string_data, stream.getvalue())
-        else:
-            self.assertEqual(string_data, stream.content.decode('utf-8'))
-
-
 for format in [f for f in serializers.get_serializer_formats()
                if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
     setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
-    setattr(SerializerTests, 'test_' + format + '_serializer_fields', curry(fieldsTest, format))
-    if format != 'python':
-        setattr(SerializerTests, 'test_' + format + '_serializer_stream', curry(streamTest, format))

@@ -4,8 +4,10 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from django.core import serializers
+from django.core.serializers import SerializerDoesNotExist
 from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
+from django.http import HttpResponse
 from django.test import (
     SimpleTestCase, mock, override_settings, skipUnlessDBFeature,
 )
@@ -14,8 +16,8 @@ from django.utils.functional import curry
 from django.utils.six import StringIO
 
 from .models import (
-    Actor, Article, Author, AuthorProfile, Category, Movie, Player, Score,
-    Team,
+    Actor, Article, Author, AuthorProfile, BaseModel, Category, ComplexModel,
+    Movie, Player, ProxyBaseModel, ProxyProxyBaseModel, Score, Team,
 )
 
 
@@ -51,6 +53,10 @@ class SerializerRegistrationTests(SimpleTestCase):
         self.assertNotIn('xml', public_formats)
         self.assertIn('json3', public_formats)
 
+    def test_unregister_unknown_serializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.unregister_serializer("nonsense")
+
     def test_builtin_serializers(self):
         "Requesting a list of serializer formats popuates the registry"
         all_formats = set(serializers.get_serializer_formats())
@@ -65,8 +71,29 @@ class SerializerRegistrationTests(SimpleTestCase):
         self.assertIn('python', all_formats)
         self.assertNotIn('python', public_formats)
 
+    def test_get_unknown_serializer(self):
+        """
+        #15889: get_serializer('nonsense') raises a SerializerDoesNotExist
+        """
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_serializer("nonsense")
+
+        with self.assertRaises(KeyError):
+            serializers.get_serializer("nonsense")
+
+        # SerializerDoesNotExist is instantiated with the nonexistent format
+        with self.assertRaises(SerializerDoesNotExist) as cm:
+            serializers.get_serializer("nonsense")
+        self.assertEqual(cm.exception.args, ("nonsense",))
+
+    def test_get_unknown_deserializer(self):
+        with self.assertRaises(SerializerDoesNotExist):
+            serializers.get_deserializer("nonsense")
+
 
 class SerializersTestBase(object):
+    serializer_name = None  # Set by subclasses to the serialization format name
+
     @staticmethod
     def _comparison_value(value):
         return value
@@ -107,6 +134,38 @@ class SerializersTestBase(object):
                                            Article.objects.all())
         models = list(serializers.deserialize(self.serializer_name, serial_str))
         self.assertEqual(len(models), 2)
+
+    def test_serialize_to_stream(self):
+        obj = ComplexModel(field1='first', field2='second', field3='third')
+        obj.save_base(raw=True)
+
+        # Serialize the test database to a stream
+        for stream in (StringIO(), HttpResponse()):
+            serializers.serialize(self.serializer_name, [obj], indent=2, stream=stream)
+
+            # Serialize normally for a comparison
+            string_data = serializers.serialize(self.serializer_name, [obj], indent=2)
+
+            # Check that the two are the same
+            if isinstance(stream, StringIO):
+                self.assertEqual(string_data, stream.getvalue())
+            else:
+                self.assertEqual(string_data, stream.content.decode('utf-8'))
+
+    def test_serialize_specific_fields(self):
+        obj = ComplexModel(field1='first', field2='second', field3='third')
+        obj.save_base(raw=True)
+
+        # Serialize then deserialize the test database
+        serialized_data = serializers.serialize(
+            self.serializer_name, [obj], indent=2, fields=('field1', 'field3')
+        )
+        result = next(serializers.deserialize(self.serializer_name, serialized_data))
+
+        # Check that the deserialized object contains data in only the serialized fields.
+        self.assertEqual(result.object.field1, 'first')
+        self.assertEqual(result.object.field2, '')
+        self.assertEqual(result.object.field3, 'third')
 
     def test_altering_serialized_output(self):
         """
@@ -293,6 +352,18 @@ class SerializersTestBase(object):
         with mock.patch('django.db.models.Model') as mock_model:
             deserial_obj.save(force_insert=False)
             mock_model.save_base.assert_called_with(deserial_obj.object, raw=True, using=None, force_insert=False)
+
+    @skipUnlessDBFeature('can_defer_constraint_checks')
+    def test_serialize_proxy_model(self):
+        BaseModel.objects.create(parent_data=1)
+        base_objects = BaseModel.objects.all()
+        proxy_objects = ProxyBaseModel.objects.all()
+        proxy_proxy_objects = ProxyProxyBaseModel.objects.all()
+        base_data = serializers.serialize("json", base_objects)
+        proxy_data = serializers.serialize("json", proxy_objects)
+        proxy_proxy_data = serializers.serialize("json", proxy_proxy_objects)
+        self.assertEqual(base_data, proxy_data.replace('proxy', ''))
+        self.assertEqual(base_data, proxy_proxy_data.replace('proxy', ''))
 
 
 class SerializersTransactionTestBase(object):
