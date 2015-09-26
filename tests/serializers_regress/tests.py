@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 import datetime
 import decimal
 import uuid
-from unittest import skipUnless
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
@@ -38,11 +37,6 @@ from .models import (
     ProxyProxyBaseModel, SlugData, SlugPKData, SmallData, SmallPKData, Tag,
     TextData, TimeData, UniqueAnchor, UUIDData,
 )
-
-try:
-    import yaml
-except ImportError:
-    yaml = None
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -431,12 +425,6 @@ class SerializerTests(TestCase):
     def test_json_deserializer_exception(self):
         with self.assertRaises(DeserializationError):
             for obj in serializers.deserialize("json", """[{"pk":1}"""):
-                pass
-
-    @skipUnless(yaml, "PyYAML not installed")
-    def test_yaml_deserializer_exception(self):
-        with self.assertRaises(DeserializationError):
-            for obj in serializers.deserialize("yaml", "{"):
                 pass
 
     def test_serialize_proxy_model(self):
