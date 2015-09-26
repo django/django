@@ -14,25 +14,24 @@ import uuid
 
 from django.core import serializers
 from django.db import connection, models
-from django.http import HttpResponse
 from django.test import TestCase
 from django.utils import six
-from django.utils.functional import curry
 
 from .models import (
-    Anchor, AutoNowDateTimeData, BigIntegerData, BinaryData,
-    BooleanData, BooleanPKData, CharData, CharPKData, DateData,
-    DateTimeData, DecimalData, DecimalPKData, EmailData, EmailPKData,
-    ExplicitInheritBaseModel, FileData, FilePathData, FilePathPKData, FKData,
-    FKDataToField, FKDataToO2O, FKSelfData, FKToUUID,
-    FloatData, FloatPKData, GenericData, GenericIPAddressData,
-    GenericIPAddressPKData, InheritAbstractModel, InheritBaseModel,
-    IntegerData, IntegerPKData, Intermediate, LengthModel, M2MData,
-    M2MIntermediateData, M2MSelfData, ModifyingSaveData,
+    Anchor, AutoNowDateTimeData, BigIntegerData, BinaryData, BooleanData,
+    BooleanPKData, CharData, CharPKData, DateData, DateTimeData, DecimalData,
+    DecimalPKData, EmailData, EmailPKData, ExplicitInheritBaseModel, FileData,
+    FilePathData, FilePathPKData, FKData, FKDataToField, FKDataToO2O,
+    FKSelfData, FKToUUID, FloatData, FloatPKData, GenericData,
+    GenericIPAddressData, GenericIPAddressPKData, InheritAbstractModel,
+    InheritBaseModel, IntegerData, IntegerPKData, Intermediate, LengthModel,
+    M2MData, M2MIntermediateData, M2MSelfData, ModifyingSaveData,
     NullBooleanData, O2OData, PositiveIntegerData, PositiveIntegerPKData,
     PositiveSmallIntegerData, PositiveSmallIntegerPKData, SlugData, SlugPKData,
     SmallData, SmallPKData, Tag, TextData, TimeData, UniqueAnchor, UUIDData,
 )
+from .tests import register_tests
+
 
 # A set of functions that can be used to recreate
 # test data objects of various kinds.
@@ -385,8 +384,9 @@ if connection.features.allows_auto_pk_0:
     ])
 
 
-class SerializerTests(TestCase):
+class SerializerDataTests(TestCase):
     pass
+
 
 def serializerTest(format, self):
 
@@ -421,6 +421,4 @@ def serializerTest(format, self):
         self.assertEqual(count, klass.objects.count())
 
 
-for format in [f for f in serializers.get_serializer_formats()
-               if not isinstance(serializers.get_serializer(f), serializers.BadSerializer) and not f == 'geojson']:
-    setattr(SerializerTests, 'test_' + format + '_serializer', curry(serializerTest, format))
+register_tests(SerializerDataTests, 'test_%s_serializer', serializerTest)
