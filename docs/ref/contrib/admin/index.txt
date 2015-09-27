@@ -126,6 +126,13 @@ The register decorator
         class PersonAdmin(admin.ModelAdmin):
             pass
 
+    You can't use this decorator if you have to reference your model admin
+    class in its ``__init__()`` method, e.g.
+    ``super(PersonAdmin, self).__init__(*args, **kwargs)``. If you are using
+    Python 3 and don't have to worry about supporting Python 2, you can
+    use ``super().__init__(*args, **kwargs)`` . Otherwise, you'll have to use
+    ``admin.site.register()`` instead of this decorator.
+
 Discovery of admin files
 ------------------------
 
