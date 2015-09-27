@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import copy
 import operator
 from collections import OrderedDict
@@ -38,7 +40,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, escapejs
+from django.utils.html import escape, escapejs, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
@@ -1065,7 +1067,7 @@ class ModelAdmin(BaseModelAdmin):
         )
         msg_dict = {
             'name': force_text(opts.verbose_name),
-            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(obj_url), escape(obj)),
+            'obj': format_html('<a href="{0}">{1}</a>', urlquote(obj_url), obj),
         }
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
@@ -1083,7 +1085,10 @@ class ModelAdmin(BaseModelAdmin):
             })
 
         elif "_continue" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                **msg_dict
+            )
             self.message_user(request, mark_safe(msg), messages.SUCCESS)
             if post_url_continue is None:
                 post_url_continue = obj_url
@@ -1094,14 +1099,20 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(post_url_continue)
 
         elif "_addanother" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may add another %(name)s below.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may add another {name} below.'),
+                **msg_dict
+            )
             self.message_user(request, mark_safe(msg), messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         else:
-            msg = _('The %(name)s "%(obj)s" was added successfully.') % msg_dict
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully.'),
+                **msg_dict
+            )
             self.message_user(request, mark_safe(msg), messages.SUCCESS)
             return self.response_post_save_add(request, obj)
 
@@ -1129,18 +1140,24 @@ class ModelAdmin(BaseModelAdmin):
 
         msg_dict = {
             'name': force_text(opts.verbose_name),
-            'obj': force_text('<a href="{0}">{1}</a>').format(urlquote(request.path), escape(obj)),
+            'obj': format_html('<a href="{0}">{1}</a>', urlquote(request.path), obj),
         }
         if "_continue" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was changed successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully. You may edit it again below.'),
+                **msg_dict
+            )
+            self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
 
         elif "_saveasnew" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was added successfully. You may edit it again below.') % msg_dict
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            msg = format_html(
+                _('The {name} "{obj}" was added successfully. You may edit it again below.'),
+                **msg_dict
+            )
+            self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse('admin:%s_%s_change' %
                                    (opts.app_label, opts.model_name),
                                    args=(pk_value,),
@@ -1149,8 +1166,11 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(redirect_url)
 
         elif "_addanother" in request.POST:
-            msg = _('The %(name)s "%(obj)s" was changed successfully. You may add another %(name)s below.') % msg_dict
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully. You may add another {name} below.'),
+                **msg_dict
+            )
+            self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse('admin:%s_%s_add' %
                                    (opts.app_label, opts.model_name),
                                    current_app=self.admin_site.name)
@@ -1158,8 +1178,11 @@ class ModelAdmin(BaseModelAdmin):
             return HttpResponseRedirect(redirect_url)
 
         else:
-            msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            msg = format_html(
+                _('The {name} "{obj}" was changed successfully.'),
+                **msg_dict
+            )
+            self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_change(request, obj)
 
     def response_post_save_add(self, request, obj):
