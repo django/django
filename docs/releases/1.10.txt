@@ -35,6 +35,7 @@ Minor features
 * For sites running on a subpath, the default :attr:`URL for the "View site"
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
+* Post-save message now contains a link to the saved object's change form.
 
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
