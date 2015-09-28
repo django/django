@@ -325,7 +325,7 @@ How to log a user in
 If you have an authenticated user you want to attach to the current session
 - this is done with a :func:`~django.contrib.auth.login` function.
 
-.. function:: login()
+.. function:: login(request, user)
 
     To log a user in, from a view, use :func:`~django.contrib.auth.login()`. It
     takes an :class:`~django.http.HttpRequest` object and a
@@ -373,7 +373,7 @@ If you have an authenticated user you want to attach to the current session
 How to log a user out
 ---------------------
 
-.. function:: logout()
+.. function:: logout(request)
 
     To log out a user who has been logged in via
     :func:`django.contrib.auth.login()`, use
