@@ -84,6 +84,8 @@ def password_validators_help_text_html(password_validators=None):
     """
     help_texts = password_validators_help_texts(password_validators)
     help_items = [format_html('<li>{}</li>', help_text) for help_text in help_texts]
+    if not help_items:
+        return ''
     return '<ul>%s</ul>' % ''.join(help_items)
 
 
