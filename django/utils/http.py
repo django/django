@@ -353,7 +353,7 @@ def limited_parse_qsl(qs, keep_blank_values=False,
     for name_value in pairs:
         if not name_value:
             continue
-        nv = name_value.split('=' if six.PY3 else b'=', 1)
+        nv = name_value.split(str('='), 1)
         if len(nv) != 2:
             # Handle case of a control-name with no equal sign
             if keep_blank_values:
