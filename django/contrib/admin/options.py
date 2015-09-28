@@ -1089,7 +1089,7 @@ class ModelAdmin(BaseModelAdmin):
                 _('The {name} "{obj}" was added successfully. You may edit it again below.'),
                 **msg_dict
             )
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            self.message_user(request, msg, messages.SUCCESS)
             if post_url_continue is None:
                 post_url_continue = obj_url
             post_url_continue = add_preserved_filters(
@@ -1103,7 +1103,7 @@ class ModelAdmin(BaseModelAdmin):
                 _('The {name} "{obj}" was added successfully. You may add another {name} below.'),
                 **msg_dict
             )
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            self.message_user(request, msg, messages.SUCCESS)
             redirect_url = request.path
             redirect_url = add_preserved_filters({'preserved_filters': preserved_filters, 'opts': opts}, redirect_url)
             return HttpResponseRedirect(redirect_url)
@@ -1113,7 +1113,7 @@ class ModelAdmin(BaseModelAdmin):
                 _('The {name} "{obj}" was added successfully.'),
                 **msg_dict
             )
-            self.message_user(request, mark_safe(msg), messages.SUCCESS)
+            self.message_user(request, msg, messages.SUCCESS)
             return self.response_post_save_add(request, obj)
 
     def response_change(self, request, obj):
