@@ -286,12 +286,25 @@ FILE_UPLOAD_HANDLERS = [
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 
 # Maximum size in bytes of request data that will be read before raising a
-# SuspiciousOperation. This applies to accessing request.body and also to any
-# data in form data requests, excluding file uploads.
+# SuspiciousOperation. This applies to any data in form data requests,
+# excluding file uploads. Since web servers typically do not do deep
+# request inspection it's not possible to limit there the amount of data Django
+# would have to process excluding file uploads. This amount of data is directly
+# correlated to the amount of memory needed to process the request and populate
+# the GET and POST dictionaries. As such, it could be used as an attack vector
+# if left unchecked. Installations that are supposed to receive form posts with
+# large values (> 2.5MB in total) should review the default value of this setting.
 DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 
 # Maximum number of keys in a POST request that will be allowed before raising
-# a SuspiciousOperation.
+# a SuspiciousOperation. Since web servers typically do not do deep request
+# inspection it's not possible to limit there the amount of parameters Django
+# would have to process. This number of parameters is directly correlated to
+# the amount of time needed to process the request and populate the GET and
+# POST dictionaries. As such, it could be used as an attack vector if left
+# unchecked. Installations that are supposed to receive form posts with a
+# large number (> 1000) of parameters should review the default value of this
+# setting.
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
 # Directory in which upload streamed files will be temporarily saved. A value of
