@@ -967,18 +967,23 @@ the same database table, which is almost certainly not what you want.
 
 .. _abstract-related-name:
 
-Be careful with ``related_name``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Be careful with ``related_name`` and ``related_query_name``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are using the :attr:`~django.db.models.ForeignKey.related_name` attribute on a ``ForeignKey`` or
-``ManyToManyField``, you must always specify a *unique* reverse name for the
-field. This would normally cause a problem in abstract base classes, since the
-fields on this class are included into each of the child classes, with exactly
-the same values for the attributes (including :attr:`~django.db.models.ForeignKey.related_name`) each time.
+If you are using :attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` on a ``ForeignKey`` or
+``ManyToManyField``, you must always specify a *unique* reverse name and query
+name for the field. This would normally cause a problem in abstract base
+classes, since the fields on this class are included into each of the child
+classes, with exactly the same values for the attributes (including
+:attr:`~django.db.models.ForeignKey.related_name` and
+:attr:`~django.db.models.ForeignKey.related_query_name`) each time.
 
-To work around this problem, when you are using :attr:`~django.db.models.ForeignKey.related_name` in an
-abstract base class (only), part of the name should contain
-``'%(app_label)s'`` and ``'%(class)s'``.
+To work around this problem, when you are using
+:attr:`~django.db.models.ForeignKey.related_name` or
+:attr:`~django.db.models.ForeignKey.related_query_name` in an abstract base
+class (only), part of the value should contain ``'%(app_label)s'`` and
+``'%(class)s'``.
 
 - ``'%(class)s'`` is replaced by the lower-cased name of the child class
   that the field is used in.
@@ -992,7 +997,11 @@ For example, given an app ``common/models.py``::
     from django.db import models
 
     class Base(models.Model):
-        m2m = models.ManyToManyField(OtherModel, related_name="%(app_label)s_%(class)s_related")
+        m2m = models.ManyToManyField(
+            OtherModel,
+            related_name="%(app_label)s_%(class)s_related",
+            related_query_name="%(app_label)s_%(class)ss",
+        )
 
         class Meta:
             abstract = True
@@ -1011,12 +1020,15 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related``, while the reverse name of the
-``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
-reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
-It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion
-to construct your related name, but if you forget to use it, Django will raise
-errors when you perform system checks (or run :djadmin:`migrate`).
+``common_childa_related`` and the reverse query name will be ``common_childas``.
+The reverse name of the ``common.ChildB.m2m`` field will be
+``common_childb_related`` and the reverse query name will be
+``common_childbs``. Finally, the reverse name of the ``rare.ChildB.m2m`` field
+will be ``rare_childb_related`` and the reverse query name will be
+``rare_childbs``. It's up to you how you use the `'%(class)s'`` and
+``'%(app_label)s`` portion to construct your related name or related query name
+but if you forget to use it, Django will raise errors when you perform system
+checks (or run :djadmin:`migrate`).
 
 If you don't specify a :attr:`~django.db.models.ForeignKey.related_name`
 attribute for a field in an abstract base class, the default reverse name will
@@ -1026,6 +1038,11 @@ in the above code, if the :attr:`~django.db.models.ForeignKey.related_name`
 attribute was omitted, the reverse name for the ``m2m`` field would be
 ``childa_set`` in the ``ChildA`` case and ``childb_set`` for the ``ChildB``
 field.
+
+.. versionchanged:: 1.10
+
+   Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` for
+   ``related_query_name`` was added.
 
 .. _multi-table-inheritance:
 

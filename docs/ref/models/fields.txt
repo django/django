@@ -1344,6 +1344,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         # That's now the name of the reverse filter
         Article.objects.filter(tag__name="important")
 
+    Like :attr:`related_name`, ``related_query_name`` supports app label and
+    class interpolation via :ref:`some special syntax <abstract-related-name>`.
+
 .. attribute:: ForeignKey.to_field
 
     The field on the related object that the relation is to. By default, Django
