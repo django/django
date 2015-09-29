@@ -301,9 +301,9 @@ model:
 
     .. deprecated:: 1.7
 
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
+        This class was moved from ``django.contrib.contenttypes.generic`` to
+        ``django.contrib.contenttypes.fields``. Support for importing from the
+        old location will be removed in Django 1.9.
 
 .. admonition:: Primary key type compatibility
 
@@ -370,12 +370,6 @@ Reverse generic relations
 
 .. class:: GenericRelation
 
-    .. deprecated:: 1.7
-
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
-
     .. attribute:: related_query_name
 
         .. versionadded:: 1.7
@@ -385,8 +379,17 @@ Reverse generic relations
         related object back to this one. This allows querying and filtering
         from the related object.
 
+    .. deprecated:: 1.7
+
+        This class was moved from ``django.contrib.contenttypes.generic`` to
+        ``django.contrib.contenttypes.fields``. Support for importing from the
+        old location will be removed in Django 1.9.
+
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
+
+    from django.db import models
+    from django.contrib.contenttypes.fields import GenericRelation
 
     class Bookmark(models.Model):
         url = models.URLField()
@@ -485,7 +488,6 @@ to the queryset to ensure the correct content type, but the
 into account. For now, if you need aggregates on generic relations, you'll
 need to calculate them without using the aggregation API.
 
-
 .. module:: django.contrib.contenttypes.forms
 
 Generic relation in forms
@@ -501,9 +503,9 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
     .. deprecated:: 1.7
 
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
+        This class was moved from ``django.contrib.contenttypes.generic`` to
+        ``django.contrib.contenttypes.forms``. Support for importing from the
+        old location will be removed in Django 1.9.
 
 .. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
 
@@ -522,14 +524,13 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
     .. deprecated:: 1.7
 
-        This function used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
+        This function was moved from ``django.contrib.contenttypes.generic``
+        to ``django.contrib.contenttypes.forms``. Support for importing from
+        the old location will be removed in Django 1.9.
 
     .. versionchanged:: 1.7
 
         ``min_num`` and ``validate_min`` were added.
-
 
 .. module:: django.contrib.contenttypes.admin
 
@@ -566,9 +567,9 @@ information.
 
     .. deprecated:: 1.7
 
-        This class used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
+        This class was moved from ``django.contrib.contenttypes.generic`` to
+        ``django.contrib.contenttypes.admin``. Support for importing from the
+        old location will be removed in Django 1.9.
 
 .. class:: GenericTabularInline
 .. class:: GenericStackedInline
@@ -578,6 +579,6 @@ information.
 
     .. deprecated:: 1.7
 
-        These classes used to be defined in ``django.contrib.contenttypes.generic``.
-        Support for importing from this old location will be removed in Django
-        1.9.
+        These classes was moved from ``django.contrib.contenttypes.generic``
+        to ``django.contrib.contenttypes.admin``. Support for importing from
+        the old location will be removed in Django 1.9.
