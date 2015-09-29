@@ -296,6 +296,13 @@ class RelatedField(Field):
                 }
                 self.remote_field.related_name = related_name
 
+            if self.remote_field.related_query_name:
+                related_query_name = force_text(self.remote_field.related_query_name) % {
+                    'class': cls.__name__.lower(),
+                    'app_label': cls._meta.app_label.lower(),
+                }
+                self.remote_field.related_query_name = related_query_name
+
             def resolve_related_class(model, related, field):
                 field.remote_field.model = related
                 field.do_related_class(related, model)
