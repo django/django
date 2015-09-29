@@ -98,8 +98,6 @@ created with the following values:
 * :attr:`~django.contrib.contenttypes.models.ContentType.model`
   will be set to ``'site'``.
 
-.. _the verbose_name attribute: ../model-api/#verbose_name
-
 Methods on ``ContentType`` instances
 ====================================
 
@@ -126,8 +124,7 @@ For example, we could look up the
 :class:`~django.contrib.auth.models.User` model::
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> user_type = ContentType.objects.get(app_label="auth", model="user")
-    >>> user_type
+    >>> ContentType.objects.get(app_label="auth", model="user")
     <ContentType: user>
 
 And then use it to query for a particular
@@ -224,8 +221,7 @@ want to go to the trouble of obtaining the model's metadata to perform a manual
 lookup::
 
     >>> from django.contrib.auth.models import User
-    >>> user_type = ContentType.objects.get_for_model(User)
-    >>> user_type
+    >>> ContentType.objects.get_for_model(User)
     <ContentType: user>
 
 .. module:: django.contrib.contenttypes.fields
@@ -369,6 +365,9 @@ Reverse generic relations
 If you know which models you'll be using most often, you can also add
 a "reverse" generic relationship to enable an additional API. For example::
 
+    from django.db import models
+    from django.contrib.contenttypes.fields import GenericRelation
+
     class Bookmark(models.Model):
         url = models.URLField()
         tags = GenericRelation(TaggedItem)
@@ -463,7 +462,6 @@ to the queryset to ensure the correct content type, but the
 :meth:`~django.db.models.query.QuerySet.aggregate` method doesn't take them
 into account. For now, if you need aggregates on generic relations, you'll
 need to calculate them without using the aggregation API.
-
 
 .. module:: django.contrib.contenttypes.forms
 
