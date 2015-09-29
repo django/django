@@ -437,30 +437,14 @@ class URLNode(Node):
             current_app = context.request.resolver_match.namespace
         except AttributeError:
             current_app = None
-        # Try to look up the URL twice: once given the view name, and again
-        # relative to what we guess is the "main" app. If they both fail,
-        # re-raise the NoReverseMatch unless we're using the
-        # {% url ... as var %} construct in which case return nothing.
+        # Try to look up the URL. If it fails, raise NoReverseMatch unless the
+        # {% url ... as var %} construct is used, in which case return nothing.
         url = ''
         try:
             url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
         except NoReverseMatch:
-            exc_info = sys.exc_info()
-            if settings.SETTINGS_MODULE:
-                project_name = settings.SETTINGS_MODULE.split('.')[0]
-                try:
-                    url = reverse(project_name + '.' + view_name,
-                              args=args, kwargs=kwargs,
-                              current_app=current_app)
-                except NoReverseMatch:
-                    if self.asvar is None:
-                        # Re-raise the original exception, not the one with
-                        # the path relative to the project. This makes a
-                        # better error message.
-                        six.reraise(*exc_info)
-            else:
-                if self.asvar is None:
-                    raise
+            if self.asvar is None:
+                raise
 
         if self.asvar:
             context[self.asvar] = url
@@ -1300,61 +1284,40 @@ def templatetag(parser, token):
 @register.tag
 def url(parser, token):
     """
-    Returns an absolute URL matching given view with its parameters.
+    Return an absolute URL matching the given view with its parameters.
 
     This is a way to define links that aren't tied to a particular URL
     configuration::
 
-        {% url "path.to.some_view" arg1 arg2 %}
+        {% url "url_name" arg1 arg2 %}
 
         or
 
-        {% url "path.to.some_view" name1=value1 name2=value2 %}
+        {% url "url_name" name1=value1 name2=value2 %}
 
-    The first argument is a path to a view. It can be an absolute Python path
-    or just ``app_name.view_name`` without the project name if the view is
-    located inside the project.
+    The first argument is a django.conf.urls.url() name. Other arguments are
+    space-separated values that will be filled in place of positional and
+    keyword arguments in the URL. Don't mix positional and keyword arguments.
+    All arguments for the URL must be present.
 
-    Other arguments are space-separated values that will be filled in place of
-    positional and keyword arguments in the URL. Don't mix positional and
-    keyword arguments.
+    For example, if you have a view ``app_name.views.client_details`` taking
+    the client's id and the corresponding line in a URLconf looks like this::
 
-    All arguments for the URL should be present.
-
-    For example if you have a view ``app_name.client`` taking client's id and
-    the corresponding line in a URLconf looks like this::
-
-        ('^client/(\d+)/$', 'app_name.client')
+        url('^client/(\d+)/$', views.client_details, name='client-detail-view')
 
     and this app's URLconf is included into the project's URLconf under some
     path::
 
-        ('^clients/', include('project_name.app_name.urls'))
+        url('^clients/', include('app_name.urls'))
 
     then in a template you can create a link for a certain client like this::
 
-        {% url "app_name.client" client.id %}
+        {% url "client-detail-view" client.id %}
 
     The URL will look like ``/clients/client/123/``.
 
-    The first argument can also be a named URL instead of the Python path to
-    the view callable. For example if the URLconf entry looks like this::
-
-        url('^client/(\d+)/$', name='client-detail-view')
-
-    then in the template you can use::
-
-        {% url "client-detail-view" client.id %}
-
-    There is even another possible value type for the first argument. It can be
-    the name of a template variable that will be evaluated to obtain the view
-    name or the URL name, e.g.::
-
-        {% with view_path="app_name.client" %}
-        {% url view_path client.id %}
-        {% endwith %}
-
-        or,
+    The first argument may also be the name of a template variable that will be
+    evaluated to obtain the view name or the URL name, e.g.::
 
         {% with url_name="client-detail-view" %}
         {% url url_name client.id %}
@@ -1362,8 +1325,7 @@ def url(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one argument"
-                                  " (path to a view)" % bits[0])
+        raise TemplateSyntaxError("'%s' takes at least one argument, the name of a url()." % bits[0])
     viewname = parser.compile_filter(bits[1])
     args = []
     kwargs = {}
