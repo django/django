@@ -47,6 +47,10 @@ Minor features
   subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
   default value.
 
+* The :func:`~django.contrib.auth.views.logout` view sends "no-cache" headers
+  to prevent an issue where Safari caches redirects and prevents a user from
+  being able to log out.
+
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

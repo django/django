@@ -92,6 +92,7 @@ def login(request, template_name='registration/login.html',
 
 
 @deprecate_current_app
+@never_cache
 def logout(request, next_page=None,
            template_name='registration/logged_out.html',
            redirect_field_name=REDIRECT_FIELD_NAME,

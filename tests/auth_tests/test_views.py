@@ -770,6 +770,14 @@ class LogoutTest(AuthViewsTestCase):
         response = self.client.get('/logout/')
         self.assertIn('site', response.context)
 
+    def test_logout_doesnt_cache(self):
+        """
+        The logout() view should send "no-cache" headers for reasons described
+        in #25490.
+        """
+        response = self.client.get('/logout/')
+        self.assertIn('no-store', response['Cache-Control'])
+
     def test_logout_with_overridden_redirect_url(self):
         # Bug 11223
         self.login()
