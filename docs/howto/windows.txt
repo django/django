@@ -3,7 +3,7 @@ How to install Django on Windows with Python 3.5, virtualenv and virtualenvwrapp
 ==================================================================================
 
 This document will guide you through installing Python 3.5 and Django on Windows.
-It also provides options instructions for installing virtualenv and 
+It also provides optional instructions for installing virtualenv and 
 virtualenvwrapper, which handle many issues which crop up with pathing on Windows. 
 This is meant as a beginner's guide for users working on Django projects and does 
 not reflect how Django should be installed when developing patches for Django 
