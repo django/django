@@ -331,6 +331,8 @@ TEST_RESULTS = {
             ('friends_inherited_rel_+', None),
             ('relating_people', None),
             ('relating_person', None),
+            ('relating_proxyperson', None),
+            ('relating_proxyperson_hidden+', None),
         ),
         BasePerson: (
             ('+', None),
@@ -413,6 +415,8 @@ TEST_RESULTS = {
             ('relating_baseperson', BasePerson),
             ('relating_people', None),
             ('relating_person', None),
+            ('relating_proxyperson', None),
+            ('relating_proxyperson_hidden+', None),
         ),
         BasePerson: (
             ('+', None),
@@ -465,6 +469,7 @@ TEST_RESULTS = {
             ('followers_concrete', None),
             ('relating_person', None),
             ('relating_people', None),
+            ('relating_proxyperson', None),
         ),
         BasePerson: (
             ('followers_abstract', None),
@@ -494,6 +499,7 @@ TEST_RESULTS = {
             ('followers_concrete', None),
             ('relating_person', None),
             ('relating_people', None),
+            ('relating_proxyperson', None),
         ),
         BasePerson: (
             ('followers_abstract', None),

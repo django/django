@@ -198,7 +198,7 @@ class ForwardManyToOneDescriptor(object):
                 'Cannot assign None: "%s.%s" does not allow null values.' %
                 (instance._meta.object_name, self.field.name)
             )
-        elif value is not None and not isinstance(value, self.field.remote_field.model):
+        elif value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,

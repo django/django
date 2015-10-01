@@ -552,15 +552,20 @@ class Options(object):
         is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
+        # Map of concrete models to all options of models it represents.
+        # Including its options and all its proxy model ones.
+        concrete_model_classes = defaultdict(list)
 
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
+            opts = model._meta
+            concrete_model_classes[opts.concrete_model].append(opts)
             # Abstract model's fields are copied to child models, hence we will
             # see the fields from the child models.
-            if model._meta.abstract:
+            if opts.abstract:
                 continue
             fields_with_relations = (
-                f for f in model._meta._get_fields(reverse=False, include_parents=False)
+                f for f in opts._get_fields(reverse=False, include_parents=False)
                 if f.is_relation and f.related_model is not None
             )
             for f in fields_with_relations:
@@ -573,7 +578,9 @@ class Options(object):
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = related_objects_graph[model._meta]
+            related_objects = list(chain.from_iterable(
+                related_objects_graph[opts] for opts in concrete_model_classes[model]
+            ))
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().

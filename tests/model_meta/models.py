@@ -113,7 +113,7 @@ class Relating(models.Model):
 
     # ForeignKey to ProxyPerson
     proxyperson = models.ForeignKey(ProxyPerson, models.CASCADE, related_name='relating_proxyperson')
-    proxyperson_hidden = models.ForeignKey(ProxyPerson, models.CASCADE, related_name='+')
+    proxyperson_hidden = models.ForeignKey(ProxyPerson, models.CASCADE, related_name='relating_proxyperson_hidden+')
 
     # ManyToManyField to BasePerson
     basepeople = models.ManyToManyField(BasePerson, related_name='relating_basepeople')

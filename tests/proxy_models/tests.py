@@ -6,7 +6,7 @@ from django.apps import apps
 from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
-from django.core import checks, exceptions, management
+from django.core import checks, management
 from django.core.urlresolvers import reverse
 from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
@@ -332,13 +332,18 @@ class ProxyModelTests(TestCase):
         self.assertEqual(resp.name, 'New South Wales')
 
     def test_filter_proxy_relation_reverse(self):
-        tu = TrackerUser.objects.create(
-            name='Contributor', status='contrib')
-        with self.assertRaises(exceptions.FieldError):
-            TrackerUser.objects.filter(issue=None),
+        tu = TrackerUser.objects.create(name='Contributor', status='contrib')
+        ptu = ProxyTrackerUser.objects.get()
+        issue = Issue.objects.create(assignee=tu)
+        self.assertEqual(tu.issues.get(), issue)
+        self.assertEqual(ptu.issues.get(), issue)
         self.assertQuerysetEqual(
-            ProxyTrackerUser.objects.filter(issue=None),
+            TrackerUser.objects.filter(issues=issue),
             [tu], lambda x: x
+        )
+        self.assertQuerysetEqual(
+            ProxyTrackerUser.objects.filter(issues=issue),
+            [ptu], lambda x: x
         )
 
     def test_proxy_bug(self):

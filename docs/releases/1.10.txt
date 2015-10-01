@@ -163,7 +163,11 @@ Migrations
 Models
 ^^^^^^
 
-* ...
+* Reverse foreign keys from proxy models are now propagated to their
+  concrete class. The reverse relation attached by a
+  :class:`~django.db.models.ForeignKey` pointing to a proxy model is now
+  accessible as a descriptor on the proxied model class and may be referenced in
+  queryset filtering.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
