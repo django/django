@@ -643,19 +643,6 @@ Since :doc:`translation </topics/i18n/translation>` is turned on by default,
 the login screen may be displayed in your own language, depending on your
 browser's settings and if Django has a translation for this language.
 
-.. admonition:: Doesn't match what you see?
-
-    If at this point, instead of the above login page, you get an error
-    page reporting something like::
-
-        ImportError at /admin/
-        cannot import name patterns
-        ...
-
-    then you're probably using a version of Django that doesn't match this
-    tutorial version. You'll want to either switch to the older tutorial or the
-    newer Django version.
-
 Enter the admin site
 --------------------
 
