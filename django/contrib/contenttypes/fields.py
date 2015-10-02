@@ -5,7 +5,7 @@ from collections import defaultdict
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist, ObjectDoesNotExist
-from django.db import DEFAULT_DB_ALIAS, connection, models, router, transaction
+from django.db import DEFAULT_DB_ALIAS, models, router, transaction
 from django.db.models import DO_NOTHING, signals
 from django.db.models.base import ModelBase, make_foreign_order_accessors
 from django.db.models.fields.related import (
@@ -468,12 +468,6 @@ def create_generic_related_manager(superclass, rel):
             content_type = ContentType.objects.db_manager(instance._state.db).get_for_model(
                 instance, for_concrete_model=rel.field.for_concrete_model)
             self.content_type = content_type
-
-            qn = connection.ops.quote_name
-            join_cols = rel.field.get_joining_columns(reverse_join=True)[0]
-            self.source_col_name = qn(join_cols[0])
-            self.target_col_name = qn(join_cols[1])
-
             self.content_type_field_name = rel.field.content_type_field_name
             self.object_id_field_name = rel.field.object_id_field_name
             self.prefetch_cache_name = rel.field.attname
