@@ -12,7 +12,8 @@ from django.utils import six
 from .models import (
     AllowsNullGFK, Animal, Comparison, ConcreteRelatedModel,
     ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
-    ProxyRelatedModel, Rock, TaggedItem, ValuableTaggedItem, Vegetable,
+    ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
+    Vegetable,
 )
 
 
@@ -399,6 +400,13 @@ class GenericRelationsTests(TestCase):
             content_object=quartz, tag="shiny", value=10
         )
         self.assertEqual(valuedtag.content_object, quartz)
+
+    def test_generic_relation_to_inherited_child(self):
+        # GenericRelations to models that use multi-table inheritance work.
+        granite = ValuableRock.objects.create(name='granite', hardness=5)
+        ValuableTaggedItem.objects.create(content_object=granite, tag="countertop", value=1)
+        granite.delete()  # deleting the rock should delete the related tag.
+        self.assertEqual(ValuableTaggedItem.objects.count(), 0)
 
     def test_generic_inline_formsets(self):
         GenericFormSet = generic_inlineformset_factory(TaggedItem, extra=1)

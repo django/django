@@ -114,6 +114,10 @@ class Rock(Mineral):
     tags = GenericRelation(TaggedItem)
 
 
+class ValuableRock(Mineral):
+    tags = GenericRelation(ValuableTaggedItem)
+
+
 class ManualPK(models.Model):
     id = models.IntegerField(primary_key=True)
     tags = GenericRelation(TaggedItem, related_query_name='manualpk')
