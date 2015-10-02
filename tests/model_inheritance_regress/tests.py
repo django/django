@@ -493,3 +493,22 @@ class ModelInheritanceTest(TestCase):
 
         jane = Supplier.objects.order_by("name").select_related("restaurant")[0]
         self.assertEqual(jane.restaurant.name, "Craft")
+
+    def test_related_filtering_query_efficiency_ticket_15844(self):
+        r = Restaurant.objects.create(
+            name="Guido's House of Pasta",
+            address='944 W. Fullerton',
+            serves_hot_dogs=True,
+            serves_pizza=False,
+        )
+        s = Supplier.objects.create(restaurant=r)
+        with self.assertNumQueries(1):
+            self.assertQuerysetEqual(
+                Supplier.objects.filter(restaurant=r),
+                [s], lambda x: x,
+            )
+        with self.assertNumQueries(1):
+            self.assertQuerysetEqual(
+                r.supplier_set.all(),
+                [s], lambda x: x,
+            )
