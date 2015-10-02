@@ -104,9 +104,11 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* When stale content types are detected after the ``migrate`` command, there's
-  now a list of related objects such as ``auth.Permission``\s that will also be
-  deleted. Previously, only the content types were listed.
+* When stale content types are detected in the
+  :djadmin:`remove_stale_contenttypes` command, there's now a list of related
+  objects such as ``auth.Permission``\s that will also be deleted. Previously,
+  only the content types were listed (and this prompt was after ``migrate``
+  rather than in a separate command).
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -476,6 +478,10 @@ Miscellaneous
   :setting:`OPTIONS['loaders'] <TEMPLATES-OPTIONS>` isn't specified. This could
   be backwards-incompatible if you have some :ref:`template tags that aren't
   thread safe <template_tag_thread_safety>`.
+
+* The prompt for stale content type deletion no longer occurs after running the
+  ``migrate`` command. Use the new :djadmin:`remove_stale_contenttypes` command
+  instead.
 
 .. _deprecated-features-1.11:
 

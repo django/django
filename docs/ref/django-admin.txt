@@ -1456,6 +1456,28 @@ it could be useful if you have a ``ForeignKey`` in
 allow creating an instance instead of entering the primary key of an existing
 instance.
 
+``django.contrib.contenttypes``
+-------------------------------
+
+``remove_stale_contenttypes``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. django-admin:: remove_stale_contenttypes
+
+.. versionadded:: 1.11
+
+This command is only available if Django's :doc:`contenttypes app
+</ref/contrib/contenttypes>` (:mod:`django.contrib.contenttypes`) is installed.
+
+Deletes stale content types (from deleted models) in your database. Any objects
+that depend on the deleted content types will also be deleted. A list of
+deleted objects will be displayed before you confirm it's okay to proceed with
+the deletion.
+
+.. django-admin-option:: --database DATABASE
+
+Specifies the database to use. Defaults to ``default``.
+
 ``django.contrib.gis``
 ----------------------
 
