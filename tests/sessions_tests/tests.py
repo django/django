@@ -274,15 +274,6 @@ class SessionTestsMixin(object):
         age = self.session.get_expiry_age(modification=modification)
         self.assertEqual(age, 10)
 
-        self.session.set_expiry(None)
-
-        date = self.session.get_expiry_date(modification=modification)
-        self.assertEqual(date, modification +
-                         timedelta(seconds=settings.SESSION_COOKIE_AGE))
-
-        age = self.session.get_expiry_age(modification=modification)
-        self.assertEqual(age, settings.SESSION_COOKIE_AGE)
-
     def test_custom_expiry_reset(self):
         self.session.set_expiry(None)
         self.session.set_expiry(10)
