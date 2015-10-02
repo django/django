@@ -521,8 +521,10 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         self.assertRaises(InvalidSessionKey,
                           self.backend()._key_to_file, "a/b/c")
 
-    @override_settings(SESSION_ENGINE="django.contrib.sessions.backends.file",
-    SESSION_COOKIE_AGE=0)
+    @override_settings(
+        SESSION_ENGINE="django.contrib.sessions.backends.file",
+        SESSION_COOKIE_AGE=0,
+    )
     def test_clearsessions_command(self):
         """
         Test clearsessions command for clearing expired sessions.
@@ -557,7 +559,7 @@ class FileSessionTests(SessionTestsMixin, unittest.TestCase):
         # Three sessions are in the filesystem before clearsessions...
         self.assertEqual(3, count_sessions())
         management.call_command('clearsessions')
-        # ... and one is deleted.
+        # ... and two are deleted.
         self.assertEqual(1, count_sessions())
 
 
