@@ -893,6 +893,11 @@ Exception Value: {{ exception_value|force_escape }}
   <h2>Request information</h2>
 
 {% if request %}
+  {% if request.user %}
+    <h3 id="user-info">USER</h3>
+    <p>{{ request.user }}</p>
+  {% endif %}
+
   <h3 id="get-info">GET</h3>
   {% if request.GET %}
     <table class="req">
@@ -1088,6 +1093,8 @@ File "{{ frame.filename }}" in {{ frame.function }}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
 {% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
 {% if request %}Request information:
+{% if request.user %}USER: {{ request.user }}{% endif %}
+
 GET:{% for k, v in request.GET.items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No GET data{% endfor %}
 

@@ -165,7 +165,7 @@ Models
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* Added ``request.user`` to the debug view.
 
 Serialization
 ^^^^^^^^^^^^^
