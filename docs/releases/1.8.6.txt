@@ -1,0 +1,12 @@
+==========================
+Django 1.8.6 release notes
+==========================
+
+*Under Development*
+
+Django 1.8.6 fixes several bugs in 1.8.5.
+
+Bugfixes
+========
+
+* ...
