@@ -16,6 +16,7 @@ from django.core.management.base import (
 from django.core.management.color import color_style
 from django.utils import autoreload, lru_cache, six
 from django.utils._os import npath, upath
+from django.utils.encoding import force_text
 
 
 def find_commands(management_dir):
@@ -106,7 +107,7 @@ def call_command(name, *args, **options):
         for s_opt in parser._actions if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
-    defaults = parser.parse_args(args=args)
+    defaults = parser.parse_args(args=[force_text(a) for a in args])
     defaults = dict(defaults._get_kwargs(), **arg_options)
     # Move positional args out of options to mimic legacy optparse
     args = defaults.pop('args', ())

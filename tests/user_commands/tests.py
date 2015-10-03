@@ -103,6 +103,14 @@ class CommandTests(SimpleTestCase):
         self.assertNotIn("opt_3", out.getvalue())
         self.assertNotIn("opt-3", out.getvalue())
 
+    def test_call_command_option_parsing_non_string_arg(self):
+        """
+        It should be possible to pass non-string arguments to call_command.
+        """
+        out = StringIO()
+        management.call_command('dance', 1, verbosity=0, stdout=out)
+        self.assertIn("You passed 1 as a positional argument.", out.getvalue())
+
     def test_calling_a_command_with_only_empty_parameter_should_ends_gracefully(self):
         out = StringIO()
         management.call_command('hal', "--empty", stdout=out)
