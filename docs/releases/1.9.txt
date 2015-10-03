@@ -254,6 +254,9 @@ Minor features
 * The new :class:`~django.contrib.gis.geoip2.GeoIP2` class allows using
   MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
 
+* The default OpenLayers library version included in widgets has been updated
+  from 2.13 to 2.13.1.
+
 :mod:`django.contrib.postgres`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

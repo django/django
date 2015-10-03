@@ -82,7 +82,7 @@ class OpenLayersWidget(BaseGeometryWidget):
 
     class Media:
         js = (
-            'http://openlayers.org/api/2.13/OpenLayers.js',
+            'http://openlayers.org/api/2.13.1/OpenLayers.js',
             'gis/js/OLMapWidget.js',
         )
 
@@ -97,7 +97,7 @@ class OSMWidget(BaseGeometryWidget):
 
     class Media:
         js = (
-            'http://openlayers.org/api/2.13/OpenLayers.js',
+            'http://openlayers.org/api/2.13.1/OpenLayers.js',
             'http://www.openstreetmap.org/openlayers/OpenStreetMap.js',
             'gis/js/OLMapWidget.js',
         )
