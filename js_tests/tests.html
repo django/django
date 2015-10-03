@@ -78,6 +78,15 @@
     <script src='../django/contrib/admin/static/admin/js/prepopulate.js' data-cover></script>
     <script src='../django/contrib/admin/static/admin/js/urlify.js' data-cover></script>
 
+    <div id="id_point_map">
+        <textarea id="id_point" name="point"
+                  class="vSerializedField required" style="display:none;"
+                  rows="10" cols="150">POINT (7.8177 47.397)</textarea>
+    </div>
+    <script src='http://openlayers.org/api/2.13.1/OpenLayers.js'></script>
+    <script src='../django/contrib/gis/static/gis/js/OLMapWidget.js' data-cover></script>
+    <script src='./gis/mapwidget.test.js'></script>
+
     <script>
        if (location.href.match(/(\?|&)gruntReport($|&|=)/)) {
            blanket.options("reporter", "qunit/grunt-reporter.js");
