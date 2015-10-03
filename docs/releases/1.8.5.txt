@@ -2,7 +2,7 @@
 Django 1.8.5 release notes
 ==========================
 
-*Under development*
+*October 3, 2015*
 
 Django 1.8.5 fixes several bugs in 1.8.4.
 
