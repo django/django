@@ -362,7 +362,7 @@ tutorial, then you can determine its path using Python's built-in
     >>> import os
     >>> import world
     >>> world_shp = os.path.abspath(os.path.join(os.path.dirname(world.__file__),
-    ...                             'data/TM_WORLD_BORDERS-0.3.shp'))
+    ...                             'data', 'TM_WORLD_BORDERS-0.3.shp'))
 
 Now, open the world borders shapefile using GeoDjango's
 :class:`~django.contrib.gis.gdal.DataSource` interface::
@@ -487,7 +487,7 @@ with the following code::
         'mpoly' : 'MULTIPOLYGON',
     }
 
-    world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data/TM_WORLD_BORDERS-0.3.shp'))
+    world_shp = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data', 'TM_WORLD_BORDERS-0.3.shp'))
 
     def run(verbose=True):
         lm = LayerMapping(WorldBorder, world_shp, world_mapping,
