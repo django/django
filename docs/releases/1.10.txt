@@ -149,7 +149,7 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* ...
+* :djadmin:`clearsessions` was fixed to remove file-based sessions.
 
 Migrations
 ^^^^^^^^^^
