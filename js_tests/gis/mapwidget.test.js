@@ -1,4 +1,4 @@
-/* global module, test */
+/* global module, test, MapWidget */
 /* eslint global-strict: 0, strict: 0 */
 'use strict';
 
