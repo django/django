@@ -39,8 +39,8 @@ test('MapWidget.getControls', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
     widget.getControls(widget.layers.vector);
-    assert.equal(widget.controls.length, 3)
-    assert.equal(widget.controls[0].displayClass, 'olControlNavigation', 'Navigation control')
-    assert.equal(widget.controls[1].displayClass, 'olControlDrawFeaturePoint', 'Draw control')
-    assert.equal(widget.controls[2].displayClass, 'olControlModifyFeature', 'Modify control')
+    assert.equal(widget.controls.length, 3);
+    assert.equal(widget.controls[0].displayClass, 'olControlNavigation', 'Navigation control');
+    assert.equal(widget.controls[1].displayClass, 'olControlDrawFeaturePoint', 'Draw control');
+    assert.equal(widget.controls[2].displayClass, 'olControlModifyFeature', 'Modify control');
 });
