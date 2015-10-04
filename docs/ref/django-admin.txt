@@ -147,6 +147,16 @@ Or you could run it directly on a production or staging deployment to verify
 that the correct settings are in use (omitting ``--settings``). You could even
 make it part of your integration test suite.
 
+.. django-admin-option:: --fail-level
+
+.. versionadded:: 1.10
+
+Specifies the message level that will cause the command to exit with a non-zero
+status. Default is ``ERROR``.
+
+Available levels are: ``CRITICAL``, ``ERROR``, ``WARNING``, ``INFO``, and
+``DEBUG``.
+
 compilemessages
 ---------------
 

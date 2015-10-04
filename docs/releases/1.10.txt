@@ -150,7 +150,9 @@ Internationalization
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The new :djadminopt:`--fail-level` option of the :djadmin:`check` command
+  allows specifying the message level that will cause the command to exit with
+  a non-zero status.
 
 Migrations
 ^^^^^^^^^^
