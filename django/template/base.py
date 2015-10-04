@@ -553,13 +553,18 @@ class Parser(object):
         if parse_until:
             raise self.error(
                 token,
-                "Invalid block tag on line %d: '%s', expected %s" % (
+                "Invalid block tag on line %d: '%s', expected %s. Did you "
+                "forget to register or load this tag?" % (
                     token.lineno,
                     command,
                     get_text_list(["'%s'" % p for p in parse_until]),
                 ),
             )
-        raise self.error(token, "Invalid block tag on line %d: '%s'" % (token.lineno, command))
+        raise self.error(
+            token,
+            "Invalid block tag on line %d: '%s'. Did you forget to register "
+            "or load this tag?" % (token.lineno, command)
+        )
 
     def unclosed_block_tag(self, parse_until):
         command, token = self.command_stack.pop()

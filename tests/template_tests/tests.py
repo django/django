@@ -68,14 +68,21 @@ class TemplateTests(SimpleTestCase):
         #7876 -- Error messages should include the unexpected block name.
         """
         engine = Engine()
-
-        with self.assertRaises(TemplateSyntaxError) as e:
+        msg = (
+            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' "
+            "or 'endif'. Did you forget to register or load this tag?"
+        )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
             engine.from_string("{% if 1 %}lala{% endblock %}{% endif %}")
 
-        self.assertEqual(
-            e.exception.args[0],
-            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' or 'endif'",
+    def test_unknown_block_tag(self):
+        engine = Engine()
+        msg = (
+            "Invalid block tag on line 1: 'foobar'. Did you forget to "
+            "register or load this tag?"
         )
+        with self.assertRaisesMessage(TemplateSyntaxError, msg):
+            engine.from_string("lala{% foobar %}")
 
     def test_compile_filter_expression_error(self):
         """
