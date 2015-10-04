@@ -18,7 +18,7 @@ test('MapWidget.featureAdded', function(assert) {
 test('MapWidget.map_srid', function(assert) {
     var options = {id: 'id_point', map_id: 'id_point_map', geom_name: 'Point'};
     var widget = new MapWidget(options);
-    assert.equal(widget.options['map_srid'], 4326, 'SRID 4326');
+    assert.equal(widget.options.map_srid, 4326, 'SRID 4326');
 });
 
 test('MapWidget.defaultCenter', function(assert) {
