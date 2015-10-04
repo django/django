@@ -355,7 +355,7 @@ class BaseCommand(object):
                 translation.activate(saved_locale)
 
     def check(self, app_configs=None, tags=None, display_num_errors=False,
-              include_deployment_checks=False):
+              include_deployment_checks=False, fail_level=checks.ERROR):
         """
         Uses the system check framework to validate entire Django project.
         Raises CommandError for any serious message (error or critical errors).
@@ -409,7 +409,7 @@ class BaseCommand(object):
                 len(all_issues) - visible_issue_count,
             )
 
-        if any(e.is_serious() and not e.is_silenced() for e in all_issues):
+        if any(e.is_serious(fail_level) and not e.is_silenced() for e in all_issues):
             msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
             raise SystemCheckError(msg)
         else:

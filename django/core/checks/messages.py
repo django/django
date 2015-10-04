@@ -48,8 +48,8 @@ class CheckMessage(object):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % \
             (self.__class__.__name__, self.level, self.msg, self.hint, self.obj, self.id)
 
-    def is_serious(self):
-        return self.level >= ERROR
+    def is_serious(self, level=ERROR):
+        return self.level >= level
 
     def is_silenced(self):
         from django.conf import settings

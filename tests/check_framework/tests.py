@@ -116,7 +116,7 @@ def simple_system_check(**kwargs):
 
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
-    return []
+    return [checks.Warning('System Check')]
 tagged_system_check.tags = ['simpletag']
 
 
@@ -191,6 +191,11 @@ class CheckCommandTests(SimpleTestCase):
     def test_tags_deployment_check_included(self):
         call_command('check', deploy=True, tags=['deploymenttag'])
         self.assertIn('Deployment Check', sys.stderr.getvalue())
+
+    @override_system_checks([tagged_system_check])
+    def test_fail_level(self):
+        with self.assertRaises(CommandError):
+            call_command('check', fail_level='WARNING')
 
 
 def custom_error_system_check(app_configs, **kwargs):
