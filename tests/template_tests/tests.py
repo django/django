@@ -74,7 +74,21 @@ class TemplateTests(SimpleTestCase):
 
         self.assertEqual(
             e.exception.args[0],
-            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' or 'endif'",
+            "Invalid block tag on line 1: 'endblock', expected 'elif', 'else' or 'endif'. Did you forget to register or load this tag?",
+        )
+
+    def test_unknown_block_tag(self):
+        """
+        #25423 -- Using custom tag without {% load %} result in confusing traceback.
+        """
+        engine = Engine()
+
+        with self.assertRaises(TemplateSyntaxError) as e:
+            engine.from_string("lala{% foobar %}")
+
+        self.assertEqual(
+            e.exception.args[0],
+            "Invalid block tag on line 1: 'foobar'. Did you forget to register or load this tag?",
         )
 
     def test_compile_filter_expression_error(self):
