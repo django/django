@@ -301,11 +301,6 @@ def deferred_class_factory(model, attrs):
         return type(str(name), (model,), overrides)
 
 
-# The above function is also used to unpickle model instances with deferred
-# fields.
-deferred_class_factory.__safe_for_unpickling__ = True
-
-
 def refs_aggregate(lookup_parts, aggregates):
     """
     A helper method to check if the lookup_parts contains references

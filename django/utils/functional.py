@@ -314,7 +314,6 @@ def unpickle_lazyobject(wrapped):
     wrapped object.
     """
     return wrapped
-unpickle_lazyobject.__safe_for_unpickling__ = True
 
 
 # Workaround for http://bugs.python.org/issue12370
