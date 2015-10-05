@@ -427,8 +427,8 @@ class ForeignObject(RelatedField):
     rel_class = ForeignObjectRel
 
     def __init__(self, to, on_delete, from_fields, to_fields, rel=None, related_name=None,
-            related_query_name=None, limit_choices_to=None, parent_link=False,
-            swappable=True, **kwargs):
+                 related_query_name=None, limit_choices_to=None, parent_link=False,
+                 swappable=True, **kwargs):
 
         if rel is None:
             rel = self.rel_class(
@@ -461,11 +461,16 @@ class ForeignObject(RelatedField):
         except exceptions.FieldDoesNotExist:
             return []
 
+        nonempty_foreign_related_fields = tuple(rel_field
+                                                for rel_field in self.foreign_related_fields if rel_field)
+        if len(nonempty_foreign_related_fields) < 1:
+            return []
+
         has_unique_field = any(rel_field.unique
-            for rel_field in self.foreign_related_fields)
-        if not has_unique_field and len(self.foreign_related_fields) > 1:
+                               for rel_field in nonempty_foreign_related_fields)
+        if not has_unique_field and len(nonempty_foreign_related_fields) > 1:
             field_combination = ', '.join("'%s'" % rel_field.name
-                for rel_field in self.foreign_related_fields)
+                                          for rel_field in nonempty_foreign_related_fields)
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -477,7 +482,7 @@ class ForeignObject(RelatedField):
                 )
             ]
         elif not has_unique_field:
-            field_name = self.foreign_related_fields[0].name
+            field_name = nonempty_foreign_related_fields[0].name
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -713,8 +718,8 @@ class ForeignKey(ForeignObject):
     description = _("Foreign Key (type determined by related field)")
 
     def __init__(self, to, on_delete=None, related_name=None, related_query_name=None,
-            limit_choices_to=None, parent_link=False, to_field=None,
-            db_constraint=True, **kwargs):
+                 limit_choices_to=None, parent_link=False, to_field=None,
+                 db_constraint=True, **kwargs):
         try:
             to._meta.model_name
         except AttributeError:
@@ -1088,9 +1093,9 @@ class ManyToManyField(RelatedField):
     description = _("Many-to-many relationship")
 
     def __init__(self, to, related_name=None, related_query_name=None,
-            limit_choices_to=None, symmetrical=None, through=None,
-            through_fields=None, db_constraint=True, db_table=None,
-            swappable=True, **kwargs):
+                 limit_choices_to=None, symmetrical=None, through=None,
+                 through_fields=None, db_constraint=True, db_table=None,
+                 swappable=True, **kwargs):
         try:
             to._meta
         except AttributeError:
