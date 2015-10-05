@@ -316,10 +316,6 @@ def unpickle_lazyobject(wrapped):
     return wrapped
 
 
-# Workaround for http://bugs.python.org/issue12370
-_super = super
-
-
 class SimpleLazyObject(LazyObject):
     """
     A lazy object initialized from any function.
@@ -337,7 +333,7 @@ class SimpleLazyObject(LazyObject):
         value.
         """
         self.__dict__['_setupfunc'] = func
-        _super(SimpleLazyObject, self).__init__()
+        super(SimpleLazyObject, self).__init__()
 
     def _setup(self):
         self._wrapped = self._setupfunc()
