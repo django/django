@@ -501,14 +501,14 @@ the intermediate model::
     ...     invite_reason="Needed a new drummer.")
     >>> m1.save()
     >>> beatles.members.all()
-    [<Person: Ringo Starr>]
+    <QuerySet [<Person: Ringo Starr>]>
     >>> ringo.group_set.all()
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
     >>> m2 = Membership.objects.create(person=paul, group=beatles,
     ...     date_joined=date(1960, 8, 1),
     ...     invite_reason="Wanted to form a band.")
     >>> beatles.members.all()
-    [<Person: Ringo Starr>, <Person: Paul McCartney>]
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
 Unlike normal many-to-many fields, you *can't* use ``add``, ``create``,
 or assignment (i.e., ``beatles.members = [...]``) to create relationships::
@@ -537,7 +537,7 @@ used to remove all many-to-many relationships for an instance::
     >>> beatles.members.clear()
     >>> # Note that this deletes the intermediate model instances
     >>> Membership.objects.all()
-    []
+    <QuerySet []>
 
 Once you have established the many-to-many relationships by creating instances
 of your intermediate model, you can issue queries. Just as with normal
@@ -546,7 +546,7 @@ many-to-many-related model::
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Group.objects.filter(members__name__startswith='Paul')
-    [<Group: The Beatles>]
+    <QuerySet [<Group: The Beatles>]>
 
 As you are using an intermediate model, you can also query on its attributes::
 
@@ -554,7 +554,7 @@ As you are using an intermediate model, you can also query on its attributes::
     >>> Person.objects.filter(
     ...     group__name='The Beatles',
     ...     membership__date_joined__gt=date(1961,1,1))
-    [<Person: Ringo Starr]
+    <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
 querying the ``Membership`` model::

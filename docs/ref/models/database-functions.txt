@@ -226,7 +226,7 @@ Usage example::
 
     >>> from django.db.models.functions import Now
     >>> Article.objects.filter(published__lte=Now())
-    [<Article: How to Django>]
+    <QuerySet [<Article: How to Django>]>
 
 .. admonition:: PostgreSQL considerations
 

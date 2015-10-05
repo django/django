@@ -382,7 +382,7 @@ be used to retrieve their associated ``TaggedItems``::
     >>> t2 = TaggedItem(content_object=b, tag='python')
     >>> t2.save()
     >>> b.tags.all()
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
@@ -394,7 +394,7 @@ from ``TaggedItem``::
 
     >>> # Get all tags belonging to books containing `django` in the url
     >>> TaggedItem.objects.filter(bookmarks__url__contains='django')
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Just as :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 accepts the names of the content-type and object-ID fields as
@@ -418,7 +418,7 @@ same types of lookups manually::
     >>> bookmark_type = ContentType.objects.get_for_model(b)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id,
     ...                           object_id=b.id)
-    [<TaggedItem: django>, <TaggedItem: python>]
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
 Note that if the model in a
 :class:`~django.contrib.contenttypes.fields.GenericRelation` uses a

@@ -234,7 +234,7 @@ class QuerySet(object):
         data = list(self[:REPR_OUTPUT_SIZE + 1])
         if len(data) > REPR_OUTPUT_SIZE:
             data[-1] = "...(remaining elements truncated)..."
-        return repr(data)
+        return '<QuerySet %r>' % data
 
     def __len__(self):
         self._fetch_all()

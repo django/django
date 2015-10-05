@@ -588,9 +588,8 @@ Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
 a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
 
     >>> from world.models import WorldBorder
-    >>> qs = WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
-    >>> qs
-    [<WorldBorder: United States>]
+    >>> WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
+    <QuerySet [<WorldBorder: United States>]>
 
 Here, you retrieved a ``QuerySet`` with only one model: the border of the
 United States (exactly what you would expect).
@@ -602,8 +601,7 @@ of a queryset::
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
-    >>> sm = WorldBorder.objects.get(mpoly__intersects=pnt)
-    >>> sm
+    >>> WorldBorder.objects.get(mpoly__intersects=pnt)
     <WorldBorder: San Marino>
 
 The ``contains`` and ``intersects`` lookups are just a subset of the
@@ -638,7 +636,7 @@ of abstraction::
     "world_worldborder"."mpoly" FROM "world_worldborder"
     WHERE ST_Intersects("world_worldborder"."mpoly", ST_Transform(%s, 4326))
     >>> qs # printing evaluates the queryset
-    [<WorldBorder: United States>]
+    <QuerySet [<WorldBorder: United States>]>
 
 __ http://spatialreference.org/ref/epsg/32140/
 

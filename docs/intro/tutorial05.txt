@@ -383,7 +383,7 @@ With that ready, we can ask the client to do some work for us::
     >>> # If the following doesn't work, you probably omitted the call to
     >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
-    [<Question: Who is your favorite Beatle?>]
+    <QuerySet [<Question: Who is your favorite Beatle?>]>
 
 Improving our view
 ------------------

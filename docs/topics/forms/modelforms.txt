@@ -912,7 +912,7 @@ extra forms displayed.
 ``max_num`` does not prevent existing objects from being displayed::
 
     >>> Author.objects.order_by('name')
-    [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]
+    <QuerySet [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]>
 
     >>> AuthorFormSet = modelformset_factory(Author, fields=('name',), max_num=1)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))

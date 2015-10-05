@@ -513,11 +513,11 @@ objects::
 
     # This list contains a Blog object.
     >>> Blog.objects.filter(name__startswith='Beatles')
-    [<Blog: Beatles Blog>]
+    <QuerySet [<Blog: Beatles Blog>]>
 
     # This list contains a dictionary.
     >>> Blog.objects.filter(name__startswith='Beatles').values()
-    [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
 
 The ``values()`` method takes optional positional arguments, ``*fields``, which
 specify field names to which the ``SELECT`` should be limited. If you specify
@@ -528,9 +528,9 @@ contain a key and value for every field in the database table.
 Example::
 
     >>> Blog.objects.values()
-    [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}],
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
     >>> Blog.objects.values('id', 'name')
-    [{'id': 1, 'name': 'Beatles Blog'}]
+    <QuerySet [{'id': 1, 'name': 'Beatles Blog'}]>
 
 A few subtleties that are worth mentioning:
 
@@ -546,13 +546,13 @@ A few subtleties that are worth mentioning:
   For example::
 
     >>> Entry.objects.values()
-    [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]
+    <QuerySet [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]>
 
     >>> Entry.objects.values('blog')
-    [{'blog': 1}, ...]
+    <QuerySet [{'blog': 1}, ...]>
 
     >>> Entry.objects.values('blog_id')
-    [{'blog_id': 1}, ...]
+    <QuerySet [{'blog_id': 1}, ...]>
 
 * When using ``values()`` together with :meth:`distinct()`, be aware that
   ordering can affect the results. See the note in :meth:`distinct` for
@@ -585,9 +585,9 @@ individualism.
 You can also refer to fields on related models with reverse relations through
 ``OneToOneField``, ``ForeignKey`` and ``ManyToManyField`` attributes::
 
-    Blog.objects.values('name', 'entry__headline')
-    [{'name': 'My blog', 'entry__headline': 'An entry'},
-         {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]
+    >>> Blog.objects.values('name', 'entry__headline')
+    <QuerySet [{'name': 'My blog', 'entry__headline': 'An entry'},
+         {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]>
 
 .. warning::
 
@@ -717,7 +717,7 @@ is an instance of ``EmptyQuerySet``.
 Examples::
 
     >>> Entry.objects.none()
-    []
+    <QuerySet []>
     >>> from django.db.models.query import EmptyQuerySet
     >>> isinstance(Entry.objects.none(), EmptyQuerySet)
     True
@@ -3015,11 +3015,11 @@ as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
-    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
     >>> Question.objects.prefetch_related(Prefetch('choice_set')).all()
-    [<Question: Question object>]
+    <QuerySet [<Question: Question object>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
 This is useful to further filter down the prefetch operation, or to call
@@ -3028,19 +3028,19 @@ relation, hence reducing the number of queries even further:
 
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
     >>> voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
 attribute:
 
     >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
-    [<Choice: The sky>]
+    <QuerySet [<Choice: The sky>]>
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
-    [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]
+    <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
 .. note::
 

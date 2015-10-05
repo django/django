@@ -800,11 +800,12 @@ class NaturalKeyFixtureTests(TestCase):
             verbosity=0,
         )
         books = Book.objects.all()
-        self.assertEqual(
-            books.__repr__(),
-            "[<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>, "
-            "<Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>, "
-            "<Book: Permutation City by Greg Egan (available at Angus and Robertson)>]"
+        self.assertQuerysetEqual(
+            books, [
+                "<Book: Cryptonomicon by Neal Stephenson (available at Amazon, Borders)>",
+                "<Book: Ender's Game by Orson Scott Card (available at Collins Bookstore)>",
+                "<Book: Permutation City by Greg Egan (available at Angus and Robertson)>",
+            ]
         )
 
 
