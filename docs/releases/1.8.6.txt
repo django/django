@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression causing ``ModelChoiceField`` to ignore
   ``prefetch_related()`` on its queryset (:ticket:`25496`).
+
+* Allowed "mode=memory" in SQLite test database name if supported
+  (:ticket:`12118`).
