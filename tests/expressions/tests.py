@@ -57,6 +57,18 @@ class BasicExpressionsTests(TestCase):
         )
         self.assertEqual(companies['result'], 2395)
 
+    def test_annotate_values_filter(self):
+        companies = Company.objects.annotate(
+            foo=RawSQL('%s', ['value']),
+        ).filter(foo='value').order_by('name')
+        self.assertQuerysetEqual(
+            companies, [
+                '<Company: Example Inc.>',
+                '<Company: Foobar Ltd.>',
+                '<Company: Test GmbH>',
+            ],
+        )
+
     def test_filter_inter_attribute(self):
         # We can filter on attribute relationships on same model obj, e.g.
         # find companies where the number of employees is greater
