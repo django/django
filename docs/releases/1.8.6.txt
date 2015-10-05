@@ -9,4 +9,5 @@ Django 1.8.6 fixes several bugs in 1.8.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression causing ``ModelChoiceField`` to ignore
+  ``prefetch_related()`` on its queryset (:ticket:`25496`).

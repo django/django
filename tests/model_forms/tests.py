@@ -2203,6 +2203,29 @@ class OtherModelFormTests(TestCase):
         with self.assertRaises(ValidationError):
             f.fields['status'].clean('z')
 
+    def test_prefetch_related_queryset(self):
+        """
+        ModelChoiceField should respect a prefetch_related() on its queryset.
+        """
+        blue = Colour.objects.create(name='blue')
+        red = Colour.objects.create(name='red')
+        multicolor_item = ColourfulItem.objects.create()
+        multicolor_item.colours.add(blue, red)
+        red_item = ColourfulItem.objects.create()
+        red_item.colours.add(red)
+
+        class ColorModelChoiceField(forms.ModelChoiceField):
+            def label_from_instance(self, obj):
+                return ', '.join(c.name for c in obj.colours.all())
+
+        field = ColorModelChoiceField(ColourfulItem.objects.prefetch_related('colours'))
+        with self.assertNumQueries(4):  # would be 5 if prefetch is ignored
+            self.assertEqual(tuple(field.choices), (
+                ('', '---------'),
+                (multicolor_item.pk, 'blue, red'),
+                (red_item.pk, 'red'),
+            ))
+
     def test_foreignkeys_which_use_to_field(self):
         apple = Inventory.objects.create(barcode=86, name='Apple')
         Inventory.objects.create(barcode=22, name='Pear')

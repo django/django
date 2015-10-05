@@ -1092,15 +1092,17 @@ class ModelChoiceIterator(object):
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
+        method = 'all' if self.queryset._prefetch_related_lookups else 'iterator'
+        queryset = getattr(self.queryset, method)
         if self.field.cache_choices:
             if self.field.choice_cache is None:
                 self.field.choice_cache = [
-                    self.choice(obj) for obj in self.queryset.iterator()
+                    self.choice(obj) for obj in queryset()
                 ]
             for choice in self.field.choice_cache:
                 yield choice
         else:
-            for obj in self.queryset.iterator():
+            for obj in queryset():
                 yield self.choice(obj)
 
     def __len__(self):
