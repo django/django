@@ -9,6 +9,7 @@ from django.utils._os import upath
 
 from .models import (
     ConcreteModel, ConcreteModelSubclass, ConcreteModelSubclassProxy,
+    ProxyModel,
 )
 
 
@@ -43,3 +44,10 @@ class MultiTableInheritanceProxyTest(TestCase):
         self.assertEqual(0, ConcreteModelSubclassProxy.objects.count())
         self.assertEqual(0, ConcreteModelSubclass.objects.count())
         self.assertEqual(0, ConcreteModel.objects.count())
+
+    def test_deletion_through_intermediate_proxy(self):
+        child = ConcreteModelSubclass.objects.create()
+        proxy = ProxyModel.objects.get(pk=child.pk)
+        proxy.delete()
+        self.assertFalse(ConcreteModel.objects.exists())
+        self.assertFalse(ConcreteModelSubclass.objects.exists())
