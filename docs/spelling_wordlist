@@ -728,6 +728,7 @@ spatialite
 Springmeyer
 SQL
 sqlflush
+sqlite
 sqlmigrate
 sqlsequencereset
 squashmigrations

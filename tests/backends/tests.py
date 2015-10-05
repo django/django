@@ -142,6 +142,28 @@ class SQLiteTests(TestCase):
                 models.Item.objects.all().aggregate,
                 **{'complex': aggregate('last_modified') + aggregate('last_modified')})
 
+    def test_memory_db_test_name(self):
+        """
+        refs: 12118 - Check that we allow a named in-memory db where supported
+        """
+        from django.db.backends.sqlite3.base import DatabaseWrapper
+
+        settings_dict = {
+            'TEST': {
+                'NAME': 'file:memorydb_test?mode=memory&cache=shared'
+            }
+        }
+        wrapper = DatabaseWrapper(settings_dict)
+        creation = wrapper.creation
+
+        can_share_in_memory_db = creation.connection.features.can_share_in_memory_db
+        if can_share_in_memory_db:
+            expected = creation.connection.settings_dict['TEST']['NAME']
+            self.assertEqual(creation._get_test_db_name(), expected)
+        else:
+            with self.assertRaises(ImproperlyConfigured):
+                creation._get_test_db_name()
+
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "Test only for PostgreSQL")
 class PostgreSQLTests(TestCase):
