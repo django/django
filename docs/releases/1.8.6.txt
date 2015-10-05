@@ -17,3 +17,5 @@ Bugfixes
 
 * Fixed system check crash on ``ForeignKey`` to abstract model
   (:ticket:`25503`).
+
+* Allowed filtering over a ``RawSQL`` annotation (:ticket:`25506`).
