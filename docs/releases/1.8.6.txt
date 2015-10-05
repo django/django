@@ -14,3 +14,6 @@ Bugfixes
 
 * Allowed "mode=memory" in SQLite test database name if supported
   (:ticket:`12118`).
+
+* Fixed system check crash on ``ForeignKey`` to abstract model
+  (:ticket:`25503`).

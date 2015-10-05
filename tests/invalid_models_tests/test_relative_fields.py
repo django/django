@@ -296,25 +296,27 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
     def test_foreign_key_to_abstract_model(self):
-        class Model(models.Model):
-            foreign_key = models.ForeignKey('AbstractModel')
-
         class AbstractModel(models.Model):
             class Meta:
                 abstract = True
 
-        field = Model._meta.get_field('foreign_key')
-        errors = field.check()
-        expected = [
-            Error(
-                ("Field defines a relation with model 'AbstractModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
-                obj=field,
-                id='fields.E300',
-            ),
+        class Model(models.Model):
+            rel_string_foreign_key = models.ForeignKey('AbstractModel')
+            rel_class_foreign_key = models.ForeignKey(AbstractModel)
+
+        fields = [
+            Model._meta.get_field('rel_string_foreign_key'),
+            Model._meta.get_field('rel_class_foreign_key'),
         ]
-        self.assertEqual(errors, expected)
+        expected_error = Error(
+            "Field defines a relation with model 'AbstractModel', "
+            "which is either not installed, or is abstract.",
+            id='fields.E300',
+        )
+        for field in fields:
+            expected_error.obj = field
+            errors = field.check()
+            self.assertEqual(errors, [expected_error])
 
     def test_m2m_to_abstract_model(self):
         class AbstractModel(models.Model):
@@ -322,20 +324,22 @@ class RelativeFieldTests(IsolatedModelsTestCase):
                 abstract = True
 
         class Model(models.Model):
-            m2m = models.ManyToManyField('AbstractModel')
+            rel_string_m2m = models.ManyToManyField('AbstractModel')
+            rel_class_m2m = models.ManyToManyField(AbstractModel)
 
-        field = Model._meta.get_field('m2m')
-        errors = field.check(from_model=Model)
-        expected = [
-            Error(
-                ("Field defines a relation with model 'AbstractModel', "
-                 "which is either not installed, or is abstract."),
-                hint=None,
-                obj=field,
-                id='fields.E300',
-            ),
+        fields = [
+            Model._meta.get_field('rel_string_m2m'),
+            Model._meta.get_field('rel_class_m2m'),
         ]
-        self.assertEqual(errors, expected)
+        expected_error = Error(
+            "Field defines a relation with model 'AbstractModel', "
+            "which is either not installed, or is abstract.",
+            id='fields.E300',
+        )
+        for field in fields:
+            expected_error.obj = field
+            errors = field.check(from_model=Model)
+            self.assertEqual(errors, [expected_error])
 
     def test_unique_m2m(self):
         class Person(models.Model):
