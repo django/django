@@ -1277,6 +1277,10 @@ correctly:
 This feature isn't available on Windows. It doesn't work with the Oracle
 database backend either.
 
+If you want to use :mod:`pdb` while debugging tests, you must disable parallel
+execution (``--parallel=1``). You'll see something like ``bdb.BdbQuit`` if you
+don't.
+
 .. warning::
 
     When test parallelization is enabled and a test fails, Django may be
