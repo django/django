@@ -139,3 +139,30 @@ class OrderedPerson(models.Model):
 
     class Meta:
         ordering = ['name']
+
+
+# Models for #23076
+
+
+class ConcretePhoto(Photo):
+    pass
+
+
+class M2MtoFile(models.Model):
+    # M2M to concrete proxy base
+    my_files = models.ManyToManyField(File)
+
+
+class M2MtoImage(M2MtoFile):
+    # M2M to proxy
+    my_images = models.ManyToManyField(Image)
+
+
+class M2MtoPhoto(M2MtoImage):
+    # M2M to proxy of proxy
+    my_photos = models.ManyToManyField(Photo)
+
+
+class M2MtoConcretePhoto(M2MtoPhoto):
+    # M2M to concrete proxy child
+    my_concrete_photos = models.ManyToManyField(ConcretePhoto)

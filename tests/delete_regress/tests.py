@@ -10,7 +10,7 @@ from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 from .models import (Book, Award, AwardNote, Person, Child, Toy, PlayedWith,
     PlayedWithNote, Email, Researcher, Food, Eaten, Policy, Version, Location,
     Item, Image, File, Photo, FooFile, FooImage, FooPhoto, FooFileProxy, Login,
-    OrgUnit, OrderedPerson, House)
+    OrgUnit, OrderedPerson, House, M2MtoConcretePhoto, ConcretePhoto)
 
 
 # Can't run this test under SQLite, because you can't
@@ -267,6 +267,51 @@ class ProxyDeleteTest(TestCase):
             Image.objects.values().delete()
         with self.assertRaises(TypeError):
             Image.objects.values_list().delete()
+
+
+# Error conditions don't show up under SQLite, needs FK constraints in DB
+@skipUnlessDBFeature('supports_foreign_keys')
+class ProxyDeleteM2MRelationshipsTest(TransactionTestCase):
+    """
+    Test that reverse FK component of M2M relationship to proxy models is
+    deleted when the relevant target model is deleted, to avoid errors like the
+    following in DBs that enforce FK integrity constraints:
+
+    - PostgreSQL:
+        IntegrityError: update or delete on table "TargetTable" violates
+        foreign key constraint "FKConstraint" on table "M2MThroughTable"
+        DETAIL:  Key (id)=(6) is still referenced from table "M2MThroughTable".
+    """
+
+    available_apps = ['delete_regress']
+
+    def setUp(self):
+        self.concrete_photo = ConcretePhoto.objects.create()
+        self.m2m_source = M2MtoConcretePhoto.objects.create()
+
+    def test_delete_with_m2m_to_concrete_base(self):
+        self.m2m_source.my_files.add(self.concrete_photo)
+
+        self.concrete_photo.delete()
+        self.assertEqual(len(self.m2m_source.my_files.all()), 0)
+
+    def test_delete_with_m2m_to_proxy(self):
+        self.m2m_source.my_images.add(self.concrete_photo)
+
+        self.concrete_photo.delete()
+        self.assertEqual(len(self.m2m_source.my_images.all()), 0)
+
+    def test_delete_with_m2m_to_proxy_of_proxy(self):
+        self.m2m_source.my_photos.add(self.concrete_photo)
+
+        self.concrete_photo.delete()
+        self.assertEqual(len(self.m2m_source.my_photos.all()), 0)
+
+    def test_delete_with_m2m_to_concrete_proxy_child(self):
+        self.m2m_source.my_concrete_photos.add(self.concrete_photo)
+
+        self.concrete_photo.delete()
+        self.assertEqual(len(self.m2m_source.my_concrete_photos.all()), 0)
 
 
 class Ticket19102Tests(TestCase):
