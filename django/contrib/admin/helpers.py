@@ -265,7 +265,16 @@ class InlineAdminFormSet(object):
                     'help_text': help_text_for_field(field_name, self.opts.model),
                 }
             else:
-                yield self.formset.form.base_fields[field_name]
+                form_field = self.formset.form.base_fields[field_name]
+                label = form_field.label
+                if label is None:
+                    label = label_for_field(field_name, self.opts.model, self.opts)
+                yield {
+                    'label': label,
+                    'widget': form_field.widget,
+                    'required': form_field.required,
+                    'help_text': form_field.help_text,
+                }
 
     def _media(self):
         media = self.opts.media + self.formset.media

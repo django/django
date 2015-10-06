@@ -97,6 +97,14 @@ class TestInline(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Fashionista.objects.filter(person__firstname='Imelda')), 1)
 
+    def test_custom_form_tabular_inline_label(self):
+        """
+        A model form with a form field specified (TitleForm.title1) should have
+        its label rendered in the tabular inline.
+        """
+        response = self.client.get(reverse('admin:admin_inlines_titlecollection_add'))
+        self.assertContains(response, '<th class="required">Title1</th>', html=True)
+
     def test_tabular_non_field_errors(self):
         """
         Ensure that non_field_errors are displayed correctly, including the
