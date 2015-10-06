@@ -461,16 +461,14 @@ class ForeignObject(RelatedField):
         except exceptions.FieldDoesNotExist:
             return []
 
-        nonempty_foreign_related_fields = tuple(rel_field
-            for rel_field in self.foreign_related_fields if rel_field)
-        if len(nonempty_foreign_related_fields) < 1:
+        if not self.foreign_related_fields:
             return []
 
         has_unique_field = any(rel_field.unique
-            for rel_field in nonempty_foreign_related_fields)
-        if not has_unique_field and len(nonempty_foreign_related_fields) > 1:
+            for rel_field in self.foreign_related_fields)
+        if not has_unique_field and len(self.foreign_related_fields) > 1:
             field_combination = ', '.join("'%s'" % rel_field.name
-                for rel_field in nonempty_foreign_related_fields)
+                for rel_field in self.foreign_related_fields)
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -482,7 +480,7 @@ class ForeignObject(RelatedField):
                 )
             ]
         elif not has_unique_field:
-            field_name = nonempty_foreign_related_fields[0].name
+            field_name = self.foreign_related_fields[0].name
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
@@ -568,7 +566,7 @@ class ForeignObject(RelatedField):
 
     @property
     def foreign_related_fields(self):
-        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields)
+        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field)
 
     def get_local_related_value(self, instance):
         return self.get_instance_value_for_fields(instance, self.local_related_fields)
