@@ -461,6 +461,9 @@ class ForeignObject(RelatedField):
         except exceptions.FieldDoesNotExist:
             return []
 
+        if not self.foreign_related_fields:
+            return []
+
         has_unique_field = any(rel_field.unique
             for rel_field in self.foreign_related_fields)
         if not has_unique_field and len(self.foreign_related_fields) > 1:
@@ -563,7 +566,7 @@ class ForeignObject(RelatedField):
 
     @property
     def foreign_related_fields(self):
-        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields)
+        return tuple(rhs_field for lhs_field, rhs_field in self.related_fields if rhs_field)
 
     def get_local_related_value(self, instance):
         return self.get_instance_value_for_fields(instance, self.local_related_fields)
