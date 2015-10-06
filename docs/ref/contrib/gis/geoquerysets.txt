@@ -515,13 +515,19 @@ Distance lookups take the following form::
 
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
-and a distance value (either a number in units of the field or a
-:class:`~django.contrib.gis.measure.Distance` object).  On every
-distance lookup but :lookup:`dwithin`, an optional
+and a distance value (either a number in units of the field, a
+:class:`~django.contrib.gis.measure.Distance` object, or a `query expression
+<ref/models/expressions>`).
+
+With PostGIS, on every distance lookup but :lookup:`dwithin`, an optional
 third element, ``'spheroid'``, may be included to tell GeoDjango
 to use the more accurate spheroid distance calculation functions on
 fields with a geodetic coordinate system (e.g., ``ST_Distance_Spheroid``
 would be used instead of ``ST_Distance_Sphere``).
+
+.. versionadded:: 1.10
+
+    The ability to pass an expression as the distance value was added.
 
 .. fieldlookup:: distance_gt
 

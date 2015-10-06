@@ -175,7 +175,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         return None
 
-    def get_distance(self, f, value, lookup_type):
+    def get_distance(self, f, value, lookup_type, **kwargs):
         """
         Returns the distance parameters for the given geometry field,
         lookup value, and lookup type.  SpatiaLite only supports regular

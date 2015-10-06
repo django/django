@@ -6,7 +6,7 @@ from django.contrib.gis.db.models.functions import (
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
-from django.db.models import Q
+from django.db.models import F, Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
@@ -322,6 +322,31 @@ class DistanceTest(TestCase):
         for qs in querysets:
             cities = self.get_names(qs)
             self.assertEqual(cities, ['Adelaide', 'Hobart', 'Shellharbour', 'Thirroul'])
+
+    @skipUnlessDBFeature("supports_distances_lookups")
+    def test_distance_lookups_with_expression_rhs(self):
+        qs = SouthTexasCity.objects.filter(
+            point__distance_lte=(self.stx_pnt, F('radius')),
+        ).order_by('name')
+        self.assertEqual(
+            self.get_names(qs),
+            ['Bellaire', 'Downtown Houston', 'Southside Place', 'West University Place']
+        )
+
+        # With a combined expression
+        qs = SouthTexasCity.objects.filter(
+            point__distance_lte=(self.stx_pnt, F('radius') * 2),
+        ).order_by('name')
+        self.assertEqual(len(qs), 5)
+        self.assertIn('Pearland', self.get_names(qs))
+
+        # With spheroid param
+        if connection.features.supports_distance_geodetic:
+            hobart = AustraliaCity.objects.get(name='Hobart')
+            qs = AustraliaCity.objects.filter(
+                point__distance_lte=(hobart.point, F('radius') * 70, 'spheroid'),
+            ).order_by('name')
+            self.assertEqual(self.get_names(qs), ['Canberra', 'Hobart', 'Melbourne'])
 
     @skipUnlessDBFeature("has_area_method")
     @ignore_warnings(category=RemovedInDjango20Warning)
