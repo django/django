@@ -353,6 +353,13 @@ class FunctionTests(TestCase):
         expected = article.title + ' - ' + article.text
         self.assertEqual(expected.upper(), article.title_text)
 
+    def test_concat_sql_generation_idempotency(self):
+        qs = Article.objects.annotate(description=Concat('title', V(': '), 'summary'))
+        initial_sql = str(qs.query)
+        subsequent_sql = str(qs.query)
+        self.assertEqual(
+            initial_sql, subsequent_sql, 'Concat() SQL generation is not idempotent')
+
     def test_lower(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')

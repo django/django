@@ -54,9 +54,22 @@ class ConcatPair(Func):
         return super(ConcatPair, self).as_sql(compiler, connection)
 
     def coalesce(self):
-        # null on either side results in null for expression, wrap with coalesce
-        expressions = [
-            Coalesce(expression, Value('')) for expression in self.get_source_expressions()]
+        # null on either side results in null for expression, wrap with
+        # coalesce
+
+        # Make this method idempotent by adding a marker to Coalesce
+        # expressions that we apply so we can recognize them. Then,
+        # don't re-apply them if the marker is already present.
+        expressions = []
+        marker_attr_name = '_concat_coalesce_id'
+        marker_value = hex(id(self))
+        for expression in self.get_source_expressions():
+            if not (isinstance(expression, Coalesce) and
+                    getattr(expression, marker_attr_name, None) == marker_value):
+                expression = Coalesce(expression, Value(''))
+                setattr(expression, marker_attr_name, marker_value)
+            expressions.append(expression)
+
         self.set_source_expressions(expressions)
 
 
