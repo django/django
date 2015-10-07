@@ -275,8 +275,8 @@ warning in :class:`~django.middleware.gzip.GZipMiddleware` for more information.
 Sessions
 --------
 
-:ref:`Using cached sessions <cached-sessions-backend>`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Using cached sessions
+^^^^^^^^^^^^^^^^^^^^^
 
 :ref:`Using cached sessions <cached-sessions-backend>` may be a way to increase
 performance by eliminating the need to load session data from a slower storage
