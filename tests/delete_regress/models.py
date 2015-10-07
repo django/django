@@ -141,7 +141,7 @@ class OrderedPerson(models.Model):
         ordering = ['name']
 
 
-# Models for #23076
+# Models for #25520
 
 
 class ConcretePhoto(Photo):

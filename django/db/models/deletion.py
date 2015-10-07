@@ -57,6 +57,7 @@ def get_candidate_relations_to_delete(opts):
     # relations coming from proxy models.
     candidate_models = {opts}
     candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
+    candidate_models = candidate_models.union([model._meta for model in opts.get_proxy_parent_list()])
     # For each model, get all candidate fields.
     candidate_model_fields = chain.from_iterable(
         opts.get_fields(include_hidden=True) for opts in candidate_models

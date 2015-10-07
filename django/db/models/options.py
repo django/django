@@ -524,6 +524,21 @@ class Options(object):
                 result.add(ancestor)
         return list(result)
 
+    def get_proxy_parent_list(self):
+        """
+        Returns all the proxy model ancestors of this model as a list.
+        Useful to combine with `get_parent_list` to get all ancestors, concrete
+        and proxy, that could define behaviour or be involved in relationships.
+        """
+        result = OrderedSet()
+        for parent in self.get_parent_list():
+            for proxy_model_opts in parent._meta.proxied_children:
+                # Ignore proxy that is myself, or proxy that isn't an ancestor
+                if self != proxy_model_opts \
+                        and issubclass(self.model, proxy_model_opts.model):
+                    result.add(proxy_model_opts.model)
+        return list(result)
+
     def get_ancestor_link(self, ancestor):
         """
         Returns the field on the current model which points to the given
