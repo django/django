@@ -265,7 +265,7 @@ class ProxyDeleteM2MRelationshipsTest(TransactionTestCase):
         foreign key constraint "FKConstraint" on table "M2MThroughTable"
         DETAIL:  Key (id)=(6) is still referenced from table "M2MThroughTable".
 
-    See Django issue #23076.
+    See Django issues #23076 and #25520.
     """
 
     available_apps = ['delete_regress']
@@ -273,12 +273,6 @@ class ProxyDeleteM2MRelationshipsTest(TransactionTestCase):
     def setUp(self):
         self.concrete_photo = ConcretePhoto.objects.create()
         self.m2m_source = M2MtoConcretePhoto.objects.create()
-
-    def test_delete_with_m2m_to_concrete_base(self):
-        self.m2m_source.my_files.add(self.concrete_photo)
-
-        self.concrete_photo.delete()
-        self.assertEqual(len(self.m2m_source.my_files.all()), 0)
 
     def test_delete_with_m2m_to_proxy(self):
         self.m2m_source.my_images.add(self.concrete_photo)
@@ -291,12 +285,6 @@ class ProxyDeleteM2MRelationshipsTest(TransactionTestCase):
 
         self.concrete_photo.delete()
         self.assertEqual(len(self.m2m_source.my_photos.all()), 0)
-
-    def test_delete_with_m2m_to_concrete_proxy_child(self):
-        self.m2m_source.my_concrete_photos.add(self.concrete_photo)
-
-        self.concrete_photo.delete()
-        self.assertEqual(len(self.m2m_source.my_concrete_photos.all()), 0)
 
 
 class Ticket19102Tests(TestCase):
