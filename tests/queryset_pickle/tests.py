@@ -5,6 +5,7 @@ import pickle
 import unittest
 import warnings
 
+from django.db import models
 from django.test import TestCase
 from django.utils import six
 from django.utils.encoding import force_text
@@ -129,6 +130,11 @@ class PickleabilityTestCase(TestCase):
         m2ms = M2MModel.objects.prefetch_related('groups')
         m2ms = pickle.loads(pickle.dumps(m2ms))
         self.assertQuerysetEqual(m2ms, [m2m], lambda x: x)
+
+    def test_annotation_with_callable_default(self):
+        # Happening.when has a callable default of datetime.datetime.now.
+        qs = Happening.objects.annotate(latest_time=models.Max('when'))
+        self.assert_pickles(qs)
 
     def test_missing_django_version_unpickling(self):
         """
