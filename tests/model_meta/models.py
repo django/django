@@ -101,6 +101,10 @@ class ProxyPerson(Person):
         proxy = True
 
 
+class PersonThroughProxySubclass(ProxyPerson):
+    pass
+
+
 class Relating(models.Model):
 
     # ForeignKey to BasePerson

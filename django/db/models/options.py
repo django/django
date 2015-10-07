@@ -552,14 +552,10 @@ class Options(object):
         is set as a property on every model.
         """
         related_objects_graph = defaultdict(list)
-        # Map of concrete models to all options of models it represents.
-        # Including its options and all its proxy model ones.
-        concrete_model_classes = defaultdict(list)
 
         all_models = self.apps.get_models(include_auto_created=True)
         for model in all_models:
             opts = model._meta
-            concrete_model_classes[opts.concrete_model].append(opts)
             # Abstract model's fields are copied to child models, hence we will
             # see the fields from the child models.
             if opts.abstract:
@@ -570,7 +566,7 @@ class Options(object):
             )
             for f in fields_with_relations:
                 if not isinstance(f.remote_field.model, six.string_types):
-                    related_objects_graph[f.remote_field.model._meta].append(f)
+                    related_objects_graph[f.remote_field.model._meta.concrete_model._meta].append(f)
 
         for model in all_models:
             # Set the relation_tree using the internal __dict__. In this way
@@ -578,9 +574,7 @@ class Options(object):
             # __dict__ takes precedence over a data descriptor (such as
             # @cached_property). This means that the _meta._relation_tree is
             # only called if related_objects is not in __dict__.
-            related_objects = list(chain.from_iterable(
-                related_objects_graph[opts] for opts in concrete_model_classes[model]
-            ))
+            related_objects = related_objects_graph[model._meta.concrete_model._meta]
             model._meta.__dict__['_relation_tree'] = related_objects
         # It seems it is possible that self is not in all_models, so guard
         # against that with default for get().
@@ -674,10 +668,10 @@ class Options(object):
                 for obj in parent._meta._get_fields(
                         forward=forward, reverse=reverse, include_parents=include_parents,
                         include_hidden=include_hidden, seen_models=seen_models):
-                    if hasattr(obj, 'parent_link') and obj.parent_link:
+                    if getattr(obj, 'parent_link', False) and obj.model != self.concrete_model:
                         continue
                     fields.append(obj)
-        if reverse:
+        if reverse and not self.proxy:
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model
             # from other models.

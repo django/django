@@ -238,6 +238,15 @@ But it didn't prohibit nested non-relation fields as it does now::
     ...
     FieldError: Non-relational field given in select_related: 'name'
 
+``_meta.get_fields()`` returns consistent reverse fields for proxy models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before Django 1.10, the :meth:`~django.db.models.options.Options.get_fields`
+method returned different reverse fields when called on a proxy model compared
+to its proxied concrete class. This inconsistency was fixed by returning the
+full set of fields pointing to a concrete class or one of its proxies in both
+cases.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
