@@ -1077,6 +1077,12 @@ For a complete discussion on the usage of the following see the
 
     ``override`` is also usable as a function decorator.
 
+.. function:: check_for_language(lang_code)
+
+    Checks whether there is a global language file for the given language
+    code (e.g. 'fr', 'pt_BR'). This is used to decide whether a user-provided
+    language is available.
+
 .. function:: get_language()
 
     Returns the currently selected language code. Returns ``None`` if

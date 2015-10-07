@@ -1878,14 +1878,15 @@ For example::
 Calling this function with the value 'de' will give you ``"Willkommen"``,
 regardless of :setting:`LANGUAGE_CODE` and language set by middleware.
 
-Functions of particular interest are ``django.utils.translation.get_language()``
-which returns the language used in the current thread,
-``django.utils.translation.activate()`` which activates a translation catalog
-for the current thread, and ``django.utils.translation.check_for_language()``
+Functions of particular interest are
+:func:`django.utils.translation.get_language()` which returns the language used
+in the current thread, :func:`django.utils.translation.activate()` which
+activates a translation catalog for the current thread, and
+:func:`django.utils.translation.check_for_language()`
 which checks if the given language is supported by Django.
 
 To help write more concise code, there is also a context manager
-``django.utils.translation.override()`` that stores the current language on
+:func:`django.utils.translation.override()` that stores the current language on
 enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation
