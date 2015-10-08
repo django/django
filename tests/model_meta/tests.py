@@ -9,7 +9,9 @@ from django.test import SimpleTestCase
 
 from .models import (
     AbstractPerson, BasePerson, Child, CommonAncestor, FirstParent, Person,
-    ProxyPerson, Relating, Relation, SecondParent,
+    ProxyPerson, Relating, Relation, SecondParent, CommonProxyAncestor,
+    FirstProxy, SecondProxy, SiblingProxy, FirstConcreteProxyChild, ThirdProxy,
+    SecondConcreteProxyChild,
 )
 from .results import TEST_RESULTS
 
@@ -265,3 +267,14 @@ class ParentListTests(SimpleTestCase):
         self.assertEqual(FirstParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(SecondParent._meta.get_parent_list(), [CommonAncestor])
         self.assertEqual(Child._meta.get_parent_list(), [FirstParent, SecondParent, CommonAncestor])
+
+
+class ProxyParentListTests(SimpleTestCase):
+    def test_get_proxy_parent_list(self):
+        self.assertEqual(CommonProxyAncestor._meta.get_proxy_parent_list(), [])
+        self.assertEqual(FirstProxy._meta.get_proxy_parent_list(), [])
+        self.assertEqual(SecondProxy._meta.get_proxy_parent_list(), [FirstProxy])
+        self.assertEqual(SiblingProxy._meta.get_proxy_parent_list(), [FirstProxy])
+        self.assertEqual(FirstConcreteProxyChild._meta.get_proxy_parent_list(), [FirstProxy, SecondProxy])
+        self.assertEqual(ThirdProxy._meta.get_proxy_parent_list(), [FirstProxy, SecondProxy])
+        self.assertEqual(SecondConcreteProxyChild._meta.get_proxy_parent_list(), [ThirdProxy, FirstProxy, SecondProxy])

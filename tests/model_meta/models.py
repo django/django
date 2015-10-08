@@ -139,3 +139,39 @@ class SecondParent(CommonAncestor):
 
 class Child(FirstParent, SecondParent):
     pass
+
+
+# ProxyParentListTests
+
+
+class CommonProxyAncestor(models.Model):
+    pass
+
+
+class FirstProxy(CommonProxyAncestor):
+    class Meta:
+        proxy = True
+
+
+class SecondProxy(FirstProxy):
+    class Meta:
+        proxy = True
+
+
+# This proxy model is not ancestor of any models below
+class SiblingProxy(FirstProxy):
+    class Meta:
+        proxy = True
+
+
+class FirstConcreteProxyChild(SecondProxy):
+    pass
+
+
+class ThirdProxy(FirstConcreteProxyChild):
+    class Meta:
+        proxy = True
+
+
+class SecondConcreteProxyChild(ThirdProxy):
+    pass
