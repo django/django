@@ -186,6 +186,22 @@ class OneToOneTests(TestCase):
         self.assertEqual(self.p1.restaurant, self.r1)
         self.assertEqual(self.p1.bar, self.b1)
 
+    def test_assign_none_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None succeeds if field is null=True.
+        ug_bar = UndergroundBar.objects.create(place=p, serves_cocktails=False)
+        p.undergroundbar = None
+        self.assertIsNone(ug_bar.place)
+        ug_bar.save()
+        ug_bar.refresh_from_db()
+        self.assertIsNone(ug_bar.place)
+
+    def test_assign_none_null_reverse_relation(self):
+        p = Place.objects.get(name="Demon Dogs")
+        # Assigning None doesn't throw AttributeError if there isn't a related
+        # UndergroundBar.
+        p.undergroundbar = None
+
     def test_related_object_cache(self):
         """ Regression test for #6886 (the related-object cache) """
 

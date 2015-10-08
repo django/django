@@ -376,14 +376,24 @@ class ReverseOneToOneDescriptor(object):
 
         # If null=True, we can assign null here, but otherwise the value needs
         # to be an instance of the related class.
-        if value is None and self.related.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' % (
-                    instance._meta.object_name,
-                    self.related.get_accessor_name(),
+        if value is None:
+            if self.related.field.null:
+                # Update the cached related instance (if any) & clear the cache.
+                try:
+                    rel_obj = getattr(instance, self.cache_name)
+                except AttributeError:
+                    pass
+                else:
+                    delattr(instance, self.cache_name)
+                    setattr(rel_obj, self.related.field.name, None)
+            else:
+                raise ValueError(
+                    'Cannot assign None: "%s.%s" does not allow null values.' % (
+                        instance._meta.object_name,
+                        self.related.get_accessor_name(),
+                    )
                 )
-            )
-        elif value is not None and not isinstance(value, self.related.related_model):
+        elif not isinstance(value, self.related.related_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,
@@ -392,7 +402,7 @@ class ReverseOneToOneDescriptor(object):
                     self.related.related_model._meta.object_name,
                 )
             )
-        elif value is not None:
+        else:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(instance.__class__, instance=value)
             elif value._state.db is None:
@@ -401,18 +411,18 @@ class ReverseOneToOneDescriptor(object):
                 if not router.allow_relation(value, instance):
                     raise ValueError('Cannot assign "%r": the current database router prevents this relation.' % value)
 
-        related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
-        # Set the value of the related field to the value of the related object's related field
-        for index, field in enumerate(self.related.field.local_related_fields):
-            setattr(value, field.attname, related_pk[index])
+            related_pk = tuple(getattr(instance, field.attname) for field in self.related.field.foreign_related_fields)
+            # Set the value of the related field to the value of the related object's related field
+            for index, field in enumerate(self.related.field.local_related_fields):
+                setattr(value, field.attname, related_pk[index])
 
-        # Set the related instance cache used by __get__ to avoid a SQL query
-        # when accessing the attribute we just set.
-        setattr(instance, self.cache_name, value)
+            # Set the related instance cache used by __get__ to avoid a SQL query
+            # when accessing the attribute we just set.
+            setattr(instance, self.cache_name, value)
 
-        # Set the forward accessor cache on the related object to the current
-        # instance to avoid an extra SQL query if it's accessed later on.
-        setattr(value, self.related.field.get_cache_name(), instance)
+            # Set the forward accessor cache on the related object to the current
+            # instance to avoid an extra SQL query if it's accessed later on.
+            setattr(value, self.related.field.get_cache_name(), instance)
 
 
 class ReverseManyToOneDescriptor(object):
