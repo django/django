@@ -88,6 +88,10 @@ class Vegetable(models.Model):
         return self.name
 
 
+class Carrot(Vegetable):
+    pass
+
+
 @python_2_unicode_compatible
 class Mineral(models.Model):
     name = models.CharField(max_length=150)

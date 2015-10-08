@@ -10,7 +10,7 @@ from django.test import SimpleTestCase, TestCase
 from django.utils import six
 
 from .models import (
-    AllowsNullGFK, Animal, Comparison, ConcreteRelatedModel,
+    AllowsNullGFK, Animal, Carrot, Comparison, ConcreteRelatedModel,
     ForConcreteModelModel, ForProxyModelModel, Gecko, ManualPK, Mineral,
     ProxyRelatedModel, Rock, TaggedItem, ValuableRock, ValuableTaggedItem,
     Vegetable,
@@ -488,7 +488,16 @@ id="id_generic_relations-taggeditem-content_type-object_id-1-id" /></p>""" % tag
         """
         granite = Rock.objects.create(name='granite', hardness=5)
         TaggedItem.objects.create(content_object=granite, tag="countertop")
-        self.assertEqual(Rock.objects.filter(tags__tag="countertop").count(), 1)
+        self.assertEqual(Rock.objects.get(tags__tag="countertop"), granite)
+
+    def test_subclasses_with_parent_gen_rel(self):
+        """
+        Generic relations on a base class (Vegetable) work correctly in
+        subclasses (Carrot).
+        """
+        bear = Carrot.objects.create(name='carrot')
+        TaggedItem.objects.create(content_object=bear, tag='orange')
+        self.assertEqual(Carrot.objects.get(tags__tag='orange'), bear)
 
     def test_generic_inline_formsets_initial(self):
         """
