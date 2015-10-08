@@ -106,7 +106,7 @@ Minor features
 Cache
 ^^^^^
 
-* ...
+* The file-based cache backend now uses the highest pickling protocol.
 
 CSRF
 ^^^^
