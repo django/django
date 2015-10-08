@@ -42,7 +42,7 @@ from django.utils.cache import (
 from django.utils.encoding import force_text
 from django.views.decorators.cache import cache_page
 
-from .models import Poll, expensive_calculation
+from .models import Poll, expensive_calculation, UnpickableType
 
 try:    # Use the same idiom as in cache backends
     from django.utils.six.moves import cPickle as pickle
@@ -1220,6 +1220,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         os.rmdir(self.dirname)
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
+
+    def test_cache_write_unpickable_type(self):
+        try:
+            cache.set('unpickable', UnpickableType())
+        except TypeError:
+            self.fail('cache.set() raised TypeError Refs #25501')
 
 
 @override_settings(CACHES={
