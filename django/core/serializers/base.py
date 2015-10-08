@@ -201,7 +201,7 @@ class DeserializedObject(object):
         models.Model.save_base(self.object, using=using, raw=True, **kwargs)
         if self.m2m_data and save_m2m:
             for accessor_name, object_list in self.m2m_data.items():
-                setattr(self.object, accessor_name, object_list)
+                getattr(self.object, accessor_name).set(object_list)
 
         # prevent a second (possibly accidental) call to save() from saving
         # the m2m data twice.

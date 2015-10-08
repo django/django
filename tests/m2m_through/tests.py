@@ -97,7 +97,7 @@ class M2mThroughTests(TestCase):
         members = list(Person.objects.filter(name__in=['Bob', 'Jim']))
 
         with self.assertRaisesMessage(AttributeError, msg):
-            setattr(self.rock, 'members', members)
+            self.rock.members.set(members)
 
         self.assertQuerysetEqual(
             self.rock.members.all(),
@@ -166,7 +166,7 @@ class M2mThroughTests(TestCase):
         members = list(Group.objects.filter(name__in=['Rock', 'Roll']))
 
         with self.assertRaisesMessage(AttributeError, msg):
-            setattr(self.bob, 'group_set', members)
+            self.bob.group_set.set(members)
 
         self.assertQuerysetEqual(
             self.bob.group_set.all(),

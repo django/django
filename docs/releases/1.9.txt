@@ -747,11 +747,10 @@ setuptools is not installed.
 Related set direct assignment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`Direct assignment <direct-assignment>` of related objects in the ORM used
-to perform a ``clear()`` followed by a call to ``add()``. This caused
-needlessly large data changes and prevented using the
-:data:`~django.db.models.signals.m2m_changed` signal to track individual
-changes in many-to-many relations.
+Direct assignment of related objects in the ORM used to perform a ``clear()``
+followed by a call to ``add()``. This caused needlessly large data changes and
+prevented using the :data:`~django.db.models.signals.m2m_changed` signal to
+track individual changes in many-to-many relations.
 
 Direct assignment now relies on the the new
 :meth:`~django.db.models.fields.related.RelatedManager.set` method on related

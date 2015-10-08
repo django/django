@@ -66,7 +66,7 @@ def fk_create(pk, klass, data):
 def m2m_create(pk, klass, data):
     instance = klass(id=pk)
     models.Model.save_base(instance, raw=True)
-    instance.data = data
+    instance.data.set(data)
     return [instance]
 
 

@@ -337,7 +337,7 @@ Fields
 
         Many-to-many field to :class:`~django.contrib.auth.models.Permission`::
 
-            group.permissions = [permission_list]
+            group.permissions.set([permission_list])
             group.permissions.add(permission, permission, ...)
             group.permissions.remove(permission, permission, ...)
             group.permissions.clear()

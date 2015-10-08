@@ -284,7 +284,8 @@ class ManyToManyExclusionTestCase(TestCase):
             'multi_choice_int': [opt1.pk],
         }
         instance = ChoiceFieldModel.objects.create(**initial)
-        instance.multi_choice = instance.multi_choice_int = [opt2, opt3]
+        instance.multi_choice.set([opt2, opt3])
+        instance.multi_choice_int.set([opt2, opt3])
         form = ChoiceFieldExclusionForm(data=data, instance=instance)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data['multi_choice'], data['multi_choice'])

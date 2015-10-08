@@ -73,12 +73,12 @@ class Queries1Tests(BaseQuerysetTest):
         time3 = datetime.datetime(2007, 12, 20, 22, 25, 0)
         time4 = datetime.datetime(2007, 12, 20, 21, 0, 0)
         cls.i1 = Item.objects.create(name='one', created=cls.time1, modified=cls.time1, creator=cls.a1, note=cls.n3)
-        cls.i1.tags = [cls.t1, cls.t2]
+        cls.i1.tags.set([cls.t1, cls.t2])
         cls.i2 = Item.objects.create(name='two', created=cls.time2, creator=cls.a2, note=n2)
-        cls.i2.tags = [cls.t1, cls.t3]
+        cls.i2.tags.set([cls.t1, cls.t3])
         cls.i3 = Item.objects.create(name='three', created=time3, creator=cls.a2, note=cls.n3)
         i4 = Item.objects.create(name='four', created=time4, creator=cls.a4, note=cls.n3)
-        i4.tags = [t4]
+        i4.tags.set([t4])
 
         cls.r1 = Report.objects.create(name='r1', creator=cls.a1)
         Report.objects.create(name='r2', creator=a3)
@@ -1373,8 +1373,8 @@ class Queries4Tests(BaseQuerysetTest):
         math101 = tag.note_set.create(note='MATH', misc='101')
         s1 = tag.annotation_set.create(name='1')
         s2 = tag.annotation_set.create(name='2')
-        s1.notes = [math101, anth100]
-        s2.notes = [math101]
+        s1.notes.set([math101, anth100])
+        s2.notes.set([math101])
         result = math101.annotation_set.all() & tag.annotation_set.exclude(notes__in=[anth100])
         self.assertEqual(list(result), [s2])
 
@@ -3348,9 +3348,9 @@ class ManyToManyExcludeTest(TestCase):
         pg2 = Page.objects.create(text='pg2')
         pg1 = Page.objects.create(text='pg1')
         pa1 = Paragraph.objects.create(text='pa1')
-        pa1.page = [pg1, pg2]
+        pa1.page.set([pg1, pg2])
         pa2 = Paragraph.objects.create(text='pa2')
-        pa2.page = [pg2, pg3]
+        pa2.page.set([pg2, pg3])
         pa3 = Paragraph.objects.create(text='pa3')
         ch1 = Chapter.objects.create(title='ch1', paragraph=pa1)
         ch2 = Chapter.objects.create(title='ch2', paragraph=pa2)

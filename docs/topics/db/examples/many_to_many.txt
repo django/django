@@ -221,11 +221,11 @@ And from the other end::
     >>> a5.publications.all()
     <QuerySet []>
 
-Relation sets can be assigned. Assignment clears any existing set members::
+Relation sets can be set::
 
     >>> a4.publications.all()
     <QuerySet [<Publication: Science News>]>
-    >>> a4.publications = [p3]
+    >>> a4.publications.set([p3])
     >>> a4.publications.all()
     <QuerySet [<Publication: Science Weekly>]>
 
@@ -282,18 +282,3 @@ referenced objects should be gone::
     <QuerySet []>
     >>> p1.article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
-
-An alternate to calling
-:meth:`~django.db.models.fields.related.RelatedManager.clear` is to assign the
-empty set::
-
-    >>> p1.article_set = []
-    >>> p1.article_set.all()
-    <QuerySet []>
-
-    >>> a2.publications = [p1, new_publication]
-    >>> a2.publications.all()
-    <QuerySet [<Publication: Highlights for Children>, <Publication: The Python Journal>]>
-    >>> a2.publications = []
-    >>> a2.publications.all()
-    <QuerySet []>

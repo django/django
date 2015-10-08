@@ -344,7 +344,7 @@ class ModelFormsetTest(TestCase):
         author3 = Author.objects.create(name='Walt Whitman')
 
         meeting = AuthorMeeting.objects.create(created=date.today())
-        meeting.authors = Author.objects.all()
+        meeting.authors.set(Author.objects.all())
 
         # create an Author instance to add to the meeting.
 

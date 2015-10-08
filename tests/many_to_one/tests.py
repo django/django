@@ -5,6 +5,7 @@ from django.core.exceptions import FieldError, MultipleObjectsReturned
 from django.db import models, transaction
 from django.test import TestCase
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
 from .models import (
@@ -123,6 +124,15 @@ class ManyToOneTests(TestCase):
             ])
         self.assertQuerysetEqual(self.r2.article_set.all(), ["<Article: Paul's story>"])
 
+    def test_reverse_assignment_deprecation(self):
+        msg = (
+            "Direct assignment to the reverse side of a related set is "
+            "deprecated due to the implicit save() that happens. Use "
+            "article_set.set() instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango20Warning, msg):
+            self.r2.article_set = []
+
     def test_assign(self):
         new_article = self.r.article_set.create(headline="John's second story",
                                                 pub_date=datetime.date(2005, 7, 29))
@@ -141,8 +151,8 @@ class ManyToOneTests(TestCase):
         ])
         self.assertQuerysetEqual(self.r2.article_set.all(), [])
 
-        # Set the article back again using set descriptor.
-        self.r2.article_set = [new_article, new_article2]
+        # Set the article back again using set() method.
+        self.r2.article_set.set([new_article, new_article2])
         self.assertQuerysetEqual(self.r.article_set.all(), ["<Article: This is a test>"])
         self.assertQuerysetEqual(self.r2.article_set.all(),
             [
@@ -150,9 +160,9 @@ class ManyToOneTests(TestCase):
                 "<Article: Paul's story>",
             ])
 
-        # Funny case - assignment notation can only go so far; because the
-        # ForeignKey cannot be null, existing members of the set must remain.
-        self.r.article_set = [new_article]
+        # Because the ForeignKey cannot be null, existing members of the set
+        # must remain.
+        self.r.article_set.set([new_article])
         self.assertQuerysetEqual(self.r.article_set.all(),
             [
                 "<Article: John's second story>",

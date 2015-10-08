@@ -177,8 +177,8 @@ class QueryTestCase(TestCase):
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
-        pro.authors = [marty]
-        dive.authors = [mark]
+        pro.authors.set([marty])
+        dive.authors.set([mark])
 
         # Inspect the m2m tables directly.
         # There should be 1 entry in each database
@@ -224,7 +224,7 @@ class QueryTestCase(TestCase):
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
-        dive.authors = [mark]
+        dive.authors.set([mark])
 
         # Add a second author
         john = Person.objects.using('other').create(name="John Smith")
@@ -285,7 +285,7 @@ class QueryTestCase(TestCase):
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
 
         # Save the author relations
-        dive.authors = [mark]
+        dive.authors.set([mark])
 
         # Create a second book on the other database
         grease = Book.objects.using('other').create(title="Greasemonkey Hacks",
@@ -357,7 +357,7 @@ class QueryTestCase(TestCase):
         # Set a foreign key set with an object from a different database
         with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
-                marty.edited = [pro, dive]
+                marty.edited.set([pro, dive])
 
         # Add to an m2m with an object from a different database
         with self.assertRaises(ValueError):
@@ -367,7 +367,7 @@ class QueryTestCase(TestCase):
         # Set a m2m with an object from a different database
         with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
-                marty.book_set = [pro, dive]
+                marty.book_set.set([pro, dive])
 
         # Add to a reverse m2m with an object from a different database
         with self.assertRaises(ValueError):
@@ -377,7 +377,7 @@ class QueryTestCase(TestCase):
         # Set a reverse m2m with an object from a different database
         with self.assertRaises(ValueError):
             with transaction.atomic(using='other'):
-                dive.authors = [mark, marty]
+                dive.authors.set([mark, marty])
 
     def test_m2m_deletion(self):
         "Cascaded deletions of m2m relations issue queries on the right database"
@@ -386,7 +386,7 @@ class QueryTestCase(TestCase):
                                                   published=datetime.date(2009, 5, 4))
 
         mark = Person.objects.using('other').create(name="Mark Pilgrim")
-        dive.authors = [mark]
+        dive.authors.set([mark])
 
         # Check the initial state
         self.assertEqual(Person.objects.using('default').count(), 0)
@@ -414,7 +414,7 @@ class QueryTestCase(TestCase):
         # Now try deletion in the reverse direction. Set up the relation again
         dive = Book.objects.using('other').create(title="Dive into Python",
                                                   published=datetime.date(2009, 5, 4))
-        dive.authors = [mark]
+        dive.authors.set([mark])
 
         # Check the initial state
         self.assertEqual(Person.objects.using('default').count(), 0)
@@ -589,7 +589,7 @@ class QueryTestCase(TestCase):
         # Set a foreign key set with an object from a different database
         with self.assertRaises(ValueError):
             with transaction.atomic(using='default'):
-                marty.edited = [pro, dive]
+                marty.edited.set([pro, dive])
 
         # Add to a foreign key set with an object from a different database
         with self.assertRaises(ValueError):
@@ -1095,7 +1095,7 @@ class RouterTestCase(TestCase):
         pro = Book.objects.using('default').create(title="Pro Django",
                                                    published=datetime.date(2008, 12, 16),
                                                    editor=marty)
-        pro.authors = [marty]
+        pro.authors.set([marty])
 
         # Create a book and author on the other database
         Book.objects.using('other').create(title="Dive into Python",
@@ -1320,7 +1320,7 @@ class RouterTestCase(TestCase):
 
         # Set a m2m set with an object from a different database
         try:
-            marty.book_set = [pro, dive]
+            marty.book_set.set([pro, dive])
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 
@@ -1358,7 +1358,7 @@ class RouterTestCase(TestCase):
 
         # Set a reverse m2m with an object from a different database
         try:
-            dive.authors = [mark, marty]
+            dive.authors.set([mark, marty])
         except ValueError:
             self.fail("Assignment across primary/replica databases with a common source should be ok")
 
@@ -1861,7 +1861,7 @@ class RouterAttributeErrorTestCase(TestCase):
         b = Book.objects.create(title="Pro Django",
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
-        b.authors = [p]
+        b.authors.set([p])
         b.editor = p
         with self.override_router():
             self.assertRaises(AttributeError, b.delete)
@@ -1872,7 +1872,8 @@ class RouterAttributeErrorTestCase(TestCase):
                                 published=datetime.date(2008, 12, 16))
         p = Person.objects.create(name="Marty Alchin")
         with self.override_router():
-            self.assertRaises(AttributeError, setattr, b, 'authors', [p])
+            with self.assertRaises(AttributeError):
+                b.authors.set([p])
 
 
 class ModelMetaRouter(object):
@@ -1898,7 +1899,7 @@ class RouterModelArgumentTestCase(TestCase):
         # test clear
         b.authors.clear()
         # test setattr
-        b.authors = [p]
+        b.authors.set([p])
         # test M2M collection
         b.delete()
 

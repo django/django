@@ -15,7 +15,7 @@ class CustomColumnsTests(TestCase):
         self.authors = [self.a1, self.a2]
 
         self.article = Article.objects.create(headline="Django lets you build Web apps easily", primary_author=self.a1)
-        self.article.authors = self.authors
+        self.article.authors.set(self.authors)
 
     def test_query_all_available_authors(self):
         self.assertQuerysetEqual(

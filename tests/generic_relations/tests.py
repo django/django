@@ -313,31 +313,31 @@ class GenericRelationsTests(TestCase):
         fatty = bacon.tags.create(tag="fatty")
         salty = bacon.tags.create(tag="salty")
 
-        bacon.tags = [fatty, salty]
+        bacon.tags.set([fatty, salty])
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
             "<TaggedItem: salty>",
         ])
 
-        bacon.tags = [fatty]
+        bacon.tags.set([fatty])
         self.assertQuerysetEqual(bacon.tags.all(), [
             "<TaggedItem: fatty>",
         ])
 
-        bacon.tags = []
+        bacon.tags.set([])
         self.assertQuerysetEqual(bacon.tags.all(), [])
 
     def test_assign_with_queryset(self):
         # Ensure that querysets used in reverse GFK assignments are pre-evaluated
         # so their value isn't affected by the clearing operation in
-        # ManyToManyDescriptor.__set__. Refs #19816.
+        # ManyRelatedManager.set() (#19816).
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         bacon.tags.create(tag="fatty")
         bacon.tags.create(tag="salty")
         self.assertEqual(2, bacon.tags.count())
 
         qs = bacon.tags.filter(tag="fatty")
-        bacon.tags = qs
+        bacon.tags.set(qs)
 
         self.assertEqual(1, bacon.tags.count())
         self.assertEqual(1, qs.count())
@@ -705,7 +705,7 @@ class ProxyRelatedModelTest(TestCase):
         base.save()
         newrel = ConcreteRelatedModel.objects.create()
 
-        newrel.bases = [base]
+        newrel.bases.set([base])
         newrel = ConcreteRelatedModel.objects.get(pk=newrel.pk)
         self.assertEqual(base, newrel.bases.get())
 

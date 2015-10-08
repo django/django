@@ -62,11 +62,13 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from __future__ import unicode_literals
 
+import warnings
 from operator import attrgetter
 
 from django.db import connections, router, transaction
 from django.db.models import Q, signals
 from django.db.models.query import QuerySet
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.functional import cached_property
 
 
@@ -477,6 +479,11 @@ class ReverseManyToOneDescriptor(object):
         - ``instance`` is the ``parent`` instance
         - ``value`` in the ``children`` sequence on the right of the equal sign
         """
+        warnings.warn(
+            'Direct assignment to the reverse side of a related set is '
+            'deprecated due to the implicit save() that happens. Use %s.set() '
+            'instead.' % self.rel.get_accessor_name(), RemovedInDjango20Warning, stacklevel=2,
+        )
         manager = self.__get__(instance)
         manager.set(value)
 

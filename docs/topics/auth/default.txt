@@ -181,11 +181,11 @@ fields: ``groups`` and ``user_permissions``.
 objects in the same way as any other :doc:`Django model
 </topics/db/models>`::
 
-    myuser.groups = [group_list]
+    myuser.groups.set([group_list])
     myuser.groups.add(group, group, ...)
     myuser.groups.remove(group, group, ...)
     myuser.groups.clear()
-    myuser.user_permissions = [permission_list]
+    myuser.user_permissions.set([permission_list])
     myuser.user_permissions.add(permission, permission, ...)
     myuser.user_permissions.remove(permission, permission, ...)
     myuser.user_permissions.clear()

@@ -16,7 +16,7 @@ class GetObjectOr404Tests(TestCase):
         self.assertRaises(Http404, get_object_or_404, Article, title="Foo")
 
         article = Article.objects.create(title="Run away!")
-        article.authors = [a1, a2]
+        article.authors.set([a1, a2])
         # get_object_or_404 can be passed a Model to query.
         self.assertEqual(
             get_object_or_404(Article, title__contains="Run"),

@@ -171,7 +171,7 @@ class OneToOneTests(TestCase):
         """
         f = Favorites(name='Fred')
         f.save()
-        f.restaurants = [self.r1]
+        f.restaurants.set([self.r1])
         self.assertQuerysetEqual(
             f.restaurants.all(),
             ['<Restaurant: Demon Dogs the restaurant>']

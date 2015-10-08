@@ -263,8 +263,7 @@ class ListFiltersTests(TestCase):
             title='Gipsy guitar for dummies', year=2002, is_best_seller=True,
             date_registered=self.one_week_ago,
         )
-        self.gipsy_book.contributors = [self.bob, self.lisa]
-        self.gipsy_book.save()
+        self.gipsy_book.contributors.set([self.bob, self.lisa])
 
         # Departments
         self.dev = Department.objects.create(code='DEV', description='Development')

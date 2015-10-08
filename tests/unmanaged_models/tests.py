@@ -19,7 +19,7 @@ class SimpleTests(TestCase):
         a = A01.objects.create(f_a="foo", f_b=42)
         B01.objects.create(fk_a=a, f_a="fred", f_b=1729)
         c = C01.objects.create(f_a="barney", f_b=1)
-        c.mm_a = [a]
+        c.mm_a.set([a])
 
         # ... and pull it out via the other set.
         a2 = A02.objects.all()[0]

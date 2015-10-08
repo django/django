@@ -1600,7 +1600,7 @@ class ManyToManyField(RelatedField):
         return getattr(obj, self.attname).all()
 
     def save_form_data(self, instance, data):
-        setattr(instance, self.attname, data)
+        getattr(instance, self.attname).set(data)
 
     def formfield(self, **kwargs):
         db = kwargs.pop('using', None)

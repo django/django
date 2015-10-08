@@ -350,10 +350,10 @@ class ModelInheritanceTest(TestCase):
 
         birthday = BirthdayParty.objects.create(
             name='Birthday party for Alice')
-        birthday.attendees = [p1, p3]
+        birthday.attendees.set([p1, p3])
 
         bachelor = BachelorParty.objects.create(name='Bachelor party for Bob')
-        bachelor.attendees = [p2, p4]
+        bachelor.attendees.set([p2, p4])
 
         parties = list(p1.birthdayparty_set.all())
         self.assertEqual(parties, [birthday])
@@ -371,7 +371,7 @@ class ModelInheritanceTest(TestCase):
         # ... but it does inherit the m2m from its parent
         messy = MessyBachelorParty.objects.create(
             name='Bachelor party for Dave')
-        messy.attendees = [p4]
+        messy.attendees.set([p4])
         messy_parent = messy.bachelorparty_ptr
 
         parties = list(p4.bachelorparty_set.all())

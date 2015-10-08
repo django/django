@@ -112,7 +112,7 @@ class SerializersTestBase(object):
             pub_date=datetime(2006, 6, 16, 11, 00)
         )
         self.a1.save()
-        self.a1.categories = [sports, op_ed]
+        self.a1.categories.set([sports, op_ed])
 
         self.a2 = Article(
             author=self.joe,
@@ -120,7 +120,7 @@ class SerializersTestBase(object):
             pub_date=datetime(2006, 6, 16, 13, 00, 11, 345)
         )
         self.a2.save()
-        self.a2.categories = [music, op_ed]
+        self.a2.categories.set([music, op_ed])
 
     def test_serialize(self):
         """Tests that basic serialization works."""
