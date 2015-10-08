@@ -71,7 +71,6 @@ class Options(object):
 
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
-        self.proxied_children = []
         self.local_fields = []
         self.local_many_to_many = []
         self.virtual_fields = []
