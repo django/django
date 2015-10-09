@@ -2,6 +2,8 @@ import datetime
 from operator import attrgetter
 
 from django.core.exceptions import FieldError
+from django.db import models
+from django.db.models.fields.related import ForeignObject
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import translation
 
@@ -391,3 +393,61 @@ class MultiColumnFKTests(TestCase):
         """ See: https://code.djangoproject.com/ticket/21566 """
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
+
+    def test_check_composite_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (
+                    ('a', 'b'),
+                )
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            value = models.CharField(max_length=255)
+
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b'),
+                to_fields=('a', 'b'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+
+        self.assertEqual(errors, [])
+
+    def test_check_subset_composite_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (
+                    ('a', 'b'),
+                )
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+            d = models.CharField(max_length=255)
+
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b', 'c'),
+                to_fields=('a', 'b', 'c'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+
+        self.assertEqual(errors, [])

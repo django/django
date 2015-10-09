@@ -464,22 +464,35 @@ class ForeignObject(RelatedField):
         if not self.foreign_related_fields:
             return []
 
-        has_unique_field = any(rel_field.unique
-            for rel_field in self.foreign_related_fields)
-        if not has_unique_field and len(self.foreign_related_fields) > 1:
+        unique_foreign_fields = {
+            frozenset([f.name])
+            for f in self.remote_field.model._meta.get_fields()
+            if getattr(f, 'unique', False)
+        }
+        unique_foreign_fields.update({
+            frozenset(ut)
+            for ut in self.remote_field.model._meta.unique_together
+        })
+        foreign_fields = {f.name for f in self.foreign_related_fields}
+
+        has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
+
+        if not has_unique_constraint and len(self.foreign_related_fields) > 1:
             field_combination = ', '.join("'%s'" % rel_field.name
                 for rel_field in self.foreign_related_fields)
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    "None of the fields %s on model '%s' have a unique=True constraint."
+                    "No subset of the fields %s on model '%s' is unique"
                     % (field_combination, model_name),
-                    hint=None,
+                    hint="Add a unique=True on any of the fields %s of '%s', or add them all or a "
+                         "subset to a unique_together constraint."
+                         % (field_combination, model_name),
                     obj=self,
                     id='fields.E310',
                 )
             ]
-        elif not has_unique_field:
+        elif not has_unique_constraint:
             field_name = self.foreign_related_fields[0].name
             model_name = self.remote_field.model.__name__
             return [
