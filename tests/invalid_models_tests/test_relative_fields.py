@@ -5,6 +5,7 @@ import warnings
 
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
+from django.db.models.fields.related import ForeignObject
 from django.test import ignore_warnings
 from django.test.testcases import skipIfDBFeature
 from django.test.utils import override_settings
@@ -507,9 +508,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                "None of the fields 'country_id', 'city_id' on model 'Person' "
-                "have a unique=True constraint.",
-                hint=None,
+                "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
                 obj=field,
                 id='fields.E310',
             )
@@ -1394,4 +1397,78 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
                       "through_fields=('field1', 'field2')"),
                 obj=field,
                 id='fields.E337')]
+        self.assertEqual(expected, errors)
+
+    def test_superset_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (('a', 'b', 'c'),)
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            value = models.CharField(max_length=255)
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b'),
+                to_fields=('a', 'b'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+        expected = [
+            Error(
+                "No subset of the fields 'a', 'b' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
+                obj=field,
+                id='fields.E310',
+            ),
+        ]
+        self.assertEqual(expected, errors)
+
+    def test_insersection_foreign_object(self):
+        class Parent(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            c = models.PositiveIntegerField()
+            d = models.PositiveIntegerField()
+
+            class Meta:
+                unique_together = (('a', 'b', 'c'),)
+
+        class Child(models.Model):
+            a = models.PositiveIntegerField()
+            b = models.PositiveIntegerField()
+            d = models.PositiveIntegerField()
+            value = models.CharField(max_length=255)
+            parent = ForeignObject(
+                Parent,
+                on_delete=models.SET_NULL,
+                from_fields=('a', 'b', 'd'),
+                to_fields=('a', 'b', 'd'),
+                related_name='children',
+            )
+
+        field = Child._meta.get_field('parent')
+        errors = field.check(from_model=Child)
+        expected = [
+            Error(
+                "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
+                obj=field,
+                id='fields.E310',
+            ),
+        ]
         self.assertEqual(expected, errors)
