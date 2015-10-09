@@ -523,7 +523,8 @@ With PostGIS, on every distance lookup but :lookup:`dwithin`, an optional
 third element, ``'spheroid'``, may be included to tell GeoDjango
 to use the more accurate spheroid distance calculation functions on
 fields with a geodetic coordinate system (e.g., ``ST_Distance_Spheroid``
-would be used instead of ``ST_Distance_Sphere``).
+would be used instead of ``ST_Distance_Sphere``). The simpler ``ST_Distance``
+function is used with projected coordinate systems.
 
 .. versionadded:: 1.10
 
@@ -541,13 +542,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_gt=(geom, D(m=5)))
 
-==========  ===============================================
+==========  ==================================================
 Backend     SQL Equivalent
-==========  ===============================================
-PostGIS     ``ST_Distance(poly, geom) > 5``
+==========  ==================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) > 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) > 5``
 SpatiaLite  ``Distance(poly, geom) > 5``
-==========  ===============================================
+==========  ==================================================
 
 .. fieldlookup:: distance_gte
 
@@ -561,13 +562,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_gte=(geom, D(m=5)))
 
-==========  ================================================
+==========  ===================================================
 Backend     SQL Equivalent
-==========  ================================================
-PostGIS     ``ST_Distance(poly, geom) >= 5``
+==========  ===================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) >= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) >= 5``
 SpatiaLite  ``Distance(poly, geom) >= 5``
-==========  ================================================
+==========  ===================================================
 
 .. fieldlookup:: distance_lt
 
@@ -581,13 +582,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_lt=(geom, D(m=5)))
 
-==========  ===============================================
+==========  ==================================================
 Backend     SQL Equivalent
-==========  ===============================================
-PostGIS     ``ST_Distance(poly, geom) < 5``
+==========  ==================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) < 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) < 5``
 SpatiaLite  ``Distance(poly, geom) < 5``
-==========  ===============================================
+==========  ==================================================
 
 .. fieldlookup:: distance_lte
 
@@ -601,13 +602,13 @@ Example::
 
     Zipcode.objects.filter(poly__distance_lte=(geom, D(m=5)))
 
-==========  ================================================
+==========  ===================================================
 Backend     SQL Equivalent
-==========  ================================================
-PostGIS     ``ST_Distance(poly, geom) <= 5``
+==========  ===================================================
+PostGIS     ``ST_Distance/ST_Distance_Sphere(poly, geom) <= 5``
 Oracle      ``SDO_GEOM.SDO_DISTANCE(poly, geom, 0.05) <= 5``
 SpatiaLite  ``Distance(poly, geom) <= 5``
-==========  ================================================
+==========  ===================================================
 
 .. fieldlookup:: dwithin
 
