@@ -28,7 +28,7 @@ class SDOOperator(SpatialOperator):
 
 
 class SDODistance(SpatialOperator):
-    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%%%s" % DEFAULT_TOLERANCE
+    sql_template = "SDO_GEOM.SDO_DISTANCE(%%(lhs)s, %%(rhs)s, %s) %%(op)s %%(value)s" % DEFAULT_TOLERANCE
 
 
 class SDODWithin(SpatialOperator):
