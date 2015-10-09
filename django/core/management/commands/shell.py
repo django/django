@@ -4,13 +4,13 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Runs a Python interactive interpreter. Tries to use IPython or bpython, if one of them is available."
+    help = "Runs a Python interactive interpreter. Tries to use IPython, bpython or ptpython, if one of them is available."
     requires_system_checks = False
-    shells = ['ipython', 'bpython']
+    shells = ['ipython', 'bpython', 'ptpython']
 
     def add_arguments(self, parser):
         parser.add_argument('--plain', action='store_true', dest='plain',
-            help='Tells Django to use plain Python, not IPython or bpython.')
+            help='Tells Django to use plain Python, not IPython, bpython or ptpython.')
         parser.add_argument('--no-startup', action='store_true', dest='no_startup',
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.')
         parser.add_argument('-i', '--interface', choices=self.shells, dest='interface',
@@ -49,6 +49,10 @@ class Command(BaseCommand):
     def bpython(self):
         import bpython
         bpython.embed()
+
+    def ptpython(self):
+        from ptpython.repl import embed
+        embed(globals(), locals())
 
     def run_shell(self, shell=None):
         available_shells = [shell] if shell else self.shells
