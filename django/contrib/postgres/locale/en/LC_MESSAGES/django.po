@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
 "PO-Revision-Date: 2015-01-18 20:56+0100\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -18,13 +18,13 @@ msgstr ""
 msgid "PostgreSQL extensions"
 msgstr ""
 
-#: contrib/postgres/fields/array.py:22 contrib/postgres/forms/array.py:15
+#: contrib/postgres/fields/array.py:19 contrib/postgres/forms/array.py:15
 #: contrib/postgres/forms/array.py:145
 #, python-format
 msgid "Item %(nth)s in the array did not validate: "
 msgstr ""
 
-#: contrib/postgres/fields/array.py:23
+#: contrib/postgres/fields/array.py:20
 msgid "Nested arrays must have the same length."
 msgstr ""
 
@@ -37,8 +37,21 @@ msgstr ""
 msgid "The value of \"%(key)s\" is not a string."
 msgstr ""
 
+#: contrib/postgres/fields/jsonb.py:15
+msgid "A JSON object"
+msgstr ""
+
+#: contrib/postgres/fields/jsonb.py:17
+msgid "Value must be valid JSON."
+msgstr ""
+
 #: contrib/postgres/forms/hstore.py:15
 msgid "Could not load JSON data."
+msgstr ""
+
+#: contrib/postgres/forms/jsonb.py:11
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
 msgstr ""
 
 #: contrib/postgres/forms/ranges.py:13
@@ -49,19 +62,19 @@ msgstr ""
 msgid "The start of the range must not exceed the end of the range."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:52
+#: contrib/postgres/forms/ranges.py:59
 msgid "Enter two whole numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:58
+#: contrib/postgres/forms/ranges.py:65
 msgid "Enter two numbers."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:64
+#: contrib/postgres/forms/ranges.py:71
 msgid "Enter two valid date/times."
 msgstr ""
 
-#: contrib/postgres/forms/ranges.py:70
+#: contrib/postgres/forms/ranges.py:77
 msgid "Enter two valid dates."
 msgstr ""
 
