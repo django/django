@@ -47,3 +47,7 @@ class State(models.Model):
 class TwoFields(models.Model):
     f1 = models.IntegerField(unique=True)
     f2 = models.IntegerField(unique=True)
+
+
+class NoFields(models.Model):
+    pass
