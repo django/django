@@ -267,6 +267,9 @@ WHEN (new.%(col_name)s IS NULL)
     def max_name_length(self):
         return 30
 
+    def pk_default_value(self):
+        return "NULL"
+
     def prep_for_iexact_query(self, x):
         return x
 

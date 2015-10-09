@@ -10,8 +10,8 @@ from django.test import (
 )
 
 from .models import (
-    Country, Pizzeria, ProxyCountry, ProxyMultiCountry, ProxyMultiProxyCountry,
-    ProxyProxyCountry, Restaurant, State, TwoFields,
+    Country, NoFields, Pizzeria, ProxyCountry, ProxyMultiCountry,
+    ProxyMultiProxyCountry, ProxyProxyCountry, Restaurant, State, TwoFields,
 )
 
 
@@ -176,6 +176,10 @@ class BulkCreateTests(TestCase):
         TwoFields.objects.all().delete()
         TwoFields.objects.bulk_create(objs, len(objs))
         self.assertEqual(TwoFields.objects.count(), len(objs))
+
+    def test_empty_model(self):
+        NoFields.objects.bulk_create([NoFields() for i in range(2)])
+        self.assertEqual(NoFields.objects.count(), 2)
 
     @skipUnlessDBFeature('has_bulk_insert')
     def test_explicit_batch_size_efficiency(self):
