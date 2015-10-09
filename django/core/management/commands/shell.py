@@ -4,7 +4,8 @@ from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
-    help = "Runs a Python interactive interpreter. Tries to use IPython, bpython or ptpython, if one of them is available."
+    help = "Runs a Python interactive interpreter. Tries to use IPython, " \
+        "bpython or ptpython, if one of them is available."
     requires_system_checks = False
     shells = ['ipython', 'bpython', 'ptpython']
 
