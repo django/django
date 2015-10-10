@@ -220,7 +220,7 @@ Database backend API
 Miscellaneous
 ~~~~~~~~~~~~~
 
-* The ``repr()`` of a ``QuerySet`` is wrapped in ```<QuerySet >`` to
+* The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
 
 .. _deprecated-features-1.10:
