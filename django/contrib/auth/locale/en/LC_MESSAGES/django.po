@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -262,40 +262,46 @@ msgstr ""
 msgid "users"
 msgstr ""
 
-#: contrib/auth/password_validation.py:100
+#: contrib/auth/password_validation.py:101
 #, python-format
 msgid ""
 "This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
 "characters."
-msgstr ""
+msgstr[0] ""
+msgstr[1] ""
 
-#: contrib/auth/password_validation.py:106
+#: contrib/auth/password_validation.py:111
 #, python-format
-msgid "Your password must contain at least %(min_length)d characters."
-msgstr ""
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+msgstr[1] ""
 
-#: contrib/auth/password_validation.py:139
+#: contrib/auth/password_validation.py:147
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr ""
 
-#: contrib/auth/password_validation.py:145
+#: contrib/auth/password_validation.py:153
 msgid "Your password can't be too similar to your other personal information."
 msgstr ""
 
-#: contrib/auth/password_validation.py:172
+#: contrib/auth/password_validation.py:180
 msgid "This password is too common."
 msgstr ""
 
-#: contrib/auth/password_validation.py:177
+#: contrib/auth/password_validation.py:185
 msgid "Your password can't be a commonly used password."
 msgstr ""
 
-#: contrib/auth/password_validation.py:187
+#: contrib/auth/password_validation.py:195
 msgid "This password is entirely numeric."
 msgstr ""
 
-#: contrib/auth/password_validation.py:192
+#: contrib/auth/password_validation.py:200
 msgid "Your password can't be entirely numeric."
 msgstr ""
 

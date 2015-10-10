@@ -13,7 +13,7 @@ from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.utils.module_loading import import_string
 from django.utils.six import string_types
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _, ungettext
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -97,13 +97,21 @@ class MinimumLengthValidator(object):
     def validate(self, password, user=None):
         if len(password) < self.min_length:
             raise ValidationError(
-                _("This password is too short. It must contain at least %(min_length)d characters."),
+                ungettext(
+                    "This password is too short. It must contain at least %(min_length)d character.",
+                    "This password is too short. It must contain at least %(min_length)d characters.",
+                    self.min_length
+                ),
                 code='password_too_short',
                 params={'min_length': self.min_length},
             )
 
     def get_help_text(self):
-        return _("Your password must contain at least %(min_length)d characters.") % {'min_length': self.min_length}
+        return ungettext(
+            "Your password must contain at least %(min_length)d character.",
+            "Your password must contain at least %(min_length)d characters.",
+            self.min_length
+        ) % {'min_length': self.min_length}
 
 
 class UserAttributeSimilarityValidator(object):
