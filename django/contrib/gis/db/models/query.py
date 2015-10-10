@@ -10,6 +10,7 @@ from django.contrib.gis.db.models.sql import (
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Area, Distance
 from django.db import connections
+from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import RawSQL
 from django.db.models.fields import Field
 from django.db.models.query import QuerySet
@@ -675,9 +676,10 @@ class GeoQuerySet(QuerySet):
         if geo_field not in opts.fields:
             # Is this operation going to be on a related geographic field?
             # If so, it'll have to be added to the select related information
-            # (e.g., if 'location__point' was given as the field name).
+            # (e.g., if 'location__point' was given as the field name, then
+            # chop the non-relational field and add select_related('location')).
             # Note: the operation really is defined as "must add select related!"
-            self.query.add_select_related([field_name])
+            self.query.add_select_related([field_name.rsplit(LOOKUP_SEP, 1)[0]])
             # Call pre_sql_setup() so that compiler.select gets populated.
             compiler.pre_sql_setup()
             for col, _, _ in compiler.select:

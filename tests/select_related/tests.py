@@ -134,12 +134,6 @@ class SelectRelatedTests(TestCase):
             orders = [o.genus.family.order.name for o in world]
             self.assertEqual(orders, ['Agaricales'])
 
-    def test_single_related_field(self):
-        with self.assertNumQueries(1):
-            species = Species.objects.select_related('genus__name')
-            names = [s.genus.name for s in species]
-            self.assertEqual(sorted(names), ['Amanita', 'Drosophila', 'Homo', 'Pisum'])
-
     def test_field_traversal(self):
         with self.assertNumQueries(1):
             s = (Species.objects.all()
@@ -205,6 +199,10 @@ class SelectRelatedValidationTests(SimpleTestCase):
 
         with self.assertRaisesMessage(FieldError, self.non_relational_error % ('name', '(none)')):
             list(Domain.objects.select_related('name'))
+
+    def test_non_relational_field_nested(self):
+        with self.assertRaisesMessage(FieldError, self.non_relational_error % ('name', 'family')):
+            list(Species.objects.select_related('genus__name'))
 
     def test_many_to_many_field(self):
         with self.assertRaisesMessage(FieldError, self.invalid_error % ('toppings', '(none)')):

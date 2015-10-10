@@ -673,7 +673,7 @@ class SQLCompiler(object):
                 if not f.is_relation:
                     # If a non-related field is used like a relation,
                     # or if a single non-relational field is given.
-                    if next or (cur_depth == 1 and f.name in requested):
+                    if next or f.name in requested:
                         raise FieldError(
                             "Non-relational field given in select_related: '%s'. "
                             "Choices are: %s" % (

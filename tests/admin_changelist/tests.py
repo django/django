@@ -75,9 +75,7 @@ class ChangeListTests(TestCase):
             request, Child,
             *get_changelist_args(m, list_select_related=m.get_list_select_related(request))
         )
-        self.assertEqual(cl.queryset.query.select_related, {
-            'parent': {'name': {}}
-        })
+        self.assertEqual(cl.queryset.query.select_related, {'parent': {}})
 
     def test_select_related_as_tuple(self):
         ia = InvitationAdmin(Invitation, custom_site)

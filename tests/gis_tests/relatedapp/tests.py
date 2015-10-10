@@ -62,6 +62,9 @@ class RelatedGeoModelTest(TestCase):
             qs = list(City.objects.filter(name=name).transform(srid, field_name='location__point'))
             check_pnt(GEOSGeometry(wkt, srid), qs[0].location.point)
 
+        # Relations more than one level deep can be queried.
+        self.assertEqual(list(Parcel.objects.transform(srid, field_name='city__location__point')), [])
+
     @skipUnlessDBFeature("supports_extent_aggr")
     def test_related_extent_aggregate(self):
         "Testing the `Extent` aggregate on related geographic models."

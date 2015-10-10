@@ -217,6 +217,23 @@ Database backend API
 
 * ...
 
+``select_related()`` prohibits non-relational fields for nested relations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django 1.8 added validation for non-relational fields in ``select_related()``::
+
+    >>> Book.objects.select_related('title')
+    Traceback (most recent call last):
+    ...
+    FieldError: Non-relational field given in select_related: 'title'
+
+But it didn't prohibit nested non-relation fields as it does now::
+
+    >>> Book.objects.select_related('author__name')
+    Traceback (most recent call last):
+    ...
+    FieldError: Non-relational field given in select_related: 'name'
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
