@@ -55,7 +55,9 @@ AsGeoJSON
 *Availability*: PostGIS, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
-<http://geojson.org/>`_ representation of the geometry.
+<http://geojson.org/>`_ representation of the geometry. Note that the result is
+not a complete GeoJSON structure but only the ``geometry`` key content of a
+GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
 
 Example::
 

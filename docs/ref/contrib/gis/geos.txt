@@ -282,7 +282,9 @@ that are a part of this geometry.
 
 .. attribute:: GEOSGeometry.json
 
-Returns the GeoJSON representation of the geometry.
+Returns the GeoJSON representation of the geometry. Note that the result is not
+a complete GeoJSON structure but only the ``geometry`` key content of a
+GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
 
 .. note::
 
