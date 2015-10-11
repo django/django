@@ -1,6 +1,6 @@
-==================================================================================
-How to install Django on Windows with Python 3.5, virtualenv and virtualenvwrapper
-==================================================================================
+================================
+How to install Django on Windows
+================================
 
 This document will guide you through installing Python 3.5 and Django on Windows.
 It also provides optional instructions for installing virtualenv and 
@@ -17,11 +17,11 @@ Install Python
 ==============
 
 Django is a Python web framework, thus requiring Python to be installed on your
-machine.
+machine. At the time of writing, Python 3.5 is the latest version.
 
 To install Python on your machine go to https://python.org/downloads/. The web
 site should detect that you're on Windows, and offer you a download button for
-the latest Python version. Download the EXE file and run it.
+the latest Python version. Download the executable installer and run it.
 
 We recommend checking ``Add Python 3.5 to PATH``, and then clicking ``Install
 Now`` to include IDLE, pip and documentation.
@@ -63,19 +63,6 @@ This will download and install the latest Django release.
 
 After the installation has completed, you can verify your Django installation
 by executing ``django-admin --version`` in the command prompt.
-
-Testing in a Browser
-====================
-
-To create your first Django project, and bring up your project in a browser, 
-simply run the following commands::
-
-    django-admin startproject myproject
-    cd myproject
-    python manage.py runserver
-
-This will bring up Django's lightweight development Web server. You should then
-be able to visit ``http://localhost:8000`` in your browser.
 
 See :ref:`database-installation` for information on database installation
 with Django.
