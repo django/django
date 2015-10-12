@@ -227,14 +227,10 @@ Tim Graham
     and finding novel ways to extract meaning from data, and is a longtime
     photographer_.
 
-    Idan previously accepted freelance work under the Pixane_ imprint, but
-    now splits his days between his startup, Skills_, and beautifying all
-    things Django and Python.
+    Idan is currently hacking on all things data and visualization at Heroku_.
 
-    .. _Idan Gazit: http://idan.gazit.me
+    .. _Idan Gazit: http://gazit.me
     .. _photographer: https://flickr.com/photos/idangazit
-    .. _Pixane: http://pixane.com
-    .. _Skills: http://skillsapp.com
 
 Paul McMillan
     Paul found Django in 2008 while looking for a more
