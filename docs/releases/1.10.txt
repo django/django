@@ -163,7 +163,8 @@ Migrations
 Models
 ^^^^^^
 
-* ...
+* The :func:`~django.db.models.prefetch_related_objects` function is now a
+  public API.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^

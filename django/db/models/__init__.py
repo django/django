@@ -14,7 +14,9 @@ from django.db.models.fields.files import FileField, ImageField  # NOQA
 from django.db.models.fields.proxy import OrderWrt  # NOQA
 from django.db.models.lookups import Lookup, Transform  # NOQA
 from django.db.models.manager import Manager  # NOQA
-from django.db.models.query import Q, Prefetch, QuerySet  # NOQA
+from django.db.models.query import (  # NOQA
+    Q, Prefetch, QuerySet, prefetch_related_objects,
+)
 
 # Imports that would create circular imports if sorted
 from django.db.models.base import Model  # NOQA isort:skip
