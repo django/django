@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -8,6 +9,7 @@ from django.utils.encoding import python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=100)
     pub_date = models.DateField()
+    pub_datetime = models.DateTimeField(default=timezone.now())
 
     categories = models.ManyToManyField("Category", related_name="articles")
 
