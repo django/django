@@ -42,10 +42,10 @@ class ConcatPair(Func):
         super(ConcatPair, self).__init__(left, right, **extra)
 
     def as_sqlite(self, compiler, connection):
-        self.arg_joiner = ' || '
-        self.template = '%(expressions)s'
-        self.coalesce()
-        return super(ConcatPair, self).as_sql(compiler, connection)
+        coalesced = self.coalesce()
+        coalesced.arg_joiner = ' || '
+        coalesced.template = '%(expressions)s'
+        return super(ConcatPair, coalesced).as_sql(compiler, connection)
 
     def as_mysql(self, compiler, connection):
         # Use CONCAT_WS with an empty separator so that NULLs are ignored.
@@ -55,9 +55,12 @@ class ConcatPair(Func):
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
+        c = self.copy()
         expressions = [
-            Coalesce(expression, Value('')) for expression in self.get_source_expressions()]
-        self.set_source_expressions(expressions)
+            Coalesce(expression, Value('')) for expression in c.get_source_expressions()
+        ]
+        c.set_source_expressions(expressions)
+        return c
 
 
 class Concat(Func):
