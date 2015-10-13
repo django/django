@@ -2511,7 +2511,8 @@ Templates can override or extend base admin templates as described in
 .. attribute:: AdminSite.site_url
 
     The URL for the "View site" link at the top of each admin page. By default,
-    ``site_url`` is ``/``. Set it to ``None`` to remove the link.
+    ``site_url`` is ``SCRIPT_NAME`` if ``SCRIPT_NAME`` is set otherwise it is
+    ``/``. Set it to ``None`` to remove the link.
 
 .. attribute:: AdminSite.index_title
 

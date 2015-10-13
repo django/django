@@ -306,11 +306,14 @@ class AdminSite(object):
         """
         Returns a dictionary of variables to put in the template context for
         *every* page in the admin site.
+        If request has SCRIPT_NAME set, then use SCRIPT_NAME as site_url for view site
         """
+        script_name = request.META['SCRIPT_NAME']
+        site_url = script_name if self.site_url == '/' and script_name else self.site_url
         return {
             'site_title': self.site_title,
             'site_header': self.site_header,
-            'site_url': self.site_url,
+            'site_url': site_url,
             'has_permission': self.has_permission(request),
             'available_apps': self.get_app_list(request),
         }
