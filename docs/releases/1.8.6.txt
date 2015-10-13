@@ -23,3 +23,5 @@ Bugfixes
   have their reverse relations disabled (:ticket:`25545`).
 
 * Allowed filtering over a ``RawSQL`` annotation (:ticket:`25506`).
+
+* Made the ``Concat`` database function idempotent on SQLite (:ticket:`25517`).
