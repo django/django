@@ -195,7 +195,7 @@ will first disassociate any existing objects in the related set before adding
 the contents of ``new_list``. Otherwise the objects in ``new_list`` will be
 added to the existing related object set.
 
-.. versionchanged:1.9
+.. versionchanged:: 1.9
 
     In earlier versions, direct assignment used to perform ``clear()`` followed
     by ``add()``. It now performs a ``set()`` with the keyword argument
