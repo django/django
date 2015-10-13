@@ -32,7 +32,9 @@ Minor features
 :mod:`django.contrib.admin`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* For sites running on a subpath, the default :attr:`URL for the "View site"
+  link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
+  will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

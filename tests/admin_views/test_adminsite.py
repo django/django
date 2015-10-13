@@ -51,6 +51,11 @@ class SiteEachContextTest(TestCase):
         self.assertEqual(ctx['site_url'], '/')
         self.assertEqual(ctx['has_permission'], True)
 
+    def test_each_context_site_url_with_script_name(self):
+        request = RequestFactory().get(reverse('test_adminsite:index'), SCRIPT_NAME='/my-script-name/')
+        request.user = self.u1
+        self.assertEqual(site.each_context(request)['site_url'], '/my-script-name/')
+
     def test_available_apps(self):
         ctx = self.ctx
         apps = ctx['available_apps']

@@ -2513,6 +2513,15 @@ Templates can override or extend base admin templates as described in
     The URL for the "View site" link at the top of each admin page. By default,
     ``site_url`` is ``/``. Set it to ``None`` to remove the link.
 
+    For sites running on a subpath, the :meth:`each_context` method checks if
+    the current request has ``request.META['SCRIPT_NAME']`` set and uses that
+    value if ``site_url`` isn't set to something other than ``/``.
+
+    .. versionchanged:: 1.10
+
+        The ``SCRIPT_NAME`` support described in the previous paragraph was
+        added.
+
 .. attribute:: AdminSite.index_title
 
     The text to put at the top of the admin index page (a string). By default,
