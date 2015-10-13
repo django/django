@@ -189,8 +189,9 @@ Related Fields
   for ``<field name>``.
 * **fields.E306**: Related name must be a valid Python identifier or end with
   a ``'+'``.
-* **fields.E310**: None of the fields ``<field1>``, ``<field2>``, ... on model
-  ``<model>`` have a ``unique=True`` constraint.
+* **fields.E310**: No subset of the fields ``<field1>``, ``<field2>``, ... on
+  model ``<model>`` is unique. Add ``unique=True`` on any of those fields or
+  add at least a subset of them to a unique_together constraint.
 * **fields.E311**: ``<model>`` must set ``unique=True`` because it is
   referenced by a ``ForeignKey``.
 * **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.

@@ -508,9 +508,11 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         errors = field.check()
         expected = [
             Error(
-                "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique",
-                hint="Add a unique=True on any of the fields 'country_id', 'city_id' of 'Person', "
-                     "or add them all or a subset to a unique_together constraint.",
+                "No subset of the fields 'country_id', 'city_id' on model 'Person' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
                 obj=field,
                 id='fields.E310',
             )
@@ -1404,15 +1406,12 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             c = models.PositiveIntegerField()
 
             class Meta:
-                unique_together = (
-                    ('a', 'b', 'c'),
-                )
+                unique_together = (('a', 'b', 'c'),)
 
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-
             parent = ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
@@ -1425,9 +1424,11 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Child)
         expected = [
             Error(
-                "No subset of the fields 'a', 'b' on model 'Parent' is unique",
-                hint="Add a unique=True on any of the fields 'a', 'b' of 'Parent', or add them "
-                     "all or a subset to a unique_together constraint.",
+                "No subset of the fields 'a', 'b' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
                 obj=field,
                 id='fields.E310',
             ),
@@ -1442,16 +1443,13 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
             d = models.PositiveIntegerField()
 
             class Meta:
-                unique_together = (
-                    ('a', 'b', 'c'),
-                )
+                unique_together = (('a', 'b', 'c'),)
 
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             d = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-
             parent = ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
@@ -1464,9 +1462,11 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         errors = field.check(from_model=Child)
         expected = [
             Error(
-                "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique",
-                hint="Add a unique=True on any of the fields 'a', 'b', 'd' of 'Parent', or add "
-                     "them all or a subset to a unique_together constraint.",
+                "No subset of the fields 'a', 'b', 'd' on model 'Parent' is unique.",
+                hint=(
+                    "Add unique=True on any of those fields or add at least "
+                    "a subset of them to a unique_together constraint."
+                ),
                 obj=field,
                 id='fields.E310',
             ),

@@ -474,7 +474,6 @@ class ForeignObject(RelatedField):
             for ut in self.remote_field.model._meta.unique_together
         })
         foreign_fields = {f.name for f in self.foreign_related_fields}
-
         has_unique_constraint = any(u <= foreign_fields for u in unique_foreign_fields)
 
         if not has_unique_constraint and len(self.foreign_related_fields) > 1:
@@ -483,11 +482,12 @@ class ForeignObject(RelatedField):
             model_name = self.remote_field.model.__name__
             return [
                 checks.Error(
-                    "No subset of the fields %s on model '%s' is unique"
+                    "No subset of the fields %s on model '%s' is unique."
                     % (field_combination, model_name),
-                    hint="Add a unique=True on any of the fields %s of '%s', or add them all or a "
-                         "subset to a unique_together constraint."
-                         % (field_combination, model_name),
+                    hint=(
+                        "Add unique=True on any of those fields or add at "
+                        "least a subset of them to a unique_together constraint."
+                    ),
                     obj=self,
                     id='fields.E310',
                 )

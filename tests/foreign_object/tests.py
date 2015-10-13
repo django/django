@@ -4,7 +4,7 @@ from operator import attrgetter
 from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models.fields.related import ForeignObject
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.utils import translation
 
 from .models import (
@@ -394,21 +394,21 @@ class MultiColumnFKTests(TestCase):
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 
+
+class TestModelCheckTests(SimpleTestCase):
+
     def test_check_composite_foreign_object(self):
         class Parent(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
 
             class Meta:
-                unique_together = (
-                    ('a', 'b'),
-                )
+                unique_together = (('a', 'b'),)
 
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             value = models.CharField(max_length=255)
-
             parent = ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
@@ -417,10 +417,7 @@ class MultiColumnFKTests(TestCase):
                 related_name='children',
             )
 
-        field = Child._meta.get_field('parent')
-        errors = field.check(from_model=Child)
-
-        self.assertEqual(errors, [])
+        self.assertEqual(Child._meta.get_field('parent').check(from_model=Child), [])
 
     def test_check_subset_composite_foreign_object(self):
         class Parent(models.Model):
@@ -429,16 +426,13 @@ class MultiColumnFKTests(TestCase):
             c = models.PositiveIntegerField()
 
             class Meta:
-                unique_together = (
-                    ('a', 'b'),
-                )
+                unique_together = (('a', 'b'),)
 
         class Child(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             c = models.PositiveIntegerField()
             d = models.CharField(max_length=255)
-
             parent = ForeignObject(
                 Parent,
                 on_delete=models.SET_NULL,
@@ -447,7 +441,4 @@ class MultiColumnFKTests(TestCase):
                 related_name='children',
             )
 
-        field = Child._meta.get_field('parent')
-        errors = field.check(from_model=Child)
-
-        self.assertEqual(errors, [])
+        self.assertEqual(Child._meta.get_field('parent').check(from_model=Child), [])
