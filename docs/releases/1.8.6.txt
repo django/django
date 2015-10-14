@@ -18,4 +18,8 @@ Bugfixes
 * Fixed system check crash on ``ForeignKey`` to abstract model
   (:ticket:`25503`).
 
+* Fixed incorrect queries when you have multiple ``ManyToManyField``\s on
+  different models that have the same field name, point to the same model, and
+  have their reverse relations disabled (:ticket:`25545`).
+
 * Allowed filtering over a ``RawSQL`` annotation (:ticket:`25506`).
