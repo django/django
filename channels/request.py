@@ -43,5 +43,6 @@ class CustomQueryDict(QueryDict):
     Custom override of QueryDict that sets things directly.
     """
 
-    def __init__(self, values):
+    def __init__(self, values, mutable=False, encoding=None):
+        """ mutable and encoding are ignored :( """
         MultiValueDict.__init__(self, values)
