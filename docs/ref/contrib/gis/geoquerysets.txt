@@ -1272,7 +1272,7 @@ comprising the lower left coordinate and the upper right coordinate.
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
-    >>> print(qs[poly__extent])
+    >>> print(qs['poly__extent'])
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
@@ -1289,7 +1289,7 @@ and z coordinates).
 Example::
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
-    >>> print(qs[poly__extent3d])
+    >>> print(qs['poly__extent3d'])
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
@@ -1305,7 +1305,7 @@ Returns a ``LineString`` constructed from the point field geometries in the
 Example::
 
      >>> print(City.objects.filter(name__in=('Houston', 'Dallas')
-     ...      ).aggregate(MakeLine('poly'))[poly__makeline]
+     ...      ).aggregate(MakeLine('poly'))['poly__makeline']
      LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
