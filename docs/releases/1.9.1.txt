@@ -53,3 +53,8 @@ Bugfixes
 
 * Fixed a regression which prevented using a language not in Django's default
   language list (:setting:`LANGUAGES`) (:ticket:`25915`).
+
+* Avoided hiding some exceptions, like an invalid ``INSTALLED_APPS`` setting,
+  behind ``AppRegistryNotReady`` when starting ``runserver`` (:ticket:`25510`).
+  This regression appeared in 1.8.5 as a side effect of fixing :ticket:`24704`
+  and by mistake the fix wasn't applied to the ``stable/1.9.x`` branch.

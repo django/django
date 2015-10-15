@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
 
-import collections
 import os
 import pkgutil
 import sys
+from collections import OrderedDict, defaultdict
 from importlib import import_module
 
 import django
@@ -144,7 +144,7 @@ class ManagementUtility(object):
                 "",
                 "Available subcommands:",
             ]
-            commands_dict = collections.defaultdict(lambda: [])
+            commands_dict = defaultdict(lambda: [])
             for name, app in six.iteritems(get_commands()):
                 if app == 'django.core':
                     app = 'django'
@@ -316,8 +316,11 @@ class ManagementUtility(object):
                     autoreload.check_errors(django.setup)()
                 except Exception:
                     # The exception will be raised later in the child process
-                    # started by the autoreloader.
-                    pass
+                    # started by the autoreloader. Pretend it didn't happen by
+                    # loading an empty list of applications.
+                    apps.all_models = defaultdict(OrderedDict)
+                    apps.app_configs = OrderedDict()
+                    apps.apps_ready = apps.models_ready = apps.ready = True
 
             # In all other cases, django.setup() is required to succeed.
             else:
