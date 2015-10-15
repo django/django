@@ -69,28 +69,16 @@ class SchemaTests(TransactionTestCase):
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
         converter = connection.introspection.table_name_converter
-        with connection.cursor() as cursor:
+        with atomic():
             connection.disable_constraint_checking()
-            table_names = connection.introspection.table_names(cursor)
+            table_names = connection.introspection.table_names()
             for model in itertools.chain(SchemaTests.models, self.local_models):
-                # Remove any M2M tables first
-                for field in model._meta.local_many_to_many:
-                    with atomic():
-                        tbl = converter(field.remote_field.through._meta.db_table)
-                        if tbl in table_names:
-                            cursor.execute(connection.schema_editor().sql_delete_table % {
-                                "table": connection.ops.quote_name(tbl),
-                            })
-                            table_names.remove(tbl)
-                # Then remove the main tables
-                with atomic():
-                    tbl = converter(model._meta.db_table)
-                    if tbl in table_names:
-                        cursor.execute(connection.schema_editor().sql_delete_table % {
-                            "table": connection.ops.quote_name(tbl),
-                        })
-                        table_names.remove(tbl)
-        connection.enable_constraint_checking()
+                tbl = converter(model._meta.db_table)
+                if tbl in table_names:
+                    with connection.schema_editor() as editor:
+                        editor.delete_model(model)
+                    table_names.remove(tbl)
+            connection.enable_constraint_checking()
 
     def column_classes(self, model):
         with connection.cursor() as cursor:
@@ -945,11 +933,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = 'schema'
                 apps = new_apps
-
-        self.local_models = [
-            LocalBookWithM2M,
-            LocalBookWithM2M._meta.get_field('tags').remote_field.through,
-        ]
+        self.local_models = [LocalBookWithM2M]
         # Create the tables
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -1028,7 +1012,6 @@ class SchemaTests(TransactionTestCase):
         # Create an M2M field
         new_field = M2MFieldClass("schema.TagM2MTest", related_name="authors")
         new_field.contribute_to_class(LocalAuthorWithM2M, "tags")
-        self.local_models += [new_field.remote_field.through]
         # Ensure there's no m2m table there
         self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
         # Add the field
@@ -1047,6 +1030,14 @@ class SchemaTests(TransactionTestCase):
             editor.remove_field(LocalAuthorWithM2M, new_field)
         # Ensure there's no m2m table there
         self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
+
+        # Need to tear down using a model without the added M2M field that's
+        # been removed.
+        class LocalAuthorWithM2M(Model):
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+        self.local_models = [LocalAuthorWithM2M]
 
     def test_m2m(self):
         self._test_m2m(ManyToManyField)
@@ -1117,12 +1108,7 @@ class SchemaTests(TransactionTestCase):
             class Meta:
                 app_label = 'schema'
                 apps = new_apps
-
-        self.local_models = [
-            LocalBookWithM2M,
-            LocalBookWithM2M._meta.get_field('tags').remote_field.through,
-        ]
-
+        self.local_models = [LocalBookWithM2M]
         # Create the tables
         with connection.schema_editor() as editor:
             editor.create_model(Author)
@@ -1144,7 +1130,6 @@ class SchemaTests(TransactionTestCase):
         old_field = LocalBookWithM2M._meta.get_field("tags")
         new_field = M2MFieldClass(UniqueTest)
         new_field.contribute_to_class(LocalBookWithM2M, "uniques")
-        self.local_models += [new_field.remote_field.through]
         with connection.schema_editor() as editor:
             editor.alter_field(LocalBookWithM2M, old_field, new_field)
         # Ensure old M2M is gone
@@ -1152,6 +1137,15 @@ class SchemaTests(TransactionTestCase):
             DatabaseError,
             self.column_classes, LocalBookWithM2M._meta.get_field("tags").remote_field.through
         )
+
+        # This model looks like the new model and is used for teardown.
+        class LocalBookWithM2M(Model):
+            uniques = M2MFieldClass(UniqueTest)
+
+            class Meta:
+                app_label = 'schema'
+                apps = new_apps
+        self.local_models = [LocalBookWithM2M]
         # Ensure the new M2M exists and points to UniqueTest
         constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:
