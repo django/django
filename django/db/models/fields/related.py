@@ -122,7 +122,7 @@ class RelatedField(Field):
         import re
         import keyword
         related_name = self.remote_field.related_name
-        if not related_name:
+        if related_name is None:
             return []
         is_valid_id = True
         if keyword.iskeyword(related_name):

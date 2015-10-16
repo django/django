@@ -662,6 +662,7 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             'ends_with_whitespace_%s' % whitespace,
             'with',  # a Python keyword
             'related_name\n',
+            '',
         ]
         # Python 2 crashes on non-ASCII strings.
         if six.PY3:
