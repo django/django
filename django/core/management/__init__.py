@@ -74,7 +74,8 @@ def get_commands():
         # user-defined commands maybe already exist,if that happened,raise CommandError
         for name in find_commands(path):
             if name in commands.keys():
-                raise CommandError("The command name <%s> is already exist in '%s',please rename it!" % (name,commands[name]))
+                raise CommandError("The command name <%s> is already exist in '%s' , \
+                    please rename it!" % (name, commands[name]))
             commands.update({name: app_config.name})
 
     return commands
