@@ -154,7 +154,7 @@ class ForeignObjectRel(object):
 
     def is_hidden(self):
         "Should the related object be hidden?"
-        return self.related_name is not None and self.related_name[-1] == '+'
+        return bool(self.related_name) and self.related_name[-1] == '+'
 
     def get_joining_columns(self):
         return self.field.get_reverse_joining_columns()
