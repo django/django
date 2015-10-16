@@ -11,8 +11,8 @@ from django.db.models.aggregates import (
     Avg, Count, Max, Min, StdDev, Sum, Variance,
 )
 from django.db.models.expressions import (
-    F, Case, Col, Date, DateTime, ExpressionWrapper, Func, OrderBy, Random,
-    RawSQL, Ref, Value, When,
+    F, Case, Col, Date, DatePart, DateTime, DateTimePart, ExpressionWrapper,
+    Func, OrderBy, Random, RawSQL, Ref, Value, When,
 )
 from django.db.models.functions import (
     Coalesce, Concat, Length, Lower, Substr, Upper,
@@ -895,6 +895,108 @@ class ValueTests(TestCase):
         UUID.objects.create()
         UUID.objects.update(uuid=Value(uuid.UUID('12345678901234567890123456789012'), output_field=UUIDField()))
         self.assertEqual(UUID.objects.get().uuid, uuid.UUID('12345678901234567890123456789012'))
+
+
+class DatePartTests(TestCase):
+
+    def setUp(self):
+        self.same_month_day = Experiment.objects.create(
+            name='same_month_day_experiment',
+            assigned=datetime.date(2014, 10, 15),
+            completed=datetime.date(2015, 10, 15),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime.now(),
+            end=datetime.datetime.now(),
+        )
+
+        self.same_month = Experiment.objects.create(
+            name='same_month_experiment',
+            assigned=datetime.date(2014, 10, 1),
+            completed=datetime.date(2015, 10, 12),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime.now(),
+            end=datetime.datetime.now(),
+        )
+
+        self.same_day = Experiment.objects.create(
+            name='same_day_experiment',
+            assigned=datetime.date(2013, 7, 15),
+            completed=datetime.date(2015, 10, 15),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime.now(),
+            end=datetime.datetime.now(),
+        )
+
+    def test_datepart(self):
+        same_day_experiments = Experiment.objects.filter(assigned__day=DatePart('completed', 'day'))
+
+        self.assertEqual(same_day_experiments.count(), 2)
+        self.assertIn(self.same_day, same_day_experiments)
+        self.assertIn(self.same_month_day, same_day_experiments)
+
+        same_month_experiments = Experiment.objects.filter(assigned__month=DatePart('completed', 'month'))
+
+        self.assertEqual(same_month_experiments.count(), 2)
+        self.assertIn(self.same_month, same_month_experiments)
+        self.assertIn(self.same_month_day, same_month_experiments)
+
+        same_month_day_experiment = Experiment.objects.get(
+            assigned__day=DatePart('completed', 'day'),
+            assigned__month=DatePart('completed', 'month'),
+        )
+
+        self.assertEqual(self.same_month_day, same_month_day_experiment)
+
+
+class DateTimePartTests(TestCase):
+
+    def setUp(self):
+        self.same_month_day = Experiment.objects.create(
+            name='same_month_day_experiment',
+            assigned=datetime.date.today(),
+            completed=datetime.date.today(),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime(2014, 7, 4, 12, 33, 15),
+            end=datetime.datetime(2015, 7, 4, 10, 13, 12),
+        )
+
+        self.same_month = Experiment.objects.create(
+            name='same_month_experiment',
+            assigned=datetime.date.today(),
+            completed=datetime.date.today(),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime(2014, 6, 12, 7, 33, 15),
+            end=datetime.datetime(2015, 6, 5, 11, 13, 12),
+        )
+
+        self.same_day = Experiment.objects.create(
+            name='same_day_experiment',
+            assigned=datetime.date.today(),
+            completed=datetime.date.today(),
+            estimated_time=datetime.timedelta(days=1),
+            start=datetime.datetime(2014, 10, 6, 4, 33, 15),
+            end=datetime.datetime(2015, 3, 6, 1, 13, 12),
+        )
+
+    def test_datetimepart(self):
+        same_day_experiments = Experiment.objects.filter(start__day=DateTimePart('end', 'day'))
+
+        self.assertEqual(same_day_experiments.count(), 2)
+        self.assertIn(self.same_day, same_day_experiments)
+        self.assertIn(self.same_month_day, same_day_experiments)
+
+        same_month_experiments = Experiment.objects.filter(start__month=DateTimePart('end', 'month'))
+
+        self.assertEqual(same_month_experiments.count(), 2)
+        self.assertIn(self.same_month, same_month_experiments)
+        self.assertIn(self.same_month_day, same_month_experiments)
+
+        same_month_day_experiment = Experiment.objects.get(
+            start__day=DatePart('end', 'day'),
+            start__month=DatePart('end', 'month'),
+        )
+
+        self.assertEqual(self.same_month_day, same_month_day_experiment)
 
 
 class ReprTests(TestCase):

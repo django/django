@@ -892,6 +892,22 @@ class Date(Expression):
         return value
 
 
+class DatePart(Date):
+    """
+    Add a partial date selection column.
+
+    Enables construction of complex date queries
+    involving date fields with lookup types of:
+    'year', 'month', 'day'. E.g.:
+
+    `MyModel.objects.filter(date1__month=DatePart('date2', 'month')`
+    """
+    def as_sql(self, compiler, connection):
+        sql, params = self.col.as_sql(compiler, connection)
+        assert not(params)
+        return connection.ops.date_extract_sql(self.lookup_type, sql), []
+
+
 class DateTime(Expression):
     """
     Add a datetime selection column.
@@ -948,6 +964,22 @@ class DateTime(Expression):
             value = value.replace(tzinfo=None)
             value = timezone.make_aware(value, self.tzinfo)
         return value
+
+
+class DateTimePart(DateTime):
+    """
+    Add a partial datetime selection column.
+
+    Enables construction of complex date queries
+    involving datetime fields with lookup types of:
+    'year', 'month', 'day'. E.g.:
+
+    `MyModel.objects.filter(date1__month=DatePart('date2', 'month')`
+    """
+    def as_sql(self, compiler, connection):
+        sql, params = self.col.as_sql(compiler, connection)
+        assert not(params)
+        return connection.ops.datetime_extract_sql(self.lookup_type, sql, self.tzname)
 
 
 class OrderBy(BaseExpression):
