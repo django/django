@@ -7,7 +7,8 @@ from django.db import connection
 from django.db.models import CharField, TextField, Value as V
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import (
-    Coalesce, Concat, Greatest, Least, Length, Lower, Now, Substr, Upper,
+    Coalesce, Concat, ConcatPair, Greatest, Least, Length, Lower, Now, Substr,
+    Upper,
 )
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.utils import six, timezone
@@ -352,6 +353,26 @@ class FunctionTests(TestCase):
         ).get(title='The Title')
         expected = article.title + ' - ' + article.text
         self.assertEqual(expected.upper(), article.title_text)
+
+    @skipUnless(connection.vendor == 'sqlite', "sqlite specific implementation detail.")
+    def test_concat_coalesce_idempotent(self):
+        pair = ConcatPair(V('a'), V('b'))
+        pair_node_count = len(list(pair.flatten()))
+        self.assertEqual(pair_node_count, 3)
+        coalesced = pair.coalesce()
+        coalesced_node_count = len(list(coalesced.flatten()))
+        self.assertEqual(coalesced_node_count, 7)  # + 2 Coalesce + 2 Value()
+        self.assertEqual(len(list(pair.flatten())), 3)
+
+    def test_concat_sql_generation_idempotency(self):
+        qs = Article.objects.annotate(description=Concat('title', V(': '), 'summary'))
+        qs1 = qs.all()
+        # Multiple compilations should not alter the generated query.
+        initial_sql = str(qs.query)
+        subsequent_sql = str(qs1.query)
+        self.assertEqual(
+            initial_sql, subsequent_sql, 'Concat() SQL generation is not idempotent'
+        )
 
     def test_lower(self):
         Author.objects.create(name='John Smith', alias='smithj')
