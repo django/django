@@ -33,7 +33,7 @@
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% trans "Objects" %}</h2>
     <ul>{{ deleted_objects|unordered_list }}</ul>
-    <form action="" method="post">{% csrf_token %}
+    <form method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes" />
     {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1" />{% endif %}
