@@ -81,11 +81,7 @@ class Media(object):
         if path.startswith(('http://', 'https://', '/')):
             return path
         if prefix is None:
-            if settings.STATIC_URL is None:
-                # backwards compatibility
-                prefix = settings.MEDIA_URL
-            else:
-                prefix = settings.STATIC_URL
+            prefix = settings.STATIC_URL
         return urljoin(prefix, path)
 
     def __getitem__(self, name):
