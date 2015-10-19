@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 
 import datetime
+import sys
+import unittest
 
 from django.contrib.admin import (
     AllValuesFieldListFilter, BooleanFieldListFilter, ModelAdmin,
@@ -351,6 +353,11 @@ class ListFiltersTests(TestCase):
             )
         )
 
+    @unittest.skipIf(
+        sys.platform.startswith('win'),
+        "Windows doesn't support setting a timezone that differs from the "
+        "system timezone."
+    )
     @override_settings(USE_TZ=True)
     def test_datefieldlistfilter_with_time_zone_support(self):
         # Regression for #17830
