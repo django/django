@@ -29,9 +29,30 @@ def _get_app_label_and_model_name(model, app_label=''):
         return model._meta.app_label, model._meta.model_name
 
 
+def _get_related_models(m):
+    """
+    Return all models that have a direct relationship to the given model.
+    """
+    related_models = [
+        subclass for subclass in m.__subclasses__()
+        if issubclass(subclass, models.Model)
+    ]
+    related_fields_models = set()
+    for f in m._meta.get_fields(include_parents=True, include_hidden=True):
+        if f.is_relation and f.related_model is not None and not isinstance(f.related_model, six.string_types):
+            related_fields_models.add(f.model)
+            related_models.append(f.related_model)
+    # Reverse accessors of foreign keys to proxy models are attached to their
+    # concrete proxied model.
+    opts = m._meta
+    if opts.proxy and m in related_fields_models:
+        related_models.append(opts.concrete_model)
+    return related_models
+
+
 def get_related_models_recursive(model):
     """
-    Returns all models that have a direct or indirect relationship
+    Return all models that have a direct or indirect relationship
     to the given model.
 
     Relationships are either defined by explicit relational fields, like
@@ -40,31 +61,14 @@ def get_related_models_recursive(model):
     however, that a model inheriting from a concrete model is also related to
     its superclass through the implicit *_ptr OneToOneField on the subclass.
     """
-    def _related_models(m):
-        related_models = [
-            subclass for subclass in m.__subclasses__()
-            if issubclass(subclass, models.Model)
-        ]
-        related_fields_models = set()
-        for f in m._meta.get_fields(include_parents=True, include_hidden=True):
-            if f.is_relation and f.related_model is not None and not isinstance(f.related_model, six.string_types):
-                related_fields_models.add(f.model)
-                related_models.append(f.related_model)
-        # Reverse accessors of foreign keys to proxy models
-        # are attached to their concrete proxied model.
-        opts = m._meta
-        if opts.proxy and m in related_fields_models:
-            related_models.append(opts.concrete_model)
-        return related_models
-
     seen = set()
-    queue = _related_models(model)
+    queue = _get_related_models(model)
     for rel_mod in queue:
         rel_app_label, rel_model_name = rel_mod._meta.app_label, rel_mod._meta.model_name
         if (rel_app_label, rel_model_name) in seen:
             continue
         seen.add((rel_app_label, rel_model_name))
-        queue.extend(_related_models(rel_mod))
+        queue.extend(_get_related_models(rel_mod))
     return seen - {(model._meta.app_label, model._meta.model_name)}
 
 
