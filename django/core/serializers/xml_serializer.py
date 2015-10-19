@@ -351,7 +351,7 @@ class DTDForbidden(DefusedXmlException):
         self.pubid = pubid
 
     def __str__(self):
-        tpl = "DTDForbidden(name='{}', system_id={!r}, public_id={!r})"
+        tpl = "DTDForbidden(name='{0}', system_id={1!r}, public_id={2!r})"
         return tpl.format(self.name, self.sysid, self.pubid)
 
 
@@ -367,7 +367,7 @@ class EntitiesForbidden(DefusedXmlException):
         self.notation_name = notation_name
 
     def __str__(self):
-        tpl = "EntitiesForbidden(name='{}', system_id={!r}, public_id={!r})"
+        tpl = "EntitiesForbidden(name='{0}', system_id={1!r}, public_id={2!r})"
         return tpl.format(self.name, self.sysid, self.pubid)
 
 
@@ -381,5 +381,5 @@ class ExternalReferenceForbidden(DefusedXmlException):
         self.pubid = pubid
 
     def __str__(self):
-        tpl = "ExternalReferenceForbidden(system_id='{}', public_id={})"
+        tpl = "ExternalReferenceForbidden(system_id='{0}', public_id={1})"
         return tpl.format(self.sysid, self.pubid)
