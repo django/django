@@ -778,8 +778,23 @@ class ObjectLookupTests(LookupTests):
 
     def test_lookup_exclude(self):
         lookup = lookups.LessThanOrEqual(F('id'), Value(5))
-        queryset = Article.objects.all().exclude(lookup)
+        queryset = Article.objects.exclude(lookup)
         self.assertQuerysetEqual(queryset, ['<Article: Article 6>',  '<Article: Article 7>'])
+
+    def test_lookup_exclude2(self):
+        season_2009 = Season.objects.create(year=2009, gt=111)
+        season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
+
+        season_2010 = Season.objects.create(year=2010, gt=222)
+        season_2010.games.create(home="Houston Astros", away="Chicago Cubs")
+
+        # keyword-based lookup
+        games = Game.objects.exclude(season__year__gte=2010)
+        self.assertQuerysetEqual(games, ['<Game: St. Louis Cardinals at Houston Astros>'])
+
+        # object-based lookup
+        games = Game.objects.exclude(lookups.GreaterThanOrEqual(F('season__year'), Value(2010)))
+        self.assertQuerysetEqual(games, ['<Game: St. Louis Cardinals at Houston Astros>'])
 
 
 class LookupTransactionTests(TransactionTestCase):
