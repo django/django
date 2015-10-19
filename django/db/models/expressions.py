@@ -339,6 +339,17 @@ class BaseExpression(object):
     def reverse_ordering(self):
         return self
 
+    def flatten(self):
+        """
+        Recursively yield this expression and all subexpressions, in
+        depth-first order.
+        """
+        yield self
+        for expr in self.get_source_expressions():
+            if expr:
+                for inner_expr in expr.flatten():
+                    yield inner_expr
+
 
 class Expression(BaseExpression, Combinable):
     """

@@ -47,8 +47,8 @@ class ConcatPair(Func):
         return super(ConcatPair, coalesced).as_sql(compiler, connection)
 
     def as_mysql(self, compiler, connection):
-        self.coalesce()
-        return super(ConcatPair, self).as_sql(compiler, connection)
+        coalesced = self.coalesce()
+        return super(ConcatPair, coalesced).as_sql(compiler, connection)
 
     def coalesce(self):
         # null on either side results in null for expression, wrap with coalesce
