@@ -776,6 +776,11 @@ class ObjectLookupTests(LookupTests):
         queryset = Article.objects.filter(lookup)
         self.assertQuerysetEqual(queryset, ['<Article: Article 5>'])
 
+    def test_lookup_exclude(self):
+        lookup = lookups.LessThanOrEqual(F('id'), Value(5))
+        queryset = Article.objects.all().exclude(lookup)
+        self.assertQuerysetEqual(queryset, ['<Article: Article 6>',  '<Article: Article 7>'])
+
 
 class LookupTransactionTests(TransactionTestCase):
     available_apps = ['lookup']
