@@ -29,3 +29,8 @@ Bugfixes
 * Avoided a confusing stack trace when starting :djadmin:`runserver` with an
   invalid :setting:`INSTALLED_APPS` setting (:ticket:`25510`). This regression
   appeared in 1.8.5 as a side effect of fixing :ticket:`24704`.
+
+* Made deferred models use their proxied model's ``_meta.apps`` for caching
+  and retrieval (:ticket:`25563`). This prevents any models generated in data
+  migrations using ``QuerySet.defer()`` from leaking to test and application
+  code.

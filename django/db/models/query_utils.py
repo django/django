@@ -9,7 +9,6 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 
-from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.db.backends import utils
 from django.db.models.constants import LOOKUP_SEP
@@ -215,12 +214,13 @@ def deferred_class_factory(model, attrs):
     """
     if not attrs:
         return model
+    opts = model._meta
     # Never create deferred models based on deferred model
     if model._deferred:
         # Deferred models are proxies for the non-deferred model. We never
         # create chains of defers => proxy_for_model is the non-deferred
         # model.
-        model = model._meta.proxy_for_model
+        model = opts.proxy_for_model
     # The app registry wants a unique name for each model, otherwise the new
     # class won't be created (we get an exception). Therefore, we generate
     # the name using the passed in attrs. It's OK to reuse an existing class
@@ -229,13 +229,14 @@ def deferred_class_factory(model, attrs):
     name = utils.truncate_name(name, 80, 32)
 
     try:
-        return apps.get_model(model._meta.app_label, name)
+        return opts.apps.get_model(model._meta.app_label, name)
 
     except LookupError:
 
         class Meta:
             proxy = True
-            app_label = model._meta.app_label
+            apps = opts.apps
+            app_label = opts.app_label
 
         overrides = {attr: DeferredAttribute(attr, model) for attr in attrs}
         overrides["Meta"] = Meta
