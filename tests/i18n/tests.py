@@ -227,6 +227,10 @@ class TranslationTests(SimpleTestCase):
         )
         self.assertEqual(result % {'name': 'Joe', 'num': 4}, "Joe has 4 good results")
 
+    def test_ungettext_lazy_bool(self):
+        self.assertTrue(ungettext_lazy('%d good result', '%d good results'))
+        self.assertFalse(ungettext_lazy('', ''))
+
     @override_settings(LOCALE_PATHS=extended_locale_paths)
     def test_pgettext(self):
         trans_real._active = local()
