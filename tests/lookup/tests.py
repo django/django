@@ -7,6 +7,8 @@ from unittest import skipUnless
 
 from django.core.exceptions import FieldError
 from django.db import connection
+from django.db.models import lookups, F, Value, Count
+from django.db.models.functions import Upper, Lower
 from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
 
 from .models import Article, Author, Game, MyISAMArticle, Player, Season, Tag
@@ -665,7 +667,6 @@ class LookupTests(TestCase):
         types ('year', 'gt', 'range', 'in' etc.).
         Refs #11670.
         """
-
         # Here we're using 'gt' as a code number for the year, e.g. 111=>2009.
         season_2009 = Season.objects.create(year=2009, gt=111)
         season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
@@ -751,6 +752,29 @@ class LookupTests(TestCase):
              '<Article: Article 7>'],
             ordered=False
         )
+
+
+class ObjectLookupTests(LookupTests):
+    def test_direct_lookup_init(self):
+        lookup = lookups.GreaterThan(F('id'), Value(5))
+        queryset = Article.objects.filter(lookup)
+        self.assertQuerysetEqual(queryset, ['<Article: Article 6>',  '<Article: Article 7>'])
+
+    def test_lookup_with_no_name(self):
+        class CustomGreaterThanLookup(lookups.GreaterThan):
+            lookup_name = None
+
+            def get_rhs_op(self, connect, rhs):
+                return '> {}'.format(rhs)
+
+        lookup = CustomGreaterThanLookup(F('id'), Value(5))
+        queryset = Article.objects.filter(lookup)
+        self.assertQuerysetEqual(queryset, ['<Article: Article 6>',  '<Article: Article 7>'])
+
+    def test_direct_lookup_with_transform(self):
+        lookup = lookups.Contains(Upper(Lower(Upper(F('headline')))), 'ARTICLE 5')
+        queryset = Article.objects.filter(lookup)
+        self.assertQuerysetEqual(queryset, ['<Article: Article 5>'])
 
 
 class LookupTransactionTests(TransactionTestCase):

@@ -16,9 +16,12 @@ from django.db.backends import utils
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
 
+
+
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
 # sides of the relation. The join_field is the field backing the relation.
+
 PathInfo = namedtuple('PathInfo', 'from_opts to_opts target_fields join_field m2m direct')
 
 

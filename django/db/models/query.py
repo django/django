@@ -11,20 +11,20 @@ from django.conf import settings
 from django.core import exceptions
 from django.db import (
     DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
-    transaction,
-)
+    transaction)
 from django.db.models import sql
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import Collector
 from django.db.models.expressions import F, Date, DateTime
 from django.db.models.fields import AutoField
 from django.db.models.query_utils import (
-    Q, InvalidQuery, check_rel_lookup_compatibility, deferred_class_factory,
-)
+    Q, InvalidQuery, check_rel_lookup_compatibility, deferred_class_factory)
 from django.db.models.sql.constants import CURSOR
 from django.utils import six, timezone
 from django.utils.functional import partition
 from django.utils.version import get_version
+
+
 
 # The maximum number of items to display in a QuerySet.__repr__
 REPR_OUTPUT_SIZE = 20
@@ -1708,3 +1708,5 @@ def get_related_populators(klass_info, select, db):
         rel_cls = RelatedPopulator(rel_klass_info, select, db)
         iterators.append(rel_cls)
     return iterators
+
+
