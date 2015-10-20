@@ -174,6 +174,11 @@ Requests and Responses
 
 * Added ``request.user`` to the debug view.
 
+* Added :class:`~django.http.HttpResponse` methods
+  :meth:`~django.http.HttpResponse.readable()` and
+  :meth:`~django.http.HttpResponse.seekable()` to make an instance a
+  stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
+
 Serialization
 ^^^^^^^^^^^^^
 
