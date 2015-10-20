@@ -65,6 +65,10 @@ class Unpickable(object):
         raise pickle.PickleError()
 
 
+class UnpickableType(object):
+    __slots__ = 'a',
+
+
 @override_settings(CACHES={
     'default': {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
@@ -1220,6 +1224,9 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         os.rmdir(self.dirname)
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
+
+    def test_cache_write_unpickable_type(self):
+        cache.set('unpickable', UnpickableType())
 
 
 @override_settings(CACHES={
