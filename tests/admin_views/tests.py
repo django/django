@@ -2430,7 +2430,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         self.assertEqual(logentry.object_id, str(edited_obj.pk))
 
     def test_logentry_save(self):
-        """"
+        """
         LogEntry.action_time is a timestamp of the date when the entry was
         created. It shouldn't be updated on a subsequent save().
         """
