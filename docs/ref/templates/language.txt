@@ -74,6 +74,8 @@ explained later in this document.
 
     Oh, and one more thing: making humans edit XML is sadistic!
 
+.. _template-variables:
+
 Variables
 =========
 

@@ -320,6 +320,14 @@ would display the keys and values of the dictionary::
         {{ key }}: {{ value }}
     {% endfor %}
 
+Keep in mind that for the dot operator, dictionary key lookup takes precedence
+over method lookup. Therefore if the ``data`` dictionary contains a key named
+``'items'``, ``data.items`` will return ``data['items']`` instead of
+``data.items()``. Avoid adding keys that are named like dictionary methods if
+you want to use those methods in a template (``items``, ``values``, ``keys``,
+etc.). Read more about the lookup order of the dot operator in the
+:ref:`documentation of template variables <template-variables>`.
+
 The for loop sets a number of variables available within the loop:
 
 ==========================  ===============================================
