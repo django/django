@@ -736,7 +736,7 @@ class SessionMiddlewareTests(TestCase):
         self.assertEqual(response['Vary'], 'Cookie')
 
     def test_empty_session_saved(self):
-        """"
+        """
         If a session is emptied of data but still has a key, it should still
         be updated.
         """
