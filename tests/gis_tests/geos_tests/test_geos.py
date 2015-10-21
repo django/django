@@ -650,6 +650,10 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         p3 = fromstr(p1.hex, srid=-1)  # -1 is intended.
         self.assertEqual(-1, p3.srid)
 
+        # Testing that geometry SRID could be set to its own value
+        pnt_wo_srid = Point(1, 1)
+        pnt_wo_srid.srid = pnt_wo_srid.srid
+
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_custom_srid(self):
         """ Test with a srid unknown from GDAL """
