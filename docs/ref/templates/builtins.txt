@@ -315,6 +315,25 @@ would display the keys and values of the dictionary::
         {{ key }}: {{ value }}
     {% endfor %}
 
+
+.. admonition:: Resolution order of ``.`` operator
+
+    Keep in mind that ``items`` key in a dictionary will shadow ``items()``
+    function. This lookup order can cause some unexpected behavior.
+
+    In normal situations Django template expression ``{{ data.items }}`` will
+    return result of following python code: ``data.items()``, however if
+    ``data`` dictionary will contain ``items`` key, the same django expression
+    will return: ``data['items']``, which is most probably *not what you want*.
+
+    You should avoid adding dictionary entries whose keys are named like methods
+    of dictionary instance for example: ``items``, ``values``, ``keys``, to
+    dictionaries that will be passed to Django templates.
+
+    For additional information see :ref:`documentation of template variables
+    <template-variables>`.
+
+
 The for loop sets a number of variables available within the loop:
 
 ==========================  ===============================================
