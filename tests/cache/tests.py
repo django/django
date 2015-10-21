@@ -60,7 +60,7 @@ class C:
         return 24
 
 
-class Unpickable(object):
+class Unpicklable(object):
     def __getstate__(self):
         raise pickle.PickleError()
 
@@ -849,7 +849,7 @@ class BaseCacheTests(object):
         self.assertEqual(caches['custom_key'].get('answer2'), 42)
         self.assertEqual(caches['custom_key2'].get('answer2'), 42)
 
-    def test_cache_write_unpickable_object(self):
+    def test_cache_write_unpicklable_object(self):
         update_middleware = UpdateCacheMiddleware()
         update_middleware.cache = cache
 
@@ -880,14 +880,13 @@ class BaseCacheTests(object):
         self.assertEqual(get_cache_data.cookies, response.cookies)
 
     def test_add_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
+        # Shouldn't fail silently if trying to cache an unpicklable type.
         with self.assertRaises(pickle.PickleError):
-            cache.add('unpickable', Unpickable())
+            cache.add('unpicklable', Unpicklable())
 
     def test_set_fail_on_pickleerror(self):
-        "See https://code.djangoproject.com/ticket/21200"
         with self.assertRaises(pickle.PickleError):
-            cache.set('unpickable', Unpickable())
+            cache.set('unpicklable', Unpicklable())
 
     def test_get_or_set(self):
         self.assertIsNone(cache.get('projector'))
@@ -1226,9 +1225,9 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         cache.set('foo', 'bar')
         os.path.exists(self.dirname)
 
-    def test_cache_write_unpickable_type(self):
+    def test_cache_write_unpicklable_type(self):
         # This fails if not using the highest pickling protocol on Python 2.
-        cache.set('unpickable', UnpicklableType())
+        cache.set('unpicklable', UnpicklableType())
 
 
 @override_settings(CACHES={
