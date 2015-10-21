@@ -1097,7 +1097,7 @@ Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
 archives with the app template files, downloading and extracting them on the
 fly.
 
-For example, taking advantage of Github's feature to expose repositories as
+For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
@@ -1172,7 +1172,7 @@ Django will also accept URLs (``http``, ``https``, ``ftp``) to compressed
 archives with the project template files, downloading and extracting them on the
 fly.
 
-For example, taking advantage of Github's feature to expose repositories as
+For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
     django-admin startproject --template=https://github.com/githubuser/django-project-template/archive/master.zip myproject
