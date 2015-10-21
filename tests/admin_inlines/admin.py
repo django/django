@@ -72,6 +72,7 @@ class InnerInline3(admin.StackedInline):
 
 
 class TitleForm(forms.ModelForm):
+    title1 = forms.CharField(max_length=100)
 
     def clean(self):
         cleaned_data = self.cleaned_data
