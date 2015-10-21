@@ -796,6 +796,21 @@ class ObjectLookupTests(LookupTests):
         games = Game.objects.exclude(lookups.GreaterThanOrEqual(F('season__year'), Value(2010)))
         self.assertQuerysetEqual(games, ['<Game: St. Louis Cardinals at Houston Astros>'])
 
+    def test_lookup_exclude3(self):
+        season_2009 = Season.objects.create(year=2009, gt=111)
+        season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
+        season_2009.games.create(home="Houston Astros", away="Chicago Cubs")
+        season_2009.games.create(home="St. Louis Cardinals", away="Houston Atros")
+        season_2010 = Season.objects.create(year=2010, gt=222)
+        season_2010.games.create(home="Houston Astros", away="Chicago Cubs")
+
+        print('\n --------------------- start test -------------------------- ')
+        qs1 = Season.objects.exclude(games__home__icontains='Houston')
+        self.assertQuerysetEqual(qs1, [])
+
+        qs2 = Season.objects.exclude(lookups.Contains(F('games__home'), Value('Houston')))
+        self.assertQuerysetEqual(qs2, [])
+
 
 class LookupTransactionTests(TransactionTestCase):
     available_apps = ['lookup']

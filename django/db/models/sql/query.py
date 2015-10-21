@@ -18,7 +18,7 @@ from django.db.models.aggregates import Count
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import Col, Ref
 from django.db.models.fields.related_lookups import MultiColSource
-from django.db.models.lookups import IsNull
+from django.db.models.lookups import IsNull, Lookup
 from django.db.models.query_utils import Q, PathInfo, check_rel_lookup_compatibility, \
     refs_expression
 from django.db.models.sql.constants import (
@@ -1066,7 +1066,10 @@ class Query(object):
                                        allow_joins, split_subq)
 
     def add_filter(self, filter_clause):
-        self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
+        if isinstance(filter_clause, Lookup):
+            self.add_q(Q(filter_clause))
+        else:
+            self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
     def add_q(self, q_object):
         """
@@ -1988,7 +1991,6 @@ class QueryKeywordLookupHelper(object):
         used_joins = set(used_joins).union(set(join_list))
         targets, alias, join_list = self.query.trim_joins(sources, join_list,
                                                           path)
-
         if field.is_relation:
             # No support for transforms for relational fields
             assert len(lookup_parts) == 1
