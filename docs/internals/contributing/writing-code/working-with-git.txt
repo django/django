@@ -40,10 +40,10 @@ used to associate your commits with your GitHub account.
 Setting up local repository
 ---------------------------
 
-When you have created your GitHub account, with the nick "github_nick", and
+When you have created your GitHub account, with the nick "GitHub_nick", and
 forked Django's repository, create a local copy of your fork::
 
-    git clone git@github.com:github_nick/django.git
+    git clone git@github.com:GitHub_nick/django.git
 
 This will create a new directory "django", containing a clone of your GitHub
 repository. The rest of the git commands on this page need to be run within the
@@ -103,7 +103,7 @@ You can publish your work on GitHub just by doing::
 When you go to your GitHub page you will notice a new branch has been created.
 
 If you are working on a Trac ticket, you should mention in the ticket that
-your work is available from branch ticket_xxxxx of your github repo. Include a
+your work is available from branch ticket_xxxxx of your GitHub repo. Include a
 link to your branch.
 
 Note that the above branch is called a "topic branch" in Git parlance. You are
