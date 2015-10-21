@@ -52,6 +52,14 @@ DetailView
                 context['now'] = timezone.now()
                 return context
 
+
+    .. admonition:: Contents of context in this example
+
+        In this example context will contain current date under ``now`` key,
+        selected article under two keys (``object`` and ``article``),
+        for full explanation see: :meth:`SingleObjectMixin.get_context_data
+        <django.views.generic.detail.SingleObjectMixin.get_context_data>`.
+
     **Example myapp/urls.py**::
 
         from django.conf.urls import url
