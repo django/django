@@ -929,7 +929,7 @@ Removal of ``django.contrib.formtools``
 The formtools contrib app has been moved to a separate package and the
 relevant documentation pages have been updated or removed.
 
-The new package is available `on Github`_ and on PyPI.
+The new package is available `on GitHub`_ and on PyPI.
 
 .. _on GitHub: https://github.com/django/django-formtools/
 

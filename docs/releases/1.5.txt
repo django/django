@@ -726,7 +726,7 @@ The localflavor contrib app has been split into separate packages.
 ``django.contrib.localflavor`` itself will be removed in Django 1.6,
 after an accelerated deprecation.
 
-The new packages are available on Github. The core team cannot
+The new packages are available on GitHub. The core team cannot
 efficiently maintain these packages in the long term — it spans just a
 dozen countries at this time; similar to translations, maintenance
 will be handed over to interested members of the community.
