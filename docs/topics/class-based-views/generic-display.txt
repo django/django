@@ -237,6 +237,11 @@ template, but you can override it to send more::
     after super if they want to be sure to override all parents. If you're
     having trouble, review the method resolution order of your view.
 
+    Another consideration is that the context data from class-based generic
+    views will override data provided by context processors; see
+    :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data` for
+    an example.
+
 .. _generic-views-list-subsets:
 
 Viewing subsets of objects
