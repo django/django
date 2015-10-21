@@ -699,9 +699,20 @@ of a generated one.
 
 .. django-admin-option:: --exit, -e
 
+.. deprecated:: 1.10
+
+   Use the :djadminopt:`--check` options instead.
+
 The ``--exit`` option will cause ``makemigrations`` to exit with error code 1
 when no migrations are created (or would have been created, if combined with
 ``--dry-run``).
+
+.. django-admin-option:: --check
+
+.. versionadded:: 1.10
+
+The ``--check`` option will cause ``makemigrations`` to exit with a non-zero
+exit status when changes are detected with missing migrations.
 
 migrate [<app_label> [<migrationname>]]
 ---------------------------------------
