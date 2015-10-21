@@ -366,7 +366,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
 
     def set_srid(self, srid):
         "Sets the SRID for the geometry."
-        capi.geos_set_srid(self.ptr, srid)
+        capi.geos_set_srid(self.ptr, 0 if srid is None else srid)
     srid = property(get_srid, set_srid)
 
     # #### Output Routines ####
