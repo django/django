@@ -104,6 +104,11 @@ details on these changes.
   ``django.template.base.StringOrigin`` aliases for
   ``django.template.base.Origin`` will be removed.
 
+See the :ref:`Django 1.10 release notes <deprecated-features-1.10>` for more
+details on these changes.
+
+* The ``makemigrations --exit`` option will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

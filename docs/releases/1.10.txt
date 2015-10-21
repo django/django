@@ -157,6 +157,10 @@ Management Commands
   allows specifying the message level that will cause the command to exit with
   a non-zero status.
 
+* The new :djadminopt:`makemigrations --check <--check>` option makes the
+  command exit with a non-zero status when model changes without migrations are
+  detected.
+
 Migrations
 ^^^^^^^^^^
 
@@ -268,7 +272,8 @@ Features deprecated in 1.10
 Miscellaneous
 ~~~~~~~~~~~~~
 
-* ...
+* The ``makemigrations --exit`` option is deprecated in favor of the
+  :djadminopt:`--check` option.
 
 .. _removed-features-1.10:
 

@@ -9,8 +9,9 @@ from django.apps import apps
 from django.core.management import CommandError, call_command
 from django.db import DatabaseError, connection, models
 from django.db.migrations.recorder import MigrationRecorder
-from django.test import mock, override_settings
+from django.test import ignore_warnings, mock, override_settings
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
 
 from .models import UnicodeModel, UnserializableModel
@@ -983,6 +984,7 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertIn("dependencies=[\n('migrations','0001_%s'),\n]" % migration_name_0001, content)
             self.assertIn("operations=[\n]", content)
 
+    @ignore_warnings(category=RemovedInDjango20Warning)
     def test_makemigrations_exit(self):
         """
         makemigrations --exit should exit with sys.exit(1) when there are no
@@ -994,6 +996,18 @@ class MakeMigrationsTests(MigrationTestBase):
         with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--exit", "migrations", verbosity=0)
+
+    def test_makemigrations_check(self):
+        """
+        makemigrations --check should exit with a non-zero status when
+        there are changes to an app requiring migrations.
+        """
+        with self.temporary_migration_module():
+            with self.assertRaises(SystemExit):
+                call_command("makemigrations", "--check", "migrations", verbosity=0)
+
+        with self.temporary_migration_module(module="migrations.test_migrations_no_changes"):
+            call_command("makemigrations", "--check", "migrations", verbosity=0)
 
 
 class SquashMigrationsTests(MigrationTestBase):
