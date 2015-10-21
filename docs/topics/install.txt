@@ -23,7 +23,8 @@ your operating system's package manager.
 .. admonition:: Python on Windows
 
     If you are just starting with Django and using Windows, you may find
-    :doc:`/howto/windows` useful.
+    :doc:`/howto/windows` useful. The documentation includes optional
+    instructions on installing virtualenv and virtualenvwrapper.
 
 Install Apache and mod_wsgi
 =============================
