@@ -270,6 +270,8 @@ class OGRGeometry(GDALBase):
         elif isinstance(srs, six.integer_types + six.string_types):
             sr = SpatialReference(srs)
             srs_ptr = sr.ptr
+        elif srs is None:
+            srs_ptr = None
         else:
             raise TypeError('Cannot assign spatial reference with object of type: %s' % type(srs))
         capi.assign_srs(self.ptr, srs_ptr)
@@ -284,7 +286,7 @@ class OGRGeometry(GDALBase):
         return None
 
     def _set_srid(self, srid):
-        if isinstance(srid, six.integer_types):
+        if isinstance(srid, six.integer_types) or srid is None:
             self.srs = srid
         else:
             raise TypeError('SRID must be set with an integer.')

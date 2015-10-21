@@ -320,6 +320,11 @@ class OGRGeomTest(unittest.TestCase, TestDataMixin):
                     self.assertEqual('WGS 72', ring.srs.name)
                     self.assertEqual(4322, ring.srid)
 
+            # srs/srid may be assigned their own values, even when srs is None.
+            mpoly = OGRGeometry(mp.wkt, srs=None)
+            mpoly.srs = mpoly.srs
+            mpoly.srid = mpoly.srid
+
     def test_srs_transform(self):
         "Testing transform()."
         orig = OGRGeometry('POINT (-104.609 38.255)', 4326)
