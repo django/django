@@ -263,6 +263,12 @@ class HttpResponseBase(six.Iterator):
     # These methods partially implement a stream-like object interface.
     # See https://docs.python.org/library/io.html#io.IOBase
 
+    def readable(self):
+        return False
+
+    def seekable(self):
+        return False
+
     def writable(self):
         return False
 

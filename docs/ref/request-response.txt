@@ -807,6 +807,20 @@ Methods
     Returns the value of :attr:`HttpResponse.content`. This method makes
     an :class:`HttpResponse` instance a stream-like object.
 
+.. method:: HttpResponse.readable()
+
+   .. versionadded:: 1.10
+
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
+.. method:: HttpResponse.seekable()
+
+   .. versionadded:: 1.10
+
+    Always ``False``. This method makes an :class:`HttpResponse` instance a
+    stream-like object.
+
 .. method:: HttpResponse.writable()
 
     Always ``True``. This method makes an :class:`HttpResponse` instance a

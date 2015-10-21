@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import io
+
 from django.conf import settings
 from django.http import HttpResponse
 from django.http.response import HttpResponseBase
@@ -112,3 +114,10 @@ class HttpResponseTests(SimpleTestCase):
         response = HttpResponse(content="Café :)".encode(UTF8), status=201)
         expected = '<HttpResponse status_code=201, "text/html; charset=utf-8">'
         self.assertEqual(repr(response), expected)
+
+    def test_wrap_textiowrapper(self):
+        content = "Café :)"
+        r = HttpResponse()
+        with io.TextIOWrapper(r, UTF8) as buf:
+            buf.write(content)
+        self.assertEqual(r.content, content.encode(UTF8))
