@@ -34,3 +34,6 @@ Bugfixes
   and retrieval (:ticket:`25563`). This prevents any models generated in data
   migrations using ``QuerySet.defer()`` from leaking to test and application
   code.
+
+* Fixed a typo in the name of the `strictly_above` PostGIS lookup
+  (:ticket:`25592`).
