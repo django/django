@@ -31,7 +31,7 @@ from django.test import (
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
 from django.utils.encoding import force_text
-from django.utils.six import PY3, StringIO
+from django.utils.six import PY2, PY3, StringIO
 
 custom_templates_dir = os.path.join(os.path.dirname(upath(__file__)), 'custom_templates')
 
@@ -632,6 +632,20 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, 'api.py')))
+
+    @unittest.skipIf(PY2, "Python 2 doesn't support Unicode package names.")
+    def test_startapp_unicode_name(self):
+        "directory: startapp creates the correct directory with unicode characters"
+        args = ['startapp', 'こんにちは']
+        app_path = os.path.join(self.test_dir, 'こんにちは')
+        out, err = self.run_django_admin(args, 'test_project.settings')
+        self.addCleanup(shutil.rmtree, app_path)
+        self.assertNoOutput(err)
+        self.assertTrue(os.path.exists(app_path))
+        with open(os.path.join(app_path, 'apps.py'), 'r') as f:
+            content = f.read()
+            self.assertIn("class こんにちはConfig(AppConfig)", content)
+            self.assertIn("name = 'こんにちは'", content)
 
     def test_builtin_command(self):
         "directory: django-admin builtin commands fail with an error when no settings provided"
@@ -1887,8 +1901,18 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
             self.addCleanup(shutil.rmtree, testproject_dir, True)
 
             out, err = self.run_django_admin(args)
-            self.assertOutput(err, "Error: '%s' is not a valid project name. "
-                "Please make sure the name begins with a letter or underscore." % bad_name)
+            if PY2:
+                self.assertOutput(
+                    err,
+                    "Error: '%s' is not a valid project name. Please make "
+                    "sure the name begins with a letter or underscore." % bad_name
+                )
+            else:
+                self.assertOutput(
+                    err,
+                    "Error: '%s' is not a valid project name. Please make "
+                    "sure the name is a valid identifier." % bad_name
+                )
             self.assertFalse(os.path.exists(testproject_dir))
 
     def test_simple_project_different_directory(self):

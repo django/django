@@ -208,14 +208,21 @@ class TemplateCommand(BaseCommand):
             raise CommandError("you must provide %s %s name" % (
                 "an" if app_or_project == "app" else "a", app_or_project))
         # If it's not a valid directory name.
-        if not re.search(r'^[_a-zA-Z]\w*$', name):
-            # Provide a smart error message, depending on the error.
-            if not re.search(r'^[_a-zA-Z]', name):
-                message = 'make sure the name begins with a letter or underscore'
-            else:
-                message = 'use only numbers, letters and underscores'
-            raise CommandError("%r is not a valid %s name. Please %s." %
-                               (name, app_or_project, message))
+        if six.PY2:
+            if not re.search(r'^[_a-zA-Z]\w*$', name):
+                # Provide a smart error message, depending on the error.
+                if not re.search(r'^[_a-zA-Z]', name):
+                    message = 'make sure the name begins with a letter or underscore'
+                else:
+                    message = 'use only numbers, letters and underscores'
+                raise CommandError("%r is not a valid %s name. Please %s." %
+                                   (name, app_or_project, message))
+        else:
+            if not name.isidentifier():
+                raise CommandError(
+                    "%r is not a valid %s name. Please make sure the name is "
+                    "a valid identifier." % (name, app_or_project)
+                )
 
     def download(self, url):
         """
