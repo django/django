@@ -642,7 +642,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
-        with open(os.path.join(app_path, 'apps.py'), 'r') as f:
+        with open(os.path.join(app_path, 'apps.py'), 'r', encoding='utf8') as f:
             content = f.read()
             self.assertIn("class こんにちはConfig(AppConfig)", content)
             self.assertIn("name = 'こんにちは'", content)
