@@ -29,8 +29,7 @@ HttpRequest objects
 Attributes
 ----------
 
-All attributes should be considered read-only, unless stated otherwise below.
-``session`` is a notable exception.
+All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.scheme
 
@@ -159,30 +158,6 @@ All attributes should be considered read-only, unless stated otherwise below.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
-.. attribute:: HttpRequest.user
-
-    An object of type :setting:`AUTH_USER_MODEL` representing the currently
-    logged-in user. If the user isn't currently logged in, ``user`` will be set
-    to an instance of :class:`django.contrib.auth.models.AnonymousUser`. You
-    can tell them apart with
-    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
-
-        if request.user.is_authenticated():
-            # Do something for logged-in users.
-        else:
-            # Do something for anonymous users.
-
-    ``user`` is only available if your Django installation has the
-    :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`
-    activated. For more, see :doc:`/topics/auth/index`.
-
-.. attribute:: HttpRequest.session
-
-    A readable-and-writable, dictionary-like object that represents the current
-    session. This is only available if your Django installation has session
-    support activated. See the :doc:`session documentation
-    </topics/http/sessions>` for full details.
-
 .. attribute:: HttpRequest.urlconf
 
     Not defined by Django itself, but will be read if other code (e.g., a custom
@@ -211,6 +186,41 @@ All attributes should be considered read-only, unless stated otherwise below.
     Not defined by Django itself, but if set, the :ttag:`url` template tag
     will use its value as the ``current_app`` argument to
     :func:`~django.core.urlresolvers.reverse()`.
+
+Attributes set by middleware
+----------------------------
+
+Some of the middleware included in Django's contrib apps set attributes on the
+request. If you don't see the attribute on a request, be sure the appropriate
+middleware class is listed in :setting:`MIDDLEWARE_CLASSES`.
+
+.. attribute:: HttpRequest.session
+
+    From the :class:`~django.contrib.sessions.middleware.SessionMiddleware`: A
+    readable and writable, dictionary-like object that represents the current
+    session.
+
+.. attribute:: HttpRequest.site
+
+    From the :class:`~django.contrib.sites.middleware.CurrentSiteMiddleware`:
+    An instance of :class:`~django.contrib.sites.models.Site` or
+    :class:`~django.contrib.sites.requests.RequestSite` as returned by
+    :func:`~django.contrib.sites.shortcuts.get_current_site()`
+    representing the current site.
+
+.. attribute:: HttpRequest.user
+
+    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    An instance of :setting:`AUTH_USER_MODEL` representing the currently
+    logged-in user. If the user isn't currently logged in, ``user`` will be set
+    to an instance of :class:`~django.contrib.auth.models.AnonymousUser`. You
+    can tell them apart with
+    :meth:`~django.contrib.auth.models.User.is_authenticated`, like so::
+
+        if request.user.is_authenticated():
+            ... # Do something for logged-in users.
+        else:
+            ... # Do something for anonymous users.
 
 Methods
 -------
