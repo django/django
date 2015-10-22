@@ -151,7 +151,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.url,
             'http://www.testserver/slash/')
 
-    # The following tests examine expected behavior given a custom urlconf that
+    # The following tests examine expected behavior given a custom URLconf that
     # overrides the default one through the request object.
 
     @override_settings(APPEND_SLASH=True)

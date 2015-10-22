@@ -174,9 +174,9 @@ class DebugViewTests(LoggingCaptureMixin, SimpleTestCase):
     @override_settings(ROOT_URLCONF='view_tests.default_urls')
     def test_default_urlconf_template(self):
         """
-        Make sure that the default urlconf template is shown shown instead
+        Make sure that the default URLconf template is shown shown instead
         of the technical 404 page, if the user has not altered their
-        url conf yet.
+        URLconf yet.
         """
         response = self.client.get('/')
         self.assertContains(

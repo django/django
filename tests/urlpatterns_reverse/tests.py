@@ -273,7 +273,7 @@ class NoURLPatternsTests(SimpleTestCase):
 
         self.assertRaisesMessage(
             ImproperlyConfigured,
-            "The included urlconf 'urlpatterns_reverse.no_urls' does not "
+            "The included URLconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import.",
             getattr, resolver, 'url_patterns'
@@ -364,7 +364,7 @@ class ResolverTests(unittest.TestCase):
         Test repr of RegexURLResolver, especially when urlconf_name is a list
         (#17892).
         """
-        # Pick a resolver from a namespaced urlconf
+        # Pick a resolver from a namespaced URLconf
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
         sub_resolver = resolver.namespace_dict['test-ns1'][1]
         self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
@@ -923,7 +923,7 @@ class DefaultErrorHandlerTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF=None)
 class NoRootUrlConfTests(SimpleTestCase):
-    """Tests for handler404 and handler500 if urlconf is None"""
+    """Tests for handler404 and handler500 if ROOT_URLCONF is None"""
 
     def test_no_handler_exception(self):
         self.assertRaises(ImproperlyConfigured, self.client.get, '/test/me/')

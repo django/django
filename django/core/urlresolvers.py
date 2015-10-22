@@ -135,9 +135,9 @@ def get_resolver(urlconf=None):
 
 @lru_cache.lru_cache(maxsize=None)
 def get_ns_resolver(ns_pattern, resolver):
-    # Build a namespaced resolver for the given parent urlconf pattern.
+    # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
-    # urlconf pattern.
+    # URLconf pattern.
     ns_resolver = RegexURLResolver(ns_pattern, resolver.url_patterns)
     return RegexURLResolver(r'^/', [ns_resolver])
 
@@ -381,7 +381,7 @@ class RegexURLResolver(LocaleRegexProvider):
             iter(patterns)
         except TypeError:
             msg = (
-                "The included urlconf '{name}' does not appear to have any "
+                "The included URLconf '{name}' does not appear to have any "
                 "patterns in it. If you see valid patterns in the file then "
                 "the issue is probably caused by a circular import."
             )
