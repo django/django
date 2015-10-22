@@ -94,7 +94,7 @@ class URLDisabledTests(URLTestCaseBase):
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
 class PathUnusedTests(URLTestCaseBase):
     """
-    Check that if no i18n_patterns is used in root urlconfs, then no
+    Check that if no i18n_patterns is used in root URLconfs, then no
     language activation happens based on url prefix.
     """
 

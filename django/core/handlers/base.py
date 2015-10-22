@@ -126,7 +126,7 @@ class BaseHandler(object):
 
             if response is None:
                 if hasattr(request, 'urlconf'):
-                    # Reset url resolver with a custom urlconf.
+                    # Reset url resolver with a custom URLconf.
                     urlconf = request.urlconf
                     urlresolvers.set_urlconf(urlconf)
                     resolver = urlresolvers.get_resolver(urlconf)
