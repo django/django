@@ -452,6 +452,12 @@ Specifically, a ``Response`` object has the following attributes:
             >>> response.context['name']
             'Arthur'
 
+        .. note::
+          This attribute is only populated when using the Django Template
+          Language. If you use another template engine,
+          :attr:`~django.template.response.SimpleTemplateResponse.context_data`
+          is a suitable alternative.
+
     .. method:: json(**kwargs)
 
         .. versionadded:: 1.9
@@ -487,6 +493,13 @@ Specifically, a ``Response`` object has the following attributes:
         ``template.name`` to get the template's file name, if the template was
         loaded from a file. (The name is a string such as
         ``'admin/index.html'``.)
+
+        .. note::
+          This attribute is only populated when using the Django Template
+          Language. If you use another template engine,
+          :attr:`~django.template.response.SimpleTemplateResponse.template_name`
+          may be suitable alternative if you only need the name of the template
+          used for rendering.
 
     .. attribute:: resolver_match
 
