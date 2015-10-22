@@ -32,7 +32,8 @@ Minor features
 :mod:`django.contrib.admin`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The URL for the ``View site`` link on the top of each admin page will now point
+  to ``SCRIPT_NAME`` if ``SCRIPT_NAME`` is set instead of default ``/``.
 
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
