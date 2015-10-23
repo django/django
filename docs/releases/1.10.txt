@@ -209,7 +209,10 @@ Tests
 URLs
 ^^^^
 
-* ...
+* An addition in :func:`django.setup()` allows URL resolving that happens
+  outside of the request/response cycle (e.g. in management commands and
+  standalone scripts) to take :setting:`FORCE_SCRIPT_NAME` into account when it
+  is set.
 
 Validators
 ^^^^^^^^^^
