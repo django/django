@@ -54,7 +54,7 @@ Web pages::
     200
     >>> response = c.get('/customer/details/')
     >>> response.content
-    '<!DOCTYPE html...'
+    b'<!DOCTYPE html...'
 
 As this example suggests, you can instantiate ``Client`` from within a session
 of the Python interactive interpreter.
@@ -433,8 +433,8 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: content
 
-        The body of the response, as a string. This is the final page content as
-        rendered by the view, or any error message.
+        The body of the response, as a bytestring. This is the final page
+        content as rendered by the view, or any error message.
 
     .. attribute:: context
 
