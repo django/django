@@ -941,7 +941,7 @@ Typical usage could look like::
     >>> from django.http import JsonResponse
     >>> response = JsonResponse({'foo': 'bar'})
     >>> response.content
-    '{"foo": "bar"}'
+    b'{"foo": "bar"}'
 
 
 Serializing non-dictionary objects
