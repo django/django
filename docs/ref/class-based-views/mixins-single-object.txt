@@ -102,20 +102,33 @@ SingleObjectMixin
 
         Returns context data for displaying the list of objects.
 
-        The base implementation of this method requires that the ``object``
+        The base implementation of this method requires that the ``self.object``
         attribute be set by the view (even if ``None``). Be sure to do this if
         you are using this mixin without one of the built-in views that does so.
+
+        The base implementation of this method returns context with following
+        contents:
+
+        1. ``object``: The object that this view is displaying (``self.object``)
+        2. ``context_object_name``: ``self.object`` will also be stored under
+           name returned by :meth:`get_context_object_name`, which defaults to
+           name of the model.
+
+        .. admonition:: Possible name shadowing in the context
+
+            Please note that any variables set by the :meth:`get_context_data`,
+            will shadow context variables injected by :ref:`context processors
+            <subclassing-context-requestcontext>`. This means that if your
+            view sets :attr:`model` attribute to :class:`~django.contrib.auth.models.User`,
+            context object will **override** currently logged in user stored
+            in context variable named ``user`` by the :ref:`the auth context
+            processor <context-processors-auth>`
 
     .. method:: get_slug_field()
 
         Returns the name of a slug field to be used to look up by slug. By
         default this simply returns the value of :attr:`slug_field`.
 
-    **Context**
-
-    * ``object``: The object that this view is displaying. If
-      ``context_object_name`` is specified, that variable will also be
-      set in the context, with the same value as ``object``.
 
 SingleObjectTemplateResponseMixin
 ---------------------------------

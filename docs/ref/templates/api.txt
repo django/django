@@ -656,6 +656,8 @@ Context processors
 
 Here's what each of the built-in processors does:
 
+.. _context-processors-auth:
+
 django.contrib.auth.context_processors.auth
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
