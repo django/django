@@ -107,7 +107,7 @@ def Deserializer(object_list, **options):
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
         m2m_data = {}
-        
+
         if Model not in field_names_cache:
             field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
         field_names = field_names_cache[Model]
