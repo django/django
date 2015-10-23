@@ -89,6 +89,7 @@ def Deserializer(object_list, **options):
     """
     db = options.pop('using', DEFAULT_DB_ALIAS)
     ignore = options.pop('ignorenonexistent', False)
+    field_names_cache = {}  # Model: <list of field_names>
 
     for d in object_list:
         # Look up the model and starting build a dict of data for it.
@@ -106,7 +107,10 @@ def Deserializer(object_list, **options):
             except Exception as e:
                 raise base.DeserializationError.WithData(e, d['model'], d.get('pk'), None)
         m2m_data = {}
-        field_names = {f.name for f in Model._meta.get_fields()}
+
+        if Model not in field_names_cache:
+            field_names_cache[Model] = {f.name for f in Model._meta.get_fields()}
+        field_names = field_names_cache[Model]
 
         # Handle each field
         for (field_name, field_value) in six.iteritems(d["fields"]):
