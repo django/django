@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import cgi
 import codecs
 import logging
+import re
 import sys
 from io import BytesIO
 from threading import Lock
@@ -20,6 +21,8 @@ logger = logging.getLogger('django.request')
 
 # encode() and decode() expect the charset to be a native string.
 ISO_8859_1, UTF_8 = str('iso-8859-1'), str('utf-8')
+
+_slashes_re = re.compile(br'/+')
 
 
 class LimitedStream(object):
@@ -218,6 +221,9 @@ def get_script_name(environ):
         script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
 
     if script_url:
+        # mod_wsgi squashes multiple successive slashes in PATH_INFO,
+        # do the same with script_url before manipulating paths (#17133).
+        script_url = _slashes_re.sub(b'/', script_url)
         path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
         script_name = script_url[:-len(path_info)] if path_info else script_url
     else:
