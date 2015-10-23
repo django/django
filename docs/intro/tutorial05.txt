@@ -369,7 +369,7 @@ With that ready, we can ask the client to do some work for us::
     >>> response.status_code
     200
     >>> response.content
-    '\n\n\n    <p>No polls are available.</p>\n\n'
+    b'\n\n\n    <p>No polls are available.</p>\n\n'
     >>> # note - you might get unexpected results if your ``TIME_ZONE``
     >>> # in ``settings.py`` is not correct. If you need to change it,
     >>> # you will also need to restart your shell session
@@ -381,7 +381,7 @@ With that ready, we can ask the client to do some work for us::
     >>> # check the response once again
     >>> response = client.get('/polls/')
     >>> response.content
-    '\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
+    b'\n\n\n    <ul>\n    \n        <li><a href="/polls/1/">Who is your favorite Beatle?</a></li>\n    \n    </ul>\n\n'
     >>> # If the following doesn't work, you probably omitted the call to
     >>> # setup_test_environment() described above
     >>> response.context['latest_question_list']
