@@ -656,23 +656,24 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
     @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_custom_srid(self):
-        """ Test with a srid unknown from GDAL """
-        pnt = Point(111200, 220900, srid=999999)
-        self.assertTrue(pnt.ewkt.startswith("SRID=999999;POINT (111200.0"))
-        self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
-        self.assertIsNone(pnt.srs)
+        """Test with a null srid and a srid unknown to GDAL."""
+        for srid in [None, 999999]:
+            pnt = Point(111200, 220900, srid=srid)
+            self.assertTrue(pnt.ewkt.startswith(("SRID=%s;" % srid if srid else '') + "POINT (111200.0"))
+            self.assertIsInstance(pnt.ogr, gdal.OGRGeometry)
+            self.assertIsNone(pnt.srs)
 
-        # Test conversion from custom to a known srid
-        c2w = gdal.CoordTransform(
-            gdal.SpatialReference(
-                '+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 '
-                '+datum=WGS84 +units=m +no_defs'
-            ),
-            gdal.SpatialReference(4326))
-        new_pnt = pnt.transform(c2w, clone=True)
-        self.assertEqual(new_pnt.srid, 4326)
-        self.assertAlmostEqual(new_pnt.x, 1, 3)
-        self.assertAlmostEqual(new_pnt.y, 2, 3)
+            # Test conversion from custom to a known srid
+            c2w = gdal.CoordTransform(
+                gdal.SpatialReference(
+                    '+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 '
+                    '+datum=WGS84 +units=m +no_defs'
+                ),
+                gdal.SpatialReference(4326))
+            new_pnt = pnt.transform(c2w, clone=True)
+            self.assertEqual(new_pnt.srid, 4326)
+            self.assertAlmostEqual(new_pnt.x, 1, 3)
+            self.assertAlmostEqual(new_pnt.y, 2, 3)
 
     def test_mutable_geometries(self):
         "Testing the mutability of Polygons and Geometry Collections."

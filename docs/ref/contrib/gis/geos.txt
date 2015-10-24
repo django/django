@@ -553,6 +553,14 @@ is returned instead.
 
     Requires GDAL. Raises :class:`~django.contrib.gis.geos.GEOSException` if
     GDAL is not available or if the geometry's SRID is ``None`` or less than 0.
+    It doesn't impose any constraints on the geometry's SRID if called with a
+    :class:`~django.contrib.gis.gdal.CoordTransform` object.
+
+    .. versionchanged:: 1.10
+
+        In previous versions, it required the geometry's SRID to be a positive
+        integer even if it was called with a
+        :class:`~django.contrib.gis.gdal.CoordTransform` object.
 
 ``Point``
 ---------
