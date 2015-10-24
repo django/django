@@ -221,9 +221,10 @@ def get_script_name(environ):
         script_url = get_bytes_from_wsgi(environ, 'REDIRECT_URL', '')
 
     if script_url:
-        # mod_wsgi squashes multiple successive slashes in PATH_INFO,
-        # do the same with script_url before manipulating paths (#17133).
-        script_url = _slashes_re.sub(b'/', script_url)
+        if b'//' in script_url:
+            # mod_wsgi squashes multiple successive slashes in PATH_INFO,
+            # do the same with script_url before manipulating paths (#17133).
+            script_url = _slashes_re.sub(b'/', script_url)
         path_info = get_bytes_from_wsgi(environ, 'PATH_INFO', '')
         script_name = script_url[:-len(path_info)] if path_info else script_url
     else:
