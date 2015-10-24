@@ -552,7 +552,7 @@ is returned instead.
 .. note::
 
     Requires GDAL. Raises :class:`~django.contrib.gis.geos.GEOSException` if
-    GDAL is not available or if the SRID is ``None`` or less than 0.
+    GDAL is not available or if the geometry's SRID is ``None`` or less than 0.
 
 ``Point``
 ---------
