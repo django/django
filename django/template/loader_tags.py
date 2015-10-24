@@ -211,7 +211,7 @@ class IncludeNode(Node):
             if context.template.engine.debug:
                 raise
             template_name = getattr(context, 'template_name', None) or 'unknown'
-            logger.warn(
+            logger.warning(
                 "Exception raised while rendering {%% include %%} for "
                 "template '%s'. Empty string rendered instead.",
                 template_name,
