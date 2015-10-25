@@ -1172,7 +1172,10 @@ class Query(object):
 
         if field.is_relation:
             # No support for transforms for relational fields
-            assert len(lookups) == 1
+            num_lookups = len(lookups)
+            if num_lookups > 1:
+                raise FieldError('Related Field got invalid lookup: {}'.format(lookups[0]))
+            assert num_lookups > 0  # Likely a bug in Django if this fails.
             lookup_class = field.get_lookup(lookups[0])
             if len(targets) == 1:
                 lhs = targets[0].get_col(alias, field)
