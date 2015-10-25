@@ -493,6 +493,12 @@ class LookupTests(TestCase):
                 str(ex), "Unsupported lookup 'starts' for CharField "
                 "or join on the field not permitted.")
 
+    def test_relation_nested_lookup_error(self):
+        # An invalid nested lookup on a related field raises a useful error.
+        msg = 'Related Field got invalid lookup: editor'
+        with self.assertRaisesMessage(FieldError, msg):
+            Article.objects.filter(author__editor__name='James')
+
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for testing field lookups:
         for a in Article.objects.all():
