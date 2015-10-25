@@ -858,6 +858,10 @@ def filesizeformat(bytes):
     TB = 1 << 40
     PB = 1 << 50
 
+    negative = True if bytes < 0 else False
+    if negative:
+        bytes = -bytes  # allow formatting of negative numbers.
+
     if bytes < KB:
         value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
     elif bytes < MB:
@@ -871,6 +875,8 @@ def filesizeformat(bytes):
     else:
         value = ugettext("%s PB") % filesize_number_format(bytes / PB)
 
+    if negative:
+        value = "-%s" % value
     return avoid_wrapping(value)
 
 
