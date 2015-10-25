@@ -839,13 +839,13 @@ def yesno(value, arg=None):
 ###################
 
 @register.filter(is_safe=True)
-def filesizeformat(bytes):
+def filesizeformat(bytes_):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
     102 bytes, etc).
     """
     try:
-        bytes = float(bytes)
+        bytes_ = float(bytes_)
     except (TypeError, ValueError, UnicodeDecodeError):
         value = ungettext("%(size)d byte", "%(size)d bytes", 0) % {'size': 0}
         return avoid_wrapping(value)
@@ -858,22 +858,22 @@ def filesizeformat(bytes):
     TB = 1 << 40
     PB = 1 << 50
 
-    negative = bytes < 0
+    negative = bytes_ < 0
     if negative:
-        bytes = -bytes  # Allow formatting of negative numbers.
+        bytes_ = -bytes_  # Allow formatting of negative numbers.
 
-    if bytes < KB:
-        value = ungettext("%(size)d byte", "%(size)d bytes", bytes) % {'size': bytes}
-    elif bytes < MB:
-        value = ugettext("%s KB") % filesize_number_format(bytes / KB)
-    elif bytes < GB:
-        value = ugettext("%s MB") % filesize_number_format(bytes / MB)
-    elif bytes < TB:
-        value = ugettext("%s GB") % filesize_number_format(bytes / GB)
-    elif bytes < PB:
-        value = ugettext("%s TB") % filesize_number_format(bytes / TB)
+    if bytes_ < KB:
+        value = ungettext("%(size)d byte", "%(size)d bytes", bytes_) % {'size': bytes_}
+    elif bytes_ < MB:
+        value = ugettext("%s KB") % filesize_number_format(bytes_ / KB)
+    elif bytes_ < GB:
+        value = ugettext("%s MB") % filesize_number_format(bytes_ / MB)
+    elif bytes_ < TB:
+        value = ugettext("%s GB") % filesize_number_format(bytes_ / GB)
+    elif bytes_ < PB:
+        value = ugettext("%s TB") % filesize_number_format(bytes_ / TB)
     else:
-        value = ugettext("%s PB") % filesize_number_format(bytes / PB)
+        value = ugettext("%s PB") % filesize_number_format(bytes_ / PB)
 
     if negative:
         value = "-%s" % value
