@@ -169,6 +169,7 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
         'year', 'is_best_seller', 'date_registered', 'no',
         ('author', RelatedOnlyFieldListFilter),
         ('contributors', RelatedOnlyFieldListFilter),
+        ('employee__department', RelatedOnlyFieldListFilter),
     )
     ordering = ('-id',)
 
@@ -578,6 +579,26 @@ class ListFiltersTests(TestCase):
         # Make sure that only actual authors are present in author's list filter
         filterspec = changelist.get_filters(request)[0][4]
         expected = [(self.alfred.pk, 'alfred'), (self.bob.pk, 'bob')]
+        self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
+
+    def test_relatedonlyfieldlistfilter_underscorelookup_foreignkey(self):
+        Department.objects.create(code='TEST', description='Testing')
+        self.djangonaut_book.employee = self.john
+        self.djangonaut_book.save()
+        self.bio_book.employee = self.jack
+        self.bio_book.save()
+
+        modeladmin = BookAdminRelatedOnlyFilter(Book, site)
+        request = self.request_factory.get('/')
+        changelist = self.get_changelist(request, Book, modeladmin)
+
+        # Only actual departments should be present in employee__department's
+        # list filter.
+        filterspec = changelist.get_filters(request)[0][6]
+        expected = [
+            (self.dev.code, str(self.dev)),
+            (self.design.code, str(self.design)),
+        ]
         self.assertEqual(sorted(filterspec.lookup_choices), sorted(expected))
 
     def test_relatedonlyfieldlistfilter_manytomany(self):
