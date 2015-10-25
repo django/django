@@ -1186,7 +1186,11 @@ class Query(object):
 
         if field.is_relation:
             # No support for transforms for relational fields
-            assert len(lookups) == 1
+            if len(lookups) > 1:
+                raise TypeError(
+                    'Related Field got invalid lookup: {}'.format(lookups[0]),
+                )
+            assert len(lookups) > 0
             lookup_class = field.get_lookup(lookups[0])
             if len(targets) == 1:
                 lhs = targets[0].get_col(alias, field)
