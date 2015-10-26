@@ -250,7 +250,7 @@ class ExtensionUserModelBackendTest(BaseModelBackendTest, TestCase):
         )
 
 
-@override_settings(AUTH_USER_MODEL='auth.CustomPermissionsUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.CustomPermissionsUser')
 class CustomPermissionsUserModelBackendTest(BaseModelBackendTest, TestCase):
     """
     Tests for the ModelBackend using the CustomPermissionsUser model.
