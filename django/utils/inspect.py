@@ -1,12 +1,13 @@
 from __future__ import absolute_import
 
 import inspect
+import sys
 
-from django.utils import six
+HAS_INSPECT_SIGNATURE = sys.version_info >= (3, 3)
 
 
 def getargspec(func):
-    if six.PY2:
+    if not HAS_INSPECT_SIGNATURE:
         return inspect.getargspec(func)
 
     sig = inspect.signature(func)
@@ -32,7 +33,7 @@ def getargspec(func):
 
 
 def get_func_args(func):
-    if six.PY2:
+    if not HAS_INSPECT_SIGNATURE:
         argspec = inspect.getargspec(func)
         return argspec.args[1:]  # ignore 'self'
 
@@ -44,7 +45,7 @@ def get_func_args(func):
 
 
 def func_accepts_kwargs(func):
-    if six.PY2:
+    if not HAS_INSPECT_SIGNATURE:
         # Not all callables are inspectable with getargspec, so we'll
         # try a couple different ways but in the end fall back on assuming
         # it is -- we don't want to prevent registration of valid but weird
@@ -65,7 +66,7 @@ def func_accepts_kwargs(func):
 
 
 def func_has_no_args(func):
-    args = inspect.getargspec(func)[0] if six.PY2 else [
+    args = inspect.getargspec(func)[0] if not HAS_INSPECT_SIGNATURE else [
         p for p in inspect.signature(func).parameters.values()
         if p.kind == p.POSITIONAL_OR_KEYWORD and p.default is p.empty
     ]
@@ -73,7 +74,7 @@ def func_has_no_args(func):
 
 
 def func_supports_parameter(func, parameter):
-    if six.PY3:
+    if HAS_INSPECT_SIGNATURE:
         return parameter in inspect.signature(func).parameters
     else:
         args, varargs, varkw, defaults = inspect.getargspec(func)
