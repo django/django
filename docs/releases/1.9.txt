@@ -1138,6 +1138,15 @@ Miscellaneous
   performance reasons. Mixed plans consist of a list of migrations where some
   are being applied and others are being unapplied.
 
+* The related model object descriptor classes in
+  ``django.db.models.fields.related`` (private API) are moved from the
+  ``related`` module to ``related_descriptors`` and renamed as follows:
+
+  * ``ReverseSingleRelatedObjectDescriptor`` is ``ForwardManyToOneDescriptor``
+  * ``SingleRelatedObjectDescriptor`` is ``ReverseOneToOneDescriptor``
+  * ``ForeignRelatedObjectsDescriptor`` is ``ReverseManyToOneDescriptor``
+  * ``ManyRelatedObjectsDescriptor`` is ``ManyToManyDescriptor``
+
 .. _deprecated-features-1.9:
 
 Features deprecated in 1.9
