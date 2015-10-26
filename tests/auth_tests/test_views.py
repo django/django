@@ -404,7 +404,7 @@ class CustomUserPasswordResetTest(AuthViewsTestCase):
         self.assertRedirects(response, '/reset/done/')
 
 
-@override_settings(AUTH_USER_MODEL='auth.UUIDUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.UUIDUser')
 class UUIDUserPasswordResetTest(CustomUserPasswordResetTest):
 
     def _test_confirm_start(self):
@@ -991,7 +991,7 @@ class ChangelistTests(AuthViewsTestCase):
 
 
 @override_settings(
-    AUTH_USER_MODEL='auth.UUIDUser',
+    AUTH_USER_MODEL='auth_tests.UUIDUser',
     ROOT_URLCONF='auth_tests.urls_custom_user_admin',
 )
 class UUIDUserTests(TestCase):
@@ -1000,7 +1000,7 @@ class UUIDUserTests(TestCase):
         u = UUIDUser.objects.create_superuser(username='uuid', email='foo@bar.com', password='test')
         self.assertTrue(self.client.login(username='uuid', password='test'))
 
-        user_change_url = reverse('custom_user_admin:auth_uuiduser_change', args=(u.pk,))
+        user_change_url = reverse('custom_user_admin:auth_tests_uuiduser_change', args=(u.pk,))
         response = self.client.get(user_change_url)
         self.assertEqual(response.status_code, 200)
 

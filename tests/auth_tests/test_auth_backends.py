@@ -292,7 +292,7 @@ class CustomUserModelBackendAuthenticateTest(TestCase):
         self.assertEqual(test_user, authenticated_user)
 
 
-@override_settings(AUTH_USER_MODEL='auth.UUIDUser')
+@override_settings(AUTH_USER_MODEL='auth_tests.UUIDUser')
 class UUIDUserTests(TestCase):
 
     def test_login(self):

@@ -148,8 +148,9 @@ class UserAdmin(admin.ModelAdmin):
                 update_session_auth_hash(request, form.user)
                 return HttpResponseRedirect(
                     reverse(
-                        '%s:auth_%s_change' % (
+                        '%s:%s_%s_change' % (
                             self.admin_site.name,
+                            user._meta.app_label,
                             user._meta.model_name,
                         ),
                         args=(user.pk,),
@@ -178,7 +179,7 @@ class UserAdmin(admin.ModelAdmin):
             'save_as': False,
             'show_save': True,
         }
-        context.update(admin.site.each_context(request))
+        context.update(self.admin_site.each_context(request))
 
         request.current_app = self.admin_site.name
 
