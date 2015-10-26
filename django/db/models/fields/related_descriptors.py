@@ -140,7 +140,7 @@ class ForwardManyToOneDescriptor(object):
                 setattr(rel_obj, rel_obj_cache_name, instance)
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
-    def __get__(self, instance, instance_type=None):
+    def __get__(self, instance, cls=None):
         """
         Get the related instance through the forward relation.
 
@@ -148,7 +148,7 @@ class ForwardManyToOneDescriptor(object):
 
         - ``self`` is the descriptor managing the ``parent`` attribute
         - ``instance`` is the ``child`` instance
-        - ``instance_type`` in the ``Child`` class (we don't need it)
+        - ``cls`` is the ``Child`` class (we don't need it)
         """
         if instance is None:
             return self
@@ -311,7 +311,7 @@ class ReverseOneToOneDescriptor(object):
             setattr(rel_obj, rel_obj_cache_name, instance)
         return queryset, rel_obj_attr, instance_attr, True, self.cache_name
 
-    def __get__(self, instance, instance_type=None):
+    def __get__(self, instance, cls=None):
         """
         Get the related instance through the reverse relation.
 
@@ -452,7 +452,7 @@ class ReverseManyToOneDescriptor(object):
             self.rel,
         )
 
-    def __get__(self, instance, instance_type=None):
+    def __get__(self, instance, cls=None):
         """
         Get the related objects through the reverse relation.
 

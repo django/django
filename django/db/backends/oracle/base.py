@@ -70,7 +70,7 @@ IntegrityError = Database.IntegrityError
 
 class _UninitializedOperatorsDescriptor(object):
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, cls=None):
         # If connection.operators is looked up before a connection has been
         # created, transparently initialize connection.operators to avert an
         # AttributeError.

@@ -121,7 +121,7 @@ class DeferredAttribute(object):
     def __init__(self, field_name, model):
         self.field_name = field_name
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, cls=None):
         """
         Retrieves and caches the value from the datastore on the first lookup.
         Returns the cached value.

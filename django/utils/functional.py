@@ -27,7 +27,7 @@ class cached_property(object):
         self.__doc__ = getattr(func, '__doc__')
         self.name = name or func.__name__
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
             return self
         res = instance.__dict__[self.name] = self.func(instance)

@@ -245,9 +245,9 @@ class ManagerDescriptor(object):
     def __init__(self, manager):
         self.manager = manager
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         if instance is not None:
-            raise AttributeError("Manager isn't accessible via %s instances" % type.__name__)
+            raise AttributeError("Manager isn't accessible via %s instances" % cls.__name__)
         return self.manager
 
 
@@ -257,7 +257,7 @@ class AbstractManagerDescriptor(object):
     def __init__(self, model):
         self.model = model
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         raise AttributeError("Manager isn't available; %s is abstract" % (
             self.model._meta.object_name,
         ))
@@ -269,7 +269,7 @@ class SwappedManagerDescriptor(object):
     def __init__(self, model):
         self.model = model
 
-    def __get__(self, instance, type=None):
+    def __get__(self, instance, cls=None):
         raise AttributeError(
             "Manager isn't available; '%s.%s' has been swapped for '%s'" % (
                 self.model._meta.app_label,

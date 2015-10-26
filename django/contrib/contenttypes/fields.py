@@ -235,7 +235,7 @@ class GenericForeignKey(object):
     def is_cached(self, instance):
         return hasattr(instance, self.cache_attr)
 
-    def __get__(self, instance, instance_type=None):
+    def __get__(self, instance, cls=None):
         if instance is None:
             return self
 

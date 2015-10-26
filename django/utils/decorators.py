@@ -11,10 +11,10 @@ from django.utils import six
 
 
 class classonlymethod(classmethod):
-    def __get__(self, instance, owner):
+    def __get__(self, instance, cls=None):
         if instance is not None:
             raise AttributeError("This method is available only on the class, not on instances.")
-        return super(classonlymethod, self).__get__(instance, owner)
+        return super(classonlymethod, self).__get__(instance, cls)
 
 
 def method_decorator(decorator, name=''):
@@ -189,8 +189,8 @@ class classproperty(object):
     def __init__(self, method=None):
         self.fget = method
 
-    def __get__(self, instance, owner):
-        return self.fget(owner)
+    def __get__(self, instance, cls=None):
+        return self.fget(cls)
 
     def getter(self, method):
         self.fget = method

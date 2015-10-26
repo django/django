@@ -286,7 +286,7 @@ class MethodDecoratorTests(SimpleTestCase):
             def __call__(self, arg):
                 return self.wrapped(arg)
 
-            def __get__(self, instance, owner):
+            def __get__(self, instance, cls=None):
                 return self
 
         class descriptor_wrapper(object):
@@ -294,8 +294,8 @@ class MethodDecoratorTests(SimpleTestCase):
                 self.wrapped = wrapped
                 self.__name__ = wrapped.__name__
 
-            def __get__(self, instance, owner):
-                return bound_wrapper(self.wrapped.__get__(instance, owner))
+            def __get__(self, instance, cls=None):
+                return bound_wrapper(self.wrapped.__get__(instance, cls))
 
         class Test(object):
             @method_dec

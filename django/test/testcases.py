@@ -1053,7 +1053,7 @@ class CheckCondition(object):
     def __init__(self, cond_func):
         self.cond_func = cond_func
 
-    def __get__(self, obj, objtype):
+    def __get__(self, instance, cls=None):
         return self.cond_func()
 
 
