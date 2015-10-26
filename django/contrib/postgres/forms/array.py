@@ -166,7 +166,7 @@ class SplitArrayField(forms.Field):
                 errors.append(None)
             except ValidationError as error:
                 errors.append(ValidationError(
-                    string_concat(self.error_messages['item_invalid'], error.message),
+                    string_concat(self.error_messages['item_invalid'], ' '.join(error.messages)),
                     code='item_invalid',
                     params={'nth': i},
                 ))

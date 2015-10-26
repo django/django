@@ -484,6 +484,11 @@ class TestSplitFormField(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors, {'array': ['Item 2 in the array did not validate: This field is required.']})
 
+    def test_invalid_integer(self):
+        msg = 'Item 1 in the array did not validate: Ensure this value is less than or equal to 100.'
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
+
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)
