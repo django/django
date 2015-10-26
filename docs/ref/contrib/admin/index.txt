@@ -922,8 +922,8 @@ subclass::
                   ('is_staff', admin.BooleanFieldListFilter),
               )
 
-      You can now limit the choices of a related model to the objects
-      involved in that relation using ``RelatedOnlyFieldListFilter``::
+      You can limit the choices of a related model to the objects involved in
+      that relation using ``RelatedOnlyFieldListFilter``::
 
           class BookAdmin(admin.ModelAdmin):
               list_filter = (
