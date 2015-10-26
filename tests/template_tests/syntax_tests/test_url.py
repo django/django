@@ -251,3 +251,23 @@ class UrlTagTests(SimpleTestCase):
         context = RequestContext(request)
         output = template.render(context)
         self.assertEqual(output, '/ns2/named-client/42/')
+
+    @setup({'url-namespace-no-current-app': '{% url "app:named.client" 42 %}'})
+    def test_url_namespace_no_current_app(self):
+        request = RequestFactory().get('/')
+        request.resolver_match = resolve('/ns1/')
+        request.current_app = None
+        template = self.engine.get_template('url-namespace-no-current-app')
+        context = RequestContext(request)
+        output = template.render(context)
+        self.assertEqual(output, '/ns2/named-client/42/')
+
+    @setup({'url-namespace-explicit-current-app': '{% url "app:named.client" 42 %}'})
+    def test_url_namespace_explicit_current_app(self):
+        request = RequestFactory().get('/')
+        request.resolver_match = resolve('/ns1/')
+        request.current_app = 'app'
+        template = self.engine.get_template('url-namespace-explicit-current-app')
+        context = RequestContext(request)
+        output = template.render(context)
+        self.assertEqual(output, '/ns2/named-client/42/')
