@@ -852,6 +852,12 @@ def filesizeformat(bytes):
 
     filesize_number_format = lambda value: formats.number_format(round(value, 1), 1)
 
+    if bytes < 0:
+        negative = True
+        bytes = -bytes
+    else:
+        negative = False
+
     KB = 1 << 10
     MB = 1 << 20
     GB = 1 << 30
@@ -871,7 +877,9 @@ def filesizeformat(bytes):
     else:
         value = ugettext("%s PB") % filesize_number_format(bytes / PB)
 
-    return avoid_wrapping(value)
+    if negative:
+        value = "&minus;%s" % value
+    return mark_safe(avoid_wrapping(value))
 
 
 @register.filter(is_safe=False)
