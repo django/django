@@ -19,9 +19,6 @@ class CustomUserNonUniqueUsername(AbstractBaseUser):
 
     objects = UserManager()
 
-    class Meta:
-        app_label = 'auth'
-
 
 class CustomUserNonListRequiredFields(AbstractBaseUser):
     "A user with a non-list REQUIRED_FIELDS"
@@ -31,9 +28,6 @@ class CustomUserNonListRequiredFields(AbstractBaseUser):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = 'date_of_birth'
 
-    class Meta:
-        app_label = 'auth'
-
 
 class CustomUserBadRequiredFields(AbstractBaseUser):
     "A user with a USERNAME_FIELD that appears in REQUIRED_FIELDS (invalid)"
@@ -42,6 +36,3 @@ class CustomUserBadRequiredFields(AbstractBaseUser):
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['username', 'date_of_birth']
-
-    class Meta:
-        app_label = 'auth'

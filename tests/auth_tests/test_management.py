@@ -327,7 +327,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         self.assertEqual(CustomUser._default_manager.count(), 0)
 
     @override_settings(
-        AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+        AUTH_USER_MODEL='auth_tests.CustomUserNonUniqueUsername',
         AUTHENTICATION_BACKENDS=['my.custom.backend'],
     )
     def test_swappable_user_username_non_unique(self):
@@ -406,7 +406,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         )
         self.assertIs(command.stdin, sys.stdin)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk(self):
         new_io = six.StringIO()
         group = Group.objects.create(name='mygroup')
@@ -436,7 +436,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
                 stdout=new_io,
             )
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserWithFK')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserWithFK')
     def test_fields_with_fk_interactive(self):
         new_io = six.StringIO()
         group = Group.objects.create(name='mygroup')
@@ -566,7 +566,7 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
 
 
 class CustomUserModelValidationTestCase(SimpleTestCase):
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonListRequiredFields')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonListRequiredFields')
     @override_system_checks([check_user_model])
     def test_required_fields_is_list(self):
         "REQUIRED_FIELDS should be a list."
@@ -581,7 +581,7 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserBadRequiredFields')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserBadRequiredFields')
     @override_system_checks([check_user_model])
     def test_username_not_in_required_fields(self):
         "USERNAME_FIELD should not appear in REQUIRED_FIELDS."
@@ -597,7 +597,7 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername')
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonUniqueUsername')
     @override_system_checks([check_user_model])
     def test_username_non_unique(self):
         "A non-unique USERNAME_FIELD should raise a model validation error."
@@ -613,7 +613,7 @@ class CustomUserModelValidationTestCase(SimpleTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUserNonUniqueUsername',
+    @override_settings(AUTH_USER_MODEL='auth_tests.CustomUserNonUniqueUsername',
                        AUTHENTICATION_BACKENDS=[
                            'my.custom.backend',
                        ])
