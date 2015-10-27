@@ -3,10 +3,6 @@ import re
 from django.conf import settings
 from django.contrib.gis.db.backends.base.operations import \
     BaseSpatialOperations
-from django.contrib.gis.db.backends.postgis.adapter import PostGISAdapter
-from django.contrib.gis.db.backends.postgis.pgraster import (
-    from_pgraster, to_pgraster,
-)
 from django.contrib.gis.db.backends.utils import SpatialOperator
 from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
@@ -15,8 +11,9 @@ from django.db.backends.postgresql.operations import DatabaseOperations
 from django.db.utils import ProgrammingError
 from django.utils.functional import cached_property
 
+from .adapter import PostGISAdapter
 from .models import PostGISGeometryColumns, PostGISSpatialRefSys
-from .pgraster import get_pgraster_srid
+from .pgraster import from_pgraster, get_pgraster_srid, to_pgraster
 
 
 class PostGISOperator(SpatialOperator):
