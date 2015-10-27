@@ -124,6 +124,12 @@ class MigrationLoader(object):
                     app_config.label,
                 )
             if south_style_migrations:
+                if app_config.label in self.migrated_apps:
+                    raise BadMigrationError(
+                        "Migrated app %r contains South migrations. Make sure "
+                        "all numbered South migrations are deleted prior to "
+                        "creating Django migrations." % app_config.label
+                    )
                 self.unmigrated_apps.add(app_config.label)
 
     def get_migration(self, app_label, name_prefix):

@@ -41,3 +41,6 @@ Bugfixes
 
 * Fixed crash with ``contrib.postgres.forms.SplitArrayField`` and
   ``IntegerField`` on invalid value (:ticket:`25597`).
+
+* Added a helpful error message when Django and South migrations exist in the
+  same directory (:ticket:`25618`).
