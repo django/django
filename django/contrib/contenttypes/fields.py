@@ -359,10 +359,43 @@ class GenericRelation(ForeignObject):
         self.to_fields = [self.model._meta.pk.name]
         return [(self.remote_field.model._meta.get_field(self.object_id_field_name), self.model._meta.pk)]
 
+    def _get_path_info_with_parent(self):
+        """
+        Returns the path with joining through the parent model.
+        """
+        # In a situation where you have inheritance chain ChildTag -> Tag,
+        # and Tagged defines the GenericForeignKey, and a TaggedItem model has a
+        # GenericRelation to ChildTag, then we need to generate a join from
+        # TaggedItem to Tag (as Tag.object_id == TaggedItem.pk), and next join
+        # from Tag to ChildTag (as that is where the relation is to). We do this
+        # by first generating a join to the parent model, then generating joins
+        # to the child models.
+        path = []
+        opts = self.remote_field.model._meta
+        parent_opts = opts.get_field(self.object_id_field_name).model._meta
+        target = parent_opts.pk
+        path.append(PathInfo(self.model._meta, parent_opts, (target,), self.remote_field, True, False))
+        # Collect joins needed for the parent -> child chain. This is easies to do
+        # if we collect joins for the child -> parent chain, and then reverse the
+        # direction (call to reverse() and use of field.remote_field.get_path_info())
+        parent_field_chain = []
+        while parent_opts != opts:
+            field = opts.get_ancestor_link(parent_opts.model)
+            parent_field_chain.append(field)
+            opts = field.remote_field.model._meta
+        parent_field_chain.reverse()
+        for field in parent_field_chain:
+            path.extend(field.remote_field.get_path_info())
+        return path
+
     def get_path_info(self):
         opts = self.remote_field.model._meta
-        target = opts.pk
-        return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
+        object_id_field = opts.get_field(self.object_id_field_name)
+        if object_id_field.model != opts.model:
+            return self._get_path_info_with_parent()
+        else:
+            target = opts.pk
+            return [PathInfo(self.model._meta, opts, (target,), self.remote_field, True, False)]
 
     def get_reverse_path_info(self):
         opts = self.model._meta
