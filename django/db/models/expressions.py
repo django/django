@@ -357,12 +357,18 @@ class BaseExpression(object):
                 for inner_expr in expr.flatten():
                     yield inner_expr
 
+    def get_source_f_object(self):
+        for e in self.get_source_expressions():
+            if hasattr(e, 'get_source_f_object'):
+                f_object = e.get_source_f_object()
+                if f_object:
+                    return f_object
+
 
 class Expression(BaseExpression, Combinable):
     """
     An expression that can be combined with other expressions.
     """
-    pass
 
 
 class CombinedExpression(Expression):
@@ -448,7 +454,7 @@ class DurationExpression(CombinedExpression):
         return expression_wrapper % sql, expression_params
 
 
-class F(Combinable):
+class F(Expression):
     """
     An object capable of resolving references to existing query objects.
     """
@@ -458,15 +464,23 @@ class F(Combinable):
          * name: the name of the field this expression references
         """
         self.name = name
+        super(F, self).__init__()
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
+
+    def as_sql(self, compiler, connection):
+        col = self.resolve_expression(compiler.query)
+        return compiler.compile(col)
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         return query.resolve_ref(self.name, allow_joins, reuse, summarize)
 
     def refs_aggregate(self, existing_aggregates):
         return refs_aggregate(self.name.split(LOOKUP_SEP), existing_aggregates)
+
+    def get_source_f_object(self):
+        return self
 
     def asc(self):
         return OrderBy(self)

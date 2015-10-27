@@ -1,7 +1,8 @@
 from copy import copy
+import itertools
 
 from django.conf import settings
-from django.db.models.expressions import Func, Value
+from django.db.models.expressions import Func, Value, Expression, F, ExpressionWrapper
 from django.db.models.fields import (
     DateField, DateTimeField, Field, IntegerField, TimeField,
 )
@@ -11,12 +12,22 @@ from django.utils.functional import cached_property
 from django.utils.six.moves import range
 
 
-class Lookup(object):
+class Lookup(Expression):
     lookup_name = None
 
     def __init__(self, lhs, rhs):
-        self.lhs, self.rhs = lhs, rhs
-        self.rhs = self.get_prep_lookup()
+        self.lhs = lhs
+        self.rhs = rhs
+
+        if self.get_source_f_object():
+            # if F object passed to lookup or nested transform, it means the
+            # output field is not yet available, which gets detected using
+            # compiler.query attr only
+            pass
+        else:
+            # otherwise call related callback
+            self.on_output_field_available()
+
         if hasattr(self.lhs, 'get_bilateral_transforms'):
             bilateral_transforms = self.lhs.get_bilateral_transforms()
         else:
@@ -29,6 +40,22 @@ class Lookup(object):
             if isinstance(rhs, QuerySet):
                 raise NotImplementedError("Bilateral transformations on nested querysets are not supported.")
         self.bilateral_transforms = bilateral_transforms
+
+    def on_output_field_available(self):
+        self.rhs = self.get_prep_lookup()
+
+    def get_source_f_object(self):
+        if hasattr(self.lhs, 'get_source_f_object'):
+            return self.lhs.get_source_f_object()
+
+    def apply_lookup(self, output_field):
+        """
+        Set output field for lhs and call all the required handlers (preps)
+        """
+        e = self.get_source_f_object()
+        e._output_field = output_field
+
+        self.on_output_field_available()
 
     def apply_bilateral_transforms(self, value):
         for transform in self.bilateral_transforms:
@@ -54,7 +81,11 @@ class Lookup(object):
         return sqls, sqls_params
 
     def get_prep_lookup(self):
-        return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        if self.lookup_name:
+            return self.lhs.output_field.get_prep_lookup(self.lookup_name, self.rhs)
+        else:
+            # don't apply preps if lookup name is not set
+            return self.rhs
 
     def get_db_prep_lookup(self, value, connection):
         return (
@@ -115,6 +146,13 @@ class Lookup(object):
     @cached_property
     def contains_aggregate(self):
         return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
+
+    def get_source_expressions(self):
+        if hasattr(self.lhs, 'get_source_expressions'):
+            head = self.lhs.get_source_expressions()
+        else:
+            head = []
+        return itertools.chain(head, self.rhs.get_source_expressions())
 
 
 class Transform(RegisterLookupMixin, Func):
