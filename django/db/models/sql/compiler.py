@@ -336,7 +336,7 @@ class SQLCompiler(object):
         """
         if name in self.quote_cache:
             return self.quote_cache[name]
-        tables = [getattr(t, 'table', None) for t in self.query.table_map]
+        tables = set(getattr(t, 'table', None) for t in self.query.table_map)
         if ((name in self.query.alias_map and name not in tables) or
                 name in self.query.extra_select or (
                     name in self.query.external_aliases and name not in tables)):
