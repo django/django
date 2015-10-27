@@ -158,21 +158,6 @@ All attributes should be considered read-only, unless stated otherwise.
     underscores in WSGI environment variables. It matches the behavior of
     Web servers like Nginx and Apache 2.4+.
 
-.. attribute:: HttpRequest.urlconf
-
-    Not defined by Django itself, but will be read if other code (e.g., a custom
-    middleware class) sets it. When present, this will be used as the root
-    URLconf for the current request, overriding the :setting:`ROOT_URLCONF`
-    setting. See :ref:`how-django-processes-a-request` for details.
-
-    ``urlconf`` can be set to ``None`` to revert any changes made by previous
-    middleware and return to using the :setting:`ROOT_URLCONF`.
-
-    .. versionchanged:: 1.9
-
-        Setting ``urlconf=None`` raised
-        :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
-
 .. attribute:: HttpRequest.resolver_match
 
     An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
@@ -181,11 +166,30 @@ All attributes should be considered read-only, unless stated otherwise.
     are executed before url resolving takes place (like ``process_request``, you
     can use ``process_view`` instead).
 
+Attributes set by application code
+----------------------------------
+
+Django doesn't set these attributes itself but makes use of them if set by your
+application.
+
 .. attribute:: HttpRequest.current_app
 
-    Not defined by Django itself, but if set, the :ttag:`url` template tag
-    will use its value as the ``current_app`` argument to
-    :func:`~django.core.urlresolvers.reverse()`.
+    The :ttag:`url` template tag will use its value as the ``current_app``
+    argument to :func:`~django.core.urlresolvers.reverse()`.
+
+.. attribute:: HttpRequest.urlconf
+
+    This will be used as the root URLconf for the current request, overriding
+    the :setting:`ROOT_URLCONF` setting. See
+    :ref:`how-django-processes-a-request` for details.
+
+    ``urlconf`` can be set to ``None`` to revert any changes made by previous
+    middleware and return to using the :setting:`ROOT_URLCONF`.
+
+    .. versionchanged:: 1.9
+
+        Setting ``urlconf=None`` raised
+        :exc:`~django.core.exceptions.ImproperlyConfigured` in older versions.
 
 Attributes set by middleware
 ----------------------------
