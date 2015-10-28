@@ -485,8 +485,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         )
         for related_object in related_objects:
             related_model = related_object.related_model
+            remote_field = related_object.field.rel
             if (any(issubclass(model, related_model) for model in registered_models) and
-                    related_object.field.rel.get_related_field() == field):
+                    hasattr(remote_field, 'get_related_field') and
+                    remote_field.get_related_field() == field):
                 return True
 
         return False

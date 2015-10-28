@@ -891,3 +891,14 @@ class ExplicitlyProvidedPK(models.Model):
 
 class ImplicitlyGeneratedPK(models.Model):
     name = models.IntegerField(unique=True)
+
+
+# Models for #25622
+class ReferencedByGenRel(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+
+class GenRelReference(models.Model):
+    references = GenericRelation(ReferencedByGenRel)

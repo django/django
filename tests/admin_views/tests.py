@@ -640,6 +640,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse('admin:admin_views_referencedbyinline_changelist'), {TO_FIELD_VAR: 'name'})
         self.assertEqual(response.status_code, 200)
 
+        # #25622 - Specifying a field of a model only referred by a generic
+        # relation should raise DisallowedModelAdminToField.
+        url = reverse('admin:admin_views_referencedbygenrel_changelist')
+        with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
+            response = self.client.get(url, {TO_FIELD_VAR: 'object_id'})
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(len(calls), 1)
+
         # We also want to prevent the add, change, and delete views from
         # leaking a disallowed field value.
         with patch_logger('django.security.DisallowedModelAdminToField', 'error') as calls:
