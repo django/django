@@ -73,7 +73,7 @@ class URLValidator(RegexValidator):
 
     # Host patterns
     hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
-    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]*(?<!-))*'
+    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]+(?<!-))*'
     tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 

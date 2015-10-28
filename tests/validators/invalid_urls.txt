@@ -49,3 +49,4 @@ http://.www.foo.bar./
 http://[::1:2::3]:8080/
 http://[]
 http://[]:8080
+http://example..com/
