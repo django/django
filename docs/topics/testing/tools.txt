@@ -856,6 +856,16 @@ port until it finds one that is free and takes it.
 
 .. _continuous integration: https://en.wikipedia.org/wiki/Continuous_integration
 
+.. tip::
+
+    If you use the :mod:`~django.contrib.staticfiles` app in your project and
+    need to perform live testing, then you might want to use the
+    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+    subclass which transparently serves all the assets during execution of
+    its tests in a way very similar to what we get at development time with
+    ``DEBUG=True``, i.e. without having to collect them using
+    :djadmin:`collectstatic`.
+
 To demonstrate how to use ``LiveServerTestCase``, let's write a simple Selenium
 test. First of all, you need to install the `selenium package`_ into your
 Python path:
@@ -907,16 +917,6 @@ out the `full reference`_ for more details.
 .. _selenium package: https://pypi.python.org/pypi/selenium
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
-
-.. tip::
-
-    If you use the :mod:`~django.contrib.staticfiles` app in your project and
-    need to perform live testing, then you might want to use the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
-    subclass which transparently serves all the assets during execution of
-    its tests in a way very similar to what we get at development time with
-    ``DEBUG=True``, i.e. without having to collect them using
-    :djadmin:`collectstatic`.
 
 .. note::
 
