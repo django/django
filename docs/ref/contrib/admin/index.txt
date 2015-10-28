@@ -1671,7 +1671,7 @@ templates used by the :class:`ModelAdmin` views:
     changelist page if :attr:`~ModelAdmin.list_editable` is used. To use a
     custom formset, for example::
 
-        from django.forms.models import BaseModelFormSet
+        from django.forms import BaseModelFormSet
 
         class MyAdminFormSet(BaseModelFormSet):
             pass
