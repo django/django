@@ -1206,6 +1206,8 @@ blue.
 
     .. attribute:: srid
 
+        .. versionadded:: 1.10
+
         The Spatial Reference System Identifier (SRID) of the raster. This
         property is a shortcut to getting or setting the SRID through the
         :attr:`srs` attribute.
