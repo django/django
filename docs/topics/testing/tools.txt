@@ -865,12 +865,21 @@ Python path:
     $ pip install selenium
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
-(for example: ``myapp/tests.py``). The code for this test may look as follows::
+(for example: ``myapp/tests.py``). For this example, we'll assume you're using
+the :mod:`~django.contrib.staticfiles` app and want to have static files served
+during the execution of your tests similar to what we get at development time
+with ``DEBUG=True``, i.e. without having to collect them using
+:djadmin:`collectstatic`. We'll use
+the  :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
+subclass which provides that functionality. Replace it with
+``django.test.LiveServerTestCase`` if you don't need that.
 
-    from django.test import LiveServerTestCase
+The code for this test may look as follows::
+
+    from django.contrib.staticfiles.testing import StaticLiveServerTestCase
     from selenium.webdriver.firefox.webdriver import WebDriver
 
-    class MySeleniumTests(LiveServerTestCase):
+    class MySeleniumTests(StaticLiveServerTestCase):
         fixtures = ['user-data.json']
 
         @classmethod
@@ -907,16 +916,6 @@ out the `full reference`_ for more details.
 .. _selenium package: https://pypi.python.org/pypi/selenium
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
 .. _Firefox: http://www.mozilla.com/firefox/
-
-.. tip::
-
-    If you use the :mod:`~django.contrib.staticfiles` app in your project and
-    need to perform live testing, then you might want to use the
-    :class:`~django.contrib.staticfiles.testing.StaticLiveServerTestCase`
-    subclass which transparently serves all the assets during execution of
-    its tests in a way very similar to what we get at development time with
-    ``DEBUG=True``, i.e. without having to collect them using
-    :djadmin:`collectstatic`.
 
 .. note::
 
