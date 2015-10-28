@@ -48,3 +48,6 @@ Bugfixes
 * Fixed a regression in ``URLValidator`` that allowed URLs with consecutive
   dots in the domain section (like ``http://example..com/``) to pass
   (:ticket:`25620`).
+
+* Fixed a crash with ``GenericRelation`` and
+  ``BaseModelAdmin.to_field_allowed`` (:ticket:`25622`).
