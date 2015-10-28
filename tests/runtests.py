@@ -22,7 +22,10 @@ from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.log import DEFAULT_LOGGING
 
+# Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango20Warning)
+# Ignore known warnings in test dependencies.
+warnings.filterwarnings("ignore", "'U' mode is deprecated", DeprecationWarning, module='docutils.io')
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(upath(__file__)))
 
