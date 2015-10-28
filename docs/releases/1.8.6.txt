@@ -44,3 +44,7 @@ Bugfixes
 
 * Added a helpful error message when Django and South migrations exist in the
   same directory (:ticket:`25618`).
+
+* Fixed a regression in ``URLValidator`` that allowed URLs with consecutive
+  dots in the domain section (like ``http://example..com/``) to pass
+  (:ticket:`25620`).
