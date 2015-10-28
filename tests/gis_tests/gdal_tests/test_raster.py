@@ -83,6 +83,16 @@ class GDALRasterTests(unittest.TestCase):
         self.assertEqual(self.rs.srs.srid, 3086)
         self.assertEqual(self.rs.srs.units, (1.0, 'metre'))
 
+    def test_rs_srid(self):
+        rast = GDALRaster({
+            'width': 16,
+            'height': 16,
+            'srid': 4326,
+        })
+        self.assertEqual(rast.srid, 4326)
+        rast.srid = 3086
+        self.assertEqual(rast.srid, 3086)
+
     def test_geotransform_and_friends(self):
         # Assert correct values for file based raster
         self.assertEqual(self.rs.geotransform,

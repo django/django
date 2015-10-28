@@ -1204,6 +1204,21 @@ blue.
             >>> rst.srs.srid
             3086
 
+    .. attribute:: srid
+
+        The Spatial Reference System Identifier (SRID) of the raster. This
+        property is a shortcut to getting or setting the SRID through the
+        :attr:`srs` attribute.
+
+            >>> rst = GDALRaster({'width': 10, 'height': 20, 'srid': 4326})
+            >>> rst.srid
+            4326
+            >>> rst.srid = 3086
+            >>> rst.srid
+            3086
+            >>> rst.srs.srid  # This is equivalent
+            3086
+
     .. attribute:: geotransform
 
         The affine transformation matrix used to georeference the source, as a
