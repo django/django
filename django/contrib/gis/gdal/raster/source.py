@@ -215,6 +215,20 @@ class GDALRaster(GDALBase):
         self._flush()
 
     @property
+    def srid(self):
+        """
+        Shortcut to access the srid of this GDALRaster.
+        """
+        return self.srs.srid
+
+    @srid.setter
+    def srid(self, value):
+        """
+        Shortcut to set this GDALRaster's srs from an srid.
+        """
+        self.srs = value
+
+    @property
     def geotransform(self):
         """
         Returns the geotransform of the data source.
