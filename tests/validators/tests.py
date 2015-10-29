@@ -22,7 +22,7 @@ from django.test.utils import str_prefix
 from django.utils._os import upath
 
 NOW = datetime.now()
-EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file']
+EXTENDED_SCHEMES = ['http', 'https', 'ftp', 'ftps', 'git', 'file', 'git+ssh']
 
 TEST_DATA = [
     # (validator, value, expected),
@@ -205,6 +205,7 @@ TEST_DATA = [
 
     (URLValidator(EXTENDED_SCHEMES), 'file://localhost/path', None),
     (URLValidator(EXTENDED_SCHEMES), 'git://example.com/', None),
+    (URLValidator(EXTENDED_SCHEMES), 'git+ssh://git@github.com/example/hg-git.git', None),
 
     (URLValidator(EXTENDED_SCHEMES), 'git://-invalid.com', ValidationError),
     # Trailing newlines not accepted
