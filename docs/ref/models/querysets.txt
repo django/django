@@ -868,7 +868,10 @@ many-to-many and many-to-one objects, which cannot be done using
 ``select_related``, in addition to the foreign key and one-to-one relationships
 that are supported by ``select_related``. It also supports prefetching of
 :class:`~django.contrib.contenttypes.fields.GenericRelation` and
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`.
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
+must be restricted to a homogeneous set of results. For example, prefetching
+objects referenced by a ``GenericForeignKey`` is only supported if the query
+is restricted to one ``ContentType``.
 
 For example, suppose you have these models::
 
