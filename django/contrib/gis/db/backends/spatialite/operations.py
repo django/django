@@ -93,6 +93,12 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     @cached_property
     def unsupported_functions(self):
         unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
+        if not self.gml:
+            unsupported.add('AsGML')
+        if not self.kml:
+            unsupported.add('AsKML')
+        if self.spatial_version < (3, 0, 0):
+            unsupported.add('AsGeoJSON')
         if self.spatial_version < (3, 1, 0):
             unsupported.add('SnapToGrid')
         if self.spatial_version < (4, 0, 0):
