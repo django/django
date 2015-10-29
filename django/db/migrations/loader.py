@@ -101,36 +101,16 @@ class MigrationLoader(object):
                     if import_name[0] not in "_.~":
                         migration_names.add(import_name)
             # Load them
-            south_style_migrations = False
             for migration_name in migration_names:
-                try:
-                    migration_module = import_module("%s.%s" % (module_name, migration_name))
-                except ImportError as e:
-                    # Ignore South import errors, as we're triggering them
-                    if "south" in str(e).lower():
-                        south_style_migrations = True
-                        break
-                    raise
+                migration_module = import_module("%s.%s" % (module_name, migration_name))
                 if not hasattr(migration_module, "Migration"):
                     raise BadMigrationError(
                         "Migration %s in app %s has no Migration class" % (migration_name, app_config.label)
                     )
-                # Ignore South-style migrations
-                if hasattr(migration_module.Migration, "forwards"):
-                    south_style_migrations = True
-                    break
                 self.disk_migrations[app_config.label, migration_name] = migration_module.Migration(
                     migration_name,
                     app_config.label,
                 )
-            if south_style_migrations:
-                if app_config.label in self.migrated_apps:
-                    raise BadMigrationError(
-                        "Migrated app %r contains South migrations. Make sure "
-                        "all numbered South migrations are deleted prior to "
-                        "creating Django migrations." % app_config.label
-                    )
-                self.unmigrated_apps.add(app_config.label)
 
     def get_migration(self, app_label, name_prefix):
         "Gets the migration exactly named, or raises `graph.NodeNotFoundError`"
