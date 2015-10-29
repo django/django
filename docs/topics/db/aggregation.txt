@@ -184,6 +184,8 @@ of the ``annotate()`` clause is a ``QuerySet``; this ``QuerySet`` can be
 modified using any other ``QuerySet`` operation, including ``filter()``,
 ``order_by()``, or even additional calls to ``annotate()``.
 
+.. _combining-multiple-aggregations:
+
 Combining multiple aggregations
 -------------------------------
 
@@ -340,29 +342,67 @@ Order of ``annotate()`` and ``filter()`` clauses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When developing a complex query that involves both ``annotate()`` and
-``filter()`` clauses, particular attention should be paid to the order
-in which the clauses are applied to the ``QuerySet``.
+``filter()`` clauses, pay particular attention to the order in which the
+clauses are applied to the ``QuerySet``.
 
-When an ``annotate()`` clause is applied to a query, the annotation is
-computed over the state of the query up to the point where the annotation
-is requested. The practical implication of this is that ``filter()`` and
-``annotate()`` are not commutative operations -- that is, there is a
-difference between the query::
+When an ``annotate()`` clause is applied to a query, the annotation is computed
+over the state of the query up to the point where the annotation is requested.
+The practical implication of this is that ``filter()`` and ``annotate()`` are
+not commutative operations.
 
-    >>> Publisher.objects.annotate(num_books=Count('book')).filter(book__rating__gt=3.0)
+Given:
 
-and the query::
+* Publisher A has two books with ratings 4 and 5.
+* Publisher B has two books with ratings 1 and 4.
+* Publisher C has one book with rating 1.
 
-    >>> Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
+Here's an example with the ``Count`` aggregate::
 
-Both queries will return a list of publishers that have at least one good
-book (i.e., a book with a rating exceeding 3.0). However, the annotation in
-the first query will provide the total number of all books published by the
-publisher; the second query will only include good books in the annotated
-count. In the first query, the annotation precedes the filter, so the
-filter has no effect on the annotation. In the second query, the filter
-precedes the annotation, and as a result, the filter constrains the objects
-considered when calculating the annotation.
+    >>> a, b = Publisher.objects.annotate(num_books=Count('book', distinct=True)).filter(book__rating__gt=3.0)
+    >>> a, a.num_books
+    (<Publisher: A>, 2)
+    >>> b, b.num_books
+    (<Publisher: B>, 2)
+
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
+    >>> a, a.num_books
+    (<Publisher: A>, 2)
+    >>> b, b.num_books
+    (<Publisher: B>, 1)
+
+Both queries return a list of publishers that have at least one book with a
+rating exceeding 3.0, hence publisher C is excluded.
+
+In the first query, the annotation precedes the filter, so the filter has no
+effect on the annotation. ``distinct=True`` is required to avoid a
+:ref:`cross-join bug <combining-multiple-aggregations>`.
+
+The second query counts the number of books that have a rating exceeding 3.0
+for each publisher. The filter precedes the annotation, so the filter
+constrains the objects considered when calculating the annotation.
+
+Here's another example with the ``Avg`` aggregate::
+
+    >>> a, b = Publisher.objects.annotate(avg_rating=Avg('book__rating')).filter(book__rating__gt=3.0)
+    >>> a, a.avg_rating
+    (<Publisher: A>, 4.5)  # (5+4)/2
+    >>> b, b.avg_rating
+    (<Publisher: B>, 2.5)  # (1+4)/2
+
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(avg_rating=Avg('book__rating'))
+    >>> a, a.avg_rating
+    (<Publisher: A>, 4.5)  # (5+4)/2
+    >>> b, b.avg_rating
+    (<Publisher: B>, 4.0)  # 4/1 (book with rating 1 excluded)
+
+The first query asks for the average rating of all a publisher's books for
+publisher's that have at least one book with a rating exceeding 3.0. The second
+query asks for the average of a publisher's book's ratings for only those
+ratings exceeding 3.0.
+
+It's difficult to intuit how the ORM will translate complex querysets into SQL
+queries so when in doubt, inspect the SQL with ``str(queryset.query)`` and
+write plenty of tests.
 
 ``order_by()``
 --------------
