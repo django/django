@@ -126,10 +126,10 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     truncate_params = {'relate': None}
 
     unsupported_functions = {
-        'AsGeoHash', 'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
+        'AsGeoJSON', 'AsGML', 'AsKML', 'AsSVG',
         'BoundingCircle', 'Envelope',
-        'ForceRHR', 'MemSize', 'Scale',
-        'SnapToGrid', 'Translate', 'GeoHash',
+        'ForceRHR', 'GeoHash', 'MemSize', 'Scale',
+        'SnapToGrid', 'Translate',
     }
 
     def geo_quote_name(self, name):
