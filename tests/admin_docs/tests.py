@@ -294,8 +294,8 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         We should be able to get a basic idea of the type returned
         by a method
         """
-        company = Company.objects.create(name="Django")
-        person = Person.objects.create(
+        company = Company(name="Django")
+        person = Person(
             first_name="Human",
             last_name="User",
             company=company

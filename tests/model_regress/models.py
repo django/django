@@ -28,7 +28,8 @@ class Article(models.Model):
 
 
 class Movie(models.Model):
-    # Test models with non-default primary keys / AutoFields #5218
+    # Test the table creation of AutoField with a non-default column name.
+    # refs #5218
     movie_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=60)
 

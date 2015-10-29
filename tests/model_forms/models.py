@@ -41,6 +41,9 @@ ARTICLE_STATUS_CHAR = (
 class Person(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        managed = False
+
 
 @python_2_unicode_compatible
 class Category(models.Model):
@@ -89,9 +92,15 @@ class Article(models.Model):
 class ImprovedArticle(models.Model):
     article = models.OneToOneField(Article, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class ImprovedArticleWithParentLink(models.Model):
     article = models.OneToOneField(Article, models.CASCADE, parent_link=True)
+
+    class Meta:
+        managed = False
 
 
 class BetterWriter(Writer):
@@ -122,6 +131,9 @@ class PublicationDefaults(models.Model):
     date_published = models.DateField(default=datetime.date.today)
     mode = models.CharField(max_length=2, choices=MODE_CHOICES, default=default_mode)
     category = models.IntegerField(choices=CATEGORY_CHOICES, default=default_category)
+
+    class Meta:
+        managed = False
 
 
 class Author(models.Model):
@@ -169,6 +181,9 @@ class CustomFF(models.Model):
 
 class FilePathModel(models.Model):
     path = models.FilePathField(path=os.path.dirname(upath(__file__)), match=".*\.py$", blank=True)
+
+    class Meta:
+        managed = False
 
 
 try:
@@ -219,12 +234,18 @@ except ImportError:
 class CommaSeparatedInteger(models.Model):
     field = models.CommaSeparatedIntegerField(max_length=20)
 
+    class Meta:
+        managed = False
+
     def __str__(self):
         return self.field
 
 
 class Homepage(models.Model):
     url = models.URLField()
+
+    class Meta:
+        managed = False
 
 
 @python_2_unicode_compatible
@@ -258,6 +279,9 @@ class Triple(models.Model):
 
 class ArticleStatus(models.Model):
     status = models.CharField(max_length=2, choices=ARTICLE_STATUS_CHAR, blank=True, null=True)
+
+    class Meta:
+        managed = False
 
 
 @python_2_unicode_compatible
@@ -334,12 +358,16 @@ class DateTimePost(models.Model):
 
 
 class DerivedPost(Post):
-    pass
+    class Meta:
+        managed = False
 
 
 @python_2_unicode_compatible
 class BigInt(models.Model):
     biggie = models.BigIntegerField()
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return six.text_type(self.biggie)
@@ -361,6 +389,9 @@ class MarkupField(models.CharField):
 class CustomFieldForExclusionModel(models.Model):
     name = models.CharField(max_length=10)
     markup = MarkupField()
+
+    class Meta:
+        managed = False
 
 
 class FlexibleDatePost(models.Model):
@@ -396,6 +427,9 @@ class CustomErrorMessage(models.Model):
         validators=[validators.validate_slug],
         error_messages={'invalid': 'Model custom error message.'})
 
+    class Meta:
+        managed = False
+
     def clean(self):
         if self.name1 == 'FORBIDDEN_VALUE':
             raise ValidationError({'name1': [ValidationError('Model.clean() error messages.')]})
@@ -426,6 +460,9 @@ class StumpJoke(models.Model):
         related_name="+",
     )
     has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+    class Meta:
+        managed = False
 
 
 # Model for #13776
@@ -460,6 +497,9 @@ class StrictAssignmentFieldSpecific(models.Model):
     title = models.CharField(max_length=30)
     _should_error = False
 
+    class Meta:
+        managed = False
+
     def __setattr__(self, key, value):
         if self._should_error is True:
             raise ValidationError(message={key: "Cannot set attribute"}, code='invalid')
@@ -469,6 +509,9 @@ class StrictAssignmentFieldSpecific(models.Model):
 class StrictAssignmentAll(models.Model):
     title = models.CharField(max_length=30)
     _should_error = False
+
+    class Meta:
+        managed = False
 
     def __setattr__(self, key, value):
         if self._should_error is True:

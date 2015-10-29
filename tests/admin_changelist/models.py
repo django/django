@@ -114,3 +114,6 @@ class OrderedObject(models.Model):
 
 class CustomIdUser(models.Model):
     uuid = models.AutoField(primary_key=True)
+
+    class Meta:
+        managed = False

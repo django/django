@@ -178,7 +178,8 @@ class Mixin(object):
 
 
 class MixinModel(models.Model, Mixin):
-    pass
+    class Meta:
+        managed = False
 
 
 class Base(models.Model):
@@ -199,12 +200,15 @@ class GrandParent(models.Model):
 
 
 class Parent(GrandParent):
-    pass
+    class Meta:
+        managed = False
 
 
 class Child(Parent):
-    pass
+    class Meta:
+        managed = False
 
 
 class GrandChild(Child):
-    pass
+    class Meta:
+        managed = False

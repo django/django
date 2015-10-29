@@ -56,6 +56,9 @@ class ParkingLot3(Place):
     primary_key = models.AutoField(primary_key=True)
     parent = models.OneToOneField(Place, models.CASCADE, parent_link=True)
 
+    class Meta:
+        managed = False
+
 
 class ParkingLot4(models.Model):
     # Test parent_link connector can be discovered in abstract classes.
@@ -70,7 +73,8 @@ class ParkingLot4A(ParkingLot4, Place):
 
 
 class ParkingLot4B(Place, ParkingLot4):
-    pass
+    class Meta:
+        managed = False
 
 
 @python_2_unicode_compatible
@@ -172,6 +176,9 @@ class CertificationAudit(AuditBase):
 class InternalCertificationAudit(CertificationAudit):
     auditing_dept = models.CharField(max_length=20)
 
+# Unmanaged manually to avoid declaring a Meta.
+InternalCertificationAudit._meta.managed = False
+
 
 # Check that abstract classes don't get m2m tables autocreated.
 @python_2_unicode_compatible
@@ -214,6 +221,9 @@ class MessyBachelorParty(BachelorParty):
 class SearchableLocation(models.Model):
     keywords = models.CharField(max_length=256)
 
+    class Meta:
+        managed = False
+
 
 class Station(SearchableLocation):
     name = models.CharField(max_length=128)
@@ -226,9 +236,15 @@ class BusStation(Station):
     bus_routes = models.CommaSeparatedIntegerField(max_length=128)
     inbound = models.BooleanField(default=False)
 
+    class Meta:
+        managed = False
+
 
 class TrainStation(Station):
     zone = models.IntegerField()
+
+    class Meta:
+        managed = False
 
 
 class User(models.Model):

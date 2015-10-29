@@ -17,7 +17,8 @@ class ProxyProxyCountry(ProxyCountry):
 
 
 class ProxyMultiCountry(ProxyCountry):
-    pass
+    class Meta:
+        managed = False
 
 
 class ProxyMultiProxyCountry(ProxyMultiCountry):
@@ -37,7 +38,8 @@ class Restaurant(Place):
 
 
 class Pizzeria(Restaurant):
-    pass
+    class Meta:
+        managed = False
 
 
 class State(models.Model):

@@ -105,6 +105,9 @@ class HybridSpecies(models.Model):
 class Topping(models.Model):
     name = models.CharField(max_length=30)
 
+    class Meta:
+        managed = False
+
     def __str__(self):
         return self.name
 
@@ -113,6 +116,9 @@ class Topping(models.Model):
 class Pizza(models.Model):
     name = models.CharField(max_length=100)
     toppings = models.ManyToManyField(Topping)
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return self.name
@@ -126,6 +132,9 @@ class TaggedItem(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    class Meta:
+        managed = False
+
     def __str__(self):
         return self.tag
 
@@ -134,6 +143,9 @@ class TaggedItem(models.Model):
 class Bookmark(models.Model):
     url = models.URLField()
     tags = GenericRelation(TaggedItem)
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return self.url

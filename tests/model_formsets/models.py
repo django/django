@@ -273,18 +273,30 @@ class AutoPKChildOfUUIDPKParent(models.Model):
 class AutoPKParent(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
 
 class UUIDPKChildOfAutoPKParent(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     parent = models.ForeignKey(AutoPKParent, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class ParentWithUUIDAlternateKey(models.Model):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=50)
 
+    class Meta:
+        managed = False
+
 
 class ChildRelatedViaAK(models.Model):
     name = models.CharField(max_length=255)
     parent = models.ForeignKey(ParentWithUUIDAlternateKey, models.CASCADE, to_field='uuid')
+
+    class Meta:
+        managed = False

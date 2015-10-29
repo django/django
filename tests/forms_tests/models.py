@@ -22,6 +22,9 @@ temp_storage = FileSystemStorage(location=tempfile.mkdtemp())
 class BoundaryModel(models.Model):
     positive_integer = models.PositiveIntegerField(null=True, blank=True)
 
+    class Meta:
+        managed = False
+
 
 class Defaults(models.Model):
     name = models.CharField(max_length=255, default='class default value')
@@ -129,6 +132,9 @@ class OptionalMultiChoiceModel(models.Model):
         blank=True,
         related_name='not_relevant2',
     )
+
+    class Meta:
+        managed = False
 
 
 class FileModel(models.Model):

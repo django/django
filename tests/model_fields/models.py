@@ -50,6 +50,9 @@ class Whiz(models.Model):
     )
     c = models.IntegerField(choices=CHOICES, null=True)
 
+    class Meta:
+        managed = False
+
 
 class Counter(six.Iterator):
     def __init__(self):
@@ -69,9 +72,15 @@ class Counter(six.Iterator):
 class WhizIter(models.Model):
     c = models.IntegerField(choices=Counter(), null=True)
 
+    class Meta:
+        managed = False
+
 
 class WhizIterEmpty(models.Model):
     c = models.CharField(choices=(x for x in []), blank=True, max_length=1)
+
+    class Meta:
+        managed = False
 
 
 class BigD(models.Model):
@@ -157,6 +166,9 @@ class FkToChar(models.Model):
 class RenamedField(models.Model):
     modelname = models.IntegerField(name="fieldname", choices=((1, 'One'),))
 
+    class Meta:
+        managed = False
+
 
 class VerboseNameField(models.Model):
     id = models.AutoField("verbose pk", primary_key=True)
@@ -186,6 +198,9 @@ class VerboseNameField(models.Model):
     field22 = models.UUIDField("verbose field22")
     field23 = models.DurationField("verbose field23")
 
+    class Meta:
+        managed = False
+
 
 class GenericIPAddress(models.Model):
     ip = models.GenericIPAddressField(null=True, protocol='ipv4')
@@ -199,10 +214,16 @@ class GenericIPAddress(models.Model):
 class DecimalLessThanOne(models.Model):
     d = models.DecimalField(max_digits=3, decimal_places=3)
 
+    class Meta:
+        managed = False
+
 
 # See ticket #18389.
 class FieldClassAttributeModel(models.Model):
     field_class = models.CharField
+
+    class Meta:
+        managed = False
 
 ###############################################################################
 
@@ -217,6 +238,9 @@ class DataModel(models.Model):
 
 class Document(models.Model):
     myfile = models.FileField(upload_to='unused')
+
+    class Meta:
+        managed = False
 
 ###############################################################################
 # ImageField
@@ -360,6 +384,9 @@ class AllFieldsModel(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     gfk = GenericForeignKey()
     gr = GenericRelation(DataModel)
+
+    class Meta:
+        managed = False
 
 
 ###############################################################################

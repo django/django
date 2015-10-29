@@ -92,6 +92,9 @@ class CarTire(models.Model):
     """
     car = models.ForeignKey(Car, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class Honeycomb(models.Model):
     location = models.CharField(max_length=20)

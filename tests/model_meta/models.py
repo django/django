@@ -6,7 +6,8 @@ from django.db import models
 
 
 class Relation(models.Model):
-    pass
+    class Meta:
+        managed = False
 
 
 class AbstractPerson(models.Model):
@@ -67,6 +68,9 @@ class BasePerson(AbstractPerson):
     # GR fields
     generic_relation_base = GenericRelation(Relation)
 
+    class Meta:
+        managed = False
+
 
 class Person(BasePerson):
     # DATA fields
@@ -95,6 +99,9 @@ class Person(BasePerson):
     # GR fields
     generic_relation_concrete = GenericRelation(Relation)
 
+    class Meta:
+        managed = False
+
 
 class ProxyPerson(Person):
     class Meta:
@@ -102,7 +109,8 @@ class ProxyPerson(Person):
 
 
 class PersonThroughProxySubclass(ProxyPerson):
-    pass
+    class Meta:
+        managed = False
 
 
 class Relating(models.Model):
@@ -127,19 +135,30 @@ class Relating(models.Model):
     people = models.ManyToManyField(Person, related_name='relating_people')
     people_hidden = models.ManyToManyField(Person, related_name='+')
 
+    class Meta:
+        managed = False
+
 
 # ParentListTests models
 class CommonAncestor(models.Model):
-    pass
+    class Meta:
+        managed = False
 
 
 class FirstParent(CommonAncestor):
     first_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
 
+    class Meta:
+        managed = False
+
 
 class SecondParent(CommonAncestor):
     second_ancestor = models.OneToOneField(CommonAncestor, models.SET_NULL, primary_key=True, parent_link=True)
 
+    class Meta:
+        managed = False
+
 
 class Child(FirstParent, SecondParent):
-    pass
+    class Meta:
+        managed = False
