@@ -761,6 +761,12 @@ additions, including:
     (for instance, MySQL with the MyISAM engine), ``setUpTestData()`` will be
     called before each test, negating the speed benefits.
 
+    Be careful not to modify any objects created in ``setUpTestData()`` in
+    your test methods. Modifications to in-memory objects from setup work done
+    at the class level will persist between test methods. If you do need to
+    modify them, you could reload them in the ``setUp()`` method with
+    :meth:`~django.db.models.Model.refresh_from_db`, for example.
+
 .. warning::
 
     If you want to test some specific database transaction behavior, you should
