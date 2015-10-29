@@ -1464,6 +1464,11 @@ Miscellaneous
   the default project template (pre-1.7.2 only), a database must be created
   before accessing a page using :djadmin:`runserver`.
 
+* The addition of the ``schemes`` argument to ``URLValidator`` will appear
+  as a backwards-incompatible change if you were previously using a custom
+  regular expression to validate schemes. Any scheme not listed in ``schemes``
+  will fail validation, even if the regular expression matches the given URL.
+
 .. _deprecated-features-1.7:
 
 Features deprecated in 1.7
