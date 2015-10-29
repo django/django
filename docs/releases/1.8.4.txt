@@ -17,7 +17,8 @@ by sending repeated requests, potentially filling up the session store or
 causing other users' session records to be evicted.
 
 The :class:`~django.contrib.sessions.middleware.SessionMiddleware` has been
-modified to no longer create empty session records.
+modified to no longer create empty session records, including when
+:setting:`SESSION_SAVE_EVERY_REQUEST` is active.
 
 Bugfixes
 ========

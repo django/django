@@ -3166,7 +3166,8 @@ Default: ``False``
 
 Whether to save the session data on every request. If this is ``False``
 (default), then the session data will only be saved if it has been modified --
-that is, if any of its dictionary values have been assigned or deleted.
+that is, if any of its dictionary values have been assigned or deleted. Empty
+sessions won't be created, even if this setting is active.
 
 .. setting:: SESSION_SERIALIZER
 
