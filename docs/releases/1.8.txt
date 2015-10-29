@@ -1179,6 +1179,12 @@ Miscellaneous
   has been removed by a migration and replaced by a property. That means it's
   not possible to query or filter a ``ContentType`` by this field any longer.
 
+  Be careful if you upgrade to Django 1.8 and skip Django 1.7. If you run
+  ``manage.py migrate --fake``, this migration will be skipped and you'll see
+  a ``RuntimeError: Error creating new content types.`` exception because the
+  ``name`` column won't be dropped from the database. Use ``migrate.py migrate
+  --fake-initial`` to fake only the initial migration instead.
+
 * :djadmin:`migrate` now accepts the :djadminopt:`--fake-initial` option to
   allow faking initial migrations. In 1.7 initial migrations were always
   automatically faked if all tables created in an initial migration already
