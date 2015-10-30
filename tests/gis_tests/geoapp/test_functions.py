@@ -27,7 +27,7 @@ class GISFunctionsTests(TestCase):
     fixtures = ['initial']
 
     def test_asgeojson(self):
-        # Only PostGIS and SpatiaLite 3.0+ support GeoJSON.
+        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
             with self.assertRaises(NotImplementedError):
                 list(Country.objects.annotate(json=functions.AsGeoJSON('mpoly')))
@@ -107,12 +107,6 @@ class GISFunctionsTests(TestCase):
                 r'^<gml:Point srsName="SDO:4326" xmlns:gml="http://www.opengis.net/gml">'
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
-            )
-        elif spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # Spatialite before 3.0 has extra colon in SrsName
-            gml_regex = re.compile(
-                r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." '
-                r'cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>'
             )
         else:
             gml_regex = re.compile(

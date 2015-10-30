@@ -10,7 +10,7 @@ from django.db.models import F, Q
 from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
-from ..utils import no_oracle, oracle, postgis, spatialite
+from ..utils import no_oracle, oracle, postgis
 from .models import (
     AustraliaCity, CensusZipcode, Interstate, SouthTexasCity, SouthTexasCityFt,
     SouthTexasInterstate, SouthTexasZipcode,
@@ -123,7 +123,7 @@ class DistanceTest(TestCase):
         # with different projected coordinate systems.
         dist1 = SouthTexasCity.objects.distance(lagrange, field_name='point').order_by('id')
         dist2 = SouthTexasCity.objects.distance(lagrange).order_by('id')  # Using GEOSGeometry parameter
-        if spatialite or oracle:
+        if oracle:
             dist_qs = [dist1, dist2]
         else:
             dist3 = SouthTexasCityFt.objects.distance(lagrange.ewkt).order_by('id')  # Using EWKT string parameter.
@@ -247,9 +247,8 @@ class DistanceTest(TestCase):
             point__distance_lte=(self.stx_pnt, D(km=20)),
         )
 
-        # Can't determine the units on SpatiaLite from PROJ.4 string, and
         # Oracle 11 incorrectly thinks it is not projected.
-        if spatialite or oracle:
+        if oracle:
             dist_qs = (qs1,)
         else:
             qs2 = SouthTexasCityFt.objects.filter(point__distance_gte=(self.stx_pnt, D(km=7))).filter(
@@ -513,7 +512,7 @@ class DistanceFunctionsTests(TestCase):
         # Testing using different variations of parameters and using models
         # with different projected coordinate systems.
         dist1 = SouthTexasCity.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-        if spatialite or oracle:
+        if oracle:
             dist_qs = [dist1]
         else:
             dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')

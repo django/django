@@ -1,6 +1,5 @@
 """
 SQL functions reference lists:
-http://www.gaia-gis.it/spatialite-2.4.0/spatialite-sql-2.4.html
 http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
@@ -16,7 +15,6 @@ from django.contrib.gis.geometry.backend import Geometry
 from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.sqlite3.operations import DatabaseOperations
-from django.db.utils import DatabaseError
 from django.utils import six
 from django.utils.functional import cached_property
 
@@ -37,7 +35,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     distance = 'Distance'
     envelope = 'Envelope'
     extent = 'Extent'
+    geojson = 'AsGeoJSON'
+    gml = 'AsGML'
     intersection = 'Intersection'
+    kml = 'AsKML'
     length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
     num_geom = 'NumGeometries'
     num_points = 'NumPoints'
@@ -110,43 +111,14 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
                 'database (error was "%s").  Was the SpatiaLite initialization '
                 'SQL loaded on this database?') % (self.connection.settings_dict['NAME'], msg)
             six.reraise(ImproperlyConfigured, ImproperlyConfigured(new_msg), sys.exc_info()[2])
-        if version < (2, 4, 0):
-            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions '
-                                       '2.4.0 and above')
+        if version < (3, 0, 0):
+            raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 3.0.0 and above.')
         return version
-
-    @property
-    def _version_greater_2_4_0_rc4(self):
-        if self.spatial_version >= (2, 4, 1):
-            return True
-        else:
-            # Spatialite 2.4.0-RC4 added AsGML and AsKML, however both
-            # RC2 (shipped in popular Debian/Ubuntu packages) and RC4
-            # report version as '2.4.0', so we fall back to feature detection
-            try:
-                self._get_spatialite_func("AsGML(GeomFromText('POINT(1 1)'))")
-            except DatabaseError:
-                return False
-            return True
 
     @cached_property
     def disallowed_aggregates(self):
         disallowed = (aggregates.Extent3D, aggregates.MakeLine)
-        if self.spatial_version < (3, 0, 0):
-            disallowed += (aggregates.Collect, aggregates.Extent)
         return disallowed
-
-    @cached_property
-    def gml(self):
-        return 'AsGML' if self._version_greater_2_4_0_rc4 else None
-
-    @cached_property
-    def kml(self):
-        return 'AsKML' if self._version_greater_2_4_0_rc4 else None
-
-    @cached_property
-    def geojson(self):
-        return 'AsGeoJSON' if self.spatial_version >= (3, 0, 0) else None
 
     def convert_extent(self, box, srid):
         """

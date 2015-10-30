@@ -113,8 +113,7 @@ class GeoQuerySet(QuerySet):
         """
         backend = connections[self.db].ops
         if not backend.geojson:
-            raise NotImplementedError('Only PostGIS 1.3.4+ and SpatiaLite 3.0+ '
-                                      'support GeoJSON serialization.')
+            raise NotImplementedError('Only PostGIS and SpatiaLite support GeoJSON serialization.')
 
         if not isinstance(precision, six.integer_types):
             raise TypeError('Precision keyword must be set with an integer.')

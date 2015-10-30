@@ -297,6 +297,10 @@ Miscellaneous
 * The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
 
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+* Support for SpatiaLite < 3.0 is dropped.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10

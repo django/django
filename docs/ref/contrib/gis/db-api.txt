@@ -345,8 +345,8 @@ support any of these aggregates, and is thus excluded from the table.
 =======================  =======  ======  ==========
 Aggregate                PostGIS  Oracle  SpatiaLite
 =======================  =======  ======  ==========
-:class:`Collect`         X                (from v3.0)
-:class:`Extent`          X        X       (from v3.0)
+:class:`Collect`         X                X
+:class:`Extent`          X        X       X
 :class:`Extent3D`        X
 :class:`MakeLine`        X
 :class:`Union`           X        X       X

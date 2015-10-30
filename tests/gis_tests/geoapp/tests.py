@@ -149,9 +149,6 @@ class GeoModelTest(TestCase):
 
         # If the GeometryField SRID is -1, then we shouldn't perform any
         # transformation if the SRID of the input geometry is different.
-        if spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # SpatiaLite < 3 does not support missing SRID values.
-            return
         m1 = MinusOneSRID(geom=Point(17, 23, srid=4326))
         m1.save()
         self.assertEqual(-1, m1.geom.srid)
@@ -272,10 +269,9 @@ class GeoLookupTest(TestCase):
         self.assertEqual('Texas', tx.name)
         self.assertEqual('New Zealand', nz.name)
 
-        # Spatialite 2.3 thinks that Lawrence is in Puerto Rico (a NULL geometry).
-        if not (spatialite and connection.ops.spatial_version < (3, 0, 0)):
-            ks = State.objects.get(poly__contains=lawrence.point)
-            self.assertEqual('Kansas', ks.name)
+        # Testing `contains` on the states using the point for Lawrence.
+        ks = State.objects.get(poly__contains=lawrence.point)
+        self.assertEqual('Kansas', ks.name)
 
         # Pueblo and Oklahoma City (even though OK City is within the bounding box of Texas)
         # are not contained in Texas or New Zealand.
@@ -558,7 +554,7 @@ class GeoQuerySetTest(TestCase):
 
     def test_geojson(self):
         "Testing GeoJSON output from the database using GeoQuerySet.geojson()."
-        # Only PostGIS and SpatiaLite 3.0+ support GeoJSON.
+        # Only PostGIS and SpatiaLite support GeoJSON.
         if not connection.ops.geojson:
             self.assertRaises(NotImplementedError, Country.objects.all().geojson, field_name='mpoly')
             return
@@ -624,12 +620,6 @@ class GeoQuerySetTest(TestCase):
                 r'^<gml:Point srsName="EPSG:4326" xmlns:gml="http://www.opengis.net/gml">'
                 r'<gml:coordinates decimal="\." cs="," ts=" ">-104.60925\d+,38.25500\d+ '
                 r'</gml:coordinates></gml:Point>'
-            )
-        elif spatialite and connection.ops.spatial_version < (3, 0, 0):
-            # Spatialite before 3.0 has extra colon in SrsName
-            gml_regex = re.compile(
-                r'^<gml:Point SrsName="EPSG::4326"><gml:coordinates decimal="\." '
-                r'cs="," ts=" ">-104.609251\d+,38.255001</gml:coordinates></gml:Point>'
             )
         else:
             gml_regex = re.compile(
