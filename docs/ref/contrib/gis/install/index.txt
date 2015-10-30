@@ -97,31 +97,6 @@ Like other Django contrib applications, you will *only* need to add
 This is the so that ``gis`` templates can be located -- if not done, then
 features such as the geographic admin or KML sitemaps will not function properly.
 
-.. _addgoogleprojection:
-
-Add Google projection to ``spatial_ref_sys`` table
---------------------------------------------------
-
-.. note::
-
-    If you're running GDAL 1.7 or above (most users), you can skip this step.
-
-In order to conduct database transformations to the so-called "Google"
-projection (a spherical mercator projection used by Google Maps),
-an entry must be added to your spatial database's ``spatial_ref_sys`` table.
-Invoke the Django shell from your project and execute the
-``add_srs_entry`` function:
-
-.. code-block:: pycon
-
-    $ python manage.py shell
-    >>> from django.contrib.gis.utils import add_srs_entry
-    >>> add_srs_entry(900913)
-
-This adds an entry for the 900913 SRID to the ``spatial_ref_sys`` (or equivalent)
-table, making it possible for the spatial database to transform coordinates in
-this projection.  You only need to execute this command *once* per spatial database.
-
 Troubleshooting
 ===============
 
