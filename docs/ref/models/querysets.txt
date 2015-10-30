@@ -1836,7 +1836,7 @@ database query like ``count()`` would.
 in_bulk
 ~~~~~~~
 
-.. method:: in_bulk(id_list)
+.. method:: in_bulk(id_list=None)
 
 Takes a list of primary-key values and returns a dictionary mapping each
 primary-key value to an instance of the object with the given ID.
@@ -1849,8 +1849,15 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
+    >>> Blog.objects.in_bulk()
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 1.10
+
+``in_bulk()`` may be called without any arguments to return all objects
+in the queryset.
 
 iterator
 ~~~~~~~~
