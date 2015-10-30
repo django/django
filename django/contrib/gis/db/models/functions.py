@@ -125,6 +125,8 @@ class OracleToleranceMixin(object):
 
 
 class Area(OracleToleranceMixin, GeoFunc):
+    arity = 1
+
     def as_sql(self, compiler, connection):
         if connection.ops.geography:
             # Geography fields support area calculation, returns square meters.
@@ -204,11 +206,11 @@ class BoundingCircle(GeoFunc):
 
 
 class Centroid(OracleToleranceMixin, GeoFunc):
-    pass
+    arity = 1
 
 
 class Difference(OracleToleranceMixin, GeoFuncWithGeoParam):
-    pass
+    arity = 2
 
 
 class DistanceResultMixin(object):
@@ -267,11 +269,11 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFuncWithGeoParam):
 
 
 class Envelope(GeoFunc):
-    pass
+    arity = 1
 
 
 class ForceRHR(GeoFunc):
-    pass
+    arity = 1
 
 
 class GeoHash(GeoFunc):
@@ -285,7 +287,7 @@ class GeoHash(GeoFunc):
 
 
 class Intersection(OracleToleranceMixin, GeoFuncWithGeoParam):
-    pass
+    arity = 2
 
 
 class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
@@ -329,14 +331,17 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
 class MemSize(GeoFunc):
     output_field_class = IntegerField
+    arity = 1
 
 
 class NumGeometries(GeoFunc):
     output_field_class = IntegerField
+    arity = 1
 
 
 class NumPoints(GeoFunc):
     output_field_class = IntegerField
+    arity = 1
 
     def as_sqlite(self, compiler, connection):
         if self.source_expressions[self.geom_param_pos].output_field.geom_type != 'LINESTRING':
@@ -346,6 +351,7 @@ class NumPoints(GeoFunc):
 
 class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     output_field_class = FloatField
+    arity = 1
 
     def as_postgresql(self, compiler, connection):
         dim = min(f.dim for f in self.get_source_fields())
@@ -355,11 +361,11 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
 
 class PointOnSurface(OracleToleranceMixin, GeoFunc):
-    pass
+    arity = 1
 
 
 class Reverse(GeoFunc):
-    pass
+    arity = 1
 
 
 class Scale(SQLiteDecimalToFloatMixin, GeoFunc):
@@ -396,7 +402,7 @@ class SnapToGrid(SQLiteDecimalToFloatMixin, GeoFunc):
 
 
 class SymDifference(OracleToleranceMixin, GeoFuncWithGeoParam):
-    pass
+    arity = 2
 
 
 class Transform(GeoFunc):
@@ -432,4 +438,4 @@ class Translate(Scale):
 
 
 class Union(OracleToleranceMixin, GeoFuncWithGeoParam):
-    pass
+    arity = 2
