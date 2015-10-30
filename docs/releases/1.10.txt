@@ -246,6 +246,9 @@ Models
   :class:`~django.db.models.AutoField` except that it is guaranteed
   to fit numbers from ``1`` to ``9223372036854775807``.
 
+* :meth:`QuerySet.in_bulk() <django.db.models.query.QuerySet.in_bulk>`
+  may be called without any arguments to return all objects in the queryset.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
