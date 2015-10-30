@@ -78,6 +78,8 @@ class ThreadedWSGIServer(socketserver.ThreadingMixIn, WSGIServer):
 
 
 class ServerHandler(simple_server.ServerHandler):
+    http_version = '1.1'
+
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
@@ -85,6 +87,8 @@ class ServerHandler(simple_server.ServerHandler):
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -131,8 +135,14 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         return super().get_environ()
 
     def handle(self):
-        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+        """Handle multiple requests if necessary."""
+        self.close_connection = 1
+        self.handle_one_request()
+        while not self.close_connection:
+            self.handle_one_request()
 
+    def handle_one_request(self):
+        """Copy of WSGIRequestHandler.handle() but with different ServerHandler"""
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:
             self.requestline = ''

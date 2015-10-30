@@ -4,11 +4,13 @@ Tests for django.core.servers.
 import errno
 import os
 import socket
+from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.test import LiveServerTestCase, override_settings
+from django.test.utils import captured_stdout
 
 from .models import Person
 
@@ -50,6 +52,20 @@ class LiveServerAddress(LiveServerBase):
 
 
 class LiveServerViews(LiveServerBase):
+    def test_protocol(self):
+        """Launched server serves with HTTP 1.1."""
+        with captured_stdout() as debug_output:
+            conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port)
+            try:
+                conn.set_debuglevel(1)
+                conn.request('GET', '/example_view/', headers={"Connection": "keep-alive"})
+                conn.getresponse().read()
+                conn.request('GET', '/example_view/', headers={"Connection": "close"})
+                conn.getresponse()
+            finally:
+                conn.close()
+        self.assertEqual(debug_output.getvalue().count("reply: 'HTTP/1.1 200 OK"), 2)
+
     def test_404(self):
         with self.assertRaises(HTTPError) as err:
             self.urlopen('/')

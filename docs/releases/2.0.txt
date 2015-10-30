@@ -173,7 +173,7 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :djadmin:`runserver` Web server supports HTTP 1.1.
 
 Serialization
 ~~~~~~~~~~~~~
