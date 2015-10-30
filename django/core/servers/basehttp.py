@@ -67,6 +67,7 @@ def is_broken_pipe_error():
 class WSGIServer(simple_server.WSGIServer, object):
     """BaseHTTPServer that implements the Python WSGI protocol"""
 
+    protocol_version = "HTTP/1.1"
     request_queue_size = 10
 
     def __init__(self, *args, **kwargs):
@@ -89,6 +90,8 @@ class WSGIServer(simple_server.WSGIServer, object):
 
 # Inheriting from object required on Python 2.
 class ServerHandler(simple_server.ServerHandler, object):
+    http_version = str("1.1")
+
     def handle_error(self):
         # Ignore broken pipe errors, otherwise pass on
         if not is_broken_pipe_error():
@@ -96,6 +99,8 @@ class ServerHandler(simple_server.ServerHandler, object):
 
 
 class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
+    protocol_version = "HTTP/1.1"
+
     def address_string(self):
         # Short-circuit parent method to not call socket.getfqdn
         return self.client_address[0]
@@ -154,7 +159,15 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
         return env
 
     def handle(self):
-        """Copy of WSGIRequestHandler, but with different ServerHandler"""
+        """Handle multiple requests if necessary."""
+        self.close_connection = 1
+
+        self.handle_one_request()
+        while not self.close_connection:
+            self.handle_one_request()
+
+    def handle_one_request(self):
+        """Copy of WSGIRequestHandler.handle(), but with different ServerHandler"""
 
         self.raw_requestline = self.rfile.readline(65537)
         if len(self.raw_requestline) > 65536:

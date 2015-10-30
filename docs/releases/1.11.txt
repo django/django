@@ -179,6 +179,8 @@ Management Commands
 * The new :option:`loaddata --exclude` option allows excluding models and apps
   while loading data from fixtures.
 
+* The :djadmin:`runserver` Web server supports HTTP 1.1.
+
 Migrations
 ~~~~~~~~~~
 

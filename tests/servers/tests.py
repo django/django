@@ -10,9 +10,11 @@ import os
 import socket
 
 from django.test import LiveServerTestCase, override_settings
+from django.test.utils import captured_stdout
 from django.utils._os import upath
 from django.utils.http import urlencode
 from django.utils.six import text_type
+from django.utils.six.moves.http_client import HTTPConnection
 from django.utils.six.moves.urllib.error import HTTPError
 from django.utils.six.moves.urllib.request import urlopen
 
@@ -56,6 +58,22 @@ class LiveServerAddress(LiveServerBase):
 
 
 class LiveServerViews(LiveServerBase):
+    def test_protocol(self):
+        """
+        Ensure launched server serves with HTTP 1.1.
+        """
+        with captured_stdout() as debug_output:
+            conn = HTTPConnection(LiveServerViews.server_thread.host, LiveServerViews.server_thread.port)
+            try:
+                conn.set_debuglevel(1)
+                conn.request('GET', '/example_view/', headers={"Connection": "keep-alive"})
+                conn.getresponse().read()
+                conn.request('GET', '/example_view/', headers={"Connection": "close"})
+                conn.getresponse()
+            finally:
+                conn.close()
+        self.assertEqual(debug_output.getvalue().count("reply: 'HTTP/1.1 200 OK"), 2)
+
     def test_404(self):
         """
         Ensure that the LiveServerTestCase serves 404s.
