@@ -40,7 +40,7 @@ The following is a simple unit test using the request factory::
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import TestCase, RequestFactory
 
-    from .views import my_view
+    from .views import MyView, my_view
 
     class SimpleTest(TestCase):
         def setUp(self):
@@ -63,6 +63,8 @@ The following is a simple unit test using the request factory::
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
+            # Use this syntax for class-based views.
+            response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
 .. _topics-testing-advanced-multidb:
