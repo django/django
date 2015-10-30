@@ -63,8 +63,8 @@ The following is a simple unit test using the request factory::
 
             # Test my_view() as if it were deployed at /customer/details
             response = my_view(request)
-            # Use this syntax for class based views
-            response = my_view.as_view()(request)
+            # Use this syntax for class-based views
+            response = MyView.as_view()(request)
             self.assertEqual(response.status_code, 200)
 
 .. _topics-testing-advanced-multidb:
