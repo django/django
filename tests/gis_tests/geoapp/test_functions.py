@@ -160,6 +160,9 @@ class GISFunctionsTests(TestCase):
         for state in qs:
             self.assertTrue(state.poly.centroid.equals_exact(state.centroid, tol))
 
+        with self.assertRaisesMessage(TypeError, "'Centroid' takes exactly 1 argument (2 given)"):
+            State.objects.annotate(centroid=functions.Centroid('poly', 'poly'))
+
     @skipUnlessDBFeature("has_Difference_function")
     def test_difference(self):
         geom = Point(5, 23, srid=4326)
