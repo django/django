@@ -190,6 +190,8 @@ class HttpResponseBase(six.Iterator):
                 max_age = max(0, delta.days * 86400 + delta.seconds)
             else:
                 self.cookies[key]['expires'] = expires
+        else:
+            self.cookies[key]['expires'] = ''
         if max_age is not None:
             self.cookies[key]['max-age'] = max_age
             # IE requires expires, so set it if hasn't been already.
