@@ -302,36 +302,36 @@ Database functions
 The following table provides a summary of what geography-specific database
 functions are available on each spatial backend.
 
-====================================  =======  ======  =====  ==========
-Method                                PostGIS  Oracle  MySQL  SpatiaLite
-====================================  =======  ======  =====  ==========
-:class:`Area`                         X        X       X      X
-:class:`AsGeoJSON`                    X                       X
-:class:`AsGML`                        X        X              X
-:class:`AsKML`                        X                       X
-:class:`AsSVG`                        X                       X
+====================================  =======  ======  ===========  ==========
+Function                              PostGIS  Oracle  MySQL        SpatiaLite
+====================================  =======  ======  ===========  ==========
+:class:`Area`                         X        X       X            X
+:class:`AsGeoJSON`                    X                             X
+:class:`AsGML`                        X        X                    X
+:class:`AsKML`                        X                             X
+:class:`AsSVG`                        X                             X
 :class:`BoundingCircle`               X
-:class:`Centroid`                     X        X              X
-:class:`Difference`                   X        X              X
-:class:`Distance`                     X        X       X      X
-:class:`Envelope`                     X                       X
+:class:`Centroid`                     X        X       X            X
+:class:`Difference`                   X        X                    X
+:class:`Distance`                     X        X       X (≥ 5.6.1)  X
+:class:`Envelope`                     X                X            X
 :class:`ForceRHR`                     X
 :class:`GeoHash`                      X
-:class:`Intersection`                 X        X              X
-:class:`Length`                       X        X       X      X
+:class:`Intersection`                 X        X                    X
+:class:`Length`                       X        X       X            X
 :class:`MemSize`                      X
-:class:`NumGeometries`                X        X              X
-:class:`NumPoints`                    X        X              X
-:class:`Perimeter`                    X        X              X
-:class:`PointOnSurface`               X        X              X
-:class:`Reverse`                      X        X              X (≥ 4.0)
-:class:`Scale`                        X                       X
-:class:`SnapToGrid`                   X                       X
-:class:`SymDifference`                X        X              X
-:class:`Transform`                    X        X              X
-:class:`Translate`                    X                       X
-:class:`Union`                        X        X              X
-====================================  =======  ======  =====  ==========
+:class:`NumGeometries`                X        X       X            X
+:class:`NumPoints`                    X        X       X            X
+:class:`Perimeter`                    X        X                    X (≥ 4.0)
+:class:`PointOnSurface`               X        X                    X
+:class:`Reverse`                      X        X                    X (≥ 4.0)
+:class:`Scale`                        X                             X
+:class:`SnapToGrid`                   X                             X (≥ 3.1)
+:class:`SymDifference`                X        X                    X
+:class:`Transform`                    X        X                    X
+:class:`Translate`                    X                             X
+:class:`Union`                        X        X       X (≥ 5.6.1)  X
+====================================  =======  ======  ===========  ==========
 
 Aggregate Functions
 -------------------
