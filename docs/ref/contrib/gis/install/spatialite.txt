@@ -56,45 +56,18 @@ __ http://www.sqlite.org/download.html
 
 .. _spatialitebuild:
 
-SpatiaLite library (``libspatialite``) and tools (``spatialite``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SpatiaLite library (``libspatialite``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get the latest SpatiaLite library source and tools bundle from the
+Get the latest SpatiaLite library source bundle from the
 `download page`__::
 
-    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-amalgamation-2.4.0-5.tar.gz
-    $ wget http://www.gaia-gis.it/gaia-sins/spatialite-tools-sources/spatialite-tools-2.4.0-5.tar.gz
-    $ tar xzf libspatialite-amalgamation-2.4.0-5.tar.gz
-    $ tar xzf spatialite-tools-2.4.0-5.tar.gz
-
-Prior to attempting to build, please read the important notes below to see if
-customization of the ``configure`` command is necessary.  If not, then run the
-``configure`` script, make, and install for the SpatiaLite library::
-
-    $ cd libspatialite-amalgamation-2.4.0-5
-    $ ./configure # May need to be modified, see notes below.
+    $ wget http://www.gaia-gis.it/gaia-sins/libspatialite-sources/libspatialite-4.1.0.tar.gz
+    $ tar xaf libspatialite-4.1.0.tar.gz
+    $ cd libspatialite-4.1.0
+    $ ./configure
     $ make
     $ sudo make install
-    $ cd ..
-
-.. _spatialite_tools:
-
-Finally, do the same for the SpatiaLite tools::
-
-    $ cd spatialite-tools-2.4.0-5
-    $ ./configure # May need to be modified, see notes below.
-    $ make
-    $ sudo make install
-    $ cd ..
-
-.. note::
-
-    If you've installed GEOS and PROJ.4 from binary packages, you will have to specify
-    their paths when running the ``configure`` scripts for *both* the library and the
-    tools (the configure scripts look, by default, in ``/usr/local``).  For example,
-    on Debian/Ubuntu distributions that have GEOS and PROJ.4 packages, the command would be::
-
-       $ ./configure --with-proj-include=/usr/include --with-proj-lib=/usr/lib --with-geos-include=/usr/include --with-geos-lib=/usr/lib
 
 .. note::
 
