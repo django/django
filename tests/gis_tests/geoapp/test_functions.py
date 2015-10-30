@@ -246,10 +246,9 @@ class GISFunctionsTests(TestCase):
 
         qs = City.objects.filter(point__isnull=False).annotate(num_geom=functions.NumGeometries('point'))
         for city in qs:
-            # Oracle and PostGIS 2.0+ will return 1 for the number of
-            # geometries on non-collections, whereas PostGIS < 2.0.0 and MySQL
-            # will return None.
-            if (postgis and connection.ops.spatial_version < (2, 0, 0)) or mysql:
+            # Oracle and PostGIS return 1 for the number of geometries on
+            # non-collections, whereas MySQL returns None.
+            if mysql:
                 self.assertIsNone(city.num_geom)
             else:
                 self.assertEqual(1, city.num_geom)
