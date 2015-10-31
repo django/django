@@ -1112,7 +1112,7 @@ Specifying the parent link field
 
 As mentioned, Django will automatically create a
 :class:`~django.db.models.OneToOneField` linking your child
-class back any non-abstract parent models. If you want to control the
+class back to any non-abstract parent models. If you want to control the
 name of the attribute linking back to the parent, you can create your
 own :class:`~django.db.models.OneToOneField` and set
 :attr:`parent_link=True <django.db.models.OneToOneField.parent_link>`
