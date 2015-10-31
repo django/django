@@ -373,8 +373,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     @property
     def ewkt(self):
         """
-        Returns the EWKT (SRID + WKT) of the Geometry. Note that Z values
-        are only included in this representation if GEOS >= 3.3.0.
+        Returns the EWKT (SRID + WKT) of the Geometry.
         """
         if self.get_srid():
             return 'SRID=%s;%s' % (self.srid, self.wkt)

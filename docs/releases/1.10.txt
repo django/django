@@ -299,7 +299,7 @@ Miscellaneous
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-* Support for SpatiaLite < 3.0 is dropped.
+* Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
 
 .. _deprecated-features-1.10:
 

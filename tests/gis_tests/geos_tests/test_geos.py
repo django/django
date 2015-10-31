@@ -13,7 +13,7 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import (
     HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, LinearRing,
     LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
-    fromfile, fromstr, geos_version_info,
+    fromfile, fromstr,
 )
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
@@ -77,7 +77,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         "Testing WKT output."
         for g in self.geometries.wkt_out:
             geom = fromstr(g.wkt)
-            if geom.hasz and geos_version_info()['version'] >= '3.3.0':
+            if geom.hasz:
                 self.assertEqual(g.ewkt, geom.wkt)
 
     def test_hex(self):
@@ -1014,15 +1014,14 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
             self.assertEqual(c, prep.covers(pnt))
 
-        if geos_version_info()['version'] > '3.3.0':
-            self.assertTrue(prep.crosses(fromstr('LINESTRING(1 1, 15 15)')))
-            self.assertTrue(prep.disjoint(Point(-5, -5)))
-            poly = Polygon(((-1, -1), (1, 1), (1, 0), (-1, -1)))
-            self.assertTrue(prep.overlaps(poly))
-            poly = Polygon(((-5, 0), (-5, 5), (0, 5), (-5, 0)))
-            self.assertTrue(prep.touches(poly))
-            poly = Polygon(((-1, -1), (-1, 11), (11, 11), (11, -1), (-1, -1)))
-            self.assertTrue(prep.within(poly))
+        self.assertTrue(prep.crosses(fromstr('LINESTRING(1 1, 15 15)')))
+        self.assertTrue(prep.disjoint(Point(-5, -5)))
+        poly = Polygon(((-1, -1), (1, 1), (1, 0), (-1, -1)))
+        self.assertTrue(prep.overlaps(poly))
+        poly = Polygon(((-5, 0), (-5, 5), (0, 5), (-5, 0)))
+        self.assertTrue(prep.touches(poly))
+        poly = Polygon(((-1, -1), (-1, 11), (11, 11), (11, -1), (-1, -1)))
+        self.assertTrue(prep.within(poly))
 
         # Original geometry deletion should not crash the prepared one (#21662)
         del mpoly

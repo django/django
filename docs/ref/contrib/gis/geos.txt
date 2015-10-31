@@ -160,11 +160,6 @@ WKB / EWKB     ``buffer``
 GeoJSON        ``str`` or ``unicode``
 =============  ======================
 
-.. note::
-
-    The new 3D/4D WKT notation with an intermediary Z or M (like
-    ``POINT Z (3, 4, 5)``) is only supported with GEOS 3.3.0 or later.
-
 Properties
 ~~~~~~~~~~
 
@@ -748,35 +743,15 @@ For example::
 
   .. method:: crosses(other)
 
-    .. note::
-
-       GEOS 3.3 is *required* to use this predicate.
-
   .. method:: disjoint(other)
-
-    .. note::
-
-       GEOS 3.3 is *required* to use this predicate.
 
   .. method:: intersects(other)
 
   .. method:: overlaps(other)
 
-    .. note::
-
-       GEOS 3.3 is *required* to use this predicate.
-
   .. method:: touches(other)
 
-    .. note::
-
-       GEOS 3.3 is *required* to use this predicate.
-
   .. method:: within(other)
-
-    .. note::
-
-       GEOS 3.3 is *required* to use this predicate.
 
 Geometry Factories
 ==================

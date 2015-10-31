@@ -20,11 +20,9 @@ class PreparedPredicate(GEOSFuncFactory):
 prepared_contains = PreparedPredicate('GEOSPreparedContains')
 prepared_contains_properly = PreparedPredicate('GEOSPreparedContainsProperly')
 prepared_covers = PreparedPredicate('GEOSPreparedCovers')
-prepared_intersects = PreparedPredicate('GEOSPreparedIntersects')
-
-# Functions added in GEOS 3.3
 prepared_crosses = PreparedPredicate('GEOSPreparedCrosses')
 prepared_disjoint = PreparedPredicate('GEOSPreparedDisjoint')
+prepared_intersects = PreparedPredicate('GEOSPreparedIntersects')
 prepared_overlaps = PreparedPredicate('GEOSPreparedOverlaps')
 prepared_touches = PreparedPredicate('GEOSPreparedTouches')
 prepared_within = PreparedPredicate('GEOSPreparedWithin')
