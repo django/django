@@ -47,23 +47,10 @@ wkt_writer_write = GEOSFuncFactory(
     'GEOSWKTWriter_write', argtypes=[WKT_WRITE_PTR, GEOM_PTR], restype=geos_char_p, errcheck=check_string
 )
 
-
-class WKTOutputDim(GEOSFuncFactory):
-    def get_func(self, *args, **kwargs):
-        try:
-            return super(WKTOutputDim, self).get_func(*args, **kwargs)
-        except AttributeError:
-            # GEOSWKTWriter_get/setOutputDimension has been introduced in GEOS 3.3.0
-            # Always return 2 if not available
-            return {
-                'GEOSWKTWriter_getOutputDimension': lambda ptr: 2,
-                'GEOSWKTWriter_setOutputDimension': lambda ptr, dim: None,
-            }.get(self.func_name)
-
-wkt_writer_get_outdim = WKTOutputDim(
+wkt_writer_get_outdim = GEOSFuncFactory(
     'GEOSWKTWriter_getOutputDimension', argtypes=[WKT_WRITE_PTR], restype=c_int
 )
-wkt_writer_set_outdim = WKTOutputDim(
+wkt_writer_set_outdim = GEOSFuncFactory(
     'GEOSWKTWriter_setOutputDimension', argtypes=[WKT_WRITE_PTR, c_int]
 )
 

@@ -4,9 +4,7 @@ import re
 from decimal import Decimal
 
 from django.contrib.gis.db.models import functions
-from django.contrib.gis.geos import (
-    LineString, Point, Polygon, fromstr, geos_version_info,
-)
+from django.contrib.gis.geos import LineString, Point, Polygon, fromstr
 from django.db import connection
 from django.test import TestCase, skipUnlessDBFeature
 from django.utils import six
@@ -375,8 +373,6 @@ class GISFunctionsTests(TestCase):
 
     @skipUnlessDBFeature("has_SymDifference_function")
     def test_sym_difference(self):
-        if geos_version_info()['version'] < '3.3.0':
-            self.skipTest("GEOS >= 3.3 required")
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
         for country in qs:
