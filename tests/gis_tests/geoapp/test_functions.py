@@ -169,9 +169,9 @@ class GISFunctionsTests(TestCase):
             qs = qs.exclude(name='Texas')
 
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.diff)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.diff))
 
-    @skipUnlessDBFeature("has_Difference_function")
+    @skipUnlessDBFeature("has_Difference_function", "has_Transform_function")
     def test_difference_mixed_srid(self):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
@@ -180,7 +180,7 @@ class GISFunctionsTests(TestCase):
         if spatialite:
             qs = qs.exclude(name='Texas')
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
 
     @skipUnlessDBFeature("has_Envelope_function")
     def test_envelope(self):
@@ -218,8 +218,8 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(inter=functions.Intersection('mpoly', geom))
         for c in qs:
-            if spatialite:
-                # When the intersection is empty, Spatialite returns None
+            if spatialite or mysql:
+                # When the intersection is empty, Spatialite and MySQL return None
                 expected = None
             else:
                 expected = c.mpoly.intersection(geom)
@@ -376,9 +376,7 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
         for country in qs:
-            # Ordering might differ in collections
-            self.assertSetEqual(set(g.wkt for g in country.mpoly.sym_difference(geom)),
-                                set(g.wkt for g in country.sym_difference))
+            self.assertTrue(country.mpoly.sym_difference(geom).equals(country.sym_difference))
 
     @skipUnlessDBFeature("has_Transform_function")
     def test_transform(self):
@@ -431,14 +429,11 @@ class GISFunctionsTests(TestCase):
             # SpatiaLite).
             return
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
-            if not spatialite:
+            self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
+            if not (spatialite or mysql):
                 self.assertEqual(c.mpoly.intersection(geom), c.intersection)
-            # Ordering might differ in collections
-            self.assertSetEqual(set(g.wkt for g in c.mpoly.sym_difference(geom)),
-                                set(g.wkt for g in c.sym_difference))
-            self.assertSetEqual(set(g.wkt for g in c.mpoly.union(geom)),
-                                set(g.wkt for g in c.union))
+            self.assertTrue(c.mpoly.sym_difference(geom).equals(c.sym_difference))
+            self.assertTrue(c.mpoly.union(geom).equals(c.union))
 
     @skipUnlessDBFeature("has_Union_function")
     def test_union(self):
