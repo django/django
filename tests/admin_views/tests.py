@@ -2025,6 +2025,31 @@ class AdminViewPermissionsTest(TestCase):
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
 
+    def test_no_forbidden_links_visible(self):
+        """
+        Ensure that we do not display any links that will lead to 403 page.
+        """
+        login = self.client.post(reverse('admin:login'), self.adduser_login)
+        self.assertRedirects(login, self.index_url)
+        # Emulate Article creation for user with add-only permission.
+        post_data = {
+            "title": "Some title",
+            "content": "Some content",
+            "date_0": "2015-10-31",
+            "date_1": "16:35:00",
+            "_save": "Save",
+        }
+        response = self.client.post(reverse('admin:admin_views_article_add'),
+                                    post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        # Post save message should not containe the link to change form
+        # since current user does not have edit permission.
+        self.assertContains(
+            response,
+            '<li class="success">The article "Some title" was added successfully.</li>',
+            html=True
+        )
+
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
     ROOT_URLCONF="admin_views.urls")

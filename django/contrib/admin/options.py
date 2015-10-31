@@ -1065,9 +1065,13 @@ class ModelAdmin(BaseModelAdmin):
             args=(quote(pk_value),),
             current_app=self.admin_site.name,
         )
+        if self.has_change_permission(request, obj):
+            obj_repr = format_html('<a href="{0}">{1}</a>', urlquote(obj_url), obj)
+        else:
+            obj_repr = force_text(obj)
         msg_dict = {
             'name': force_text(opts.verbose_name),
-            'obj': format_html('<a href="{0}">{1}</a>', urlquote(obj_url), obj),
+            'obj': obj_repr,
         }
         # Here, we distinguish between different save types by checking for
         # the presence of keys in request.POST.
