@@ -123,10 +123,7 @@ class Transform(RegisterLookupMixin, Func):
     first examine self and then check output_field.
     """
     bilateral = False
-
-    def __init__(self, expression, **extra):
-        # Restrict Transform to allow only a single expression.
-        super(Transform, self).__init__(expression, **extra)
+    arity = 1
 
     @property
     def lhs(self):

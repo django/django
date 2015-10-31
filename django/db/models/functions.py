@@ -145,9 +145,6 @@ class Lower(Transform):
     function = 'LOWER'
     lookup_name = 'lower'
 
-    def __init__(self, expression, **extra):
-        super(Lower, self).__init__(expression, **extra)
-
 
 class Now(Func):
     template = 'CURRENT_TIMESTAMP'
@@ -197,6 +194,3 @@ class Substr(Func):
 class Upper(Transform):
     function = 'UPPER'
     lookup_name = 'upper'
-
-    def __init__(self, expression, **extra):
-        super(Upper, self).__init__(expression, **extra)

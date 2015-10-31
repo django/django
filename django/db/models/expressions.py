@@ -482,8 +482,18 @@ class Func(Expression):
     function = None
     template = '%(function)s(%(expressions)s)'
     arg_joiner = ', '
+    arity = None  # The number of arguments the function accepts.
 
     def __init__(self, *expressions, **extra):
+        if self.arity is not None and len(expressions) != self.arity:
+            raise TypeError(
+                "'%s' takes exactly %s %s (%s given)" % (
+                    self.__class__.__name__,
+                    self.arity,
+                    "argument" if self.arity == 1 else "arguments",
+                    len(expressions),
+                )
+            )
         output_field = extra.pop('output_field', None)
         super(Func, self).__init__(output_field=output_field)
         self.source_expressions = self._parse_expressions(*expressions)

@@ -389,6 +389,9 @@ class FunctionTests(TestCase):
             lambda a: (a.lower_name, a.name)
         )
 
+        with self.assertRaisesMessage(TypeError, "'Lower' takes exactly 1 argument (2 given)"):
+            Author.objects.update(name=Lower('name', 'name'))
+
     def test_upper(self):
         Author.objects.create(name='John Smith', alias='smithj')
         Author.objects.create(name='Rhonda')
