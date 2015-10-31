@@ -176,7 +176,7 @@ Centroid
 
 .. class:: Centroid(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL, PostGIS, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the ``centroid``
 value of the geometry.
@@ -241,7 +241,7 @@ Envelope
 
 .. class:: Envelope(expression, **extra)
 
-*Availability*: PostGIS, SpatiaLite
+*Availability*: MySQL, PostGIS, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
@@ -311,7 +311,7 @@ NumGeometries
 
 .. class:: NumGeometries(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL, PostGIS, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of
 geometries if the geometry field is a collection (e.g., a ``GEOMETRYCOLLECTION``
@@ -322,7 +322,7 @@ NumPoints
 
 .. class:: NumPoints(expression, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL, PostGIS, Oracle, SpatiaLite
 
 Accepts a single geographic field or expression and returns the number of points
 in the first linestring in the geometry field; otherwise returns ``None``.

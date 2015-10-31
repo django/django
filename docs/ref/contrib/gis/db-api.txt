@@ -311,17 +311,17 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 :class:`AsKML`                        X                             X
 :class:`AsSVG`                        X                             X
 :class:`BoundingCircle`               X
-:class:`Centroid`                     X        X                    X
+:class:`Centroid`                     X        X       X            X
 :class:`Difference`                   X        X                    X
 :class:`Distance`                     X        X       X (≥ 5.6.1)  X
-:class:`Envelope`                     X                             X
+:class:`Envelope`                     X                X            X
 :class:`ForceRHR`                     X
 :class:`GeoHash`                      X
 :class:`Intersection`                 X        X                    X
 :class:`Length`                       X        X       X            X
 :class:`MemSize`                      X
-:class:`NumGeometries`                X        X                    X
-:class:`NumPoints`                    X        X                    X
+:class:`NumGeometries`                X        X       X            X
+:class:`NumPoints`                    X        X       X            X
 :class:`Perimeter`                    X        X                    X (≥ 4.0)
 :class:`PointOnSurface`               X        X                    X
 :class:`Reverse`                      X        X                    X (≥ 4.0)
