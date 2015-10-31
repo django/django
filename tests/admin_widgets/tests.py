@@ -1033,9 +1033,8 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
                          str(self.arthur.id), str(self.cliff.id)])
 
     def test_basic(self):
-        self.school.students = [self.lisa, self.peter]
-        self.school.alumni = [self.lisa, self.peter]
-        self.school.save()
+        self.school.students.set([self.lisa, self.peter])
+        self.school.alumni.set([self.lisa, self.peter])
 
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get('%s%s' % (
@@ -1061,9 +1060,8 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         """
         from selenium.webdriver.common.keys import Keys
 
-        self.school.students = [self.lisa, self.peter]
-        self.school.alumni = [self.lisa, self.peter]
-        self.school.save()
+        self.school.students.set([self.lisa, self.peter])
+        self.school.alumni.set([self.lisa, self.peter])
 
         self.admin_login(username='super', password='secret', login_url='/')
         self.selenium.get(
