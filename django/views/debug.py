@@ -9,10 +9,11 @@ from django.core.urlresolvers import Resolver404, resolve
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
 from django.template.defaultfilters import force_escape, pprint
-from django.utils import lru_cache, six, timezone
+from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_bytes, smart_text
 from django.utils.module_loading import import_string
+from django.utils.timezone import datetime, localtime, utc
 from django.utils.translation import ugettext as _
 
 # Minimal Django templates engine to render the error templates
@@ -285,6 +286,9 @@ class ExceptionReporter(object):
                     'ascii', errors='replace'
                 )
         from django import get_version
+        # NOTE: server_time does not use timezone.now(), which can return naive
+        # dates if USE_TZ = False. This results in the debug view breaking during
+        # DST changes, hence we use UTC and localize properly!
         c = {
             'is_email': self.is_email,
             'unicode_hint': unicode_hint,
@@ -294,7 +298,7 @@ class ExceptionReporter(object):
             'settings': get_safe_settings(),
             'sys_executable': sys.executable,
             'sys_version_info': '%d.%d.%d' % sys.version_info[0:3],
-            'server_time': timezone.now(),
+            'server_time': localtime(datetime.utcnow().replace(tzinfo=utc)),
             'django_version_info': get_version(),
             'sys_path': sys.path,
             'template_info': self.template_info,
