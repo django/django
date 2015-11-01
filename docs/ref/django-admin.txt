@@ -354,11 +354,12 @@ Specifies the database to flush. Defaults to ``default``.
 ``inspectdb``
 -------------
 
-.. django-admin:: inspectdb
+.. django-admin:: inspectdb [table [table ...]]
 
 Introspects the database tables in the database pointed-to by the
 :setting:`NAME` setting and outputs a Django model module (a ``models.py``
-file) to standard output.
+file) to standard output. You may choose what tables to inspect by passing
+their names as arguments.
 
 Use this if you have a legacy database with which you'd like to use Django.
 The script will inspect the database and create a model for each table within
@@ -405,6 +406,11 @@ modification, and deletion. If you do want to allow Django to manage the
 table's lifecycle, you'll need to change the
 :attr:`~django.db.models.Options.managed` option to ``True`` (or simply remove
 it because ``True`` is its default value).
+
+.. versionadded:: 1.10
+
+    Support for the ``table`` argument(s) to choose what tables should be
+    inspected was added.
 
 .. django-admin-option:: --database DATABASE
 
