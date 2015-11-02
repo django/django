@@ -625,6 +625,12 @@ It is an error to pass in ``flat`` when there is more than one field.
 If you don't pass any values to ``values_list()``, it will return all the
 fields in the model, in the order they were declared.
 
+A common need is to get a specific field value of a certain model instance. To
+achieve that, use ``values_list()`` followed by a ``get()`` call::
+
+    >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
+    'First entry'
+
 dates
 ~~~~~
 
