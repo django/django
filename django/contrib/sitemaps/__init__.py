@@ -6,7 +6,7 @@ from django.utils import translation
 from django.utils.six.moves.urllib.parse import urlencode
 from django.utils.six.moves.urllib.request import urlopen
 
-PING_URL = "http://www.google.com/webmasters/tools/ping"
+PING_URL = "https://www.google.com/webmasters/tools/ping"
 
 
 class SitemapNotFound(Exception):
