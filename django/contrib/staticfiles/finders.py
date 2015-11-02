@@ -22,6 +22,9 @@ class BaseFinder(object):
     A base file finder to be used for custom staticfiles finder classes.
     """
 
+    def __init__(self, *args, **kwargs):
+        super(BaseFinder, self).__init__()
+
     def find(self, path, all=False):
         """
         Given a relative file path this ought to find an
