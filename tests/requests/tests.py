@@ -857,8 +857,10 @@ class DataUploadMaxMemorySizeMPostTests(SimpleTestCase):
 
     def test_size_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_MEMORY_SIZE=10):
-            with self.assertRaisesMessage(RequestBodyTooBig,
-                                          'Request body too big. Check DATA_UPLOAD_MAX_MEMORY_SIZE.'):
+            with self.assertRaisesMessage(
+                    RequestBodyTooBig,
+                    'The size of the request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
+            ):
                 self.request._load_post_and_files()
 
     def test_size_not_exceeded(self):
@@ -893,8 +895,10 @@ class DataUploadMaxNumberOfFieldsGet(SimpleTestCase):
 
     def test_get_max_fields_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=1):
-            with self.assertRaisesMessage(TooManyFieldsSent,
-                                          'Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.'):
+            with self.assertRaisesMessage(
+                    TooManyFieldsSent,
+                    'The number of fields in a POST request exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            ):
                 request = WSGIRequest({
                     'REQUEST_METHOD': 'GET',
                     'wsgi.input': BytesIO(b''),
@@ -963,8 +967,10 @@ class DataUploadMaxNumberOfFieldsFPost(SimpleTestCase):
 
     def test_number_exceeded(self):
         with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=2):
-            with self.assertRaisesMessage(TooManyFieldsSent,
-                                          'Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.'):
+            with self.assertRaisesMessage(
+                    TooManyFieldsSent,
+                    'The number of fields in a POST request exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            ):
                 self.request._load_post_and_files()
 
     def test_number_not_exceeded(self):
