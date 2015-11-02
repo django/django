@@ -2749,6 +2749,61 @@ The presence of the ``admin_password_reset`` named URL will cause a "forgotten
 your password?" link to appear on the default admin log-in page under the
 password box.
 
+.. _admin-logentries:
+
+``LogEntry`` objects
+====================
+
+.. class:: django.contrib.admin.models.LogEntry
+
+    The ``LogEntry`` class represents your activity in the admin interface:
+    additions, changes and deletions of objects.
+
+``LogEntry`` attributes
+-----------------------
+
+.. attribute:: LogEntry.action_time
+
+    The date and time of the action.
+
+.. attribute:: LogEntry.user
+
+    The user responsible of the action, an :setting:`AUTH_USER_MODEL` instance.
+
+.. attribute:: LogEntry.content_type
+
+    The content type of the modified object, a
+    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+
+.. attribute:: LogEntry.object_id
+
+    The textual representation of the modified object`s primary key.
+
+.. attribute:: LogEntry.object_repr
+
+    The object`s ``repr()`` after the modification.
+
+.. attribute:: LogEntry.action_flag
+
+    The type of action logged: ``ADDITION``, ``CHANGE``, ``DELETION``::
+
+        from django.contrib.admin.models import LogEntry, ADDITION
+
+        # Get all the additions via admin
+        LogEntry.objects.filter(action_flag=ADDITION)
+
+.. attribute:: LogEntry.change_message
+
+    The detailed description of the modification, including, for example, changed field names.
+
+``LogEntry`` methods
+-----------------------
+
+.. method:: LogEntry.get_edited_object()
+
+    A shortcut to get the referenced object from within the log record.
+
+
 .. _admin-reverse-urls:
 
 Reversing admin URLs
