@@ -82,7 +82,7 @@ to_wkt = StringFromGeom('GEOSGeomToWKT')
 geos_normalize = IntFromGeom('GEOSNormalize')
 geos_type = StringFromGeom('GEOSGeomType')
 geos_typeid = IntFromGeom('GEOSGeomTypeId')
-get_dims = IntFromGeom('GEOSGeom_getDimensions', zero=True)
+get_dims = GEOSFuncFactory('GEOSGeom_getDimensions', argtypes=[GEOM_PTR], restype=c_int)
 get_num_coords = IntFromGeom('GEOSGetNumCoordinates')
 get_num_geoms = IntFromGeom('GEOSGetNumGeometries')
 

@@ -228,6 +228,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             pnt = fromstr(p.wkt)
             self.assertEqual(pnt.geom_type, 'Point')
             self.assertEqual(pnt.geom_typeid, 0)
+            self.assertEqual(pnt.dims, 0)
             self.assertEqual(p.x, pnt.x)
             self.assertEqual(p.y, pnt.y)
             self.assertEqual(pnt, fromstr(p.wkt))
@@ -281,6 +282,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             mpnt = fromstr(mp.wkt)
             self.assertEqual(mpnt.geom_type, 'MultiPoint')
             self.assertEqual(mpnt.geom_typeid, 4)
+            self.assertEqual(mpnt.dims, 0)
 
             self.assertAlmostEqual(mp.centroid[0], mpnt.centroid.tuple[0], 9)
             self.assertAlmostEqual(mp.centroid[1], mpnt.centroid.tuple[1], 9)
@@ -301,6 +303,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             ls = fromstr(l.wkt)
             self.assertEqual(ls.geom_type, 'LineString')
             self.assertEqual(ls.geom_typeid, 1)
+            self.assertEqual(ls.dims, 1)
             self.assertEqual(ls.empty, False)
             self.assertEqual(ls.ring, False)
             if hasattr(l, 'centroid'):
@@ -329,6 +332,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             ml = fromstr(l.wkt)
             self.assertEqual(ml.geom_type, 'MultiLineString')
             self.assertEqual(ml.geom_typeid, 5)
+            self.assertEqual(ml.dims, 1)
 
             self.assertAlmostEqual(l.centroid[0], ml.centroid.x, 9)
             self.assertAlmostEqual(l.centroid[1], ml.centroid.y, 9)
@@ -352,6 +356,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             lr = fromstr(rr.wkt)
             self.assertEqual(lr.geom_type, 'LinearRing')
             self.assertEqual(lr.geom_typeid, 2)
+            self.assertEqual(lr.dims, 1)
             self.assertEqual(rr.n_p, len(lr))
             self.assertEqual(True, lr.valid)
             self.assertEqual(False, lr.empty)
@@ -385,6 +390,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             poly = fromstr(p.wkt)
             self.assertEqual(poly.geom_type, 'Polygon')
             self.assertEqual(poly.geom_typeid, 3)
+            self.assertEqual(poly.dims, 2)
             self.assertEqual(poly.empty, False)
             self.assertEqual(poly.ring, False)
             self.assertEqual(p.n_i, poly.num_interior_rings)
@@ -462,6 +468,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             mpoly = fromstr(mp.wkt)
             self.assertEqual(mpoly.geom_type, 'MultiPolygon')
             self.assertEqual(mpoly.geom_typeid, 6)
+            self.assertEqual(mpoly.dims, 2)
             self.assertEqual(mp.valid, mpoly.valid)
 
             if mp.valid:
@@ -830,6 +837,19 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                 self.assertRaises(IndexError, lr.__getitem__, 0)
             else:
                 self.assertRaises(IndexError, g.__getitem__, 0)
+
+    def test_collection_dims(self):
+        gc = GeometryCollection([])
+        self.assertEqual(gc.dims, -1)
+
+        gc = GeometryCollection(Point(0, 0))
+        self.assertEqual(gc.dims, 0)
+
+        gc = GeometryCollection(LineString((0, 0), (1, 1)), Point(0, 0))
+        self.assertEqual(gc.dims, 1)
+
+        gc = GeometryCollection(LineString((0, 0), (1, 1)), Polygon(((0, 0), (0, 1), (1, 1), (0, 0))), Point(0, 0))
+        self.assertEqual(gc.dims, 2)
 
     def test_collections_of_collections(self):
         "Testing GeometryCollection handling of other collections."
