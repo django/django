@@ -748,6 +748,38 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # self.assertEqual((3.14, 2.71), mpoly[0].shell[0])
         # del mpoly
 
+    def test_point_list_assignment(self):
+        p = Point(0, 0)
+
+        p[:] = (1, 2, 3)
+        self.assertEqual(p, Point(1, 2, 3))
+
+        p[:] = (1, 2)
+        self.assertEqual(p.wkt, Point(1, 2))
+
+        with self.assertRaises(ValueError):
+            p[:] = (1,)
+        with self.assertRaises(ValueError):
+            p[:] = (1, 2, 3, 4, 5)
+
+    def test_linestring_list_assignment(self):
+        ls = LineString((0, 0), (1, 1))
+
+        ls[:] = ((0, 0), (1, 1), (2, 2))
+        self.assertEqual(ls, LineString((0, 0), (1, 1), (2, 2)))
+
+        with self.assertRaises(ValueError):
+            ls[:] = (1,)
+
+    def test_linearring_list_assignment(self):
+        ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
+
+        ls[:] = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
+        self.assertEqual(ls, LinearRing((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
+
+        with self.assertRaises(ValueError):
+            ls[:] = ((0, 0), (1, 1), (2, 2))
+
     def test_threed(self):
         "Testing three-dimensional geometries."
         # Testing a 3D Point
