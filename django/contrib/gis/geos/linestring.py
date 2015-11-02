@@ -167,5 +167,5 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
 
 # LinearRings are LineStrings used within Polygons.
 class LinearRing(LineString):
-    _minLength = 4
+    _minlength = 4
     _init_func = capi.create_linearring
