@@ -443,6 +443,10 @@ Management Commands
 * Management commands that have the ``--noinput`` option now also take
   ``--no-input`` as an alias for that option.
 
+* The :djadmin:`inspectdb` command now lets you choose what table/views should
+  be inspected by specifying their names with the command.
+
+
 Migrations
 ^^^^^^^^^^
 
