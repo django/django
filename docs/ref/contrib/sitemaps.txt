@@ -494,7 +494,7 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
     The :func:`ping_google` command only works if you have registered your
     site with `Google Webmaster Tools`_.
 
-.. _`Google Webmaster Tools`: http://www.google.com/webmasters/tools/
+.. _`Google Webmaster Tools`: https://www.google.com/webmasters/tools/
 
 One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
