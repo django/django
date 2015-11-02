@@ -655,6 +655,12 @@ like a list. Most of the time this is enough, but if you require an actual
 Python list object, you can simply call ``list()`` on it, which will evaluate
 the queryset.
 
+A common need is to get a specific field value of a certain model instance. To
+achieve that, use ``values_list()`` followed by a ``get()`` call::
+
+    >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
+    'First entry'
+
 dates
 ~~~~~
 
