@@ -54,12 +54,18 @@ class DisallowedRedirect(SuspiciousOperation):
 
 
 class TooManyFieldsSent(SuspiciousOperation):
-    """Request has too many fields to parse"""
+    """
+    The number of fields in a POST request exceeded
+    settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.
+    """
     pass
 
 
 class RequestBodyTooBig(SuspiciousOperation):
-    """Request is too big to parse"""
+    """
+    The size of the request body (excluding any file uploads)
+    exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.
+    """
     pass
 
 

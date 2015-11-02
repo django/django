@@ -346,7 +346,9 @@ def limited_parse_qsl(qs, keep_blank_values=False,
     if fields_limit:
         pairs = FIELDS_MATCH.split(qs, fields_limit)
         if len(pairs) > fields_limit:
-            raise TooManyFieldsSent('Too many fields sent. Check DATA_UPLOAD_MAX_NUMBER_FIELDS.')
+            raise TooManyFieldsSent(
+                'The number of fields in a POST request exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+            )
     else:
         pairs = FIELDS_MATCH.split(qs)
     r = []

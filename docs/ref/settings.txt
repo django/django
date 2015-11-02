@@ -875,7 +875,7 @@ The maximum size that the DATAFILE_TMP is allowed to grow to.
 DATA_UPLOAD_MAX_MEMORY_SIZE
 ---------------------------
 
-.. versionadded:: 1.9
+.. versionadded:: 1.10
 
 Default: ``2621440`` (i.e. 2.5 MB).
 
@@ -893,7 +893,7 @@ See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 DATA_UPLOAD_MAX_NUMBER_FIELDS
 -----------------------------
 
-.. versionadded:: 1.9
+.. versionadded:: 1.10
 
 Default: ``1000``
 
