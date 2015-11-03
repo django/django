@@ -884,7 +884,14 @@ The maximum size (in bytes) that a request body may be before a
 when accessing ``request.body`` or ``request.POST`` and is calculated against
 the total request size excluding any file upload data. You can set it to
 ``None`` to disable the check. When processing forms with very large field values,
-or with a large number of fields, this limit may need to be increased.
+or with a large number of fields, this limit may need to be increased. Since web
+servers typically do not do deep request inspection it's not possible to limit
+there the amount of data Django would have to process excluding file uploads.
+This amount of data is directly correlated to the amount of memory needed to
+process the request and populate the GET and POST dictionaries. As such, it could
+be used as an attack vector if left unchecked. Installations that are supposed to
+receive form posts with large values (> 2.5MB in total) should review the default
+value of this setting.
 
 See also :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`.
 
@@ -900,7 +907,14 @@ Default: ``1000``
 The maximum number of parameters received either via GET, or FORM POST before a
 :exc:`~django.core.exceptions.SuspiciousOperation` is raised. You can set it to
 ``None`` to disable the check. When processing forms with a very large number
-of fields, this limit may need to be increased.
+of fields, this limit may need to be increased. Since web servers typically do
+not do deep request inspection it's not possible to limit there the amount of
+parameters Django would have to process. This number of parameters is directly
+correlated to the amount of time needed to process the request and populate the
+GET and POST dictionaries. As such, it could be used as an attack vector if
+left unchecked. Installations that are supposed to receive form posts with a
+large number (> 1000) of parameters should review the default value of this
+setting.
 
 .. setting:: DATABASE_ROUTERS
 
