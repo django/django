@@ -108,6 +108,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     view_on_site = True
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
+    order = None
 
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)

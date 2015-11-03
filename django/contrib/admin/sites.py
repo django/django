@@ -443,10 +443,18 @@ class AdminSite(object):
                 continue
 
             info = (app_label, model._meta.model_name)
+            model_name = capfirst(model._meta.verbose_name_plural)
+            # Generate model order
+            try:
+                model_order = int(model_admin.order)
+            except (TypeError, ValueError):
+                model_order = None
+
             model_dict = {
-                'name': capfirst(model._meta.verbose_name_plural),
+                'name': model_name,
                 'object_name': model._meta.object_name,
                 'perms': perms,
+                'order': model_order,
             }
             if perms.get('change'):
                 try:
@@ -490,7 +498,7 @@ class AdminSite(object):
 
         # Sort the models alphabetically within each app.
         for app in app_list:
-            app['models'].sort(key=lambda x: x['name'])
+            app['models'].sort(key=lambda x: x['order'])
 
         return app_list
 
