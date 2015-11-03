@@ -136,7 +136,7 @@ class FunctionTests(TestCase):
         self.assertEqual(articles.first().last_updated, now)
 
     @skipIfDBFeature('greatest_least_ignores_nulls')
-    def test_greatest_propogates_null(self):
+    def test_greatest_propagates_null(self):
         now = timezone.now()
 
         Article.objects.create(title="Testing with Django", written=now)
@@ -231,7 +231,7 @@ class FunctionTests(TestCase):
         self.assertEqual(articles.first().first_updated, now)
 
     @skipIfDBFeature('greatest_least_ignores_nulls')
-    def test_least_propogates_null(self):
+    def test_least_propagates_null(self):
         now = timezone.now()
 
         Article.objects.create(title="Testing with Django", written=now)

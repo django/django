@@ -143,7 +143,7 @@ class ExtractorTests(SerializeMixin, SimpleTestCase):
 
         None can be passed for the line_number argument to skip checking of
         the :42 suffix part.
-        A string token can also be pased as line_number, in which case it
+        A string token can also be passed as line_number, in which case it
         will be searched in the template, and its line number will be used.
         A msgid is a suitable candidate.
         """
