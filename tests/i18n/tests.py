@@ -1750,7 +1750,7 @@ class LocaleMiddlewareTests(TestCase):
     LANGUAGES=[
         ('bg', 'Bulgarian'),
         ('en-us', 'English'),
-        ('pt-br', 'Portugese (Brazil)'),
+        ('pt-br', 'Portuguese (Brazil)'),
     ],
     MIDDLEWARE_CLASSES=[
         'django.middleware.locale.LocaleMiddleware',

@@ -760,20 +760,20 @@ class NamespaceTests(SimpleTestCase):
         "current_app should either match the whole path or shouldn't be used"
         self.assertEqual(
             '/ns-included1/test4/inner/',
-            reverse('inc-ns1:testapp:urlobject-view', current_app='non-existant:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-view', current_app='non-existent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/37/42/',
-            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='non-existant:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-view', args=[37, 42], current_app='non-existent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/42/37/',
             reverse('inc-ns1:testapp:urlobject-view', kwargs={'arg1': 42, 'arg2': 37},
-                    current_app='non-existant:test-ns3')
+                    current_app='non-existent:test-ns3')
         )
         self.assertEqual(
             '/ns-included1/test4/inner/+%5C$*/',
-            reverse('inc-ns1:testapp:urlobject-special-view', current_app='non-existant:test-ns3')
+            reverse('inc-ns1:testapp:urlobject-special-view', current_app='non-existent:test-ns3')
         )
 
 

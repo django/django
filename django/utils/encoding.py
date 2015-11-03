@@ -223,7 +223,7 @@ def escape_uri_path(path):
     #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
     #   unreserved  = alphanum | mark
     #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
-    # The list of safe characters here is constructed substracting ";", "=",
+    # The list of safe characters here is constructed subtracting ";", "=",
     # and "?" according to section 3.3 of RFC 2396.
     # The reason for not subtracting and escaping "/" is that we are escaping
     # the entire path, not a path segment.

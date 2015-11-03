@@ -966,7 +966,7 @@ class TestCase(TransactionTestCase):
     Similar to TransactionTestCase, but uses `transaction.atomic()` to achieve
     test isolation.
 
-    In most situation, TestCase should be prefered to TransactionTestCase as
+    In most situations, TestCase should be preferred to TransactionTestCase as
     it allows faster execution. However, there are some situations where using
     TransactionTestCase might be necessary (e.g. testing some transactional
     behavior).

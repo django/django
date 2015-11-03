@@ -292,7 +292,7 @@ class MultiColumnFKTests(TestCase):
 
         self.assertQuerysetEqual(self.jane.friends.all(), [])
 
-    def test_prefetch_related_m2m_foward_works(self):
+    def test_prefetch_related_m2m_forward_works(self):
         Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
         Membership.objects.create(membership_country=self.usa, person=self.jim, group=self.democrat)
 
