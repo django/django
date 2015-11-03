@@ -2749,15 +2749,13 @@ The presence of the ``admin_password_reset`` named URL will cause a "forgotten
 your password?" link to appear on the default admin log-in page under the
 password box.
 
-.. _admin-logentries:
-
 ``LogEntry`` objects
 ====================
 
 .. class:: django.contrib.admin.models.LogEntry
 
-    The ``LogEntry`` class represents your activity in the admin interface:
-    additions, changes and deletions of objects.
+    The ``LogEntry`` class tracks additions, changes, and deletions of objects
+    done through the admin interface.
 
 ``LogEntry`` attributes
 -----------------------
@@ -2768,16 +2766,17 @@ password box.
 
 .. attribute:: LogEntry.user
 
-    The user responsible of the action, an :setting:`AUTH_USER_MODEL` instance.
+    The user (an :setting:`AUTH_USER_MODEL` instance) responsible of the
+    action.
 
 .. attribute:: LogEntry.content_type
 
-    The content type of the modified object, a
-    :class:`~django.contrib.contenttypes.models.ContentType` instance.
+    The :class:`~django.contrib.contenttypes.models.ContentType` of the
+    modified object.
 
 .. attribute:: LogEntry.object_id
 
-    The textual representation of the modified object`s primary key.
+    The textual representation of the modified object's primary key.
 
 .. attribute:: LogEntry.object_repr
 
@@ -2785,24 +2784,24 @@ password box.
 
 .. attribute:: LogEntry.action_flag
 
-    The type of action logged: ``ADDITION``, ``CHANGE``, ``DELETION``::
+    The type of action logged: ``ADDITION``, ``CHANGE``, ``DELETION``. For
+    example, to get a list of all additions done through the admin::
 
         from django.contrib.admin.models import LogEntry, ADDITION
 
-        # Get all the additions via admin
         LogEntry.objects.filter(action_flag=ADDITION)
 
 .. attribute:: LogEntry.change_message
 
-    The detailed description of the modification, including, for example, changed field names.
+    The detailed description of the modification. In the case of an edit, for
+    example, the message contains a list of the edited fields.
 
 ``LogEntry`` methods
------------------------
+--------------------
 
 .. method:: LogEntry.get_edited_object()
 
-    A shortcut to get the referenced object from within the log record.
-
+    A shortcut that returns the referenced object.
 
 .. _admin-reverse-urls:
 
