@@ -448,7 +448,7 @@ class AdminSite(object):
             try:
                 model_order = int(model_admin.order)
             except (TypeError, ValueError):
-                model_order = None
+                model_order = model_name
 
             model_dict = {
                 'name': model_name,
