@@ -805,11 +805,25 @@ class ObjectLookupTests(LookupTests):
         season_2010.games.create(home="Houston Astros", away="Chicago Cubs")
 
         print('\n --------------------- start test -------------------------- ')
-        qs1 = Season.objects.exclude(games__home__icontains='Houston')
-        self.assertQuerysetEqual(qs1, [])
+        list(Season.objects.filter(games__home__contains='Cardinals'))
+        qs1 = Season.objects.exclude(games__home__contains='Cardinals')
+        self.assertQuerysetEqual(qs1, ['<Season: 2010>'])
 
-        qs2 = Season.objects.exclude(lookups.Contains(F('games__home'), Value('Houston')))
-        self.assertQuerysetEqual(qs2, [])
+        print('\n second test ')
+        qs2 = Season.objects.exclude(lookups.Contains(F('games__home'), 'Cardinals'))
+        self.assertQuerysetEqual(qs2, ['<Season: 2010>'])
+
+    def test_lookup_join(self):
+        season_2009 = Season.objects.create(year=2009, gt=111)
+        season_2009.games.create(home="Houston Astros", away="St. Louis Cardinals")
+        season_2009.games.create(home="Houston Astros", away="Chicago Cubs")
+        season_2009.games.create(home="St. Louis Cardinals", away="Houston Atros")
+
+        season_2010 = Season.objects.create(year=2010, gt=222)
+        season_2010.games.create(home="Houston Astros", away="Chicago Cubs")
+
+        lst = list(Season.objects.filter(lookups.Contains(F('games__home'), 'Houston')))
+        self.assertQuerysetEqual(lst, ['<Season: 2009>', '<Season: 2009>', '<Season: 2010>'])
 
 
 class LookupTransactionTests(TransactionTestCase):
