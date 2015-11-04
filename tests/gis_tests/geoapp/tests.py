@@ -893,3 +893,7 @@ class GeoQuerySetTest(TestCase):
     def test_non_concrete_field(self):
         NonConcreteModel.objects.create(point=Point(0, 0), name='name')
         list(NonConcreteModel.objects.all())
+
+    def test_values_srid(self):
+        for c, v in zip(City.objects.all(), City.objects.values()):
+            self.assertEqual(c.point.srid, v['point'].srid)
