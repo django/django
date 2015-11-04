@@ -19,8 +19,9 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
-from django.test import mock
+from django.test import ignore_warnings, mock
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
@@ -629,7 +630,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(4326, pnt.srid)
         pnt.srid = 3084
         self.assertEqual(3084, pnt.srid)
-        self.assertRaises(ctypes.ArgumentError, pnt.set_srid, '4326')
+        with self.assertRaises(ctypes.ArgumentError):
+            pnt.srid = '4326'
 
         # Testing SRID keyword on fromstr(), and on Polygon rings.
         poly = fromstr(self.geometries.polygons[1].wkt, srid=4269)
@@ -1138,3 +1140,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_srid_getters_setters(self):
+        p = Point(1, 2, srid=123)
+        self.assertEqual(p.get_srid(), p.srid)
+
+        p.set_srid(321)
+        self.assertEqual(p.srid, 321)
