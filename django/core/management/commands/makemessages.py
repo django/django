@@ -16,7 +16,6 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import (
     find_command, handle_extensions, popen_wrapper,
 )
-from django.utils import six
 from django.utils._os import upath
 from django.utils.encoding import DEFAULT_LOCALE_ENCODING, force_str
 from django.utils.functional import cached_property
@@ -33,26 +32,6 @@ def check_programs(*programs):
         if find_command(program) is None:
             raise CommandError("Can't find %s. Make sure you have GNU "
                     "gettext tools 0.15 or newer installed." % program)
-
-
-def gettext_popen_wrapper(args, os_err_exc_type=CommandError, stdout_encoding="utf-8"):
-    """
-    Makes sure text obtained from stdout of gettext utilities is Unicode.
-    """
-    # This both decodes utf-8 and cleans line endings. Simply using
-    # popen_wrapper(universal_newlines=True) doesn't properly handle the
-    # encoding. This goes back to popen's flaky support for encoding:
-    # https://bugs.python.org/issue6135. This is a solution for #23271, #21928.
-    # No need to do anything on Python 2 because it's already a byte-string there.
-    manual_io_wrapper = six.PY3 and stdout_encoding != DEFAULT_LOCALE_ENCODING
-
-    stdout, stderr, status_code = popen_wrapper(args, os_err_exc_type=os_err_exc_type,
-                                                universal_newlines=not manual_io_wrapper)
-    if manual_io_wrapper:
-        stdout = io.TextIOWrapper(io.BytesIO(stdout), encoding=stdout_encoding).read()
-    if six.PY2:
-        stdout = stdout.decode(stdout_encoding)
-    return stdout, stderr, status_code
 
 
 @total_ordering
@@ -334,7 +313,7 @@ class Command(BaseCommand):
     def gettext_version(self):
         # Gettext tools will output system-encoded bytestrings instead of UTF-8,
         # when looking up the version. It's especially a problem on Windows.
-        out, err, status = gettext_popen_wrapper(
+        out, err, status = popen_wrapper(
             ['xgettext', '--version'],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
         )
@@ -357,7 +336,7 @@ class Command(BaseCommand):
             if not os.path.exists(potfile):
                 continue
             args = ['msguniq'] + self.msguniq_options + [potfile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -510,7 +489,7 @@ class Command(BaseCommand):
             input_files_list.flush()
             args.extend(['--files-from', input_files_list.name])
             args.extend(self.xgettext_options)
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
 
         if errors:
             if status != STATUS_OK:
@@ -553,7 +532,7 @@ class Command(BaseCommand):
 
         if os.path.exists(pofile):
             args = ['msgmerge'] + self.msgmerge_options + [pofile, potfile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
@@ -572,7 +551,7 @@ class Command(BaseCommand):
 
         if self.no_obsolete:
             args = ['msgattrib'] + self.msgattrib_options + ['-o', pofile, pofile]
-            msgs, errors, status = gettext_popen_wrapper(args)
+            msgs, errors, status = popen_wrapper(args)
             if errors:
                 if status != STATUS_OK:
                     raise CommandError(
