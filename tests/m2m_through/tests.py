@@ -13,12 +13,13 @@ from .models import (
 
 
 class M2mThroughTests(TestCase):
-    def setUp(self):
-        self.bob = Person.objects.create(name='Bob')
-        self.jim = Person.objects.create(name='Jim')
-        self.jane = Person.objects.create(name='Jane')
-        self.rock = Group.objects.create(name='Rock')
-        self.roll = Group.objects.create(name='Roll')
+    @classmethod
+    def setUpTestData(cls):
+        cls.bob = Person.objects.create(name='Bob')
+        cls.jim = Person.objects.create(name='Jim')
+        cls.jane = Person.objects.create(name='Jane')
+        cls.rock = Group.objects.create(name='Rock')
+        cls.roll = Group.objects.create(name='Roll')
 
     def test_retrieve_intermediate_items(self):
         Membership.objects.create(person=self.jim, group=self.rock)
@@ -432,14 +433,15 @@ class M2mThroughReferentialTests(TestCase):
 
 
 class M2mThroughToFieldsTests(TestCase):
-    def setUp(self):
-        self.pea = Ingredient.objects.create(iname='pea')
-        self.potato = Ingredient.objects.create(iname='potato')
-        self.tomato = Ingredient.objects.create(iname='tomato')
-        self.curry = Recipe.objects.create(rname='curry')
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.potato)
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.pea)
-        RecipeIngredient.objects.create(recipe=self.curry, ingredient=self.tomato)
+    @classmethod
+    def setUpTestData(cls):
+        cls.pea = Ingredient.objects.create(iname='pea')
+        cls.potato = Ingredient.objects.create(iname='potato')
+        cls.tomato = Ingredient.objects.create(iname='tomato')
+        cls.curry = Recipe.objects.create(rname='curry')
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.potato)
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.pea)
+        RecipeIngredient.objects.create(recipe=cls.curry, ingredient=cls.tomato)
 
     def test_retrieval(self):
         # Forward retrieval
