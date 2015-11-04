@@ -224,12 +224,13 @@ class DeletionTests(TestCase):
         s2 = S.objects.create(pk=2, r=r)
         T.objects.create(pk=1, s=s1)
         T.objects.create(pk=2, s=s2)
+        RChild.objects.create(r_ptr=r)
         r.delete()
         self.assertEqual(
-            pre_delete_order, [(T, 2), (T, 1), (S, 2), (S, 1), (R, 1)]
+            pre_delete_order, [(T, 2), (T, 1), (RChild, 1), (S, 2), (S, 1), (R, 1)]
         )
         self.assertEqual(
-            post_delete_order, [(T, 1), (T, 2), (S, 1), (S, 2), (R, 1)]
+            post_delete_order, [(T, 1), (T, 2), (RChild, 1), (S, 1), (S, 2), (R, 1)]
         )
 
         models.signals.post_delete.disconnect(log_post_delete)
