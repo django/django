@@ -2,7 +2,7 @@
 Django 1.8.6 release notes
 ==========================
 
-*Under Development*
+*November 4, 2015*
 
 Django 1.8.6 adds official support for Python 3.5 and fixes several bugs in
 1.8.5.
