@@ -328,6 +328,13 @@ added in Django 1.9::
 
 This prevents confusion about an assignment resulting in an implicit save.
 
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``get_srid()`` and ``set_srid()`` methods of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` are deprecated in favor
+  of the :attr:`~django.contrib.gis.geos.GEOSGeometry.srid` property.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
