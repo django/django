@@ -1443,6 +1443,40 @@ then the output would be::
     * 1984 (George)
     * Timequake (Kurt)
 
+``dictsort`` can also order a list of lists (or any other object implementing
+``__getitem__()``) by elements at specified index. For example::
+
+    {{ value|dictsort:0 }}
+
+If ``value`` is:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('c', 'string'),
+        ('b', 'foo'),
+    ]
+
+then the output would be:
+
+.. code-block:: python
+
+    [
+        ('a', '42'),
+        ('b', 'foo'),
+        ('c', 'string'),
+    ]
+
+You must pass the index as an integer rather than a string. The following
+produce empty output::
+
+    {{ values|dictsort:"0" }}
+
+.. versionchanged:: 1.10
+
+    The ability to order a list of lists was added.
+
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``

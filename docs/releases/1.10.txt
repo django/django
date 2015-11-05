@@ -333,6 +333,9 @@ Templates
 
 * Added the ``is`` comparison operator to the :ttag:`if` tag.
 
+* Allowed :tfilter:`dictsort` to order a list of lists by an element at a
+  specified index.
+
 Tests
 ~~~~~
 
