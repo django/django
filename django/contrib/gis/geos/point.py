@@ -172,14 +172,29 @@ class Point(GEOSGeometry):
         self.z = value
 
     # ### Tuple setting and retrieval routines. ###
-    def get_coords(self):
+    @property
+    def tuple(self):
         "Returns a tuple of the point."
         return self._cs.tuple
 
-    def set_coords(self, tup):
+    @tuple.setter
+    def tuple(self, tup):
         "Sets the coordinates of the point with the given tuple."
         self._cs[0] = tup
 
+    def get_coords(self):
+        warnings.warn(
+            "`get_coords()` is deprecated, use the `tuple` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        return self.tuple
+
+    def set_coords(self, tup):
+        warnings.warn(
+            "`set_coords()` is deprecated, use the `tuple` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        self.tuple = tup
+
     # The tuple and coords properties
-    tuple = property(get_coords, set_coords)
     coords = tuple
