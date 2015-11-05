@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
-import unittest
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import skipUnless
@@ -19,7 +18,7 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
-from django.test import ignore_warnings, mock
+from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
@@ -29,7 +28,7 @@ from ..test_data import TestDataMixin
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
-class GEOSTest(unittest.TestCase, TestDataMixin):
+class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_base(self):
         "Tests out the GEOSBase class."
@@ -326,6 +325,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
+            with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
+                LineString((0, 0))
+
+            with self.assertRaisesMessage(TypeError, 'LineString requires at least 2 points, got 1.'):
+                LineString([(0, 0)])
+
     def test_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
@@ -368,6 +373,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(lr, LinearRing([list(tup) for tup in lr.tuple]))
             if numpy:
                 self.assertEqual(lr, LinearRing(numpy.array(lr.tuple)))
+
+        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 3.'):
+            LinearRing((0, 0), (1, 1), (0, 0))
+
+        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 1.'):
+            LinearRing([(0, 0)])
 
     def test_polygons_from_bbox(self):
         "Testing `from_bbox` class method."
