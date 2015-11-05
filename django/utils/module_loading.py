@@ -48,6 +48,8 @@ def autodiscover_modules(*args, **kwargs):
                     before_import_registry = copy.copy(register_to._registry)
 
                 import_module('%s.%s' % (app_config.name, module_to_search))
+            except SystemExit:
+                raise
             except:
                 # Reset the registry to the state before the last import
                 # as this import will have to reoccur on the next request and
