@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a regression in 1.8.6 that caused database routers without an
   ``allow_migrate()`` method to crash (:ticket:`25686`).
+
+* Fixed a regression in 1.8.6 by restoring the ability to use ``Manager``
+  objects for the ``queryset`` argument of ``ModelChoiceField``
+  (:ticket:`25683`).
