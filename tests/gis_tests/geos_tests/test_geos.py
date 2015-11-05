@@ -787,7 +787,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
         self.assertEqual((2., 3., 8.), pnt.coords)
-        self.assertRaises(TypeError, pnt.set_coords, (1., 2.))
+        with self.assertRaises(TypeError):
+            pnt.tuple = (1., 2.)
         pnt.coords = (1., 2., 3.)
         self.assertEqual((1., 2., 3.), pnt.coords)
 
@@ -1156,6 +1157,14 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual((p.get_x(), p.get_y(), p.get_z()), (p.x, p.y, p.z))
 
         p.set_x(3)
-        p.set_y(1)
-        p.set_z(2)
-        self.assertEqual((p.x, p.y, p.z), (3, 1, 2))
+        p.set_y(2)
+        p.set_z(1)
+        self.assertEqual((p.x, p.y, p.z), (3, 2, 1))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_tuple_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual(p.get_coords(), (p.x, p.y, p.z))
+
+        p.set_coords((3, 2, 1))
+        self.assertEqual(p.get_coords(), (3, 2, 1))

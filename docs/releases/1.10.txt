@@ -339,6 +339,10 @@ This prevents confusion about an assignment resulting in an implicit save.
   ``set_z()`` methods of :class:`~django.contrib.gis.geos.Point`
   are deprecated in favor of the ``x``, ``y`` and ``z`` properties.
 
+* The ``get_coords()`` and ``set_coords()`` methods of
+  :class:`~django.contrib.gis.geos.Point` are deprecated in favor of the
+  ``tuple`` property.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

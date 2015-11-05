@@ -119,6 +119,9 @@ details on these changes.
   ``set_z()`` methods of :class:`~django.contrib.gis.geos.Point`
   will be removed.
 
+* The ``get_coords()`` and ``set_coords()`` methods of
+  :class:`~django.contrib.gis.geos.Point` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
