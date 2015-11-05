@@ -1,9 +1,11 @@
+import warnings
 from ctypes import c_uint
 
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.error import GEOSException
 from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.six.moves import range
 
 
@@ -95,40 +97,79 @@ class Point(GEOSGeometry):
 
     _get_single_internal = _get_single_external
 
-    def get_x(self):
+    @property
+    def x(self):
         "Returns the X component of the Point."
         return self._cs.getOrdinate(0, 0)
 
-    def set_x(self, value):
+    @x.setter
+    def x(self, value):
         "Sets the X component of the Point."
         self._cs.setOrdinate(0, 0, value)
 
-    def get_y(self):
+    @property
+    def y(self):
         "Returns the Y component of the Point."
         return self._cs.getOrdinate(1, 0)
 
-    def set_y(self, value):
+    @y.setter
+    def y(self, value):
         "Sets the Y component of the Point."
         self._cs.setOrdinate(1, 0, value)
 
-    def get_z(self):
+    @property
+    def z(self):
         "Returns the Z component of the Point."
-        if self.hasz:
-            return self._cs.getOrdinate(2, 0)
-        else:
-            return None
+        return self._cs.getOrdinate(2, 0) if self.hasz else None
+
+    @z.setter
+    def z(self, value):
+        "Sets the Z component of the Point."
+        if not self.hasz:
+            raise GEOSException('Cannot set Z on 2D Point.')
+        self._cs.setOrdinate(2, 0, value)
+
+    def get_x(self):
+        warnings.warn(
+            "`get_x()` is deprecated, use the `x` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        return self.x
+
+    def set_x(self, value):
+        warnings.warn(
+            "`set_x()` is deprecated, use the `x` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        self.x = value
+
+    def get_y(self):
+        warnings.warn(
+            "`get_y()` is deprecated, use the `y` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        return self.y
+
+    def set_y(self, value):
+        warnings.warn(
+            "`set_y()` is deprecated, use the `y` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        self.y = value
+
+    def get_z(self):
+        warnings.warn(
+            "`get_z()` is deprecated, use the `z` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        return self.z
 
     def set_z(self, value):
-        "Sets the Z component of the Point."
-        if self.hasz:
-            self._cs.setOrdinate(2, 0, value)
-        else:
-            raise GEOSException('Cannot set Z on 2D Point.')
-
-    # X, Y, Z properties
-    x = property(get_x, set_x)
-    y = property(get_y, set_y)
-    z = property(get_z, set_z)
+        warnings.warn(
+            "`set_z()` is deprecated, use the `z` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        self.z = value
 
     # ### Tuple setting and retrieval routines. ###
     def get_coords(self):
