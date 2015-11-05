@@ -813,7 +813,7 @@ TECHNICAL_500_TEMPLATE = ("""
                 </tr>
               </thead>
               <tbody>
-                {% for var in frame.vars|dictsort:"0" %}
+                {% for var in frame.vars|dictsort:0 %}
                   <tr>
                     <td>{{ var.0|force_escape }}</td>
                     <td class="code"><pre>{{ var.1 }}</pre></td>
@@ -995,7 +995,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in request.META.items|dictsort:"0" %}
+      {% for var in request.META.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1017,7 +1017,7 @@ Exception Value: {{ exception_value|force_escape }}
       </tr>
     </thead>
     <tbody>
-      {% for var in settings.items|dictsort:"0" %}
+      {% for var in settings.items|dictsort:0 %}
         <tr>
           <td>{{ var.0 }}</td>
           <td class="code"><pre>{{ var.1|pprint }}</pre></td>
@@ -1107,12 +1107,12 @@ FILES:{% for k, v in request.FILES.items %}
 COOKIES:{% for k, v in request.COOKIES.items %}
 {{ k }} = {{ v|stringformat:"r" }}{% empty %} No cookie data{% endfor %}
 
-META:{% for k, v in request.META.items|dictsort:"0" %}
+META:{% for k, v in request.META.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 {% else %}Request data not supplied
 {% endif %}
 Settings:
-Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:"0" %}
+Using settings module {{ settings.SETTINGS_MODULE }}{% for k, v in settings.items|dictsort:0 %}
 {{ k }} = {{ v|stringformat:"r" }}{% endfor %}
 
 {% if not is_email %}
