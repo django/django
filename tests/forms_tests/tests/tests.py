@@ -87,6 +87,12 @@ class TestTicket14567(TestCase):
         self.assertIsInstance(form.cleaned_data['multi_choice'], models.query.QuerySet)
 
 
+class TestTicket25683(TestCase):
+    def test_modelchoicefield_manager(self):
+        f = ModelChoiceField(ChoiceOptionModel.objects)
+        self.assertTrue(list(f.choices))
+
+
 class ModelFormCallableModelDefault(TestCase):
     def test_no_empty_option(self):
         "If a model's ForeignKey has blank=False and a default, no empty option is created (Refs #10792)."
