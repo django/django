@@ -36,16 +36,20 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
             ncoords = len(coords)
-            if coords:
-                ndim = len(coords[0])
-            else:
-                raise TypeError('Cannot initialize on empty sequence.')
-            self._checkdim(ndim)
+            if ncoords < self._minlength:
+                raise TypeError(
+                    '`%s` requires at least %d points, got %s.' % (self.__class__.__name__, self._minlength, ncoords)
+                )
+            ndim = None
             # Incrementing through each of the coordinates and verifying
-            for i in range(1, ncoords):
-                if not isinstance(coords[i], (tuple, list, Point)):
-                    raise TypeError('each coordinate should be a sequence (list or tuple)')
-                if len(coords[i]) != ndim:
+            for coord in coords:
+                if not isinstance(coord, (tuple, list, Point)):
+                    raise TypeError('Each coordinate should be a sequence (list or tuple)')
+
+                if ndim is None:
+                    ndim = len(coord)
+                    self._checkdim(ndim)
+                elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
             numpy_coords = False
         elif numpy and isinstance(coords, numpy.ndarray):
