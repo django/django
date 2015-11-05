@@ -1558,6 +1558,11 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
     A form for creating a new user.
 
+    .. versionchanged:: 1.10
+
+        The :class:`~django.contrib.auth.forms.UserCreationForm` does not allow
+        usernames that differ only in case.
+
 .. currentmodule:: django.contrib.auth
 
 Authentication data in templates

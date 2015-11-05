@@ -56,6 +56,10 @@ Minor features
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
+* The :class:`~django.contrib.auth.forms.UserCreationForm` does not allow
+  usernames that differ only in case.
+
+
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
