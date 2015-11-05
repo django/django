@@ -36,12 +36,7 @@ class Loader(BaseLoader):
     def get_contents(self, origin):
         try:
             source = resource_string(origin.app_name, origin.pkg_name)
-        except SystemExit:
-            # Make sure to re-raise a SystemExit, we don't want it to be
-            # transformed into another exception which will get caught later
-            # on.
-            raise
-        except:
+        except Exception:
             raise TemplateDoesNotExist(origin)
 
         if six.PY2:
