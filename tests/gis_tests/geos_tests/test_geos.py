@@ -862,7 +862,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                self.assertRaises(IndexError, g.get_x)
+                with self.assertRaises(IndexError):
+                    g.x
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
@@ -1148,3 +1149,13 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         p.set_srid(321)
         self.assertEqual(p.srid, 321)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_coordinate_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual((p.get_x(), p.get_y(), p.get_z()), (p.x, p.y, p.z))
+
+        p.set_x(3)
+        p.set_y(1)
+        p.set_z(2)
+        self.assertEqual((p.x, p.y, p.z), (3, 1, 2))

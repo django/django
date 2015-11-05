@@ -115,6 +115,9 @@ details on these changes.
 * The ``get_srid()`` and ``set_srid()`` methods of
   ``django.contrib.gis.geos.GEOSGeometry`` will be removed.
 
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

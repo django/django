@@ -335,6 +335,10 @@ This prevents confusion about an assignment resulting in an implicit save.
   :class:`~django.contrib.gis.geos.GEOSGeometry` are deprecated in favor
   of the :attr:`~django.contrib.gis.geos.GEOSGeometry.srid` property.
 
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of :class:`~django.contrib.gis.geos.Point` are deprecated
+  in favor of the ``x``, ``y``, and ``z`` properties.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
