@@ -228,17 +228,6 @@ class InspectDBTestCase(TestCase):
         self.longMessage = False
         self.assertIn("        managed = False", output, msg='inspectdb should generate unmanaged models.')
 
-    def test_unique_together_meta(self):
-        out = StringIO()
-        call_command('inspectdb',
-                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
-                     stdout=out)
-        output = out.getvalue()
-        self.assertIn(
-            "        unique_together = (('field1', 'field2'),)", output,
-            msg='inspectdb should generate unique_together.'
-        )
-
     @skipUnless(connection.vendor == 'sqlite',
                 "Only patched sqlite's DatabaseIntrospection.data_types_reverse for this test")
     def test_custom_fields(self):
@@ -260,3 +249,57 @@ class InspectDBTestCase(TestCase):
             self.assertIn("big_int_field = models.BigIntegerField()", output)
         finally:
             connection.introspection.data_types_reverse = orig_data_types_reverse
+
+
+class TestUniqueTogether(TestCase):
+
+    """
+    We test whether ``unique_together`` is generated properly, specifically we
+    test whether ``unique_together`` contains field names properly generated
+    from columns whose names were cleaned.
+    """
+
+    def setUp(self):
+        out = StringIO()
+        call_command('inspectdb',
+                     table_name_filter=lambda tn: tn.startswith('inspectdb_uniquetogether'),
+                     stdout=out)
+        self.inspect_output = out.getvalue()
+        # self.unique_re = re.compile(r".*unique_together = \(([\'\w\s,\d_\(\)]+),\).*")
+        self.unique_re = re.compile(r".*unique_together = \((.+),\).*")
+
+    def test_unique_together_meta(self):
+
+        self.assertIn("unique_together", self.inspect_output,
+            msg='inspectdb should generate unique_together.')
+
+    def test_simple_fields(self):
+
+        match_list = re.findall(self.unique_re, self.inspect_output)
+
+        self.assertEqual(len(match_list), 1, "There should be exactly one unique block")
+        fields = match_list[0]
+
+        self.assertIn("('field1', 'field2')", fields,
+            msg="Tuple ('field1', 'field2') should be in unique_together Meta entry")
+
+    def test_simple_keyword(self):
+
+        match_list = re.findall(self.unique_re, self.inspect_output)
+
+        self.assertEqual(len(match_list), 1, "There should be exactly one unique block")
+        fields = match_list[0]
+
+        self.assertIn("('non_unique_column', 'non_unique_column_0')", fields,
+            msg="Tuple ('from_field', 'field1') should be in unique_together Meta entry")
+
+    def test_renamed_columns(self):
+
+        match_list = re.findall(self.unique_re, self.inspect_output)
+
+        self.assertEqual(len(match_list), 1, "There should be exactly one unique block")
+        fields = match_list[0]
+
+        self.assertIn("('non_unique_column', 'non_unique_column_0')", fields,
+            msg="Tuple ('non_unique_column', 'non_unique_column_0') "
+                "should be in unique_together Meta entry")
