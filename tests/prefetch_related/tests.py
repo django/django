@@ -223,6 +223,17 @@ class PrefetchRelatedTests(TestCase):
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
 
+    def test_m2m_shadow(self):
+        msg = 'to_attr=books conflicts with a field on the Author model.'
+        poems = Book.objects.filter(title='Poems')
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Author.objects.prefetch_related(
+                Prefetch('books', queryset=poems, to_attr='books'),
+            ))
+        # Without the ValueError, a book was deleted due to the implicit
+        # save of reverse relation assignment.
+        self.assertEqual(self.author1.books.count(), 2)
+
 
 class CustomPrefetchTests(TestCase):
     @classmethod
