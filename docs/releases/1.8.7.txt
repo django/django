@@ -21,3 +21,6 @@ Bugfixes
 
 * Fixed a regression in 1.8.6 that caused an application with South migrations
   in the ``migrations`` directory to fail (:ticket:`25618`).
+
+* Fixed a data loss possibility with :class:`~django.db.models.Prefetch` if
+  ``to_attr`` is set to a ``ManyToManyField`` (:ticket:`25693`).

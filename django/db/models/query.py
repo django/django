@@ -1575,6 +1575,17 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
         to_attr, as_attr = lookup.get_current_to_attr(level)
+
+        # Check we are not shadowing a field on obj.
+        if as_attr:
+            try:
+                field = obj._meta.get_field(to_attr)
+            except exceptions.FieldDoesNotExist:
+                pass
+            else:
+                msg = 'to_attr={} conflicts with a field on the {} model.'
+                raise ValueError(msg.format(to_attr, field.model.__name__))
+
         if single:
             val = vals[0] if vals else None
             to_attr = to_attr if as_attr else cache_name
