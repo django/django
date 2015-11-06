@@ -9,4 +9,4 @@ Django 1.8.7 fixes several bugs in 1.8.6.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression where database routers without a ``allow_migrate`` method raised an exception (:ticket:`25686`).

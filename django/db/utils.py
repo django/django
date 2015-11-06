@@ -299,12 +299,12 @@ class ConnectionRouter(object):
                 continue
 
             if six.PY3:
-                sig = inspect.signature(router.allow_migrate)
+                sig = inspect.signature(method)
                 has_deprecated_signature = not any(
                     p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
                 )
             else:
-                argspec = inspect.getargspec(router.allow_migrate)
+                argspec = inspect.getargspec(method)
                 has_deprecated_signature = len(argspec.args) == 3 and not argspec.keywords
 
             if has_deprecated_signature:
