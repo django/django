@@ -255,6 +255,7 @@ with two read replicas. Here are the settings specifying these
 databases::
 
     DATABASES = {
+        'default': {},
         'auth_db': {
             'NAME': 'auth_db',
             'ENGINE': 'django.db.backends.mysql',
