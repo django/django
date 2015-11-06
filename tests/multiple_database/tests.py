@@ -956,6 +956,27 @@ class RouterTestCase(TestCase):
                 self.assertTrue(router.allow_migrate('default', 'app_label'))
                 self.assertEqual(force_text(recorded.pop().message), msg)
 
+    def test_allow_syncdb_deprecation(self):
+        class LegacyRouter(object):
+            def allow_syncdb(self, db, model):
+                assert db == 'default'
+                assert model is User
+                return True
+
+        with override_settings(DATABASE_ROUTERS=[LegacyRouter()]):
+            with warnings.catch_warnings(record=True) as recorded:
+                warnings.filterwarnings('always')
+                msg = (
+                    "Router.allow_syncdb has been deprecated and will stop "
+                    "working in Django 1.9. Rename the method to allow_migrate."
+                )
+                self.assertTrue(router.allow_migrate_model('default', User))
+                self.assertEqual(force_text(recorded.pop().message), msg)
+                self.assertEqual(recorded, [])
+
+                self.assertTrue(router.allow_migrate('default', 'app_label'))
+                self.assertEqual(force_text(recorded.pop().message), msg)
+
     def test_partial_router(self):
         "A router can choose to implement a subset of methods"
         dive = Book.objects.using('other').create(title="Dive into Python",
