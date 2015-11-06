@@ -338,6 +338,8 @@ def compare_xml(want, got):
                 return node
 
     want, got = strip_quotes(want, got)
+    want = want.strip()
+    got = got.strip()
     want = want.replace('\\n', '\n')
     got = got.replace('\\n', '\n')
 
