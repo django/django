@@ -1910,6 +1910,14 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
         to_attr, as_attr = lookup.get_current_to_attr(level)
+
+        # Check we are not shadowing a field on obj.
+        if as_attr:
+            for related_m2m in obj._meta.get_all_related_many_to_many_objects():
+                if related_m2m.get_accessor_name() == to_attr:
+                    msg = 'to_attr={} conflicts with a field on the {} model.'
+                    raise ValueError(msg.format(to_attr, obj.__class__.__name__))
+
         if single:
             val = vals[0] if vals else None
             to_attr = to_attr if as_attr else cache_name
