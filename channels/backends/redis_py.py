@@ -56,6 +56,8 @@ class RedisChannelBackend(BaseChannelBackend):
     def receive_many(self, channels):
         if not channels:
             raise ValueError("Cannot receive on empty channel list!")
+        # Shuffle channels to avoid the first ones starving others of workers
+        random.shuffle(channels)
         # Get a message from one of our channels
         while True:
             result = self.connection.blpop([self.prefix + channel for channel in channels], timeout=1)
