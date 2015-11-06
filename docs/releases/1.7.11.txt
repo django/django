@@ -1,0 +1,16 @@
+===========================
+Django 1.7.11 release notes
+===========================
+
+*Under development*
+
+Django 1.7.11 fixes several bugs in 1.7.10.
+
+Bugfixes
+========
+
+* Fixed a data-loss bug when using :class:`~django.db.models.Prefetch`
+  with ``to_attr`` set to a :class:`~django.db.models.ManyToManyField`.
+
+* ...
+
