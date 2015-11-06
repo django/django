@@ -66,4 +66,5 @@ class WebsocketAsyncioInterface(object):
         for protocol in self.factory.protocols.values():
             if time.time() - protocol.last_keepalive > expiry_window:
                 protocol.sendKeepalive()
-        self.loop.call_later(1, self.keepalive_sender)
+        if self.loop.is_running():
+            self.loop.call_later(1, self.keepalive_sender)
