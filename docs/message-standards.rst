@@ -38,7 +38,6 @@ Contains the following keys:
 * cookies: Dict of cookies as {cookie_name: cookie_value} (names and values are strings)
 * meta: Dict of HTTP headers and info as defined in the Django Request docs (names and values are strings)
 * path: String, full path to the requested page, without query string or domain
-* path_info: String, like ``path`` but without any script prefix. Often just ``path``.
 * method: String, upper-cased HTTP method
 
 Should come with an associated ``reply_channel`` which accepts HTTP Responses.

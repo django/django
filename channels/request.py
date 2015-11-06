@@ -15,7 +15,6 @@ def encode_request(request):
         "cookies": request.COOKIES,
         "meta": {k: v for k, v in request.META.items() if not k.startswith("wsgi")},
         "path": request.path,
-        "path_info": request.path_info,
         "method": request.method,
         "reply_channel": request.reply_channel,
     }
@@ -33,8 +32,9 @@ def decode_request(value):
     request.META = value['meta']
     request.path = value['path']
     request.method = value['method']
-    request.path_info = value['path_info']
     request.reply_channel = value['reply_channel']
+    # We don't support non-/ script roots
+    request.path_info = value['path']
     return request
 
 
