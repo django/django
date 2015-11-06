@@ -28,3 +28,10 @@ That's why Channels labels any *response channel* with a leading ``!``, letting
 you know that only one server is listening for it, and thus letting you scale
 and shard the two different types of channels accordingly (for more on
 the difference, see :ref:`channel-types`).
+
+This is the underlying theory behind Channels' sharding model - normal channels
+are sent to random Redis servers, while response channels are sent to a
+predictable server that both the interface server and worker can derive.
+
+Currently, sharding is implemented as part of the Redis backend only;
+see the :doc:`backend documentation <backends>` for more information.

@@ -5,6 +5,50 @@ Multiple choices of backend are available, to fill different tradeoffs of
 complexity, throughput and scalability. You can also write your own backend if
 you wish; the API is very simple and documented below.
 
+Redis
+-----
+
+The Redis backend is the recommended backend to run Channels with, as it
+supports both high throughput on a single Redis server as well as the ability
+to run against a set of Redis servers in a sharded mode.
+
+To use the Redis backend you have to install the redis package::
+
+    pip install -U redis
+
+By default, it will attempt to connect to a Redis server on ``localhost:6379``,
+but you can override this with the ``HOSTS`` setting::
+
+    CHANNEL_BACKENDS = {
+        "default": {
+            "BACKEND": "channels.backends.redis.RedisChannelBackend",
+            "HOSTS": [("redis-channel-1", 6379), ("redis-channel-2", 6379)],
+        },
+    }
+
+Sharding
+~~~~~~~~
+
+The sharding model is based on consistent hashing - in particular,
+:ref:`response channels <channel-types>` are hashed and used to pick a single
+Redis server that both the interface server and the worker will use.
+
+For normal channels, since any worker can service any channel request, messages
+are simply distributed randomly among all possible servers, and workers will
+pick a single server to listen to. Note that if you run more Redis servers than
+workers, it's very likely that some servers will not have workers listening to
+them; we recommend you always have at least ten workers for each Redis server
+to ensure good distribution. Workers will, however, change server periodically
+(every five seconds or so) so queued messages should eventually get a response.
+
+Note that if you change the set of sharding servers you will need to restart
+all interface servers and workers with the new set before anything works,
+and any in-flight messages will be lost (even with persistence, some will);
+the consistent hashing model relies on all running clients having the same
+settings. Any misconfigured interface server or worker will drop some or all
+messages.
+
+
 In-memory
 ---------
 
@@ -18,23 +62,7 @@ This backend provides no network transparency or non-blocking guarantees.
 Database
 --------
 
-Redis
------
-
-To use the Redis backend you have to install the redis package::
-
-    pip install -U redis
-
-Also you need to set the following in the ``CHANNEL_BACKENDS`` setting::
-
-    CHANNEL_BACKENDS = {
-        "default": {
-            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
-            "HOST": "redis-hostname",
-        },
-    }
-
-
+=======
 Writing Custom Backends
 -----------------------
 
