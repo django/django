@@ -9,4 +9,5 @@ Django 1.8.8 fixes several bugs in 1.8.7.
 Bugfixes
 ========
 
-* ...
+* Fixed incorrect ``unique_together`` field name generation by ``inspectdb``
+  (:ticket:`25274`).
