@@ -14,6 +14,8 @@ class ConsumerRegistry(object):
 
     def __init__(self, routing=None):
         self.consumers = {}
+        # Add basic internal consumers
+        self.add_consumer(self.echo_consumer, ["__channels__.echo"])
         # Initialise with any routing that was passed in
         if routing:
             # If the routing was a string, import it
@@ -56,3 +58,11 @@ class ConsumerRegistry(object):
             return self.consumers[channel]
         except KeyError:
             return None
+
+    def echo_consumer(self, message):
+        """
+        Implements the echo message standard.
+        """
+        message.reply_channel.send({
+            "content": message.content.get("content", None),
+        })

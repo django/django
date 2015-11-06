@@ -183,4 +183,4 @@ class RedisChannelBackend(BaseChannelBackend):
         self.connection(self.consistent_hash(channel)).delete(key)
 
     def __str__(self):
-        return "%s(host=%s, port=%s)" % (self.__class__.__name__, self.host, self.port)
+        return "%s(hosts=%s)" % (self.__class__.__name__, self.hosts)
