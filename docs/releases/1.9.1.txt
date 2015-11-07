@@ -22,3 +22,7 @@ Bugfixes
 
 * Fixed a regression in ``CommonMiddleware`` causing ``If-None-Match`` checks
   to always return HTTP 200 (:ticket:`25900`).
+
+* Fixed missing ``varchar/text_pattern_ops`` index on ``CharField`` and
+  ``TextField`` respectively when using ``AlterField`` on PostgreSQL
+  (:ticket:`25412`).

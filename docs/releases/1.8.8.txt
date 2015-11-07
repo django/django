@@ -30,3 +30,7 @@ Bugfixes
 
 * Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
   backwards (:ticket:`25896`).
+
+* Fixed missing ``varchar/text_pattern_ops`` index on ``CharField`` and
+  ``TextField`` respectively when using ``AlterField`` on PostgreSQL
+  (:ticket:`25412`).
