@@ -9,4 +9,7 @@ Django 1.8.7 fixes several bugs in 1.8.6.
 Bugfixes
 ========
 
+* Fixed a crash of the debug view during the autumn DST change when
+  :setting:`USE_TZ` is ``False`` and ``pytz`` is installed.
+
 * ...
