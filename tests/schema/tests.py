@@ -241,7 +241,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field2, new_field, strict=True)
         # Make sure no FK constraint is present
-        constraints = self.get_constraints(Author._meta.db_table)
+            constraints = self.get_constraints(Author._meta.db_table)
         for name, details in constraints.items():
             if details['columns'] == ["tag_id"] and details['foreign_key']:
                 self.fail("FK constraint for tag_id found")
@@ -1709,3 +1709,39 @@ class SchemaTests(TransactionTestCase):
         new_field.set_attributes_from_name("info")
         with connection.schema_editor() as editor:
             editor.add_field(Author, new_field)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_index_to_charfield(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Ensure the table is there and has no index
+        self.assertNotIn(
+            "name",
+            self.get_indexes(Author._meta.db_table),
+        )
+        # Alter to add the index
+        old_field = Author._meta.get_field('name')
+        new_field = CharField(max_length=255, db_index=True)
+        new_field.set_attributes_from_name('name')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        # Check that all the constraints are there
+        constraints = self.get_constraints(Author._meta.db_table)
+        name_indexes = []
+        for name, details in constraints.items():
+            if details['columns'] == ['name']:
+                name_indexes.append(details)
+        self.assertEqual(2, len(name_indexes),
+                         'Indexes are missing for name column')
+        # Remove the index
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        # Ensure the name constraints where dropped
+        constraints = self.get_constraints(Author._meta.db_table)
+        name_indexes = []
+        for name, details in constraints.items():
+            if details['columns'] == ['name']:
+                name_indexes.append(details)
+        self.assertEqual(0, len(name_indexes),
+                         'Indexes were not dropped for the name column')
