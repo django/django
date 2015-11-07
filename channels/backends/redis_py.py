@@ -1,6 +1,5 @@
 import time
 import json
-import datetime
 import math
 import redis
 import random
@@ -64,7 +63,11 @@ class RedisChannelBackend(BaseChannelBackend):
     def send(self, channel, message):
         # if channel is no str (=> bytes) convert it
         if not isinstance(channel, str):
-            channel = channel.decode('utf-8')
+            channel = channel.decode("utf-8")
+        # Write out message into expiring key (avoids big items in list)
+        # TODO: Use extended set, drop support for older redis?
+        key = self.prefix + uuid.uuid4().hex
+
         # Pick a connection to the right server - consistent for response
         # channels, random for normal channels
         if channel.startswith("!"):
@@ -72,9 +75,7 @@ class RedisChannelBackend(BaseChannelBackend):
             connection = self.connection(index)
         else:
             connection = self.connection(None)
-        # Write out message into expiring key (avoids big items in list)
-        # TODO: Use extended set, drop support for older redis?
-        key = self.prefix + uuid.uuid4().hex
+
         connection.set(
             key,
             json.dumps(message),

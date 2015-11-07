@@ -16,4 +16,4 @@ channel_backends = BackendManager(
 default_app_config = 'channels.apps.ChannelsConfig'
 
 # Promote channel to top-level (down here to avoid circular import errs)
-from .channel import Channel, Group
+from .channel import Channel, Group  # NOQA

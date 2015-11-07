@@ -18,7 +18,8 @@ def linearize(func):
     def inner(message, *args, **kwargs):
         # Make sure there's a reply channel
         if not message.reply_channel:
-            raise ValueError("No reply_channel sent to consumer; @no_overlap can only be used on messages containing it.")
+            raise ValueError("No reply_channel sent to consumer; "
+                             "@no_overlap can only be used on messages containing it.")
         # Get the lock, or re-queue
         locked = message.channel_backend.lock_channel(message.reply_channel)
         if not locked:
@@ -43,10 +44,12 @@ def channel_session(func):
     def inner(message, *args, **kwargs):
         # Make sure there's a reply_channel
         if not message.reply_channel:
-            raise ValueError("No reply_channel sent to consumer; @channel_session can only be used on messages containing it.")
+            raise ValueError("No reply_channel sent to consumer; "
+                             "@channel_session can only be used on messages containing it.")
         # Make sure there's NOT a channel_session already
         if hasattr(message, "channel_session"):
-            raise ValueError("channel_session decorator wrapped inside another channel_session decorator")
+            raise ValueError("channel_session decorator wrapped "
+                             "inside another channel_session decorator")
         # Turn the reply_channel into a valid session key length thing.
         # We take the last 24 bytes verbatim, as these are the random section,
         # and then hash the remaining ones onto the start, and add a prefix

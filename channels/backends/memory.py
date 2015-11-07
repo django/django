@@ -7,6 +7,7 @@ queues = {}
 groups = {}
 locks = set()
 
+
 class InMemoryChannelBackend(BaseChannelBackend):
     """
     In-memory channel implementation. Intended only for use with threading,

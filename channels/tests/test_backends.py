@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from ..channel import Channel
 from ..backends.database import DatabaseChannelBackend
 from ..backends.redis_py import RedisChannelBackend
 from ..backends.memory import InMemoryChannelBackend

@@ -14,7 +14,8 @@ class Command(BaseCommand):
         channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         if channel_backend.local_only:
             raise CommandError(
-                "You have a process-local channel backend configured, and so cannot run separate workers.\n"
+                "You have a process-local channel backend configured, "
+                "and so cannot run separate workers.\n"
                 "Configure a network-based backend in CHANNEL_BACKENDS to use this command."
             )
         # Launch a worker

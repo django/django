@@ -1,7 +1,6 @@
 import threading
 
 from django.core.management.commands.runserver import Command as RunserverCommand
-
 from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.adapters import UrlConsumer
 from channels.interfaces.wsgi import WSGIInterface
