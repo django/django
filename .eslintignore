@@ -1,3 +1,4 @@
 **/{*.min,jquery}.js
+django/contrib/admin/static/admin/js/vendor
 django/contrib/gis/templates/**/*.js
 node_modules/**.js

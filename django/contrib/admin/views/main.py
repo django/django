@@ -6,7 +6,8 @@ from django.contrib.admin.exceptions import (
     DisallowedModelAdminLookup, DisallowedModelAdminToField,
 )
 from django.contrib.admin.options import (
-    IS_POPUP_VAR, TO_FIELD_VAR, IncorrectLookupParameters,
+    IS_AJAX_AUTOCOMPLETE_VAR, IS_POPUP_VAR, TO_FIELD_VAR,
+    IncorrectLookupParameters,
 )
 from django.contrib.admin.utils import (
     get_fields_from_path, lookup_needs_distinct, prepare_lookup_value, quote,
@@ -31,7 +32,7 @@ SEARCH_VAR = 'q'
 ERROR_FLAG = 'e'
 
 IGNORED_PARAMS = (
-    ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
+    ALL_VAR, ORDER_VAR, ORDER_TYPE_VAR, SEARCH_VAR, IS_AJAX_AUTOCOMPLETE_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
 
 
 class ChangeList(object):

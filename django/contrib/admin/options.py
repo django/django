@@ -32,7 +32,7 @@ from django.forms.models import (
     modelform_factory, modelformset_factory,
 )
 from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
@@ -47,6 +47,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
 IS_POPUP_VAR = '_popup'
+IS_AJAX_AUTOCOMPLETE_VAR = '_ajax_autocomplete'
 TO_FIELD_VAR = '_to_field'
 
 
@@ -94,6 +95,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
     """Functionality common to both ModelAdmin and InlineAdmin."""
 
     raw_id_fields = ()
+    ajax_autocomplete = []
     fields = None
     exclude = None
     fieldsets = None
@@ -211,6 +213,9 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         Get a form Field for a ForeignKey.
         """
         db = kwargs.get('using')
+        if db_field.name in self.ajax_autocomplete:
+            kwargs['widget'] = widgets.ForeignKeyAjaxAutocompleteWidget(db_field.remote_field,
+                                    self.admin_site, using=db)
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ForeignKeyRawIdWidget(db_field.remote_field,
                                     self.admin_site, using=db)
@@ -237,6 +242,10 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
             return None
         db = kwargs.get('using')
 
+        if db_field.name in self.ajax_autocomplete:
+            kwargs['widget'] = widgets.ManyToManyAjaxAutocompleteWidget(db_field.remote_field,
+                                    self.admin_site, using=db)
+            kwargs['help_text'] = ''
         if db_field.name in self.raw_id_fields:
             kwargs['widget'] = widgets.ManyToManyRawIdWidget(db_field.remote_field,
                                     self.admin_site, using=db)
@@ -566,9 +575,10 @@ class ModelAdmin(BaseModelAdmin):
         extra = '' if settings.DEBUG else '.min'
         js = [
             'core.js',
-            'admin/RelatedObjectLookups.js',
             'vendor/jquery/jquery%s.js' % extra,
+            'vendor/select2/select2%s.js' % extra,  # must be between jquery and jquery.init
             'jquery.init.js',
+            'admin/RelatedObjectLookups.js',
             'actions%s.js' % extra,
             'urlify.js',
             'prepopulate%s.js' % extra,
@@ -1479,6 +1489,11 @@ class ModelAdmin(BaseModelAdmin):
                     'title': _('Database error'),
                 })
             return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+
+        if IS_AJAX_AUTOCOMPLETE_VAR in request.GET:
+            return JsonResponse({
+                'results': [{'id': obj.pk, 'text': force_text(obj)} for obj in cl.get_queryset(request)],
+            })
 
         # If the request was POSTed, this might be a bulk action or a bulk
         # edit. Try to look up an action or confirmation first, but if this
