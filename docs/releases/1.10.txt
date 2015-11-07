@@ -114,7 +114,9 @@ Cache
 CSRF
 ^^^^
 
-* ...
+* The default :setting:`CSRF_FAILURE_VIEW`, ``views.csrf.csrf_failure()`` now
+  accepts an optional ``template_name`` parameter, defaulting to
+  ``'403_csrf.html'``, to control the template used to render the page.
 
 Database backends
 ^^^^^^^^^^^^^^^^^
