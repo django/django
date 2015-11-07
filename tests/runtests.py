@@ -234,7 +234,7 @@ def actual_test_processes(parallel):
 
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
-                 test_labels, debug_sql, parallel):
+                 test_labels, debug_sql, parallel, tags, exclude_tags):
     state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
@@ -251,6 +251,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
         reverse=reverse,
         debug_sql=debug_sql,
         parallel=actual_test_processes(parallel),
+        tags=tags,
+        exclude_tags=exclude_tags,
     )
     failures = test_runner.run_tests(
         test_labels or get_installed(),
@@ -270,6 +272,10 @@ def get_subprocess_args(options):
         subprocess_args.append('--verbosity=%s' % options.verbosity)
     if not options.interactive:
         subprocess_args.append('--noinput')
+    if options.tags:
+        subprocess_args.append('--tag=%s' % options.tags)
+    if options.exclude_tags:
+        subprocess_args.append('--exclude_tag=%s' % options.exclude_tags)
     return subprocess_args
 
 
@@ -399,6 +405,12 @@ if __name__ == "__main__":
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
         help='Run tests using up to N parallel processes.')
+    parser.add_argument(
+        '--tag', dest='tags', action='append',
+        help='Run only tests with the specified tags. Can be used multiple times.')
+    parser.add_argument(
+        '--exclude-tag', dest='exclude_tags', action='append',
+        help='Do not run tests with the specified tag. Can be used multiple times.')
 
     options = parser.parse_args()
 
@@ -433,9 +445,11 @@ if __name__ == "__main__":
     elif options.pair:
         paired_tests(options.pair, options, options.modules, options.parallel)
     else:
-        failures = django_tests(options.verbosity, options.interactive,
-                                options.failfast, options.keepdb,
-                                options.reverse, options.modules,
-                                options.debug_sql, options.parallel)
+        failures = django_tests(
+            options.verbosity, options.interactive, options.failfast,
+            options.keepdb, options.reverse, options.modules,
+            options.debug_sql, options.parallel, options.tags,
+            options.exclude_tags,
+        )
         if failures:
             sys.exit(bool(failures))

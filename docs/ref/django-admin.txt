@@ -1348,6 +1348,20 @@ don't.
     in order to exchange them between processes. See
     :ref:`python:pickle-picklable` for details.
 
+.. option:: --tag TAGS
+
+.. versionadded:: 1.10
+
+Runs only tests :ref:`marked with the specified tags <topics-tagging-tests>`.
+May be specified multiple times and combined with :option:`test --exclude-tag`.
+
+.. option:: --exclude-tag EXCLUDE_TAGS
+
+.. versionadded:: 1.10
+
+Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
+May be specified multiple times and combined with :option:`test --tag`.
+
 ``testserver``
 --------------
 

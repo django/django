@@ -336,6 +336,10 @@ Tests
 * To better catch bugs, :class:`~django.test.TestCase` now checks deferrable
   database constraints at the end of each test.
 
+* Tests and test cases can be :ref:`marked with tags <topics-tagging-tests>`
+  and run selectively with the new :option:`test --tag` and :option:`test
+  --exclude-tag` options.
+
 URLs
 ~~~~
 
