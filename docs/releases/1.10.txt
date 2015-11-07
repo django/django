@@ -36,6 +36,9 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* The admin's ``ChangeList`` will always use ``root_queryset.count()`` if
+  ``show_full_result_count = True``.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
