@@ -22,6 +22,9 @@ class EventAdmin(admin.ModelAdmin):
     def event_date_func(self, event):
         return event.date
 
+    def has_add_permission(self, request):
+        return False
+
 site.register(Event, EventAdmin)
 
 

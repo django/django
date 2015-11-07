@@ -36,6 +36,9 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* On a ``ModelAdmin``'s changelist, if a user has no add permission the
+  ``object-tools`` block will still be rendered, but without the add button.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
