@@ -41,8 +41,8 @@ algorithm the system follows to determine which Python code to execute:
 1. Django determines the root URLconf module to use. Ordinarily,
    this is the value of the :setting:`ROOT_URLCONF` setting, but if the incoming
    ``HttpRequest`` object has a :attr:`~django.http.HttpRequest.urlconf`
-   attribute (set by middleware :ref:`request processing <request-middleware>`),
-   its value will be used in place of the :setting:`ROOT_URLCONF` setting.
+   attribute (set by middleware), its value will be used in place of the
+   :setting:`ROOT_URLCONF` setting.
 
 2. Django loads that Python module and looks for the variable
    ``urlpatterns``. This should be a Python list of :func:`django.conf.urls.url`

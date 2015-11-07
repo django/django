@@ -175,13 +175,14 @@ the most likely choices.
 Here's an example that stores the current timezone in the session. (It skips
 error handling entirely for the sake of simplicity.)
 
-Add the following middleware to :setting:`MIDDLEWARE_CLASSES`::
+Add the following middleware to :setting:`MIDDLEWARE`::
 
     import pytz
 
     from django.utils import timezone
+    from django.django.utils.deprecation import MiddlewareMixin
 
-    class TimezoneMiddleware(object):
+    class TimezoneMiddleware(MiddlewareMixin):
         def process_request(self, request):
             tzname = request.session.get('django_timezone')
             if tzname:

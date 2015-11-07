@@ -433,13 +433,15 @@ SECURE_PROXY_SSL_HEADER = None
 # MIDDLEWARE #
 ##############
 
-# List of middleware classes to use.  Order is important; in the request phase,
-# this middleware classes will be applied in the order given, and in the
-# response phase the middleware will be applied in reverse order.
+# List of middleware to use. Order is important; in the request phase, these
+# middleware will be applied in the order given, and in the response
+# phase the middleware will be applied in reverse order.
 MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 ]
+
+MIDDLEWARE = None
 
 ############
 # SESSIONS #

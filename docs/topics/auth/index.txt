@@ -60,7 +60,7 @@ startproject <startproject>`, these consist of two items listed in your
    </ref/contrib/contenttypes>`, which allows permissions to be associated with
    models you create.
 
-and these items in your :setting:`MIDDLEWARE_CLASSES` setting:
+and these items in your :setting:`MIDDLEWARE` setting:
 
 1. :class:`~django.contrib.sessions.middleware.SessionMiddleware` manages
    :doc:`sessions </topics/http/sessions>` across requests.

@@ -40,7 +40,7 @@ class TestDataMixin(object):
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -102,7 +102,7 @@ class FlatpageViewTests(TestDataMixin, TestCase):
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',

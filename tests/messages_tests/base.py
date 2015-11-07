@@ -217,7 +217,7 @@ class BaseTests(object):
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         MESSAGE_LEVEL=constants.DEBUG,
@@ -243,7 +243,7 @@ class BaseTests(object):
 
     @modify_settings(
         INSTALLED_APPS={'remove': 'django.contrib.messages'},
-        MIDDLEWARE_CLASSES={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
+        MIDDLEWARE={'remove': 'django.contrib.messages.middleware.MessageMiddleware'},
     )
     @override_settings(
         TEMPLATES=[{

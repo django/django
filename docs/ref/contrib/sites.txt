@@ -405,8 +405,8 @@ If you often use this pattern::
 
 there is simple way to avoid repetitions. Add
 :class:`django.contrib.sites.middleware.CurrentSiteMiddleware` to
-:setting:`MIDDLEWARE_CLASSES`. The middleware sets the ``site`` attribute on
-every request object, so you can use ``request.site`` to get the current site.
+:setting:`MIDDLEWARE`. The middleware sets the ``site`` attribute on every
+request object, so you can use ``request.site`` to get the current site.
 
 How Django uses the sites framework
 ===================================

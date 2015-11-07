@@ -37,6 +37,17 @@ It also now includes trigram support, using the :lookup:`trigram_similar`
 lookup, and the :class:`~django.contrib.postgres.search.TrigramSimilarity` and
 :class:`~django.contrib.postgres.search.TrigramDistance` expressions.
 
+New-style middleware
+--------------------
+
+:doc:`A new style of middleware is introduced </topics/http/middleware>` to
+solve the lack of strict request/response layering of the old-style of
+middleware described in `DEP 0005
+<https://github.com/django/deps/blob/master/final/0005-improved-middleware.rst>`_.
+You'll need to :ref:`adapt old, custom middleware <upgrading-middleware>` and
+switch from the ``MIDDLEWARE_CLASSES`` setting to the new :setting:`MIDDLEWARE`
+setting to take advantage of the improvements.
+
 Official support for Unicode usernames
 --------------------------------------
 

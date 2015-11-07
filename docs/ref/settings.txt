@@ -77,7 +77,7 @@ can be used as a subdomain wildcard: ``'.example.com'`` will match
 ``example.com``. A value of ``'*'`` will match anything; in this case you are
 responsible to provide your own validation of the ``Host`` header (perhaps in a
 middleware; if so this middleware must be listed first in
-:setting:`MIDDLEWARE_CLASSES`).
+:setting:`MIDDLEWARE`).
 
 Django also allows the `fully qualified domain name (FQDN)`_ of any entries.
 Some browsers include a trailing dot in the ``Host`` header which Django
@@ -1844,6 +1844,17 @@ Example: ``"http://media.example.com/"``
     :setting:`MEDIA_URL` and :setting:`STATIC_URL` must have different
     values. See :setting:`MEDIA_ROOT` for more details.
 
+.. setting:: MIDDLEWARE
+
+``MIDDLEWARE``
+--------------
+
+.. versionadded:: 1.10
+
+Default:: ``None``
+
+A list of middleware to use. See :doc:`/topics/http/middleware`.
+
 .. setting:: MIDDLEWARE_CLASSES
 
 ``MIDDLEWARE_CLASSES``
@@ -1856,7 +1867,11 @@ Default::
         'django.middleware.csrf.CsrfViewMiddleware',
     ]
 
-A list of middleware classes to use. See :doc:`/topics/http/middleware`.
+A list of middleware classes to use. This was the default setting used in
+Django 1.9 and earlier. Django 1.10 introduced a new style of middleware. If
+you have an older project using this setting you should :ref:`update any
+middleware you've written yourself <upgrading-middleware>` to the new style
+and then use the :setting:`MIDDLEWARE` setting.
 
 .. setting:: MIGRATION_MODULES
 
@@ -3312,6 +3327,7 @@ HTTP
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`
 * :setting:`INTERNAL_IPS`
+* :setting:`MIDDLEWARE`
 * :setting:`MIDDLEWARE_CLASSES`
 * Security
 

@@ -1,19 +1,18 @@
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test import modify_settings
 from django.test.selenium import SeleniumTestCase
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import ugettext as _
 
 
-class CSPMiddleware(object):
+class CSPMiddleware(MiddlewareMixin):
     """The admin's JavaScript should be compatible with CSP."""
     def process_response(self, request, response):
         response['Content-Security-Policy'] = "default-src 'self'"
         return response
 
 
-@modify_settings(
-    MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'},
-)
+@modify_settings(MIDDLEWARE={'append': 'django.contrib.admin.tests.CSPMiddleware'})
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
     available_apps = [

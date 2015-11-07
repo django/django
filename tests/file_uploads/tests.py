@@ -27,7 +27,7 @@ MEDIA_ROOT = sys_tempfile.mkdtemp()
 UPLOAD_TO = os.path.join(MEDIA_ROOT, 'test_upload')
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE_CLASSES=[])
+@override_settings(MEDIA_ROOT=MEDIA_ROOT, ROOT_URLCONF='file_uploads.urls', MIDDLEWARE=[])
 class FileUploadTests(TestCase):
 
     @classmethod

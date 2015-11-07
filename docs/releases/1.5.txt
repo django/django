@@ -188,8 +188,7 @@ is an iterator.
 
 Since :class:`~django.http.StreamingHttpResponse` does not have a ``content``
 attribute, middleware that needs access to the response content must test for
-streaming responses and behave accordingly. See :ref:`response-middleware` for
-more information.
+streaming responses and behave accordingly.
 
 ``{% verbatim %}`` template tag
 -------------------------------

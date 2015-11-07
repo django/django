@@ -4,13 +4,15 @@ import pickle
 import time
 from datetime import datetime
 
-from django.conf import settings
 from django.template import engines
 from django.template.response import (
     ContentNotRenderedError, SimpleTemplateResponse, TemplateResponse,
 )
-from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.test import (
+    RequestFactory, SimpleTestCase, modify_settings, override_settings,
+)
 from django.test.utils import require_jinja2
+from django.utils.deprecation import MiddlewareMixin
 
 from .utils import TEMPLATE_DIR
 
@@ -21,7 +23,7 @@ test_processor_name = 'template_tests.test_response.test_processor'
 
 
 # A test middleware that installs a temporary URLConf
-class CustomURLConfMiddleware(object):
+class CustomURLConfMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.urlconf = 'template_tests.alternate_urls'
 
@@ -319,12 +321,8 @@ class TemplateResponseTest(SimpleTestCase):
         pickle.dumps(unpickled_response)
 
 
-@override_settings(
-    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
-        'template_tests.test_response.CustomURLConfMiddleware'
-    ],
-    ROOT_URLCONF='template_tests.urls',
-)
+@modify_settings(MIDDLEWARE={'append': ['template_tests.test_response.CustomURLConfMiddleware']})
+@override_settings(ROOT_URLCONF='template_tests.urls')
 class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
@@ -332,16 +330,47 @@ class CustomURLConfTest(SimpleTestCase):
         self.assertContains(response, 'This is where you can find the snark: /snark/')
 
 
+@modify_settings(
+    MIDDLEWARE={
+        'append': [
+            'django.middleware.cache.FetchFromCacheMiddleware',
+            'django.middleware.cache.UpdateCacheMiddleware',
+        ],
+    },
+)
+@override_settings(CACHE_MIDDLEWARE_SECONDS=2.0, ROOT_URLCONF='template_tests.alternate_urls')
+class CacheMiddlewareTest(SimpleTestCase):
+
+    def test_middleware_caching(self):
+        response = self.client.get('/template_response_view/')
+        self.assertEqual(response.status_code, 200)
+
+        time.sleep(1.0)
+
+        response2 = self.client.get('/template_response_view/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertEqual(response.content, response2.content)
+
+        time.sleep(2.0)
+
+        # Let the cache expire and test again
+        response2 = self.client.get('/template_response_view/')
+        self.assertEqual(response2.status_code, 200)
+
+        self.assertNotEqual(response.content, response2.content)
+
+
 @override_settings(
-    CACHE_MIDDLEWARE_SECONDS=2.0,
-    MIDDLEWARE_CLASSES=settings.MIDDLEWARE_CLASSES + [
+    MIDDLEWARE=None,
+    MIDDLEWARE_CLASSES=[
         'django.middleware.cache.FetchFromCacheMiddleware',
         'django.middleware.cache.UpdateCacheMiddleware',
     ],
-    ROOT_URLCONF='template_tests.alternate_urls',
+    CACHE_MIDDLEWARE_SECONDS=2.0,
+    ROOT_URLCONF='template_tests.alternate_urls'
 )
-class CacheMiddlewareTest(SimpleTestCase):
-
+class CacheMiddlewareClassesTest(SimpleTestCase):
     def test_middleware_caching(self):
         response = self.client.get('/template_response_view/')
         self.assertEqual(response.status_code, 200)

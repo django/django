@@ -1182,7 +1182,7 @@ easy::
     class MiddlewareTestCase(TestCase):
 
         def test_cache_middleware(self):
-            with self.modify_settings(MIDDLEWARE_CLASSES={
+            with self.modify_settings(MIDDLEWARE={
                 'append': 'django.middleware.cache.FetchFromCacheMiddleware',
                 'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
                 'remove': [
@@ -1233,7 +1233,7 @@ decorator::
 
     class MiddlewareTestCase(TestCase):
 
-        @modify_settings(MIDDLEWARE_CLASSES={
+        @modify_settings(MIDDLEWARE={
             'append': 'django.middleware.cache.FetchFromCacheMiddleware',
             'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
         })
@@ -1245,7 +1245,7 @@ The decorator can also be applied to test case classes::
 
     from django.test import TestCase, modify_settings
 
-    @modify_settings(MIDDLEWARE_CLASSES={
+    @modify_settings(MIDDLEWARE={
         'append': 'django.middleware.cache.FetchFromCacheMiddleware',
         'prepend': 'django.middleware.cache.UpdateCacheMiddleware',
     })

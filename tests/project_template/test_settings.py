@@ -26,16 +26,16 @@ class TestStartProjectSettings(TestCase):
         shutil.copyfile(template_settings_py, test_settings_py)
         self.addCleanup(os.remove, test_settings_py)
 
-    def test_middleware_classes_headers(self):
+    def test_middleware_headers(self):
         """
-        Ensure headers sent by the default MIDDLEWARE_CLASSES do not
-        inadvertently change. For example, we never want "Vary: Cookie" to
-        appear in the list since it prevents the caching of responses.
+        Ensure headers sent by the default MIDDLEWARE don't inadvertently
+        change. For example, we never want "Vary: Cookie" to appear in the list
+        since it prevents the caching of responses.
         """
-        from django.conf.project_template.project_name.settings import MIDDLEWARE_CLASSES
+        from django.conf.project_template.project_name.settings import MIDDLEWARE
 
         with self.settings(
-            MIDDLEWARE_CLASSES=MIDDLEWARE_CLASSES,
+            MIDDLEWARE=MIDDLEWARE,
             ROOT_URLCONF='project_template.urls',
         ):
             response = self.client.get('/empty/')

@@ -1756,7 +1756,7 @@ class MultipleLocaleActivationTests(SimpleTestCase):
         ('en', 'English'),
         ('fr', 'French'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
@@ -1772,7 +1772,7 @@ class LocaleMiddlewareTests(TestCase):
         self.assertContains(response, "Yes/No")
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             'django.contrib.sessions.middleware.SessionMiddleware',
             'django.middleware.locale.LocaleMiddleware',
             'django.middleware.common.CommonMiddleware',
@@ -1792,7 +1792,7 @@ class LocaleMiddlewareTests(TestCase):
         ('en', 'English'),
         ('fr', 'French'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
@@ -1828,7 +1828,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         ('en-us', 'English'),
         ('pt-br', 'Portuguese (Brazil)'),
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],
