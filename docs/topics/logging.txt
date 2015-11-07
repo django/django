@@ -310,15 +310,15 @@ Finally, here's an example of a fairly complex logging setup::
             'special': {
                 '()': 'project.logging.SpecialFilter',
                 'foo': 'bar',
-            }
+            },
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            },
         },
         'handlers': {
-            'null': {
-                'level': 'DEBUG',
-                'class': 'logging.NullHandler',
-            },
             'console': {
-                'level': 'DEBUG',
+                'level': 'INFO',
+                'filters': ['require_debug_true'],
                 'class': 'logging.StreamHandler',
                 'formatter': 'simple'
             },
@@ -330,9 +330,8 @@ Finally, here's an example of a fairly complex logging setup::
         },
         'loggers': {
             'django': {
-                'handlers': ['null'],
+                'handlers': ['console'],
                 'propagate': True,
-                'level': 'INFO',
             },
             'django.request': {
                 'handlers': ['mail_admins'],
@@ -366,17 +365,18 @@ This logging configuration does the following things:
     message, plus the time, process, thread and module that
     generate the log message.
 
-* Defines one filter -- ``project.logging.SpecialFilter``,
-  using the alias ``special``. If this filter required additional
-  arguments at time of construction, they can be provided as
-  additional keys in the filter configuration dictionary. In this
-  case, the argument ``foo`` will be given a value of ``bar`` when
-  instantiating the ``SpecialFilter``.
+* Defines two filters:
 
-* Defines three handlers:
+  * ``project.logging.SpecialFilter``, using the alias ``special``. If this
+    filter required additional arguments, they can be provided as additional
+    keys in the filter configuration dictionary. In this case, the argument
+    ``foo`` will be given a value of ``bar`` when instantiating
+    ``SpecialFilter``.
 
-  * ``null``, a NullHandler, which will pass any ``DEBUG`` (or
-    higher) message to ``/dev/null``.
+  * ``django.utils.log.RequireDebugTrue``, which passes on records when
+    :setting:`DEBUG` is ``True``.
+
+* Defines two handlers:
 
   * ``console``, a StreamHandler, which will print any ``DEBUG``
     (or higher) message to stderr. This handler uses the ``simple`` output
@@ -388,8 +388,7 @@ This logging configuration does the following things:
 
 * Configures three loggers:
 
-  * ``django``, which passes all messages at ``INFO`` or higher
-    to the ``null`` handler.
+  * ``django``, which passes all messages to the ``console`` handler.
 
   * ``django.request``, which passes all ``ERROR`` messages to
     the ``mail_admins`` handler. In addition, this logger is
@@ -527,6 +526,11 @@ specific logger following this example:
 
 .. code-block:: python
 
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
     'loggers': {
         'django.security.DisallowedHost': {
             'handlers': ['null'],
