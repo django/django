@@ -64,6 +64,10 @@ class MigrationLoader(object):
         self.unmigrated_apps = set()
         self.migrated_apps = set()
         for app_config in apps.get_app_configs():
+            # make it possible to skip migrations during tests
+            if self.connection and not self.connection.settings_dict.get('MIGRATE', True):
+                self.unmigrated_apps.add(app_config.label)
+                continue
             # Get the migrations module directory
             module_name = self.migrations_module(app_config.label)
             if module_name is None:
