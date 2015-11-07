@@ -8,6 +8,7 @@ from __future__ import unicode_literals
 
 import logging
 import re
+import string
 
 from django.conf import settings
 from django.urls import get_callable
@@ -16,7 +17,9 @@ from django.utils.crypto import constant_time_compare, get_random_string
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
+from django.utils.six.moves import zip
 from django.utils.six.moves.urllib.parse import urlparse
+
 
 logger = logging.getLogger('django.request')
 
@@ -27,7 +30,9 @@ REASON_BAD_TOKEN = "CSRF token missing or incorrect."
 REASON_MALFORMED_REFERER = "Referer checking failed - Referer is malformed."
 REASON_INSECURE_REFERER = "Referer checking failed - Referer is insecure while host is secure."
 
-CSRF_KEY_LENGTH = 32
+CSRF_SECRET_LENGTH = 32
+CSRF_TOKEN_LENGTH = 2 * CSRF_SECRET_LENGTH
+CSRF_ALLOWED_CHARS = string.ascii_letters + string.digits
 
 
 def _get_failure_view():
@@ -37,8 +42,38 @@ def _get_failure_view():
     return get_callable(settings.CSRF_FAILURE_VIEW)
 
 
-def _get_new_csrf_key():
-    return get_random_string(CSRF_KEY_LENGTH)
+def _get_new_csrf_string():
+    return get_random_string(CSRF_SECRET_LENGTH, allowed_chars=CSRF_ALLOWED_CHARS)
+
+
+def _salt_cipher_secret(secret):
+    """
+    Given a secret (assumed to be a string of CSRF_ALLOWED_CHARS), generate a
+    token by adding a salt and using it to encrypt the secret.
+    """
+    salt = _get_new_csrf_string()
+    chars = CSRF_ALLOWED_CHARS
+    pairs = zip((chars.index(x) for x in secret), (chars.index(x) for x in salt))
+    cipher = ''.join(chars[(x + y) % len(chars)] for x, y in pairs)
+    return salt + cipher
+
+
+def _unsalt_cipher_token(token):
+    """
+    Given a token (assumed to be a string of CSRF_ALLOWED_CHARS, of length
+    CSRF_TOKEN_LENGTH, and that its first half is a salt), use it to decrypt
+    the second half to produce the original secret.
+    """
+    salt = token[:CSRF_SECRET_LENGTH]
+    token = token[CSRF_SECRET_LENGTH:]
+    chars = CSRF_ALLOWED_CHARS
+    pairs = zip((chars.index(x) for x in token), (chars.index(x) for x in salt))
+    secret = ''.join(chars[x - y] for x, y in pairs)  # Note negative values are ok
+    return secret
+
+
+def _get_new_csrf_token():
+    return _salt_cipher_secret(_get_new_csrf_string())
 
 
 def get_token(request):
@@ -52,9 +87,12 @@ def get_token(request):
     function lazily, as is done by the csrf context processor.
     """
     if "CSRF_COOKIE" not in request.META:
-        request.META["CSRF_COOKIE"] = _get_new_csrf_key()
+        csrf_secret = _get_new_csrf_string()
+        request.META["CSRF_COOKIE"] = _salt_cipher_secret(csrf_secret)
+    else:
+        csrf_secret = _unsalt_cipher_token(request.META["CSRF_COOKIE"])
     request.META["CSRF_COOKIE_USED"] = True
-    return request.META["CSRF_COOKIE"]
+    return _salt_cipher_secret(csrf_secret)
 
 
 def rotate_token(request):
@@ -64,19 +102,35 @@ def rotate_token(request):
     """
     request.META.update({
         "CSRF_COOKIE_USED": True,
-        "CSRF_COOKIE": _get_new_csrf_key(),
+        "CSRF_COOKIE": _get_new_csrf_token(),
     })
+    request.csrf_cookie_needs_reset = True
 
 
 def _sanitize_token(token):
-    # Allow only alphanum
-    if len(token) > CSRF_KEY_LENGTH:
-        return _get_new_csrf_key()
-    token = re.sub('[^a-zA-Z0-9]+', '', force_text(token))
-    if token == "":
-        # In case the cookie has been truncated to nothing at some point.
-        return _get_new_csrf_key()
-    return token
+    # Allow only ASCII alphanumerics
+    if re.search('[^a-zA-Z0-9]', force_text(token)):
+        return _get_new_csrf_token()
+    elif len(token) == CSRF_TOKEN_LENGTH:
+        return token
+    elif len(token) == CSRF_SECRET_LENGTH:
+        # Older Django versions set cookies to values of CSRF_SECRET_LENGTH
+        # alphanumeric characters. For backwards compatibility, accept
+        # such values as unsalted secrets.
+        # It's easier to salt here and be consistent later, rather than add
+        # different code paths in the checks, although that might be a tad more
+        # efficient.
+        return _salt_cipher_secret(token)
+    return _get_new_csrf_token()
+
+
+def _compare_salted_tokens(request_csrf_token, csrf_token):
+    # Assume both arguments are sanitized -- that is, strings of
+    # length CSRF_TOKEN_LENGTH, all CSRF_ALLOWED_CHARS.
+    return constant_time_compare(
+        _unsalt_cipher_token(request_csrf_token),
+        _unsalt_cipher_token(csrf_token),
+    )
 
 
 class CsrfViewMiddleware(MiddlewareMixin):
@@ -112,12 +166,17 @@ class CsrfViewMiddleware(MiddlewareMixin):
             return None
 
         try:
-            csrf_token = _sanitize_token(
-                request.COOKIES[settings.CSRF_COOKIE_NAME])
-            # Use same token next time
-            request.META['CSRF_COOKIE'] = csrf_token
+            cookie_token = request.COOKIES[settings.CSRF_COOKIE_NAME]
         except KeyError:
             csrf_token = None
+        else:
+            csrf_token = _sanitize_token(cookie_token)
+            if csrf_token != cookie_token:
+                # Cookie token needed to be replaced;
+                # the cookie needs to be reset.
+                request.csrf_cookie_needs_reset = True
+            # Use same token next time.
+            request.META['CSRF_COOKIE'] = csrf_token
 
         # Wait until request.META["CSRF_COOKIE"] has been manipulated before
         # bailing out, so that get_token still works
@@ -142,7 +201,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 #
                 # The attacker will need to provide a CSRF cookie and token, but
                 # that's no problem for a MITM and the session-independent
-                # nonce we're using. So the MITM can circumvent the CSRF
+                # secret we're using. So the MITM can circumvent the CSRF
                 # protection. This is true for any HTTP connection, but anyone
                 # using HTTPS expects better! For this reason, for
                 # https://example.com/ we need additional protection that treats
@@ -213,14 +272,16 @@ class CsrfViewMiddleware(MiddlewareMixin):
                 # and possible for PUT/DELETE.
                 request_csrf_token = request.META.get(settings.CSRF_HEADER_NAME, '')
 
-            if not constant_time_compare(request_csrf_token, csrf_token):
+            request_csrf_token = _sanitize_token(request_csrf_token)
+            if not _compare_salted_tokens(request_csrf_token, csrf_token):
                 return self._reject(request, REASON_BAD_TOKEN)
 
         return self._accept(request)
 
     def process_response(self, request, response):
-        if getattr(response, 'csrf_processing_done', False):
-            return response
+        if not getattr(request, 'csrf_cookie_needs_reset', False):
+            if getattr(response, 'csrf_cookie_set', False):
+                return response
 
         if not request.META.get("CSRF_COOKIE_USED", False):
             return response
@@ -237,5 +298,5 @@ class CsrfViewMiddleware(MiddlewareMixin):
                             )
         # Content varies with the CSRF cookie, so set the Vary header.
         patch_vary_headers(response, ('Cookie',))
-        response.csrf_processing_done = True
+        response.csrf_cookie_set = True
         return response

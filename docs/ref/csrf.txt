@@ -218,26 +218,36 @@ How it works
 
 The CSRF protection is based on the following things:
 
-1. A CSRF cookie that is set to a random value (a session independent nonce, as
-   it is called), which other sites will not have access to.
+1. A CSRF cookie that is based on a random secret value, which other sites
+   will not have access to.
 
-   This cookie is set by ``CsrfViewMiddleware``.  It is meant to be permanent,
-   but since there is no way to set a cookie that never expires, it is sent with
-   every response that has called ``django.middleware.csrf.get_token()``
-   (the function used internally to retrieve the CSRF token).
+   This cookie is set by ``CsrfViewMiddleware``. It is sent with every
+   response that has called ``django.middleware.csrf.get_token()`` (the
+   function used internally to retrieve the CSRF token), if it wasn't already
+   set on the request.
 
-   For security reasons, the value of the CSRF cookie is changed each time a
+   In order to protect against `BREACH`_ attacks, the token is not simply the
+   secret; a random salt is prepended to the secret and used to scramble it.
+
+   For security reasons, the value of the secret is changed each time a
    user logs in.
 
 2. A hidden form field with the name 'csrfmiddlewaretoken' present in all
-   outgoing POST forms.  The value of this field is the value of the CSRF
-   cookie.
+   outgoing POST forms. The value of this field is, again, the value of the
+   secret, with a salt which is both added to it and used to scramble it. The
+   salt is regenerated on every call to ``get_token()`` so that the form field
+   value is changed in every such response.
 
    This part is done by the template tag.
 
 3. For all incoming requests that are not using HTTP GET, HEAD, OPTIONS or
    TRACE, a CSRF cookie must be present, and the 'csrfmiddlewaretoken' field
    must be present and correct. If it isn't, the user will get a 403 error.
+
+   When validating the 'csrfmiddlewaretoken' field value, only the secret,
+   not the full token, is compared with the secret in the cookie value.
+   This allows the use of ever-changing tokens. While each request may use its
+   own token, the secret remains common to all.
 
    This check is done by ``CsrfViewMiddleware``.
 
@@ -247,7 +257,7 @@ The CSRF protection is based on the following things:
    application since that request won't come from your own exact domain.
 
    This also addresses a man-in-the-middle attack that's possible under HTTPS
-   when using a session independent nonce, due to the fact that HTTP
+   when using a session independent secret, due to the fact that HTTP
    ``Set-Cookie`` headers are (unfortunately) accepted by clients even when
    they are talking to a site under HTTPS. (Referer checking is not done for
    HTTP requests because the presence of the ``Referer`` header isn't reliable
@@ -282,6 +292,13 @@ vulnerability allows and much worse).
 .. versionchanged:: 1.9
 
     Checking against the :setting:`CSRF_COOKIE_DOMAIN` setting was added.
+
+.. versionchanged:: 1.10
+
+   Added salting to the token and started changing it with each request
+   to protect against `BREACH`_ attacks.
+
+.. _BREACH: http://breachattack.com/
 
 Caching
 =======
@@ -498,15 +515,6 @@ Is the fact that Django's CSRF protection isn't linked to a session a problem?
 No, this is by design. Not linking CSRF protection to a session allows using
 the protection on sites such as a `pastebin` that allow submissions from
 anonymous users which don't have a session.
-
-Why not use a new token for each request?
------------------------------------------
-
-Generating a new token for each request is problematic from a UI perspective
-because it invalidates all previous forms. Most users would be very unhappy to
-find that opening a new tab on your site has invalidated the form they had
-just spent time filling out in another tab or that a form they accessed via
-the back button could not be filled out.
 
 Why might a user encounter a CSRF validation failure after logging in?
 ----------------------------------------------------------------------
