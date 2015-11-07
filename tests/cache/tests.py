@@ -1456,6 +1456,7 @@ class CacheUtils(SimpleTestCase):
         tests = (
             # Initial Cache-Control, kwargs to patch_cache_control, expected Cache-Control parts
             (None, {'private': True}, {'private'}),
+            ('', {'private': True}, {'private'}),
 
             # Test whether private/public attributes are mutually exclusive
             ('private', {'private': True}, {'private'}),
