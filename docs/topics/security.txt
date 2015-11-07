@@ -65,10 +65,10 @@ this if you know what you are doing. There are other :ref:`limitations
 <csrf-limitations>` if your site has subdomains that are outside of your
 control.
 
-:ref:`CSRF protection works <how-csrf-works>` by checking for a nonce in each
+:ref:`CSRF protection works <how-csrf-works>` by checking for a secret in each
 POST request. This ensures that a malicious user cannot simply "replay" a form
 POST to your website and have another logged in user unwittingly submit that
-form. The malicious user would have to know the nonce, which is user specific
+form. The malicious user would have to know the secret, which is user specific
 (using a cookie).
 
 When deployed with :ref:`HTTPS <security-recommendation-ssl>`,
