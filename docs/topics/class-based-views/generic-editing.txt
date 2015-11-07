@@ -153,9 +153,9 @@ Finally, we hook these new views into the URLconf:
 
     urlpatterns = [
         # ...
-        url(r'author/add/$', AuthorCreate.as_view(), name='author_add'),
-        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author_update'),
-        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author_delete'),
+        url(r'author/add/$', AuthorCreate.as_view(), name='author-add'),
+        url(r'author/(?P<pk>[0-9]+)/$', AuthorUpdate.as_view(), name='author-update'),
+        url(r'author/(?P<pk>[0-9]+)/delete/$', AuthorDelete.as_view(), name='author-delete'),
     ]
 
 .. note::

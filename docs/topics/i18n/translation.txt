@@ -1342,7 +1342,7 @@ prepend the current active language code to all url patterns defined within
     from sitemap.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
@@ -1364,7 +1364,7 @@ function. Example::
     from django.utils.translation import activate
 
     >>> activate('en')
-    >>> reverse('sitemap_xml')
+    >>> reverse('sitemap-xml')
     '/sitemap.xml'
     >>> reverse('news:index')
     '/en/news/'
@@ -1400,7 +1400,7 @@ URL patterns can also be marked translatable using the
     from sitemaps.views import sitemap
 
     urlpatterns = [
-        url(r'^sitemap\.xml$', sitemap, name='sitemap_xml'),
+        url(r'^sitemap\.xml$', sitemap, name='sitemap-xml'),
     ]
 
     news_patterns = ([
