@@ -168,3 +168,6 @@ class DatabaseChannelBackend(BaseChannelBackend):
 
     def __str__(self):
         return "%s(alias=%s)" % (self.__class__.__name__, self.connection.alias)
+
+    def flush(self):
+        pass

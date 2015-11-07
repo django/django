@@ -61,11 +61,6 @@ class RedisChannelBackend(BaseChannelBackend):
         host, port = self.hosts[index]
         return redis.Redis(host=host, port=port)
 
-    @property
-    def connections(self):
-        for i in range(len(self.hosts)):
-            return self.connection(i)
-
     def send(self, channel, message):
         # if channel is no str (=> bytes) convert it
         if not isinstance(channel, str):
@@ -189,3 +184,7 @@ class RedisChannelBackend(BaseChannelBackend):
 
     def __str__(self):
         return "%s(hosts=%s)" % (self.__class__.__name__, self.hosts)
+
+    def flush(self):
+        for i in range(self.ring_size):
+            self.connection(i).flushdb()

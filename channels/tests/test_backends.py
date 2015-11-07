@@ -13,6 +13,7 @@ class MemoryBackendTests(TestCase):
 
     def setUp(self):
         self.backend = self.backend_class(routing={})
+        self.backend.flush()
 
     def test_send_recv(self):
         """

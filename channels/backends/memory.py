@@ -92,3 +92,9 @@ class InMemoryChannelBackend(BaseChannelBackend):
         Unlocks the named channel. Always succeeds.
         """
         locks.discard(channel)
+
+    def flush(self):
+        global queues, groups, locks
+        queues = {}
+        groups = {}
+        locks = set()
