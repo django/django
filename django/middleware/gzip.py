@@ -1,12 +1,13 @@
 import re
 
 from django.utils.cache import patch_vary_headers
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.text import compress_sequence, compress_string
 
 re_accepts_gzip = re.compile(r'\bgzip\b')
 
 
-class GZipMiddleware(object):
+class GZipMiddleware(MiddlewareMixin):
     """
     This middleware compresses content if the browser allows gzip compression.
     It sets the Vary header accordingly, so that caches will base their storage

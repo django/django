@@ -41,8 +41,8 @@ For reference, here are the requirements:
    defined in your :setting:`TEMPLATES` as well as
    :class:`django.contrib.auth.middleware.AuthenticationMiddleware` and
    :class:`django.contrib.messages.middleware.MessageMiddleware` to
-   :setting:`MIDDLEWARE_CLASSES`. (These are all active by default, so
-   you only need to do this if you've manually tweaked the settings.)
+   :setting:`MIDDLEWARE`. These are all active by default, so you only need to
+   do this if you've manually tweaked the settings.
 
 4. Determine which of your application's models should be editable in the
    admin interface.

@@ -785,7 +785,7 @@ class RequestURLconfTests(SimpleTestCase):
         self.assertEqual(response.status_code, 404)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
         ]
     )
@@ -799,7 +799,7 @@ class RequestURLconfTests(SimpleTestCase):
         self.assertEqual(response.content, b'outer:,inner:/second_test/')
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.NullChangeURLconfMiddleware' % middleware.__name__,
         ]
     )
@@ -817,7 +817,7 @@ class RequestURLconfTests(SimpleTestCase):
         self.assertEqual(response.status_code, 404)
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
             '%s.ReverseInnerInResponseMiddleware' % middleware.__name__,
         ]
@@ -832,7 +832,7 @@ class RequestURLconfTests(SimpleTestCase):
         self.assertEqual(response.content, b'/second_test/')
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
             '%s.ReverseOuterInResponseMiddleware' % middleware.__name__,
         ]
@@ -847,7 +847,7 @@ class RequestURLconfTests(SimpleTestCase):
             self.client.get('/second_test/')
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
             '%s.ReverseInnerInStreaming' % middleware.__name__,
         ]
@@ -862,7 +862,7 @@ class RequestURLconfTests(SimpleTestCase):
         self.assertEqual(b''.join(response), b'/second_test/')
 
     @override_settings(
-        MIDDLEWARE_CLASSES=[
+        MIDDLEWARE=[
             '%s.ChangeURLconfMiddleware' % middleware.__name__,
             '%s.ReverseOuterInStreaming' % middleware.__name__,
         ]

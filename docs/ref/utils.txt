@@ -173,6 +173,10 @@ The functions defined in this module share the following properties:
     middleware functionality on a per-view basis. The middleware is created
     with no params passed.
 
+    It assumes middleware that's compatible with the old style of Django 1.9
+    and earlier (having methods like ``process_request()``,
+    ``process_exception()``, and ``process_response()``).
+
 .. function:: decorator_from_middleware_with_args(middleware_class)
 
     Like ``decorator_from_middleware``, but returns a function

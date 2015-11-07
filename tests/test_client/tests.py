@@ -694,7 +694,7 @@ class ClientTest(TestCase):
 
 
 @override_settings(
-    MIDDLEWARE_CLASSES=['django.middleware.csrf.CsrfViewMiddleware'],
+    MIDDLEWARE=['django.middleware.csrf.CsrfViewMiddleware'],
     ROOT_URLCONF='test_client.urls',
 )
 class CSRFEnabledClientTests(SimpleTestCase):

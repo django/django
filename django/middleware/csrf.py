@@ -13,6 +13,7 @@ from django.conf import settings
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.encoding import force_text
 from django.utils.http import is_same_domain
 from django.utils.six.moves.urllib.parse import urlparse
@@ -78,7 +79,7 @@ def _sanitize_token(token):
     return token
 
 
-class CsrfViewMiddleware(object):
+class CsrfViewMiddleware(MiddlewareMixin):
     """
     Middleware that requires a present and correct csrfmiddlewaretoken
     for POST requests that have a CSRF cookie, and sets an outgoing

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import unittest
 
+from django.core.exceptions import ImproperlyConfigured
 from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
@@ -166,6 +167,10 @@ class SignalsTests(SimpleTestCase):
         self.assertEqual(self.signals, ['started', 'finished'])
 
 
+def empty_middleware(get_response):
+    pass
+
+
 @override_settings(ROOT_URLCONF='handlers.urls')
 class HandlerRequestTests(SimpleTestCase):
 
@@ -198,6 +203,12 @@ class HandlerRequestTests(SimpleTestCase):
         environ = RequestFactory().get('/httpstatus_enum/').environ
         WSGIHandler()(environ, start_response)
         self.assertEqual(start_response.status, '200 OK')
+
+    @override_settings(MIDDLEWARE=['handlers.tests.empty_middleware'])
+    def test_middleware_returns_none(self):
+        msg = 'Middleware factory handlers.tests.empty_middleware returned None.'
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            self.client.get('/')
 
 
 class ScriptNameTests(SimpleTestCase):

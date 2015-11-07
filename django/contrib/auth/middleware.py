@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 
@@ -11,18 +13,18 @@ def get_user(request):
     return request._cached_user
 
 
-class AuthenticationMiddleware(object):
+class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
         assert hasattr(request, 'session'), (
             "The Django authentication middleware requires session middleware "
-            "to be installed. Edit your MIDDLEWARE_CLASSES setting to insert "
+            "to be installed. Edit your MIDDLEWARE%s setting to insert "
             "'django.contrib.sessions.middleware.SessionMiddleware' before "
             "'django.contrib.auth.middleware.AuthenticationMiddleware'."
-        )
+        ) % ("_CLASSES" if settings.MIDDLEWARE is None else "")
         request.user = SimpleLazyObject(lambda: get_user(request))
 
 
-class SessionAuthenticationMiddleware(object):
+class SessionAuthenticationMiddleware(MiddlewareMixin):
     """
     Formerly, a middleware for invalidating a user's sessions that don't
     correspond to the user's current session authentication hash. However, it
@@ -35,7 +37,7 @@ class SessionAuthenticationMiddleware(object):
         pass
 
 
-class RemoteUserMiddleware(object):
+class RemoteUserMiddleware(MiddlewareMixin):
     """
     Middleware for utilizing Web-server-provided authentication.
 
@@ -61,7 +63,7 @@ class RemoteUserMiddleware(object):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
                 " authentication middleware to be installed.  Edit your"
-                " MIDDLEWARE_CLASSES setting to insert"
+                " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
                 " before the RemoteUserMiddleware class.")
         try:

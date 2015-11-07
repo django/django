@@ -56,9 +56,9 @@ Setting ``X-Frame-Options`` for all responses
 
 To set the same ``X-Frame-Options`` value for all responses in your site, put
 ``'django.middleware.clickjacking.XFrameOptionsMiddleware'`` to
-:setting:`MIDDLEWARE_CLASSES`::
+:setting:`MIDDLEWARE`::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         ...
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         ...

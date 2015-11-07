@@ -53,7 +53,7 @@ Then either:
 or:
 
 3. Add ``'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'``
-   to your :setting:`MIDDLEWARE_CLASSES` setting.
+   to your :setting:`MIDDLEWARE` setting.
 
 4. Run the command :djadmin:`manage.py migrate <migrate>`.
 
@@ -144,8 +144,7 @@ can do all of the work.
    methods. Only requests which are successfully routed to a view via
    normal URL resolution apply view middleware.
 
-Note that the order of :setting:`MIDDLEWARE_CLASSES` matters. Generally, you
-can put
+Note that the order of :setting:`MIDDLEWARE` matters. Generally, you can put
 :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware` at the
 end of the list. This means it will run first when processing the response, and
 ensures that any other response-processing middlewares see the real flatpage

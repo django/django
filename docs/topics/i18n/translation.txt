@@ -38,7 +38,7 @@ make some optimizations so as not to load the internationalization machinery.
 .. note::
 
     Make sure you've activated translation for your project (the fastest way is
-    to check if :setting:`MIDDLEWARE_CLASSES` includes
+    to check if :setting:`MIDDLEWARE` includes
     :mod:`django.middleware.locale.LocaleMiddleware`). If you haven't yet,
     see :ref:`how-django-discovers-language-preference`.
 
@@ -1422,7 +1422,7 @@ Django provides two mechanisms to internationalize URL patterns:
     Using either one of these features requires that an active language be set
     for each request; in other words, you need to have
     :class:`django.middleware.locale.LocaleMiddleware` in your
-    :setting:`MIDDLEWARE_CLASSES` setting.
+    :setting:`MIDDLEWARE` setting.
 
 Language prefix in URL patterns
 -------------------------------
@@ -2065,8 +2065,8 @@ prefer, then you also need to use the ``LocaleMiddleware``.
 It customizes content for each user.
 
 To use ``LocaleMiddleware``, add ``'django.middleware.locale.LocaleMiddleware'``
-to your :setting:`MIDDLEWARE_CLASSES` setting. Because middleware order
-matters, you should follow these guidelines:
+to your :setting:`MIDDLEWARE` setting. Because middleware order matters, follow
+these guidelines:
 
 * Make sure it's one of the first middlewares installed.
 * It should come after ``SessionMiddleware``, because ``LocaleMiddleware``
@@ -2075,9 +2075,9 @@ matters, you should follow these guidelines:
   to resolve the requested URL.
 * If you use ``CacheMiddleware``, put ``LocaleMiddleware`` after it.
 
-For example, your :setting:`MIDDLEWARE_CLASSES` might look like this::
+For example, your :setting:`MIDDLEWARE` might look like this::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
        'django.contrib.sessions.middleware.SessionMiddleware',
        'django.middleware.locale.LocaleMiddleware',
        'django.middleware.common.CommonMiddleware',

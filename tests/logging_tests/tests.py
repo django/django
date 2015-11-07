@@ -125,7 +125,7 @@ class HandlerLoggingTests(SetupDefaultLoggingMixin, LoggingCaptureMixin, SimpleT
     DEBUG=True,
     USE_I18N=True,
     LANGUAGES=[('en', 'English')],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.locale.LocaleMiddleware',
         'django.middleware.common.CommonMiddleware',
     ],

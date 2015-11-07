@@ -23,7 +23,7 @@ class RemoteUserTest(TestCase):
     def setUp(self):
         self.patched_settings = modify_settings(
             AUTHENTICATION_BACKENDS={'append': self.backend},
-            MIDDLEWARE_CLASSES={'append': self.middleware},
+            MIDDLEWARE={'append': self.middleware},
         )
         self.patched_settings.enable()
 
@@ -149,6 +149,21 @@ class RemoteUserTest(TestCase):
         User.objects.create(username='knownuser', is_active=False)
         response = self.client.get('/remote_user/', **{self.header: 'knownuser'})
         self.assertTrue(response.context['user'].is_anonymous)
+
+
+@override_settings(MIDDLEWARE=None)
+class RemoteUserTestMiddlewareClasses(RemoteUserTest):
+
+    def setUp(self):
+        self.patched_settings = modify_settings(
+            AUTHENTICATION_BACKENDS={'append': self.backend},
+            MIDDLEWARE_CLASSES={'append': [
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.contrib.auth.middleware.AuthenticationMiddleware',
+                self.middleware,
+            ]},
+        )
+        self.patched_settings.enable()
 
 
 class RemoteUserNoCreateBackend(RemoteUserBackend):

@@ -491,19 +491,19 @@ The following checks are run if you use the :option:`check --deploy` option:
 
 * **security.W001**: You do not have
   :class:`django.middleware.security.SecurityMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES` so the :setting:`SECURE_HSTS_SECONDS`,
   :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, :setting:`SECURE_BROWSER_XSS_FILTER`,
   and :setting:`SECURE_SSL_REDIRECT` settings will have no effect.
 * **security.W002**: You do not have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES`, so your pages will not be served with an
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, so your pages will not be served with an
   ``'x-frame-options'`` header. Unless there is a good reason for your
   site to be served in a frame, you should consider enabling this
   header to help prevent clickjacking attacks.
 * **security.W003**: You don't appear to be using Django's built-in cross-site
   request forgery protection via the middleware
   (:class:`django.middleware.csrf.CsrfViewMiddleware` is not in your
-  :setting:`MIDDLEWARE_CLASSES`). Enabling the middleware is the safest
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`). Enabling the middleware is the safest
   approach to ensure you don't leave any holes.
 * **security.W004**: You have not set a value for the
   :setting:`SECURE_HSTS_SECONDS` setting. If your entire site is served only
@@ -540,7 +540,7 @@ The following checks are run if you use the :option:`check --deploy` option:
   sessions.
 * **security.W011**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES`, but you have not set
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but you have not set
   :setting:`SESSION_COOKIE_SECURE` to ``True``. Using a secure-only session
   cookie makes it more difficult for network traffic sniffers to hijack user
   sessions.
@@ -554,7 +554,7 @@ The following checks are run if you use the :option:`check --deploy` option:
   sessions.
 * **security.W014**: You have
   :class:`django.contrib.sessions.middleware.SessionMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES`, but you have not set
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but you have not set
   :setting:`SESSION_COOKIE_HTTPONLY` to ``True``. Using an ``HttpOnly`` session
   cookie makes it more difficult for cross-site scripting attacks to hijack user
   sessions.
@@ -571,7 +571,7 @@ The following checks are run if you use the :option:`check --deploy` option:
   deployment.
 * **security.W019**: You have
   :class:`django.middleware.clickjacking.XFrameOptionsMiddleware` in your
-  :setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
+  :setting:`MIDDLEWARE`/:setting:`MIDDLEWARE_CLASSES`, but :setting:`X_FRAME_OPTIONS` is not set to
   ``'DENY'``. The default is ``'SAMEORIGIN'``, but unless there is a good reason
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.

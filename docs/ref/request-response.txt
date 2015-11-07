@@ -176,9 +176,9 @@ All attributes should be considered read-only, unless stated otherwise.
 
     An instance of :class:`~django.urls.ResolverMatch` representing the
     resolved URL. This attribute is only set after URL resolving took place,
-    which means it's available in all views but not in middleware methods
-    which are executed before URL resolving takes place (like
-    ``process_request()``, you can use ``process_view()`` instead).
+    which means it's available in all views but not in middleware which are
+    executed before URL resolving takes place (you can use it in
+    :meth:`process_view` though).
 
 Attributes set by application code
 ----------------------------------
@@ -210,7 +210,7 @@ Attributes set by middleware
 
 Some of the middleware included in Django's contrib apps set attributes on the
 request. If you don't see the attribute on a request, be sure the appropriate
-middleware class is listed in :setting:`MIDDLEWARE_CLASSES`.
+middleware class is listed in :setting:`MIDDLEWARE`.
 
 .. attribute:: HttpRequest.session
 
@@ -257,7 +257,9 @@ Methods
         behind multiple proxies. One solution is to use middleware to rewrite
         the proxy headers, as in the following example::
 
-            class MultipleProxyMiddleware(object):
+            from django.django.utils.deprecation import MiddlewareMixin
+
+            class MultipleProxyMiddleware(MiddlewareMixin):
                 FORWARDED_FOR_FIELDS = [
                     'HTTP_X_FORWARDED_FOR',
                     'HTTP_X_FORWARDED_HOST',

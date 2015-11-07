@@ -5,7 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.test import SimpleTestCase, TestCase, override_settings
 
-from .settings import AUTH_MIDDLEWARE_CLASSES, AUTH_TEMPLATES
+from .settings import AUTH_MIDDLEWARE, AUTH_TEMPLATES
 
 
 class MockUser(object):
@@ -67,7 +67,7 @@ class AuthContextProcessorTests(TestCase):
     def setUpTestData(cls):
         cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
 
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE_CLASSES)
+    @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_not_accessed(self):
         """
         Tests that the session is not accessed simply by including
@@ -76,12 +76,22 @@ class AuthContextProcessorTests(TestCase):
         response = self.client.get('/auth_processor_no_attr_access/')
         self.assertContains(response, "Session not accessed")
 
-    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE_CLASSES)
+    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
+    def test_session_not_accessed_middleware_classes(self):
+        response = self.client.get('/auth_processor_no_attr_access/')
+        self.assertContains(response, "Session not accessed")
+
+    @override_settings(MIDDLEWARE=AUTH_MIDDLEWARE)
     def test_session_is_accessed(self):
         """
         Tests that the session is accessed if the auth context processor
         is used and relevant attributes accessed.
         """
+        response = self.client.get('/auth_processor_attr_access/')
+        self.assertContains(response, "Session accessed")
+
+    @override_settings(MIDDLEWARE_CLASSES=AUTH_MIDDLEWARE, MIDDLEWARE=None)
+    def test_session_is_accessed_middleware_classes(self):
         response = self.client.get('/auth_processor_attr_access/')
         self.assertContains(response, "Session accessed")
 

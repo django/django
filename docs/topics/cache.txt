@@ -447,9 +447,9 @@ Once the cache is set up, the simplest way to use caching is to cache your
 entire site. You'll need to add
 ``'django.middleware.cache.UpdateCacheMiddleware'`` and
 ``'django.middleware.cache.FetchFromCacheMiddleware'`` to your
-:setting:`MIDDLEWARE_CLASSES` setting, as in this example::
+:setting:`MIDDLEWARE` setting, as in this example::
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'django.middleware.cache.UpdateCacheMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
@@ -459,7 +459,7 @@ entire site. You'll need to add
 
     No, that's not a typo: the "update" middleware must be first in the list,
     and the "fetch" middleware must be last. The details are a bit obscure, but
-    see `Order of MIDDLEWARE_CLASSES`_ below if you'd like the full story.
+    see `Order of MIDDLEWARE`_ below if you'd like the full story.
 
 Then, add the following required settings to your Django settings file:
 
@@ -1217,11 +1217,11 @@ Example::
     def myview(request):
         ...
 
-Order of ``MIDDLEWARE_CLASSES``
-===============================
+Order of ``MIDDLEWARE``
+=======================
 
 If you use caching middleware, it's important to put each half in the right
-place within the :setting:`MIDDLEWARE_CLASSES` setting. That's because the cache
+place within the :setting:`MIDDLEWARE` setting. That's because the cache
 middleware needs to know which headers by which to vary the cache storage.
 Middleware always adds something to the ``Vary`` response header when it can.
 

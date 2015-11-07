@@ -40,7 +40,7 @@ class TestDataMixin(object):
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,11 +107,26 @@ class FlatpageMiddlewareTests(TestDataMixin, TestCase):
         self.assertContains(response, "<p>Isn't it special!</p>")
 
 
+@override_settings(
+    MIDDLEWARE=None,
+    MIDDLEWARE_CLASSES=[
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    ],
+)
+class FlatpageMiddlewareClassesTests(FlatpageMiddlewareTests):
+    pass
+
+
 @modify_settings(INSTALLED_APPS={'append': 'django.contrib.flatpages'})
 @override_settings(
     APPEND_SLASH=True,
     LOGIN_URL='/accounts/login/',
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'django.middleware.common.CommonMiddleware',
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -172,3 +187,18 @@ class FlatpageMiddlewareAppendSlashTests(TestDataMixin, TestCase):
 
         response = self.client.get('/')
         self.assertContains(response, "<p>Root</p>")
+
+
+@override_settings(
+    MIDDLEWARE=None,
+    MIDDLEWARE_CLASSES=[
+        'django.middleware.common.CommonMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
+    ],
+)
+class FlatpageAppendSlashMiddlewareClassesTests(FlatpageMiddlewareAppendSlashTests):
+    pass

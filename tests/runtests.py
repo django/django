@@ -62,7 +62,7 @@ ALWAYS_INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-ALWAYS_MIDDLEWARE_CLASSES = [
+ALWAYS_MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -124,7 +124,7 @@ def setup(verbosity, test_labels, parallel):
         'LANGUAGE_CODE': settings.LANGUAGE_CODE,
         'STATIC_URL': settings.STATIC_URL,
         'STATIC_ROOT': settings.STATIC_ROOT,
-        'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES,
+        'MIDDLEWARE': settings.MIDDLEWARE,
     }
 
     # Redirect some settings for the duration of these tests.
@@ -147,7 +147,7 @@ def setup(verbosity, test_labels, parallel):
     }]
     settings.LANGUAGE_CODE = 'en'
     settings.SITE_ID = 1
-    settings.MIDDLEWARE_CLASSES = ALWAYS_MIDDLEWARE_CLASSES
+    settings.MIDDLEWARE = ALWAYS_MIDDLEWARE
     settings.MIGRATION_MODULES = {
         # This lets us skip creating migrations for the test models as many of
         # them depend on one of the following contrib applications.

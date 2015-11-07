@@ -3,12 +3,13 @@
 from django.conf import settings
 from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.http import HttpResponseRedirect
+from django.middleware.exception import ExceptionMiddleware
 from django.urls import get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
 
 
-class LocaleMiddleware(object):
+class LocaleMiddleware(ExceptionMiddleware):
     """
     This is a very simple middleware that parses a request
     and decides what translation object to install in the current
@@ -17,6 +18,17 @@ class LocaleMiddleware(object):
     is available, of course).
     """
     response_redirect_class = HttpResponseRedirect
+
+    def __init__(self, get_response=None):
+        # This override makes get_response optional during the
+        # MIDDLEWARE_CLASSES deprecation.
+        super(LocaleMiddleware, self).__init__(get_response)
+
+    def __call__(self, request):
+        response = self.process_request(request)
+        if not response:
+            response = super(LocaleMiddleware, self).__call__(request)
+        return self.process_response(request, response)
 
     def process_request(self, request):
         urlconf = getattr(request, 'urlconf', settings.ROOT_URLCONF)

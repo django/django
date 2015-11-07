@@ -1,13 +1,14 @@
 from django.conf import settings
 
 from .. import Tags, Warning, register
+from ..utils import patch_middleware_message
 
 SECRET_KEY_MIN_LENGTH = 50
 SECRET_KEY_MIN_UNIQUE_CHARACTERS = 5
 
 W001 = Warning(
     "You do not have 'django.middleware.security.SecurityMiddleware' "
-    "in your MIDDLEWARE_CLASSES so the SECURE_HSTS_SECONDS, "
+    "in your MIDDLEWARE so the SECURE_HSTS_SECONDS, "
     "SECURE_CONTENT_TYPE_NOSNIFF, "
     "SECURE_BROWSER_XSS_FILTER, and SECURE_SSL_REDIRECT settings "
     "will have no effect.",
@@ -17,7 +18,7 @@ W001 = Warning(
 W002 = Warning(
     "You do not have "
     "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
-    "MIDDLEWARE_CLASSES, so your pages will not be served with an "
+    "MIDDLEWARE, so your pages will not be served with an "
     "'x-frame-options' header. Unless there is a good reason for your "
     "site to be served in a frame, you should consider enabling this "
     "header to help prevent clickjacking attacks.",
@@ -88,7 +89,7 @@ W018 = Warning(
 W019 = Warning(
     "You have "
     "'django.middleware.clickjacking.XFrameOptionsMiddleware' in your "
-    "MIDDLEWARE_CLASSES, but X_FRAME_OPTIONS is not set to 'DENY'. "
+    "MIDDLEWARE, but X_FRAME_OPTIONS is not set to 'DENY'. "
     "The default is 'SAMEORIGIN', but unless there is a good reason for "
     "your site to serve other parts of itself in a frame, you should "
     "change it to 'DENY'.",
@@ -102,23 +103,25 @@ W020 = Warning(
 
 
 def _security_middleware():
-    return "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES
+    return ("django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE_CLASSES or
+            settings.MIDDLEWARE and "django.middleware.security.SecurityMiddleware" in settings.MIDDLEWARE)
 
 
 def _xframe_middleware():
-    return "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES
+    return ("django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE_CLASSES or
+            settings.MIDDLEWARE and "django.middleware.clickjacking.XFrameOptionsMiddleware" in settings.MIDDLEWARE)
 
 
 @register(Tags.security, deploy=True)
 def check_security_middleware(app_configs, **kwargs):
     passed_check = _security_middleware()
-    return [] if passed_check else [W001]
+    return [] if passed_check else [patch_middleware_message(W001)]
 
 
 @register(Tags.security, deploy=True)
 def check_xframe_options_middleware(app_configs, **kwargs):
     passed_check = _xframe_middleware()
-    return [] if passed_check else [W002]
+    return [] if passed_check else [patch_middleware_message(W002)]
 
 
 @register(Tags.security, deploy=True)
@@ -186,7 +189,7 @@ def check_xframe_deny(app_configs, **kwargs):
         not _xframe_middleware() or
         settings.X_FRAME_OPTIONS == 'DENY'
     )
-    return [] if passed_check else [W019]
+    return [] if passed_check else [patch_middleware_message(W019)]
 
 
 @register(Tags.security, deploy=True)

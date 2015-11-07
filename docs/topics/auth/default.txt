@@ -838,7 +838,7 @@ Session invalidation on password change
     ``SessionAuthenticationMiddleware`` is enabled. In older
     versions, this protection only applies if
     ``django.contrib.auth.middleware.SessionAuthenticationMiddleware``
-    is enabled in :setting:`MIDDLEWARE_CLASSES`.
+    is enabled in :setting:`MIDDLEWARE`.
 
 If your :setting:`AUTH_USER_MODEL` inherits from
 :class:`~django.contrib.auth.models.AbstractBaseUser` or implements its own

@@ -852,7 +852,8 @@ Python Version: {{ sys_version_info }}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{{ settings.MIDDLEWARE_CLASSES|pprint }}
+{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
+"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
 
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
@@ -1059,7 +1060,8 @@ Server time: {{server_time|date:"r"}}
 Installed Applications:
 {{ settings.INSTALLED_APPS|pprint }}
 Installed Middleware:
-{{ settings.MIDDLEWARE_CLASSES|pprint }}
+{% if settings.MIDDLEWARE is not None %}{{ settings.MIDDLEWARE|pprint }}"""
+"""{% else %}{{ settings.MIDDLEWARE_CLASSES|pprint }}{% endif %}
 {% if template_does_not_exist %}Template loader postmortem
 {% if postmortem %}Django tried loading these templates, in this order:
 {% for entry in postmortem %}
