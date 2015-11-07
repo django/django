@@ -1613,6 +1613,64 @@ your test suite.
             Person.objects.create(name="Aaron")
             Person.objects.create(name="Daniel")
 
+.. _topics-tagging-tests:
+
+Tagging tests
+-------------
+
+.. versionadded:: 1.10
+
+You can tag your tests to group them. For example, you might label fast or slow tests::
+
+    from django.test.utils import tag
+
+    class SampleTestCase(TestCase):
+
+        @tag('fast')
+        def test_fast(self):
+            ...
+
+        @tag('slow')
+        def test_slow(self):
+            ...
+
+        @tag('slow', 'core')
+        def test_slow_but_core(self):
+            ...
+
+You can also tag a test case with tags::
+
+    class SampleTestCase(TestCase):
+        tags = ['slow', 'core']
+
+        def test_foo(self):
+            ...
+
+        def test_bar(self):
+            ...
+
+
+And then you can choose which tests to run.
+
+.. code-block:: console
+
+    ./manage.py test --tag=fast # this will run only fast test
+
+    # this will run fast test and the core one, despite it's slow
+    ./manage.py test --tag=fast --tag=core
+
+
+You can also exclude some tests from being run by tags.
+
+.. code-block:: console
+
+    # this will run only core tests if they are not slow
+    ./manage.py test --tag=core --exclude-tag=slow
+
+:djadminopt:`--exclude-tag` has precedence over :djadminopt:`--tag`, so if a test has
+two tags and you select one of them and exclude the other, the
+test won't be run.
+
 .. _topics-testing-email:
 
 Email services

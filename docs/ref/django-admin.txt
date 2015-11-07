@@ -1307,6 +1307,22 @@ don't.
     in order to exchange them between processes. See
     :ref:`python:pickle-picklable` for details.
 
+.. django-admin-option:: --tags
+
+.. versionadded:: 1.10
+
+The ``--tags`` option can be used to run only tests marked with specified
+tags. This may help with running only subset of tests. It can be combined
+with ``--exclude-tags``.
+
+.. django-admin-option:: --exclude-tags
+
+.. versionadded:: 1.10
+
+The ``--exclude-tags`` option can be used to exclude tests marked with
+specified tags from running.This may help with running only subset of
+tests. It can be combined with ``--tags``.
+
 testserver <fixture fixture ...>
 --------------------------------
 

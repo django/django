@@ -143,7 +143,7 @@ class ManageCommandTests(unittest.TestCase):
     def test_custom_test_runner(self):
         call_command('test', 'sites',
                      testrunner='test_runner.tests.MockTestRunner')
-        MockTestRunner.run_tests.assert_called_with(('sites',))
+        MockTestRunner.run_tests.assert_called_with(('sites',), tags=set([]), exclude_tags=set([]))
 
     def test_bad_test_runner(self):
         with self.assertRaises(AttributeError):

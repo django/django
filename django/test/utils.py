@@ -640,3 +640,14 @@ class LoggingCaptureMixin(object):
 
     def tearDown(self):
         self.logger.handlers[0].stream = self.old_stream
+
+
+def tag(*tags):
+    """
+    Decorator to add tags to test
+    """
+    def decorator(obj):
+        setattr(obj, 'tags', set(tags))
+        return obj
+
+    return decorator
