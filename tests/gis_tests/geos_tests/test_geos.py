@@ -989,6 +989,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(g1.srid, 4326)
             self.assertIsNot(g1, g, "Clone didn't happen")
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_nosrid(self):
         """ Testing `transform` method (no SRID or negative SRID) """
 
