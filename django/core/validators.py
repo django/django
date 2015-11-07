@@ -83,9 +83,10 @@ class URLValidator(RegexValidator):
     ipv6_re = r'\[[0-9a-f:\.]+\]'  # (simple regex, validated later)
 
     # Host patterns
-    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]*[a-z' + ul + r'0-9])?'
-    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]+(?<!-))*'
-    tld_re = r'\.(?:[a-z' + ul + r']{2,}|xn--[a-z0-9]+)\.?'
+    hostname_re = r'[a-z' + ul + r'0-9](?:[a-z' + ul + r'0-9-]{0,61}[a-z' + ul + r'0-9])?'
+    # Max length for domain name labels is 63 characters per RFC 1034 sec. 3.1
+    domain_re = r'(?:\.(?!-)[a-z' + ul + r'0-9-]{1,63}(?<!-))*'
+    tld_re = r'\.(?:[a-z' + ul + r']{2,63}|xn--[a-z0-9]{1,59})\.?'
     host_re = '(' + hostname_re + domain_re + tld_re + '|localhost)'
 
     regex = _lazy_re_compile(
@@ -135,6 +136,14 @@ class URLValidator(RegexValidator):
                 except ValidationError:
                     raise ValidationError(self.message, code=self.code)
             url = value
+
+        if len(urlsplit(value).netloc) > 253:
+            # Check the maximum length of a full host name which is 253
+            # characters as per RFC 1034 section 3.1. (It is defined to be
+            # 255 bytes or less, but this includes one byte for the length
+            # of the name and one byte for the trailing dot that is used to
+            # indicate absolute names in DNS.)
+            raise ValidationError(self.message, code=self.code)
 
 integer_validator = RegexValidator(
     _lazy_re_compile('^-?\d+\Z'),
