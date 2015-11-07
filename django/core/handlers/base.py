@@ -35,6 +35,7 @@ class BaseHandler(object):
         self._template_response_middleware = None
         self._response_middleware = None
         self._exception_middleware = None
+        self._middleware = None
 
     def load_middleware(self):
         """
@@ -46,8 +47,11 @@ class BaseHandler(object):
         self._template_response_middleware = []
         self._response_middleware = []
         self._exception_middleware = []
+        self._middleware = []
+        self._new_style_middleware = False
 
         request_middleware = []
+        middleware_count = 0
         for middleware_path in settings.MIDDLEWARE_CLASSES:
             mw_class = import_string(middleware_path)
             try:
@@ -59,6 +63,8 @@ class BaseHandler(object):
                     else:
                         logger.debug('MiddlewareNotUsed: %r', middleware_path)
                 continue
+            else:
+                middleware_count += 1
 
             if hasattr(mw_instance, 'process_request'):
                 request_middleware.append(mw_instance.process_request)
@@ -70,6 +76,11 @@ class BaseHandler(object):
                 self._response_middleware.insert(0, mw_instance.process_response)
             if hasattr(mw_instance, 'process_exception'):
                 self._exception_middleware.insert(0, mw_instance.process_exception)
+            if callable(mw_instance):
+                self._middleware.insert(0, mw_instance)
+
+        if middleware_count == len(self._middleware):
+            self._new_style_middleware = True
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -105,6 +116,20 @@ class BaseHandler(object):
         return response
 
     def get_response(self, request):
+        if not self._new_style_middleware:
+            return self._get_response(request)
+
+        callables = self._middleware[:]
+
+        def response_factory(request):
+            if callables:
+                return callables.pop()(request, response_factory)
+            else:
+                return self._get_response(request)
+
+        return response_factory(request)
+
+    def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
 
         # Setup default url resolver for this thread, this code is outside
@@ -120,10 +145,11 @@ class BaseHandler(object):
         try:
             response = None
             # Apply request middleware
-            for middleware_method in self._request_middleware:
-                response = middleware_method(request)
-                if response:
-                    break
+            if not self._new_style_middleware:
+                for middleware_method in self._request_middleware:
+                    response = middleware_method(request)
+                    if response:
+                        break
 
             if response is None:
                 if hasattr(request, 'urlconf'):
@@ -230,20 +256,21 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
-        try:
-            # Apply response middleware, regardless of the response
-            for middleware_method in self._response_middleware:
-                response = middleware_method(request, response)
-                # Complain if the response middleware returned None (a common error).
-                if response is None:
-                    raise ValueError(
-                        "%s.process_response didn't return an "
-                        "HttpResponse object. It returned None instead."
-                        % (middleware_method.__self__.__class__.__name__))
-            response = self.apply_response_fixes(request, response)
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+        if not self._new_style_middleware:
+            try:
+                # Apply response middleware, regardless of the response
+                for middleware_method in self._response_middleware:
+                    response = middleware_method(request, response)
+                    # Complain if the response middleware returned None (a common error).
+                    if response is None:
+                        raise ValueError(
+                            "%s.process_response didn't return an "
+                            "HttpResponse object. It returned None instead."
+                            % (middleware_method.__self__.__class__.__name__))
+                response = self.apply_response_fixes(request, response)
+            except Exception:  # Any exception should be gathered and handled
+                signals.got_request_exception.send(sender=self.__class__, request=request)
+                response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
         response._closable_objects.append(request)
 

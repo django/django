@@ -2,11 +2,12 @@ import time
 from importlib import import_module
 
 from django.conf import settings
+from django.core.handlers.middleware import MiddlewareMixin
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
 
 
-class SessionMiddleware(object):
+class SessionMiddleware(MiddlewareMixin):
     def __init__(self):
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
