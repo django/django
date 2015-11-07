@@ -124,6 +124,8 @@ details on these changes.
 * The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
   will be removed.
 
+* ``django.utils.functional.allow_lazy()`` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

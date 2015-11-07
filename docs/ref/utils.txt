@@ -522,6 +522,15 @@ Atom1Feed
 
 .. function:: allow_lazy(func, *resultclasses)
 
+    .. deprecated:: 1.10
+
+    Works like :meth:`~django.utils.functional.keep_lazy` except that it can't
+    be used as a decorator.
+
+.. function:: keep_lazy(func, *resultclasses)
+
+    .. versionadded:: 1.10
+
     Django offers many utility functions (particularly in ``django.utils``)
     that take a string as their first argument and do something to that string.
     These functions are used by template filters as well as directly in other
@@ -533,30 +542,58 @@ Atom1Feed
     because you might be using this function outside of a view (and hence the
     current thread's locale setting will not be correct).
 
-    For cases like this, use the ``django.utils.functional.allow_lazy()``
+    For cases like this, use the ``django.utils.functional.keep_lazy()``
     decorator. It modifies the function so that *if* it's called with a lazy
     translation as one of its arguments, the function evaluation is delayed
     until it needs to be converted to a string.
 
     For example::
 
-        from django.utils.functional import allow_lazy
+        from django.utils import six
+        from django.utils.functional import keep_lazy, keep_lazy_text
 
         def fancy_utility_function(s, ...):
             # Do some conversion on string 's'
             ...
-        # Replace unicode by str on Python 3
-        fancy_utility_function = allow_lazy(fancy_utility_function, unicode)
+        fancy_utility_function = keep_lazy(six.text_type)(fancy_utility_function)
 
-    The ``allow_lazy()`` decorator takes, in addition to the function to
-    decorate, a number of extra arguments (``*args``) specifying the type(s)
-    that the original function can return. Usually, it's enough to include
-    ``unicode`` (or ``str`` on Python 3) here and ensure that your function
-    returns only Unicode strings.
+        # Or more succinctly:
+        @keep_lazy(six.text_type)
+        def fancy_utility_function(s, ...):
+            ...
+
+    The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
+    specifying the type(s) that the original function can return. A common
+    use case is to have functions that return text. For these, you can just
+    pass the ``six.text_type`` type to ``keep_lazy`` (or even simpler, use the
+    :func:`keep_lazy_text` decorator described in the next section).
 
     Using this decorator means you can write your function and assume that the
     input is a proper string, then add support for lazy translation objects at
     the end.
+
+
+.. function:: keep_lazy_text(func)
+
+    .. versionadded:: 1.10
+
+    A shortcut for ``keep_lazy(six.text_type)(func)``.
+
+    If you have a function that returns text and you want to be able to take
+    lazy arguments while delaying their evaluation, simply use this decorator::
+
+        from django.utils import six
+        from django.utils.functional import keep_lazy, keep_lazy_text
+
+        # Our previous example was:
+        @keep_lazy(six.text_type)
+        def fancy_utility_function(s, ...):
+            ...
+
+        # Which can be rewritten as:
+        @keep_lazy_text
+        def fancy_utility_function(s, ...):
+            ...
 
 ``django.utils.html``
 =====================
