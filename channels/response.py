@@ -9,7 +9,7 @@ def encode_response(response):
     value = {
         "content_type": getattr(response, "content_type", None),
         "content": response.content,
-        "status_code": response.status_code,
+        "status": response.status_code,
         "headers": list(response._headers.values()),
         "cookies": [v.output(header="") for _, v in response.cookies.items()]
     }
@@ -26,7 +26,7 @@ def decode_response(value):
     response = HttpResponse(
         content = value['content'],
         content_type = value['content_type'],
-        status = value['status_code'],
+        status = value['status'],
     )
     for cookie in value['cookies']:
         response.cookies.load(cookie)

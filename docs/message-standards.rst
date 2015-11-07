@@ -59,7 +59,7 @@ Only sent on reply channels.
 Keys that must only be in the first message of a set:
 
 * content_type: String, mimetype of content
-* status_code: Integer, numerical HTTP status code
+* status: Integer, numerical HTTP status code
 * cookies: List of cookies to set (as encoded cookie strings suitable for headers)
 * headers: Dictionary of headers (key is header name, value is value, both strings)
 
