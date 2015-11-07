@@ -204,12 +204,17 @@ class In(BuiltinLookup):
 
     def process_rhs(self, compiler, connection):
         if self.rhs_is_direct_value():
-            # rhs should be an iterable, we use batch_process_rhs
-            # to prepare/transform those values
-            rhs = list(self.rhs)
+            try:
+                rhs = set(self.rhs)
+            except TypeError:  # Unhashable items in self.rhs
+                rhs = self.rhs
+
             if not rhs:
                 from django.db.models.sql.datastructures import EmptyResultSet
                 raise EmptyResultSet
+
+            # rhs should be an iterable, we use batch_process_rhs
+            # to prepare/transform those values
             sqls, sqls_params = self.batch_process_rhs(compiler, connection, rhs)
             placeholder = '(' + ', '.join(sqls) + ')'
             return (placeholder, sqls_params)
