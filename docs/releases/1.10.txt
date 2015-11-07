@@ -47,6 +47,10 @@ Minor features
   classes on inline fieldsets. Inlines with a ``collapse`` class will be
   initially collapsed and their header will have a small "show" link.
 
+* If a user doesn't have the add permission, the ``object-tools`` block on a
+  model's changelist will now be rendered (without the add button, of course).
+  This makes it easier to add custom tools in this case.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
