@@ -1,4 +1,5 @@
 from django import template
+from django.apps import apps
 from django.utils.encoding import iri_to_uri
 from django.utils.six.moves.urllib.parse import urljoin
 
@@ -108,7 +109,11 @@ class StaticNode(template.Node):
 
     @classmethod
     def handle_simple(cls, path):
-        return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
+        if apps.is_installed('django.contrib.staticfiles'):
+            from django.contrib.staticfiles.storage import staticfiles_storage
+            return staticfiles_storage.url(path)
+        else:
+            return urljoin(PrefixNode.handle_simple("STATIC_URL"), path)
 
     @classmethod
     def handle_token(cls, parser, token):
@@ -151,4 +156,14 @@ def do_static(parser, token):
 
 
 def static(path):
+    """
+    Return ether a StaticNode or staticfiles storage url if configured.
+
+    Args:
+        path (str): Relative path to static asset.
+
+    Returns:
+        str: Absolute path to static asset.
+
+    """
     return StaticNode.handle_simple(path)

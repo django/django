@@ -6,7 +6,6 @@ from __future__ import unicode_literals
 import copy
 
 from django import forms
-from django.contrib.admin.templatetags.admin_static import static
 from django.core.urlresolvers import reverse
 from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
@@ -32,7 +31,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
     @property
     def media(self):
         js = ["core.js", "SelectBox.js", "SelectFilter2.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, verbose_name, is_stacked, attrs=None, choices=()):
         self.verbose_name = verbose_name
@@ -56,7 +55,7 @@ class AdminDateWidget(forms.DateInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'vDateField', 'size': '10'}
@@ -69,7 +68,7 @@ class AdminTimeWidget(forms.TimeInput):
     @property
     def media(self):
         js = ["calendar.js", "admin/DateTimeShortcuts.js"]
-        return forms.Media(js=[static("admin/js/%s" % path) for path in js])
+        return forms.Media(js=["admin/js/%s" % path for path in js])
 
     def __init__(self, attrs=None, format=None):
         final_attrs = {'class': 'vTimeField', 'size': '8'}

@@ -2418,18 +2418,17 @@ slightly different call::
     {% static "images/hi.jpg" as myphoto %}
     <img src="{{ myphoto }}"></img>
 
-.. note::
 
-    The :mod:`staticfiles<django.contrib.staticfiles>` contrib app also ships
-    with a :ttag:`static template tag<staticfiles-static>` which uses
-    ``staticfiles'`` :setting:`STATICFILES_STORAGE` to build the URL of the
-    given path (rather than simply using :func:`urllib.parse.urljoin` with the
-    :setting:`STATIC_URL` setting and the given path). Use that instead if you
-    have an advanced use case such as :ref:`using a cloud service to serve
-    static files<staticfiles-from-cdn>`::
+If the :mod:`~django.contrib.staticfiles` contrib app is configured,
+the static template tag, will serve all files from
+defined storage by :setting:`STATICFILES_STORAGE`.
 
-        {% load static from staticfiles %}
-        <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
+.. versionchanged:: 1.10
+
+    In older versions, static had to be loaded from
+    :mod:`~django.contrib.staticfiles` to serve files
+    from the storage defined in :setting:`STATICFILES_STORAGE`.
+    This is no longer required.
 
 .. templatetag:: get_static_prefix
 

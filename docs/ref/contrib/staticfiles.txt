@@ -285,10 +285,16 @@ following requirements are met:
 * the :setting:`STATICFILES_STORAGE` setting is set to
   ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
-* you use the ``staticfiles`` :ttag:`static<staticfiles-static>` template
-  tag to refer to your static files in your templates
 * you've collected all your static files by using the
   :djadmin:`collectstatic` management command
+
+.. versionchanged:: 1.10
+
+    In older versions, you also had to use the ``staticfiles``
+    :ttag:`static<staticfiles-static>` template tag to refer
+    to your static files in your templates.
+    The ``static`` template tag uses now the ``staticfiles`` template tag,
+    if :mod:`django.contrib.staticfiles` is installed.
 
 Since creating the MD5 hash can be a performance burden to your website
 during runtime, ``staticfiles`` will automatically store the mapping with

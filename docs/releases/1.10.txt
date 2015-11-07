@@ -127,7 +127,10 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* You no longer have to use the ``staticfiles`` :ttag:`static<staticfiles-static>`
+  template tag to refer to your static files in your templates.
+  The ``static`` template tag uses the ``staticfiles`` template tag,
+  if :mod:`django.contrib.staticfiles` is installed.
 
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -169,7 +172,8 @@ File Uploads
 Forms
 ^^^^^
 
-* ...
+* Forms and widget ``Media`` gets now served using
+  :mod:`django.contrib.staticfiles` if installed.
 
 Generic Views
 ^^^^^^^^^^^^^
