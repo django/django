@@ -640,3 +640,31 @@ Let's see how it works::
     Apple: AAPL
     Yahoo: Internet Company
     Django Software Foundation: No Tagline
+
+Adding support for third-party database backends
+------------------------------------------------
+
+If you're using a database backend that uses a different SQL syntax for a
+certain function, you can add support for it by monkey patching a new method
+onto the function's expression class.
+
+Let's say we're using the `Firebird` backend. If `Firebird` uses a different
+syntax for the ``SUM`` function, we'd monkey patch a new method called
+``as_firebird`` onto the ``Sum`` class. We use ``as_firebird`` because
+``connection.vendor`` returns ``firebird`` when using the `Firebird` backend.
+
+In our new method, we could override the :attr:`~Func.template` and/or
+:attr:`~Func.function` attributes, or even do more complicated things.
+
+In our example, we could end up with something like this::
+
+    from django.db.models import Sum
+
+    def firebird_sum(self, compiler, connection):
+        original_template = self.template
+        self.template = 'SUM(%(expressions)s)'
+        sql = self.as_sql(compiler, connection)
+        self.template = original_template
+        return sql
+
+    Sum.as_firebird = firebird_sum
