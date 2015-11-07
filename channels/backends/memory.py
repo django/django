@@ -1,6 +1,7 @@
-import time
 import json
+import time
 from collections import deque
+
 from .base import BaseChannelBackend
 
 queues = {}

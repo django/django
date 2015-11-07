@@ -21,11 +21,12 @@ class BackendManager(object):
         except KeyError:
             raise InvalidChannelBackendError("No BACKEND specified for %s" % name)
         except ImportError:
-            raise InvalidChannelBackendError("Cannot import BACKEND %r specified for %s" %
-                                             (self.configs[name]['BACKEND'], name))
+            raise InvalidChannelBackendError(
+                "Cannot import BACKEND %r specified for %s" % (self.configs[name]['BACKEND'], name)
+            )
+
         # Initialise and pass config
-        instance = backend_class(
-            **{k.lower(): v for k, v in self.configs[name].items() if k != "BACKEND"})
+        instance = backend_class(**{k.lower(): v for k, v in self.configs[name].items() if k != "BACKEND"})
         instance.alias = name
         return instance
 

@@ -1,11 +1,11 @@
-import time
+import binascii
 import json
 import math
-import redis
 import random
-import binascii
+import time
 import uuid
 
+import redis
 from django.utils import six
 
 from .base import BaseChannelBackend

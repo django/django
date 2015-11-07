@@ -1,6 +1,8 @@
 import importlib
-from django.utils import six
+
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
+
 from .utils import name_that_thing
 
 

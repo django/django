@@ -1,6 +1,6 @@
 import time
 
-from channels import Channel, channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, Channel, channel_backends
 
 
 def get_protocol(base):

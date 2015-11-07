@@ -1,8 +1,9 @@
+from django.core.handlers.base import BaseHandler
 from django.http.request import HttpRequest
 from django.http.response import HttpResponseBase
-from django.core.handlers.base import BaseHandler
-from .request import encode_request, decode_request
-from .response import encode_response, decode_response, ResponseLater
+
+from .request import decode_request, encode_request
+from .response import ResponseLater, decode_response, encode_response
 
 
 def monkeypatch_django():

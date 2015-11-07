@@ -1,6 +1,7 @@
+
 from django.core.management import BaseCommand, CommandError
 
-from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
 from channels.log import setup_logger
 from channels.worker import Worker
 
@@ -14,8 +15,7 @@ class Command(BaseCommand):
         channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         if channel_backend.local_only:
             raise CommandError(
-                "You have a process-local channel backend configured, "
-                "and so cannot run separate workers.\n"
+                "You have a process-local channel backend configured, and so cannot run separate workers.\n"
                 "Configure a network-based backend in CHANNEL_BACKENDS to use this command."
             )
         # Launch a worker

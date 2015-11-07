@@ -1,7 +1,7 @@
 import random
 import string
 
-from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
 
 
 class Channel(object):

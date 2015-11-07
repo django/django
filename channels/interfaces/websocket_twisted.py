@@ -1,9 +1,11 @@
 import time
 
-from autobahn.twisted.websocket import WebSocketServerProtocol, WebSocketServerFactory
+from autobahn.twisted.websocket import (
+    WebSocketServerFactory, WebSocketServerProtocol,
+)
 from twisted.internet import reactor
 
-from .websocket_autobahn import get_protocol, get_factory
+from .websocket_autobahn import get_factory, get_protocol
 
 
 class WebsocketTwistedInterface(object):
