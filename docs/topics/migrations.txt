@@ -115,7 +115,7 @@ a field and remove a model - and then run :djadmin:`makemigrations`::
 
     $ python manage.py makemigrations
     Migrations for 'books':
-      0003_auto.py:
+      books/migrations/0003_auto.py:
         - Alter field author on book
 
 Your models will be scanned and compared to the versions currently

@@ -199,6 +199,9 @@ Management Commands
   command exit with a non-zero status when model changes without migrations are
   detected.
 
+* :djadmin:`makemigrations` now displays the path to the migration files that
+  it generates.
+
 Migrations
 ^^^^^^^^^^
 
