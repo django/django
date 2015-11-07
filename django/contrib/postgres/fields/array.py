@@ -5,7 +5,7 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, In
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
 
@@ -215,6 +215,15 @@ class ArrayLenTransform(Transform):
             'CASE WHEN %(lhs)s IS NULL THEN NULL ELSE '
             'coalesce(array_length(%(lhs)s, 1), 0) END'
         ) % {'lhs': lhs}, params
+
+
+@ArrayField.register_lookup
+class ArrayInLookup(In):
+    def get_prep_lookup(self):
+        values = super(ArrayInLookup, self).get_prep_lookup()
+        # In.process_rhs() expects values to be hashable, so convert lists
+        # to tuples.
+        return [tuple(value) for value in values]
 
 
 class IndexTransform(Transform):
