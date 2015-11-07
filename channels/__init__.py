@@ -8,6 +8,7 @@ channel_backends = BackendManager(
     getattr(settings, "CHANNEL_BACKENDS", {
         DEFAULT_CHANNEL_BACKEND: {
             "BACKEND": "channels.backends.memory.InMemoryChannelBackend",
+            "ROUTING": {},
         }
     })
 )
