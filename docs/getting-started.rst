@@ -30,7 +30,7 @@ Make a new project, a new app, and put this in a ``consumers.py`` file in the ap
         message.reply_channel.send(response.channel_encode())
 
 The most important thing to note here is that, because things we send in
-messages must be JSON-serialisable, the request and response messages
+messages must be JSON serialisable, the request and response messages
 are in a key-value format. There are ``channel_decode()`` and
 ``channel_encode()`` methods on both Django's request and response classes,
 but here we just use the message's ``content`` attribute directly for simplicity
@@ -69,12 +69,14 @@ If you start up ``python manage.py runserver`` and go to
 you get the Hello World response, so things are working. If you don't see
 a response, check you :doc:`installed Channels correctly <installation>`.
 
-Now, that's not very exciting - raw HTTP responses are something Django can
-do any time. Let's try some WebSockets, and make a basic chat server!
+Now, that's not very exciting - raw HTTP responses are something Django has
+been able to do for a long time. Let's try some WebSockets, and make a basic
+chat server!
 
 Delete that consumer and its routing - we'll want the normal Django view layer to
 serve HTTP requests from now on - and make this WebSocket consumer instead::
 
+    # In consumers.py
     from channels import Group
 
     def ws_add(message):
@@ -82,6 +84,7 @@ serve HTTP requests from now on - and make this WebSocket consumer instead::
 
 Hook it up to the ``websocket.connect`` channel like this::
 
+    # In routing.py
     channel_routing = {
         "websocket.connect": "myproject.myapp.consumers.ws_add",
     }
@@ -102,19 +105,21 @@ connections you have open at any one time.
 
 The solution to this is that the WebSocket interface servers will send
 periodic "keepalive" messages on the ``websocket.keepalive`` channel,
-so we can hook that up to re-add the channel (it's safe to add the channel to
-a group it's already in - similarly, it's safe to discard a channel from a
-group it's not in)::
+so we can hook that up to re-add the channel::
 
+    # In consumers.py
     from channels import Group
 
     # Connected to websocket.keepalive
     def ws_keepalive(message):
         Group("chat").add(message.reply_channel)
 
+It's safe to add the channel to a group it's already in - similarly, it's
+safe to discard a channel from a group it's not in.
 Of course, this is exactly the same code as the ``connect`` handler, so let's
 just route both channels to the same consumer::
 
+    # In routing.py
     channel_routing = {
         "websocket.connect": "myproject.myapp.consumers.ws_add",
         "websocket.keepalive": "myproject.myapp.consumers.ws_add",
@@ -124,6 +129,7 @@ And, even though channels will expire out, let's add an explicit ``disconnect``
 handler to clean up as people disconnect (most channels will cleanly disconnect
 and get this called)::
 
+    # In consumers.py
     from channels import Group
 
     # Connected to websocket.disconnect
@@ -135,6 +141,7 @@ Now, that's taken care of adding and removing WebSocket send channels for the
 we're not going to store a history of messages or anything and just replay
 any message sent in to all connected clients. Here's all the code::
 
+    # In consumers.py
     from channels import Group
 
     # Connected to websocket.connect and websocket.keepalive
@@ -158,9 +165,9 @@ And what our routing should look like in ``routing.py``::
         "websocket.disconnect": "myproject.myapp.consumers.ws_disconnect",
     }
 
-With all that code in your ``consumers.py`` file, you now have a working
-set of a logic for a chat server. All you need to do now is get it deployed,
-and as we'll see, that's not too hard.
+With all that code, you now have a working set of a logic for a chat server.
+All you need to do now is get it deployed, and as we'll see, that's not too
+hard.
 
 Running with Channels
 ---------------------
@@ -168,7 +175,7 @@ Running with Channels
 Because Channels takes Django into a multi-process model, you can no longer
 just run one process if you want to serve more than one protocol type.
 
-There are multiple kinds of "interface server", and each one will service a
+There are multiple kinds of "interface servers", and each one will service a
 different type of request - one might do WSGI requests, one might handle
 WebSockets, or you might have one that handles both.
 
@@ -233,7 +240,7 @@ Persisting Data
 Echoing messages is a nice simple example, but it's
 skirting around the real design pattern - persistent state for connections.
 Let's consider a basic chat site where a user requests a chat room upon initial
-connection, as part of the query string (e.g. ``http://host/websocket?room=abc``).
+connection, as part of the query string (e.g. ``https://host/websocket?room=abc``).
 
 The ``reply_channel`` attribute you've seen before is our unique pointer to the
 open WebSocket - because it varies between different clients, it's how we can
@@ -253,6 +260,7 @@ just like a normal Django session.
 Let's use it now to build a chat server that expects you to pass a chatroom
 name in the path of your WebSocket request (we'll ignore auth for now - that's next)::
 
+    # In consumers.py
     from channels import Group
     from channels.decorators import channel_session
 
@@ -282,7 +290,7 @@ name in the path of your WebSocket request (we'll ignore auth for now - that's n
 
 If you play around with it from the console (or start building a simple
 JavaScript chat client that appends received messages to a div), you'll see
-that you can now request which chat room you want in the initial request.
+that you can set a chat room with the initial request.
 
 Authentication
 --------------
@@ -336,9 +344,10 @@ loads the user from the *channel* session rather than the *HTTP* session,
 and a function called ``transfer_user`` which replicates a user from one session
 to another.
 
-Bringing that all together, let's make a chat server one where users can only
+Bringing that all together, let's make a chat server where users can only
 chat to people with the same first letter of their username::
 
+    # In consumers.py
     from channels import Channel, Group
     from channels.decorators import channel_session
     from channels.auth import http_session_user, channel_session_user, transfer_user
@@ -375,7 +384,7 @@ Django session ID as part of the URL, like this::
 
 You can get the current session key in a template with ``{{ request.session.session_key }}``.
 Note that Channels can't work with signed cookie sessions - since only HTTP
-responses can set cookies, it needs a backend it can write to separately to
+responses can set cookies, it needs a backend it can write to to separately to
 store state.
 
 
@@ -393,7 +402,7 @@ easily integrate the send into the save flow of the model, rather than the
 message receive - that way, any new message saved will be broadcast to all
 the appropriate clients, no matter where it's saved from.
 
-We'll even take some performance considerations into account - We'll make our
+We'll even take some performance considerations into account: We'll make our
 own custom channel for new chat messages and move the model save and the chat
 broadcast into that, meaning the sending process/consumer can move on
 immediately and not spend time waiting for the database save and the
@@ -402,10 +411,12 @@ immediately and not spend time waiting for the database save and the
 Let's see what that looks like, assuming we
 have a ChatMessage model with ``message`` and ``room`` fields::
 
+    # In consumers.py
     from channels import Channel
     from channels.decorators import channel_session
     from .models import ChatMessage
 
+    # Connected to chat-messages
     def msg_consumer(message):
         # Save to model
         ChatMessage.objects.create(
@@ -451,7 +462,7 @@ command run via ``cron``. If we wanted to write a bot, too, we could put its
 listening logic inside the ``chat-messages`` consumer, as every message would
 pass through it.
 
-Linearization
+Linearisation
 -------------
 
 There's one final concept we want to introduce you to before you go on to build
@@ -482,6 +493,7 @@ decorator, but generally you'll want to use it for most session-based WebSocket
 and other "continuous protocol" things. Here's an example, improving our
 first-letter-of-username chat from earlier::
 
+    # In consumers.py
     from channels import Channel, Group
     from channels.decorators import channel_session, linearize
     from channels.auth import http_session_user, channel_session_user, transfer_user
