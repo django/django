@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 
 import socket
 import sys
+import time
 from wsgiref import simple_server
 
 from django.core.exceptions import ImproperlyConfigured
@@ -106,7 +107,8 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
 
         msg = "[%s] " % self.log_date_time_string()
         try:
-            msg += "%s\n" % (format % args)
+            msg += "%s %dms\n" % (format % args,
+                                  1e3 * (time.time() - self.response_started))
         except UnicodeDecodeError:
             # e.g. accessing the server via SSL on Python 2
             msg += "\n"
@@ -176,6 +178,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler, object):
             self.rfile, self.wfile, self.get_stderr(), self.get_environ()
         )
         handler.request_handler = self      # backpointer for logging
+        self.response_started = time.time()
         handler.run(self.server.get_app())
 
 
