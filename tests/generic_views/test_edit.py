@@ -9,8 +9,8 @@ from django.views.generic.base import View
 from django.views.generic.edit import CreateView, FormMixin, ModelFormMixin
 
 from . import views
+from .forms import AuthorForm
 from .models import Artist, Author
-from .test_forms import AuthorForm
 
 
 class FormMixinTests(SimpleTestCase):
