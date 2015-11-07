@@ -23,8 +23,8 @@ class ConsumerRegistry(object):
                 module_name, variable_name = routing.rsplit(".", 1)
                 try:
                     routing = getattr(importlib.import_module(module_name), variable_name)
-                except (ImportError, AttributeError):
-                    raise ImproperlyConfigured("Cannot import channel routing %r" % routing)
+                except (ImportError, AttributeError) as e:
+                    raise ImproperlyConfigured("Cannot import channel routing %r: %s" % (routing, e))
             # Load consumers into us
             for channel, handler in routing.items():
                 self.add_consumer(handler, [channel])

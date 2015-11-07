@@ -37,6 +37,8 @@ class RedisChannelBackend(BaseChannelBackend):
         Maps the value to a node value between 0 and 4095
         using MD5, then down to one of the ring nodes.
         """
+        if isinstance(value, six.text_type):
+            value = value.encode("utf8")
         bigval = binascii.crc32(value) & 0xffffffff
         return (bigval // 0x100000) // self.ring_divisor
 
@@ -77,7 +79,7 @@ class RedisChannelBackend(BaseChannelBackend):
             connection = self.connection(None)
         # Write out message into expiring key (avoids big items in list)
         # TODO: Use extended set, drop support for older redis?
-        key = self.prefix + uuid.uuid4().get_hex()
+        key = self.prefix + uuid.uuid4().hex
         connection.set(
             key,
             json.dumps(message),
@@ -113,7 +115,7 @@ class RedisChannelBackend(BaseChannelBackend):
         while True:
             # Select a random connection to use
             # TODO: Would we be better trying to do this truly async?
-            index = random.choice(indexes.keys())
+            index = random.choice(list(indexes.keys()))
             connection = self.connection(index)
             channels = indexes[index]
             # Shuffle channels to avoid the first ones starving others of workers
@@ -134,6 +136,7 @@ class RedisChannelBackend(BaseChannelBackend):
         seconds (expiry defaults to message expiry if not provided).
         """
         key = "%s:group:%s" % (self.prefix, group)
+        key = key.encode("utf8")
         self.connection(self.consistent_hash(group)).zadd(
             key,
             **{channel: time.time() + (expiry or self.expiry)}
@@ -145,6 +148,7 @@ class RedisChannelBackend(BaseChannelBackend):
         does nothing otherwise (does not error)
         """
         key = "%s:group:%s" % (self.prefix, group)
+        key = key.encode("utf8")
         self.connection(self.consistent_hash(group)).zrem(
             key,
             channel,
@@ -155,15 +159,16 @@ class RedisChannelBackend(BaseChannelBackend):
         Returns an iterable of all channels in the group.
         """
         key = "%s:group:%s" % (self.prefix, group)
+        key = key.encode("utf8")
         connection = self.connection(self.consistent_hash(group))
         # Discard old channels
         connection.zremrangebyscore(key, 0, int(time.time()) - 10)
         # Return current lot
-        return connection.zrange(
+        return [x.decode("utf8") for x in connection.zrange(
             key,
             0,
             -1,
-        )
+        )]
 
     # TODO: send_group efficient implementation using Lua
 

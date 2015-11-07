@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.test import TestCase
 from ..channel import Channel
 from ..backends.database import DatabaseChannelBackend
@@ -44,16 +46,16 @@ class MemoryBackendTests(TestCase):
         Tests that group addition and removal and listing works
         """
         self.backend.group_add("tgroup", "test")
-        self.backend.group_add("tgroup", "test2")
+        self.backend.group_add("tgroup", "test2€")
         self.backend.group_add("tgroup2", "test3")
         self.assertEqual(
             set(self.backend.group_channels("tgroup")),
-            {"test", "test2"},
+            {"test", "test2€"},
         )
-        self.backend.group_discard("tgroup", "test2")
-        self.backend.group_discard("tgroup", "test2")
+        self.backend.group_discard("tgroup", "test2€")
+        self.backend.group_discard("tgroup", "test2€")
         self.assertEqual(
-            self.backend.group_channels("tgroup"),
+            list(self.backend.group_channels("tgroup")),
             ["test"],
         )
 
@@ -76,7 +78,7 @@ class MemoryBackendTests(TestCase):
         self.backend.group_add("tgroup", "test")
         self.backend.group_add("tgroup", "test2")
         self.assertEqual(
-            self.backend.group_channels("tgroup"),
+            list(self.backend.group_channels("tgroup")),
             [],
         )
 
