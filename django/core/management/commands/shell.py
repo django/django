@@ -18,6 +18,8 @@ class Command(BaseCommand):
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.')
         parser.add_argument('-i', '--interface', choices=self.shells, dest='interface',
             help='Specify an interactive interpreter interface. Available options: "ipython", "bpython", and "python"')
+        parser.add_argument('-c', '--command', dest='command',
+            help='Instead of opening an interactive shell, run a command as Django and exit.')
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""
@@ -92,6 +94,11 @@ class Command(BaseCommand):
                 RemovedInDjango20Warning
             )
             options['interface'] = 'python'
+
+        # Execute the command and exit.
+        if options['command']:
+            exec(options['command'])
+            return
 
         available_shells = [options['interface']] if options['interface'] else self.shells
 

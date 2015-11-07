@@ -224,6 +224,9 @@ Management Commands
 * The :djadmin:`shell` ``--interface`` option now accepts ``python`` to force
   use of the "plain" Python interpreter.
 
+* The new :djadminopt:`shell --command <--command>` option lets you run a
+  command as Django and exit, instead of opening the interactive shell.
+
 Migrations
 ^^^^^^^^^^
 
