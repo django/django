@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from six import PY3
+from django.utils.six import PY3
 
 
 def encode_response(response):
