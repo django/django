@@ -36,6 +36,9 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* The :attr:`InlineModelAdmin.classes` attribute was added to support specifying
+  collapsed inlines that can be shown/hidden via a link.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
