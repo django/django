@@ -1,6 +1,7 @@
-import time
 from django.core.management import BaseCommand, CommandError
+
 from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels.log import setup_logger
 
 
 class Command(BaseCommand):
@@ -10,6 +11,8 @@ class Command(BaseCommand):
             help='Optional port number')
 
     def handle(self, *args, **options):
+        self.verbosity = options.get("verbosity", 1)
+        self.logger = setup_logger('django.channels', self.verbosity)
         # Get the backend to use
         channel_backend = channel_backends[DEFAULT_CHANNEL_BACKEND]
         if channel_backend.local_only:
@@ -23,13 +26,13 @@ class Command(BaseCommand):
             import asyncio
         except ImportError:
             from channels.interfaces.websocket_twisted import WebsocketTwistedInterface
-            self.stdout.write("Running Twisted/Autobahn WebSocket interface server")
-            self.stdout.write(" Channel backend: %s" % channel_backend)
-            self.stdout.write(" Listening on: ws://0.0.0.0:%i" % port)
+            self.logger.info("Running Twisted/Autobahn WebSocket interface server")
+            self.logger.info(" Channel backend: %s", channel_backend)
+            self.logger.info(" Listening on: ws://0.0.0.0:%i" % port)
             WebsocketTwistedInterface(channel_backend=channel_backend, port=port).run()
         else:
             from channels.interfaces.websocket_asyncio import WebsocketAsyncioInterface
-            self.stdout.write("Running asyncio/Autobahn WebSocket interface server")
-            self.stdout.write(" Channel backend: %s" % channel_backend)
-            self.stdout.write(" Listening on: ws://0.0.0.0:%i" % port)
+            self.logger.info("Running asyncio/Autobahn WebSocket interface server")
+            self.logger.info(" Channel backend: %s", channel_backend)
+            self.logger.info(" Listening on: ws://0.0.0.0:%i", port)
             WebsocketAsyncioInterface(channel_backend=channel_backend, port=port).run()
