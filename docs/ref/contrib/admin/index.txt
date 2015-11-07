@@ -2058,6 +2058,16 @@ The ``InlineModelAdmin`` class adds:
     parent model fails to validate, it may be left in an inconsistent state as
     described in the warning in :ref:`validation-on-modelform`.
 
+.. attribute:: InlineModelAdmin.classes
+
+    .. versionadded:: 1.10
+
+    A list or tuple containing extra CSS classes to apply to the fieldset that
+    is rendered for the inlines. Defaults to ``None``. As with classes
+    configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
+    class will be initially collapsed and their header will have a small "show"
+    link.
+
 .. attribute:: InlineModelAdmin.extra
 
     This controls the number of extra forms the formset will display in

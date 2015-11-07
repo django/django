@@ -42,6 +42,11 @@ Minor features
 * All inline JavaScript is removed so you can enable the
   ``Content-Security-Policy`` HTTP header if you wish.
 
+* The new :attr:`InlineModelAdmin.classes
+  <django.contrib.admin.InlineModelAdmin.classes>` attribute allows specifying
+  classes on inline fieldsets. Inlines with a ``collapse`` class will be
+  initially collapsed and their header will have a small "show" link.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

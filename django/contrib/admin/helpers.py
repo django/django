@@ -235,6 +235,7 @@ class InlineAdminFormSet(object):
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.classes = ' '.join(inline.classes) if inline.classes else ''
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):

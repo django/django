@@ -874,6 +874,25 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             "%s.row2" % row_selector)), 1, msg="Expect one row2 styled row")
 
+    def test_collapsed_inlines(self):
+        # Collapsed inlines have SHOW/HIDE links.
+        self.admin_login(username='super', password='secret')
+        self.selenium.get(self.live_server_url + reverse('admin:admin_inlines_author_add'))
+        # One field is in a stacked inline, other in a tabular one.
+        test_fields = ['id_nonautopkbook_set-0-title', 'id_nonautopkbook_set-2-0-title']
+        show_links = self.selenium.find_elements_by_link_text('SHOW')
+        self.assertEqual(len(show_links), 2)
+        for show_index, field_name in enumerate(test_fields, 0):
+            self.assertFalse(self.selenium.find_element_by_id(field_name).is_displayed())
+            show_links[show_index].click()
+            self.assertTrue(self.selenium.find_element_by_id(field_name).is_displayed())
+        hide_links = self.selenium.find_elements_by_link_text('HIDE')
+        self.assertEqual(len(hide_links), 2)
+        for hide_index, field_name in enumerate(test_fields, 0):
+            self.assertTrue(self.selenium.find_element_by_id(field_name).is_displayed())
+            hide_links[hide_index].click()
+            self.assertFalse(self.selenium.find_element_by_id(field_name).is_displayed())
+
 
 class SeleniumChromeTests(SeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'

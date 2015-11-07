@@ -1800,6 +1800,7 @@ class InlineModelAdmin(BaseModelAdmin):
     can_delete = True
     show_change_link = False
     checks_class = InlineModelAdminChecks
+    classes = None
 
     def __init__(self, parent_model, admin_site):
         self.admin_site = admin_site
@@ -1819,6 +1820,8 @@ class InlineModelAdmin(BaseModelAdmin):
               'inlines%s.js' % extra]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
+        if self.classes and 'collapse' in self.classes:
+            js.append('collapse%s.js' % extra)
         return forms.Media(js=['admin/js/%s' % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
