@@ -34,3 +34,5 @@ Bugfixes
 * Fixed serialization of
   :class:`~django.contrib.postgres.fields.DateRangeField` and
   :class:`~django.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).
+
+* Fixed the exact lookup of ``ArrayField`` (:ticket:`25666`).
