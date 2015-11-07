@@ -108,3 +108,15 @@ class DjangoTemplatesTests(TemplateStringsTests):
                 'template_backends.apps.good.templatetags.good_tags',
             ]
         )
+
+    def test_autoescape(self):
+        engine = DjangoTemplates({
+            'DIRS': [],
+            'APP_DIRS': False,
+            'NAME': 'django',
+            'OPTIONS': {}
+        })
+
+        rendered = engine.from_string('Hello, {{ name }}!').render({'name': 'Luc & Anita'}, autoescape=False)
+
+        self.assertEqual(rendered, 'Hello, Luc & Anita!')
