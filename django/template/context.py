@@ -245,12 +245,12 @@ class RequestContext(Context):
         return new_context
 
 
-def make_context(context, request=None):
+def make_context(context, request=None, autoescape=True):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
     if request is None:
-        context = Context(context)
+        context = Context(context, autoescape=autoescape)
     else:
         # The following pattern is required to ensure values from
         # context override those from template context processors.
