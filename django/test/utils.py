@@ -293,7 +293,7 @@ def compare_xml(want, got):
     """Tries to do a 'xml-comparison' of want and got.  Plain string
     comparison doesn't always work because, for example, attribute
     ordering should not be important. Comment nodes are not considered in the
-    comparison.
+    comparison. Leading and trailing whitespace is ignored on both chunks.
 
     Based on http://codespeak.net/svn/lxml/trunk/src/lxml/doctestcompare.py
     """
@@ -338,8 +338,8 @@ def compare_xml(want, got):
                 return node
 
     want, got = strip_quotes(want, got)
-    want = want.replace('\\n', '\n')
-    got = got.replace('\\n', '\n')
+    want = want.strip().replace('\\n', '\n')
+    got = got.strip().replace('\\n', '\n')
 
     # If the string is not a complete xml document, we may need to add a
     # root element. This allow us to compare fragments, like "<foo/><bar/>"
