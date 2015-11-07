@@ -15,6 +15,8 @@ class Command(BaseCommand):
             help='When using plain Python, ignore the PYTHONSTARTUP environment variable and ~/.pythonrc.py script.')
         parser.add_argument('-i', '--interface', choices=self.shells, dest='interface',
             help='Specify an interactive interpreter interface. Available options: "ipython" and "bpython"')
+        parser.add_argument('-c', '--command', dest='command',
+            help='Instead of opening an interactive shell, run one command as Django and exit.')
 
     def _ipython_pre_011(self):
         """Start IPython pre-0.11"""
@@ -62,6 +64,11 @@ class Command(BaseCommand):
 
     def handle(self, **options):
         try:
+            # Just execute this command and get out.
+            if options['command']:
+                exec(options['command'])
+                return
+
             if options['plain']:
                 # Don't bother loading IPython, because the user wants plain Python.
                 raise ImportError

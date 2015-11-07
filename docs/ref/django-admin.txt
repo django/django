@@ -966,6 +966,15 @@ behavior you can use the ``--no-startup`` option. e.g.::
 
     django-admin shell --plain --no-startup
 
+.. versionadded:: 1.10
+
+.. django-admin-option:: --command, -c <command>
+
+The ``--command`` option lets you pass a command as a string to execute it
+as Django, like so::
+
+    django-admin shell --command="import django; print(django.__version__)"
+
 showmigrations [<app_label> [<app_label>]]
 ------------------------------------------
 
