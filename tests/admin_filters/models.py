@@ -76,3 +76,17 @@ class Bookmark(models.Model):
 
     def __str__(self):
         return self.url
+
+
+ORDER_STATE_CHOICES = (
+    ('started', 'Started'),
+    ('completed', 'Completed'),
+    ('canceled', 'Canceled'),
+)
+
+
+class Order(models.Model):
+    state = models.CharField(max_length=50, choices=ORDER_STATE_CHOICES)
+
+    def __str__(self):
+        return self.state

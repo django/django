@@ -493,6 +493,8 @@ class ModelAdmin(BaseModelAdmin):
     list_display = ('__str__',)
     list_display_links = ()
     list_filter = ()
+    list_filter_defaults = {}
+    list_filter_sentinel = '_off_'
     list_select_related = False
     list_per_page = 100
     list_max_show_all = 200
@@ -895,6 +897,14 @@ class ModelAdmin(BaseModelAdmin):
         the right sidebar of the changelist page.
         """
         return self.list_filter
+
+    def get_list_filter_defaults(self, request):
+        """Return a dictionary containing the list filter defaults."""
+        return self.list_filter_defaults
+
+    def get_list_filter_sentinel(self, request):
+        """Returns the sentinel value for disabling filters."""
+        return self.list_filter_sentinel
 
     def get_list_select_related(self, request):
         """

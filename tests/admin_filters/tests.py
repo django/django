@@ -12,7 +12,10 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory, TestCase, override_settings
 
-from .models import Book, Bookmark, Department, Employee, TaggedItem
+from .models import (
+    ORDER_STATE_CHOICES, Book, Bookmark, Department, Employee, Order,
+    TaggedItem,
+)
 
 
 def select_by(dictlist, key, value):
@@ -242,6 +245,11 @@ class DepartmentFilterDynamicValueBookAdmin(EmployeeAdmin):
 
 class BookmarkAdminGenericRelation(ModelAdmin):
     list_filter = ['tags__tag']
+
+
+class OrderAdminDefaultFilter(ModelAdmin):
+    list_filter = ('state',)
+    list_filter_defaults = {'state__exact': ORDER_STATE_CHOICES[1][0]}
 
 
 class ListFiltersTests(TestCase):
@@ -479,6 +487,7 @@ class ListFiltersTests(TestCase):
         modeladmin = BookAdminWithCustomQueryset(self.alfred, Book, site)
         request = self.request_factory.get('/')
         changelist = modeladmin.get_changelist_instance(request)
+        sentinel = modeladmin.get_list_filter_sentinel(request)
 
         filterspec = changelist.get_filters(request)[0][0]
         choices = list(filterspec.choices(changelist))
@@ -486,7 +495,7 @@ class ListFiltersTests(TestCase):
         # books written by alfred (which is the filtering criteria set by
         # BookAdminWithCustomQueryset.get_queryset())
         self.assertEqual(3, len(choices))
-        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[0]['query_string'], '?year={0}'.format(sentinel))
         self.assertEqual(choices[1]['query_string'], '?year=1999')
         self.assertEqual(choices[2]['query_string'], '?year=2009')
 
@@ -684,6 +693,51 @@ class ListFiltersTests(TestCase):
         expected = [python_bookmark, django_bookmark]
         self.assertEqual(list(queryset), expected)
 
+    def test_listfilter_default(self):
+        started_order = Order.objects.create(state=ORDER_STATE_CHOICES[0][0])
+        completed_order = Order.objects.create(state=ORDER_STATE_CHOICES[1][0])
+        canceled_order = Order.objects.create(state=ORDER_STATE_CHOICES[2][0])
+
+        modeladmin = OrderAdminDefaultFilter(Order, site)
+        request = self.request_factory.get('/')
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        sentinel = modeladmin.get_list_filter_sentinel(request)
+
+        expected = [completed_order]
+        self.assertEqual(list(queryset), expected)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        choice = select_by(filterspec.choices(changelist), "display", ORDER_STATE_CHOICES[1][1])
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?state__exact={0}'.format(ORDER_STATE_CHOICES[1][0]))
+
+        # Now also make sure defaults can be overridden
+        request = self.request_factory.get('/', {'state__exact': ORDER_STATE_CHOICES[0][0]})
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+
+        expected = [started_order]
+        self.assertEqual(list(queryset), expected)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        choice = select_by(filterspec.choices(changelist), "display", ORDER_STATE_CHOICES[0][1])
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?state__exact={0}'.format(ORDER_STATE_CHOICES[0][0]))
+
+        # Now also make sure defaults are not used when there is ? in the querystring
+        request = self.request_factory.get('/', {'state__exact': sentinel})
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+
+        expected = [canceled_order, completed_order, started_order]
+        self.assertEqual(list(queryset), expected)
+
+        filterspec = changelist.get_filters(request)[0][0]
+        choice = select_by(filterspec.choices(changelist), "display", 'All')
+        self.assertEqual(choice['selected'], True)
+        self.assertEqual(choice['query_string'], '?state__exact={0}'.format(sentinel))
+
     def test_booleanfieldlistfilter(self):
         modeladmin = BookAdmin(Book, site)
         self.verify_booleanfieldlistfilter(modeladmin)
@@ -767,6 +821,7 @@ class ListFiltersTests(TestCase):
         # Make sure that the first option is 'All' ---------------------------
         request = self.request_factory.get('/', {})
         changelist = modeladmin.get_changelist_instance(request)
+        sentinel = modeladmin.get_list_filter_sentinel(request)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
@@ -777,8 +832,8 @@ class ListFiltersTests(TestCase):
         self.assertEqual(filterspec.title, 'publication decade')
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[0]['display'], 'All')
-        self.assertIs(choices[0]['selected'], True)
-        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[0]['selected'], True)
+        self.assertEqual(choices[0]['query_string'], '?publication-decade={0}'.format(sentinel))
 
         # Look for books in the 1980s ----------------------------------------
         request = self.request_factory.get('/', {'publication-decade': 'the 80s'})
@@ -898,6 +953,7 @@ class ListFiltersTests(TestCase):
         modeladmin = DecadeFilterBookAdminWithQuerysetBasedLookups(Book, site)
         request = self.request_factory.get('/', {})
         changelist = modeladmin.get_changelist_instance(request)
+        sentinel = modeladmin.get_list_filter_sentinel(request)
 
         filterspec = changelist.get_filters(request)[0][0]
         self.assertEqual(filterspec.title, 'publication decade')
@@ -905,8 +961,8 @@ class ListFiltersTests(TestCase):
         self.assertEqual(len(choices), 3)
 
         self.assertEqual(choices[0]['display'], 'All')
-        self.assertIs(choices[0]['selected'], True)
-        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[0]['selected'], True)
+        self.assertEqual(choices[0]['query_string'], '?publication-decade={0}'.format(sentinel))
 
         self.assertEqual(choices[1]['display'], 'the 1990\'s')
         self.assertIs(choices[1]['selected'], False)
@@ -1021,6 +1077,7 @@ class ListFiltersTests(TestCase):
 
         request = self.request_factory.get('/', {})
         changelist = modeladmin.get_changelist_instance(request)
+        sentinel = modeladmin.get_list_filter_sentinel(request)
 
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
@@ -1032,7 +1089,7 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]['display'], 'All')
         self.assertIs(choices[0]['selected'], True)
-        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[0]['query_string'], '?department__code__exact={0}'.format(sentinel))
 
         self.assertEqual(choices[1]['display'], 'Development')
         self.assertIs(choices[1]['selected'], False)
@@ -1057,7 +1114,7 @@ class ListFiltersTests(TestCase):
 
         self.assertEqual(choices[0]['display'], 'All')
         self.assertIs(choices[0]['selected'], False)
-        self.assertEqual(choices[0]['query_string'], '?')
+        self.assertEqual(choices[0]['query_string'], '?department__code__exact={0}'.format(sentinel))
 
         self.assertEqual(choices[1]['display'], 'Development')
         self.assertIs(choices[1]['selected'], True)
