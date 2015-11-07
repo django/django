@@ -1174,6 +1174,34 @@ class AutodetectorTests(TestCase):
         self.assertOperationAttributes(changes, "otherapp", 0, 1, name="book", unique_together={("title", "newfield")})
         self.assertOperationAttributes(changes, "otherapp", 0, 2, name="book", index_together={("title", "newfield")})
 
+    def test_create_model_and_unique_together(self):
+        author = ModelState("otherapp", "Author", [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200)),
+        ])
+        book_with_author = ModelState("otherapp", "Book", [
+            ("id", models.AutoField(primary_key=True)),
+            ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+            ("title", models.CharField(max_length=200)),
+        ], {
+            "index_together": {("title", "author")},
+            "unique_together": {("title", "author")},
+        })
+        before = self.make_project_state([self.book_with_no_author])
+        after = self.make_project_state([author, book_with_author])
+        autodetector = MigrationAutodetector(before, after)
+        changes = autodetector._detect_changes()
+        # Right number of migrations?
+        self.assertEqual(len(changes['otherapp']), 1)
+        # Right number of actions?
+        migration = changes['otherapp'][0]
+        self.assertEqual(len(migration.operations), 4)
+        # Right actions order?
+        self.assertOperationTypes(
+            changes, 'otherapp', 0,
+            ['CreateModel', 'AddField', 'AlterUniqueTogether', 'AlterIndexTogether']
+        )
+
     def test_remove_field_and_foo_together(self):
         """
         Tests that removed fields will be removed after updating
