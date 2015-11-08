@@ -320,6 +320,21 @@ All attributes can be set in your derived class and can be used in
     because attempting to set the locale needs access to settings. This
     condition will generate a :class:`CommandError`.
 
+.. attribute:: BaseCommand.style
+
+    An instance attribute that helps create colored output when writing to
+    ``stdout`` or ``stderr``. For example::
+
+        self.stdout.write(self.style.NOTICE('...'))
+
+    See :ref:`syntax-coloring` to learn how to modify the color palette and to
+    see the available styles (use uppercased versions of the "roles" described
+    in that section).
+
+    If you pass the :djadminopt:`--no-color` option when running your
+    command, all ``self.style()`` calls will return the original string
+    uncolored.
+
 Methods
 -------
 
