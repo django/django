@@ -116,6 +116,18 @@ class TestQuerying(TestCase):
             [self.objs[6]]
         )
 
+    def test_deep_lookup_isnull(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__j__isnull=True),
+            [self.objs[8]]
+        )
+
+    def test_deep_lookup_not_isnull(self):
+        self.assertSequenceEqual(
+            JSONModel.objects.filter(field__l__isnull=False),
+            [self.objs[10]]
+        )
+
     def test_exact_complex(self):
         self.assertSequenceEqual(
             JSONModel.objects.filter(field__exact={'a': 'b', 'c': 1}),

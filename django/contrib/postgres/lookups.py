@@ -1,4 +1,5 @@
 from django.db.models import Lookup, Transform
+from django.db.models.lookups import IsNull
 
 
 class PostgresSimpleLookup(Lookup):
@@ -43,3 +44,17 @@ class Unaccent(Transform):
     bilateral = True
     lookup_name = 'unaccent'
     function = 'UNACCENT'
+
+
+class JSONIsNull(IsNull):
+    lookup_name = 'isnull'
+
+    def as_sql(self, compiler, connection):
+        if isinstance(self.lhs, Transform):
+            sql, params = compiler.compile(self.lhs)
+            if self.rhs:
+                return "%s = 'null'" % sql, params
+            else:
+                return "%s != 'null'" % sql, params
+        else:
+            return super(JSONIsNull, self).as_sql(compiler, connection)
