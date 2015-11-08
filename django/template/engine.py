@@ -16,9 +16,10 @@ class Engine(object):
         'django.template.loader_tags',
     ]
 
-    def __init__(self, dirs=None, app_dirs=False, context_processors=None,
-                 debug=False, loaders=None, string_if_invalid='',
-                 file_charset='utf-8', libraries=None, builtins=None):
+    def __init__(self, dirs=None, app_dirs=False, autoescape=True,
+                 context_processors=None, debug=False, loaders=None,
+                 string_if_invalid='', file_charset='utf-8',
+                 libraries=None, builtins=None):
         if dirs is None:
             dirs = []
         if context_processors is None:
@@ -38,6 +39,7 @@ class Engine(object):
 
         self.dirs = dirs
         self.app_dirs = app_dirs
+        self.autoescape = autoescape
         self.context_processors = context_processors
         self.debug = debug
         self.loaders = loaders
