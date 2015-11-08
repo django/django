@@ -1082,10 +1082,7 @@ class SQLUpdateCompiler(SQLCompiler):
         self.pre_sql_setup()
         if not self.query.values:
             return '', ()
-        table = self.query.tables[0]
         qn = self.quote_name_unless_alias
-        result = ['UPDATE %s' % qn(table)]
-        result.append('SET')
         values, update_params = [], []
         for field, model, val in self.query.values:
             if hasattr(val, 'resolve_expression'):
@@ -1124,7 +1121,11 @@ class SQLUpdateCompiler(SQLCompiler):
                 values.append('%s = NULL' % qn(name))
         if not values:
             return '', ()
-        result.append(', '.join(values))
+        table = self.query.tables[0]
+        result = [
+            'UPDATE %s SET' % qn(table),
+            ', '.join(values)
+        ]
         where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
