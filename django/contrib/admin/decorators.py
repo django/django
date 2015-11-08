@@ -3,7 +3,7 @@ def register(*models, **kwargs):
     Registers the given model(s) classes and wrapped ModelAdmin class with
     admin site:
 
-    Atleast one model must be passed for register.
+    At least one model must be passed to register.
 
     @register(Author)
     class AuthorAdmin(admin.ModelAdmin):
@@ -17,7 +17,7 @@ def register(*models, **kwargs):
 
     def _model_admin_wrapper(admin_class):
         if not models:
-            raise ValueError('Atleast one model must be passed for register')
+            raise ValueError('At least one model must be passed to register')
 
         admin_site = kwargs.pop('site', site)
 
