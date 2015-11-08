@@ -23,6 +23,7 @@ class DjangoTemplates(BaseEngine):
     def __init__(self, params):
         params = params.copy()
         options = params.pop('OPTIONS').copy()
+        options.setdefault('autoescape', True)
         options.setdefault('debug', settings.DEBUG)
         options.setdefault('file_charset', settings.FILE_CHARSET)
         libraries = options.get('libraries', {})
@@ -60,7 +61,7 @@ class Template(object):
         return self.template.origin
 
     def render(self, context=None, request=None):
-        context = make_context(context, request)
+        context = make_context(context, request, autoescape=self.backend.engine.autoescape)
         try:
             return self.template.render(context)
         except TemplateDoesNotExist as exc:
