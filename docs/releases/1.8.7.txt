@@ -27,3 +27,6 @@ Bugfixes
 
 * Fixed a data loss possibility with :class:`~django.db.models.Prefetch` if
   ``to_attr`` is set to a ``ManyToManyField`` (:ticket:`25693`).
+
+* Fixed a regression in 1.8 by making ``gettext()`` once again return UTF-8
+  bytestrings on Python 2 if the input is a bytestring (:ticket:`25720`).
