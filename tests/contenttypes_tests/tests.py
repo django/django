@@ -361,6 +361,8 @@ class GenericRelationshipTests(SimpleTestCase):
 
 
 class UpdateContentTypesTests(TestCase):
+    available_apps = ['django.contrib.contenttypes', 'contenttypes_tests']
+
     def setUp(self):
         self.before_count = ContentType.objects.count()
         ContentType.objects.create(app_label='contenttypes_tests', model='Fake')
