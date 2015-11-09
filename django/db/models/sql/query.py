@@ -981,10 +981,14 @@ class Query(object):
         # Interpret '__exact=None' as the sql 'is NULL'; otherwise, reject all
         # uses of None as a query value.
         if value is None:
-            if lookups[-1] not in ('exact', 'iexact'):
-                raise ValueError("Cannot use None as a query value")
-            lookups[-1] = 'isnull'
-            value = True
+            # Some transformed lookup
+            if lookups[-1] not in self.query_terms:
+                lookups.append('exact')
+            else:
+                if lookups[-1] not in ('exact', 'iexact'):
+                    raise ValueError("Cannot use None as a query value")
+                lookups[-1] = 'isnull'
+                value = True
         elif hasattr(value, 'resolve_expression'):
             pre_joins = self.alias_refcount.copy()
             value = value.resolve_expression(self, reuse=can_reuse, allow_joins=allow_joins)
@@ -1191,7 +1195,7 @@ class Query(object):
         clause.add(condition, AND)
 
         require_outer = lookup_type == 'isnull' and value is True and not current_negated
-        if current_negated and (lookup_type != 'isnull' or value is False):
+        if current_negated and (lookup_type != 'isnull' or value is False) and value is not None:
             require_outer = True
             if (lookup_type != 'isnull' and (
                     self.is_nullable(targets[0]) or
