@@ -906,6 +906,26 @@ class ForeignKeyToFieldTest(TestCase):
             )
 
 
+class ShadowTest(TestCase):
+    def test_m2m_shadow(self):
+        book1 = Book.objects.create(title='Poems')
+        book2 = Book.objects.create(title='Code')
+        author = Author.objects.create(name='Jane', first_book=book1)
+        author.books.add(book1)
+        author.books.add(book2)
+
+        books_field = author._meta.get_field('books')
+        msg = 'to_attr=books conflicts with a field on the {} model.'.format(books_field.model)
+
+        poems = Book.objects.filter(title='Poems')
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Author.objects.prefetch_related(
+                Prefetch('books', queryset=poems, to_attr='books'),
+            ))
+
+        self.assertEqual(author.books.count(), 2)
+
+
 class LookupOrderingTest(TestCase):
     """
     Test cases that demonstrate that ordering of lookups is important, and
