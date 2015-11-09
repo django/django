@@ -12,4 +12,5 @@ Bugfixes
 * Fixed a crash of the debug view during the autumn DST change when
   :setting:`USE_TZ` is ``False`` and ``pytz`` is installed.
 
-* ...
+* Fixed a regression in 1.8.6 that caused database routers without an
+  ``allow_migrate()`` method to crash (:ticket:`25686`).
