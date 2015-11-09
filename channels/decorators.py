@@ -50,8 +50,9 @@ def channel_session(func):
         # Turn the reply_channel into a valid session key length thing.
         # We take the last 24 bytes verbatim, as these are the random section,
         # and then hash the remaining ones onto the start, and add a prefix
-        reply_name = str(message.reply_channel.name).encode()
-        session_key = b"skt" + str(hashlib.md5(reply_name[:-24]).hexdigest()[:8]).encode() + reply_name[-24:]
+        reply_name = message.reply_channel.name
+        hashed = hashlib.md5(reply_name[:-24].encode()).hexdigest()[:8]
+        session_key = "skt" + hashed + reply_name[-24:]
         # Make a session storage
         session_engine = import_module(settings.SESSION_ENGINE)
         session = session_engine.SessionStore(session_key=session_key)
