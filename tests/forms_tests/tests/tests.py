@@ -167,6 +167,12 @@ class ModelFormCallableModelDefault(TestCase):
 
 
 class FormsModelTestCase(TestCase):
+    def test_modelchoicefield_manager(self):
+        f = ModelChoiceField(ChoiceOptionModel.objects)
+        choice = ChoiceOptionModel.objects.create(name="choice 1")
+        self.assertEqual(list(f.choices), [('', '---------'),
+                                           (choice.pk, six.text_type(choice))])
+
     def test_unicode_filename(self):
         # FileModel with unicode filename and data #########################
         file1 = SimpleUploadedFile('我隻氣墊船裝滿晒鱔.txt', 'मेरी मँडराने वाली नाव सर्पमीनों से भरी ह'.encode('utf-8'))
