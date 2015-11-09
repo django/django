@@ -241,7 +241,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field2, new_field, strict=True)
         # Make sure no FK constraint is present
-            constraints = self.get_constraints(Author._meta.db_table)
+        constraints = self.get_constraints(Author._meta.db_table)
         for name, details in constraints.items():
             if details['columns'] == ["tag_id"] and details['foreign_key']:
                 self.fail("FK constraint for tag_id found")
