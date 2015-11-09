@@ -312,6 +312,12 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
         """
         return connection.ops.get_distance(self, value, lookup_type)
 
+    def get_db_prep_value(self, value, connection, *args, **kwargs):
+        return connection.ops.Adapter(
+            super(GeometryField, self).get_db_prep_value(value, connection, *args, **kwargs),
+            **({'geography': True} if self.geography else {})
+        )
+
     def from_db_value(self, value, expression, connection, context):
         if value:
             if not isinstance(value, Geometry):
