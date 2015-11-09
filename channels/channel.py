@@ -1,7 +1,7 @@
 import random
 import string
 
-from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
 
 
 class Channel(object):
@@ -81,7 +81,7 @@ class Group(object):
         self.channel_backend.group_discard(self.name, channel)
 
     def channels(self):
-        self.channel_backend.group_channels(self.name)
+        return self.channel_backend.group_channels(self.name)
 
     def send(self, content):
         if not isinstance(content, dict):

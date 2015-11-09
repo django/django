@@ -1,7 +1,6 @@
 from django.http import HttpRequest
-from django.utils.datastructures import MultiValueDict
 from django.http.request import QueryDict
-from django.conf import settings
+from django.utils.datastructures import MultiValueDict
 
 
 def encode_request(request):

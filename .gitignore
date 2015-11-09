@@ -2,5 +2,6 @@
 dist/
 docs/_build
 __pycache__/
+.tox/
 *.swp
-
+*.pyc

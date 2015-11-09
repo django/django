@@ -1,9 +1,8 @@
-import time
-import json
 import datetime
+import json
 
 from django.apps.registry import Apps
-from django.db import models, connections, DEFAULT_DB_ALIAS, IntegrityError
+from django.db import DEFAULT_DB_ALIAS, IntegrityError, connections, models
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 
@@ -39,6 +38,7 @@ class DatabaseChannelBackend(BaseChannelBackend):
             channel = models.CharField(max_length=200, db_index=True)
             content = models.TextField()
             expiry = models.DateTimeField(db_index=True)
+
             class Meta:
                 apps = Apps()
                 app_label = "channels"
@@ -60,6 +60,7 @@ class DatabaseChannelBackend(BaseChannelBackend):
             group = models.CharField(max_length=200)
             channel = models.CharField(max_length=200)
             expiry = models.DateTimeField(db_index=True)
+
             class Meta:
                 apps = Apps()
                 app_label = "channels"
@@ -81,6 +82,7 @@ class DatabaseChannelBackend(BaseChannelBackend):
         class Lock(models.Model):
             channel = models.CharField(max_length=200, unique=True)
             expiry = models.DateTimeField(db_index=True)
+
             class Meta:
                 apps = Apps()
                 app_label = "channels"
@@ -93,9 +95,9 @@ class DatabaseChannelBackend(BaseChannelBackend):
 
     def send(self, channel, message):
         self.channel_model.objects.create(
-            channel = channel,
-            content = json.dumps(message),
-            expiry = now() + datetime.timedelta(seconds=self.expiry)
+            channel=channel,
+            content=json.dumps(message),
+            expiry=now() + datetime.timedelta(seconds=self.expiry)
         )
 
     def receive_many(self, channels):
@@ -125,9 +127,9 @@ class DatabaseChannelBackend(BaseChannelBackend):
         seconds (expiry defaults to message expiry if not provided).
         """
         self.group_model.objects.update_or_create(
-            group = group,
-            channel = channel,
-            defaults = {"expiry": now() + datetime.timedelta(seconds=expiry or self.expiry)},
+            group=group,
+            channel=channel,
+            defaults={"expiry": now() + datetime.timedelta(seconds=expiry or self.expiry)},
         )
 
     def group_discard(self, group, channel):
@@ -152,8 +154,8 @@ class DatabaseChannelBackend(BaseChannelBackend):
         # We rely on the UNIQUE constraint for only-one-thread-wins on locks
         try:
             self.lock_model.objects.create(
-                channel = channel,
-                expiry = now() + datetime.timedelta(seconds=expiry or self.expiry),
+                channel=channel,
+                expiry=now() + datetime.timedelta(seconds=expiry or self.expiry),
             )
         except IntegrityError:
             return False

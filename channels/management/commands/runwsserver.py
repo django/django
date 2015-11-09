@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand, CommandError
 
-from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
 from channels.log import setup_logger
 
 
@@ -23,7 +23,7 @@ class Command(BaseCommand):
         # Run the interface
         port = int(options.get("port", None) or 9000)
         try:
-            import asyncio
+            import asyncio  # NOQA
         except ImportError:
             from channels.interfaces.websocket_twisted import WebsocketTwistedInterface
             self.logger.info("Running Twisted/Autobahn WebSocket interface server")

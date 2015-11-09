@@ -1,11 +1,13 @@
-import time
 import json
+import time
 from collections import deque
+
 from .base import BaseChannelBackend
 
 queues = {}
 groups = {}
 locks = set()
+
 
 class InMemoryChannelBackend(BaseChannelBackend):
     """

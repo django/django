@@ -1,8 +1,9 @@
 import threading
 
-from django.core.management.commands.runserver import Command as RunserverCommand
+from django.core.management.commands.runserver import \
+    Command as RunserverCommand
 
-from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
+from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
 from channels.adapters import UrlConsumer
 from channels.interfaces.wsgi import WSGIInterface
 from channels.log import setup_logger

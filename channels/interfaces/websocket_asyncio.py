@@ -1,9 +1,11 @@
-import asyncio
 import time
 
-from autobahn.asyncio.websocket import WebSocketServerProtocol, WebSocketServerFactory
+import asyncio
+from autobahn.asyncio.websocket import (
+    WebSocketServerFactory, WebSocketServerProtocol,
+)
 
-from .websocket_autobahn import get_protocol, get_factory
+from .websocket_autobahn import get_factory, get_protocol
 
 
 class WebsocketAsyncioInterface(object):
