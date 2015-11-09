@@ -4803,6 +4803,13 @@ class UserAdminTest(TestCase):
     """
     Tests user CRUD functionality.
     """
+    available_apps = [
+        'django.contrib.auth',
+        'django.contrib.sessions',
+        'django.contrib.contenttypes',
+        'django.contrib.admin',
+        'admin_views',
+    ]
 
     @classmethod
     def setUpTestData(cls):
@@ -5541,6 +5548,13 @@ class AdminUserMessageTest(TestCase):
     ROOT_URLCONF="admin_views.urls")
 class AdminKeepChangeListFiltersTests(TestCase):
     admin_site = site
+    available_apps = [
+        'django.contrib.auth',
+        'django.contrib.sessions',
+        'django.contrib.contenttypes',
+        'django.contrib.admin',
+        'admin_views',
+    ]
 
     @classmethod
     def setUpTestData(cls):
