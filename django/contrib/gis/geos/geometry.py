@@ -621,6 +621,11 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         return self._topology(capi.geos_symdifference(self.ptr, other.ptr))
 
+    @property
+    def unary_union(self):
+        "Return the union of all the elements of this geometry."
+        return self._topology(capi.geos_unary_union(self.ptr))
+
     def union(self, other):
         "Returns a Geometry representing all the points in this Geometry and other."
         return self._topology(capi.geos_union(self.ptr, other.ptr))

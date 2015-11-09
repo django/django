@@ -582,6 +582,15 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             a |= b  # testing __ior__
             self.assertEqual(u1, a)
 
+    def test_unary_union(self):
+        "Testing unary_union."
+        for i in range(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            u1 = fromstr(self.geometries.union_geoms[i].wkt)
+            u2 = GeometryCollection(a, b).unary_union
+            self.assertTrue(u1.equals(u2))
+
     def test_difference(self):
         "Testing difference()."
         for i in range(len(self.geometries.topology_geoms)):
