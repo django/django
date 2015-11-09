@@ -34,6 +34,7 @@ geos_symdifference = Topology('GEOSSymDifference', argtypes=[GEOM_PTR, GEOM_PTR]
 geos_union = Topology('GEOSUnion', argtypes=[GEOM_PTR, GEOM_PTR])
 
 geos_cascaded_union = GEOSFuncFactory('GEOSUnionCascaded', argtypes=[GEOM_PTR], restype=GEOM_PTR)
+geos_unary_union = GEOSFuncFactory('GEOSUnaryUnion', argtypes=[GEOM_PTR], restype=GEOM_PTR)
 
 # GEOSRelate returns a string, not a geometry.
 geos_relate = GEOSFuncFactory(

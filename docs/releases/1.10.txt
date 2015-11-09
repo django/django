@@ -64,6 +64,10 @@ Minor features
 * :ref:`Distance lookups <distance-lookups>` now accept expressions as the
   distance value parameter.
 
+* The new :attr:`GEOSGeometry.unary_union
+  <django.contrib.gis.geos.GEOSGeometry.unary_union>` property computes the
+  union of all the elements of this geometry.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
