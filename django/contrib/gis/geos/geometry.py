@@ -493,15 +493,15 @@ class GEOSGeometry(GEOSBase, ListMixin):
             else:
                 return
 
+        if not gdal.HAS_GDAL:
+            raise GEOSException("GDAL library is not available to transform() geometry.")
+
         if isinstance(ct, gdal.CoordTransform):
             # We don't care about SRID because CoordTransform presupposes
             # source SRS.
             srid = None
         elif srid is None or srid < 0:
             raise GEOSException("Calling transform() with no SRID set is not supported")
-
-        if not gdal.HAS_GDAL:
-            raise GEOSException("GDAL library is not available to transform() geometry.")
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self.wkb, srid)

@@ -93,7 +93,8 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :class:`~django.contrib.sites.models.Site` model now supports
+  :ref:`natural keys <topics-serialization-natural-keys>`.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -15,7 +15,8 @@ from django.views.debug import ExceptionReporter
 
 # Default logging for Django. This sends an email to the site admins on every
 # HTTP 500 error. Depending on DEBUG, all other log records are either sent to
-# the console (DEBUG=True) or discarded by mean of the NullHandler (DEBUG=False).
+# the console (DEBUG=True) or discarded (DEBUG=False) by means of the
+# require_debug_true filter.
 DEFAULT_LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

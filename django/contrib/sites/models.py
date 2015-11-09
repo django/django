@@ -78,6 +78,9 @@ class SiteManager(models.Manager):
         global SITE_CACHE
         SITE_CACHE = {}
 
+    def get_by_natural_key(self, domain):
+        return self.get(domain=domain)
+
 
 @python_2_unicode_compatible
 class Site(models.Model):
@@ -95,6 +98,9 @@ class Site(models.Model):
 
     def __str__(self):
         return self.domain
+
+    def natural_key(self):
+        return (self.domain,)
 
 
 def clear_site_cache(sender, **kwargs):

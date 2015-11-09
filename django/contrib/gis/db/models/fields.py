@@ -257,8 +257,12 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
             return geom
 
     def from_db_value(self, value, expression, connection, context):
-        if value and not isinstance(value, Geometry):
-            value = Geometry(value)
+        if value:
+            if not isinstance(value, Geometry):
+                value = Geometry(value)
+            srid = value.srid
+            if not srid and self.srid != -1:
+                value.srid = self.srid
         return value
 
     def get_srid(self, geom):
