@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 import warnings
 
+from django.apps.registry import Apps
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.db.models.fields.related import ForeignObject
@@ -132,6 +133,26 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
+    def test_foreign_key_to_isolated_apps_model(self):
+        """
+        #25723 - Referenced model registration lookup should be run against the
+        field's model registry.
+        """
+        test_apps = Apps(['invalid_models_tests'])
+
+        class OtherModel(models.Model):
+            class Meta:
+                apps = test_apps
+
+        class Model(models.Model):
+            foreign_key = models.ForeignKey('OtherModel', models.CASCADE)
+
+            class Meta:
+                apps = test_apps
+
+        field = Model._meta.get_field('foreign_key')
+        self.assertEqual(field.check(from_model=Model), [])
+
     def test_many_to_many_to_missing_model(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("Rel2")
@@ -148,6 +169,26 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+    def test_many_to_many_to_isolated_apps_model(self):
+        """
+        #25723 - Referenced model registration lookup should be run against the
+        field's model registry.
+        """
+        test_apps = Apps(['invalid_models_tests'])
+
+        class OtherModel(models.Model):
+            class Meta:
+                apps = test_apps
+
+        class Model(models.Model):
+            m2m = models.ManyToManyField('OtherModel')
+
+            class Meta:
+                apps = test_apps
+
+        field = Model._meta.get_field('m2m')
+        self.assertEqual(field.check(from_model=Model), [])
 
     def test_many_to_many_with_useless_options(self):
         class Model(models.Model):
@@ -287,6 +328,33 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             ),
         ]
         self.assertEqual(errors, expected)
+
+    def test_many_to_many_through_isolated_apps_model(self):
+        """
+        #25723 - Through model registration lookup should be run against the
+        field's model registry.
+        """
+        test_apps = Apps(['invalid_models_tests'])
+
+        class GroupMember(models.Model):
+            person = models.ForeignKey('Person', models.CASCADE)
+            group = models.ForeignKey('Group', models.CASCADE)
+
+            class Meta:
+                apps = test_apps
+
+        class Person(models.Model):
+            class Meta:
+                apps = test_apps
+
+        class Group(models.Model):
+            members = models.ManyToManyField('Person', through='GroupMember')
+
+            class Meta:
+                apps = test_apps
+
+        field = Group._meta.get_field('members')
+        self.assertEqual(field.check(from_model=Group), [])
 
     def test_symmetrical_self_referential_field(self):
         class Person(models.Model):
