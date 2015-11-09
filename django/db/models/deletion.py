@@ -64,7 +64,7 @@ class Collector(object):
     def __init__(self, using):
         self.using = using
         # Initially, {model: {instances}}, later values become lists.
-        self.data = {}
+        self.data = OrderedDict()
         self.field_updates = {}  # {model: {(field, value): {instances}}}
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
