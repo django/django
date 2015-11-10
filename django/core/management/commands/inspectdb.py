@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 except NotImplementedError:
                     constraints = {}
                 used_column_names = []  # Holds column names used in the table so far
-                column_to_field_name = {}  # Maps original column names to names of django fields
+                column_to_field_name = {}  # Maps original column names to names of model fields
                 for row in connection.introspection.get_table_description(cursor, table_name):
                     comment_notes = []  # Holds Field notes, to be displayed in a Python comment.
                     extra_params = OrderedDict()  # Holds Field parameters such as 'db_column'.
@@ -257,8 +257,7 @@ class Command(BaseCommand):
                 if len(columns) > 1:
                     # we do not want to include the u"" or u'' prefix
                     # so we build the string rather than interpolate the tuple
-                    tup = '(' + ', '.join(
-                        "'%s'" % column_to_field_name[c] for c in columns) + ')'
+                    tup = '(' + ', '.join("'%s'" % column_to_field_name[c] for c in columns) + ')'
                     unique_together.append(tup)
         meta = ["",
                 "    class Meta:",
