@@ -18,3 +18,6 @@ Bugfixes
 * Fixed a regression in 1.8.6 by restoring the ability to use ``Manager``
   objects for the ``queryset`` argument of ``ModelChoiceField``
   (:ticket:`25683`).
+
+* Fixed a regression in 1.8.6 that caused an application with South migrations
+  in the ``migrations`` directory to fail (:ticket:`25618`).
