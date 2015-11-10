@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed ``BaseCache.get_or_set()`` with the ``DummyCache`` backend
   (:ticket:`25840`).
+
+* Fixed a regression in ``FormMixin`` causing forms to be validated twice
+  (:ticket:`25548`).

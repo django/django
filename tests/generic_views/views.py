@@ -307,3 +307,13 @@ class NonModelDetail(generic.DetailView):
 class ObjectDoesNotExistDetail(generic.DetailView):
     def get_queryset(self):
         return Book.does_not_exist.all()
+
+
+class LateValidationView(generic.FormView):
+    form_class = ContactForm
+    success_url = reverse_lazy('authors_list')
+    template_name = 'generic_views/form.html'
+
+    def form_valid(self, form):
+        form.add_error(None, 'There is an error')
+        return self.form_invalid(form)
