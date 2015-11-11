@@ -566,13 +566,17 @@ Handlers
 Django provides one log handler in addition to those provided by the
 Python logging module.
 
+.. _logging-adminemailhandler:
+
 .. class:: AdminEmailHandler(include_html=False, email_backend=None)
 
     This handler sends an email to the site admins for each log
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
-    of the request will be included in the email.
+    of the request will be included in the email. If the client's IP address
+    is in the :setting:`INTERNAL_IPS`, an email subject will be marked
+    with an "internal IP" phrase, and "EXTERNAL IP" otherwise.
 
     If the log record contains stack trace information, that stack
     trace will be included in the email.

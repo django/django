@@ -1528,9 +1528,11 @@ Default: ``[]`` (Empty list)
 
 A list of IP addresses, as strings, that:
 
-* See debug comments, when :setting:`DEBUG` is ``True``
-* Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/ref/contrib/admin/admindocs`)
+* Have special variables in templates when :setting:`DEBUG` is ``True`` and the
+  :ref:`debug context processor <context-processors>` is enabled.
+* Can use the :ref:`admindocs bookmarklets <admindocs-bookmarklets>` even not
+  being logged in as a staff user.
+* Are marked as internal in :ref:`AdminEmailHandler <logging-adminemailhandler>` emails.
 
 .. setting:: LANGUAGE_CODE
 
