@@ -691,6 +691,8 @@ variables:
 django.template.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. function:: debug
+
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and
 the request's IP address (``request.META['REMOTE_ADDR']``) is in the
