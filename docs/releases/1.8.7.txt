@@ -30,3 +30,7 @@ Bugfixes
 
 * Fixed a regression in 1.8 by making ``gettext()`` once again return UTF-8
   bytestrings on Python 2 if the input is a bytestring (:ticket:`25720`).
+
+* Fixed serialization of
+  :class:`~django.contrib.postgres.fields.DateRangeField` and
+  :class:`~django.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).
