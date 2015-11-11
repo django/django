@@ -1,8 +1,8 @@
 
 from django.core.management import BaseCommand, CommandError
-
-from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
+from channels import channel_backends, DEFAULT_CHANNEL_BACKEND
 from channels.log import setup_logger
+from channels.adapters import UrlConsumer
 from channels.worker import Worker
 
 
@@ -18,6 +18,10 @@ class Command(BaseCommand):
                 "You have a process-local channel backend configured, and so cannot run separate workers.\n"
                 "Configure a network-based backend in CHANNEL_BACKENDS to use this command."
             )
+        # Check a handler is registered for http reqs
+        if not channel_backend.registry.consumer_for_channel("http.request"):
+            # Register the default one
+            channel_backend.registry.add_consumer(UrlConsumer(), ["http.request"])
         # Launch a worker
         self.logger.info("Running worker against backend %s", channel_backend)
         # Optionally provide an output callback

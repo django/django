@@ -12,7 +12,11 @@ def encode_request(request):
         "get": dict(request.GET.lists()),
         "post": dict(request.POST.lists()),
         "cookies": request.COOKIES,
-        "meta": {k: v for k, v in request.META.items() if not k.startswith("wsgi")},
+        "headers": {
+            k[5:].lower(): v
+            for k, v in request.META.items()
+            if k.lower().startswith("http_")
+        },
         "path": request.path,
         "method": request.method,
         "reply_channel": request.reply_channel,
@@ -28,10 +32,20 @@ def decode_request(value):
     request.GET = CustomQueryDict(value['get'])
     request.POST = CustomQueryDict(value['post'])
     request.COOKIES = value['cookies']
-    request.META = value['meta']
     request.path = value['path']
     request.method = value['method']
     request.reply_channel = value['reply_channel']
+    # Channels requests are more high-level than the dumping ground that is
+    # META; re-combine back into it
+    request.META = {
+        "REQUEST_METHOD": value["method"],
+        "SERVER_NAME": value["server"][0],
+        "SERVER_PORT": value["server"][1],
+        "REMOTE_ADDR": value["client"][0],
+        "REMOTE_HOST": value["client"][0],  # Not the DNS name, hopefully fine.
+    }
+    for header, header_value in value.get("headers", {}).items():
+        request.META["HTTP_%s" % header.upper()] = header_value
     # We don't support non-/ script roots
     request.path_info = value['path']
     return request

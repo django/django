@@ -203,7 +203,7 @@ The easiest way to do this is to use the ``runwsserver`` management command
 that ships with Django; just make sure you've installed the latest release
 of ``autobahn`` first::
 
-    pip install -U autobahn
+    pip install -U autobahn[twisted]
     python manage.py runwsserver
 
 Run that alongside ``runserver`` and you'll have two interface servers, a
