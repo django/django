@@ -1571,20 +1571,23 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
         rel_attr_val = rel_obj_attr(rel_obj)
         rel_obj_cache.setdefault(rel_attr_val, []).append(rel_obj)
 
+    to_attr, as_attr = lookup.get_current_to_attr(level)
+    # Make sure `to_attr` does not conflict with a field.
+    if as_attr and instances:
+        # We assume that objects retrieved are homogeneous (which is the premise
+        # of prefetch_related), so what applies to first object applies to all.
+        model = instances[0].__class__
+        try:
+            model._meta.get_field(to_attr)
+        except exceptions.FieldDoesNotExist:
+            pass
+        else:
+            msg = 'to_attr={} conflicts with a field on the {} model.'
+            raise ValueError(msg.format(to_attr, model.__name__))
+
     for obj in instances:
         instance_attr_val = instance_attr(obj)
         vals = rel_obj_cache.get(instance_attr_val, [])
-        to_attr, as_attr = lookup.get_current_to_attr(level)
-
-        # Check we are not shadowing a field on obj.
-        if as_attr:
-            try:
-                field = obj._meta.get_field(to_attr)
-            except exceptions.FieldDoesNotExist:
-                pass
-            else:
-                msg = 'to_attr={} conflicts with a field on the {} model.'
-                raise ValueError(msg.format(to_attr, field.model.__name__))
 
         if single:
             val = vals[0] if vals else None
