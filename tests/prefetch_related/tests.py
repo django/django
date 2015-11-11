@@ -223,7 +223,18 @@ class PrefetchRelatedTests(TestCase):
         self.assertIn('prefetch_related', str(cm.exception))
         self.assertIn("name", str(cm.exception))
 
-    def test_m2m_shadow(self):
+    def test_forward_m2m_to_attr_conflict(self):
+        msg = 'to_attr=authors conflicts with a field on the Book model.'
+        authors = Author.objects.all()
+        with self.assertRaisesMessage(ValueError, msg):
+            list(Book.objects.prefetch_related(
+                Prefetch('authors', queryset=authors, to_attr='authors'),
+            ))
+        # Without the ValueError, an author was deleted due to the implicit
+        # save of the relation assignment.
+        self.assertEqual(self.book1.authors.count(), 3)
+
+    def test_reverse_m2m_to_attr_conflict(self):
         msg = 'to_attr=books conflicts with a field on the Author model.'
         poems = Book.objects.filter(title='Poems')
         with self.assertRaisesMessage(ValueError, msg):
