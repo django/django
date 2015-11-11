@@ -314,13 +314,16 @@ class HttpResponse(HttpResponseBase):
     def content(self, value):
         # Consume iterators upon assignment to allow repeated iteration.
         if hasattr(value, '__iter__') and not isinstance(value, (bytes, six.string_types)):
+            content = b''.join(self.make_bytes(chunk) for chunk in value)
             if hasattr(value, 'close'):
-                self._closable_objects.append(value)
-            value = b''.join(self.make_bytes(chunk) for chunk in value)
+                try:
+                    value.close()
+                except Exception:
+                    pass
         else:
-            value = self.make_bytes(value)
+            content = self.make_bytes(value)
         # Create a list of properly encoded bytestrings to support write().
-        self._container = [value]
+        self._container = [content]
 
     def __iter__(self):
         return iter(self._container)

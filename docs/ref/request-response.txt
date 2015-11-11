@@ -610,6 +610,14 @@ Finally, you can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
 string, and discard it.
 
+Closeable objects passed to a ``HttpResponse``,
+such as file objects and generators, are immediately being closed.
+
+.. versionchanged:: 1.10
+
+    Closeable objects used be closed once the WSGI server called close on
+    the response. They are now being closed immediately.
+
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
 

@@ -295,6 +295,16 @@ to use this form::
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
 
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+Iterators you pass to :class:`~django.http.HttpResponse`
+are now being properly consumed, closed and discarded.
+Closeable objects used be closed once the WSGI server called close on
+the response. They are now being closed immediately.
+Be aware that file resources passed to a :class:`~django.http.HttpResponse`
+are now immediately closed.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
