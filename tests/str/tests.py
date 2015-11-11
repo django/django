@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import datetime
 from unittest import skipIf
 
+from django.apps.registry import Apps
+from django.db import models
 from django.test import TestCase
 from django.utils import six
 
@@ -33,3 +35,22 @@ class SimpleTests(TestCase):
             # output of __unicode__() -- or __str__() when the
             # python_2_unicode_compatible decorator is used.
             self.assertEqual(str(a), b'Girl wins \xe2\x82\xac12.500 in lottery')
+
+    def test_defaults(self):
+        """
+        The default implementation of __str__ and __repr__ should return
+        instances of str.
+        """
+        test_apps = Apps(['str'])
+
+        class Default(models.Model):
+            class Meta:
+                apps = test_apps
+
+        obj = Default()
+        # Explicit call to __str__/__repr__ to make sure str()/repr() don't
+        # coerce the returned value.
+        self.assertIsInstance(obj.__str__(), str)
+        self.assertIsInstance(obj.__repr__(), str)
+        self.assertEqual(str(obj), str('Default object'))
+        self.assertEqual(repr(obj), str('<Default: Default object>'))
