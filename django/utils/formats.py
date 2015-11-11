@@ -30,6 +30,24 @@ ISO_INPUT_FORMATS = {
 }
 
 
+FORMAT_SETTINGS = frozenset([
+    'DECIMAL_SEPARATOR',
+    'THOUSAND_SEPARATOR',
+    'NUMBER_GROUPING',
+    'FIRST_DAY_OF_WEEK',
+    'MONTH_DAY_FORMAT',
+    'TIME_FORMAT',
+    'DATE_FORMAT',
+    'DATETIME_FORMAT',
+    'SHORT_DATE_FORMAT',
+    'SHORT_DATETIME_FORMAT',
+    'YEAR_MONTH_FORMAT',
+    'DATE_INPUT_FORMATS',
+    'TIME_INPUT_FORMATS',
+    'DATETIME_INPUT_FORMATS',
+])
+
+
 def reset_format_cache():
     """Clear any cached formats.
 
@@ -92,6 +110,8 @@ def get_format(format_type, lang=None, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     format_type = force_str(format_type)
+    if format_type not in FORMAT_SETTINGS:
+        return format_type
     if use_l10n or (use_l10n is None and settings.USE_L10N):
         if lang is None:
             lang = get_language()

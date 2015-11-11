@@ -1245,6 +1245,9 @@ class FormattingTests(SimpleTestCase):
                 '<input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47" />'
             )
 
+    def test_format_arbitrary_settings(self):
+        self.assertEqual(get_format('DEBUG'), 'DEBUG')
+
 
 class MiscTests(SimpleTestCase):
 
