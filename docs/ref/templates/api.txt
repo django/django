@@ -48,7 +48,7 @@ probably isn't the documentation you're looking for. An instance of the
 of that backend and any attribute defaults mentioned below are overridden by
 what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. class:: Engine(dirs=None, app_dirs=False, autoescape=True, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
