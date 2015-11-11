@@ -96,6 +96,8 @@ urlpatterns = auth_urlpatterns + [
     url(r'^auth_processor_messages/$', auth_processor_messages),
     url(r'^custom_request_auth_login/$', custom_request_auth_login),
     url(r'^userpage/(.+)/$', userpage, name="userpage"),
+    url(r'^login/redirect_authenticated_user_default/$', views.login),
+    url(r'^login/redirect_authenticated_user/$', views.login, dict(redirect_authenticated_user=True)),
 
     # This line is only required to render the password reset with is_admin=True
     url(r'^admin/', admin.site.urls),

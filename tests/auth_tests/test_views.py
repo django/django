@@ -752,6 +752,61 @@ class RedirectToLoginTests(AuthViewsTestCase):
         self.assertEqual(expected, login_redirect_response.url)
 
 
+class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
+
+    def setUp(self):
+        super(LoginRedirectAuthenticatedUser, self).setUp()
+        self.dont_redirect_url = '/login/redirect_authenticated_user_default/'
+        self.do_redirect_url = '/login/redirect_authenticated_user/'
+
+    def test_default(self):
+        """ Keep on the login page by default """
+        self.login()
+        response = self.client.get(self.dont_redirect_url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_guest(self):
+        """If not loggued keep on the same page """
+        response = self.client.get(self.do_redirect_url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_redirect(self):
+        """If logged in go to default redirected url """
+        self.login()
+        response = self.client.get(self.do_redirect_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/accounts/profile/')
+
+    @override_settings(LOGIN_REDIRECT_URL='/custom/')
+    def test_redirect_url(self):
+        """If logged in go to custom redirected url """
+        self.login()
+        response = self.client.get(self.do_redirect_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/custom/')
+
+    def test_redirect_param(self):
+        """If next is specified as argument, go there """
+        self.login()
+        url = self.do_redirect_url + '?next=/custom_next/'
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertURLEqual(response.url, '/custom_next/')
+
+    def test_redirect_loop(self):
+        """Detect a redirect loop if LOGIN_REDIRECT_URL is not correctly set"""
+        self.login()
+        with self.settings(LOGIN_REDIRECT_URL=self.do_redirect_url):
+            self.assertRaises(ValueError, lambda: self.client.get(self.do_redirect_url))
+
+    def test_redirect_loop_with_querystring(self):
+        """Loop detection still work if we pass custom parameters"""
+        self.login()
+        url = self.do_redirect_url + '?bla=2'
+        with self.settings(LOGIN_REDIRECT_URL=self.do_redirect_url):
+            self.assertRaises(ValueError, lambda: self.client.get(url))
+
+
 class LogoutTest(AuthViewsTestCase):
 
     def confirm_logged_out(self):
