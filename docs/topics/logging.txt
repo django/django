@@ -572,7 +572,9 @@ Python logging module.
     message it receives.
 
     If the log record contains a ``request`` attribute, the full details
-    of the request will be included in the email.
+    of the request will be included in the email. The email subject will be
+    include the phrase "internal IP" if the client's IP address is in the
+    :setting:`INTERNAL_IPS` setting; if not, it will include "EXTERNAL IP".
 
     If the log record contains stack trace information, that stack
     trace will be included in the email.
