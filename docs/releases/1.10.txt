@@ -357,6 +357,10 @@ Miscellaneous
 * The ``add_postgis_srs()`` backwards compatibility alias for
   ``django.contrib.gis.utils.add_srs_entry()`` is removed.
 
+* Objects with a ``close()`` method such as files and generators passed to
+  :class:`~django.http.HttpResponse` are now closed immediately instead of when
+  the WSGI server calls ``close()`` on the response.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
