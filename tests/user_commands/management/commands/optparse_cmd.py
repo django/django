@@ -16,7 +16,5 @@ class Command(BaseCommand):
         options["example"]
         # BaseCommand default option is available
         options['verbosity']
-        assert (
-            isinstance(options['verbosity'], int), "verbosity option is not int, but %s" % type(options['verbosity'])
-        )
+        assert isinstance(options['verbosity'], int)
         self.stdout.write("All right, let's dance %s." % options["style"])
