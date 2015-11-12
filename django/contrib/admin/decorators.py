@@ -17,7 +17,7 @@ def register(*models, **kwargs):
 
     def _model_admin_wrapper(admin_class):
         if not models:
-            raise ValueError('At least one model must be passed to register')
+            raise ValueError('At least one model must be passed to register.')
 
         admin_site = kwargs.pop('site', site)
 
