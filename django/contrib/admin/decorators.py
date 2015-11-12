@@ -3,6 +3,8 @@ def register(*models, **kwargs):
     Registers the given model(s) classes and wrapped ModelAdmin class with
     admin site:
 
+    At least one model must be passed to register.
+
     @register(Author)
     class AuthorAdmin(admin.ModelAdmin):
         pass
