@@ -85,7 +85,7 @@ class TestHashedFiles(object):
 
     def test_path_with_querystring_and_fragment(self):
         relpath = self.hashed_file_path("cached/css/fragments.css")
-        self.assertEqual(relpath, "cached/css/fragments.75433540b096.css")
+        self.assertEqual(relpath, "cached/css/fragments.ef92012a8c16.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b'fonts/font.a4b0478549d0.eot?#iefix', content)
