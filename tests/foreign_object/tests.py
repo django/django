@@ -1,6 +1,7 @@
 import datetime
 from operator import attrgetter
 
+from django.apps.registry import Apps
 from django.core.exceptions import FieldError
 from django.db import models
 from django.db.models.fields.related import ForeignObject
@@ -412,11 +413,14 @@ class TestModelCheckTests(SimpleTestCase):
 
     @isolate_apps('foreign_object')
     def test_check_composite_foreign_object(self):
+        test_apps = Apps(['foreign_object'])
+
         class Parent(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
 
             class Meta:
+                apps = test_apps
                 unique_together = (('a', 'b'),)
 
         class Child(models.Model):
@@ -431,16 +435,22 @@ class TestModelCheckTests(SimpleTestCase):
                 related_name='children',
             )
 
+            class Meta:
+                apps = apps = test_apps
+
         self.assertEqual(Child._meta.get_field('parent').check(from_model=Child), [])
 
     @isolate_apps('foreign_object')
     def test_check_subset_composite_foreign_object(self):
+        test_apps = Apps(['foreign_object'])
+
         class Parent(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()
             c = models.PositiveIntegerField()
 
             class Meta:
+                apps = test_apps
                 unique_together = (('a', 'b'),)
 
         class Child(models.Model):
@@ -455,5 +465,8 @@ class TestModelCheckTests(SimpleTestCase):
                 to_fields=('a', 'b', 'c'),
                 related_name='children',
             )
+
+            class Meta:
+                apps = test_apps
 
         self.assertEqual(Child._meta.get_field('parent').check(from_model=Child), [])
