@@ -739,6 +739,9 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.selenium.get('%s%s' % (self.live_server_url,
             reverse('admin:admin_inlines_holder4_add')))
 
+        # we need maximizing to fit 5th block into the screen
+        self.selenium.maximize_window()
+
         inline_id = '#inner4stacked_set-group'
         rows_length = lambda: len(self.selenium.find_elements_by_css_selector(
             '%s .dynamic-inner4stacked_set' % inline_id))
@@ -746,8 +749,14 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
         add_button = self.selenium.find_element_by_link_text(
             'Add another Inner4 stacked')
-        add_button.click()
-        add_button.click()
+
+        add_button.click() # 4th block
+        # we need this explicit wait so that 4th block has time to appear
+        self.wait_for('#inner4stacked_set-3')
+
+        add_button.click() # 5th block
+        # we need this explicit wait so that 5th block has time to appear
+        self.wait_for('#inner4stacked_set-4')
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
         for delete_link in self.selenium.find_elements_by_css_selector(
