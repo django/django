@@ -204,7 +204,7 @@ Signals
 Templates
 ^^^^^^^^^
 
-* ...
+* Added autoescape option to :class:`~django.template.backends.django.DjangoTemplates` backend.
 
 Tests
 ^^^^^
