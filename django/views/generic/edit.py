@@ -1,10 +1,9 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.forms import models as model_forms
+from django.forms import Form, models as model_forms
 from django.http import HttpResponseRedirect
 from django.utils.encoding import force_text
 from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
-from django.views.generic.detail import (SingleObjectMixin,
-                        SingleObjectTemplateResponseMixin, BaseDetailView)
+from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
 
 
 class FormMixin(ContextMixin):
