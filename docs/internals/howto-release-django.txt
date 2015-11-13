@@ -223,7 +223,7 @@ OK, this is the fun part, where we actually push out a release!
    .. code-block:: text
 
     This file contains MD5, SHA1, and SHA256 checksums for the source-code
-    tarball of Django <<VERSION>>, released <<DATE>>.
+    tarball and wheel files of Django <<VERSION>>, released <<DATE>>.
 
     To use this file, you will need a working install of PGP or other
     compatible public-key encryption software. You will also need to have
@@ -245,8 +245,8 @@ OK, this is the fun part, where we actually push out a release!
     Release packages:
     =================
 
-    Django <<VERSION>> (tar.tgz): https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
-    Django <<VERSION>> (.whl): https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE TAR.GZ FILENAME>>
+    https://www.djangoproject.com/m/releases/<<RELEASE WHL FILENAME>>
 
     MD5 checksums:
     ==============
