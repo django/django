@@ -19,13 +19,34 @@ img { max-width: 100%; }
 .epub-cover h3 { margin: 3em 0 2em 0; }
 
 /* Code examples should never exceed the width of the page, so wrap instead. */
-pre, span.pre { white-space: pre-wrap; }
+pre, span.pre {
+    white-space: pre-wrap;
+
+    /* Mono fonts for code sample */
+    font-family: "Fira Mono", Consolas, Menlo, Monaco, "Courier New", Courier, monospace;
+}
+
+/* Only otf and ttf fonts are accepted by sphinx-build. */
+@font-face {
+    font-family: "Fira Mono";
+    font-style: normal;
+    font-weight: 400;
+    src: url("./FiraMono-Regular.otf");
+}
+
+@font-face {
+    font-family: "Fira Mono";
+    font-style: normal;
+    font-weight: 700;
+    src: url("./FiraMono-Bold.otf");
+}
 
 pre {
     background-color: #f6f6f6;
     border: 0;
     padding: 0.5em;
     font-size: 90%;
+    color: #0C4B33;
 }
 
 /* Header for some code blocks. */
