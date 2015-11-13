@@ -203,6 +203,7 @@ class PostgreSQLTests(TestCase):
         with warnings.catch_warnings(record=True) as w:
             with mock.patch('django.db.backends.base.base.BaseDatabaseWrapper.connect',
                             side_effect=mocked_connect, autospec=True):
+                warnings.simplefilter('always', RuntimeWarning)
                 nodb_conn = connection._nodb_connection
         self.assertIsNotNone(nodb_conn.settings_dict['NAME'])
         self.assertEqual(nodb_conn.settings_dict['NAME'], connection.settings_dict['NAME'])

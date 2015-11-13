@@ -3,13 +3,11 @@ import os
 import pickle
 import subprocess
 import sys
-import warnings
 
 from django.core.files.temp import NamedTemporaryFile
 from django.db import DJANGO_VERSION_PICKLE_KEY, models
 from django.test import TestCase, mock
 from django.utils._os import npath, upath
-from django.utils.encoding import force_text
 from django.utils.version import get_version
 
 from .models import Article
@@ -31,11 +29,9 @@ class ModelPickleTestCase(TestCase):
                 return reduce_list
 
         p = MissingDjangoVersion(title="FooBar")
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled model instance's Django version is not specified."
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(msg,
-                "Pickled model instance's Django version is not specified.")
 
     def test_unsupported_unpickle(self):
         """
@@ -52,14 +48,9 @@ class ModelPickleTestCase(TestCase):
                 return reduce_list
 
         p = DifferentDjangoVersion(title="FooBar")
-        with warnings.catch_warnings(record=True) as recorded:
+        msg = "Pickled model instance's Django version 1.0 does not match the current version %s." % get_version()
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             pickle.loads(pickle.dumps(p))
-            msg = force_text(recorded.pop().message)
-            self.assertEqual(
-                msg,
-                "Pickled model instance's Django version 1.0 does not "
-                "match the current version %s." % get_version()
-            )
 
     def test_unpickling_when_appregistrynotready(self):
         """
