@@ -59,7 +59,6 @@ def login(request, template_name='registration/login.html',
     """
     Displays the login form and handles the login action.
     """
-
     redirect_to = request.POST.get(redirect_field_name,
                                    request.GET.get(redirect_field_name, ''))
 

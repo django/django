@@ -961,11 +961,9 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
-    * ``redirect_authenticated_user``: Boolean. If True, authenticated users
-      accessing the login page will be redirected as if they had just successfully
-      logged in.
-      If the redirect url redirects to the same login page, :exc:`ValueError`
-      will be raised. Defaults to False.
+    * ``redirect_authenticated_user``: A boolean that controls whether or not
+      authenticated users accessing the login page will be redirected as if
+      they had just successfully logged in. Defaults to `False`.
 
     .. deprecated:: 1.9
 
