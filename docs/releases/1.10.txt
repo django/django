@@ -202,6 +202,10 @@ Models
   accessible as a descriptor on the proxied model class and may be referenced in
   queryset filtering.
 
+* The new :meth:`Field.rel_db_type() <django.db.models.Field.rel_db_type>`
+  method returns the database column data type for fields such as ``ForeignKey``
+  and ``OneToOneField`` that point to another field.
+
 * The :attr:`~django.db.models.Func.arity` class attribute is added to
   :class:`~django.db.models.Func`. This attribute can be used to set the number
   of arguments the function accepts.
