@@ -6,6 +6,9 @@ Django 1.8.7 release notes
 
 Django 1.8.7 fixes several bugs in 1.8.6.
 
+Additionally, Django's vendored version of six, :mod:`django.utils.six`, has
+been upgraded to the latest release (1.10.0).
+
 Bugfixes
 ========
 
@@ -24,3 +27,10 @@ Bugfixes
 
 * Fixed a data loss possibility with :class:`~django.db.models.Prefetch` if
   ``to_attr`` is set to a ``ManyToManyField`` (:ticket:`25693`).
+
+* Fixed a regression in 1.8 by making ``gettext()`` once again return UTF-8
+  bytestrings on Python 2 if the input is a bytestring (:ticket:`25720`).
+
+* Fixed serialization of
+  :class:`~django.contrib.postgres.fields.DateRangeField` and
+  :class:`~django.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).

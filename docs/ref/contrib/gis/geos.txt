@@ -346,7 +346,8 @@ return a boolean.
 
 .. method:: GEOSGeometry.contains(other)
 
-Returns ``True`` if :meth:`GEOSGeometry.within` is ``False``.
+Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>` returns
+``True``.
 
 .. method:: GEOSGeometry.crosses(other)
 

@@ -172,7 +172,9 @@ def localize(value, use_l10n=None):
     If use_l10n is provided and is not None, that will force the value to
     be localized (or not), overriding the value of settings.USE_L10N.
     """
-    if isinstance(value, bool):
+    if isinstance(value, six.string_types):  # Handle strings first for performance reasons.
+        return value
+    elif isinstance(value, bool):  # Make sure booleans don't get treated as numbers
         return mark_safe(six.text_type(value))
     elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value, use_l10n=use_l10n)
@@ -182,8 +184,7 @@ def localize(value, use_l10n=None):
         return date_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.time):
         return time_format(value, 'TIME_FORMAT', use_l10n=use_l10n)
-    else:
-        return value
+    return value
 
 
 def localize_input(value, default=None):
@@ -191,7 +192,9 @@ def localize_input(value, default=None):
     Checks if an input value is a localizable type and returns it
     formatted with the appropriate formatting string of the current locale.
     """
-    if isinstance(value, (decimal.Decimal, float) + six.integer_types):
+    if isinstance(value, six.string_types):  # Handle strings first for performance reasons.
+        return value
+    elif isinstance(value, (decimal.Decimal, float) + six.integer_types):
         return number_format(value)
     elif isinstance(value, datetime.datetime):
         value = datetime_safe.new_datetime(value)
