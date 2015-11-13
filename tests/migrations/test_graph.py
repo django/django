@@ -197,6 +197,7 @@ class GraphTests(SimpleTestCase):
         leaf = expected[-1]
 
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', RuntimeWarning)
             forwards_plan = graph.forwards_plan(leaf)
 
         self.assertEqual(len(w), 1)
@@ -205,6 +206,7 @@ class GraphTests(SimpleTestCase):
         self.assertEqual(expected, forwards_plan)
 
         with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always', RuntimeWarning)
             backwards_plan = graph.backwards_plan(root)
 
         self.assertEqual(len(w), 1)

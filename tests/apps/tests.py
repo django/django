@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import warnings
 from unittest import skipUnless
 
 from django.apps import AppConfig, apps
@@ -232,14 +231,13 @@ class AppsTests(SimpleTestCase):
         body = {}
         body['Meta'] = type(str("Meta"), tuple(), meta_contents)
         body['__module__'] = TotallyNormal.__module__
-        with warnings.catch_warnings(record=True) as w:
+        msg = (
+            "Model 'apps.southponies' was already registered. "
+            "Reloading models is not advised as it can lead to inconsistencies, "
+            "most notably with related models."
+        )
+        with self.assertRaisesMessage(RuntimeWarning, msg):
             type(str("SouthPonies"), (models.Model,), body)
-            self.assertEqual(len(w), 1)
-            self.assertTrue(issubclass(w[-1].category, RuntimeWarning))
-            self.assertEqual(str(w[-1].message),
-                 "Model 'apps.southponies' was already registered. "
-                 "Reloading models is not advised as it can lead to inconsistencies, "
-                 "most notably with related models.")
 
         # If it doesn't appear to be a reloaded module then we expect
         # a RuntimeError.
