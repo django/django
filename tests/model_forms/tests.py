@@ -23,7 +23,7 @@ from django.utils import six
 from django.utils._os import upath
 
 from .models import (
-    Article, ArticleStatus, Author, Author1, BetterWriter, BigInt, Book,
+    Article, ArticleStatus, Author, Author1, Award, BetterWriter, BigInt, Book,
     Category, Character, Colour, ColourfulItem, CommaSeparatedInteger,
     CustomErrorMessage, CustomFF, CustomFieldForExclusionModel, DateTimePost,
     DerivedBook, DerivedPost, Document, ExplicitPK, FilePathModel,
@@ -235,6 +235,40 @@ class ModelFormBaseTest(TestCase):
         self.assertTrue(f2.is_valid())
         obj = f2.save()
         self.assertEqual(obj.character, char)
+
+    def test_blank_false_with_null_true_foreign_key_field(self):
+        """
+        A ModelForm with a model having ForeignKey(blank=False, null=True)
+        and the form field set to required=False should allow the field to be
+        unset.
+        """
+        class AwardForm(forms.ModelForm):
+            class Meta:
+                model = Award
+                fields = '__all__'
+
+            def __init__(self, *args, **kwargs):
+                super(AwardForm, self).__init__(*args, **kwargs)
+                self.fields['character'].required = False
+
+        character = Character.objects.create(username='user', last_action=datetime.datetime.today())
+        award = Award.objects.create(name='Best sprinter', character=character)
+        data = {'name': 'Best tester', 'character': ''}  # remove character
+        form = AwardForm(data=data, instance=award)
+        self.assertTrue(form.is_valid())
+        award = form.save()
+        self.assertIsNone(award.character)
+
+    def test_save_blank_false_with_required_false(self):
+        """
+        A ModelForm with a model with a field set to blank=False and the form
+        field set to required=False should allow the field to be unset.
+        """
+        obj = Writer.objects.create(name='test')
+        form = CustomWriterForm(data={'name': ''}, instance=obj)
+        self.assertTrue(form.is_valid())
+        obj = form.save()
+        self.assertEqual(obj.name, '')
 
     def test_missing_fields_attribute(self):
         message = (

@@ -376,11 +376,6 @@ class BaseModelForm(BaseForm):
 
         exclude = self._get_validation_exclusions()
 
-        try:
-            self.instance = construct_instance(self, self.instance, opts.fields, exclude)
-        except ValidationError as e:
-            self._update_errors(e)
-
         # Foreign Keys being used to represent inline relationships
         # are excluded from basic field value validation. This is for two
         # reasons: firstly, the value may not be supplied (#12507; the
@@ -391,6 +386,11 @@ class BaseModelForm(BaseForm):
         for name, field in self.fields.items():
             if isinstance(field, InlineForeignKeyField):
                 exclude.append(name)
+
+        try:
+            self.instance = construct_instance(self, self.instance, opts.fields, opts.exclude)
+        except ValidationError as e:
+            self._update_errors(e)
 
         try:
             self.instance.full_clean(exclude=exclude, validate_unique=False)
