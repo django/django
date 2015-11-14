@@ -687,8 +687,7 @@ class ListFiltersTests(TestCase):
     def test_fieldlistfilter_underscorelookup_tuple(self):
         """
         Ensure ('fieldpath', ClassName ) lookups pass lookup_allowed checks
-        when fieldpath contains double underscore in value.
-        Refs #19182
+        when fieldpath contains double underscore in value (#19182).
         """
         modeladmin = BookAdminWithUnderscoreLookupAndTuple(Book, site)
         request = self.request_factory.get('/')
@@ -705,7 +704,6 @@ class ListFiltersTests(TestCase):
         modeladmin = DecadeFilterBookAdmin(Book, site)
 
         # Make sure that the first option is 'All' ---------------------------
-
         request = self.request_factory.get('/', {})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -722,7 +720,6 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[0]['query_string'], '?')
 
         # Look for books in the 1980s ----------------------------------------
-
         request = self.request_factory.get('/', {'publication-decade': 'the 80s'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -739,7 +736,6 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[1]['query_string'], '?publication-decade=the+80s')
 
         # Look for books in the 1990s ----------------------------------------
-
         request = self.request_factory.get('/', {'publication-decade': 'the 90s'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -756,7 +752,6 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[2]['query_string'], '?publication-decade=the+90s')
 
         # Look for books in the 2000s ----------------------------------------
-
         request = self.request_factory.get('/', {'publication-decade': 'the 00s'})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -773,7 +768,6 @@ class ListFiltersTests(TestCase):
         self.assertEqual(choices[3]['query_string'], '?publication-decade=the+00s')
 
         # Combine multiple filters -------------------------------------------
-
         request = self.request_factory.get('/', {'publication-decade': 'the 00s', 'author__id__exact': self.alfred.pk})
         changelist = self.get_changelist(request, Book, modeladmin)
 
@@ -832,8 +826,7 @@ class ListFiltersTests(TestCase):
     def test_filter_with_failing_queryset(self):
         """
         Ensure that when a filter's queryset method fails, it fails loudly and
-        the corresponding exception doesn't get swallowed.
-        Refs #17828.
+        the corresponding exception doesn't get swallowed (#17828).
         """
         modeladmin = DecadeFilterBookAdminWithFailingQueryset(Book, site)
         request = self.request_factory.get('/', {})
@@ -863,8 +856,7 @@ class ListFiltersTests(TestCase):
 
     def test_two_characters_long_field(self):
         """
-        Ensure that list_filter works with two-characters long field names.
-        Refs #16080.
+        list_filter works with two-characters long field names (#16080).
         """
         modeladmin = BookAdmin(Book, site)
         request = self.request_factory.get('/', {'no': '207'})
@@ -883,10 +875,8 @@ class ListFiltersTests(TestCase):
     def test_parameter_ends_with__in__or__isnull(self):
         """
         Ensure that a SimpleListFilter's parameter name is not mistaken for a
-        model field if it ends with '__isnull' or '__in'.
-        Refs #17091.
+        model field if it ends with '__isnull' or '__in' (#17091).
         """
-
         # When it ends with '__in' -----------------------------------------
         modeladmin = DecadeFilterBookAdminParameterEndsWith__In(Book, site)
         request = self.request_factory.get('/', {'decade__in': 'the 90s'})
@@ -924,10 +914,8 @@ class ListFiltersTests(TestCase):
     def test_lookup_with_non_string_value(self):
         """
         Ensure choices are set the selected class when using non-string values
-        for lookups in SimpleListFilters.
-        Refs #19318
+        for lookups in SimpleListFilters (#19318).
         """
-
         modeladmin = DepartmentFilterEmployeeAdmin(Employee, site)
         request = self.request_factory.get('/', {'department': self.john.department.pk})
         changelist = self.get_changelist(request, Employee, modeladmin)
@@ -946,8 +934,7 @@ class ListFiltersTests(TestCase):
     def test_lookup_with_non_string_value_underscored(self):
         """
         Ensure SimpleListFilter lookups pass lookup_allowed checks when
-        parameter_name attribute contains double-underscore value.
-        Refs #19182
+        parameter_name attribute contains double-underscore value (#19182).
         """
         modeladmin = DepartmentFilterUnderscoredEmployeeAdmin(Employee, site)
         request = self.request_factory.get('/', {'department__whatever': self.john.department.pk})
@@ -966,8 +953,7 @@ class ListFiltersTests(TestCase):
 
     def test_fk_with_to_field(self):
         """
-        Ensure that a filter on a FK respects the FK's to_field attribute.
-        Refs #17972.
+        A filter on a FK respects the FK's to_field attribute (#17972).
         """
         modeladmin = EmployeeAdmin(Employee, site)
 
