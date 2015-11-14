@@ -866,7 +866,7 @@ class ListFiltersTests(TestCase):
         """
 
         modeladmin = DepartmentFilterEmployeeAdmin(Employee, site)
-        request = self.request_factory.get('/', {'department': self.john.pk})
+        request = self.request_factory.get('/', {'department': self.john.department.pk})
         changelist = self.get_changelist(request, Employee, modeladmin)
 
         queryset = changelist.get_queryset(request)
@@ -878,7 +878,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[1]['display'], 'DEV')
         self.assertEqual(choices[1]['selected'], True)
-        self.assertEqual(choices[1]['query_string'], '?department=%s' % self.john.pk)
+        self.assertEqual(choices[1]['query_string'], '?department=%s' % self.john.department.pk)
 
     def test_lookup_with_non_string_value_underscored(self):
         """
@@ -887,7 +887,7 @@ class ListFiltersTests(TestCase):
         Refs #19182
         """
         modeladmin = DepartmentFilterUnderscoredEmployeeAdmin(Employee, site)
-        request = self.request_factory.get('/', {'department__whatever': self.john.pk})
+        request = self.request_factory.get('/', {'department__whatever': self.john.department.pk})
         changelist = self.get_changelist(request, Employee, modeladmin)
 
         queryset = changelist.get_queryset(request)
@@ -899,7 +899,7 @@ class ListFiltersTests(TestCase):
         choices = list(filterspec.choices(changelist))
         self.assertEqual(choices[1]['display'], 'DEV')
         self.assertEqual(choices[1]['selected'], True)
-        self.assertEqual(choices[1]['query_string'], '?department__whatever=%s' % self.john.pk)
+        self.assertEqual(choices[1]['query_string'], '?department__whatever=%s' % self.john.department.pk)
 
     def test_fk_with_to_field(self):
         """
