@@ -5,6 +5,7 @@ from django.contrib.postgres.forms import SimpleArrayField
 from django.contrib.postgres.validators import ArrayMaxLengthValidator
 from django.core import checks, exceptions
 from django.db.models import Field, IntegerField, Transform
+from django.db.models.lookups import Exact
 from django.utils import six
 from django.utils.translation import string_concat, ugettext_lazy as _
 
@@ -166,7 +167,7 @@ class ArrayField(Field):
 class ArrayContains(lookups.DataContains):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayContains, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
@@ -174,7 +175,15 @@ class ArrayContains(lookups.DataContains):
 class ArrayContainedBy(lookups.ContainedBy):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayContainedBy, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
+        return sql, params
+
+
+@ArrayField.register_lookup
+class ArrayExact(Exact):
+    def as_sql(self, qn, connection):
+        sql, params = super(ArrayExact, self).as_sql(qn, connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
@@ -182,7 +191,7 @@ class ArrayContainedBy(lookups.ContainedBy):
 class ArrayOverlap(lookups.Overlap):
     def as_sql(self, qn, connection):
         sql, params = super(ArrayOverlap, self).as_sql(qn, connection)
-        sql += '::%s' % self.lhs.output_field.db_type(connection)
+        sql = '%s::%s' % (sql, self.lhs.output_field.db_type(connection))
         return sql, params
 
 
