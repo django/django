@@ -45,8 +45,8 @@ database to match it.
 ``name`` is the model name, as would be written in the ``models.py`` file.
 
 ``fields`` is a list of 2-tuples of ``(field_name, field_instance)``.
-The field instance should be an unbound field (so just ``models.CharField()``,
-rather than a field takes from another model).
+The field instance should be an unbound field (so just
+``models.CharField(...)``, rather than a field taken from another model).
 
 ``options`` is an optional dictionary of values from the model's ``Meta`` class.
 
