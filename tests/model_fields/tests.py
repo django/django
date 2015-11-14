@@ -247,6 +247,37 @@ class ForeignKeyTests(test.TestCase):
             "Pending lookup added for a foreign key on an abstract model"
         )
 
+    def test_save_with_null_false(self):
+        """
+        #25349 -- Assigning None to foreign key field with null=False should be possible.
+        However saving should not be possible.
+        """
+        b = Bar(b='abc', a=None)
+
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                b.save()
+
+    def test_create_with_null_false(self):
+        """
+        #25349 -- Saving model with None value of foreign key field with null=True
+        should not be possible.
+        """
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                Bar.objects.create(b='abc', a=None)
+
+    def test_full_clean_with_blank_false_null_false(self):
+        """
+        #25349 -- Model validation for None value of foreign key field with null=False
+        should raise ValidationError
+        """
+        b = Bar(b='abc', a=None)
+
+        with transaction.atomic():
+            with self.assertRaises(ValidationError):
+                b.full_clean()
+
 
 class ManyToManyFieldTests(test.SimpleTestCase):
     def test_abstract_model_pending_operations(self):

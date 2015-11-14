@@ -193,14 +193,7 @@ class ForwardManyToOneDescriptor(object):
         - ``instance`` is the ``child`` instance
         - ``value`` in the ``parent`` instance on the right of the equal sign
         """
-        # If null=True, we can assign null here, but otherwise the value needs
-        # to be an instance of the related class.
-        if value is None and self.field.null is False:
-            raise ValueError(
-                'Cannot assign None: "%s.%s" does not allow null values.' %
-                (instance._meta.object_name, self.field.name)
-            )
-        elif value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
+        if value is not None and not isinstance(value, self.field.remote_field.model._meta.concrete_model):
             raise ValueError(
                 'Cannot assign "%r": "%s.%s" must be a "%s" instance.' % (
                     value,

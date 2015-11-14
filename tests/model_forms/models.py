@@ -474,3 +474,9 @@ class StrictAssignmentAll(models.Model):
         if self._should_error is True:
             raise ValidationError(message="Cannot set attribute", code='invalid')
         super(StrictAssignmentAll, self).__setattr__(key, value)
+
+
+# Model for #25349
+class Award(models.Model):
+    character = models.ForeignKey(Character, models.SET_NULL, blank=False, null=True)
+    name = models.CharField(max_length=30)
