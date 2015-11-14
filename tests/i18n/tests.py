@@ -704,6 +704,7 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual('66666.67', Template('{{ n|floatformat:2 }}').render(self.ctxt))
                 self.assertEqual('100000.0', Template('{{ f|floatformat }}').render(self.ctxt))
 
+    @override_settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!', FIRST_DAY_OF_WEEK=1)
     def test_false_like_locale_formats(self):
         """
         Ensure that the active locale's formats take precedence over the
@@ -713,15 +714,13 @@ class FormattingTests(SimpleTestCase):
         """
         with patch_formats('fr', THOUSAND_SEPARATOR='', FIRST_DAY_OF_WEEK=0):
             with translation.override('fr'):
-                with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR='!'):
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual('', get_format('THOUSAND_SEPARATOR'))
 
-                with self.settings(FIRST_DAY_OF_WEEK=1):
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
-                    # Even a second time (after the format has been cached)...
-                    self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
+                # Even a second time (after the format has been cached)...
+                self.assertEqual(0, get_format('FIRST_DAY_OF_WEEK'))
 
     def test_l10n_enabled(self):
         self.maxDiff = 3000
@@ -1117,29 +1116,27 @@ class FormattingTests(SimpleTestCase):
                     form6.as_ul()
                 )
 
+    @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_sanitize_separators(self):
         """
         Tests django.utils.formats.sanitize_separators.
         """
         # Non-strings are untouched
         self.assertEqual(sanitize_separators(123), 123)
-
         with translation.override('ru', deactivate=True):
             # Russian locale has non-breaking space (\xa0) as thousand separator
             # Check that usual space is accepted too when sanitizing inputs
-            with self.settings(USE_THOUSAND_SEPARATOR=True):
-                self.assertEqual(sanitize_separators('1\xa0234\xa0567'), '1234567')
-                self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
-                self.assertEqual(sanitize_separators('12 345'), '12345')
-                self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
-            with self.settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=False):
+            self.assertEqual(sanitize_separators('1\xa0234\xa0567'), '1234567')
+            self.assertEqual(sanitize_separators('77\xa0777,777'), '77777.777')
+            self.assertEqual(sanitize_separators('12 345'), '12345')
+            self.assertEqual(sanitize_separators('77 777,777'), '77777.777')
+            with self.settings(USE_L10N=False):
                 self.assertEqual(sanitize_separators('12\xa0345'), '12\xa0345')
 
         with patch_formats(get_language(), THOUSAND_SEPARATOR='.', DECIMAL_SEPARATOR=','):
-            with self.settings(USE_THOUSAND_SEPARATOR=True):
-                self.assertEqual(sanitize_separators('10.234'), '10234')
-                # Suspicion that user entered dot as decimal separator (#22171)
-                self.assertEqual(sanitize_separators('10.10'), '10.10')
+            self.assertEqual(sanitize_separators('10.234'), '10234')
+            # Suspicion that user entered dot as decimal separator (#22171)
+            self.assertEqual(sanitize_separators('10.10'), '10.10')
 
     def test_iter_format_modules(self):
         """

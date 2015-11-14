@@ -112,32 +112,37 @@ def get_format(format_type, lang=None, use_l10n=None):
     format_type = force_str(format_type)
     if format_type not in FORMAT_SETTINGS:
         return format_type
-    if use_l10n or (use_l10n is None and settings.USE_L10N):
-        if lang is None:
-            lang = get_language()
-        cache_key = (format_type, lang)
-        try:
-            cached = _format_cache[cache_key]
-            if cached is not None:
-                return cached
-            else:
-                # Return the general setting by default
-                return getattr(settings, format_type)
-        except KeyError:
-            for module in get_format_modules(lang):
-                try:
-                    val = getattr(module, format_type)
-                    for iso_input in ISO_INPUT_FORMATS.get(format_type, ()):
-                        if iso_input not in val:
-                            if isinstance(val, tuple):
-                                val = list(val)
-                            val.append(iso_input)
-                    _format_cache[cache_key] = val
-                    return val
-                except AttributeError:
-                    pass
-            _format_cache[cache_key] = None
-    return getattr(settings, format_type)
+    use_l10n = use_l10n or (use_l10n is None and settings.USE_L10N)
+    if use_l10n and lang is None:
+        lang = get_language()
+    cache_key = (format_type, lang)
+    try:
+        return _format_cache[cache_key]
+    except KeyError:
+        pass
+    # The requested format_type has not been cached yet. Try to find it in any of the
+    # format_modules for the given lang if l10n is enabled. If it's not there, or l10n
+    # is disabled we fall back to the project settings.
+    val = None
+    if use_l10n:
+        for module in get_format_modules(lang):
+            try:
+                val = getattr(module, format_type)
+                if val is not None:
+                    break
+            except AttributeError:
+                pass
+    if val is None:
+        val = getattr(settings, format_type)
+    elif format_type in ISO_INPUT_FORMATS.keys():
+        # If we got a list of input formats from one of the format_modules we need to make sure
+        # sure the ISO_INPUT_FORMATS are in this list.
+        val = list(val)
+        for iso_input in ISO_INPUT_FORMATS.get(format_type, ()):
+            if iso_input not in val:
+                val.append(iso_input)
+    _format_cache[cache_key] = val
+    return val
 
 get_format_lazy = lazy(get_format, six.text_type, list, tuple)
 
