@@ -358,6 +358,33 @@ A couple of tips to remember when writing your own template tags and filters:
   translation objects into strings. It's easier to work solely with Unicode
   strings at that point.
 
+Files
+=====
+
+If you're taking advantage of the internationalization features of Django (see
+:doc:`/topics/i18n/index`) and you intend to allow users to upload files, you must
+ensure that the environment used to run Django is configured to accept
+non-ASCII file names. If your environment is not correctly configured, you
+will trigger ``UnicodeEncodeError`` exceptions. For example when saving files
+with file names that contain non-ASCII characters.
+
+Filesystem support for UTF-8 file names varies and might depend on the environment.
+Check your current configuration in an interactive python shell by running::
+
+    import sys
+    sys.getfilesystemencoding()
+
+This should output "UTF-8" to support non-ASCII characters in file names.
+
+The ``LANG`` environment variable is responsible for setting the expected
+encoding on Unix platforms. Consult the documentation for your operating system
+and application server for the appropriate syntax and location to set this variable.
+
+In your development environment the ``.bashrc`` should contain a setting
+analogous to the following::
+
+    export LANG="en_US.UTF-8"
+
 Email
 =====
 
