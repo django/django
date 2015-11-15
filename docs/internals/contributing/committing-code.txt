@@ -70,7 +70,7 @@ pull request "Merged in XXXXXXX" (replacing with the commit hash) after you
 merge it. Trac checks for this message format to indicate on the ticket page
 whether or not a pull request is merged.
 
-Avoid using GitHub's "Merge pull request" button on the Web site as its creates
+Avoid using GitHub's "Merge pull request" button on the website as it creates
 an ugly "merge commit" and makes navigating history more difficult.
 
 When rewriting the commit history of a pull request, the goal is to make

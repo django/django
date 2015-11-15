@@ -16,7 +16,7 @@ translates them to the end user's time zone in templates and forms.
 This is handy if your users live in more than one time zone and you want to
 display datetime information according to each user's wall clock.
 
-Even if your Web site is available in only one time zone, it's still good
+Even if your website is available in only one time zone, it's still good
 practice to store data in UTC in your database. The main reason is Daylight
 Saving Time (DST). Many countries have a system of DST, where clocks are moved
 forward in spring and backward in autumn. If you're working in local time,
@@ -168,7 +168,7 @@ time zone automatically. Instead, Django provides :ref:`time zone selection
 functions <time-zone-selection-functions>`. Use them to build the time zone
 selection logic that makes sense for you.
 
-Most Web sites that care about time zones just ask users in which time zone they
+Most websites that care about time zones just ask users in which time zone they
 live and store this information in the user's profile. For anonymous users,
 they use the time zone of their primary audience or UTC. pytz_ provides
 helpers_, like a list of time zones per country, that you can use to pre-select

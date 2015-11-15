@@ -2702,7 +2702,7 @@ Multiple admin sites in the same URLconf
 ----------------------------------------
 
 It's easy to create multiple instances of the admin site on the same
-Django-powered Web site. Just create multiple instances of ``AdminSite`` and
+Django-powered website. Just create multiple instances of ``AdminSite`` and
 root each one at a different URL.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
