@@ -593,9 +593,10 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
         )
         try:
             search_term_as_int = int(search_term)
-            queryset |= self.model.objects.filter(age=search_term_as_int)
-        except:
+        except ValueError:
             pass
+        else:
+            queryset |= self.model.objects.filter(age=search_term_as_int)
         return queryset, use_distinct
 
 
