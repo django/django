@@ -726,8 +726,6 @@ def date(value, arg=None):
     """Formats a date according to the given format."""
     if value in (None, ''):
         return ''
-    if arg is None:
-        arg = settings.DATE_FORMAT
     try:
         return formats.date_format(value, arg)
     except AttributeError:
