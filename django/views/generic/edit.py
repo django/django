@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
+<<<<<<< 12be0f9e696cf33cda488038a0601e2a06f2bba0
 from django.views.generic.base import ContextMixin, TemplateResponseMixin, View
 from django.views.generic.detail import (
      SingleObjectMixin, SingleObjectTemplateResponseMixin,
@@ -28,6 +29,10 @@ class FormMixinBase(type):
                     "its `form_class` argument." % (attrs['__module__'], name),
                     RemovedInDjango20Warning, stacklevel=2
                 )
+=======
+from django.views.generic.base import TemplateResponseMixin, ContextMixin, View
+from django.views.generic.detail import SingleObjectMixin, SingleObjectTemplateResponseMixin
+>>>>>>> updated edit.py
 
                 def get_form_with_form_class(self, form_class=None):
                     if form_class is None:
