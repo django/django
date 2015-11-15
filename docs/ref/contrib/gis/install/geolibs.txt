@@ -106,7 +106,7 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS 3.4.2 from the GEOS Web site and untar the source
+First, download GEOS 3.4.2 from the GEOS website and untar the source
 archive::
 
     $ wget http://download.osgeo.org/geos/geos-3.4.2.tar.bz2

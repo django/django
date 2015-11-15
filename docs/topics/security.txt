@@ -65,7 +65,7 @@ control.
 
 :ref:`CSRF protection works <how-csrf-works>` by checking for a nonce in each
 POST request. This ensures that a malicious user cannot simply "replay" a form
-POST to your Web site and have another logged in user unwittingly submit that
+POST to your website and have another logged in user unwittingly submit that
 form. The malicious user would have to know the nonce, which is user specific
 (using a cookie).
 

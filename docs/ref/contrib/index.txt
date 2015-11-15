@@ -117,7 +117,7 @@ See the :doc:`sessions documentation </topics/http/sessions>`.
 sites
 =====
 
-A light framework that lets you operate multiple Web sites off of the same
+A light framework that lets you operate multiple websites off of the same
 database and Django installation. It gives you hooks for associating objects to
 one or more sites.
 

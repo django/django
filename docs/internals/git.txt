@@ -22,7 +22,7 @@ over time, so you'll need a copy of the Git client (a program called ``git``)
 on your computer, and you'll want to familiarize yourself with the basics of
 how Git works.
 
-Git's web site offers downloads for various operating systems. The site also
+Git's website offers downloads for various operating systems. The site also
 contains vast amounts of `documentation`_.
 
 The Django Git repository is located online at `github.com/django/django

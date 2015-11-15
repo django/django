@@ -757,7 +757,7 @@ TestCase
 .. class:: TestCase()
 
 This class provides some additional capabilities that can be useful for testing
-Web sites.
+websites.
 
 Converting a normal :class:`unittest.TestCase` to a Django :class:`TestCase` is
 easy: Just change the base class of your test from ``'unittest.TestCase'`` to
@@ -1047,7 +1047,7 @@ Fixture loading
 
 .. attribute:: TransactionTestCase.fixtures
 
-A test case for a database-backed Web site isn't much use if there isn't any
+A test case for a database-backed website isn't much use if there isn't any
 data in the database. To make it easy to put test data into the database,
 Django's custom ``TransactionTestCase`` class provides a way of loading
 **fixtures**.
