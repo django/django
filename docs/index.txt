@@ -59,7 +59,7 @@ Django provides an abstraction layer (the "models") for structuring and
 manipulating the data of your Web application. Learn more about it below:
 
 * **Models:**
-  :doc:`Model syntax <topics/db/models>` |
+  :doc:`Introduction to models <topics/db/models>` |
   :doc:`Field types <ref/models/fields>` |
   :doc:`Meta options <ref/models/options>` |
   :doc:`Model class <ref/models/class>`
