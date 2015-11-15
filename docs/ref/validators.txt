@@ -159,7 +159,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         URL/URI scheme list to validate against. If not provided, the default
         list is ``['http', 'https', 'ftp', 'ftps']``. As a reference, the IANA
-        Web site provides a full list of `valid URI schemes`_.
+        website provides a full list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
 

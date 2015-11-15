@@ -274,7 +274,7 @@ Including other URLconfs
 At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
-For example, here's an excerpt of the URLconf for the `Django Web site`_
+For example, here's an excerpt of the URLconf for the `Django website`_
 itself. It includes a number of other URLconfs::
 
     from django.conf.urls import include, url
@@ -343,7 +343,7 @@ the suffixes that differ::
         ])),
     ]
 
-.. _`Django Web site`: https://www.djangoproject.com/
+.. _`Django website`: https://www.djangoproject.com/
 
 Captured parameters
 -------------------

@@ -111,12 +111,12 @@ We've specified ``auto_id=False`` to simplify the output::
     >>> from django import forms
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(label='Your name')
-    ...     url = forms.URLField(label='Your Web site', required=False)
+    ...     url = forms.URLField(label='Your website', required=False)
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" /></td></tr>
-    <tr><th>Your Web site:</th><td><input type="url" name="url" /></td></tr>
+    <tr><th>Your website:</th><td><input type="url" name="url" /></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``label_suffix``

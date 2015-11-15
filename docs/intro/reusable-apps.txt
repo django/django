@@ -300,7 +300,7 @@ the world! If this wasn't just an example, you could now:
 
 * Email the package to a friend.
 
-* Upload the package on your Web site.
+* Upload the package on your website.
 
 * Post the package on a public repository, such as `the Python Package Index
   (PyPI)`_. `packaging.python.org <https://packaging.python.org>`_ has `a good

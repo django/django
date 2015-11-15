@@ -13,7 +13,7 @@ creating sitemap_ XML files easy.
 Overview
 ========
 
-A sitemap is an XML file on your Web site that tells search-engine indexers how
+A sitemap is an XML file on your website that tells search-engine indexers how
 frequently your pages change and how "important" certain pages are in relation
 to other pages on your site. This information helps search engines index your
 site.

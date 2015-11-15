@@ -206,7 +206,7 @@ support functionality that goes beyond this basic goal.
 Discourage redundancy
 ---------------------
 
-The majority of dynamic Web sites use some sort of common sitewide design --
+The majority of dynamic websites use some sort of common sitewide design --
 a common header, footer, navigation bar, etc. The Django template system should
 make it easy to store those elements in a single place, eliminating duplicate
 code.

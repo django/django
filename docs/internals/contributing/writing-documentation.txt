@@ -106,7 +106,7 @@ documentation:
 * **Web**, **World Wide Web**, **the Web** -- note Web is always
   capitalized when referring to the World Wide Web.
 
-* **Web site** -- use two words, with Web capitalized.
+* **website** -- use one word, without capitalization.
 
 Django-specific terminology
 ---------------------------

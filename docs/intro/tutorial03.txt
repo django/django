@@ -103,7 +103,7 @@ method and display whatever ID you provide in the URL. Try
 "/polls/34/results/" and "/polls/34/vote/" too -- these will display the
 placeholder results and voting pages.
 
-When somebody requests a page from your Web site -- say, "/polls/34/", Django
+When somebody requests a page from your website -- say, "/polls/34/", Django
 will load the ``mysite.urls`` Python module because it's pointed to by the
 :setting:`ROOT_URLCONF` setting. It finds the variable named ``urlpatterns``
 and traverses the regular expressions in order. The

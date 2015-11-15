@@ -142,7 +142,7 @@ A dynamic admin interface: it's not just scaffolding -- it's the whole house
 
 Once your models are defined, Django can automatically create a professional,
 production ready :doc:`administrative interface </ref/contrib/admin/index>` --
-a Web site that lets authenticated users add, change and delete objects. It's
+a website that lets authenticated users add, change and delete objects. It's
 as easy as registering your model in the admin site:
 
 .. snippet::
