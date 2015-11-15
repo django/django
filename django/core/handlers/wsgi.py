@@ -159,7 +159,7 @@ class WSGIHandler(base.BaseHandler):
                     # Check that middleware is still uninitialized.
                     if self._request_middleware is None:
                         self.load_middleware()
-                except:
+                except Exception:
                     # Unload whatever middleware we got
                     self._request_middleware = None
                     raise
