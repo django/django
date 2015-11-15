@@ -5,4 +5,5 @@ from django.contrib.gis.db.models.fields import (  # NOQA
     MultiLineStringField, MultiPointField, MultiPolygonField, PointField,
     PolygonField, RasterField,
 )
+from django.contrib.gis.db.models.functions import GeomValue  # NOQA
 from django.contrib.gis.db.models.manager import GeoManager  # NOQA

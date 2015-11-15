@@ -4,7 +4,7 @@ import re
 import tempfile
 
 from django.contrib.gis import gdal
-from django.contrib.gis.db.models import Extent, MakeLine, Union
+from django.contrib.gis.db.models import Extent, GeomValue, MakeLine, Union
 from django.contrib.gis.geos import (
     GeometryCollection, GEOSGeometry, LinearRing, LineString, Point, Polygon,
     fromstr,
@@ -897,3 +897,9 @@ class GeoQuerySetTest(TestCase):
     def test_values_srid(self):
         for c, v in zip(City.objects.all(), City.objects.values()):
             self.assertEqual(c.point.srid, v['point'].srid)
+
+    def test_geometry_value_annotation(self):
+        p = Point(1, 1, srid=4326)
+        point = City.objects.annotate(p=GeomValue(p)).first().p
+        self.assertEqual(point, p)
+        self.assertEqual(point.srid, 4326)

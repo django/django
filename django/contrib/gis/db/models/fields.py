@@ -236,7 +236,7 @@ class GeometryField(GeoSelectFormatMixin, BaseSpatialField):
 
         # When the input is not a GEOS geometry, attempt to construct one
         # from the given string input.
-        if isinstance(geom, Geometry):
+        if isinstance(geom, Geometry) or hasattr(geom, 'srid'):
             pass
         elif isinstance(geom, (bytes, six.string_types)) or hasattr(geom, '__geo_interface__'):
             try:

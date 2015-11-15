@@ -67,6 +67,11 @@ class GeoFunc(Func):
 class GeomValue(Value):
     geography = False
 
+    def __init__(self, value, output_field=None):
+        if output_field is None:
+            output_field = GeometryField(srid=value.srid)
+        super(GeomValue, self).__init__(value, output_field=output_field)
+
     @property
     def srid(self):
         return self.value.srid
