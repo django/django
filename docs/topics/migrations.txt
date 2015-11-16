@@ -645,6 +645,7 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
+- ``enum.Enum`` instances
 - ``functools.partial`` instances which have serializable ``func``, ``args``,
   and ``keywords`` values.
 - Any Django field
@@ -655,6 +656,10 @@ Django can serialize the following:
 .. versionchanged:: 1.9
 
     Serialization support for `functools.partial` was added.
+
+.. versionchanged:: 1.10
+
+    Serialization support for ``enum.Enum`` was added.
 
 Django can serialize the following on Python 3 only:
 

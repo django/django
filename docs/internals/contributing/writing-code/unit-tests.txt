@@ -138,6 +138,7 @@ dependencies:
 
 *  bcrypt_
 *  docutils_
+*  enum34_ (Python 2 only)
 *  geoip2_
 *  jinja2_ 2.7+
 *  numpy_
@@ -171,6 +172,7 @@ associated tests will be skipped.
 
 .. _bcrypt: https://pypi.python.org/pypi/bcrypt
 .. _docutils: https://pypi.python.org/pypi/docutils
+.. _enum34: https://pypi.python.org/pypi/enum34
 .. _geoip2: https://pypi.python.org/pypi/geoip2
 .. _jinja2: https://pypi.python.org/pypi/jinja2
 .. _numpy: https://pypi.python.org/pypi/numpy

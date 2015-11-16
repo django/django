@@ -174,7 +174,7 @@ Management Commands
 Migrations
 ^^^^^^^^^^
 
-* ...
+* Added support for serialization of ``enum.Enum`` objects.
 
 Models
 ^^^^^^
