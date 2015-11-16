@@ -276,6 +276,9 @@ cause any trouble::
 
     $ ./runtests.py basic --reverse
 
+Seeing the SQL queries run during a test
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
 combine this with ``--verbosity=2``, all SQL queries will be output::
@@ -286,8 +289,12 @@ combine this with ``--verbosity=2``, all SQL queries will be output::
 
     The ``--reverse`` and ``--debug-sql`` options were added.
 
-By default tests are run in parallel with one process per core. You can adjust
-this behavior with the ``--parallel`` option::
+Seeing the full traceback of a test failure
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default tests are run in parallel with one process per core. When the tests
+are run in parallel, however, you'll only see a truncated traceback for any
+test failures. You can adjust this behavior with the ``--parallel`` option::
 
     $ ./runtests.py basic --parallel=1
 
