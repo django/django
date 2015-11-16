@@ -233,8 +233,12 @@ rst_epilog = """
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-    'preamble': ('\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'
-                 '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}')
+    'preamble': (
+        '\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'
+        '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}'
+        '\\DeclareUnicodeCharacter{2665}{[unicode-heart]}'
+        '\\DeclareUnicodeCharacter{2713}{[unicode-checkmark]}'
+    ),
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
