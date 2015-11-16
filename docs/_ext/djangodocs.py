@@ -7,7 +7,7 @@ import re
 
 from docutils import nodes
 from docutils.parsers.rst import Directive, directives
-from sphinx import __version__ as sphinx_ver, addnodes
+from sphinx import addnodes
 from sphinx.builders.html import StandaloneHTMLBuilder
 from sphinx.util.console import bold
 from sphinx.util.nodes import set_source_info
@@ -255,18 +255,6 @@ class DjangoHTMLTranslator(SmartyPantsHTMLTranslator):
 
     def depart_desc_parameterlist(self, node):
         self.body.append(')')
-
-    if sphinx_ver < '1.0.8':
-        #
-        # Don't apply smartypants to literal blocks
-        #
-        def visit_literal_block(self, node):
-            self.no_smarty += 1
-            SmartyPantsHTMLTranslator.visit_literal_block(self, node)
-
-        def depart_literal_block(self, node):
-            SmartyPantsHTMLTranslator.depart_literal_block(self, node)
-            self.no_smarty -= 1
 
     #
     # Turn the "new in version" stuff (versionadded/versionchanged) into a
