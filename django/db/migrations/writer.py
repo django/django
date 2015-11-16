@@ -533,7 +533,7 @@ class MigrationWriter(object):
             raise ValueError(
                 "Cannot serialize: %r\nThere are some values Django cannot serialize into "
                 "migration files.\nFor more, see https://docs.djangoproject.com/en/%s/"
-                "topics/migrations/#migration-serializing" % (value, get_docs_version())
+                "topics/migrations/#serializing-values" % (value, get_docs_version())
             )
 
 
