@@ -232,6 +232,9 @@ class BaseDatabaseFeatures(object):
     # be equal?
     ignores_quoted_identifier_case = False
 
+    # Used to place FOR UPDATE part right after FROM clause, this is used on MSSQL
+    for_update_after_from = False
+
     def __init__(self, connection):
         self.connection = connection
 
