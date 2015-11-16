@@ -125,14 +125,8 @@ def visit_snippet_latex(self, node):
     """
     Latex document generator visit handler
     """
-    self.verbatim = ''
+    code = node.rawsource.rstrip('\n')
 
-
-def depart_snippet_latex(self, node):
-    """
-    Latex document generator depart handler.
-    """
-    code = self.verbatim.rstrip('\n')
     lang = self.hlsettingstack[-1][0]
     linenos = code.count('\n') >= self.hlsettingstack[-1][1] - 1
     fname = node['filename']
@@ -151,9 +145,14 @@ def depart_snippet_latex(self, node):
                                               linenos=linenos,
                                               **highlight_args)
 
-    self.body.append('\n{\\colorbox[rgb]{0.9,0.9,0.9}'
-                     '{\\makebox[\\textwidth][l]'
-                     '{\\small\\texttt{%s}}}}\n' % (fname,))
+    self.body.append(
+        '\n{\\colorbox[rgb]{0.9,0.9,0.9}'
+        '{\\makebox[\\textwidth][l]'
+        '{\\small\\texttt{%s}}}}\n' % (
+            # Some filenames have '_', which is special in latex.
+            fname.replace('_', r'\_'),
+        )
+    )
 
     if self.table:
         hlcode = hlcode.replace('\\begin{Verbatim}',
@@ -165,7 +164,16 @@ def depart_snippet_latex(self, node):
     hlcode = hlcode.rstrip() + '\n'
     self.body.append('\n' + hlcode + '\\end{%sVerbatim}\n' %
                      (self.table and 'Original' or ''))
-    self.verbatim = None
+
+    # Prevent rawsource from appearing in output a second time.
+    raise nodes.SkipNode
+
+
+def depart_snippet_latex(self, node):
+    """
+    Latex document generator depart handler.
+    """
+    pass
 
 
 class SnippetWithFilename(Directive):
