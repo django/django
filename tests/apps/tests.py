@@ -9,7 +9,7 @@ from django.contrib.admin.models import LogEntry
 from django.core.exceptions import AppRegistryNotReady, ImproperlyConfigured
 from django.db import models
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import extend_sys_path
+from django.test.utils import extend_sys_path, isolate_apps
 from django.utils import six
 from django.utils._os import upath
 
@@ -260,7 +260,8 @@ class AppsTests(SimpleTestCase):
         finally:
             apps.apps_ready = True
 
-    def test_lazy_model_operation(self):
+    @isolate_apps('apps', kwarg_name='apps')
+    def test_lazy_model_operation(self, apps):
         """
         Tests apps.lazy_model_operation().
         """

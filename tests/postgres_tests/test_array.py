@@ -4,11 +4,11 @@ import unittest
 import uuid
 
 from django import forms
-from django.apps.registry import Apps
 from django.core import exceptions, serializers, validators
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.test import TransactionTestCase, override_settings
+from django.test.utils import isolate_apps
 from django.utils import timezone
 
 from . import PostgreSQLTestCase
@@ -333,16 +333,12 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
         )
 
 
+@isolate_apps('postgres_tests')
 class TestChecks(PostgreSQLTestCase):
 
     def test_field_checks(self):
-        test_apps = Apps(['postgres_tests'])
-
         class MyModel(PostgreSQLModel):
             field = ArrayField(models.CharField())
-
-            class Meta:
-                apps = test_apps
 
         model = MyModel()
         errors = model.check()
@@ -352,13 +348,8 @@ class TestChecks(PostgreSQLTestCase):
         self.assertIn('max_length', errors[0].msg)
 
     def test_invalid_base_fields(self):
-        test_apps = Apps(['postgres_tests'])
-
         class MyModel(PostgreSQLModel):
             field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
-
-            class Meta:
-                apps = test_apps
 
         model = MyModel()
         errors = model.check()
@@ -369,13 +360,8 @@ class TestChecks(PostgreSQLTestCase):
         """
         Nested ArrayFields are permitted.
         """
-        test_apps = Apps(['postgres_tests'])
-
         class MyModel(PostgreSQLModel):
             field = ArrayField(ArrayField(models.CharField()))
-
-            class Meta:
-                apps = test_apps
 
         model = MyModel()
         errors = model.check()

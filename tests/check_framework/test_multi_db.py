@@ -1,8 +1,6 @@
 from django.db import connections, models
 from django.test import TestCase, mock
-from django.test.utils import override_settings
-
-from .tests import IsolateModelsMixin
+from django.test.utils import isolate_apps, override_settings
 
 
 class TestRouter(object):
@@ -14,7 +12,8 @@ class TestRouter(object):
 
 
 @override_settings(DATABASE_ROUTERS=[TestRouter()])
-class TestMultiDBChecks(IsolateModelsMixin, TestCase):
+@isolate_apps('check_framework')
+class TestMultiDBChecks(TestCase):
     multi_db = True
 
     def _patch_check_field_on(self, db):

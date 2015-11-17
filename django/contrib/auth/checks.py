@@ -6,10 +6,22 @@ from django.conf import settings
 from django.core import checks
 
 
-def check_user_model(**kwargs):
-    errors = []
+def check_user_model(app_configs=None, **kwargs):
+    if app_configs is None:
+        cls = apps.get_model(settings.AUTH_USER_MODEL)
+    else:
+        app_label, model_name = settings.AUTH_USER_MODEL.split('.')
+        for app_config in app_configs:
+            if app_config.label == app_label:
+                cls = app_config.get_model(model_name)
+                break
+        else:
+            # Checks might be run against a set of app configs that don't
+            # include the specified user model. In this case we simply don't
+            # perform the checks defined below.
+            return []
 
-    cls = apps.get_model(settings.AUTH_USER_MODEL)
+    errors = []
 
     # Check that REQUIRED_FIELDS is a list
     if not isinstance(cls.REQUIRED_FIELDS, (list, tuple)):

@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from django.apps.registry import Apps
 from django.db import models
 from django.test import TestCase
+from django.test.utils import isolate_apps
 
 from .base_tests import BaseOrderWithRespectToTests
 from .models import Answer, Dimension, Entity, Post, Question
@@ -18,12 +18,10 @@ class OrderWithRespectToBaseTests(BaseOrderWithRespectToTests, TestCase):
 
 class OrderWithRespectToTests(TestCase):
 
+    @isolate_apps('order_with_respect_to')
     def test_duplicate_order_field(self):
-        test_apps = Apps(['order_with_respect_to'])
-
         class Bar(models.Model):
             class Meta:
-                apps = test_apps
                 app_label = 'order_with_respect_to'
 
         class Foo(models.Model):
@@ -32,7 +30,6 @@ class OrderWithRespectToTests(TestCase):
 
             class Meta:
                 order_with_respect_to = 'bar'
-                apps = test_apps
                 app_label = 'order_with_respect_to'
 
         count = 0

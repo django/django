@@ -3,21 +3,19 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.apps.registry import Apps
 from django.core.checks import Error, Warning as DjangoWarning
 from django.db import models
 from django.db.models.fields.related import ForeignObject
 from django.test import ignore_warnings
-from django.test.testcases import skipIfDBFeature
-from django.test.utils import override_settings
+from django.test.testcases import SimpleTestCase, skipIfDBFeature
+from django.test.utils import isolate_apps, override_settings
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.version import get_docs_version
 
-from .base import IsolatedModelsTestCase
 
-
-class RelativeFieldTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class RelativeFieldTests(SimpleTestCase):
 
     def test_valid_foreign_key_without_accessor(self):
         class Target(models.Model):
@@ -133,22 +131,17 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def test_foreign_key_to_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_foreign_key_to_isolate_apps_model(self):
         """
         #25723 - Referenced model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class OtherModel(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Model(models.Model):
             foreign_key = models.ForeignKey('OtherModel', models.CASCADE)
-
-            class Meta:
-                apps = test_apps
 
         field = Model._meta.get_field('foreign_key')
         self.assertEqual(field.check(from_model=Model), [])
@@ -170,22 +163,17 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def test_many_to_many_to_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_to_isolate_apps_model(self):
         """
         #25723 - Referenced model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class OtherModel(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Model(models.Model):
             m2m = models.ManyToManyField('OtherModel')
-
-            class Meta:
-                apps = test_apps
 
         field = Model._meta.get_field('m2m')
         self.assertEqual(field.check(from_model=Model), [])
@@ -329,29 +317,21 @@ class RelativeFieldTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(errors, expected)
 
-    def test_many_to_many_through_isolated_apps_model(self):
+    @isolate_apps('invalid_models_tests')
+    def test_many_to_many_through_isolate_apps_model(self):
         """
         #25723 - Through model registration lookup should be run against the
         field's model registry.
         """
-        test_apps = Apps(['invalid_models_tests'])
-
         class GroupMember(models.Model):
             person = models.ForeignKey('Person', models.CASCADE)
             group = models.ForeignKey('Group', models.CASCADE)
 
-            class Meta:
-                apps = test_apps
-
         class Person(models.Model):
-            class Meta:
-                apps = test_apps
+            pass
 
         class Group(models.Model):
             members = models.ManyToManyField('Person', through='GroupMember')
-
-            class Meta:
-                apps = test_apps
 
         field = Group._meta.get_field('members')
         self.assertEqual(field.check(from_model=Group), [])
@@ -790,7 +770,8 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertFalse(errors)
 
 
-class AccessorClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class AccessorClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_accessor_clash(
@@ -902,7 +883,8 @@ class AccessorClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ReverseQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ReverseQueryNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_reverse_query_name_clash(
@@ -958,7 +940,8 @@ class ReverseQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_explicit_related_name_clash(
@@ -1022,7 +1005,8 @@ class ExplicitRelatedNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ExplicitRelatedQueryNameClashTests(SimpleTestCase):
 
     def test_fk_to_integer(self):
         self._test_explicit_related_query_name_clash(
@@ -1086,7 +1070,8 @@ class ExplicitRelatedQueryNameClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialM2MClashTests(SimpleTestCase):
 
     def test_clash_between_accessors(self):
         class Model(models.Model):
@@ -1181,7 +1166,8 @@ class SelfReferentialM2MClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, [])
 
 
-class SelfReferentialFKClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class SelfReferentialFKClashTests(SimpleTestCase):
 
     def test_accessor_clash(self):
         class Model(models.Model):
@@ -1244,7 +1230,8 @@ class SelfReferentialFKClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class ComplexClashTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class ComplexClashTests(SimpleTestCase):
 
     # New tests should not be included here, because this is a single,
     # self-contained sanity check, not a test of everything.
@@ -1358,7 +1345,8 @@ class ComplexClashTests(IsolatedModelsTestCase):
         self.assertEqual(errors, expected)
 
 
-class M2mThroughFieldsTests(IsolatedModelsTestCase):
+@isolate_apps('invalid_models_tests')
+class M2mThroughFieldsTests(SimpleTestCase):
     def test_m2m_field_argument_validation(self):
         """
         Tests that ManyToManyField accepts the ``through_fields`` kwarg

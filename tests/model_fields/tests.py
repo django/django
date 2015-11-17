@@ -19,7 +19,7 @@ from django.db.models.fields import (
     TimeField, URLField,
 )
 from django.db.models.fields.files import FileField, ImageField
-from django.test.utils import requires_tz_support
+from django.test.utils import isolate_apps, requires_tz_support
 from django.utils import six, timezone
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
@@ -207,7 +207,11 @@ class ForeignKeyTests(test.TestCase):
         fk_model_empty = FkToChar.objects.select_related('out').get(id=fk_model_empty.pk)
         self.assertEqual(fk_model_empty.out, char_model_empty)
 
+    @isolate_apps('model_fields')
     def test_warning_when_unique_true_on_fk(self):
+        class Foo(models.Model):
+            pass
+
         class FKUniqueTrue(models.Model):
             fk_field = models.ForeignKey(Foo, models.CASCADE, unique=True)
 
