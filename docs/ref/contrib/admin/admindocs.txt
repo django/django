@@ -145,6 +145,8 @@ check if the specified template exists and to show where on the filesystem that
 template is stored.
 
 
+.. _admindocs-bookmarklets:
+
 Included Bookmarklets
 =====================
 
