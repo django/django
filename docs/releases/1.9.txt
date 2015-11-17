@@ -1409,7 +1409,7 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * The model and form ``IPAddressField`` is removed. A stub field remains for
   compatibility with historical migrations.
 
-* ``AppCommand.handle_app()`` is no longer be supported.
+* ``AppCommand.handle_app()`` is no longer supported.
 
 * ``RequestSite`` and ``get_current_site()`` are no longer importable from
   ``django.contrib.sites.models``.
