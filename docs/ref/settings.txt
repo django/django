@@ -385,6 +385,15 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :doc:`/ref/csrf`.
 
+The default implementation ``django.views.csrf.csrf_failure`` takes an additional
+keyword parameter ``template_name`` that defaults to ``'403_csrf.html'``. If a
+template can be found under this name, it will be used to render the error
+message.
+
+.. versionchanged:: 1.10
+
+   The ``template_name`` parameter of ``csrf_failure`` has been added.
+
 .. setting:: CSRF_HEADER_NAME
 
 CSRF_HEADER_NAME

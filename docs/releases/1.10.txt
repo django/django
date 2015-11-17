@@ -114,7 +114,10 @@ Cache
 CSRF
 ^^^^
 
-* ...
+* The default implementation of :setting:`CSRF_FAILURE_VIEW` now takes
+  an optional ``template_name`` parameter defaulting to
+  ``'403_csrf.html'`` and looks for a template of this name to render
+  its error message.
 
 Database backends
 ^^^^^^^^^^^^^^^^^

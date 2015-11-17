@@ -1,5 +1,9 @@
-from django.test import Client, SimpleTestCase, override_settings
+from django.template import TemplateDoesNotExist
+from django.test import (
+    Client, RequestFactory, SimpleTestCase, override_settings,
+)
 from django.utils.translation import override
+from django.views.csrf import CSRF_FAILURE_TEMPLATE_NAME, csrf_failure
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
@@ -70,3 +74,29 @@ class CsrfViewTests(SimpleTestCase):
         """
         response = self.client.post('/')
         self.assertContains(response, "Forbidden", status_code=403)
+
+    @override_settings(TEMPLATES=[{
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'OPTIONS': {
+            'loaders': [
+                ('django.template.loaders.locmem.Loader', {
+                    CSRF_FAILURE_TEMPLATE_NAME: 'Test template for CSRF failure'
+                }),
+            ],
+        },
+    }])
+    def test_custom_template(self):
+        """
+        Test that csrf_failed.html is used correctly, if it exists.
+        """
+        response = self.client.post('/')
+        self.assertContains(response, "Test template for CSRF failure", status_code=403)
+
+    def test_custom_template_does_not_exist(self):
+        """
+        Test that an exception is raised if we supply a custom template name
+        """
+        factory = RequestFactory()
+        request = factory.post('/')
+        with self.assertRaises(TemplateDoesNotExist):
+            csrf_failure(request, template_name="non_existant.html")
