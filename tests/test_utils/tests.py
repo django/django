@@ -8,7 +8,7 @@ from django.conf.urls import url
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.files.storage import default_storage
-from django.db import connection, router
+from django.db import connection, models, router
 from django.forms import EmailField, IntegerField
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -17,7 +17,9 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.html import HTMLParseError, parse_html
-from django.test.utils import CaptureQueriesContext, override_settings
+from django.test.utils import (
+    CaptureQueriesContext, isolate_apps, override_settings,
+)
 from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils._os import abspathu
@@ -1029,3 +1031,40 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_allowed_database_queries(self):
         Car.objects.first()
+
+
+@isolate_apps('test_utils', attr_name='class_apps')
+class IsolatedAppsTests(SimpleTestCase):
+    def test_installed_apps(self):
+        self.assertEqual([app_config.label for app_config in self.class_apps.get_app_configs()], ['test_utils'])
+
+    def test_class_decoration(self):
+        class ClassDecoration(models.Model):
+            pass
+        self.assertEqual(ClassDecoration._meta.apps, self.class_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_method_decoration(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+
+    def test_context_manager(self):
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+
+    @isolate_apps('test_utils', kwarg_name='method_apps')
+    def test_nested(self, method_apps):
+        class MethodDecoration(models.Model):
+            pass
+        with isolate_apps('test_utils') as context_apps:
+            class ContextManager(models.Model):
+                pass
+            with isolate_apps('test_utils') as nested_context_apps:
+                class NestedContextManager(models.Model):
+                    pass
+        self.assertEqual(MethodDecoration._meta.apps, method_apps)
+        self.assertEqual(ContextManager._meta.apps, context_apps)
+        self.assertEqual(NestedContextManager._meta.apps, nested_context_apps)

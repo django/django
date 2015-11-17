@@ -69,6 +69,8 @@ class Options(object):
                           'local_concrete_fields', '_forward_fields_map'}
     REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
+    default_apps = apps
+
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
         self.local_fields = []
@@ -124,7 +126,7 @@ class Options(object):
         self.related_fkey_lookups = []
 
         # A custom app registry to use, if you're making a separate model set.
-        self.apps = apps
+        self.apps = self.default_apps
 
         self.default_related_name = None
 

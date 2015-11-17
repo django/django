@@ -9,10 +9,12 @@ from unittest import skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
 from django.apps import apps
+from django.apps.registry import Apps
 from django.conf import UserSettingsHolder, settings
 from django.core import mail
 from django.core.signals import request_started
 from django.db import reset_queries
+from django.db.models.options import Options
 from django.http import request
 from django.template import Template
 from django.test.signals import setting_changed, template_rendered
@@ -640,3 +642,69 @@ class LoggingCaptureMixin(object):
 
     def tearDown(self):
         self.logger.handlers[0].stream = self.old_stream
+
+
+class isolate_apps(object):
+    """
+    Act as either a decorator or a context manager to register models defined
+    in its wrapped context to an isolated registry.
+
+    The list of installed apps the isolated registry should contain must be
+    passed as arguments.
+
+    Two optional keyword arguments can be specified:
+
+    `attr_name`: attribute assigned the isolated registry if used as a class
+                 decorator.
+
+    `kwarg_name`: keyword argument passing the isolated registry to the
+                  decorated method.
+    """
+
+    def __init__(self, *installed_apps, **kwargs):
+        self.installed_apps = installed_apps
+        self.attr_name = kwargs.pop('attr_name', None)
+        self.kwarg_name = kwargs.pop('kwarg_name', None)
+
+    def enable(self):
+        self.old_apps = Options.default_apps
+        apps = Apps(self.installed_apps)
+        setattr(Options, 'default_apps', apps)
+        return apps
+
+    def disable(self):
+        setattr(Options, 'default_apps', self.old_apps)
+
+    def __enter__(self):
+        return self.enable()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.disable()
+
+    def __call__(self, decorated):
+        if isinstance(decorated, type):
+            # A class is decorated
+            decorated_setUp = decorated.setUp
+            decorated_tearDown = decorated.tearDown
+
+            def setUp(inner_self):
+                apps = self.enable()
+                if self.attr_name:
+                    setattr(inner_self, self.attr_name, apps)
+                decorated_setUp(inner_self)
+
+            def tearDown(inner_self):
+                decorated_tearDown(inner_self)
+                self.disable()
+
+            decorated.setUp = setUp
+            decorated.tearDown = tearDown
+            return decorated
+        else:
+            @wraps(decorated)
+            def inner(*args, **kwargs):
+                with self as apps:
+                    if self.kwarg_name:
+                        kwargs[self.kwarg_name] = apps
+                    return decorated(*args, **kwargs)
+            return inner
