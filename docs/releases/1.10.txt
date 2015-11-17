@@ -312,6 +312,9 @@ Miscellaneous
 
 * Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
 
+* ``utils.version.get_version()`` returns :pep:`440` compliant release
+  candidate versions (e.g. '1.10rc1' instead of '1.10c1').
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
