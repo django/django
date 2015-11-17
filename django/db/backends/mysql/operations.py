@@ -13,8 +13,8 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     # MySQL stores positive fields as UNSIGNED ints.
     integer_field_ranges = dict(BaseDatabaseOperations.integer_field_ranges,
-        PositiveSmallIntegerField=(0, 4294967295),
-        PositiveIntegerField=(0, 18446744073709551615),
+        PositiveSmallIntegerField=(0, 65535),
+        PositiveIntegerField=(0, 4294967295),
     )
 
     def date_extract_sql(self, lookup_type, field_name):
