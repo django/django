@@ -63,11 +63,7 @@ class CsrfViewTests(SimpleTestCase):
                             "by third parties.",
                             status_code=403)
 
-    # In Django 1.10, this can be changed to TEMPLATES=[] because the code path
-    # that reads the TEMPLATE_* settings in that case will have been removed.
-    @override_settings(TEMPLATES=[{
-        'BACKEND': 'django.template.backends.dummy.TemplateStrings',
-    }])
+    @override_settings(TEMPLATES=[])
     def test_no_django_template_engine(self):
         """
         The CSRF view doesn't depend on the TEMPLATES configuration (#24388).

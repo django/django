@@ -126,9 +126,6 @@ class ForTagTests(SimpleTestCase):
         output = self.engine.render_to_string('for-tag-filter-ws', {'s': 'abc'})
         self.assertEqual(output, 'abc')
 
-    # These tests raise deprecation warnings and will raise an exception
-    # in Django 1.10. The existing behavior is silent truncation if the
-    # length of loopvars differs to the length of each set of items.
     @setup({'for-tag-unpack10': '{% for x,y in items %}{{ x }}:{{ y }}/{% endfor %}'})
     def test_for_tag_unpack10(self):
         with self.assertRaisesMessage(ValueError, 'Need 2 values to unpack in for loop; got 3.'):
