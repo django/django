@@ -92,8 +92,6 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {},
         'MIGRATE_HEADING': {},
         'MIGRATE_LABEL': {},
-        'MIGRATE_SUCCESS': {},
-        'MIGRATE_FAILURE': {},
     },
     DARK_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -113,8 +111,6 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
-        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
-        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     },
     LIGHT_PALETTE: {
         'ERROR': {'fg': 'red', 'opts': ('bold',)},
@@ -134,8 +130,6 @@ PALETTES = {
         'HTTP_SERVER_ERROR': {'fg': 'magenta', 'opts': ('bold',)},
         'MIGRATE_HEADING': {'fg': 'cyan', 'opts': ('bold',)},
         'MIGRATE_LABEL': {'opts': ('bold',)},
-        'MIGRATE_SUCCESS': {'fg': 'green', 'opts': ('bold',)},
-        'MIGRATE_FAILURE': {'fg': 'red', 'opts': ('bold',)},
     }
 }
 DEFAULT_PALETTE = DARK_PALETTE
