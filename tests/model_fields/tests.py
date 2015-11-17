@@ -624,6 +624,12 @@ class IntegerFieldTests(test.TestCase):
     model = IntegerModel
     documented_range = (-2147483648, 2147483647)
 
+    @property
+    def backend_range(self):
+        field = self.model._meta.get_field('value')
+        internal_type = field.get_internal_type()
+        return connection.ops.integer_field_range(internal_type)
+
     def test_documented_range(self):
         """
         Ensure that values within the documented safe range pass validation,
@@ -645,14 +651,34 @@ class IntegerFieldTests(test.TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertEqual(qs[0].value, max_value)
 
+    def test_backend_range_save(self):
+        """
+        Ensure that backend specific range can be saved without corruption.
+        """
+        min_value, max_value = self.backend_range
+
+        if min_value is not None:
+            instance = self.model(value=min_value)
+            instance.full_clean()
+            instance.save()
+            qs = self.model.objects.filter(value__lte=min_value)
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs[0].value, min_value)
+
+        if max_value is not None:
+            instance = self.model(value=max_value)
+            instance.full_clean()
+            instance.save()
+            qs = self.model.objects.filter(value__gte=max_value)
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs[0].value, max_value)
+
     def test_backend_range_validation(self):
         """
         Ensure that backend specific range are enforced at the model
         validation level. ref #12030.
         """
-        field = self.model._meta.get_field('value')
-        internal_type = field.get_internal_type()
-        min_value, max_value = connection.ops.integer_field_range(internal_type)
+        min_value, max_value = self.backend_range
 
         if min_value is not None:
             instance = self.model(value=min_value - 1)

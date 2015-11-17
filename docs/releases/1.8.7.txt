@@ -46,3 +46,8 @@ Bugfixes
 * Fixed ``set_FOO_order()`` crash when the ``ForeignKey`` of a model with
   ``order_with_respect_to`` references a model with a ``OneToOneField``
   primary key (:ticket:`25786`).
+
+* Fixed incorrect validation for ``PositiveIntegerField`` and
+  ``PositiveSmallIntegerField`` on MySQL resulting in values greater than
+  4294967295 or 65535, respectively, passing validation and being silently
+  truncated by the database (:ticket:`25767`).
