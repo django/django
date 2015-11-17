@@ -1823,6 +1823,7 @@ number of roles in which color is used:
 
 * ``error`` - A major error.
 * ``notice`` - A minor error.
+* ``warning`` - A warning.
 * ``sql_field`` - The name of a model field in SQL.
 * ``sql_coltype`` - The type of a model field in SQL.
 * ``sql_keyword`` - An SQL keyword.
@@ -1834,6 +1835,8 @@ number of roles in which color is used:
 * ``http_not_found`` - A 404 HTTP Not Found server response.
 * ``http_bad_request`` - A 4XX HTTP Bad Request server response other than 404.
 * ``http_server_error`` - A 5XX HTTP Server Error response.
+* ``migrate_heading`` - A heading in a migrations management command.
+* ``migrate_label`` - A migration name.
 
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:
