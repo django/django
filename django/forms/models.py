@@ -850,6 +850,102 @@ class InlineFormSetMetaclass(type):
         return new_class
 
 
+
+class InlineFormSet(ModelFormSet):
+    """A formset for child objects related to a parent."""
+    __metaclass__ = InlineFormSetMetaclass
+
+    parent_model = None
+    fk_name = None
+
+    def __init__(self, data=None, files=None, instance=None,
+                 save_as_new=False, prefix=None, queryset=None):
+
+        from django.db.models.fields.related import RelatedObject
+        if instance is None:
+            self.instance = self.fk.rel.to()
+        else:
+            self.instance = instance
+        self.save_as_new = save_as_new
+        # is there a better way to get the object descriptor?
+        self.rel_name = RelatedObject(self.fk.rel.to, self.form._meta.model, 
+                                        self.fk).get_accessor_name()
+        if queryset is None:
+            queryset = self.form._meta.model._default_manager
+        qs = queryset.filter(**{self.fk.name: self.instance})
+        super(InlineFormSet, self).__init__(data, files, prefix=prefix,
+                                                queryset=qs)
+
+    def initial_form_count(self):
+        if self.save_as_new:
+            return 0
+        return super(InlineFormSet, self).initial_form_count()
+
+
+    def _construct_form(self, i, **kwargs):
+        form = super(InlineFormSet, self)._construct_form(i, **kwargs)
+        if self.save_as_new:
+            # Remove the primary key from the form's data, we are only
+            # creating new instances
+            form.data[form.add_prefix(self._pk_field.name)] = None
+
+            # Remove the foreign key from the form's data
+            form.data[form.add_prefix(self.fk.name)] = None
+
+        # Set the fk value here so that the form can do it's validation.
+        setattr(form.instance, self.fk.get_attname(), self.instance.pk)
+        return form
+
+    @classmethod
+    def get_default_prefix(cls):
+        from django.db.models.fields.related import RelatedObject
+        fk = _get_foreign_key(cls.parent_model, cls.form._meta.model, 
+                                fk_name=cls.fk_name)
+        return RelatedObject(fk.rel.to, cls.form._meta.model,
+                                fk).get_accessor_name().replace('+','')
+
+    def save_new(self, form, commit=True):
+        # Use commit=False so we can assign the parent key afterwards, then
+        # save the object.
+        obj = form.save(commit=False)
+        pk_value = getattr(self.instance, self.fk.rel.field_name)
+        setattr(obj, self.fk.get_attname(), getattr(pk_value, 'pk', pk_value))
+        if commit:
+            obj.save()
+        # form.save_m2m() can be called via the formset later on if commit=False
+        if commit and hasattr(form, 'save_m2m'):
+            form.save_m2m()
+        return obj
+
+    def add_fields(self, form, index):
+        super(InlineFormSet, self).add_fields(form, index)
+        if self._pk_field == self.fk:
+            name = self._pk_field.name
+            kwargs = {'pk_field': True}
+        else:
+            # The foreign key field might not be on the form, so we poke at the
+            # Model field to get the label, since we need that for error messages.
+            name = self.fk.name
+            kwargs = {
+                'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
+            }
+            if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
+                kwargs['to_field'] = self.fk.rel.field_name
+
+        form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
+
+        # Add the generated field to form._meta.fields if it's defined to make
+        # sure validation isn't skipped on that field.
+        if form._meta.fields:
+            if isinstance(form._meta.fields, tuple):
+                form._meta.fields = list(form._meta.fields)
+            form._meta.fields.append(self.fk.name)
+
+    def get_unique_error_message(self, unique_check):
+        unique_check = [field for field in unique_check if field != self.fk.name]
+        return super(InlineFormSet, self).get_unique_error_message(unique_check)
+
+
 def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     """
     Finds and returns the ForeignKey from model to parent if there is one
