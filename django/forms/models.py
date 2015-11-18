@@ -1259,8 +1259,5 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              formfield_callback=formfield_callback,
                              widgets=widgets, localized_fields=localized_fields,
                              labels=labels, help_texts=help_texts, error_messages=error_messages)
-    FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
-                              can_order=can_order, can_delete=can_delete,
-                              validate_max=validate_max)
-    FormSet.model = model
-    return FormSet
+    
+    return formset_factory(form, formset, **kwargs)
