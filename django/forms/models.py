@@ -11,7 +11,7 @@ from django.core.exceptions import (
     ImproperlyConfigured, ValidationError, NON_FIELD_ERRORS, FieldError)
 from django.forms.fields import Field, ChoiceField
 from django.forms.forms import DeclarativeFieldsMetaclass, BaseForm
-from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.formsets import FormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.forms.widgets import (SelectMultiple, HiddenInput,
     MultipleHiddenInput)
@@ -19,6 +19,8 @@ from django.utils import six
 from django.utils.encoding import smart_text, force_text
 from django.utils.text import get_text_list, capfirst
 from django.utils.translation import ugettext_lazy as _, ugettext
+
+import warnings
 
 
 __all__ = (
@@ -538,11 +540,10 @@ def modelform_factory(model, form=ModelForm, fields=None, exclude=None,
 
 # ModelFormSets ##############################################################
 
-class BaseModelFormSet(BaseFormSet):
+class ModelFormSet(FormSet):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
-    model = None
 
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  queryset=None, **kwargs):
@@ -550,13 +551,18 @@ class BaseModelFormSet(BaseFormSet):
         self.initial_extra = kwargs.pop('initial', None)
         defaults = {'data': data, 'files': files, 'auto_id': auto_id, 'prefix': prefix}
         defaults.update(kwargs)
-        super(BaseModelFormSet, self).__init__(**defaults)
+        super(ModelFormSet, self).__init__(**defaults)
+
+    @property
+    def model(cls):
+        return cls.form._meta.model
+    
 
     def initial_form_count(self):
         """Returns the number of forms that are required in this FormSet."""
         if not (self.data or self.files):
             return len(self.get_queryset())
-        return super(BaseModelFormSet, self).initial_form_count()
+        return super(ModelFormSet, self).initial_form_count()
 
     def _existing_object(self, pk):
         if not hasattr(self, '_object_dict'):
@@ -588,7 +594,7 @@ class BaseModelFormSet(BaseFormSet):
                 kwargs['initial'] = self.initial_extra[i - self.initial_form_count()]
             except IndexError:
                 pass
-        return super(BaseModelFormSet, self)._construct_form(i, **kwargs)
+        return super(ModelFormSet, self)._construct_form(i, **kwargs)
 
     def get_queryset(self):
         if not hasattr(self, '_queryset'):
@@ -798,36 +804,10 @@ class BaseModelFormSet(BaseFormSet):
             else:
                 widget = HiddenInput
             form.fields[self._pk_field.name] = ModelChoiceField(qs, initial=pk_value, required=False, widget=widget)
-        super(BaseModelFormSet, self).add_fields(form, index)
+        super(ModelFormSet, self).add_fields(form, index)
 
 
-def modelformset_factory(model, form=ModelForm, formfield_callback=None,
-                         formset=BaseModelFormSet, extra=1, can_delete=False,
-                         can_order=False, max_num=None, fields=None, exclude=None,
-                         widgets=None, validate_max=False, localized_fields=None,
-                         labels=None, help_texts=None, error_messages=None):
-    """
-    Returns a FormSet class for the given Django model class.
-    """
-    meta = getattr(form, 'Meta', None)
-    if meta is None:
-        meta = type(str('Meta'), (object,), {})
-    if (getattr(meta, 'fields', fields) is None and
-            getattr(meta, 'exclude', exclude) is None):
-        raise ImproperlyConfigured(
-            "Calling modelformset_factory without defining 'fields' or "
-            "'exclude' explicitly is prohibited."
-        )
 
-    form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
-                             formfield_callback=formfield_callback,
-                             widgets=widgets, localized_fields=localized_fields,
-                             labels=labels, help_texts=help_texts, error_messages=error_messages)
-    FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
-                              can_order=can_order, can_delete=can_delete,
-                              validate_max=validate_max)
-    FormSet.model = model
-    return FormSet
 
 
 # InlineFormSets #############################################################
@@ -1249,3 +1229,38 @@ def modelform_defines_fields(form_class):
             (form_class._meta.fields is not None or
              form_class._meta.exclude is not None)
             ))
+
+
+#######################################################
+#                                                     #
+#      DEPRICATION WARNINGS                           #
+#######################################################
+
+
+class BaseModelFormSet(ModelFormSet):
+    warnings.warn("BaseModelFormSet has been renamed to ModelFormSet.",
+        PendingDeprecationWarning)
+
+
+
+def modelformset_factory(model, form=ModelForm, formfield_callback=None,
+                         formset=BaseModelFormSet, extra=1, can_delete=False,
+                         can_order=False, max_num=None, fields=None, exclude=None,
+                         widgets=None, validate_max=False, localized_fields=None,
+                         labels=None, help_texts=None, error_messages=None):
+    """
+    Returns a FormSet class for the given Django model class.
+    """
+
+    warnings.warn("modelformset_factory is deprecated. Use a declarative "
+        "ModelFormSet instead.", PendingDeprecationWarning)
+
+    form = modelform_factory(model, form=form, fields=fields, exclude=exclude,
+                             formfield_callback=formfield_callback,
+                             widgets=widgets, localized_fields=localized_fields,
+                             labels=labels, help_texts=help_texts, error_messages=error_messages)
+    FormSet = formset_factory(form, formset, extra=extra, max_num=max_num,
+                              can_order=can_order, can_delete=can_delete,
+                              validate_max=validate_max)
+    FormSet.model = model
+    return FormSet
