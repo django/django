@@ -812,88 +812,7 @@ class ModelFormSet(FormSet):
 
 # InlineFormSets #############################################################
 
-class BaseInlineFormSet(BaseModelFormSet):
-    """A formset for child objects related to a parent."""
-    def __init__(self, data=None, files=None, instance=None,
-                 save_as_new=False, prefix=None, queryset=None, **kwargs):
-        if instance is None:
-            self.instance = self.fk.rel.to()
-        else:
-            self.instance = instance
-        self.save_as_new = save_as_new
-        if queryset is None:
-            queryset = self.model._default_manager
-        if self.instance.pk is not None:
-            qs = queryset.filter(**{self.fk.name: self.instance})
-        else:
-            qs = queryset.none()
-        super(BaseInlineFormSet, self).__init__(data, files, prefix=prefix,
-                                                queryset=qs, **kwargs)
 
-    def initial_form_count(self):
-        if self.save_as_new:
-            return 0
-        return super(BaseInlineFormSet, self).initial_form_count()
-
-    def _construct_form(self, i, **kwargs):
-        form = super(BaseInlineFormSet, self)._construct_form(i, **kwargs)
-        if self.save_as_new:
-            # Remove the primary key from the form's data, we are only
-            # creating new instances
-            form.data[form.add_prefix(self._pk_field.name)] = None
-
-            # Remove the foreign key from the form's data
-            form.data[form.add_prefix(self.fk.name)] = None
-
-        # Set the fk value here so that the form can do its validation.
-        setattr(form.instance, self.fk.get_attname(), self.instance.pk)
-        return form
-
-    @classmethod
-    def get_default_prefix(cls):
-        from django.db.models.fields.related import RelatedObject
-        return RelatedObject(cls.fk.rel.to, cls.model, cls.fk).get_accessor_name().replace('+', '')
-
-    def save_new(self, form, commit=True):
-        # Use commit=False so we can assign the parent key afterwards, then
-        # save the object.
-        obj = form.save(commit=False)
-        pk_value = getattr(self.instance, self.fk.rel.field_name)
-        setattr(obj, self.fk.get_attname(), getattr(pk_value, 'pk', pk_value))
-        if commit:
-            obj.save()
-        # form.save_m2m() can be called via the formset later on if commit=False
-        if commit and hasattr(form, 'save_m2m'):
-            form.save_m2m()
-        return obj
-
-    def add_fields(self, form, index):
-        super(BaseInlineFormSet, self).add_fields(form, index)
-        if self._pk_field == self.fk:
-            name = self._pk_field.name
-            kwargs = {'pk_field': True}
-        else:
-            # The foreign key field might not be on the form, so we poke at the
-            # Model field to get the label, since we need that for error messages.
-            name = self.fk.name
-            kwargs = {
-                'label': getattr(form.fields.get(name), 'label', capfirst(self.fk.verbose_name))
-            }
-            if self.fk.rel.field_name != self.fk.rel.to._meta.pk.name:
-                kwargs['to_field'] = self.fk.rel.field_name
-
-        form.fields[name] = InlineForeignKeyField(self.instance, **kwargs)
-
-        # Add the generated field to form._meta.fields if it's defined to make
-        # sure validation isn't skipped on that field.
-        if form._meta.fields:
-            if isinstance(form._meta.fields, tuple):
-                form._meta.fields = list(form._meta.fields)
-            form._meta.fields.append(self.fk.name)
-
-    def get_unique_error_message(self, unique_check):
-        unique_check = [field for field in unique_check if field != self.fk.name]
-        return super(BaseInlineFormSet, self).get_unique_error_message(unique_check)
 
 
 def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
@@ -944,42 +863,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     return fk
 
 
-def inlineformset_factory(parent_model, model, form=ModelForm,
-                          formset=BaseInlineFormSet, fk_name=None,
-                          fields=None, exclude=None, extra=3, can_order=False,
-                          can_delete=True, max_num=None, formfield_callback=None,
-                          widgets=None, validate_max=False, localized_fields=None,
-                          labels=None, help_texts=None, error_messages=None):
-    """
-    Returns an ``InlineFormSet`` for the given kwargs.
 
-    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
-    to ``parent_model``.
-    """
-    fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
-    # enforce a max_num=1 when the foreign key to the parent model is unique.
-    if fk.unique:
-        max_num = 1
-    kwargs = {
-        'form': form,
-        'formfield_callback': formfield_callback,
-        'formset': formset,
-        'extra': extra,
-        'can_delete': can_delete,
-        'can_order': can_order,
-        'fields': fields,
-        'exclude': exclude,
-        'max_num': max_num,
-        'widgets': widgets,
-        'validate_max': validate_max,
-        'localized_fields': localized_fields,
-        'labels': labels,
-        'help_texts': help_texts,
-        'error_messages': error_messages,
-    }
-    FormSet = modelformset_factory(model, **kwargs)
-    FormSet.fk = fk
-    return FormSet
 
 
 # Fields #####################################################################
@@ -1259,5 +1143,30 @@ def modelformset_factory(model, form=ModelForm, formfield_callback=None,
                              formfield_callback=formfield_callback,
                              widgets=widgets, localized_fields=localized_fields,
                              labels=labels, help_texts=help_texts, error_messages=error_messages)
-    
+
     return formset_factory(form, formset, **kwargs)
+
+
+
+class BaseInlineFormSet(InlineFormSet):
+    warnings.warn("BaseInlineFormSet has been deprecated in favor of InlineFormSet.",
+        PendingDeprecationWarning)
+
+
+def inlineformset_factory(parent_model, model, formset=InlineFormSet,
+                            fk_name=None, **kwargs):
+    """
+    Returns an ``InlineFormSet`` for the given kwargs.
+ 
+    You must provide ``fk_name`` if ``model`` has more than one ``ForeignKey``
+    to ``parent_model``.
+    """
+
+    warnings.warn("inlineformset_factory is deprecated. Use a declarative "
+        "InlineFormSet instead.", PendingDeprecationWarning)
+
+    kwargs.update({
+        'parent_model': parent_model,
+        'fk_name': fk_name,
+        })
+    return modelformset_factory(model, **kwargs)
