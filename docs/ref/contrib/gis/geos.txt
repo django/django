@@ -497,6 +497,23 @@ geometry is a point.
 Computes and returns a :class:`Point` guaranteed to be on the interior
 of this geometry.
 
+.. attribute:: GEOSGeometry.unary_union
+
+.. versionadded:: 1.10
+
+Computes the union of all the elements of this geometry.
+
+The result obeys the following contract:
+
+* Unioning a set of :class:`LineString`\ s has the effect of fully
+  noding and dissolving the linework.
+
+* Unioning a set of :class:`Polygon`\ s will always return a
+  :class:`Polygon` or :class:`MultiPolygon` geometry
+  (unlike :meth:`GEOSGeometry.union`, which may return geometries
+  of lower dimension if a topology collapse occurred).
+
+
 Other Properties & Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
