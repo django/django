@@ -1,5 +1,7 @@
 import time
 
+from django.http import parse_cookie
+
 from channels import DEFAULT_CHANNEL_BACKEND, Channel, channel_backends
 
 
@@ -16,6 +18,7 @@ def get_protocol(base):
             self.request_info = {
                 "path": request.path,
                 "get": request.params,
+                "cookies": parse_cookie(request.headers.get('cookie', ''))
             }
 
         def onOpen(self):
