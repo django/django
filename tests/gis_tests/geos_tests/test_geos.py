@@ -19,8 +19,9 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
-from django.test import mock
+from django.test import ignore_warnings, mock
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
@@ -629,7 +630,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(4326, pnt.srid)
         pnt.srid = 3084
         self.assertEqual(3084, pnt.srid)
-        self.assertRaises(ctypes.ArgumentError, pnt.set_srid, '4326')
+        with self.assertRaises(ctypes.ArgumentError):
+            pnt.srid = '4326'
 
         # Testing SRID keyword on fromstr(), and on Polygon rings.
         poly = fromstr(self.geometries.polygons[1].wkt, srid=4269)
@@ -785,7 +787,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
         self.assertEqual((2., 3., 8.), pnt.coords)
-        self.assertRaises(TypeError, pnt.set_coords, (1., 2.))
+        with self.assertRaises(TypeError):
+            pnt.tuple = (1., 2.)
         pnt.coords = (1., 2., 3.)
         self.assertEqual((1., 2., 3.), pnt.coords)
 
@@ -860,7 +863,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                self.assertRaises(IndexError, g.get_x)
+                with self.assertRaises(IndexError):
+                    g.x
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
@@ -1138,3 +1142,29 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_srid_getters_setters(self):
+        p = Point(1, 2, srid=123)
+        self.assertEqual(p.get_srid(), p.srid)
+
+        p.set_srid(321)
+        self.assertEqual(p.srid, 321)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_coordinate_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual((p.get_x(), p.get_y(), p.get_z()), (p.x, p.y, p.z))
+
+        p.set_x(3)
+        p.set_y(2)
+        p.set_z(1)
+        self.assertEqual((p.x, p.y, p.z), (3, 2, 1))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_tuple_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual(p.get_coords(), (p.x, p.y, p.z))
+
+        p.set_coords((3, 2, 1))
+        self.assertEqual(p.get_coords(), (3, 2, 1))

@@ -328,6 +328,21 @@ added in Django 1.9::
 
 This prevents confusion about an assignment resulting in an implicit save.
 
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``get_srid()`` and ``set_srid()`` methods of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` are deprecated in favor
+  of the :attr:`~django.contrib.gis.geos.GEOSGeometry.srid` property.
+
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``,
+  ``set_z()`` methods of :class:`~django.contrib.gis.geos.Point`
+  are deprecated in favor of the ``x``, ``y`` and ``z`` properties.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  :class:`~django.contrib.gis.geos.Point` are deprecated in favor of the
+  ``tuple`` property.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
