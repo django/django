@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.forms import Form
 from django.forms.fields import IntegerField, BooleanField
 from django.forms.utils import ErrorList
@@ -12,8 +12,9 @@ from django.utils import six
 from django.utils.six.moves import xrange
 from django.utils.translation import ungettext, ugettext as _
 
+import warnings
 
-__all__ = ('BaseFormSet', 'formset_factory', 'all_valid')
+__all__ = ('BaseFormSet', 'FormSet', 'formset_factory', 'all_valid')
 
 # special field names
 TOTAL_FORM_COUNT = 'TOTAL_FORMS'
@@ -48,10 +49,16 @@ class ManagementForm(Form):
 
 
 @python_2_unicode_compatible
-class BaseFormSet(object):
+class FormSet(object):
     """
     A collection of instances of the same Form class.
     """
+    form = None
+    extra = 1
+    can_order = False
+    can_delete = False
+    max_num = None
+
     def __init__(self, data=None, files=None, auto_id='id_%s', prefix=None,
                  initial=None, error_class=ErrorList):
         self.is_bound = data is not None or files is not None
@@ -63,6 +70,14 @@ class BaseFormSet(object):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+
+        # check declaration of FormSet
+        if self.form is None:
+            raise ImproperlyConfigured("FormSet declaration does not contain "
+                "'form' value.")
+
+        # construct the forms in the formset
+        self._construct_forms()
 
     def __str__(self):
         return self.as_table()
@@ -410,25 +425,21 @@ class BaseFormSet(object):
         return mark_safe('\n'.join([six.text_type(self.management_form), forms]))
 
 
+class BaseFormSet(FormSet):
+    warnings.warn("BaseFormSet has been renamed to FormSet.",
+        PendingDeprecationWarning)
+
+
 def formset_factory(form, formset=BaseFormSet, extra=1, can_order=False,
                     can_delete=False, max_num=None, validate_max=False,
                     min_num=None, validate_min=False):
     """Return a FormSet for the given form class."""
-    if min_num is None:
-        min_num = DEFAULT_MIN_NUM
-    if max_num is None:
-        max_num = DEFAULT_MAX_NUM
-    # hard limit on forms instantiated, to prevent memory-exhaustion attacks
-    # limit is simply max_num + DEFAULT_MAX_NUM (which is 2*DEFAULT_MAX_NUM
-    # if max_num is None in the first place)
-    absolute_max = max_num + DEFAULT_MAX_NUM
-    extra += min_num
-    attrs = {'form': form, 'extra': extra,
-             'can_order': can_order, 'can_delete': can_delete,
-             'min_num': min_num, 'max_num': max_num,
-             'absolute_max': absolute_max, 'validate_min': validate_min,
-             'validate_max': validate_max}
-    return type(form.__name__ + str('FormSet'), (formset,), attrs)
+
+    warnings.warn("formset_factory is deprecated. Use a declarative FormSet "
+                      "instead.", PendingDeprecationWarning)
+
+    kwargs.update({'form': form,})
+    return type(form.__name__ + str('FormSet'), (formset,), kwargs)
 
 
 def all_valid(formsets):
