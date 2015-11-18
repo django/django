@@ -185,7 +185,7 @@ class Engine(object):
         else:
             warnings.warn(
                 "The context_instance argument of render_to_string is "
-                "deprecated.", RemovedInDjango110Warning, stacklevel=2)
+                "deprecated.", RemovedInDjango110Warning, stacklevel=3)
         if dirs is _dirs_undefined:
             # Do not set dirs to None here to avoid triggering the deprecation
             # warning in select_template or get_template.
@@ -193,13 +193,13 @@ class Engine(object):
         else:
             warnings.warn(
                 "The dirs argument of render_to_string is deprecated.",
-                RemovedInDjango110Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=3)
         if dictionary is _dictionary_undefined:
             dictionary = None
         else:
             warnings.warn(
                 "The dictionary argument of render_to_string was renamed to "
-                "context.", RemovedInDjango110Warning, stacklevel=2)
+                "context.", RemovedInDjango110Warning, stacklevel=3)
             context = dictionary
 
         if isinstance(template_name, (list, tuple)):
@@ -231,7 +231,7 @@ class Engine(object):
         else:
             warnings.warn(
                 "The dirs argument of select_template is deprecated.",
-                RemovedInDjango110Warning, stacklevel=2)
+                RemovedInDjango110Warning, stacklevel=3)
 
         if not template_name_list:
             raise TemplateDoesNotExist("No template names provided")
