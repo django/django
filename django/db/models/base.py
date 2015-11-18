@@ -557,7 +557,7 @@ class Model(six.with_metaclass(ModelBase)):
         """
         if fields is not None:
             if len(fields) == 0:
-                return
+                return self
             if any(LOOKUP_SEP in f for f in fields):
                 raise ValueError(
                     'Found "%s" in fields argument. Relations and transforms '
@@ -595,6 +595,7 @@ class Model(six.with_metaclass(ModelBase)):
                 if local_val != related_val:
                     del self.__dict__[field.get_cache_name()]
         self._state.db = db_instance._state.db
+        return self
 
     def serializable_value(self, field_name):
         """
