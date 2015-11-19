@@ -62,7 +62,7 @@ class PoFileTests(MessageCompilationTests):
         try:
             call_command('compilemessages', locale=['en'], stderr=err_buffer, verbosity=0)
             err = err_buffer.getvalue()
-            self.assertIn("not writable location", err)
+            self.assertIn("not writable location", force_text(err))
         finally:
             os.chmod(mo_file_en, old_mode)
 
