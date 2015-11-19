@@ -129,6 +129,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Find the index for this field.
             # This is needed because the BaseDatabaseSchemaEditor._alter_field
             # method doesn't drop the '_like' indexes.
+            index_to_remove = self._create_index_name(model, [old_field.column], suffix='_like')
             index_names = self._constraint_names(model, [old_field.column], index=True)
             for index_name in index_names:
-                self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
+                if index_name == index_to_remove:
+                    self.execute(self._delete_constraint_sql(self.sql_delete_index, model, index_name))
