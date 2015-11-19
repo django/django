@@ -3811,7 +3811,7 @@ class AdminCustomQuerysetTest(TestCase):
     def test_add_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         self.assertEqual(CoverLetter.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3831,7 +3831,7 @@ class AdminCustomQuerysetTest(TestCase):
             reverse('admin:admin_views_coverletter_change', args=(pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         self.assertEqual(ShortMessage.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3854,7 +3854,7 @@ class AdminCustomQuerysetTest(TestCase):
     def test_add_model_modeladmin_only_qs(self):
         # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         self.assertEqual(Telegram.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3874,7 +3874,7 @@ class AdminCustomQuerysetTest(TestCase):
             reverse('admin:admin_views_telegram_change', args=(pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         self.assertEqual(Paper.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3897,7 +3897,7 @@ class AdminCustomQuerysetTest(TestCase):
     def test_edit_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         cl = CoverLetter.objects.create(author="John Doe")
         self.assertEqual(CoverLetter.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_coverletter_change', args=(cl.pk,)))
@@ -3912,7 +3912,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name. Instance
-        # representation is set by model's __unicode__()
+        # representation is set by model's __str__()
         self.assertContains(
             response,
             '<li class="success">The cover letter "<a href="%s">'
@@ -3920,7 +3920,7 @@ class AdminCustomQuerysetTest(TestCase):
             reverse('admin:admin_views_coverletter_change', args=(cl.pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         sm = ShortMessage.objects.create(content="This is expensive")
         self.assertEqual(ShortMessage.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)))
@@ -3946,7 +3946,7 @@ class AdminCustomQuerysetTest(TestCase):
     def test_edit_model_modeladmin_only_qs(self):
         # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         t = Telegram.objects.create(title="Frist Telegram")
         self.assertEqual(Telegram.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_telegram_change', args=(t.pk,)))
@@ -3961,7 +3961,7 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The instance
-        # representation is set by model's __unicode__()
+        # representation is set by model's __str__()
         self.assertContains(
             response,
             '<li class="success">The telegram "<a href="%s">'
@@ -3969,7 +3969,7 @@ class AdminCustomQuerysetTest(TestCase):
             reverse('admin:admin_views_telegram_change', args=(t.pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         p = Paper.objects.create(title="My Paper Title")
         self.assertEqual(Paper.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_paper_change', args=(p.pk,)))
