@@ -168,7 +168,7 @@ class GISFunctionsTests(TestCase):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(diff=functions.Difference('mpoly', geom))
         # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
 
         for c in qs:
@@ -179,8 +179,8 @@ class GISFunctionsTests(TestCase):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        # For some reason SpatiaLite and Oracle does something screwy with the Texas geometry here.
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
         for c in qs:
             self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
@@ -224,6 +224,9 @@ class GISFunctionsTests(TestCase):
             if spatialite or mysql:
                 # When the intersection is empty, Spatialite and MySQL return None
                 expected = None
+            elif oracle:
+                # When the intersection is empty, Oracle returns empty string
+                expected = ''
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
@@ -378,6 +381,9 @@ class GISFunctionsTests(TestCase):
     def test_sym_difference(self):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
+        # For some reason Oracle does something screwy with the Texas geometry here.
+        if oracle:
+            qs = qs.exclude(name='Texas')
         for country in qs:
             self.assertTrue(country.mpoly.sym_difference(geom).equals(country.sym_difference))
 
