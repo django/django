@@ -1,10 +1,10 @@
 import json
-from unittest import skipIf
 
-from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.shortcuts import numpy
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase, TransactionTestCase, skipUnlessDBFeature
+from django.test import (
+    TestCase, TransactionTestCase, mock, skipUnlessDBFeature,
+)
 
 from ..data.rasters.textrasters import JSON_RASTER
 from ..models import models
@@ -90,7 +90,7 @@ class RasterFieldTest(TransactionTestCase):
         )
 
 
-@skipIf(HAS_GDAL, 'Test raster field exception on systems without GDAL.')
+@mock.patch('django.contrib.gis.db.models.fields.HAS_GDAL', False)
 class RasterFieldWithoutGDALTest(TestCase):
 
     def test_raster_field_without_gdal_exception(self):
