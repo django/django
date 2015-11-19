@@ -264,10 +264,6 @@ Minor features
 
 * Added :doc:`/ref/contrib/postgres/aggregates`.
 
-* Fixed serialization of
-  :class:`~django.contrib.postgres.fields.DateRangeField` and
-  :class:`~django.contrib.postgres.fields.DateTimeRangeField`.
-
 * Added the :class:`~django.contrib.postgres.functions.TransactionNow` database
   function.
 
