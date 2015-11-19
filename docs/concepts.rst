@@ -11,7 +11,7 @@ which allow websites to communicate outside of this traditional cycle.
 
 And, beyond that, there are plenty of non-critical tasks that applications
 could easily offload until after a response as been sent - like saving things
-into a cache, sending emails or thumbnailing newly-uploaded images.
+into a cache or thumbnailing newly-uploaded images.
 
 Channels changes the way Django runs to be "event oriented" - rather than 
 just responding to requests, instead Django responses to a wide array of events
@@ -38,7 +38,7 @@ alternative is *at-least-once*, where normally one consumer gets the message
 but when things crash it's sent to more than one, which is not the trade-off
 we want.
 
-There are a couple of other limitations - messages must be JSON serialisable,
+There are a couple of other limitations - messages must be JSON serializable,
 and not be more than 1MB in size - but these are to make the whole thing
 practical, and not too important to think about up front.
 
@@ -121,7 +121,7 @@ However, the key here is that you can run code (and so send on channels) in
 response to any event - and that includes ones you create. You can trigger
 on model saves, on other incoming messages, or from code paths inside views
 and forms. That approach comes in handy for push-style
-code - where you use HTTP2's server-sent events or a WebSocket to notify
+code - where you use HTML5's server-sent events or a WebSocket to notify
 clients of changes in real time (messages in a chat, perhaps, or live updates
 in an admin as another user edits something).
 
@@ -239,7 +239,7 @@ start thinking about them. Remember, Django provides some channels
 but you're free to make and consume your own, and all channels are
 network-transparent.
 
-One thing channels do not, however, is guaranteeing delivery. If you need
+One thing channels do not, however, is guarantee delivery. If you need
 certainty that tasks will complete, use a system designed for this with 
 retries and persistence (e.g. Celery), or alternatively make a management
 command that checks for completion and re-submits a message to the channel

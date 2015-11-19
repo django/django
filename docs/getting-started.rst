@@ -30,7 +30,7 @@ Make a new project, a new app, and put this in a ``consumers.py`` file in the ap
         message.reply_channel.send(response.channel_encode())
 
 The most important thing to note here is that, because things we send in
-messages must be JSON serialisable, the request and response messages
+messages must be JSON serializable, the request and response messages
 are in a key-value format. There are ``channel_decode()`` and
 ``channel_encode()`` methods on both Django's request and response classes,
 but here we just use the message's ``content`` attribute directly for simplicity
@@ -240,7 +240,7 @@ Persisting Data
 Echoing messages is a nice simple example, but it's
 skirting around the real design pattern - persistent state for connections.
 Let's consider a basic chat site where a user requests a chat room upon initial
-connection, as part of the query string (e.g. ``https://host/websocket?room=abc``).
+connection, as part of the query string (e.g. ``wss://host/websocket?room=abc``).
 
 The ``reply_channel`` attribute you've seen before is our unique pointer to the
 open WebSocket - because it varies between different clients, it's how we can
@@ -462,7 +462,7 @@ command run via ``cron``. If we wanted to write a bot, too, we could put its
 listening logic inside the ``chat-messages`` consumer, as every message would
 pass through it.
 
-Linearisation
+Linearization
 -------------
 
 There's one final concept we want to introduce you to before you go on to build
