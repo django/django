@@ -2877,6 +2877,14 @@ Delete                  ``{{ app_label }}_{{ model_name }}_delete``       ``obje
 Change                  ``{{ app_label }}_{{ model_name }}_change``       ``object_id``
 ======================  ===============================================   =============
 
+The ``UserAdmin`` provides a named URL:
+
+======================  ===============================================   =============
+Page                    URL name                                          Parameters
+======================  ===============================================   =============
+Password change         ``auth_user_password_change``                     ``user_id``
+======================  ===============================================   =============
+
 These named URLs are registered with the application namespace ``admin``, and
 with an instance namespace corresponding to the name of the Site instance.
 
