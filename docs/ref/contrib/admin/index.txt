@@ -2052,6 +2052,18 @@ The ``InlineModelAdmin`` class adds:
     through to :func:`~django.forms.models.inlineformset_factory` when
     creating the formset for this inline.
 
+.. attribute:: InlineModelAdmin.classes
+
+    A list or tuple containing extra CSS classes to apply to the fieldset that
+    is rendered for the inlines. By default this is empty. As with classes
+    configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
+    style will be initially collapsed in the admin and their header will have
+    a small "show" link.
+
+    .. versionadded:: 1.10
+
+        The ``classes`` attribute was added.
+
 .. warning::
     When writing custom validation for ``InlineModelAdmin`` forms, be cautious
     of writing validation that relies on features of the parent model. If the
