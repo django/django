@@ -43,6 +43,22 @@ class DecadeListFilter(SimpleListFilter):
             return queryset.filter(year__gte=2000, year__lte=2009)
 
 
+class NotNinetiesListFilter(SimpleListFilter):
+    title = "Not nineties books"
+    parameter_name = "book_year"
+
+    def lookups(self, request, model_admin):
+        return (
+            ('the 90s', "the 1990's"),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'the 90s':
+            return queryset.filter(year__gte=1990, year__lte=1999)
+        else:
+            return queryset.exclude(year__gte=1990, year__lte=1999)
+
+
 class DecadeListFilterWithTitleAndParameter(DecadeListFilter):
     title = 'publication decade'
     parameter_name = 'publication-decade'
@@ -177,6 +193,10 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
 class DecadeFilterBookAdmin(ModelAdmin):
     list_filter = ('author', DecadeListFilterWithTitleAndParameter)
     ordering = ('-id',)
+
+
+class NotNinetiesListFilterAdmin(ModelAdmin):
+    list_filter = (NotNinetiesListFilter,)
 
 
 class DecadeFilterBookAdminWithoutTitle(ModelAdmin):
@@ -1026,3 +1046,13 @@ class ListFiltersTests(TestCase):
 
         _test_choices(self.request_factory.get('/', {'publication-decade': 'the 90s'}),
                       ("All", "the 1980's"))
+
+    def test_list_filter_queryset_filtered_by_default(self):
+        "A list filter that filters the queryset by default gives the right full_result_count."
+        modeladmin = NotNinetiesListFilterAdmin(Book, site)
+
+        request = self.request_factory.get('/', {})
+        changelist = self.get_changelist(request, Book, modeladmin)
+        changelist.get_results(request)
+
+        self.assertEqual(changelist.full_result_count, 4)
