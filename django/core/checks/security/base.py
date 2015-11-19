@@ -98,9 +98,13 @@ W019 = Warning(
 
 W020 = Warning(
     "ALLOWED_HOSTS must not be empty in deployment.",
+    id='security.W020',
+)
+
+W021 = Warning(
     "Your SECRET_KEY contains invalid Unicode. Please ensure you have a "
     "valid Unicode string.",
-    id='security.W020',
+    id='security.W021',
 )
 
 
