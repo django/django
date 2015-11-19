@@ -172,8 +172,8 @@ class GISFunctionsTests(TestCase):
     def test_difference(self):
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(diff=functions.Difference('mpoly', geom))
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        # SpatiaLite and Oracle do something screwy with the Texas geometry.
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
 
         for c in qs:
@@ -184,8 +184,8 @@ class GISFunctionsTests(TestCase):
         """Testing with mixed SRID (Country has default 4326)."""
         geom = Point(556597.4, 2632018.6, srid=3857)  # Spherical mercator
         qs = Country.objects.annotate(difference=functions.Difference('mpoly', geom))
-        # For some reason SpatiaLite does something screwy with the Texas geometry here.
-        if spatialite:
+        # SpatiaLite and Oracle do something screwy with the Texas geometry.
+        if spatialite or oracle:
             qs = qs.exclude(name='Texas')
         for c in qs:
             self.assertEqual(c.mpoly.difference(geom), c.difference)
@@ -229,6 +229,9 @@ class GISFunctionsTests(TestCase):
             if spatialite:
                 # When the intersection is empty, Spatialite returns None
                 expected = None
+            elif oracle:
+                # When the intersection is empty, Oracle returns an empty string
+                expected = ''
             else:
                 expected = c.mpoly.intersection(geom)
             self.assertEqual(c.inter, expected)
@@ -385,6 +388,9 @@ class GISFunctionsTests(TestCase):
             self.skipTest("GEOS >= 3.3 required")
         geom = Point(5, 23, srid=4326)
         qs = Country.objects.annotate(sym_difference=functions.SymDifference('mpoly', geom))
+        # Oracle does something screwy with the Texas geometry.
+        if oracle:
+            qs = qs.exclude(name='Texas')
         for country in qs:
             # Ordering might differ in collections
             self.assertSetEqual(set(g.wkt for g in country.mpoly.sym_difference(geom)),
