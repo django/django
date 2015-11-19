@@ -750,10 +750,8 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         add_button.click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
-        self.selenium.find_element_by_css_selector(
-                '%s .inline-deletelink' % inline_id).click()
-        self.selenium.find_element_by_css_selector(
-                '%s .inline-deletelink' % inline_id).click()
+        self.selenium.find_element_by_css_selector('%s .inline-deletelink' % inline_id).click()
+        self.selenium.find_element_by_css_selector('%s .inline-deletelink' % inline_id).click()
         self.assertEqual(rows_length(), 3)
 
     def test_add_inlines(self):
