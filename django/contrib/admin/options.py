@@ -1522,7 +1522,7 @@ class ModelAdmin(BaseModelAdmin):
         if (request.method == "POST" and cl.list_editable and
                 '_save' in request.POST and not action_failed):
             FormSet = self.get_changelist_formset(request)
-            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=cl.result_list)
+            formset = cl.formset = FormSet(request.POST, request.FILES, queryset=self.get_queryset(request))
             if formset.is_valid():
                 changecount = 0
                 for form in formset.forms:
