@@ -58,3 +58,14 @@ def csrf_exempt(view_func):
         return view_func(*args, **kwargs)
     wrapped_view.csrf_exempt = True
     return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
+
+
+def csrf_header_only(view_func):
+    """
+    Marks a view function to be exempt from looking for CSRF token in POST
+    data. Prevents clashes with updating HttpRequest.upload_handlers.
+    """
+    def wrapped_view(*args, **kwargs):
+        return view_func(*args, **kwargs)
+    wrapped_view.csrf_header_only = True
+    return wraps(view_func, assigned=available_attrs(view_func))(wrapped_view)
