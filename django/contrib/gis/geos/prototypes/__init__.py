@@ -17,8 +17,9 @@ from django.contrib.gis.geos.prototypes.geom import (  # NOQA
 )
 from django.contrib.gis.geos.prototypes.misc import *  # NOQA
 from django.contrib.gis.geos.prototypes.predicates import (  # NOQA
-    geos_contains, geos_crosses, geos_disjoint, geos_equals, geos_equalsexact,
-    geos_hasz, geos_intersects, geos_isempty, geos_isring, geos_issimple,
-    geos_isvalid, geos_overlaps, geos_relatepattern, geos_touches, geos_within,
+    geos_contains, geos_covers, geos_crosses, geos_disjoint, geos_equals,
+    geos_equalsexact, geos_hasz, geos_intersects, geos_isempty, geos_isring,
+    geos_issimple, geos_isvalid, geos_overlaps, geos_relatepattern,
+    geos_touches, geos_within,
 )
 from django.contrib.gis.geos.prototypes.topology import *  # NOQA

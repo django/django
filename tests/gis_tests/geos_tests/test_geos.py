@@ -643,6 +643,11 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
 
+    def test_covers(self):
+        poly = Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)))
+        self.assertTrue(poly.covers(Point(5, 5)))
+        self.assertFalse(poly.covers(Point(100, 100)))
+
     def test_srid(self):
         "Testing the SRID property and keyword."
         # Testing SRID keyword on Point
@@ -1084,12 +1089,11 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         # A set of test points.
         pnts = [Point(5, 5), Point(7.5, 7.5), Point(2.5, 7.5)]
-        covers = [True, True, False]  # No `covers` op for regular GEOS geoms.
-        for pnt, c in zip(pnts, covers):
+        for pnt in pnts:
             # Results should be the same (but faster)
             self.assertEqual(mpoly.contains(pnt), prep.contains(pnt))
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
-            self.assertEqual(c, prep.covers(pnt))
+            self.assertEqual(mpoly.covers(pnt), prep.covers(pnt))
 
         self.assertTrue(prep.crosses(fromstr('LINESTRING(1 1, 15 15)')))
         self.assertTrue(prep.disjoint(Point(-5, -5)))
