@@ -767,6 +767,17 @@ class ModelRefreshTests(TestCase):
         self.assertEqual(a2.pub_date, pub_date)
         self.assertEqual(a2._state.db, "default")
 
+    def test_refresh_fk_on_delete_set_null(self):
+        a = Article.objects.create(
+            headline='Parrot programs in Python',
+            pub_date=datetime(2005, 7, 28),
+        )
+        s1 = SelfRef.objects.create(article=a)
+        a.delete()
+        s1.refresh_from_db()
+        self.assertIsNone(s1.article_id)
+        self.assertIsNone(s1.article)
+
     def test_refresh_no_fields(self):
         a = Article.objects.create(pub_date=self._truncate_ms(datetime.now()))
         with self.assertNumQueries(0):

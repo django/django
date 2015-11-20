@@ -30,6 +30,7 @@ class ArticleSelectOnSave(Article):
 class SelfRef(models.Model):
     selfref = models.ForeignKey('self', null=True, blank=True,
                                 related_name='+')
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         # This method intentionally doesn't work for all cases - part
