@@ -5,13 +5,13 @@ Django's traditional view of the world revolves around requests and responses;
 a request comes in, Django is fired up to serve it, generates a response to
 send, and then Django goes away and waits for the next request.
 
-That was fine when the internet was all driven by simple browser interactions,
+That was fine when the internet was driven by simple browser interactions,
 but the modern Web includes things like WebSockets and HTTP2 server push,
 which allow websites to communicate outside of this traditional cycle.
 
 And, beyond that, there are plenty of non-critical tasks that applications
 could easily offload until after a response as been sent - like saving things
-into a cache, or thumbnailing newly-uploaded images.
+into a cache or thumbnailing newly-uploaded images.
 
 Channels changes the way Django runs to be "event oriented" - rather than 
 just responding to requests, instead Django responses to a wide array of events
@@ -38,7 +38,7 @@ alternative is *at-least-once*, where normally one consumer gets the message
 but when things crash it's sent to more than one, which is not the trade-off
 we want.
 
-There are a couple of other limitations - messages must be JSON-serialisable,
+There are a couple of other limitations - messages must be JSON serializable,
 and not be more than 1MB in size - but these are to make the whole thing
 practical, and not too important to think about up front.
 
@@ -59,13 +59,13 @@ channel, they're writing into the same channel.
 How do we use channels?
 -----------------------
 
-That's what a channel is, but how is Django using them? Well, inside Django
-you can write a function to consume a channel, like so::
+So how is Django using those channels? Inside Django
+you can write a function to consume a channel::
 
     def my_consumer(message):
         pass
 
-And then assign a channel to it like this in the channel routing::
+And then assign a channel to it in the channel routing::
 
     channel_routing = {
         "some-channel": "myapp.consumers.my_consumer",
@@ -76,14 +76,11 @@ consumer function with a message object (message objects have a "content"
 attribute which is always a dict of data, and a "channel" attribute which
 is the channel it came from, as well as some others).
 
-Django can do this as rather than run in a request-response mode, Channels
-changes Django so that it runs in a worker mode - it listens on all channels
-that have consumers assigned, and when a message arrives on one, runs the
-relevant consumer.
-
-In fact, this is illustrative of the new way Django runs to enable Channels to
-work. Rather than running in just a single process tied to a WSGI server,
-Django runs in three separate layers:
+Instead of having Django run in the traditional request-response mode, 
+Channels changes Django so that it runs in a worker mode - it listens on 
+all channels that have consumers assigned, and when a message arrives on
+one, it runs the relevant consumer. So rather than running in just a 
+single process tied to a WSGI server, Django runs in three separate layers:
 
 * Interface servers, which communicate between Django and the outside world.
   This includes a WSGI adapter as well as a separate WebSocket server - we'll
@@ -104,8 +101,8 @@ message and can write out zero to many other channel messages.
 
 Now, let's make a channel for requests (called ``http.request``),
 and a channel per client for responses (e.g. ``http.response.o4F2h2Fd``),
-with the response channel a property (``reply_channel``) of the request message.
-Suddenly, a view is merely another example of a consumer::
+where the response channel is a property (``reply_channel``) of the request
+message. Suddenly, a view is merely another example of a consumer::
 
     # Listens on http.request
     def my_consumer(message):
@@ -120,22 +117,20 @@ In fact, this is how Channels works. The interface servers transform connections
 from the outside world (HTTP, WebSockets, etc.) into messages on channels,
 and then you write workers to handle these messages.
 
-This may seem like it's still not very well designed to handle push-style
-code - where you use HTTP2's server-sent events or a WebSocket to notify
-clients of changes in real time (messages in a chat, perhaps, or live updates
-in an admin as another user edits something).
-
 However, the key here is that you can run code (and so send on channels) in
 response to any event - and that includes ones you create. You can trigger
 on model saves, on other incoming messages, or from code paths inside views
-and forms.
+and forms. That approach comes in handy for push-style
+code - where you use HTML5's server-sent events or a WebSocket to notify
+clients of changes in real time (messages in a chat, perhaps, or live updates
+in an admin as another user edits something).
 
 .. _channel-types:
 
 Channel Types
 -------------
 
-Now, if you think about it, there are actually two major uses for channels in
+There are actually two major uses for channels in
 this model. The first, and more obvious one, is the dispatching of work to
 consumers - a message gets added to a channel, and then any one of the workers
 can pick it up and run the consumer.
@@ -240,15 +235,15 @@ Next Steps
 ----------
 
 That's the high-level overview of channels and groups, and how you should
-starting thinking about them - remember, Django provides some channels
+start thinking about them. Remember, Django provides some channels
 but you're free to make and consume your own, and all channels are
 network-transparent.
 
-One thing channels are not, however, is guaranteed delivery. If you want tasks
-you're sure will complete, use a system designed for this with retries and
-persistence like Celery, or you'll need to make a management command that
-checks for completion and re-submits a message to the channel if nothing
-is completed (rolling your own retry logic, essentially).
+One thing channels do not, however, is guarantee delivery. If you need
+certainty that tasks will complete, use a system designed for this with 
+retries and persistence (e.g. Celery), or alternatively make a management
+command that checks for completion and re-submits a message to the channel
+if nothing is completed (rolling your own retry logic, essentially).
 
 We'll cover more about what kind of tasks fit well into Channels in the rest
 of the documentation, but for now, let's progress to :doc:`getting-started`
