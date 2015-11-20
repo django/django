@@ -36,3 +36,6 @@ Bugfixes
   :class:`~django.contrib.postgres.fields.DateTimeRangeField` (:ticket:`24937`).
 
 * Fixed the exact lookup of ``ArrayField`` (:ticket:`25666`).
+
+* Fixed ``Model.refresh_from_db()`` updating of ``ForeignKey`` fields with
+  ``on_delete=models.SET_NULL`` (:ticket:`25715`).
