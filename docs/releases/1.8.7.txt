@@ -39,3 +39,6 @@ Bugfixes
 
 * Fixed ``Model.refresh_from_db()`` updating of ``ForeignKey`` fields with
   ``on_delete=models.SET_NULL`` (:ticket:`25715`).
+
+* Fixed a duplicate query regression in 1.8 on proxied model deletion
+  (:ticket:`25685`).
