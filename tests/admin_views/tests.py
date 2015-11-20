@@ -73,7 +73,6 @@ class AdminViewBasicTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
         cls.u1 = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
@@ -181,7 +180,7 @@ class AdminViewBasicTestCase(TestCase):
         }
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def tearDown(self):
         formats.reset_format_cache()
@@ -1071,7 +1070,7 @@ class AdminViewFormUrlTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def test_change_form_URL_has_correct_value(self):
         """
@@ -1114,7 +1113,7 @@ class AdminJavaScriptTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def test_js_minified_only_if_debug_is_false(self):
         """
@@ -1163,7 +1162,7 @@ class SaveAsTests(TestCase):
         cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
@@ -1600,15 +1599,13 @@ class AdminViewPermissionsTest(TestCase):
     def test_add_view(self):
         """Test add view restricts access and actually adds items."""
 
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         add_dict = {'title': 'Døm ikke',
                     'content': '<p>great article</p>',
                     'date_0': '2008-03-18', 'date_1': '10:54:39',
                     'section': self.s1.pk}
 
         # Change User should not have access to add articles
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.u3)
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
         response = self.client.get(reverse('admin:admin_views_article_add'))
@@ -1620,8 +1617,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get(reverse('admin:logout'))
 
         # Add user may login and POST to add view, then redirect to admin root
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.u2)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
         change_list_link = '&rsaquo; <a href="%s">Articles</a>' % reverse('admin:admin_views_article_changelist')
         self.assertNotContains(addpage, change_list_link,
@@ -1645,8 +1641,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(addition_log.change_message, "Added.")
 
         # Super can add too, but is redirected to the change list view
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.super_login)
+        self.client.force_login(self.u1)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
         self.assertContains(addpage, change_list_link,
             msg_prefix='Unrestricted user is not given link to change list view in breadcrumbs.')
@@ -1657,17 +1652,15 @@ class AdminViewPermissionsTest(TestCase):
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
-        self.client.login(username='joepublic', password='secret')
+        self.client.force_login(self.u5)
         # Check and make sure that if user expires, data still persists
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.super_login)
+        self.client.force_login(self.u1)
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
 
     def test_change_view(self):
         """Change view should restrict access and allow users to edit items."""
 
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         change_dict = {'title': 'Ikke fordømt',
                        'content': '<p>edited article</p>',
                        'date_0': '2008-03-18', 'date_1': '10:54:39',
@@ -1676,8 +1669,7 @@ class AdminViewPermissionsTest(TestCase):
         article_changelist_url = reverse('admin:admin_views_article_changelist')
 
         # add user should not be able to view the list of article or change any of them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.u2)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 403)
         response = self.client.get(article_change_url)
@@ -1687,8 +1679,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get(reverse('admin:logout'))
 
         # change user can view all items and edit them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.u3)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
         response = self.client.get(article_change_url)
@@ -1714,8 +1705,8 @@ class AdminViewPermissionsTest(TestCase):
         r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         change_url_1 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r1.pk,))
         change_url_2 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r2.pk,))
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.u1, self.u2, self.u3, self.u4]:
+            self.client.force_login(login_user)
             response = self.client.get(change_url_1)
             self.assertEqual(response.status_code, 403)
             response = self.client.post(change_url_1, {'name': 'changed'})
@@ -1728,8 +1719,8 @@ class AdminViewPermissionsTest(TestCase):
             self.assertRedirects(response, self.index_url)
             self.client.get(reverse('admin:logout'))
 
-        for login_dict in [self.joepublic_login, self.no_username_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.u5, self.u6]:
+            self.client.force_login(login_user)
             response = self.client.get(change_url_1, follow=True)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
@@ -1753,7 +1744,7 @@ class AdminViewPermissionsTest(TestCase):
         delete_url = reverse('admin:admin_views_article_delete', args=(self.a1.pk,))
 
         # add user should not be able to delete articles
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         response = self.client.get(delete_url)
         self.assertEqual(response.status_code, 403)
         post = self.client.post(delete_url, delete_dict)
@@ -1762,7 +1753,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.logout()
 
         # Delete user can delete
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.u4)
         response = self.client.get(reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
@@ -1786,26 +1777,22 @@ class AdminViewPermissionsTest(TestCase):
     def test_history_view(self):
         """History view should restrict access."""
 
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
-
         # add user should not be able to view the list of article or change any of them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.u2)
         response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
         self.assertEqual(response.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
         # change user can view all items and edit them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.u3)
         response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
         self.assertEqual(response.status_code, 200)
 
         # Test redirection when using row-level change permissions. Refs #11513.
         rl1 = RowLevelChangePermissionModel.objects.create(name="odd id")
         rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.u1, self.u2, self.u3, self.u4]:
+            self.client.force_login(login_user)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url)
             self.assertEqual(response.status_code, 403)
@@ -1816,8 +1803,8 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get(reverse('admin:logout'))
 
-        for login_dict in [self.joepublic_login, self.no_username_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.u5, self.u6]:
+            self.client.force_login(login_user)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url, follow=True)
             self.assertEqual(response.status_code, 200)
@@ -1830,7 +1817,7 @@ class AdminViewPermissionsTest(TestCase):
             self.client.get(reverse('admin:logout'))
 
     def test_history_view_bad_url(self):
-        self.client.post(reverse('admin:login'), self.changeuser_login)
+        self.client.force_login(self.u3)
         response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
         self.assertEqual(response.status_code, 404)
 
@@ -1839,7 +1826,7 @@ class AdminViewPermissionsTest(TestCase):
         The foreign key widget should only show the "add related" button if the
         user has permission to add that related item.
         """
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         # The user can't add sections yet, so they shouldn't see the "add section" link.
         url = reverse('admin:admin_views_article_add')
         add_link_text = 'add_id_section'
@@ -1860,7 +1847,7 @@ class AdminViewPermissionsTest(TestCase):
         def get_change_related(response):
             return response.context['adminform'].form.fields['section'].widget.can_change_related
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         # The user can't change sections yet, so they shouldn't see the "change section" link.
         url = reverse('admin:admin_views_article_add')
         change_link_text = 'change_id_section'
@@ -1883,7 +1870,7 @@ class AdminViewPermissionsTest(TestCase):
         def get_delete_related(response):
             return response.context['adminform'].form.fields['sub_section'].widget.can_delete_related
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         # The user can't delete sections yet, so they shouldn't see the "delete section" link.
         url = reverse('admin:admin_views_article_add')
         delete_link_text = 'delete_id_sub_section'
@@ -1899,7 +1886,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, delete_link_text)
 
     def test_disabled_permissions_when_logged_in(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
         superuser = User.objects.get(username='super')
         superuser.is_active = False
         superuser.save()
@@ -1912,7 +1899,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'id="login-form"')
 
     def test_disabled_staff_permissions_when_logged_in(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
         superuser = User.objects.get(username='super')
         superuser.is_staff = False
         superuser.save()
@@ -1933,7 +1920,7 @@ class AdminViewPermissionsTest(TestCase):
         change_user = User.objects.get(username='changeuser')
         permission = get_perm(Article, get_permission_codename('change', opts))
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.u3)
 
         # the user has no module permissions, because this module doesn't exist
         change_user.user_permissions.remove(permission)
@@ -1958,7 +1945,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertTemplateUsed(response, 'admin/login.html')
 
         # Logged in? Redirect.
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
@@ -1971,25 +1958,25 @@ class AdminViewPermissionsTest(TestCase):
         have any permission for that module (add, change, or delete), so that
         the module is displayed on the admin index page.
         """
-        self.client.login(**self.super_login)
+        self.client.force_login(self.u1)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.u3)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.u4)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
@@ -2002,25 +1989,25 @@ class AdminViewPermissionsTest(TestCase):
         """
         index_url = reverse('admin7:index')
 
-        self.client.login(**self.super_login)
+        self.client.force_login(self.u1)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.u2)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.u3)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.u4)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
@@ -2066,17 +2053,9 @@ class AdminViewsNoUrlTest(TestCase):
         # User who can change Reports
         cls.u3.user_permissions.add(get_perm(Report, get_permission_codename('change', opts)))
 
-        # login POST dict
-        cls.changeuser_login = {
-            REDIRECT_FIELD_NAME: reverse('admin:index'),
-            'username': 'changeuser',
-            'password': 'secret',
-        }
-
     def test_no_standard_modeladmin_urls(self):
         """Admin index views don't break when user's ModelAdmin removes standard urls"""
-        self.client.get(reverse('admin:index'))
-        r = self.client.post(reverse('admin:login'), self.changeuser_login)
+        self.client.force_login(self.u3)
         r = self.client.get(reverse('admin:index'))
         # we shouldn't get a 500 error caused by a NoReverseMatch
         self.assertEqual(r.status_code, 200)
@@ -2152,7 +2131,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         cls.cy2 = CyclicTwo.objects.create(name='I am recursive too', one_id=1)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def test_nesting(self):
         """
@@ -2310,7 +2289,7 @@ class TestGenericRelations(TestCase):
         cls.pl3 = Plot.objects.create(name='Corn Conspiracy', team_leader=cls.v1, contact=cls.v1)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.u1)
 
     def test_generic_content_object_in_list_display(self):
         FunkyTag.objects.create(content_object=self.pl3, name='hott')
