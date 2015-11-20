@@ -71,6 +71,9 @@ Minor features
   <django.contrib.gis.geos.GEOSGeometry.unary_union>` property computes the
   union of all the elements of this geometry.
 
+* Added the :meth:`GEOSGeometry.covers()
+  <django.contrib.gis.geos.GEOSGeometry.covers>` binary predicate.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -349,6 +349,28 @@ return a boolean.
 Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>` returns
 ``True``.
 
+.. method:: GEOSGeometry.covers(other)
+
+.. versionadded:: 1.10
+
+Returns ``True`` if this geometry covers the specified geometry.
+
+The ``covers`` predicate has the following equivalent definitions:
+
+* Every point of the other geometry is a point of this geometry.
+* The DE-9IM Intersection Matrix for the two geometries is
+  ``T*****FF*``, ``*T****FF*``, ``***T**FF*``, or ``****T*FF*``.
+
+If either geometry is empty, returns ``False``.
+
+This predicate is similar to :meth:`GEOSGeometry.contains`, but is more
+inclusive (i.e. returns ``True`` for more cases). In particular, unlike
+:meth:`~GEOSGeometry.contains` it does not distinguish between points in the
+boundary and in the interior of geometries. For most situations, ``covers()``
+should be preferred to :meth:`~GEOSGeometry.contains`. As an added benefit,
+``covers()`` is more amenable to optimization and hence should outperform
+:meth:`~GEOSGeometry.contains`.
+
 .. method:: GEOSGeometry.crosses(other)
 
 Returns ``True`` if the DE-9IM intersection matrix for the two Geometries

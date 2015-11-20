@@ -294,6 +294,14 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Returns true if other.within(this) returns true."
         return capi.geos_contains(self.ptr, other.ptr)
 
+    def covers(self, other):
+        """
+        Return True if the DE-9IM Intersection Matrix for the two geometries is
+        T*****FF*, *T****FF*, ***T**FF*, or ****T*FF*. If either geometry is
+        empty, return False.
+        """
+        return capi.geos_covers(self.ptr, other.ptr)
+
     def crosses(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
