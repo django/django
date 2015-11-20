@@ -33,3 +33,19 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# order_with_respect_to points to a model with a OneToOneField primary key.
+class Entity(models.Model):
+    pass
+
+
+class Dimension(models.Model):
+    entity = models.OneToOneField('Entity', primary_key=True)
+
+
+class Component(models.Model):
+    dimension = models.ForeignKey('Dimension')
+
+    class Meta:
+        order_with_respect_to = 'dimension'

@@ -42,3 +42,7 @@ Bugfixes
 
 * Fixed a duplicate query regression in 1.8 on proxied model deletion
   (:ticket:`25685`).
+
+* Fixed ``set_FOO_order()`` crash when the ``ForeignKey`` of a model with
+  ``order_with_respect_to`` references a model with a ``OneToOneField``
+  primary key (:ticket:`25786`).

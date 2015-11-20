@@ -5,7 +5,7 @@ from operator import attrgetter
 from django.db import models
 from django.test import TestCase
 
-from .models import Answer, Post, Question
+from .models import Answer, Dimension, Entity, Post, Question
 
 
 class OrderWithRespectToTests(TestCase):
@@ -103,3 +103,13 @@ class OrderWithRespectToTests2(TestCase):
                 count += 1
 
         self.assertEqual(count, 1)
+
+
+class TestOrderWithRespectToOneToOnePK(TestCase):
+    def test_set_order(self):
+        e = Entity.objects.create()
+        d = Dimension.objects.create(entity=e)
+        c1 = d.component_set.create()
+        c2 = d.component_set.create()
+        d.set_component_order([c1.id, c2.id])
+        self.assertQuerysetEqual(d.component_set.all(), [c1.id, c2.id], attrgetter('pk'))
