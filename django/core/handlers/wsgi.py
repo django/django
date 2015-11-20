@@ -155,14 +155,9 @@ class WSGIHandler(base.BaseHandler):
         # settings weren't available.
         if self._request_middleware is None:
             with self.initLock:
-                try:
-                    # Check that middleware is still uninitialized.
-                    if self._request_middleware is None:
-                        self.load_middleware()
-                except Exception:
-                    # Unload whatever middleware we got
-                    self._request_middleware = None
-                    raise
+                # Check that middleware is still uninitialized.
+                if self._request_middleware is None:
+                    self.load_middleware()
 
         set_script_prefix(get_script_name(environ))
         signals.request_started.send(sender=self.__class__, environ=environ)
