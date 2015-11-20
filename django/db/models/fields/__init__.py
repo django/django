@@ -1865,7 +1865,7 @@ class IntegerField(Field):
 
     def get_prep_value(self, value):
         value = super(IntegerField, self).get_prep_value(value)
-        if value is None:
+        if value in [None, '']:
             return None
         return int(value)
 
