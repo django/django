@@ -98,6 +98,12 @@ class Avatar(models.Model):
     desc = models.TextField(null=True)
 
 
+# This model is used to test a duplicate query regression (#25685)
+class AvatarProxy(Avatar):
+    class Meta:
+        proxy = True
+
+
 class User(models.Model):
     avatar = models.ForeignKey(Avatar, null=True)
 

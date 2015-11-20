@@ -58,9 +58,9 @@ def get_candidate_relations_to_delete(opts):
     candidate_models = {opts}
     candidate_models = candidate_models.union(opts.concrete_model._meta.proxied_children)
     # For each model, get all candidate fields.
-    candidate_model_fields = chain.from_iterable(
+    candidate_model_fields = set(chain.from_iterable(
         opts.get_fields(include_hidden=True) for opts in candidate_models
-    )
+    ))
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
     return (
