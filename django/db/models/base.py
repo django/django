@@ -592,7 +592,7 @@ class Model(six.with_metaclass(ModelBase)):
                 rel_instance = getattr(self, field.get_cache_name())
                 local_val = getattr(db_instance, field.attname)
                 related_val = None if rel_instance is None else getattr(rel_instance, field.target_field.attname)
-                if local_val != related_val:
+                if local_val != related_val or (local_val is None and related_val is None):
                     del self.__dict__[field.get_cache_name()]
         self._state.db = db_instance._state.db
 
