@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 
 import string
 
+from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models.signals import pre_delete, pre_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.http.request import split_domain_port
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
@@ -27,30 +28,43 @@ def _simple_domain_name_validator(value):
         )
 
 
+def _cache_key_for_site_id(site_id):
+    return 'site:id:%s' % (site_id,)
+
+
+def _cache_key_for_site_host(site_host):
+    return 'site:host:%s' % (site_host,)
+
+
 class SiteManager(models.Manager):
     use_in_migrations = True
 
     def _get_site_by_id(self, site_id):
-        if site_id not in SITE_CACHE:
+        key = _cache_key_for_site_id(site_id)
+        site = cache.get(key)
+        if site is None:
             site = self.get(pk=site_id)
             SITE_CACHE[site_id] = site
-        return SITE_CACHE[site_id]
+        cache.add(key, site)
+        return site
 
     def _get_site_by_request(self, request):
         host = request.get_host()
-        try:
-            # First attempt to look up the site by host with or without port.
-            if host not in SITE_CACHE:
-                SITE_CACHE[host] = self.get(domain__iexact=host)
-            return SITE_CACHE[host]
-        except Site.DoesNotExist:
-            # Fallback to looking up site after stripping port from the host.
-            domain, port = split_domain_port(host)
-            if not port:
-                raise
-            if domain not in SITE_CACHE:
-                SITE_CACHE[domain] = self.get(domain__iexact=domain)
-            return SITE_CACHE[domain]
+        key = _cache_key_for_site_host(host)
+        site = cache.get(key)
+        if site is None:
+            try:
+                # First attempt to look up the site by host with or without port.
+                site = self.get(domain__iexact=host)
+            except Site.DoesNotExist:
+                # Fallback to looking up site after stripping port from the host.
+                domain, port = split_domain_port(host)
+                if not port:
+                    raise
+                site = self.get(domain__iexact=domain)
+            SITE_CACHE[host] = site
+        cache.add(key, site)
+        return site
 
     def get_current(self, request=None):
         """
@@ -75,8 +89,10 @@ class SiteManager(models.Manager):
 
     def clear_cache(self):
         """Clears the ``Site`` object cache."""
-        global SITE_CACHE
-        SITE_CACHE = {}
+        keys_id = [_cache_key_for_site_id(site_id) for site_id in SITE_CACHE]
+        keys_host = [_cache_key_for_site_host(site_host) for site_host in SITE_CACHE]
+        cache.delete_many(keys_id + keys_host)
+        SITE_CACHE.clear()
 
     def get_by_natural_key(self, domain):
         return self.get(domain=domain)
@@ -108,14 +124,17 @@ def clear_site_cache(sender, **kwargs):
     Clears the cache (if primed) each time a site is saved or deleted
     """
     instance = kwargs['instance']
-    using = kwargs['using']
+    key_id = _cache_key_for_site_id(instance.pk)
+    key_host = _cache_key_for_site_host(instance.domain)
+    cache.delete_many([key_id, key_host])
     try:
         del SITE_CACHE[instance.pk]
     except KeyError:
         pass
     try:
-        del SITE_CACHE[Site.objects.using(using).get(pk=instance.pk).domain]
-    except (KeyError, Site.DoesNotExist):
+        del SITE_CACHE[instance.domain]
+    except KeyError:
         pass
 pre_save.connect(clear_site_cache, sender=Site)
+post_save.connect(clear_site_cache, sender=Site)
 pre_delete.connect(clear_site_cache, sender=Site)

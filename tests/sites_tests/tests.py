@@ -8,6 +8,7 @@ from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.contrib.sites.models import Site, clear_site_cache
 from django.contrib.sites.requests import RequestSite
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models.signals import post_migrate
 from django.http import HttpRequest
@@ -141,18 +142,27 @@ class SitesFrameworkTests(TestCase):
             "SERVER_PORT": "80",
         }
         self.assertEqual(models.SITE_CACHE, {})
+        key = models._cache_key_for_site_id(self.site.id)
+        self.assertEqual(cache.get(key), None)
         get_current_site(request)
         expected_cache = {self.site.id: self.site}
         self.assertEqual(models.SITE_CACHE, expected_cache)
+        self.assertEqual(cache.get(key), self.site)
 
         with self.settings(SITE_ID=''):
             get_current_site(request)
 
         expected_cache.update({self.site.domain: self.site})
         self.assertEqual(models.SITE_CACHE, expected_cache)
+        key = models._cache_key_for_site_host(self.site.domain)
+        self.assertEqual(cache.get(key), self.site)
 
         clear_site_cache(Site, instance=self.site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
+        key = models._cache_key_for_site_id(self.site.id)
+        self.assertEqual(cache.get(key), None)
+        key = models._cache_key_for_site_host(self.site.domain)
+        self.assertEqual(cache.get(key), None)
 
     @override_settings(SITE_ID='')
     def test_clear_site_cache_domain(self):
@@ -162,16 +172,19 @@ class SitesFrameworkTests(TestCase):
             "SERVER_NAME": "example2.com",
             "SERVER_PORT": "80",
         }
+        self.assertEqual(models.SITE_CACHE, {})
         get_current_site(request)  # prime the models.SITE_CACHE
         expected_cache = {site.domain: site}
         self.assertEqual(models.SITE_CACHE, expected_cache)
+        key = models._cache_key_for_site_host(site.domain)
+        self.assertEqual(cache.get(key), site)
 
-        # Site exists in 'default' database so using='other' shouldn't clear.
         clear_site_cache(Site, instance=site, using='other')
-        self.assertEqual(models.SITE_CACHE, expected_cache)
-        # using='default' should clear.
+        self.assertEqual(models.SITE_CACHE, {})
+        self.assertEqual(cache.get(key), None)
         clear_site_cache(Site, instance=site, using='default')
         self.assertEqual(models.SITE_CACHE, {})
+        self.assertEqual(cache.get(key), None)
 
     def test_unique_domain(self):
         site = Site(domain=self.site.domain)
