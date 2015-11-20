@@ -130,3 +130,17 @@ class DjangoTemplatesTests(TemplateStringsTests):
             engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
             'Hello, Bob &amp; Jim'
         )
+
+    def test_cache_templates(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+            'OPTIONS': {'cache_templates': True}
+        }]
+        engine = EngineHandler(templates=templates)['django'].engine
+        self.assertEqual(engine.loaders, [
+            ('django.template.loaders.cached.Loader', [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ]),
+        ])
