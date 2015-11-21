@@ -6,6 +6,8 @@ import shutil
 import tempfile
 import unittest
 
+from admin_scripts.tests import AdminScriptTestCase
+
 from django.conf import settings
 from django.contrib.staticfiles import storage
 from django.contrib.staticfiles.management.commands import collectstatic
@@ -128,6 +130,18 @@ class TestConfiguration(StaticFilesTestCase):
             staticfiles_storage._wrapped = empty
             collectstatic.staticfiles_storage = staticfiles_storage
             storage.staticfiles_storage = staticfiles_storage
+
+
+class TestCollectionsHelpSubcommand(AdminScriptTestCase):
+    @override_settings(STATIC_ROOT=None)
+    def test_missing_settings_dont_prevent_help(self):
+        """
+        Even if the :setting:`STATIC_ROOT` is not set, one can still call the
+        `manage.py help collectstatic` command.
+        """
+        self.write_settings('settings.py', apps=['django.contrib.staticfiles'])
+        out, err = self.run_manage(['help', 'collectstatic'])
+        self.assertNoOutput(err)
 
 
 class TestCollection(CollectionTestCase, TestDefaults):
