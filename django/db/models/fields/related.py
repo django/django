@@ -1058,8 +1058,8 @@ def create_many_to_many_intermediary_model(field, klass):
         'app_label': klass._meta.app_label,
         'db_tablespace': klass._meta.db_tablespace,
         'unique_together': (from_, to),
-        'verbose_name': '%(from)s-%(to)s relationship' % {'from': from_, 'to': to},
-        'verbose_name_plural': '%(from)s-%(to)s relationships' % {'from': from_, 'to': to},
+        'verbose_name': _('%(from)s-%(to)s relationship') % {'from': from_, 'to': to},
+        'verbose_name_plural': _('%(from)s-%(to)s relationships') % {'from': from_, 'to': to},
         'apps': field.model._meta.apps,
     })
     # Construct and return the new class.
