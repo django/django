@@ -753,6 +753,16 @@ class XMLEqualTests(SimpleTestCase):
         xml2 = "<?xml version='1.0'?><!-- comment2 --><elem attr2='b' attr1='a' />"
         self.assertXMLEqual(xml1, xml2)
 
+    def test_simple_equal_with_leading_or_trailing_whitespace(self):
+        xml1 = "<elem>foo</elem> \t\n"
+        xml2 = " \t\n<elem>foo</elem>"
+        self.assertXMLEqual(xml1, xml2)
+
+    def test_simple_not_equal_with_whitespace_in_the_middle(self):
+        xml1 = "<elem>foo</elem><elem>bar</elem>"
+        xml2 = "<elem>foo</elem> <elem>bar</elem>"
+        self.assertXMLNotEqual(xml1, xml2)
+
 
 class SkippingExtraTests(TestCase):
     fixtures = ['should_not_be_loaded.json']

@@ -73,42 +73,11 @@ class AdminViewBasicTestCase(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -181,7 +150,7 @@ class AdminViewBasicTestCase(TestCase):
         }
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def tearDown(self):
         formats.reset_format_cache()
@@ -227,7 +196,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_add_with_GET_args(self):
         response = self.client.get(reverse('admin:admin_views_section_add'), {'name': 'My Section'})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Section"',
             msg_prefix="Couldn't find an input with the right value in the response")
 
@@ -292,7 +260,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             'date_1': '14:55:39',
         }
         response = self.client.post(reverse('admin:admin_views_article_add'), post_data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'title with a new\\u000Aline')
 
@@ -512,7 +479,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         This also tests relation-spanning filters (e.g. 'color__value').
         """
         response = self.client.get(reverse('admin:admin_views_thing_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">',
             msg_prefix="Expected filter not found in changelist view")
         self.assertNotContains(response, '<a href="?color__id__exact=3">Blue</a>',
@@ -521,7 +487,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_relation_spanning_filters(self):
         changelist_url = reverse('admin:admin_views_chapterxtra1_changelist')
         response = self.client.get(changelist_url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">')
         filters = {
             'chap__id__exact': dict(
@@ -682,7 +647,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         WorkHour.objects.create(datum=datetime.datetime.now(), employee=e1)
         WorkHour.objects.create(datum=datetime.datetime.now(), employee=e2)
         response = self.client.get(reverse('admin:admin_views_workhour_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'employee__person_ptr__exact')
         response = self.client.get("%s?employee__person_ptr__exact=%d" % (
             reverse('admin:admin_views_workhour_changelist'), e1.pk)
@@ -1021,42 +985,11 @@ class AdminViewFormUrlTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        # password = "secret"
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -1071,7 +1004,7 @@ class AdminViewFormUrlTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_change_form_URL_has_correct_value(self):
         """
@@ -1106,7 +1039,7 @@ class AdminJavaScriptTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -1114,7 +1047,7 @@ class AdminJavaScriptTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_js_minified_only_if_debug_is_false(self):
         """
@@ -1154,7 +1087,7 @@ class SaveAsTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -1163,7 +1096,7 @@ class SaveAsTests(TestCase):
         cls.per1 = Person.objects.create(name='John Mauchly', gender=1, alive=True)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_save_as_duplication(self):
         """Ensure save as actually creates a new person"""
@@ -1292,12 +1225,12 @@ class CustomModelAdminTest(AdminViewBasicTestCase):
         self.assertContains(response, 'Hello from a custom password change done template')
 
     def test_custom_admin_site_view(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         response = self.client.get(reverse('admin2:my_view'))
         self.assertEqual(response.content, b"Django is a magical pony!")
 
     def test_pwd_change_custom_template(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         su = User.objects.get(username='super')
         try:
             response = self.client.get(
@@ -1321,38 +1254,37 @@ class AdminViewPermissionsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        super(AdminViewPermissionsTest, cls).setUpTestData()
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u2 = User.objects.create(
+        cls.adduser = User.objects.create(
             id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
             first_name='Add', last_name='User', email='auser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u3 = User.objects.create(
+        cls.changeuser = User.objects.create(
             id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u4 = User.objects.create(
+        cls.deleteuser = User.objects.create(
             id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
             first_name='Delete', last_name='User', email='duser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u5 = User.objects.create(
+        cls.joepublicuser = User.objects.create(
             id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u6 = User.objects.create(
+        cls.nostaffuser = User.objects.create(
             id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
@@ -1374,14 +1306,14 @@ class AdminViewPermissionsTest(TestCase):
         opts = Article._meta
 
         # User who can add Articles
-        cls.u2.user_permissions.add(get_perm(Article, get_permission_codename('add', opts)))
+        cls.adduser.user_permissions.add(get_perm(Article, get_permission_codename('add', opts)))
         # User who can change Articles
-        cls.u3.user_permissions.add(get_perm(Article, get_permission_codename('change', opts)))
-        cls.u6.user_permissions.add(get_perm(Article, get_permission_codename('change', opts)))
+        cls.changeuser.user_permissions.add(get_perm(Article, get_permission_codename('change', opts)))
+        cls.nostaffuser.user_permissions.add(get_perm(Article, get_permission_codename('change', opts)))
 
         # User who can delete Articles
-        cls.u4.user_permissions.add(get_perm(Article, get_permission_codename('delete', opts)))
-        cls.u4.user_permissions.add(get_perm(Section, get_permission_codename('delete', Section._meta)))
+        cls.deleteuser.user_permissions.add(get_perm(Article, get_permission_codename('delete', opts)))
+        cls.deleteuser.user_permissions.add(get_perm(Section, get_permission_codename('delete', Section._meta)))
 
         # login POST dicts
         cls.index_url = reverse('admin:index')
@@ -1595,20 +1527,17 @@ class AdminViewPermissionsTest(TestCase):
         self.client.login(**self.nostaff_login)
         response = self.client.get(self.index_url, follow=True)
         self.assertContains(response, 'login-form')
-        self.assertContains(response, hint_template.format(self.u6.username), status_code=200)
+        self.assertContains(response, hint_template.format(self.nostaffuser.username), status_code=200)
 
     def test_add_view(self):
         """Test add view restricts access and actually adds items."""
-
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         add_dict = {'title': 'Døm ikke',
                     'content': '<p>great article</p>',
                     'date_0': '2008-03-18', 'date_1': '10:54:39',
                     'section': self.s1.pk}
 
         # Change User should not have access to add articles
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.changeuser)
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
         response = self.client.get(reverse('admin:admin_views_article_add'))
@@ -1620,8 +1549,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get(reverse('admin:logout'))
 
         # Add user may login and POST to add view, then redirect to admin root
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.adduser)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
         change_list_link = '&rsaquo; <a href="%s">Articles</a>' % reverse('admin:admin_views_article_changelist')
         self.assertNotContains(addpage, change_list_link,
@@ -1637,7 +1565,7 @@ class AdminViewPermissionsTest(TestCase):
         addition_log = LogEntry.objects.all()[0]
         new_article = Article.objects.last()
         article_ct = ContentType.objects.get_for_model(Article)
-        self.assertEqual(addition_log.user_id, self.u2.pk)
+        self.assertEqual(addition_log.user_id, self.adduser.pk)
         self.assertEqual(addition_log.content_type_id, article_ct.pk)
         self.assertEqual(addition_log.object_id, str(new_article.pk))
         self.assertEqual(addition_log.object_repr, "Døm ikke")
@@ -1645,8 +1573,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(addition_log.change_message, "Added.")
 
         # Super can add too, but is redirected to the change list view
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.super_login)
+        self.client.force_login(self.superuser)
         addpage = self.client.get(reverse('admin:admin_views_article_add'))
         self.assertContains(addpage, change_list_link,
             msg_prefix='Unrestricted user is not given link to change list view in breadcrumbs.')
@@ -1657,17 +1584,14 @@ class AdminViewPermissionsTest(TestCase):
 
         # 8509 - if a normal user is already logged in, it is possible
         # to change user into the superuser without error
-        self.client.login(username='joepublic', password='secret')
+        self.client.force_login(self.joepublicuser)
         # Check and make sure that if user expires, data still persists
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.super_login)
+        self.client.force_login(self.superuser)
         # make sure the view removes test cookie
         self.assertEqual(self.client.session.test_cookie_worked(), False)
 
     def test_change_view(self):
         """Change view should restrict access and allow users to edit items."""
-
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
         change_dict = {'title': 'Ikke fordømt',
                        'content': '<p>edited article</p>',
                        'date_0': '2008-03-18', 'date_1': '10:54:39',
@@ -1676,8 +1600,7 @@ class AdminViewPermissionsTest(TestCase):
         article_changelist_url = reverse('admin:admin_views_article_changelist')
 
         # add user should not be able to view the list of article or change any of them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.adduser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 403)
         response = self.client.get(article_change_url)
@@ -1687,8 +1610,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.get(reverse('admin:logout'))
 
         # change user can view all items and edit them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.changeuser)
         response = self.client.get(article_changelist_url)
         self.assertEqual(response.status_code, 200)
         response = self.client.get(article_change_url)
@@ -1714,8 +1636,8 @@ class AdminViewPermissionsTest(TestCase):
         r2 = RowLevelChangePermissionModel.objects.create(id=2, name="even id")
         change_url_1 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r1.pk,))
         change_url_2 = reverse('admin:admin_views_rowlevelchangepermissionmodel_change', args=(r2.pk,))
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.superuser, self.adduser, self.changeuser, self.deleteuser]:
+            self.client.force_login(login_user)
             response = self.client.get(change_url_1)
             self.assertEqual(response.status_code, 403)
             response = self.client.post(change_url_1, {'name': 'changed'})
@@ -1728,32 +1650,27 @@ class AdminViewPermissionsTest(TestCase):
             self.assertRedirects(response, self.index_url)
             self.client.get(reverse('admin:logout'))
 
-        for login_dict in [self.joepublic_login, self.no_username_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.joepublicuser, self.nostaffuser]:
+            self.client.force_login(login_user)
             response = self.client.get(change_url_1, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.post(change_url_1, {'name': 'changed'}, follow=True)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.get(change_url_2, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.post(change_url_2, {'name': 'changed again'}, follow=True)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             self.client.get(reverse('admin:logout'))
 
     def test_delete_view(self):
         """Delete view should restrict access and actually delete items."""
-
         delete_dict = {'post': 'yes'}
         delete_url = reverse('admin:admin_views_article_delete', args=(self.a1.pk,))
 
         # add user should not be able to delete articles
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         response = self.client.get(delete_url)
         self.assertEqual(response.status_code, 403)
         post = self.client.post(delete_url, delete_dict)
@@ -1762,7 +1679,7 @@ class AdminViewPermissionsTest(TestCase):
         self.client.logout()
 
         # Delete user can delete
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.deleteuser)
         response = self.client.get(reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
         self.assertContains(response, "<h2>Summary</h2>")
         self.assertContains(response, "<li>Articles: 3</li>")
@@ -1785,27 +1702,22 @@ class AdminViewPermissionsTest(TestCase):
 
     def test_history_view(self):
         """History view should restrict access."""
-
-        login_url = '%s?next=%s' % (reverse('admin:login'), reverse('admin:index'))
-
         # add user should not be able to view the list of article or change any of them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.adduser_login)
+        self.client.force_login(self.adduser)
         response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
         self.assertEqual(response.status_code, 403)
         self.client.get(reverse('admin:logout'))
 
         # change user can view all items and edit them
-        self.client.get(self.index_url)
-        self.client.post(login_url, self.changeuser_login)
+        self.client.force_login(self.changeuser)
         response = self.client.get(reverse('admin:admin_views_article_history', args=(self.a1.pk,)))
         self.assertEqual(response.status_code, 200)
 
         # Test redirection when using row-level change permissions. Refs #11513.
         rl1 = RowLevelChangePermissionModel.objects.create(name="odd id")
         rl2 = RowLevelChangePermissionModel.objects.create(name="even id")
-        for login_dict in [self.super_login, self.changeuser_login, self.adduser_login, self.deleteuser_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.superuser, self.adduser, self.changeuser, self.deleteuser]:
+            self.client.force_login(login_user)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url)
             self.assertEqual(response.status_code, 403)
@@ -1816,21 +1728,19 @@ class AdminViewPermissionsTest(TestCase):
 
             self.client.get(reverse('admin:logout'))
 
-        for login_dict in [self.joepublic_login, self.no_username_login]:
-            self.client.post(login_url, login_dict)
+        for login_user in [self.joepublicuser, self.nostaffuser]:
+            self.client.force_login(login_user)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,))
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
 
             self.client.get(reverse('admin:logout'))
 
     def test_history_view_bad_url(self):
-        self.client.post(reverse('admin:login'), self.changeuser_login)
+        self.client.force_login(self.changeuser)
         response = self.client.get(reverse('admin:admin_views_article_history', args=('foo',)))
         self.assertEqual(response.status_code, 404)
 
@@ -1839,7 +1749,7 @@ class AdminViewPermissionsTest(TestCase):
         The foreign key widget should only show the "add related" button if the
         user has permission to add that related item.
         """
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         # The user can't add sections yet, so they shouldn't see the "add section" link.
         url = reverse('admin:admin_views_article_add')
         add_link_text = 'add_id_section'
@@ -1860,7 +1770,7 @@ class AdminViewPermissionsTest(TestCase):
         def get_change_related(response):
             return response.context['adminform'].form.fields['section'].widget.can_change_related
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         # The user can't change sections yet, so they shouldn't see the "change section" link.
         url = reverse('admin:admin_views_article_add')
         change_link_text = 'change_id_section'
@@ -1883,7 +1793,7 @@ class AdminViewPermissionsTest(TestCase):
         def get_delete_related(response):
             return response.context['adminform'].form.fields['sub_section'].widget.can_delete_related
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         # The user can't delete sections yet, so they shouldn't see the "delete section" link.
         url = reverse('admin:admin_views_article_add')
         delete_link_text = 'delete_id_sub_section'
@@ -1899,7 +1809,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, delete_link_text)
 
     def test_disabled_permissions_when_logged_in(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         superuser = User.objects.get(username='super')
         superuser.is_active = False
         superuser.save()
@@ -1912,7 +1822,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertContains(response, 'id="login-form"')
 
     def test_disabled_staff_permissions_when_logged_in(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         superuser = User.objects.get(username='super')
         superuser.is_staff = False
         superuser.save()
@@ -1933,7 +1843,7 @@ class AdminViewPermissionsTest(TestCase):
         change_user = User.objects.get(username='changeuser')
         permission = get_perm(Article, get_permission_codename('change', opts))
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.changeuser)
 
         # the user has no module permissions, because this module doesn't exist
         change_user.user_permissions.remove(permission)
@@ -1958,7 +1868,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertTemplateUsed(response, 'admin/login.html')
 
         # Logged in? Redirect.
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         response = self.client.get(shortcut_url, follow=False)
         # Can't use self.assertRedirects() because User.get_absolute_url() is silly.
         self.assertEqual(response.status_code, 302)
@@ -1971,25 +1881,25 @@ class AdminViewPermissionsTest(TestCase):
         have any permission for that module (add, change, or delete), so that
         the module is displayed on the admin index page.
         """
-        self.client.login(**self.super_login)
+        self.client.force_login(self.superuser)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.changeuser)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.deleteuser)
         response = self.client.get(self.index_url)
         self.assertContains(response, 'admin_views')
         self.assertContains(response, 'Articles')
@@ -2002,28 +1912,50 @@ class AdminViewPermissionsTest(TestCase):
         """
         index_url = reverse('admin7:index')
 
-        self.client.login(**self.super_login)
+        self.client.force_login(self.superuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.adduser_login)
+        self.client.force_login(self.adduser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.changeuser_login)
+        self.client.force_login(self.changeuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
         self.client.logout()
 
-        self.client.login(**self.deleteuser_login)
+        self.client.force_login(self.deleteuser)
         response = self.client.get(index_url)
         self.assertNotContains(response, 'admin_views')
         self.assertNotContains(response, 'Articles')
+
+    def test_post_save_message_no_forbidden_links_visible(self):
+        """
+        Post-save message shouldn't contain a link to the change form if the
+        user doen't have the change permission.
+        """
+        login = self.client.post(reverse('admin:login'), self.adduser_login)
+        self.assertRedirects(login, self.index_url)
+        # Emulate Article creation for user with add-only permission.
+        post_data = {
+            "title": "Fun & games",
+            "content": "Some content",
+            "date_0": "2015-10-31",
+            "date_1": "16:35:00",
+            "_save": "Save",
+        }
+        response = self.client.post(reverse('admin:admin_views_article_add'), post_data, follow=True)
+        self.assertContains(
+            response,
+            '<li class="success">The article "Fun &amp; games" was added successfully.</li>',
+            html=True
+        )
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
@@ -2033,7 +1965,7 @@ class AdminViewsNoUrlTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u3 = User.objects.create(
+        cls.changeuser = User.objects.create(
             id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
@@ -2042,19 +1974,11 @@ class AdminViewsNoUrlTest(TestCase):
 
         opts = Report._meta
         # User who can change Reports
-        cls.u3.user_permissions.add(get_perm(Report, get_permission_codename('change', opts)))
-
-        # login POST dict
-        cls.changeuser_login = {
-            REDIRECT_FIELD_NAME: reverse('admin:index'),
-            'username': 'changeuser',
-            'password': 'secret',
-        }
+        cls.changeuser.user_permissions.add(get_perm(Report, get_permission_codename('change', opts)))
 
     def test_no_standard_modeladmin_urls(self):
         """Admin index views don't break when user's ModelAdmin removes standard urls"""
-        self.client.get(reverse('admin:index'))
-        r = self.client.post(reverse('admin:login'), self.changeuser_login)
+        self.client.force_login(self.changeuser)
         r = self.client.get(reverse('admin:index'))
         # we shouldn't get a 500 error caused by a NoReverseMatch
         self.assertEqual(r.status_code, 200)
@@ -2068,41 +1992,17 @@ class AdminViewDeletedObjectsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
+        cls.deleteuser = User.objects.create(
             id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
             first_name='Delete', last_name='User', email='duser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -2130,7 +2030,7 @@ class AdminViewDeletedObjectsTest(TestCase):
         cls.cy2 = CyclicTwo.objects.create(name='I am recursive too', one_id=1)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_nesting(self):
         """
@@ -2278,7 +2178,7 @@ class TestGenericRelations(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -2288,7 +2188,7 @@ class TestGenericRelations(TestCase):
         cls.pl3 = Plot.objects.create(name='Corn Conspiracy', team_leader=cls.v1, contact=cls.v1)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_generic_content_object_in_list_display(self):
         FunkyTag.objects.create(content_object=self.pl3, name='hott')
@@ -2302,41 +2202,11 @@ class AdminViewStringPrimaryKeyTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -2358,7 +2228,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         LogEntry.objects.log_action(100, content_type_pk, cls.pk, cls.pk, 2, change_message='Changed something')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_get_history_view(self):
         """
@@ -2541,15 +2411,6 @@ class SecureViewTests(TestCase):
     Test behavior of a view protected by the staff_member_required decorator.
     """
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
-            first_name='Super', last_name='User', email='super@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-
     def test_secure_view_shows_login_if_not_logged_in(self):
         """
         Ensure that we see the admin login form.
@@ -2577,7 +2438,7 @@ class AdminViewUnicodeTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -2600,7 +2461,7 @@ class AdminViewUnicodeTest(TestCase):
         cls.chap9 = ChapterXtra2.objects.create(chap=cls.chap3, xtra='<Xtra(2) Kjærlighet>')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_unicode_edit(self):
         """
@@ -2653,41 +2514,11 @@ class AdminViewListEditable(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -2705,7 +2536,7 @@ class AdminViewListEditable(TestCase):
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_inheritance(self):
         Podcast.objects.create(name="This Week in Django",
@@ -3116,40 +2947,16 @@ class AdminSearchTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u2 = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
-            first_name='Add', last_name='User', email='auser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u3 = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
-            first_name='Change', last_name='User', email='cuser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
+        cls.joepublicuser = User.objects.create(
             id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
@@ -3179,7 +2986,7 @@ class AdminSearchTest(TestCase):
         cls.tt4 = TitleTranslation.objects.create(title=cls.t4, text='Bas')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_search_on_sibling_models(self):
         "Check that a search that mentions sibling models"
@@ -3264,7 +3071,7 @@ class AdminInheritedInlinesTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3272,11 +3079,10 @@ class AdminInheritedInlinesTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_inline(self):
         "Ensure that inline models which inherit from a common parent are correctly handled by admin."
-
         foo_user = "foo username"
         bar_user = "bar username"
 
@@ -3357,7 +3163,7 @@ class AdminActionsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3367,7 +3173,7 @@ class AdminActionsTest(TestCase):
         cls.s2 = Subscriber.objects.create(name='Max Mustermann', email='max@example.org')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_model_admin_custom_action(self):
         "Tests a custom action defined in a ModelAdmin method"
@@ -3668,7 +3474,7 @@ class TestCustomChangeList(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3701,7 +3507,7 @@ class TestInlineNotEditable(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3726,7 +3532,7 @@ class AdminCustomQuerysetTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3734,7 +3540,7 @@ class AdminCustomQuerysetTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
         self.pks = [EmptyModel.objects.create().id for i in range(3)]
         self.super_login = {
             REDIRECT_FIELD_NAME: reverse('admin:index'),
@@ -3756,13 +3562,12 @@ class AdminCustomQuerysetTest(TestCase):
         Person.objects.create(name='person2', gender=2)
         changelist_url = reverse('admin:admin_views_person_changelist')
 
-        # 4 queries are expected: 1 for the session, 1 for the user,
-        # 1 for the count and 1 for the objects on the page
-        with self.assertNumQueries(4):
+        # 5 queries are expected: 1 for the session, 1 for the user,
+        # 2 for the counts and 1 for the objects on the page
+        with self.assertNumQueries(5):
             resp = self.client.get(changelist_url)
             self.assertEqual(resp.context['selection_note'], '0 of 2 selected')
             self.assertEqual(resp.context['selection_note_all'], 'All 2 selected')
-        # here one more count(*) query will run, because filters were applied
         with self.assertNumQueries(5):
             extra = {'q': 'not_in_name'}
             resp = self.client.get(changelist_url, extra)
@@ -3790,7 +3595,7 @@ class AdminCustomQuerysetTest(TestCase):
     def test_add_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         self.assertEqual(CoverLetter.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3802,13 +3607,15 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = CoverLetter.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The cover letter &quot;Candidate, Best&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The cover letter "<a href="%s">'
+            'Candidate, Best</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_coverletter_change', args=(pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         self.assertEqual(ShortMessage.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3820,16 +3627,18 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(ShortMessage.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = ShortMessage.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The short message &quot;ShortMessage object&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The short message "<a href="%s">'
+            'ShortMessage object</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_shortmessage_change', args=(pk,)), html=True
         )
 
     def test_add_model_modeladmin_only_qs(self):
         # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         self.assertEqual(Telegram.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3841,13 +3650,15 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = Telegram.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The telegram &quot;Urgent telegram&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The telegram "<a href="%s">'
+            'Urgent telegram</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_telegram_change', args=(pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         self.assertEqual(Paper.objects.count(), 0)
         # Emulate model instance creation via the admin
         post_data = {
@@ -3859,16 +3670,18 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Paper.objects.count(), 1)
         # Message should contain non-ugly model verbose name
+        pk = Paper.objects.all()[0].pk
         self.assertContains(
             response,
-            '<li class="success">The paper &quot;Paper object&quot; was added successfully.</li>',
-            html=True
+            '<li class="success">The paper "<a href="%s">'
+            'Paper object</a>" was added successfully.</li>' %
+            reverse('admin:admin_views_paper_change', args=(pk,)), html=True
         )
 
     def test_edit_model_modeladmin_defer_qs(self):
         # Test for #14529. defer() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         cl = CoverLetter.objects.create(author="John Doe")
         self.assertEqual(CoverLetter.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_coverletter_change', args=(cl.pk,)))
@@ -3883,14 +3696,15 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(CoverLetter.objects.count(), 1)
         # Message should contain non-ugly model verbose name. Instance
-        # representation is set by model's __unicode__()
+        # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The cover letter &quot;John Doe II&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The cover letter "<a href="%s">'
+            'John Doe II</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_coverletter_change', args=(cl.pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         sm = ShortMessage.objects.create(content="This is expensive")
         self.assertEqual(ShortMessage.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)))
@@ -3907,17 +3721,16 @@ class AdminCustomQuerysetTest(TestCase):
         # Message should contain non-ugly model verbose name. The ugly(!)
         # instance representation is set by six.text_type()
         self.assertContains(
-            response, (
-                '<li class="success">The short message '
-                '&quot;ShortMessage_Deferred_timestamp object&quot; was '
-                'changed successfully.</li>'
-            ), html=True
+            response,
+            '<li class="success">The short message "<a href="%s">'
+            'ShortMessage_Deferred_timestamp object</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_shortmessage_change', args=(sm.pk,)), html=True
         )
 
     def test_edit_model_modeladmin_only_qs(self):
         # Test for #14529. only() is used in ModelAdmin.get_queryset()
 
-        # model has __unicode__ method
+        # model has __str__ method
         t = Telegram.objects.create(title="Frist Telegram")
         self.assertEqual(Telegram.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_telegram_change', args=(t.pk,)))
@@ -3932,14 +3745,15 @@ class AdminCustomQuerysetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Telegram.objects.count(), 1)
         # Message should contain non-ugly model verbose name. The instance
-        # representation is set by model's __unicode__()
+        # representation is set by model's __str__()
         self.assertContains(
             response,
-            '<li class="success">The telegram &quot;Telegram without typo&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The telegram "<a href="%s">'
+            'Telegram without typo</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_telegram_change', args=(t.pk,)), html=True
         )
 
-        # model has no __unicode__ method
+        # model has no __str__ method
         p = Paper.objects.create(title="My Paper Title")
         self.assertEqual(Paper.objects.count(), 1)
         response = self.client.get(reverse('admin:admin_views_paper_change', args=(p.pk,)))
@@ -3957,8 +3771,9 @@ class AdminCustomQuerysetTest(TestCase):
         # instance representation is set by six.text_type()
         self.assertContains(
             response,
-            '<li class="success">The paper &quot;Paper_Deferred_author object&quot; was changed successfully.</li>',
-            html=True
+            '<li class="success">The paper "<a href="%s">'
+            'Paper_Deferred_author object</a>" was changed successfully.</li>' %
+            reverse('admin:admin_views_paper_change', args=(p.pk,)), html=True
         )
 
     def test_history_view_custom_qs(self):
@@ -3986,7 +3801,7 @@ class AdminInlineFileUploadTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -3994,7 +3809,7 @@ class AdminInlineFileUploadTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
         # Set up test Picture and Gallery.
         # These must be set up here instead of in fixtures in order to allow Picture
@@ -4038,7 +3853,7 @@ class AdminInlineTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4364,7 +4179,7 @@ class NeverCacheTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4373,7 +4188,7 @@ class NeverCacheTests(TestCase):
         cls.s1 = Section.objects.create(name='Test section')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_admin_index(self):
         "Check the never-cache status of the main index"
@@ -4444,7 +4259,7 @@ class PrePopulatedTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4453,18 +4268,16 @@ class PrePopulatedTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_prepopulated_on(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "id: '#id_slug',")
         self.assertContains(response, "field['dependency_ids'].push('#id_title');")
         self.assertContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
 
     def test_prepopulated_off(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_change', args=(self.p1.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "A Long Title")
         self.assertNotContains(response, "id: '#id_slug'")
         self.assertNotContains(response, "field['dependency_ids'].push('#id_title');")
@@ -4488,7 +4301,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
     webdriver_class = 'selenium.webdriver.firefox.webdriver.WebDriver'
 
     def setUp(self):
-        self.u1 = User.objects.create(
+        self.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4759,7 +4572,7 @@ class ReadonlyTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4767,7 +4580,7 @@ class ReadonlyTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_readonly_get(self):
@@ -4879,7 +4692,6 @@ class ReadonlyTest(TestCase):
         """
         p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
@@ -4900,7 +4712,7 @@ class LimitChoicesToInAdminTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4908,7 +4720,7 @@ class LimitChoicesToInAdminTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_limit_choices_to_as_callable(self):
         """Test for ticket 2445 changes to admin."""
@@ -4932,7 +4744,7 @@ class RawIdFieldsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -4940,7 +4752,7 @@ class RawIdFieldsTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_limit_choices_to(self):
         """Regression test for 14880"""
@@ -5030,41 +4842,23 @@ class UserAdminTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u2 = User.objects.create(
+        cls.adduser = User.objects.create(
             id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
             first_name='Add', last_name='User', email='auser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u3 = User.objects.create(
+        cls.changeuser = User.objects.create(
             id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u4 = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
-            first_name='Delete', last_name='User', email='duser@example.com',
-            is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u5 = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
-            first_name='Joe', last_name='Public', email='joepublic@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
-        )
-        cls.u6 = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
-            last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
-            first_name='No', last_name='Staff', email='nostaff@example.com',
-            is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.s1 = Section.objects.create(name='Test section')
         cls.a1 = Article.objects.create(
@@ -5083,7 +4877,7 @@ class UserAdminTest(TestCase):
         cls.per3 = Person.objects.create(name='Guido van Rossum', gender=1, alive=True)
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_save_button(self):
         user_count = User.objects.count()
@@ -5125,11 +4919,9 @@ class UserAdminTest(TestCase):
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_add'))
         self.assertContains(response, 'class="related-widget-wrapper-link add-related" id="add_id_owner"')
         response = self.client.get(reverse('admin:auth_user_add') + '?_popup=1')
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
         data = {
@@ -5140,19 +4932,16 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(reverse('admin:auth_user_add') + '?_popup=1', data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddRelatedObjectPopup')
 
     def test_user_fk_change_popup(self):
         """User change through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_change', args=('__fk__',)))
         self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
         user = User.objects.get(username='changeuser')
         url = reverse('admin:auth_user_change', args=(user.pk,)) + '?_popup=1'
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
         data = {
@@ -5167,13 +4956,11 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissChangeRelatedObjectPopup')
 
     def test_user_fk_delete_popup(self):
         """User deletion through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_delete', args=('__fk__',)))
         self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
         user = User.objects.get(username='changeuser')
@@ -5185,7 +4972,6 @@ class UserAdminTest(TestCase):
             '_popup': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissDeleteRelatedObjectPopup')
 
     def test_save_add_another_button(self):
@@ -5227,7 +5013,7 @@ class GroupAdminTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5235,7 +5021,7 @@ class GroupAdminTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_save_button(self):
         group_count = Group.objects.count()
@@ -5264,7 +5050,7 @@ class CSSTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5283,7 +5069,7 @@ class CSSTest(TestCase):
         cls.p1 = PrePopulatedPost.objects.create(title='A Long Title', published=True, slug='a-long-title')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
     def test_field_prefix_css_classes(self):
@@ -5329,7 +5115,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by change_form template
         """
         response = self.client.get(reverse('admin:admin_views_section_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5338,7 +5123,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by change_list template
         """
         response = self.client.get(reverse('admin:admin_views_section_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5349,7 +5133,6 @@ class CSSTest(TestCase):
         """
         response = self.client.get(
             reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5358,7 +5141,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by app_index template
         """
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<body class=" dashboard app-admin_views')
 
     def test_app_model_in_delete_selected_confirmation_body_class(self):
@@ -5373,7 +5155,6 @@ class CSSTest(TestCase):
         }
         response = self.client.post(reverse('admin:admin_views_section_changelist'),
             action_data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5407,7 +5188,7 @@ class AdminDocsTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5415,7 +5196,7 @@ class AdminDocsTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_tags(self):
         response = self.client.get(reverse('django-admindocs-tags'))
@@ -5470,7 +5251,7 @@ class ValidXHTMLTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5478,7 +5259,7 @@ class ValidXHTMLTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_lang_name_present(self):
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
@@ -5493,7 +5274,7 @@ class DateHierarchyTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5501,7 +5282,7 @@ class DateHierarchyTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def tearDown(self):
         formats.reset_format_cache()
@@ -5627,7 +5408,7 @@ class AdminCustomSaveRelatedTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5635,7 +5416,7 @@ class AdminCustomSaveRelatedTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_should_be_able_to_edit_related_objects_on_add_view(self):
         post = {
@@ -5700,7 +5481,7 @@ class AdminViewLogoutTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5708,7 +5489,7 @@ class AdminViewLogoutTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_client_logout_url_can_be_used_to_login(self):
         response = self.client.get(reverse('admin:logout'))
@@ -5734,7 +5515,7 @@ class AdminUserMessageTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -5742,7 +5523,7 @@ class AdminUserMessageTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def send_message(self, level):
         """
@@ -5798,13 +5579,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
-        cls.u5 = User.objects.create(
+        cls.joepublicuser = User.objects.create(
             id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
@@ -5812,7 +5593,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def assertURLEqual(self, url1, url2):
         """
@@ -5838,7 +5619,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
     def test_assert_url_equal(self):
         # Test equality.
-        change_user_url = reverse('admin:auth_user_change', args=(self.u5.pk,))
+        change_user_url = reverse('admin:auth_user_change', args=(self.joepublicuser.pk,))
         self.assertURLEqual(
             'http://testserver{}?_changelist_filters=is_staff__exact%3D0%26is_superuser__exact%3D0'.format(
                 change_user_url
@@ -5894,7 +5675,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
         })
 
     def get_sample_user_id(self):
-        return self.u5.pk
+        return self.joepublicuser.pk
 
     def get_changelist_url(self):
         return '%s?%s' % (
@@ -5943,7 +5724,7 @@ class AdminKeepChangeListFiltersTests(TestCase):
 
         # Check the `change_view` link has the correct querystring.
         detail_link = re.search(
-            '<a href="(.*?)">{}</a>'.format(self.u5.username),
+            '<a href="(.*?)">{}</a>'.format(self.joepublicuser.username),
             force_text(response.content)
         )
         self.assertURLEqual(detail_link.group(1), self.get_change_url())
@@ -6102,7 +5883,7 @@ class TestLabelVisibility(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -6110,7 +5891,7 @@ class TestLabelVisibility(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_all_fields_visible(self):
         response = self.client.get(reverse('admin:admin_views_emptymodelvisible_add'))
@@ -6149,7 +5930,7 @@ class AdminViewOnSiteTests(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -6173,7 +5954,7 @@ class AdminViewOnSiteTests(TestCase):
         cls.w3 = Worker.objects.create(work_at=cls.r1, name='John', surname='Doe')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_add_view_form_and_formsets_run_validation(self):
         """
@@ -6286,7 +6067,7 @@ class InlineAdminViewOnSiteTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -6310,7 +6091,7 @@ class InlineAdminViewOnSiteTest(TestCase):
         cls.w3 = Worker.objects.create(work_at=cls.r1, name='John', surname='Doe')
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_false(self):
         "Ensure that the 'View on site' button is not displayed if view_on_site is False"
@@ -6361,7 +6142,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.u1 = User.objects.create(
+        cls.superuser = User.objects.create(
             id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
@@ -6369,7 +6150,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
         )
 
     def setUp(self):
-        self.client.login(username='super', password='secret')
+        self.client.force_login(self.superuser)
 
     def test_explicitly_provided_pk(self):
         post_data = {'name': '1'}

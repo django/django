@@ -346,7 +346,30 @@ return a boolean.
 
 .. method:: GEOSGeometry.contains(other)
 
-Returns ``True`` if :meth:`GEOSGeometry.within` is ``False``.
+Returns ``True`` if :meth:`other.within(this) <GEOSGeometry.within>` returns
+``True``.
+
+.. method:: GEOSGeometry.covers(other)
+
+.. versionadded:: 1.10
+
+Returns ``True`` if this geometry covers the specified geometry.
+
+The ``covers`` predicate has the following equivalent definitions:
+
+* Every point of the other geometry is a point of this geometry.
+* The DE-9IM Intersection Matrix for the two geometries is
+  ``T*****FF*``, ``*T****FF*``, ``***T**FF*``, or ``****T*FF*``.
+
+If either geometry is empty, returns ``False``.
+
+This predicate is similar to :meth:`GEOSGeometry.contains`, but is more
+inclusive (i.e. returns ``True`` for more cases). In particular, unlike
+:meth:`~GEOSGeometry.contains` it does not distinguish between points in the
+boundary and in the interior of geometries. For most situations, ``covers()``
+should be preferred to :meth:`~GEOSGeometry.contains`. As an added benefit,
+``covers()`` is more amenable to optimization and hence should outperform
+:meth:`~GEOSGeometry.contains`.
 
 .. method:: GEOSGeometry.crosses(other)
 
@@ -495,6 +518,21 @@ geometry is a point.
 
 Computes and returns a :class:`Point` guaranteed to be on the interior
 of this geometry.
+
+.. attribute:: GEOSGeometry.unary_union
+
+.. versionadded:: 1.10
+
+Computes the union of all the elements of this geometry.
+
+The result obeys the following contract:
+
+* Unioning a set of :class:`LineString`\s has the effect of fully noding and
+  dissolving the linework.
+
+* Unioning a set of :class:`Polygon`\s will always return a :class:`Polygon` or
+  :class:`MultiPolygon` geometry (unlike :meth:`GEOSGeometry.union`, which may
+  return geometries of lower dimension if a topology collapse occurs).
 
 Other Properties & Methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

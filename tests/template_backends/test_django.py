@@ -1,5 +1,6 @@
 from template_tests.test_response import test_processor_name
 
+from django.template import EngineHandler
 from django.template.backends.django import DjangoTemplates
 from django.template.library import InvalidTemplateLibrary
 from django.test import RequestFactory, override_settings
@@ -107,4 +108,25 @@ class DjangoTemplatesTests(TemplateStringsTests):
                 'django.template.loader_tags',
                 'template_backends.apps.good.templatetags.good_tags',
             ]
+        )
+
+    def test_autoescape_off(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'OPTIONS': {'autoescape': False},
+        }]
+        engines = EngineHandler(templates=templates)
+        self.assertEqual(
+            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            'Hello, Bob & Jim'
+        )
+
+    def test_autoescape_default(self):
+        templates = [{
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        }]
+        engines = EngineHandler(templates=templates)
+        self.assertEqual(
+            engines['django'].from_string('Hello, {{ name }}').render({'name': 'Bob & Jim'}),
+            'Hello, Bob &amp; Jim'
         )

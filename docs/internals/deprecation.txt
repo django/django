@@ -112,6 +112,15 @@ details on these changes.
 * Support for direct assignment to a reverse foreign key or many-to-many
   relation will be removed.
 
+* The ``get_srid()`` and ``set_srid()`` methods of
+  ``django.contrib.gis.geos.GEOSGeometry`` will be removed.
+
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of ``django.contrib.gis.geos.Point`` will be removed.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  ``django.contrib.gis.geos.Point`` will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

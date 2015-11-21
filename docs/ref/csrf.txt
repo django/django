@@ -7,8 +7,8 @@ Cross Site Request Forgery protection
 
 The CSRF middleware and template tag provides easy-to-use protection against
 `Cross Site Request Forgeries`_.  This type of attack occurs when a malicious
-Web site contains a link, a form button or some JavaScript that is intended to
-perform some action on your Web site, using the credentials of a logged-in user
+website contains a link, a form button or some JavaScript that is intended to
+perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser.  A related type of attack,
 'login CSRF', where an attacking site tricks a user's browser into logging into
 a site with someone else's credentials, is also covered.

@@ -45,12 +45,15 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         attrs['class'] = 'selectfilter'
         if self.is_stacked:
             attrs['class'] += 'stacked'
-        output = [super(FilteredSelectMultiple, self).render(name, value, attrs, choices)]
-        output.append('<script type="text/javascript">addEvent(window, "load", function(e) {')
-        # TODO: "id_" is hard-coded here. This should instead use the correct
-        # API to determine the ID dynamically.
-        output.append('SelectFilter.init("id_%s", "%s", %s); });</script>\n'
-            % (name, escapejs(self.verbose_name), int(self.is_stacked)))
+        output = [
+            super(FilteredSelectMultiple, self).render(name, value, attrs, choices),
+            '<script type="text/javascript">addEvent(window, "load", function(e) {',
+            # TODO: "id_" is hard-coded here. This should instead use the
+            # correct API to determine the ID dynamically.
+            'SelectFilter.init("id_%s", "%s", %s); });</script>\n' % (
+                name, escapejs(self.verbose_name), int(self.is_stacked),
+            ),
+        ]
         return mark_safe(''.join(output))
 
 

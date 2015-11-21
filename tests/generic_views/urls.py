@@ -65,6 +65,8 @@ urlpatterns = [
     # FormView
     url(r'^contact/$',
         views.ContactView.as_view()),
+    url(r'^late-validation/$',
+        views.LateValidationView.as_view()),
 
     # Create/UpdateView
     url(r'^edit/artists/create/$',

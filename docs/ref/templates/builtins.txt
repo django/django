@@ -1779,8 +1779,8 @@ For example::
 
     {{ value|lower }}
 
-If ``value`` is ``Still MAD At Yoko``, the output will be
-``still mad at yoko``.
+If ``value`` is ``Totally LOVING this Album!``, the output will be
+``totally loving this album!``.
 
 .. templatefilter:: make_list
 

@@ -6,8 +6,8 @@ from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
+from .forms import AuthorForm, ContactForm
 from .models import Artist, Author, Book, BookSigning, Page
-from .test_forms import AuthorForm, ContactForm
 
 
 class CustomTemplateView(generic.TemplateView):
@@ -307,3 +307,13 @@ class NonModelDetail(generic.DetailView):
 class ObjectDoesNotExistDetail(generic.DetailView):
     def get_queryset(self):
         return Book.does_not_exist.all()
+
+
+class LateValidationView(generic.FormView):
+    form_class = ContactForm
+    success_url = reverse_lazy('authors_list')
+    template_name = 'generic_views/form.html'
+
+    def form_valid(self, form):
+        form.add_error(None, 'There is an error')
+        return self.form_invalid(form)

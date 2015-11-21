@@ -64,6 +64,10 @@ class SchemaTests(TransactionTestCase):
             model._meta._expire_cache()
         if 'schema' in new_apps.all_models:
             for model in self.local_models:
+                for many_to_many in model._meta.many_to_many:
+                    through = many_to_many.remote_field.through
+                    if through and through._meta.auto_created:
+                        del new_apps.all_models['schema'][through._meta.model_name]
                 del new_apps.all_models['schema'][model._meta.model_name]
 
     def delete_tables(self):
@@ -1031,13 +1035,12 @@ class SchemaTests(TransactionTestCase):
         # Ensure there's no m2m table there
         self.assertRaises(DatabaseError, self.column_classes, new_field.remote_field.through)
 
-        # Need to tear down using a model without the added M2M field that's
-        # been removed.
-        class LocalAuthorWithM2M(Model):
-            class Meta:
-                app_label = 'schema'
-                apps = new_apps
-        self.local_models = [LocalAuthorWithM2M]
+        # Make sure the model state is coherent with the table one now that
+        # we've removed the tags field.
+        opts = LocalAuthorWithM2M._meta
+        opts.local_many_to_many.remove(new_field)
+        del new_apps.all_models['schema'][new_field.remote_field.through._meta.model_name]
+        opts._expire_cache()
 
     def test_m2m(self):
         self._test_m2m(ManyToManyField)
@@ -1139,13 +1142,8 @@ class SchemaTests(TransactionTestCase):
         )
 
         # This model looks like the new model and is used for teardown.
-        class LocalBookWithM2M(Model):
-            uniques = M2MFieldClass(UniqueTest)
-
-            class Meta:
-                app_label = 'schema'
-                apps = new_apps
-        self.local_models = [LocalBookWithM2M]
+        opts = LocalBookWithM2M._meta
+        opts.local_many_to_many.remove(old_field)
         # Ensure the new M2M exists and points to UniqueTest
         constraints = self.get_constraints(new_field.remote_field.through._meta.db_table)
         if connection.features.supports_foreign_keys:

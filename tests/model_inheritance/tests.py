@@ -19,7 +19,7 @@ from .models import (
 class ModelInheritanceTests(TestCase):
     def test_abstract(self):
         # The Student and Worker models both have 'name' and 'age' fields on
-        # them and inherit the __unicode__() method, just as with normal Python
+        # them and inherit the __str__() method, just as with normal Python
         # subclassing. This is useful if you want to factor out common
         # information for programming purposes, but still completely
         # independent separate models at the database level.

@@ -326,7 +326,6 @@ class CustomURLConfTest(SimpleTestCase):
 
     def test_custom_urlconf(self):
         response = self.client.get('/template_response_view/')
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is where you can find the snark: /snark/')
 
 

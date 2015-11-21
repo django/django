@@ -2,7 +2,6 @@ from decimal import Decimal
 
 from django.contrib.gis.db.models.fields import GeometryField
 from django.contrib.gis.db.models.sql import AreaField
-from django.contrib.gis.geos.geometry import GEOSGeometry
 from django.contrib.gis.measure import (
     Area as AreaMeasure, Distance as DistanceMeasure,
 )
@@ -91,16 +90,9 @@ class GeomValue(Value):
 
 class GeoFuncWithGeoParam(GeoFunc):
     def __init__(self, expression, geom, *expressions, **extra):
-        if not hasattr(geom, 'srid'):
-            # Try to interpret it as a geometry input
-            try:
-                geom = GEOSGeometry(geom)
-            except Exception:
-                raise ValueError("This function requires a geometric parameter.")
-        if not geom.srid:
+        if not hasattr(geom, 'srid') or not geom.srid:
             raise ValueError("Please provide a geometry attribute with a defined SRID.")
-        geom = GeomValue(geom)
-        super(GeoFuncWithGeoParam, self).__init__(expression, geom, *expressions, **extra)
+        super(GeoFuncWithGeoParam, self).__init__(expression, GeomValue(geom), *expressions, **extra)
 
 
 class SQLiteDecimalToFloatMixin(object):

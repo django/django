@@ -67,7 +67,7 @@ look like this::
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write('Successfully closed poll "%s"' % poll_id)
+                self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
 
 .. _management-commands-output:
 
@@ -255,6 +255,21 @@ All attributes can be set in your derived class and can be used in
     :data:`~BaseCommand.can_import_settings` option is set to ``False`` too
     because attempting to set the locale needs access to settings. This
     condition will generate a :class:`CommandError`.
+
+.. attribute:: BaseCommand.style
+
+    An instance attribute that helps create colored output when writing to
+    ``stdout`` or ``stderr``. For example::
+
+        self.stdout.write(self.style.SUCCESS('...'))
+
+    See :ref:`syntax-coloring` to learn how to modify the color palette and to
+    see the available styles (use uppercased versions of the "roles" described
+    in that section).
+
+    If you pass the :djadminopt:`--no-color` option when running your
+    command, all ``self.style()`` calls will return the original string
+    uncolored.
 
 Methods
 -------

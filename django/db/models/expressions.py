@@ -982,8 +982,10 @@ class OrderBy(BaseExpression):
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         expression_sql, params = compiler.compile(self.expression)
-        placeholders = {'expression': expression_sql}
-        placeholders['ordering'] = 'DESC' if self.descending else 'ASC'
+        placeholders = {
+            'expression': expression_sql,
+            'ordering': 'DESC' if self.descending else 'ASC',
+        }
         return (self.template % placeholders).rstrip(), params
 
     def get_group_by_cols(self):

@@ -27,7 +27,7 @@ sys.path.append(abspath(join(dirname(__file__), "_ext")))
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '1.0'
+needs_sphinx = '1.0.8'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
@@ -235,8 +235,12 @@ rst_epilog = """
 # -- Options for LaTeX output --------------------------------------------------
 
 latex_elements = {
-    'preamble': ('\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'
-                 '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}')
+    'preamble': (
+        '\\DeclareUnicodeCharacter{2264}{\\ensuremath{\\le}}'
+        '\\DeclareUnicodeCharacter{2265}{\\ensuremath{\\ge}}'
+        '\\DeclareUnicodeCharacter{2665}{[unicode-heart]}'
+        '\\DeclareUnicodeCharacter{2713}{[unicode-checkmark]}'
+    ),
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

@@ -17,12 +17,12 @@ callable view object. For example, given the following ``url``::
 
     from news import views
 
-    url(r'^archive/$', views.archive, name='news_archive')
+    url(r'^archive/$', views.archive, name='news-archive')
 
 you can use any of the following to reverse the URL::
 
     # using the named URL
-    reverse('news_archive')
+    reverse('news-archive')
 
     # passing a callable object
     # (This is discouraged because you can't reverse namespaced views this way.)

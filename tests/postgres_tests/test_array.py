@@ -4,6 +4,7 @@ import unittest
 import uuid
 
 from django import forms
+from django.apps.registry import Apps
 from django.core import exceptions, serializers, validators
 from django.core.management import call_command
 from django.db import IntegrityError, connection, models
@@ -120,6 +121,20 @@ class TestQuerying(PostgreSQLTestCase):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[1]),
             self.objs[:1]
+        )
+
+    def test_exact_charfield(self):
+        instance = CharArrayModel.objects.create(field=['text'])
+        self.assertSequenceEqual(
+            CharArrayModel.objects.filter(field=['text']),
+            [instance]
+        )
+
+    def test_exact_nested(self):
+        instance = NestedIntegerArrayModel.objects.create(field=[[1, 2], [3, 4]])
+        self.assertSequenceEqual(
+            NestedIntegerArrayModel.objects.filter(field=[[1, 2], [3, 4]]),
+            [instance]
         )
 
     def test_isnull(self):
@@ -244,11 +259,83 @@ class TestQuerying(PostgreSQLTestCase):
         )
 
 
+class TestDateTimeExactQuerying(PostgreSQLTestCase):
+
+    def setUp(self):
+        now = timezone.now()
+        self.datetimes = [now]
+        self.dates = [now.date()]
+        self.times = [now.time()]
+        self.objs = [
+            DateTimeArrayModel.objects.create(
+                datetimes=self.datetimes,
+                dates=self.dates,
+                times=self.times,
+            )
+        ]
+
+    def test_exact_datetimes(self):
+        self.assertSequenceEqual(
+            DateTimeArrayModel.objects.filter(datetimes=self.datetimes),
+            self.objs
+        )
+
+    def test_exact_dates(self):
+        self.assertSequenceEqual(
+            DateTimeArrayModel.objects.filter(dates=self.dates),
+            self.objs
+        )
+
+    def test_exact_times(self):
+        self.assertSequenceEqual(
+            DateTimeArrayModel.objects.filter(times=self.times),
+            self.objs
+        )
+
+
+class TestOtherTypesExactQuerying(PostgreSQLTestCase):
+
+    def setUp(self):
+        self.ips = ['192.168.0.1', '::1']
+        self.uuids = [uuid.uuid4()]
+        self.decimals = [decimal.Decimal(1.25), 1.75]
+        self.objs = [
+            OtherTypesArrayModel.objects.create(
+                ips=self.ips,
+                uuids=self.uuids,
+                decimals=self.decimals,
+            )
+        ]
+
+    def test_exact_ip_addresses(self):
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(ips=self.ips),
+            self.objs
+        )
+
+    def test_exact_uuids(self):
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(uuids=self.uuids),
+            self.objs
+        )
+
+    def test_exact_decimals(self):
+        self.assertSequenceEqual(
+            OtherTypesArrayModel.objects.filter(decimals=self.decimals),
+            self.objs
+        )
+
+
 class TestChecks(PostgreSQLTestCase):
 
     def test_field_checks(self):
+        test_apps = Apps(['postgres_tests'])
+
         class MyModel(PostgreSQLModel):
             field = ArrayField(models.CharField())
+
+            class Meta:
+                apps = test_apps
 
         model = MyModel()
         errors = model.check()
@@ -256,8 +343,13 @@ class TestChecks(PostgreSQLTestCase):
         self.assertEqual(errors[0].id, 'postgres.E001')
 
     def test_invalid_base_fields(self):
+        test_apps = Apps(['postgres_tests'])
+
         class MyModel(PostgreSQLModel):
             field = ArrayField(models.ManyToManyField('postgres_tests.IntegerArrayModel'))
+
+            class Meta:
+                apps = test_apps
 
         model = MyModel()
         errors = model.check()

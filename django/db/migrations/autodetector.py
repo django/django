@@ -558,22 +558,7 @@ class MigrationAutodetector(object):
 
             # Generate operations for each related field
             for name, field in sorted(related_fields.items()):
-                # Account for FKs to swappable models
-                swappable_setting = getattr(field, 'swappable_setting', None)
-                if swappable_setting is not None:
-                    dep_app_label = "__setting__"
-                    dep_object_name = swappable_setting
-                else:
-                    dep_app_label = field.remote_field.model._meta.app_label
-                    dep_object_name = field.remote_field.model._meta.object_name
-                dependencies = [(dep_app_label, dep_object_name, None, True)]
-                if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
-                    dependencies.append((
-                        field.remote_field.through._meta.app_label,
-                        field.remote_field.through._meta.object_name,
-                        None,
-                        True
-                    ))
+                dependencies = self._get_dependecies_for_foreign_key(field)
                 # Depend on our own model being created
                 dependencies.append((app_label, model_name, None, True))
                 # Make operation
@@ -810,22 +795,7 @@ class MigrationAutodetector(object):
         # Fields that are foreignkeys/m2ms depend on stuff
         dependencies = []
         if field.remote_field and field.remote_field.model:
-            # Account for FKs to swappable models
-            swappable_setting = getattr(field, 'swappable_setting', None)
-            if swappable_setting is not None:
-                dep_app_label = "__setting__"
-                dep_object_name = swappable_setting
-            else:
-                dep_app_label = field.remote_field.model._meta.app_label
-                dep_object_name = field.remote_field.model._meta.object_name
-            dependencies = [(dep_app_label, dep_object_name, None, True)]
-            if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
-                dependencies.append((
-                    field.remote_field.through._meta.app_label,
-                    field.remote_field.through._meta.object_name,
-                    None,
-                    True,
-                ))
+            dependencies.extend(self._get_dependecies_for_foreign_key(field))
         # You can't just add NOT NULL fields with no default or fields
         # which don't allow empty strings as default.
         preserve_default = True
@@ -925,6 +895,25 @@ class MigrationAutodetector(object):
                     self._generate_removed_field(app_label, model_name, field_name)
                     self._generate_added_field(app_label, model_name, field_name)
 
+    def _get_dependecies_for_foreign_key(self, field):
+        # Account for FKs to swappable models
+        swappable_setting = getattr(field, 'swappable_setting', None)
+        if swappable_setting is not None:
+            dep_app_label = "__setting__"
+            dep_object_name = swappable_setting
+        else:
+            dep_app_label = field.remote_field.model._meta.app_label
+            dep_object_name = field.remote_field.model._meta.object_name
+        dependencies = [(dep_app_label, dep_object_name, None, True)]
+        if getattr(field.remote_field, "through", None) and not field.remote_field.through._meta.auto_created:
+            dependencies.append((
+                field.remote_field.through._meta.app_label,
+                field.remote_field.through._meta.object_name,
+                None,
+                True,
+            ))
+        return dependencies
+
     def _generate_altered_foo_together(self, operation):
         option_name = operation.option_name
         for app_label, model_name in sorted(self.kept_model_keys):
@@ -948,12 +937,20 @@ class MigrationAutodetector(object):
                 new_value = set(new_value)
 
             if old_value != new_value:
+                dependencies = []
+                for foo_togethers in new_value:
+                    for field_name in foo_togethers:
+                        field = self.new_apps.get_model(app_label, model_name)._meta.get_field(field_name)
+                        if field.remote_field and field.remote_field.model:
+                            dependencies.extend(self._get_dependecies_for_foreign_key(field))
+
                 self.add_operation(
                     app_label,
                     operation(
                         name=model_name,
                         **{option_name: new_value}
-                    )
+                    ),
+                    dependencies=dependencies,
                 )
 
     def generate_altered_unique_together(self):

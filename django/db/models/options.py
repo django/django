@@ -65,9 +65,9 @@ def make_immutable_fields_list(name, data):
 
 @python_2_unicode_compatible
 class Options(object):
-    FORWARD_PROPERTIES = ('fields', 'many_to_many', 'concrete_fields',
-                          'local_concrete_fields', '_forward_fields_map')
-    REVERSE_PROPERTIES = ('related_objects', 'fields_map', '_relation_tree')
+    FORWARD_PROPERTIES = {'fields', 'many_to_many', 'concrete_fields',
+                          'local_concrete_fields', '_forward_fields_map'}
+    REVERSE_PROPERTIES = {'related_objects', 'fields_map', '_relation_tree'}
 
     def __init__(self, meta, app_label=None):
         self._get_fields_cache = {}
@@ -586,18 +586,14 @@ class Options(object):
     def _expire_cache(self, forward=True, reverse=True):
         # This method is usually called by apps.cache_clear(), when the
         # registry is finalized, or when a new field is added.
-        properties_to_expire = []
         if forward:
-            properties_to_expire.extend(self.FORWARD_PROPERTIES)
+            for cache_key in self.FORWARD_PROPERTIES:
+                if cache_key in self.__dict__:
+                    delattr(self, cache_key)
         if reverse and not self.abstract:
-            properties_to_expire.extend(self.REVERSE_PROPERTIES)
-
-        for cache_key in properties_to_expire:
-            try:
-                delattr(self, cache_key)
-            except AttributeError:
-                pass
-
+            for cache_key in self.REVERSE_PROPERTIES:
+                if cache_key in self.__dict__:
+                    delattr(self, cache_key)
         self._get_fields_cache = {}
 
     def get_fields(self, include_parents=True, include_hidden=False):

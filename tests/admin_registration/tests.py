@@ -133,3 +133,7 @@ class TestRegistrationDecorator(SimpleTestCase):
     def test_custom_site_not_an_admin_site(self):
         self.assertRaisesMessage(ValueError, 'site must subclass AdminSite',
             register(Person, site=Traveler), NameAdmin)
+
+    def test_empty_models_list_registration_fails(self):
+        with self.assertRaisesMessage(ValueError, 'At least one model must be passed to register.'):
+            register()(NameAdmin)

@@ -153,7 +153,7 @@ Widget classes
     ``template_name`` is ``gis/openlayers.html``.
 
     ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
-    hosted on the ``openlayers.org`` Web site. This works for basic usage
+    hosted on the ``openlayers.org`` website. This works for basic usage
     during development, but isn't appropriate for a production deployment as
     ``openlayers.org/api/`` has no guaranteed uptime and runs on a slow server.
     You are therefore advised to subclass these widgets in order to specify

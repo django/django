@@ -322,6 +322,8 @@ class TestSerialization(TestCase):
         self.assertEqual(instance.ints, NumericRange(0, 10))
         self.assertEqual(instance.floats, NumericRange(empty=True))
         self.assertEqual(instance.bigints, None)
+        self.assertEqual(instance.dates, DateRange(self.lower_date, self.upper_date))
+        self.assertEqual(instance.timestamps, DateTimeTZRange(self.lower_dt, self.upper_dt))
 
 
 class TestValidators(PostgreSQLTestCase):

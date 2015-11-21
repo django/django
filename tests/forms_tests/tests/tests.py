@@ -60,16 +60,22 @@ class FileForm(Form):
     file1 = FileField()
 
 
-class TestTicket12510(TestCase):
-    ''' It is not necessary to generate choices for ModelChoiceField (regression test for #12510). '''
-    def setUp(self):
-        self.groups = [Group.objects.create(name=name) for name in 'abc']
+class TestModelChoiceField(TestCase):
 
     def test_choices_not_fetched_when_not_rendering(self):
+        """
+        Generating choices for ModelChoiceField should require 1 query (#12510).
+        """
+        self.groups = [Group.objects.create(name=name) for name in 'abc']
         # only one query is required to pull the model from DB
         with self.assertNumQueries(1):
             field = ModelChoiceField(Group.objects.order_by('-name'))
             self.assertEqual('a', field.clean(self.groups[0].pk).name)
+
+    def test_queryset_manager(self):
+        f = ModelChoiceField(ChoiceOptionModel.objects)
+        choice = ChoiceOptionModel.objects.create(name="choice 1")
+        self.assertEqual(list(f.choices), [('', '---------'), (choice.pk, str(choice))])
 
 
 class TestTicket14567(TestCase):

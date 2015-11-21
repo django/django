@@ -714,6 +714,22 @@ subclass::
 
           colored_first_name.admin_order_field = '-first_name'
 
+      ``admin_order_field`` supports query lookups to sort by values on related
+      models. This example includes an "author first name" column in the list
+      display and allows sorting it by first name::
+
+          class Blog(models.Model):
+              title = models.CharField(max_length=255)
+              author = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+          class BlogAdmin(admin.ModelAdmin):
+              list_display = ('title', 'author', 'author_first_name')
+
+              def author_first_name(self, obj):
+                  return obj.author.first_name
+
+              author_first_name.admin_order_field = 'author__first_name'
+
     * Elements of ``list_display`` can also be properties. Please note however,
       that due to the way properties work in Python, setting
       ``short_description`` on a property is only possible when using the
@@ -2686,7 +2702,7 @@ Multiple admin sites in the same URLconf
 ----------------------------------------
 
 It's easy to create multiple instances of the admin site on the same
-Django-powered Web site. Just create multiple instances of ``AdminSite`` and
+Django-powered website. Just create multiple instances of ``AdminSite`` and
 root each one at a different URL.
 
 In this example, the URLs ``/basic-admin/`` and ``/advanced-admin/`` feature
@@ -2840,6 +2856,14 @@ Add                     ``{{ app_label }}_{{ model_name }}_add``
 History                 ``{{ app_label }}_{{ model_name }}_history``      ``object_id``
 Delete                  ``{{ app_label }}_{{ model_name }}_delete``       ``object_id``
 Change                  ``{{ app_label }}_{{ model_name }}_change``       ``object_id``
+======================  ===============================================   =============
+
+The ``UserAdmin`` provides a named URL:
+
+======================  ===============================================   =============
+Page                    URL name                                          Parameters
+======================  ===============================================   =============
+Password change         ``auth_user_password_change``                     ``user_id``
 ======================  ===============================================   =============
 
 These named URLs are registered with the application namespace ``admin``, and

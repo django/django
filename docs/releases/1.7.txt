@@ -274,7 +274,7 @@ Custom lookups
 ~~~~~~~~~~~~~~
 
 It is now possible to write custom lookups and transforms for the ORM.
-Custom lookups work just like Django's inbuilt lookups (e.g. ``lte``,
+Custom lookups work just like Django's built-in lookups (e.g. ``lte``,
 ``icontains``) while transforms are a new concept.
 
 The :class:`django.db.models.Lookup` class provides a way to add lookup

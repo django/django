@@ -48,7 +48,7 @@ probably isn't the documentation you're looking for. An instance of the
 of that backend and any attribute defaults mentioned below are overridden by
 what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
 
-.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None)
+.. class:: Engine(dirs=None, app_dirs=False, context_processors=None, debug=False, loaders=None, string_if_invalid='', file_charset='utf-8', libraries=None, builtins=None, autoescape=True)
 
     When instantiating an ``Engine`` all arguments must be passed as keyword
     arguments:
@@ -62,6 +62,18 @@ what's passed by :class:`~django.template.backends.django.DjangoTemplates`.
     * ``app_dirs`` only affects the default value of ``loaders``. See below.
 
       It defaults to ``False``.
+
+    * ``autoescape`` controls whether HTML autoescaping is enabled.
+
+      It defaults to ``True``.
+
+      .. warning::
+
+          Only set it to ``False`` if you're rendering non-HTML templates!
+
+      .. versionadded:: 1.10
+
+          The ``autoescape`` option was added.
 
     * ``context_processors`` is a list of dotted Python paths to callables
       that are used to populate the context when a template is rendered with a
@@ -678,6 +690,8 @@ variables:
 
 django.template.context_processors.debug
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. function:: debug
 
 If this processor is enabled, every ``RequestContext`` will contain these two
 variables -- but only if your :setting:`DEBUG` setting is set to ``True`` and

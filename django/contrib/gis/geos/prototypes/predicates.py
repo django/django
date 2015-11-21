@@ -30,6 +30,7 @@ geos_isvalid = UnaryPredicate('GEOSisValid')
 
 # ## Binary Predicates ##
 geos_contains = BinaryPredicate('GEOSContains')
+geos_covers = BinaryPredicate('GEOSCovers')
 geos_crosses = BinaryPredicate('GEOSCrosses')
 geos_disjoint = BinaryPredicate('GEOSDisjoint')
 geos_equals = BinaryPredicate('GEOSEquals')

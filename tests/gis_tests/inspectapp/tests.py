@@ -181,7 +181,7 @@ def get_ogr_db_string():
     # Ensure that GDAL library has driver support for the database.
     try:
         Driver(drv_name)
-    except:
+    except GDALException:
         return None
 
     # SQLite/Spatialite in-memory databases

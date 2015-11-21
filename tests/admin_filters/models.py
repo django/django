@@ -26,6 +26,12 @@ class Book(models.Model):
         related_name='books_contributed',
         blank=True,
     )
+    employee = models.ForeignKey(
+        'Employee',
+        models.SET_NULL,
+        verbose_name='Employee',
+        blank=True, null=True,
+    )
     is_best_seller = models.NullBooleanField(default=0)
     date_registered = models.DateField(null=True)
     # This field name is intentionally 2 characters long (#16080).

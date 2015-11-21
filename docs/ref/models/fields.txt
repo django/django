@@ -929,7 +929,7 @@ is ``False`` or :class:`~django.forms.TextInput` otherwise.
 ``GenericIPAddressField``
 -------------------------
 
-.. class:: GenericIPAddressField(protocol=both, unpack_ipv4=False, **options)
+.. class:: GenericIPAddressField(protocol='both', unpack_ipv4=False, **options)
 
 An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
 ``2a02:42fe::4``). The default form widget for this field is a

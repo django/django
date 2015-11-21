@@ -619,7 +619,7 @@ class LayerMapping(object):
                 try:
                     num_feat, num_saved = _save(step_slice, num_feat, num_saved)
                     beg = end
-                except:  # Deliberately catch everything
+                except Exception:  # Deliberately catch everything
                     stream.write('%s\nFailed to save slice: %s\n' % ('=-' * 20, step_slice))
                     raise
         else:

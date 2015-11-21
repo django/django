@@ -1102,9 +1102,11 @@ class ModelChoiceIterator(object):
     def __iter__(self):
         if self.field.empty_label is not None:
             yield ("", self.field.empty_label)
+        queryset = self.queryset.all()
         # Can't use iterator() when queryset uses prefetch_related()
-        method = 'all' if self.queryset._prefetch_related_lookups else 'iterator'
-        for obj in getattr(self.queryset, method)():
+        if not queryset._prefetch_related_lookups:
+            queryset = queryset.iterator()
+        for obj in queryset:
             yield self.choice(obj)
 
     def __len__(self):

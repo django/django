@@ -385,6 +385,15 @@ where ``reason`` is a short message (intended for developers or logging, not for
 end users) indicating the reason the request was rejected.  See
 :doc:`/ref/csrf`.
 
+``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
+parameter that defaults to ``'403_csrf.html'``. If a template with that name
+exists, it will be used to render the page.
+
+.. versionchanged:: 1.10
+
+   The ``template_name`` parameter and the behavior of searching for a template
+   called ``403_csrf.html`` were added to ``csrf_failure()``.
+
 .. setting:: CSRF_HEADER_NAME
 
 CSRF_HEADER_NAME
@@ -1528,9 +1537,12 @@ Default: ``[]`` (Empty list)
 
 A list of IP addresses, as strings, that:
 
-* See debug comments, when :setting:`DEBUG` is ``True``
-* Receive X headers in admindocs if the ``XViewMiddleware`` is installed (see
-  :doc:`/ref/contrib/admin/admindocs`)
+* Allow the :func:`~django.template.context_processors.debug` context processor
+  to add some variables to the template context.
+* Can use the :ref:`admindocs bookmarklets <admindocs-bookmarklets>` even if
+  not logged in as a staff user.
+* Are marked as "internal" (as opposed to "EXTERNAL") in
+  :class:`~django.utils.log.AdminEmailHandler` emails.
 
 .. setting:: LANGUAGE_CODE
 

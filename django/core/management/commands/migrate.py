@@ -191,9 +191,9 @@ class Command(BaseCommand):
             elif action == "apply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "unapply_start":
                 if compute_time:
                     self.start = time.time()
@@ -202,9 +202,9 @@ class Command(BaseCommand):
             elif action == "unapply_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
                 if fake:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" FAKED" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" FAKED" + elapsed))
                 else:
-                    self.stdout.write(self.style.MIGRATE_SUCCESS(" OK" + elapsed))
+                    self.stdout.write(self.style.SUCCESS(" OK" + elapsed))
             elif action == "render_start":
                 if compute_time:
                     self.start = time.time()
@@ -212,7 +212,7 @@ class Command(BaseCommand):
                 self.stdout.flush()
             elif action == "render_success":
                 elapsed = " (%.3fs)" % (time.time() - self.start) if compute_time else ""
-                self.stdout.write(self.style.MIGRATE_SUCCESS(" DONE" + elapsed))
+                self.stdout.write(self.style.SUCCESS(" DONE" + elapsed))
 
     def sync_apps(self, connection, app_labels):
         "Runs the old syncdb-style operation on a list of app_labels."

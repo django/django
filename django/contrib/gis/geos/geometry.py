@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 import json
+import warnings
 from ctypes import addressof, byref, c_double
 
 from django.contrib.gis import gdal
@@ -20,6 +21,7 @@ from django.contrib.gis.geos.prototypes.io import (
     ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w,
 )
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes, force_text
 
 
@@ -292,6 +294,14 @@ class GEOSGeometry(GEOSBase, ListMixin):
         "Returns true if other.within(this) returns true."
         return capi.geos_contains(self.ptr, other.ptr)
 
+    def covers(self, other):
+        """
+        Return True if the DE-9IM Intersection Matrix for the two geometries is
+        T*****FF*, *T****FF*, ***T**FF*, or ****T*FF*. If either geometry is
+        empty, return False.
+        """
+        return capi.geos_covers(self.ptr, other.ptr)
+
     def crosses(self, other):
         """
         Returns true if the DE-9IM intersection matrix for the two Geometries
@@ -356,7 +366,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return capi.geos_within(self.ptr, other.ptr)
 
     # #### SRID Routines ####
-    def get_srid(self):
+    @property
+    def srid(self):
         "Gets the SRID for the geometry, returns None if no SRID is set."
         s = capi.geos_get_srid(self.ptr)
         if s == 0:
@@ -364,10 +375,24 @@ class GEOSGeometry(GEOSBase, ListMixin):
         else:
             return s
 
-    def set_srid(self, srid):
+    @srid.setter
+    def srid(self, srid):
         "Sets the SRID for the geometry."
         capi.geos_set_srid(self.ptr, 0 if srid is None else srid)
-    srid = property(get_srid, set_srid)
+
+    def get_srid(self):
+        warnings.warn(
+            "`get_srid()` is deprecated, use the `srid` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        return self.srid
+
+    def set_srid(self, srid):
+        warnings.warn(
+            "`set_srid()` is deprecated, use the `srid` property instead.",
+            RemovedInDjango20Warning, 2
+        )
+        self.srid = srid
 
     # #### Output Routines ####
     @property
@@ -375,10 +400,8 @@ class GEOSGeometry(GEOSBase, ListMixin):
         """
         Returns the EWKT (SRID + WKT) of the Geometry.
         """
-        if self.get_srid():
-            return 'SRID=%s;%s' % (self.srid, self.wkt)
-        else:
-            return self.wkt
+        srid = self.srid
+        return 'SRID=%s;%s' % (srid, self.wkt) if srid else self.wkt
 
     @property
     def wkt(self):
@@ -493,15 +516,15 @@ class GEOSGeometry(GEOSBase, ListMixin):
             else:
                 return
 
+        if not gdal.HAS_GDAL:
+            raise GEOSException("GDAL library is not available to transform() geometry.")
+
         if isinstance(ct, gdal.CoordTransform):
             # We don't care about SRID because CoordTransform presupposes
             # source SRS.
             srid = None
         elif srid is None or srid < 0:
             raise GEOSException("Calling transform() with no SRID set is not supported")
-
-        if not gdal.HAS_GDAL:
-            raise GEOSException("GDAL library is not available to transform() geometry.")
 
         # Creating an OGR Geometry, which is then transformed.
         g = gdal.OGRGeometry(self.wkb, srid)
@@ -605,6 +628,11 @@ class GEOSGeometry(GEOSBase, ListMixin):
         and the points in other not in this Geometry.
         """
         return self._topology(capi.geos_symdifference(self.ptr, other.ptr))
+
+    @property
+    def unary_union(self):
+        "Return the union of all the elements of this geometry."
+        return self._topology(capi.geos_unary_union(self.ptr))
 
     def union(self, other):
         "Returns a Geometry representing all the points in this Geometry and other."

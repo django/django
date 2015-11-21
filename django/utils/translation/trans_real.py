@@ -103,6 +103,7 @@ class DjangoTranslation(gettext_module.GNUTranslations):
     def __init__(self, language):
         """Create a GNUTranslations() using many locale directories"""
         gettext_module.GNUTranslations.__init__(self)
+        self.set_output_charset('utf-8')  # For Python 2 gettext() (#25720)
 
         self.__language = language
         self.__to_language = to_language(language)

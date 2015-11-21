@@ -381,7 +381,7 @@ GeoDjango on Windows.
 Python
 ^^^^^^
 
-First, download the latest `Python 2.7 installer`__ from the Python Web site.
+First, download the latest `Python 2.7 installer`__ from the Python website.
 Next, run the installer and keep the defaults -- for example, keep
 'Install for all users' checked and the installation path set as
 ``C:\Python27``.
@@ -398,7 +398,7 @@ PostgreSQL
 ^^^^^^^^^^
 
 First, download the latest `PostgreSQL 9.x installer`__ from the
-`EnterpriseDB`__ Web site.  After downloading, simply run the installer,
+`EnterpriseDB`__ website.  After downloading, simply run the installer,
 follow the on-screen directions, and keep the default options unless
 you know the consequences of changing them.
 

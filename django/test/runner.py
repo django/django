@@ -657,16 +657,19 @@ def partition_suite_by_case(suite):
     return groups
 
 
-def get_unique_databases():
+def get_unique_databases_and_mirrors():
     """
     Figure out which databases actually need to be created.
 
     Deduplicate entries in DATABASES that correspond the same database or are
     configured as test mirrors.
 
-    Returns an ordered mapping of signatures to (name, list of aliases)
-    where all aliases share the same unerlying database.
+    Return two values:
+    - test_databases: ordered mapping of signatures to (name, list of aliases)
+                      where all aliases share the same underlying database.
+    - mirrored_aliases: mapping of mirror aliases to original aliases.
     """
+    mirrored_aliases = {}
     test_databases = {}
     dependencies = {}
     default_sig = connections[DEFAULT_DB_ALIAS].creation.test_db_signature()
@@ -676,34 +679,34 @@ def get_unique_databases():
         test_settings = connection.settings_dict['TEST']
 
         if test_settings['MIRROR']:
-            target = test_settings['MIRROR']
-            signature = connections[target].creation.test_db_signature()
-
+            # If the database is marked as a test mirror, save the alias.
+            mirrored_aliases[alias] = test_settings['MIRROR']
         else:
-            signature = connection.creation.test_db_signature()
+            # Store a tuple with DB parameters that uniquely identify it.
+            # If we have two aliases with the same values for that tuple,
+            # we only need to create the test database once.
+            item = test_databases.setdefault(
+                connection.creation.test_db_signature(),
+                (connection.settings_dict['NAME'], set())
+            )
+            item[1].add(alias)
 
             if 'DEPENDENCIES' in test_settings:
                 dependencies[alias] = test_settings['DEPENDENCIES']
-            elif alias != DEFAULT_DB_ALIAS and signature != default_sig:
-                dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
-
-        # Store a tuple with DB parameters that uniquely identify it.
-        # If we have two aliases with the same values for that tuple,
-        # we only need to create the test database once.
-        item = test_databases.setdefault(
-            signature, (connection.settings_dict['NAME'], set()))
-        item[1].add(alias)
+            else:
+                if alias != DEFAULT_DB_ALIAS and connection.creation.test_db_signature() != default_sig:
+                    dependencies[alias] = test_settings.get('DEPENDENCIES', [DEFAULT_DB_ALIAS])
 
     test_databases = dependency_ordered(test_databases.items(), dependencies)
     test_databases = collections.OrderedDict(test_databases)
-    return test_databases
+    return test_databases, mirrored_aliases
 
 
 def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, parallel=0, **kwargs):
     """
     Creates the test databases.
     """
-    test_databases = get_unique_databases()
+    test_databases, mirrored_aliases = get_unique_databases_and_mirrors()
 
     old_names = []
 
@@ -733,6 +736,11 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             else:
                 connections[alias].creation.set_as_test_mirror(
                     connections[first_alias].settings_dict)
+
+    # Configure the test mirrors.
+    for alias, mirror_alias in mirrored_aliases.items():
+        connections[alias].creation.set_as_test_mirror(
+            connections[mirror_alias].settings_dict)
 
     if debug_sql:
         for alias in connections:

@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
-import unittest
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import skipUnless
@@ -19,8 +18,9 @@ from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
-from django.test import mock
+from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_bytes
 from django.utils.six.moves import range
 
@@ -28,7 +28,7 @@ from ..test_data import TestDataMixin
 
 
 @skipUnless(HAS_GEOS, "Geos is required.")
-class GEOSTest(unittest.TestCase, TestDataMixin):
+class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_base(self):
         "Tests out the GEOSBase class."
@@ -325,6 +325,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
+            with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
+                LineString((0, 0))
+
+            with self.assertRaisesMessage(TypeError, 'LineString requires at least 2 points, got 1.'):
+                LineString([(0, 0)])
+
     def test_multilinestring(self):
         "Testing MultiLineString objects."
         prev = fromstr('POINT(0 0)')
@@ -367,6 +373,12 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(lr, LinearRing([list(tup) for tup in lr.tuple]))
             if numpy:
                 self.assertEqual(lr, LinearRing(numpy.array(lr.tuple)))
+
+        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 3.'):
+            LinearRing((0, 0), (1, 1), (0, 0))
+
+        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 1.'):
+            LinearRing([(0, 0)])
 
     def test_polygons_from_bbox(self):
         "Testing `from_bbox` class method."
@@ -570,6 +582,15 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             a |= b  # testing __ior__
             self.assertEqual(u1, a)
 
+    def test_unary_union(self):
+        "Testing unary_union."
+        for i in range(len(self.geometries.topology_geoms)):
+            a = fromstr(self.geometries.topology_geoms[i].wkt_a)
+            b = fromstr(self.geometries.topology_geoms[i].wkt_b)
+            u1 = fromstr(self.geometries.union_geoms[i].wkt)
+            u2 = GeometryCollection(a, b).unary_union
+            self.assertTrue(u1.equals(u2))
+
     def test_difference(self):
         "Testing difference()."
         for i in range(len(self.geometries.topology_geoms)):
@@ -622,6 +643,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
                     self.assertAlmostEqual(exp_ring[k][0], buf_ring[k][0], 9)
                     self.assertAlmostEqual(exp_ring[k][1], buf_ring[k][1], 9)
 
+    def test_covers(self):
+        poly = Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)))
+        self.assertTrue(poly.covers(Point(5, 5)))
+        self.assertFalse(poly.covers(Point(100, 100)))
+
     def test_srid(self):
         "Testing the SRID property and keyword."
         # Testing SRID keyword on Point
@@ -629,7 +655,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertEqual(4326, pnt.srid)
         pnt.srid = 3084
         self.assertEqual(3084, pnt.srid)
-        self.assertRaises(ctypes.ArgumentError, pnt.set_srid, '4326')
+        with self.assertRaises(ctypes.ArgumentError):
+            pnt.srid = '4326'
 
         # Testing SRID keyword on fromstr(), and on Polygon rings.
         poly = fromstr(self.geometries.polygons[1].wkt, srid=4269)
@@ -785,7 +812,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         # Testing a 3D Point
         pnt = Point(2, 3, 8)
         self.assertEqual((2., 3., 8.), pnt.coords)
-        self.assertRaises(TypeError, pnt.set_coords, (1., 2.))
+        with self.assertRaises(TypeError):
+            pnt.tuple = (1., 2.)
         pnt.coords = (1., 2., 3.)
         self.assertEqual((1., 2., 3.), pnt.coords)
 
@@ -860,7 +888,8 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                self.assertRaises(IndexError, g.get_x)
+                with self.assertRaises(IndexError):
+                    g.x
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual('LINEARRING EMPTY', lr.wkt)
@@ -989,6 +1018,7 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertEqual(g1.srid, 4326)
             self.assertIsNot(g1, g, "Clone didn't happen")
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_transform_nosrid(self):
         """ Testing `transform` method (no SRID or negative SRID) """
 
@@ -1059,12 +1089,11 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
 
         # A set of test points.
         pnts = [Point(5, 5), Point(7.5, 7.5), Point(2.5, 7.5)]
-        covers = [True, True, False]  # No `covers` op for regular GEOS geoms.
-        for pnt, c in zip(pnts, covers):
+        for pnt in pnts:
             # Results should be the same (but faster)
             self.assertEqual(mpoly.contains(pnt), prep.contains(pnt))
             self.assertEqual(mpoly.intersects(pnt), prep.intersects(pnt))
-            self.assertEqual(c, prep.covers(pnt))
+            self.assertEqual(mpoly.covers(pnt), prep.covers(pnt))
 
         self.assertTrue(prep.crosses(fromstr('LINESTRING(1 1, 15 15)')))
         self.assertTrue(prep.disjoint(Point(-5, -5)))
@@ -1104,7 +1133,6 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
         self.assertIsInstance(g.valid_reason, six.string_types)
         self.assertTrue(g.valid_reason.startswith("Too few points in geometry component"))
 
-    @skipUnless(HAS_GEOS, "Geos is required.")
     def test_linearref(self):
         "Testing linear referencing"
 
@@ -1137,3 +1165,29 @@ class GEOSTest(unittest.TestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_srid_getters_setters(self):
+        p = Point(1, 2, srid=123)
+        self.assertEqual(p.get_srid(), p.srid)
+
+        p.set_srid(321)
+        self.assertEqual(p.srid, 321)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_coordinate_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual((p.get_x(), p.get_y(), p.get_z()), (p.x, p.y, p.z))
+
+        p.set_x(3)
+        p.set_y(2)
+        p.set_z(1)
+        self.assertEqual((p.x, p.y, p.z), (3, 2, 1))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_point_tuple_getters_setters(self):
+        p = Point(1, 2, 3)
+        self.assertEqual(p.get_coords(), (p.x, p.y, p.z))
+
+        p.set_coords((3, 2, 1))
+        self.assertEqual(p.get_coords(), (3, 2, 1))

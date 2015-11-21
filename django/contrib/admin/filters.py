@@ -166,9 +166,9 @@ class RelatedFieldListFilter(FieldListFilter):
         self.lookup_kwarg_isnull = '%s__isnull' % field_path
         self.lookup_val = request.GET.get(self.lookup_kwarg)
         self.lookup_val_isnull = request.GET.get(self.lookup_kwarg_isnull)
-        self.lookup_choices = self.field_choices(field, request, model_admin)
         super(RelatedFieldListFilter, self).__init__(
             field, request, params, model, model_admin, field_path)
+        self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, 'verbose_name'):
             self.lookup_title = field.verbose_name
         else:
@@ -412,5 +412,5 @@ FieldListFilter.register(lambda f: True, AllValuesFieldListFilter)
 
 class RelatedOnlyFieldListFilter(RelatedFieldListFilter):
     def field_choices(self, field, request, model_admin):
-        limit_choices_to = {'pk__in': set(model_admin.get_queryset(request).values_list(field.name, flat=True))}
-        return field.get_choices(include_blank=False, limit_choices_to=limit_choices_to)
+        pk_qs = model_admin.get_queryset(request).distinct().values_list('%s__pk' % self.field_path, flat=True)
+        return field.get_choices(include_blank=False, limit_choices_to={'pk__in': pk_qs})

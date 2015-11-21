@@ -108,6 +108,17 @@ Example ini configuration file usage::
 
     uwsgi --ini uwsgi.ini
 
+.. admonition:: Fixing ``UnicodeEncodeError`` for file uploads
+
+    If you get a ``UnicodeEncodeError`` when uploading files with file names
+    that contain non-ASCII characters, make sure uWSGI is configured to accept
+    non-ASCII file names by adding this to your ``uwsgi.ini``::
+
+        env = LANG='en_US.UTF-8'
+
+    See the :ref:`unicode-files` section of the Unicode reference guide for
+    details.
+
 See the uWSGI docs on `managing the uWSGI process`_ for information on
 starting, stopping and reloading the uWSGI workers.
 

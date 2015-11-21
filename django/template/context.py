@@ -201,9 +201,9 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None):
+    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
         super(RequestContext, self).__init__(
-            dict_, use_l10n=use_l10n, use_tz=use_tz)
+            dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
         self._processors_index = len(self.dicts)
@@ -245,17 +245,17 @@ class RequestContext(Context):
         return new_context
 
 
-def make_context(context, request=None):
+def make_context(context, request=None, **kwargs):
     """
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
     if request is None:
-        context = Context(context)
+        context = Context(context, **kwargs)
     else:
         # The following pattern is required to ensure values from
         # context override those from template context processors.
         original_context = context
-        context = RequestContext(request)
+        context = RequestContext(request, **kwargs)
         if original_context:
             context.push(original_context)
     return context

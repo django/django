@@ -25,6 +25,12 @@ from django.utils.module_loading import module_dir
 from django.utils.timezone import now, utc
 from django.utils.version import get_docs_version
 
+try:
+    import enum
+except ImportError:
+    # No support on Python 2 if enum34 isn't installed.
+    enum = None
+
 
 class SettingsReference(str):
     """
@@ -376,6 +382,14 @@ class MigrationWriter(object):
                 imports.update(v_imports)
                 strings.append((k_string, v_string))
             return "{%s}" % (", ".join("%s: %s" % (k, v) for k, v in strings)), imports
+        # Enums
+        elif enum and isinstance(value, enum.Enum):
+            enum_class = value.__class__
+            module = enum_class.__module__
+            imports = {"import %s" % module}
+            v_string, v_imports = cls.serialize(value.value)
+            imports.update(v_imports)
+            return "%s.%s(%s)" % (module, enum_class.__name__, v_string), imports
         # Datetimes
         elif isinstance(value, datetime.datetime):
             value_repr = cls.serialize_datetime(value)

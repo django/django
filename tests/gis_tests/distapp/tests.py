@@ -516,9 +516,7 @@ class DistanceFunctionsTests(TestCase):
             dist_qs = [dist1]
         else:
             dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-            # Using EWKT string parameter.
-            dist3 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange.ewkt)).order_by('id')
-            dist_qs = [dist1, dist2, dist3]
+            dist_qs = [dist1, dist2]
 
         # Original query done on PostGIS, have to adjust AlmostEqual tolerance
         # for Oracle.

@@ -687,6 +687,17 @@ The ``permission_required`` decorator
     (HTTP Forbidden) view<http_forbidden_view>` instead of redirecting to the
     login page.
 
+    If you want to use ``raise_exception`` but also give your users a chance to
+    login first, you can add the
+    :func:`~django.contrib.auth.decorators.login_required` decorator::
+
+        from django.contrib.auth.decorators import login_required, permission_required
+
+        @permission_required('polls.can_vote', raise_exception=True)
+        @login_required
+        def my_view(request):
+            ...
+
     .. versionchanged:: 1.9
 
         In older versions, the ``permission`` parameter only worked with

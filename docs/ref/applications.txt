@@ -41,6 +41,8 @@ interact with installed applications, mainly for configuration and also for
 introspection. That's why the application registry maintains metadata in an
 :class:`~django.apps.AppConfig` instance for each installed application.
 
+.. _configuring-applications-ref:
+
 Configuring applications
 ========================
 

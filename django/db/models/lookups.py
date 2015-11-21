@@ -22,7 +22,7 @@ class Lookup(object):
         else:
             bilateral_transforms = []
         if bilateral_transforms:
-            # We should warn the user as soon as possible if he is trying to apply
+            # Warn the user as soon as possible if they are trying to apply
             # a bilateral transformation on a nested QuerySet: that won't work.
             # We need to import QuerySet here so as to avoid circular
             from django.db.models.query import QuerySet

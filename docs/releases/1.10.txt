@@ -36,6 +36,9 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* The success message that appears after adding or editing an object now
+  contains a link to the object's change form.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -63,6 +66,13 @@ Minor features
 
 * :ref:`Distance lookups <distance-lookups>` now accept expressions as the
   distance value parameter.
+
+* The new :attr:`GEOSGeometry.unary_union
+  <django.contrib.gis.geos.GEOSGeometry.unary_union>` property computes the
+  union of all the elements of this geometry.
+
+* Added the :meth:`GEOSGeometry.covers()
+  <django.contrib.gis.geos.GEOSGeometry.covers>` binary predicate.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -93,7 +103,8 @@ Minor features
 :mod:`django.contrib.sites`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :class:`~django.contrib.sites.models.Site` model now supports
+  :ref:`natural keys <topics-serialization-natural-keys>`.
 
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -113,7 +124,9 @@ Cache
 CSRF
 ^^^^
 
-* ...
+* The default :setting:`CSRF_FAILURE_VIEW`, ``views.csrf.csrf_failure()`` now
+  accepts an optional ``template_name`` parameter, defaulting to
+  ``'403_csrf.html'``, to control the template used to render the page.
 
 Database backends
 ^^^^^^^^^^^^^^^^^
@@ -164,7 +177,7 @@ Management Commands
 Migrations
 ^^^^^^^^^^
 
-* ...
+* Added support for serialization of ``enum.Enum`` objects.
 
 Models
 ^^^^^^
@@ -203,7 +216,9 @@ Signals
 Templates
 ^^^^^^^^^
 
-* ...
+* Added the ``autoescape`` option to the
+  :class:`~django.template.backends.django.DjangoTemplates` backend and the
+  :class:`~django.template.Engine` class.
 
 Tests
 ^^^^^
@@ -303,6 +318,9 @@ Miscellaneous
 
 * Support for SpatiaLite < 3.0 and GEOS < 3.3 is dropped.
 
+* ``utils.version.get_version()`` returns :pep:`440` compliant release
+  candidate versions (e.g. '1.10rc1' instead of '1.10c1').
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
@@ -322,6 +340,21 @@ added in Django 1.9::
         >>> e.related_set.set([obj1, obj2, obj3])
 
 This prevents confusion about an assignment resulting in an implicit save.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The ``get_srid()`` and ``set_srid()`` methods of
+  :class:`~django.contrib.gis.geos.GEOSGeometry` are deprecated in favor
+  of the :attr:`~django.contrib.gis.geos.GEOSGeometry.srid` property.
+
+* The ``get_x()``, ``set_x()``, ``get_y()``, ``set_y()``, ``get_z()``, and
+  ``set_z()`` methods of :class:`~django.contrib.gis.geos.Point` are deprecated
+  in favor of the ``x``, ``y``, and ``z`` properties.
+
+* The ``get_coords()`` and ``set_coords()`` methods of
+  :class:`~django.contrib.gis.geos.Point` are deprecated in favor of the
+  ``tuple`` property.
 
 Miscellaneous
 ~~~~~~~~~~~~~

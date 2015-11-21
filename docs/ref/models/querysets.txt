@@ -2177,7 +2177,7 @@ specified as keyword arguments to the ``QuerySet`` methods :meth:`filter()`,
 For an introduction, see :ref:`models and database queries documentation
 <field-lookups-intro>`.
 
-Django's inbuilt lookups are listed below. It is also possible to write
+Django's built-in lookups are listed below. It is also possible to write
 :doc:`custom lookups </howto/custom-lookups>` for model fields.
 
 As a convenience when no lookup type is provided (like in

@@ -508,8 +508,7 @@ class CoverLetterAdmin(admin.ModelAdmin):
     """
     A ModelAdmin with a custom get_queryset() method that uses defer(), to test
     verbose_name display in messages shown after adding/editing CoverLetter
-    instances.
-    Note that the CoverLetter model defines a __unicode__ method.
+    instances. Note that the CoverLetter model defines a __str__ method.
     For testing fix for ticket #14529.
     """
 
@@ -545,8 +544,7 @@ class TelegramAdmin(admin.ModelAdmin):
     """
     A ModelAdmin with a custom get_queryset() method that uses only(), to test
     verbose_name display in messages shown after adding/editing Telegram
-    instances.
-    Note that the Telegram model defines a __unicode__ method.
+    instances. Note that the Telegram model defines a __str__ method.
     For testing fix for ticket #14529.
     """
 
@@ -593,9 +591,10 @@ class PluggableSearchPersonAdmin(admin.ModelAdmin):
         )
         try:
             search_term_as_int = int(search_term)
-            queryset |= self.model.objects.filter(age=search_term_as_int)
-        except:
+        except ValueError:
             pass
+        else:
+            queryset |= self.model.objects.filter(age=search_term_as_int)
         return queryset, use_distinct
 
 
