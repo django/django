@@ -5,7 +5,7 @@ import datetime
 
 from django.forms import (CharField, DateField, FileField, Form, IntegerField,
     SplitDateTimeField, ValidationError, formsets)
-from django.forms.formsets import BaseFormSet, formset_factory
+from django.forms.formsets import FormSet, formset_factory
 from django.forms.utils import ErrorList
 from django.test import TestCase
 
@@ -24,7 +24,7 @@ class FavoriteDrinkForm(Form):
     name = CharField()
 
 
-class BaseFavoriteDrinksFormSet(BaseFormSet):
+class BaseFavoriteDrinksFormSet(FormSet):
     def clean(self):
         seen_drinks = []
 
@@ -35,7 +35,7 @@ class BaseFavoriteDrinksFormSet(BaseFormSet):
             seen_drinks.append(drink['name'])
 
 
-class EmptyFsetWontValidate(BaseFormSet):
+class EmptyFsetWontValidate(FormSet):
     def clean(self):
         raise ValidationError("Clean method called")
 
@@ -890,7 +890,7 @@ class FormsFormsetTestCase(TestCase):
             pass
 
         # Formets can override the default iteration order
-        class BaseReverseFormSet(BaseFormSet):
+        class BaseReverseFormSet(FormSet):
             def __iter__(self):
                 return reversed(self.forms)
 
@@ -1026,7 +1026,7 @@ class FormsFormsetTestCase(TestCase):
         # Regression test for #11160
         # If non_form_errors() is called without calling is_valid() first,
         # it should ensure that full_clean() is called.
-        class BaseCustomFormSet(BaseFormSet):
+        class BaseCustomFormSet(FormSet):
             def clean(self):
                 raise ValidationError("This is a non-form error")
 
