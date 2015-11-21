@@ -1,7 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
-from django.forms.models import BaseModelForm, BaseModelFormSet, _get_foreign_key
+from django.forms.models import BaseModelForm, ModelFormSet, _get_foreign_key
 from django.contrib.admin.utils import get_fields_from_path, NotRelationField
 
 """
@@ -395,10 +395,10 @@ class InlineValidator(BaseValidator):
         check_type(cls, 'max_num', int)
 
     def validate_formset(self, cls, model):
-        " Validate formset is a subclass of BaseModelFormSet. "
-        if hasattr(cls, 'formset') and not issubclass(cls.formset, BaseModelFormSet):
+        " Validate formset is a subclass of ModelFormSet. "
+        if hasattr(cls, 'formset') and not issubclass(cls.formset, ModelFormSet):
             raise ImproperlyConfigured("'%s.formset' does not inherit from "
-                    "BaseModelFormSet." % cls.__name__)
+                    "ModelFormSet." % cls.__name__)
 
 
 def check_type(cls, attr, type_):

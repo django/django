@@ -7,7 +7,7 @@ from django.contrib.admin.utils import get_fields_from_path, NotRelationField, f
 from django.core import checks
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
-from django.forms.models import BaseModelForm, _get_foreign_key, BaseModelFormSet
+from django.forms.models import BaseModelForm, _get_foreign_key, ModelFormSet
 
 
 def check_admin_app(**kwargs):
@@ -910,10 +910,10 @@ class InlineModelAdminChecks(BaseModelAdminChecks):
             return []
 
     def _check_formset(self, cls):
-        """ Check formset is a subclass of BaseModelFormSet. """
+        """ Check formset is a subclass of ModelFormSet. """
 
-        if not issubclass(cls.formset, BaseModelFormSet):
-            return must_inherit_from(parent='BaseModelFormSet', option='formset',
+        if not issubclass(cls.formset, ModelFormSet):
+            return must_inherit_from(parent='ModelFormSet', option='formset',
                                      obj=cls, id='admin.E205')
         else:
             return []

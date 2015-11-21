@@ -29,7 +29,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH, FieldDoesNotExist
 from django.db.models.sql.constants import QUERY_TERMS
 from django.forms.formsets import all_valid, DELETION_FIELD_NAME
 from django.forms.models import (modelform_factory, modelformset_factory,
-    inlineformset_factory, BaseInlineFormSet, modelform_defines_fields)
+    inlineformset_factory, InlineFormSet, modelform_defines_fields)
 from django.forms.widgets import SelectMultiple, CheckboxSelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
@@ -1704,7 +1704,7 @@ class InlineModelAdmin(BaseModelAdmin):
     """
     model = None
     fk_name = None
-    formset = BaseInlineFormSet
+    formset = InlineFormSet
     extra = 3
     max_num = None
     template = None
