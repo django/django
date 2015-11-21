@@ -1716,10 +1716,7 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
         # Ensure the table is there and has no index
-        self.assertNotIn(
-            "name",
-            self.get_indexes(Author._meta.db_table),
-        )
+        self.assertNotIn("name", self.get_indexes(Author._meta.db_table))
         # Alter to add the index
         old_field = Author._meta.get_field('name')
         new_field = CharField(max_length=255, db_index=True)
@@ -1732,8 +1729,7 @@ class SchemaTests(TransactionTestCase):
         for name, details in constraints.items():
             if details['columns'] == ['name']:
                 name_indexes.append(details)
-        self.assertEqual(2, len(name_indexes),
-                         'Indexes are missing for name column')
+        self.assertEqual(2, len(name_indexes), 'Indexes are missing for name column')
         # Remove the index
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
@@ -1743,5 +1739,4 @@ class SchemaTests(TransactionTestCase):
         for name, details in constraints.items():
             if details['columns'] == ['name']:
                 name_indexes.append(details)
-        self.assertEqual(0, len(name_indexes),
-                         'Indexes were not dropped for the name column')
+        self.assertEqual(0, len(name_indexes), 'Indexes were not dropped for the name column')
