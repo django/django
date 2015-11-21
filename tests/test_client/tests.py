@@ -729,7 +729,6 @@ class RequestFactoryTest(SimpleTestCase):
         request = self.request_factory.get('/somewhere/')
         response = get_view(request)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is a test')
 
     def test_trace_request_from_factory(self):
@@ -740,5 +739,4 @@ class RequestFactoryTest(SimpleTestCase):
         protocol = request.META["SERVER_PROTOCOL"]
         echoed_request_line = "TRACE {} {}".format(url_path, protocol)
 
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, echoed_request_line)

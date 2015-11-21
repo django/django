@@ -247,7 +247,6 @@ class TemplateViewTest(SimpleTestCase):
 
     def _assert_about(self, response):
         response.render()
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<h1>About</h1>')
 
     def test_get(self):

@@ -62,7 +62,6 @@ class AdminCustomUrlsTest(TestCase):
         string works.
         """
         response = self.client.get(reverse('admin_custom_urls:admin_custom_urls_action_add'), {'name': 'My Action'})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Action"')
 
     def test_basic_add_POST(self):
@@ -75,7 +74,6 @@ class AdminCustomUrlsTest(TestCase):
             "description": "Description of added action",
         }
         response = self.client.post(reverse('admin_custom_urls:admin_custom_urls_action_add'), post_data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'Action added through a popup')
 
@@ -88,7 +86,6 @@ class AdminCustomUrlsTest(TestCase):
         url = reverse('admin_custom_urls:%s_action_change' % Action._meta.app_label,
                 args=(quote('add'),))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
 
         # Should correctly get the change_view for the model instance with the
@@ -96,7 +93,6 @@ class AdminCustomUrlsTest(TestCase):
         url = reverse('admin_custom_urls:%s_action_change' % Action._meta.app_label,
                 args=(quote("path/to/html/document.html"),))
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Change action')
         self.assertContains(response, 'value="path/to/html/document.html"')
 

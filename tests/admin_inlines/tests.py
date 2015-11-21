@@ -492,7 +492,6 @@ class TestInlineProtectedOnDelete(TestDataMixin, TestCase):
             'chapter_set-0-DELETE': 'on'
         }
         response = self.client.post(change_url, data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Deleting chapter %s would require deleting "
                             "the following protected related objects: foot note %s"
                             % (chapter, foot_note))

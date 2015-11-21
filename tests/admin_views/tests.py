@@ -227,7 +227,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
 
     def test_add_with_GET_args(self):
         response = self.client.get(reverse('admin:admin_views_section_add'), {'name': 'My Section'})
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="My Section"',
             msg_prefix="Couldn't find an input with the right value in the response")
 
@@ -292,7 +291,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             'date_1': '14:55:39',
         }
         response = self.client.post(reverse('admin:admin_views_article_add'), post_data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'title with a new\\u000Aline')
 
@@ -512,7 +510,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         This also tests relation-spanning filters (e.g. 'color__value').
         """
         response = self.client.get(reverse('admin:admin_views_thing_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">',
             msg_prefix="Expected filter not found in changelist view")
         self.assertNotContains(response, '<a href="?color__id__exact=3">Blue</a>',
@@ -521,7 +518,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_relation_spanning_filters(self):
         changelist_url = reverse('admin:admin_views_chapterxtra1_changelist')
         response = self.client.get(changelist_url)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<div id="changelist-filter">')
         filters = {
             'chap__id__exact': dict(
@@ -682,7 +678,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         WorkHour.objects.create(datum=datetime.datetime.now(), employee=e1)
         WorkHour.objects.create(datum=datetime.datetime.now(), employee=e2)
         response = self.client.get(reverse('admin:admin_views_workhour_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'employee__person_ptr__exact')
         response = self.client.get("%s?employee__person_ptr__exact=%d" % (
             reverse('admin:admin_views_workhour_changelist'), e1.pk)
@@ -1731,18 +1726,14 @@ class AdminViewPermissionsTest(TestCase):
         for login_dict in [self.joepublic_login, self.no_username_login]:
             self.client.post(login_url, login_dict)
             response = self.client.get(change_url_1, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.post(change_url_1, {'name': 'changed'}, follow=True)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=1).name, 'odd id')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.get(change_url_2, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             response = self.client.post(change_url_2, {'name': 'changed again'}, follow=True)
             self.assertEqual(RowLevelChangePermissionModel.objects.get(id=2).name, 'changed')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             self.client.get(reverse('admin:logout'))
 
@@ -1820,11 +1811,9 @@ class AdminViewPermissionsTest(TestCase):
             self.client.post(login_url, login_dict)
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl1.pk,))
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
             url = reverse('admin:admin_views_rowlevelchangepermissionmodel_history', args=(rl2.pk,))
             response = self.client.get(url, follow=True)
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'login-form')
 
             self.client.get(reverse('admin:logout'))
@@ -4488,14 +4477,12 @@ class PrePopulatedTest(TestCase):
 
     def test_prepopulated_on(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "id: '#id_slug',")
         self.assertContains(response, "field['dependency_ids'].push('#id_title');")
         self.assertContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
 
     def test_prepopulated_off(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_change', args=(self.p1.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "A Long Title")
         self.assertNotContains(response, "id: '#id_slug'")
         self.assertNotContains(response, "field['dependency_ids'].push('#id_title');")
@@ -4910,7 +4897,6 @@ class ReadonlyTest(TestCase):
         """
         p = FieldOverridePost.objects.create(title="Test Post", content="Test Content")
         response = self.client.get(reverse('admin:admin_views_fieldoverridepost_change', args=(p.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<p class="help">Overridden help text for the date</p>')
         self.assertContains(response, '<label for="id_public">Overridden public label:</label>', html=True)
         self.assertNotContains(response, "Some help text for the date (with unicode ŠĐĆŽćžšđ)")
@@ -5156,11 +5142,9 @@ class UserAdminTest(TestCase):
     def test_user_fk_add_popup(self):
         """User addition through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_add'))
         self.assertContains(response, 'class="related-widget-wrapper-link add-related" id="add_id_owner"')
         response = self.client.get(reverse('admin:auth_user_add') + '?_popup=1')
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
         data = {
@@ -5171,19 +5155,16 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(reverse('admin:auth_user_add') + '?_popup=1', data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissAddRelatedObjectPopup')
 
     def test_user_fk_change_popup(self):
         """User change through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_change', args=('__fk__',)))
         self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
         user = User.objects.get(username='changeuser')
         url = reverse('admin:auth_user_change', args=(user.pk,)) + '?_popup=1'
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'name="_continue"')
         self.assertNotContains(response, 'name="_addanother"')
         data = {
@@ -5198,13 +5179,11 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissChangeRelatedObjectPopup')
 
     def test_user_fk_delete_popup(self):
         """User deletion through a FK popup should return the appropriate JavaScript response."""
         response = self.client.get(reverse('admin:admin_views_album_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('admin:auth_user_delete', args=('__fk__',)))
         self.assertContains(response, 'class="related-widget-wrapper-link change-related" id="change_id_owner"')
         user = User.objects.get(username='changeuser')
@@ -5216,7 +5195,6 @@ class UserAdminTest(TestCase):
             '_popup': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dismissDeleteRelatedObjectPopup')
 
     def test_save_add_another_button(self):
@@ -5360,7 +5338,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by change_form template
         """
         response = self.client.get(reverse('admin:admin_views_section_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5369,7 +5346,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by change_list template
         """
         response = self.client.get(reverse('admin:admin_views_section_changelist'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5380,7 +5356,6 @@ class CSSTest(TestCase):
         """
         response = self.client.get(
             reverse('admin:admin_views_section_delete', args=(self.s1.pk,)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
@@ -5389,7 +5364,6 @@ class CSSTest(TestCase):
         Ensure app and model tag are correctly read by app_index template
         """
         response = self.client.get(reverse('admin:app_list', args=('admin_views',)))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<body class=" dashboard app-admin_views')
 
     def test_app_model_in_delete_selected_confirmation_body_class(self):
@@ -5404,7 +5378,6 @@ class CSSTest(TestCase):
         }
         response = self.client.post(reverse('admin:admin_views_section_changelist'),
             action_data)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
             '<body class=" app-admin_views model-section ')
 
