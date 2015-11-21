@@ -1743,7 +1743,7 @@ class InlineModelAdmin(BaseModelAdmin):
         return self.max_num
 
     def get_formset(self, request, obj=None, **kwargs):
-        """Returns a BaseInlineFormSet class for use in admin add/change views."""
+        """Returns a InlineFormSet class for use in admin add/change views."""
         if 'fields' in kwargs:
             fields = kwargs.pop('fields')
         else:
