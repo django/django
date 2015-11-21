@@ -37,6 +37,51 @@
         var totalForms = $("#id_" + options.prefix + "-TOTAL_FORMS").prop("autocomplete", "off");
         var nextIndex = parseInt(totalForms.val(), 10);
         var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
+        // only show the add button if we are allowed to add more items,
+        // note that max_num = None translates to a blank string.
+        var addButton;
+        var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
+        $this.each(function(i) {
+            $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
+        });
+        if ($this.length && showAddButton) {
+            if ($this.prop("tagName") === "TR") {
+                // If forms are laid out as table rows, insert the
+                // "add" button in a new table row:
+                var numCols = this.eq(-1).children().length;
+                $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
+                addButton = $parent.find("tr:last a");
+            } else {
+                // Otherwise, insert it immediately after the last form:
+                $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
+                addButton = $this.filter(":last").next().find("a");
+            }
+            addButton.click(function(e) {
+                e.preventDefault();
+                var template = $("#" + options.prefix + "-empty");
+                var row = template.clone(true);
+                row.removeClass(options.emptyCssClass)
+                .addClass(options.formCssClass)
+                .attr("id", options.prefix + "-" + nextIndex);
+                row.find("*").each(function() {
+                    updateElementIndex(this, options.prefix, totalForms.val());
+                });
+                // Insert the new form when it has been fully edited
+                row.insertBefore($(template));
+                // Update number of total forms
+                $(totalForms).val(parseInt(totalForms.val(), 10) + 1);
+                nextIndex += 1;
+                // Hide add button in case we've hit the max, except we want to add infinitely
+                if ((maxForms.val() !== '') && (maxForms.val() - totalForms.val()) <= 0) {
+                    addButton.parent().hide();
+                }
+                // If a post-add callback was supplied, call it with the added form:
+                if (options.added) {
+                    options.added(row);
+                }
+                $(document).trigger('formset:added', [row, options.prefix]);
+            });
+        }
         // add delete buttons to all rows that don't have a delete checkbox
         $(this).each(function() {
             // skip rows that have an original
@@ -86,51 +131,6 @@
                 });
             }
         });
-        // only show the add button if we are allowed to add more items,
-        // note that max_num = None translates to a blank string.
-        var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
-        $this.each(function(i) {
-            $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
-        });
-        if ($this.length && showAddButton) {
-            var addButton;
-            if ($this.prop("tagName") === "TR") {
-                // If forms are laid out as table rows, insert the
-                // "add" button in a new table row:
-                var numCols = this.eq(-1).children().length;
-                $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
-                addButton = $parent.find("tr:last a");
-            } else {
-                // Otherwise, insert it immediately after the last form:
-                $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
-                addButton = $this.filter(":last").next().find("a");
-            }
-            addButton.click(function(e) {
-                e.preventDefault();
-                var template = $("#" + options.prefix + "-empty");
-                var row = template.clone(true);
-                row.removeClass(options.emptyCssClass)
-                .addClass(options.formCssClass)
-                .attr("id", options.prefix + "-" + nextIndex);
-                row.find("*").each(function() {
-                    updateElementIndex(this, options.prefix, totalForms.val());
-                });
-                // Insert the new form when it has been fully edited
-                row.insertBefore($(template));
-                // Update number of total forms
-                $(totalForms).val(parseInt(totalForms.val(), 10) + 1);
-                nextIndex += 1;
-                // Hide add button in case we've hit the max, except we want to add infinitely
-                if ((maxForms.val() !== '') && (maxForms.val() - totalForms.val()) <= 0) {
-                    addButton.parent().hide();
-                }
-                // If a post-add callback was supplied, call it with the added form:
-                if (options.added) {
-                    options.added(row);
-                }
-                $(document).trigger('formset:added', [row, options.prefix]);
-            });
-        }
         return this;
     };
 
