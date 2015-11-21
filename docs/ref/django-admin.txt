@@ -6,15 +6,13 @@ django-admin and manage.py
 This document outlines all it can do.
 
 In addition, ``manage.py`` is automatically created in each Django project.
-``manage.py`` is a thin wrapper around ``django-admin`` that takes care of
-several things for you before delegating to ``django-admin``:
+``manage.py`` does the same thing as ``django-admin`` but takes care of a few
+things for you:
 
 * It puts your project's package on ``sys.path``.
 
 * It sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable so that
   it points to your project's ``settings.py`` file.
-
-* It calls :func:`django.setup()` to initialize various internals of Django.
 
 The ``django-admin`` script should be on your system path if you installed
 Django via its ``setup.py`` utility. If it's not on your path, you can find it
