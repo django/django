@@ -182,19 +182,15 @@ class HandlerNotFoundTest(SimpleTestCase):
 
     def test_invalid_urls(self):
         response = self.client.get('~%A9helloworld')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '~%A9helloworld', status_code=404)
 
         response = self.client.get('d%aao%aaw%aan%aal%aao%aaa%aad%aa/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, 'd%AAo%AAw%AAn%AAl%AAo%AAa%AAd%AA', status_code=404)
 
         response = self.client.get('/%E2%99%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '%E2%99\u2665', status_code=404)
 
         response = self.client.get('/%E2%98%8E%E2%A9%E2%99%A5/')
-        self.assertEqual(response.status_code, 404)
         self.assertContains(response, '\u260e%E2%A9\u2665', status_code=404)
 
     def test_environ_path_info_type(self):

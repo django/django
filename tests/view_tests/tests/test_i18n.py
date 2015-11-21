@@ -208,7 +208,6 @@ class JsI18NTests(SimpleTestCase):
         """
         with self.settings(LANGUAGE_CODE='en-us'), override('fr'):
             response = self.client.get('/jsi18n/app5/')
-            self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'emoji')
             self.assertContains(response, '\\ud83d\\udca9')
 
