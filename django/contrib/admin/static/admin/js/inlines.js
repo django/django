@@ -39,24 +39,23 @@
         var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
         // add delete buttons to all rows that don't have a delete checkbox
         $(this).each(function() {
-            var row = $(this);
             // skip rows that have an original
             if (!$(this).find("[name=" + $(this).attr("id") + "-id]").val()) {
-                if (row.is("tr")) {
+                if ($(this).is("tr")) {
                     // If the forms are laid out in table rows, insert
                     // the remove button into the last table cell:
-                    row.children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
-                } else if (row.is("ul") || row.is("ol")) {
+                    $(this).children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
+                } else if ($(this).is("ul") || $(this).is("ol")) {
                     // If they're laid out as an ordered/unordered list,
                     // insert an <li> after the last list item:
-                    row.append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
+                    $(this).append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
                 } else {
                     // Otherwise, just insert the remove button as the
                     // last child element of the form's container:
-                    row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
+                    $(this).children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
                 }
                 // The delete button of each row triggers a bunch of other things
-                row.find("a." + options.deleteCssClass).click(function(e1) {
+                $(this).find("a." + options.deleteCssClass).click(function(e1) {
                     e1.preventDefault();
                     // Remove the parent form containing this button:
                     var row = $(this).parents("." + options.formCssClass);
