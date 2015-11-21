@@ -135,7 +135,7 @@ class DjangoTemplatesTests(TemplateStringsTests):
         templates = [{
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'APP_DIRS': True,
-            'OPTIONS': {'cache_templates': True}
+            'OPTIONS': {'cache_templates': True},
         }]
         engine = EngineHandler(templates=templates)['django'].engine
         self.assertEqual(engine.loaders, [
