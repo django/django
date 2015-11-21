@@ -2,11 +2,11 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.forms import ModelForm, modelformset_factory
-from django.forms.models import BaseModelFormSet
+from django.forms.models import ModelFormSet
 from django.contrib.contenttypes.models import ContentType
 
 
-class BaseGenericInlineFormSet(BaseModelFormSet):
+class BaseGenericInlineFormSet(ModelFormSet):
     """
     A formset for generic inline objects to a parent.
     """
