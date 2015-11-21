@@ -459,7 +459,7 @@ class Parser(object):
 
     def parse(self, parse_until=None):
         """
-        Iterate through the parser tokens and compils each one into a node.
+        Iterate through the parser tokens and compiles each one into a node.
 
         If parse_until is provided, parsing will stop once one of the
         specified tokens has been reached. This is formatted as a list of
