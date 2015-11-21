@@ -1728,15 +1728,19 @@ class SchemaTests(TransactionTestCase):
         name_indexes = []
         for name, details in constraints.items():
             if details['columns'] == ['name']:
-                name_indexes.append(details)
+                name_indexes.append(name)
         self.assertEqual(2, len(name_indexes), 'Indexes are missing for name column')
+        # Check that one of the indexes ends with `_like`
+        like_index = list(filter(lambda x: x.endswith('_like'), name_indexes))
+        self.assertEqual(1, len(like_index),
+                         'Index with the operator class is missing for the name column')
         # Remove the index
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
         # Ensure the name constraints where dropped
         constraints = self.get_constraints(Author._meta.db_table)
         name_indexes = []
-        for name, details in constraints.items():
+        for details in constraints.values():
             if details['columns'] == ['name']:
                 name_indexes.append(details)
         self.assertEqual(0, len(name_indexes), 'Indexes were not dropped for the name column')
