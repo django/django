@@ -218,6 +218,13 @@ class TestQuerying(TestCase):
             self.objs[0:3]
         )
 
+    def test_len_empty_array(self):
+        obj = NullableIntegerArrayModel.objects.create(field=[])
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__len=0),
+            [obj]
+        )
+
     def test_slice(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__0_1=[2]),

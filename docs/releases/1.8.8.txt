@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed incorrect ``unique_together`` field name generation by ``inspectdb``
   (:ticket:`25274`).
+
+* Corrected ``__len`` query lookup on ``ArrayField`` for empty arrays
+  (:ticket:`25772`).
