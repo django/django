@@ -1744,3 +1744,38 @@ class SchemaTests(TransactionTestCase):
             if details['columns'] == ['name']:
                 name_indexes.append(details)
         self.assertEqual(0, len(name_indexes), 'Indexes were not dropped for the name column')
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_index_to_textfield(self):
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Note)
+        # Ensure the table is there and has no index
+        self.assertNotIn("info", self.get_indexes(Note._meta.db_table))
+        # Alter to add the index
+        old_field = Note._meta.get_field('info')
+        new_field = TextField(db_index=True)
+        new_field.set_attributes_from_name('info')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, old_field, new_field, strict=True)
+        # Check that all the constraints are there
+        constraints = self.get_constraints(Note._meta.db_table)
+        info_indexes = []
+        for name, details in constraints.items():
+            if details['columns'] == ['info']:
+                info_indexes.append(name)
+        self.assertEqual(2, len(info_indexes), 'Indexes are missing for info column')
+        # Check that one of the indexes ends with `_like`
+        like_index = list(filter(lambda x: x.endswith('_like'), info_indexes))
+        self.assertEqual(1, len(like_index),
+                         'Index with the operator class is missing for the info column')
+        # Remove the index
+        with connection.schema_editor() as editor:
+            editor.alter_field(Note, new_field, old_field, strict=True)
+        # Ensure the info constraints where dropped
+        constraints = self.get_constraints(Note._meta.db_table)
+        info_indexes = []
+        for details in constraints.values():
+            if details['columns'] == ['info']:
+                info_indexes.append(details)
+        self.assertEqual(0, len(info_indexes), 'Indexes were not dropped for the info column')
