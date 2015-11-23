@@ -105,11 +105,22 @@
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
             var now_link = document.createElement('a');
-            now_link.setAttribute('href', "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", -1);");
+            now_link.setAttribute('href', "#");
             now_link.appendChild(document.createTextNode(gettext('Now')));
+            addEvent(now_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, -1);
+            });
             var clock_link = document.createElement('a');
-            clock_link.setAttribute('href', 'javascript:DateTimeShortcuts.openClock(' + num + ');');
+            clock_link.setAttribute('href', '#');
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
+            addEvent(clock_link, 'click', function(e) {
+                e.preventDefault();
+                // avoid triggering the document click handler to dismiss the clock
+                e.stopPropagation();
+                DateTimeShortcuts.openClock(num);
+            });
+
             quickElement(
                 'span', clock_link, '',
                 'class', 'clock-icon',
@@ -146,15 +157,40 @@
             quickElement('h2', clock_box, gettext('Choose a time'));
             var time_list = quickElement('ul', clock_box);
             time_list.className = 'timelist';
-            quickElement("a", quickElement("li", time_list), gettext("Now"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", -1);");
-            quickElement("a", quickElement("li", time_list), gettext("Midnight"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 0);");
-            quickElement("a", quickElement("li", time_list), gettext("6 a.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 6);");
-            quickElement("a", quickElement("li", time_list), gettext("Noon"), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 12);");
-            quickElement("a", quickElement("li", time_list), gettext("6 p.m."), "href", "javascript:DateTimeShortcuts.handleClockQuicklink(" + num + ", 18);");
+            var time_link = quickElement("a", quickElement("li", time_list), gettext("Now"), "href", "#");
+            addEvent(time_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, -1);
+            });
+            time_link = quickElement("a", quickElement("li", time_list), gettext("Midnight"), "href", "#");
+            addEvent(time_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, 0);
+            });
+            time_link = quickElement("a", quickElement("li", time_list), gettext("6 a.m."), "href", "#");
+            addEvent(time_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, 6);
+            });
+            time_link = quickElement("a", quickElement("li", time_list), gettext("Noon"), "href", "#");
+            addEvent(time_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, 12);
+            });
+            time_link = quickElement("a", quickElement("li", time_list), gettext("6 p.m."), "href", "#");
+            addEvent(time_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleClockQuicklink(num, 18);
+            });
 
             var cancel_p = quickElement('p', clock_box);
             cancel_p.className = 'calendar-cancel';
-            quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissClock(' + num + ');');
+            var cancel_link = quickElement('a', cancel_p, gettext('Cancel'), 'href', '#');
+            addEvent(cancel_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.dismissClock(num);
+            });
+
             django.jQuery(document).bind('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
@@ -213,11 +249,21 @@
             shortcuts_span.className = DateTimeShortcuts.shortCutsClass;
             inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
             var today_link = document.createElement('a');
-            today_link.setAttribute('href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
+            today_link.setAttribute('href', '#');
             today_link.appendChild(document.createTextNode(gettext('Today')));
+            addEvent(today_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleCalendarQuickLink(num, 0);
+            });
             var cal_link = document.createElement('a');
-            cal_link.setAttribute('href', 'javascript:DateTimeShortcuts.openCalendar(' + num + ');');
+            cal_link.setAttribute('href', '#');
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
+            addEvent(cal_link, 'click', function(e) {
+                e.preventDefault();
+                // avoid triggering the document click handler to dismiss the calendar
+                e.stopPropagation();
+                DateTimeShortcuts.openCalendar(num);
+            });
             quickElement(
                 'span', cal_link, '',
                 'class', 'date-icon',
@@ -255,10 +301,19 @@
 
             // next-prev links
             var cal_nav = quickElement('div', cal_box);
-            var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', 'javascript:DateTimeShortcuts.drawPrev(' + num + ');');
+            var cal_nav_prev = quickElement('a', cal_nav, '<', 'href', '#');
             cal_nav_prev.className = 'calendarnav-previous';
-            var cal_nav_next = quickElement('a', cal_nav, '>', 'href', 'javascript:DateTimeShortcuts.drawNext(' + num + ');');
+            addEvent(cal_nav_prev, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.drawPrev(num);
+            });
+
+            var cal_nav_next = quickElement('a', cal_nav, '>', 'href', '#');
             cal_nav_next.className = 'calendarnav-next';
+            addEvent(cal_nav_next, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.drawNext(num);
+            });
 
             // main box
             var cal_main = quickElement('div', cal_box, '', 'id', DateTimeShortcuts.calendarDivName2 + num);
@@ -269,16 +324,32 @@
             // calendar shortcuts
             var shortcuts = quickElement('div', cal_box);
             shortcuts.className = 'calendar-shortcuts';
-            quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
+            var day_link = quickElement('a', shortcuts, gettext('Yesterday'), 'href', '#');
+            addEvent(day_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleCalendarQuickLink(num, -1);
+            });
             shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            quickElement('a', shortcuts, gettext('Today'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
+            day_link = quickElement('a', shortcuts, gettext('Today'), 'href', '#');
+            addEvent(day_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleCalendarQuickLink(num, 0);
+            });
             shortcuts.appendChild(document.createTextNode('\u00A0|\u00A0'));
-            quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
+            day_link = quickElement('a', shortcuts, gettext('Tomorrow'), 'href', '#');
+            addEvent(day_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.handleCalendarQuickLink(num, +1);
+            });
 
             // cancel bar
             var cancel_p = quickElement('p', cal_box);
             cancel_p.className = 'calendar-cancel';
-            quickElement('a', cancel_p, gettext('Cancel'), 'href', 'javascript:DateTimeShortcuts.dismissCalendar(' + num + ');');
+            var cancel_link = quickElement('a', cancel_p, gettext('Cancel'), 'href', '#');
+            addEvent(cancel_link, 'click', function(e) {
+                e.preventDefault();
+                DateTimeShortcuts.dismissCalendar(num);
+            });
             django.jQuery(document).bind('keyup', function(event) {
                 if (event.which === 27) {
                     // ESC key closes popup
@@ -340,15 +411,11 @@
             format = format.replace('\n', '\\n');
             format = format.replace('\t', '\\t');
             format = format.replace("'", "\\'");
-            return ["function(y, m, d) { DateTimeShortcuts.calendarInputs[",
-                   num,
-                   "].value = new Date(y, m-1, d).strftime('",
-                   format,
-                   "');DateTimeShortcuts.calendarInputs[",
-                   num,
-                   "].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+",
-                   num,
-                   ").style.display='none';}"].join('');
+            return function(y, m, d) {
+                DateTimeShortcuts.calendarInputs[num].value = new Date(y, m - 1, d).strftime(format);
+                DateTimeShortcuts.calendarInputs[num].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1 + num).style.display = 'none';
+            };
         },
         handleCalendarQuickLink: function(num, offset) {
             var d = DateTimeShortcuts.now();
