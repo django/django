@@ -271,9 +271,8 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', False)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 0); });</script>\n'
+            '<select multiple="multiple" name="test" class="selectfilter" '
+            'data-field-name="test\\" data-is-stacked="0">\n</select>'
         )
 
     def test_stacked_render(self):
@@ -281,9 +280,8 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', True)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 1); });</script>\n'
+            '<select multiple="multiple" name="test" class="selectfilterstacked" '
+            'data-field-name="test\\" data-is-stacked="1">\n</select>'
         )
 
 

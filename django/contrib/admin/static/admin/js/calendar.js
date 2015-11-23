@@ -1,4 +1,4 @@
-/*global gettext, pgettext, get_format, quickElement, removeChildren*/
+/*global gettext, pgettext, get_format, quickElement, removeChildren, addEvent*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -100,6 +100,14 @@ depends on core.js for utility functions like removeChildren or quickElement
                 nonDayCell.className = "nonday";
             }
 
+            function calendarMonth(y, m) {
+                function onClick(e) {
+                    e.preventDefault();
+                    callback(y, m, django.jQuery(this).text());
+                }
+                return onClick;
+            }
+
             // Draw days of month
             var currentDay = 1;
             for (i = startingPos; currentDay <= days; i++) {
@@ -121,8 +129,8 @@ depends on core.js for utility functions like removeChildren or quickElement
                 }
 
                 var cell = quickElement('td', tableRow, '', 'class', todayClass);
-
-                quickElement('a', cell, currentDay, 'href', 'javascript:void(' + callback + '(' + year + ',' + month + ',' + currentDay + '));');
+                var link = quickElement('a', cell, currentDay, 'href', '#');
+                addEvent(link, 'click', calendarMonth(year, month));
                 currentDay++;
             }
 

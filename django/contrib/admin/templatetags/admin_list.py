@@ -19,7 +19,7 @@ from django.template.loader import get_template
 from django.utils import formats
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
-from django.utils.html import escapejs, format_html
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
@@ -254,13 +254,11 @@ def items_for_result(cl, result, form):
                 else:
                     attr = pk
                 value = result.serializable_value(attr)
-                result_id = escapejs(value)
                 link_or_text = format_html(
                     '<a href="{}"{}>{}</a>',
                     url,
                     format_html(
-                        ' onclick="opener.dismissRelatedLookupPopup(window, '
-                        '&#39;{}&#39;); return false;"', result_id
+                        ' data-popup-opener="{}"', value
                     ) if cl.is_popup else '',
                     result_repr)
 

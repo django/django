@@ -10,6 +10,11 @@
   {% if cl.formset or action_form %}
     <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
   {% endif %}
+  {% if action_form %}
+      {% if actions_on_top or actions_on_bottom %}
+          <script type="application/json" id="actions_enabled">true</script>
+      {% endif %}
+  {% endif %}
   {{ media.css }}
   {% if not actions_on_top and not actions_on_bottom %}
     <style>
@@ -21,15 +26,6 @@
 {% block extrahead %}
 {{ block.super }}
 {{ media.js }}
-{% if action_form %}{% if actions_on_top or actions_on_bottom %}
-<script type="text/javascript">
-(function($) {
-    $(document).ready(function($) {
-        $("tr input.action-select").actions();
-    });
-})(django.jQuery);
-</script>
-{% endif %}{% endif %}
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}

@@ -15,7 +15,7 @@ from django.template.loader import render_to_string
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import (
-    escape, escapejs, format_html, format_html_join, smart_urlquote,
+    escape, format_html, format_html_join, smart_urlquote,
 )
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
@@ -45,16 +45,11 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         attrs['class'] = 'selectfilter'
         if self.is_stacked:
             attrs['class'] += 'stacked'
-        output = [
-            super(FilteredSelectMultiple, self).render(name, value, attrs, choices),
-            '<script type="text/javascript">addEvent(window, "load", function(e) {',
-            # TODO: "id_" is hard-coded here. This should instead use the
-            # correct API to determine the ID dynamically.
-            'SelectFilter.init("id_%s", "%s", %s); });</script>\n' % (
-                name, escapejs(self.verbose_name), int(self.is_stacked),
-            ),
-        ]
-        return mark_safe(''.join(output))
+
+        attrs['data-field-name'] = self.verbose_name
+        attrs['data-is-stacked'] = int(self.is_stacked)
+        output = super(FilteredSelectMultiple, self).render(name, value, attrs, choices)
+        return mark_safe(output)
 
 
 class AdminDateWidget(forms.DateInput):

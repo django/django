@@ -29,7 +29,13 @@ In your custom ``change_form.html`` template, extend the
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
-    <script type="text/javascript">
+    <script type="text/javascript" src="{% static 'app/formset_handlers.js' %}></script>
+    </script>
+    {% endblock %}
+
+.. code-block:: javascript
+
+    // app/static/app/formset_handlers.js
     (function($) {
         $(document).on('formset:added', function(event, $row, formsetName) {
             if (formsetName == 'author_set') {
@@ -41,8 +47,6 @@ In your custom ``change_form.html`` template, extend the
             // Row removed
         });
     })(django.jQuery);
-    </script>
-    {% endblock %}
 
 Two points to keep in mind:
 
@@ -63,6 +67,12 @@ namespace, just listen to the event triggered from there. For example:
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
+    <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}></script>
+    {% endblock %}
+
+.. code-block:: javascript
+
+    // app/static/app/unregistered_hanlders.js
     <script type="text/javascript">
         django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
             // Row added
@@ -72,4 +82,3 @@ namespace, just listen to the event triggered from there. For example:
             // Row removed
         });
     </script>
-    {% endblock %}
