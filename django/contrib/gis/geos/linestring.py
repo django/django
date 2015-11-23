@@ -32,18 +32,22 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
         else:
             coords = args
 
+        if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
+            raise TypeError('Invalid initialization input for LineStrings.')
+
+        ncoords = len(coords)
+        if ncoords < self._minlength:
+            raise ValueError(
+                '%s requires at least %d points, got %s.' % (
+                    self.__class__.__name__,
+                    self._minlength,
+                    ncoords,
+                )
+            )
+
         if isinstance(coords, (tuple, list)):
             # Getting the number of coords and the number of dimensions -- which
             #  must stay the same, e.g., no LineString((1, 2), (1, 2, 3)).
-            ncoords = len(coords)
-            if ncoords < self._minlength:
-                raise TypeError(
-                    '%s requires at least %d points, got %s.' % (
-                        self.__class__.__name__,
-                        self._minlength,
-                        ncoords,
-                    )
-                )
             ndim = None
             # Incrementing through each of the coordinates and verifying
             for coord in coords:
@@ -56,16 +60,13 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
                 elif len(coord) != ndim:
                     raise TypeError('Dimension mismatch.')
             numpy_coords = False
-        elif numpy and isinstance(coords, numpy.ndarray):
+        else:
             shape = coords.shape  # Using numpy's shape.
             if len(shape) != 2:
                 raise TypeError('Too many dimensions.')
             self._checkdim(shape[1])
-            ncoords = shape[0]
             ndim = shape[1]
             numpy_coords = True
-        else:
-            raise TypeError('Invalid initialization input for LineStrings.')
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using GEOSCoordSeq.__setitem__().

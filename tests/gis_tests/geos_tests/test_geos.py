@@ -325,11 +325,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
-            with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
-                LineString((0, 0))
+        with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
+            LineString((0, 0))
 
-            with self.assertRaisesMessage(TypeError, 'LineString requires at least 2 points, got 1.'):
-                LineString([(0, 0)])
+        with self.assertRaisesMessage(ValueError, 'LineString requires at least 2 points, got 1.'):
+            LineString([(0, 0)])
+
+        if numpy:
+            with self.assertRaisesMessage(ValueError, 'LineString requires at least 2 points, got 1.'):
+                LineString(numpy.array([(0, 0)]))
+
+        with mock.patch('django.contrib.gis.geos.linestring.numpy', False):
+            with self.assertRaisesMessage(TypeError, 'Invalid initialization input for LineStrings.'):
+                LineString('wrong input')
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -374,11 +382,15 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(lr, LinearRing(numpy.array(lr.tuple)))
 
-        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 3.'):
+        with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 3.'):
             LinearRing((0, 0), (1, 1), (0, 0))
 
-        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 1.'):
+        with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 1.'):
             LinearRing([(0, 0)])
+
+        if numpy:
+            with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 1.'):
+                LinearRing(numpy.array([(0, 0)]))
 
     def test_polygons_from_bbox(self):
         "Testing `from_bbox` class method."
