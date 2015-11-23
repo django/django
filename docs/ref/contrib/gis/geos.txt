@@ -65,11 +65,10 @@ created by passing in the X and Y coordinates into its constructor::
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(5, 23)
 
-Finally, there are :func:`fromstr` and :func:`fromfile` factory methods, which
-return a :class:`GEOSGeometry` object from an input string or a file::
+Finally, there is :func:`fromfile` factory method, which
+returns a :class:`GEOSGeometry` object from a file::
 
-    >>> from django.contrib.gis.geos import fromstr, fromfile
-    >>> pnt = fromstr('POINT(5 23)')
+    >>> from django.contrib.gis.geos import fromfile
     >>> pnt = fromfile('/path/to/pnt.wkt')
     >>> pnt = fromfile(open('/path/to/pnt.wkt'))
 
@@ -828,6 +827,10 @@ Example::
 
     >>> from django.contrib.gis.geos import fromstr
     >>> pnt = fromstr('POINT(-90.5 29.5)', srid=4326)
+
+.. note::
+    ``fromstr(string, srid)`` is an equivalent of
+    :class:`GEOSGeometry(string, srid) <GEOSGeometry>`.
 
 I/O Objects
 ===========
