@@ -2,7 +2,7 @@
 Django 1.7.11 release notes
 ===========================
 
-*Under development*
+*November 24, 2015*
 
 Django 1.7.11 fixes a security issue and a data loss bug in 1.7.10.
 
