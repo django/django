@@ -22,6 +22,9 @@ class BaseDatabaseFeatures(object):
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
 
+    # Does the backend check the value before inserting it into the table?
+    has_strict_value_checking = True
+
     can_use_chunked_reads = True
     can_return_id_from_insert = False
     has_bulk_insert = False

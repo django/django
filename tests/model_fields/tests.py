@@ -9,7 +9,9 @@ from django import forms, test
 from django.apps import apps
 from django.core import checks, validators
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError, connection, models, transaction
+from django.db import (
+    DatabaseError, IntegrityError, connection, models, transaction,
+)
 from django.db.models.fields import (
     NOT_PROVIDED, AutoField, BigIntegerField, BinaryField, BooleanField,
     CharField, CommaSeparatedIntegerField, DateField, DateTimeField,
@@ -624,6 +626,12 @@ class IntegerFieldTests(test.TestCase):
     model = IntegerModel
     documented_range = (-2147483648, 2147483647)
 
+    @property
+    def backend_range(self):
+        field = self.model._meta.get_field('value')
+        internal_type = field.get_internal_type()
+        return connection.ops.integer_field_range(internal_type)
+
     def test_documented_range(self):
         """
         Ensure that values within the documented safe range pass validation,
@@ -645,14 +653,34 @@ class IntegerFieldTests(test.TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertEqual(qs[0].value, max_value)
 
+    def test_backend_range(self):
+        """
+        Ensure that backend specific range can be saved without corruption.
+        """
+        min_value, max_value = self.backend_range
+
+        if min_value is not None:
+            instance = self.model(value=min_value)
+            instance.full_clean()
+            instance.save()
+            qs = self.model.objects.filter(value__lte=min_value)
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs[0].value, min_value)
+
+        if max_value is not None:
+            instance = self.model(value=max_value)
+            instance.full_clean()
+            instance.save()
+            qs = self.model.objects.filter(value__gte=max_value)
+            self.assertEqual(qs.count(), 1)
+            self.assertEqual(qs[0].value, max_value)
+
     def test_backend_range_validation(self):
         """
         Ensure that backend specific range are enforced at the model
-        validation level. ref #12030.
+        validation level. ref #12030, #25767.
         """
-        field = self.model._meta.get_field('value')
-        internal_type = field.get_internal_type()
-        min_value, max_value = connection.ops.integer_field_range(internal_type)
+        min_value, max_value = self.backend_range
 
         if min_value is not None:
             instance = self.model(value=min_value - 1)
@@ -661,6 +689,14 @@ class IntegerFieldTests(test.TestCase):
             }
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
+            if connection.features.has_strict_value_checking:
+                with transaction.atomic(), self.assertRaises(DatabaseError):
+                    instance.save()
+            else:
+                instance.save()
+                qs = self.model.objects.filter(value__lte=min_value)
+                self.assertEqual(qs.count(), 1)
+                self.assertEqual(qs[0].value, min_value)
             instance.value = min_value
             instance.full_clean()
 
@@ -671,6 +707,14 @@ class IntegerFieldTests(test.TestCase):
             }
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
+            if connection.features.has_strict_value_checking:
+                with transaction.atomic(), self.assertRaises(DatabaseError):
+                    instance.save()
+            else:
+                instance.save()
+                qs = self.model.objects.filter(value__gte=max_value)
+                self.assertEqual(qs.count(), 1)
+                self.assertEqual(qs[0].value, max_value)
             instance.value = max_value
             instance.full_clean()
 

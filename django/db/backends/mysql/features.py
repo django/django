@@ -67,5 +67,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             cursor.execute("SELECT 1 FROM mysql.time_zone LIMIT 1")
             return cursor.fetchone() is not None
 
+    @cached_property
+    def has_strict_value_checking(self):
+        "Check if strict mode is enabled"
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT @@sql_mode")
+            result = cursor.fetchone()
+
+        return any(sql_mode in result[0] for sql_mode in ('STRICT_ALL_TABLES', 'STRICT_TRANS_TABLES'))
+
     def introspected_boolean_field_type(self, *args, **kwargs):
         return 'IntegerField'
