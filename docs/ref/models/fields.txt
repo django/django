@@ -497,9 +497,13 @@ optional arguments:
     for creation of timestamps. Note that the current date is *always* used;
     it's not just a default value that you can override. So even if you
     set a value for this field when creating the object, it will be ignored.
-    If you want to be able to modify this field, set ``default=timezone.now``
-    (from :func:`django.utils.timezone.now`) instead of ``auto_now_add=True``.
+    If you want to be able to modify this field, set the following instead of
+    ``auto_now_add=True``:
 
+    * For :class:`DateField`: ``default=date.today`` - from
+      :meth:`datetime.date.today`
+    * For :class:`DateTimeField`: ``default=timezone.now`` - from
+      :func:`django.utils.timezone.now`
 
 The default form widget for this field is a
 :class:`~django.forms.TextInput`. The admin adds a JavaScript calendar,
