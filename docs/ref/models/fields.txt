@@ -492,7 +492,9 @@ optional arguments:
     it's not just a default value that you can override. So even if you
     set a value for this field when creating the object, it will be ignored.
     If you want to be able to modify this field, set ``default=timezone.now``
-    (from :func:`django.utils.timezone.now`) instead of ``auto_now_add=True``.
+    (from :func:`django.utils.timezone.now`) for :class:`DateTimeField` or
+    ``default=date.today`` (from `datetime.date.today`) for :class:`DateField`
+    instead of ``auto_now_add=True``.
 
 
 The default form widget for this field is a
