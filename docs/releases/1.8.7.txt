@@ -2,7 +2,7 @@
 Django 1.8.7 release notes
 ==========================
 
-*Under development*
+*November 24, 2015*
 
 Django 1.8.7 fixes a security issue and several bugs in 1.8.6.
 
