@@ -147,7 +147,7 @@ class RelatedField(Field):
         return []
 
     def _check_relation_model_exists(self):
-        rel_is_missing = self.remote_field.model not in self.opts.apps.get_models()
+        rel_is_missing = self.remote_field.model not in self.model._meta.apps.get_models()
         rel_is_string = isinstance(self.remote_field.model, six.string_types)
         model_name = self.remote_field.model if rel_is_string else self.remote_field.model._meta.object_name
         if rel_is_missing and (rel_is_string or not self.remote_field.model._meta.swapped):
@@ -163,7 +163,7 @@ class RelatedField(Field):
         return []
 
     def _check_referencing_to_swapped_model(self):
-        if (self.remote_field.model not in self.opts.apps.get_models() and
+        if (self.remote_field.model not in self.model._meta.apps.get_models() and
                 not isinstance(self.remote_field.model, six.string_types) and
                 self.remote_field.model._meta.swapped):
             model = "%s.%s" % (
@@ -1197,7 +1197,7 @@ class ManyToManyField(RelatedField):
 
         errors = []
 
-        if self.remote_field.through not in self.opts.apps.get_models(include_auto_created=True):
+        if self.remote_field.through not in self.model._meta.apps.get_models(include_auto_created=True):
             # The relationship model is not installed.
             errors.append(
                 checks.Error(
