@@ -431,6 +431,17 @@ originally generated.
 
 Specifies a single app to look for fixtures in rather than looking in all apps.
 
+.. django-admin-option:: --exclude EXCLUDE, -e EXCLUDE
+
+The ``--exclude`` option may be provided to prevent specific
+applications or models (specified as in the form of ``app_label.ModelName``)
+from being loaded.  You can also mix application names and model names. Use
+multiple `--exclude` options to exclude multiple apps or models.
+
+.. versionchanged:: 1.10
+
+    The ``--exclude`` option was added.
+
 What's a "fixture"?
 ~~~~~~~~~~~~~~~~~~~
 

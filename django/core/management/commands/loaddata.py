@@ -13,6 +13,7 @@ from django.core import serializers
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
+from django.core.management.utils import parse_model_labels
 from django.db import (
     DEFAULT_DB_ALIAS, DatabaseError, IntegrityError, connections, router,
     transaction,
@@ -43,12 +44,18 @@ class Command(BaseCommand):
             'fixtures into. Defaults to the "default" database.')
         parser.add_argument('--app', action='store', dest='app_label',
             default=None, help='Only look for fixtures in the specified app.')
+        parser.add_argument('-e', '--exclude', dest='exclude', action='append', default=[],
+            help='An app_label or app_label.ModelName to exclude '
+                 '(use multiple --exclude to exclude multiple apps/models).')
         parser.add_argument('--ignorenonexistent', '-i', action='store_true',
             dest='ignore', default=False,
             help='Ignores entries in the serialized data for fields that do not '
             'currently exist on the model.')
 
     def handle(self, *fixture_labels, **options):
+
+        excludes = options.get('exclude')
+        self.excluded_models, self.excluded_apps = parse_model_labels(excludes, source='excludes')
 
         self.ignore = options.get('ignore')
         self.using = options.get('database')
@@ -151,6 +158,8 @@ class Command(BaseCommand):
 
                 for obj in objects:
                     objects_in_fixture += 1
+                    if self.should_skip(obj.object):
+                        continue
                     if router.allow_migrate_model(self.using, obj.object.__class__):
                         loaded_objects_in_fixture += 1
                         self.models.add(obj.object.__class__)
@@ -300,6 +309,12 @@ class Command(BaseCommand):
         name = '.'.join(parts)
 
         return name, ser_fmt, cmp_fmt
+
+    def should_skip(self, object):
+        """
+        Tests if the specified object should not be saved to the database.
+        """
+        return (object._meta.app_config in self.excluded_apps) or (object.__class__ in self.excluded_models)
 
 
 class SingleZipReader(zipfile.ZipFile):

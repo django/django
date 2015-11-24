@@ -234,6 +234,9 @@ Management Commands
 * The new :option:`shell --command` option lets you run a command as Django and
   exit, instead of opening the interactive shell.
 
+* The new :option:`loaddata --exclude` option allows excluding unwanted models and
+  apps while loading data from fixtures.
+
 Migrations
 ^^^^^^^^^^
 
