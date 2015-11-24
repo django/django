@@ -74,6 +74,11 @@ Minor features
 * Added the :meth:`GEOSGeometry.covers()
   <django.contrib.gis.geos.GEOSGeometry.covers>` binary predicate.
 
+* Added the :meth:`GDALBand.statistics()
+  <django.contrib.gis.gdal.GDALBand.statistics>` method and
+  :attr:`~django.contrib.gis.gdal.GDALBand.mean`
+  and :attr:`~django.contrib.gis.gdal.GDALBand.std` attributes.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
