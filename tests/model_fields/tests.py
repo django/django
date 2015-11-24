@@ -10,7 +10,7 @@ from django.apps import apps
 from django.core import checks, validators
 from django.core.exceptions import ValidationError
 from django.db import (
-    DataError, IntegrityError, connection, models, transaction,
+    DatabaseError, IntegrityError, connection, models, transaction,
 )
 from django.db.models.fields import (
     NOT_PROVIDED, AutoField, BigIntegerField, BinaryField, BooleanField,
@@ -689,12 +689,11 @@ class IntegerFieldTests(test.TestCase):
             }
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
-            try:
-                with transaction.atomic():
+            if connection.features.has_strict_value_checking:
+                with transaction.atomic(), self.assertRaises(DatabaseError):
                     instance.save()
-            except (DataError, IntegrityError):
-                pass  # backends such as Postgres don't fail silently
             else:
+                instance.save()
                 qs = self.model.objects.filter(value__lte=min_value)
                 self.assertEqual(qs.count(), 1)
                 self.assertEqual(qs[0].value, min_value)
@@ -708,12 +707,11 @@ class IntegerFieldTests(test.TestCase):
             }
             with self.assertRaisesMessage(ValidationError, expected_message):
                 instance.full_clean()
-            try:
-                with transaction.atomic():
+            if connection.features.has_strict_value_checking:
+                with transaction.atomic(), self.assertRaises(DatabaseError):
                     instance.save()
-            except DataError:
-                pass  # backends such as Postgres don't fail silently
             else:
+                instance.save()
                 qs = self.model.objects.filter(value__gte=max_value)
                 self.assertEqual(qs.count(), 1)
                 self.assertEqual(qs[0].value, max_value)

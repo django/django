@@ -18,6 +18,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # and then writing the same rows to the database in another cursor. This
     # setting ensures we always read result sets fully into memory all in one
     # go.
+    has_strict_value_checking = False
     can_use_chunked_reads = False
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
