@@ -138,7 +138,7 @@ class Feed(BaseFeed):
     feed_type = GeoRSSFeed
 
     def feed_extra_kwargs(self, obj):
-        return {'geometry': self.__get_dynamic_attr('geometry', obj)}
+        return {'geometry': self._get_dynamic_attr('geometry', obj)}
 
     def item_extra_kwargs(self, item):
-        return {'geometry': self.__get_dynamic_attr('item_geometry', item)}
+        return {'geometry': self._get_dynamic_attr('item_geometry', item)}

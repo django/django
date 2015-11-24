@@ -65,17 +65,17 @@ class Feed(object):
             )
 
     def item_enclosures(self, item):
-        enc_url = self.__get_dynamic_attr('item_enclosure_url', item)
+        enc_url = self._get_dynamic_attr('item_enclosure_url', item)
         if enc_url:
             enc = feedgenerator.Enclosure(
                 url=smart_text(enc_url),
-                length=smart_text(self.__get_dynamic_attr('item_enclosure_length', item)),
-                mime_type=smart_text(self.__get_dynamic_attr('item_enclosure_mime_type', item)),
+                length=smart_text(self._get_dynamic_attr('item_enclosure_length', item)),
+                mime_type=smart_text(self._get_dynamic_attr('item_enclosure_mime_type', item)),
             )
             return [enc]
         return []
 
-    def __get_dynamic_attr(self, attname, obj, default=None):
+    def _get_dynamic_attr(self, attname, obj, default=None):
         try:
             attr = getattr(self, attname)
         except AttributeError:
@@ -128,27 +128,27 @@ class Feed(object):
         """
         current_site = get_current_site(request)
 
-        link = self.__get_dynamic_attr('link', obj)
+        link = self._get_dynamic_attr('link', obj)
         link = add_domain(current_site.domain, link, request.is_secure())
 
         feed = self.feed_type(
-            title=self.__get_dynamic_attr('title', obj),
-            subtitle=self.__get_dynamic_attr('subtitle', obj),
+            title=self._get_dynamic_attr('title', obj),
+            subtitle=self._get_dynamic_attr('subtitle', obj),
             link=link,
-            description=self.__get_dynamic_attr('description', obj),
+            description=self._get_dynamic_attr('description', obj),
             language=settings.LANGUAGE_CODE,
             feed_url=add_domain(
                 current_site.domain,
-                self.__get_dynamic_attr('feed_url', obj) or request.path,
+                self._get_dynamic_attr('feed_url', obj) or request.path,
                 request.is_secure(),
             ),
-            author_name=self.__get_dynamic_attr('author_name', obj),
-            author_link=self.__get_dynamic_attr('author_link', obj),
-            author_email=self.__get_dynamic_attr('author_email', obj),
-            categories=self.__get_dynamic_attr('categories', obj),
-            feed_copyright=self.__get_dynamic_attr('feed_copyright', obj),
-            feed_guid=self.__get_dynamic_attr('feed_guid', obj),
-            ttl=self.__get_dynamic_attr('ttl', obj),
+            author_name=self._get_dynamic_attr('author_name', obj),
+            author_link=self._get_dynamic_attr('author_link', obj),
+            author_email=self._get_dynamic_attr('author_email', obj),
+            categories=self._get_dynamic_attr('categories', obj),
+            feed_copyright=self._get_dynamic_attr('feed_copyright', obj),
+            feed_guid=self._get_dynamic_attr('feed_guid', obj),
+            ttl=self._get_dynamic_attr('ttl', obj),
             **self.feed_extra_kwargs(obj)
         )
 
@@ -166,37 +166,37 @@ class Feed(object):
             except TemplateDoesNotExist:
                 pass
 
-        for item in self.__get_dynamic_attr('items', obj):
+        for item in self._get_dynamic_attr('items', obj):
             context = self.get_context_data(item=item, site=current_site,
                                             obj=obj, request=request)
             if title_tmp is not None:
                 title = title_tmp.render(context, request)
             else:
-                title = self.__get_dynamic_attr('item_title', item)
+                title = self._get_dynamic_attr('item_title', item)
             if description_tmp is not None:
                 description = description_tmp.render(context, request)
             else:
-                description = self.__get_dynamic_attr('item_description', item)
+                description = self._get_dynamic_attr('item_description', item)
             link = add_domain(
                 current_site.domain,
-                self.__get_dynamic_attr('item_link', item),
+                self._get_dynamic_attr('item_link', item),
                 request.is_secure(),
             )
-            enclosures = self.__get_dynamic_attr('item_enclosures', item)
-            author_name = self.__get_dynamic_attr('item_author_name', item)
+            enclosures = self._get_dynamic_attr('item_enclosures', item)
+            author_name = self._get_dynamic_attr('item_author_name', item)
             if author_name is not None:
-                author_email = self.__get_dynamic_attr('item_author_email', item)
-                author_link = self.__get_dynamic_attr('item_author_link', item)
+                author_email = self._get_dynamic_attr('item_author_email', item)
+                author_link = self._get_dynamic_attr('item_author_link', item)
             else:
                 author_email = author_link = None
 
             tz = get_default_timezone()
 
-            pubdate = self.__get_dynamic_attr('item_pubdate', item)
+            pubdate = self._get_dynamic_attr('item_pubdate', item)
             if pubdate and is_naive(pubdate):
                 pubdate = make_aware(pubdate, tz)
 
-            updateddate = self.__get_dynamic_attr('item_updateddate', item)
+            updateddate = self._get_dynamic_attr('item_updateddate', item)
             if updateddate and is_naive(updateddate):
                 updateddate = make_aware(updateddate, tz)
 
@@ -204,8 +204,8 @@ class Feed(object):
                 title=title,
                 link=link,
                 description=description,
-                unique_id=self.__get_dynamic_attr('item_guid', item, link),
-                unique_id_is_permalink=self.__get_dynamic_attr(
+                unique_id=self._get_dynamic_attr('item_guid', item, link),
+                unique_id_is_permalink=self._get_dynamic_attr(
                     'item_guid_is_permalink', item),
                 enclosures=enclosures,
                 pubdate=pubdate,
@@ -213,8 +213,8 @@ class Feed(object):
                 author_name=author_name,
                 author_email=author_email,
                 author_link=author_link,
-                categories=self.__get_dynamic_attr('item_categories', item),
-                item_copyright=self.__get_dynamic_attr('item_copyright', item),
+                categories=self._get_dynamic_attr('item_categories', item),
+                item_copyright=self._get_dynamic_attr('item_copyright', item),
                 **self.item_extra_kwargs(item)
             )
         return feed
