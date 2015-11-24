@@ -1209,7 +1209,7 @@ class AdminTests(TestCase):
     def setUpTestData(cls):
         # password = "secret"
         cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
             is_superuser=True, username='super', first_name='Super', last_name='User',
             email='super@example.com', is_staff=True, is_active=True,

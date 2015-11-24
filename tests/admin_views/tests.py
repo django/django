@@ -74,7 +74,7 @@ class AdminViewBasicTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -986,7 +986,7 @@ class AdminViewFormUrlTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -1040,7 +1040,7 @@ class AdminJavaScriptTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -1088,7 +1088,7 @@ class SaveAsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -1255,37 +1255,37 @@ class AdminViewPermissionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.adduser = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
             first_name='Add', last_name='User', email='auser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.changeuser = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.deleteuser = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
             first_name='Delete', last_name='User', email='duser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.joepublicuser = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.nostaffuser = User.objects.create(
-            id=106, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='nostaff',
             first_name='No', last_name='Staff', email='nostaff@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -1966,7 +1966,7 @@ class AdminViewsNoUrlTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.changeuser = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -1993,13 +1993,13 @@ class AdminViewDeletedObjectsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.deleteuser = User.objects.create(
-            id=103, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='deleteuser',
             first_name='Delete', last_name='User', email='duser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -2179,7 +2179,7 @@ class TestGenericRelations(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -2203,7 +2203,7 @@ class AdminViewStringPrimaryKeyTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -2225,7 +2225,8 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
         content_type_pk = ContentType.objects.get_for_model(ModelWithStringPrimaryKey).pk
-        LogEntry.objects.log_action(100, content_type_pk, cls.pk, cls.pk, 2, change_message='Changed something')
+        user_pk = cls.superuser.pk
+        LogEntry.objects.log_action(user_pk, content_type_pk, cls.pk, cls.pk, 2, change_message='Changed something')
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -2439,7 +2440,7 @@ class AdminViewUnicodeTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -2515,7 +2516,7 @@ class AdminViewListEditable(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -2948,13 +2949,13 @@ class AdminSearchTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.joepublicuser = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3072,7 +3073,7 @@ class AdminInheritedInlinesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3164,7 +3165,7 @@ class AdminActionsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3475,7 +3476,7 @@ class TestCustomChangeList(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3508,7 +3509,7 @@ class TestInlineNotEditable(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3533,7 +3534,7 @@ class AdminCustomQuerysetTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3802,7 +3803,7 @@ class AdminInlineFileUploadTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -3854,7 +3855,7 @@ class AdminInlineTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4180,7 +4181,7 @@ class NeverCacheTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4260,7 +4261,7 @@ class PrePopulatedTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4302,7 +4303,7 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     def setUp(self):
         self.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4573,7 +4574,7 @@ class ReadonlyTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4713,7 +4714,7 @@ class LimitChoicesToInAdminTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4745,7 +4746,7 @@ class RawIdFieldsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -4843,19 +4844,19 @@ class UserAdminTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.adduser = User.objects.create(
-            id=101, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='adduser',
             first_name='Add', last_name='User', email='auser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.changeuser = User.objects.create(
-            id=102, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='changeuser',
             first_name='Change', last_name='User', email='cuser@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5014,7 +5015,7 @@ class GroupAdminTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5051,7 +5052,7 @@ class CSSTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5189,7 +5190,7 @@ class AdminDocsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5252,7 +5253,7 @@ class ValidXHTMLTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5275,7 +5276,7 @@ class DateHierarchyTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5409,7 +5410,7 @@ class AdminCustomSaveRelatedTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5482,7 +5483,7 @@ class AdminViewLogoutTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5516,7 +5517,7 @@ class AdminUserMessageTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5580,13 +5581,13 @@ class AdminKeepChangeListFiltersTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
         )
         cls.joepublicuser = User.objects.create(
-            id=104, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=False, username='joepublic',
             first_name='Joe', last_name='Public', email='joepublic@example.com',
             is_staff=False, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5884,7 +5885,7 @@ class TestLabelVisibility(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -5931,7 +5932,7 @@ class AdminViewOnSiteTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -6068,7 +6069,7 @@ class InlineAdminViewOnSiteTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
@@ -6143,7 +6144,7 @@ class GetFormsetsWithInlinesArgumentTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.superuser = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10), is_superuser=True, username='super',
             first_name='Super', last_name='User', email='super@example.com',
             is_staff=True, is_active=True, date_joined=datetime.datetime(2007, 5, 30, 13, 20, 10)
