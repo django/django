@@ -23,24 +23,38 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return output
 
         for field in model._meta.local_fields:
-            db_type = field.db_type(connection=self.connection)
-            if db_type is not None and (field.db_index or field.unique):
-                # Fields with database column types of `varchar` and `text` need
-                # a second index that specifies their operator class, which is
-                # needed when performing correct LIKE queries outside the
-                # C locale. See #12234.
-                #
-                # The same doesn't apply to array fields such as varchar[size]
-                # and text[size], so skip them.
-                if '[' in db_type:
-                    continue
-                if db_type.startswith('varchar'):
-                    output.append(self._create_index_sql(
-                        model, [field], suffix='_like', sql=self.sql_create_varchar_index))
-                elif db_type.startswith('text'):
-                    output.append(self._create_index_sql(
-                        model, [field], suffix='_like', sql=self.sql_create_text_index))
+            # Fields with database column types of `varchar` and `text` need
+            # a second index that specifies their operator class, which is
+            # needed when performing correct LIKE queries outside the
+            # C locale. See #12234.
+            like_index_statement = self._varchar_operator_index_sql(model, field)
+            if like_index_statement is not None:
+                output.append(like_index_statement)
         return output
+
+    def _varchar_operator_index_sql(self, model, field):
+        """
+        Returns the statement to create an index with varchar operator pattern
+        when the column type is 'varchar' or 'text', otherwise returns None.
+        """
+        db_type = field.db_type(connection=self.connection)
+        if db_type is not None and (field.db_index or field.unique):
+            # Fields with database column types of `varchar` and `text` need
+            # a second index that specifies their operator class, which is
+            # needed when performing correct LIKE queries outside the
+            # C locale. See #12234.
+            #
+            # The same doesn't apply to array fields such as varchar[size]
+            # and text[size], so skip them.
+            if '[' in db_type:
+                return None
+            if db_type.startswith('varchar'):
+                return self._create_index_sql(
+                    model, [field], suffix='_like', sql=self.sql_create_varchar_index)
+            elif db_type.startswith('text'):
+                return self._create_index_sql(
+                    model, [field], suffix='_like', sql=self.sql_create_text_index)
+        return None
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
         """
@@ -103,27 +117,14 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         # Added an index?
         if ((not old_field.db_index and new_field.db_index) or (not old_field.unique and new_field.unique)):
-            db_type = new_field.db_type(connection=self.connection)
-            if db_type is not None and (new_field.db_index or new_field.unique):
-                # Fields with database column types of `varchar` and `text` need
-                # a second index that specifies their operator class, which is
-                # needed when performing correct LIKE queries outside the
-                # C locale. See #12234.
-                #
-                # This code resambles the one found in `self._model_indexes_sql`.
-                # The only difference is that here the statements are
-                # executed immediately.
-                #
-                # The same doesn't apply to array fields such as varchar[size]
-                # and text[size], so skip them.
-                if '[' in db_type:
-                    return
-                if db_type.startswith('varchar'):
-                    self.execute(self._create_index_sql(
-                        model, [new_field], suffix='_like', sql=self.sql_create_varchar_index))
-                elif db_type.startswith('text'):
-                    self.execute(self._create_index_sql(
-                        model, [new_field], suffix='_like', sql=self.sql_create_text_index))
+            # Fields with database column types of `varchar` and `text` need
+            # a second index that specifies their operator class, which is
+            # needed when performing correct LIKE queries outside the
+            # C locale. See #12234.
+            like_index_statement = self._varchar_operator_index_sql(model, new_field)
+            if like_index_statement is not None:
+                self.execute(like_index_statement)
+
         # Removed an index?
         if ((not new_field.db_index and old_field.db_index) or (not new_field.unique and old_field.unique)):
             # Find the index for this field.
