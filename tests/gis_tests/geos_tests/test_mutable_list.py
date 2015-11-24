@@ -299,18 +299,18 @@ class ListMixinTest(unittest.TestCase):
 
     def test08_min_length(self):
         'Length limits'
-        pl, ul = self.lists_of_len()
-        ul._minlength = 1
+        pl, ul = self.lists_of_len(5)
+        ul._minlength = 3
 
         def delfcn(x, i):
             del x[:i]
 
         def setfcn(x, i):
             x[:i] = []
-        for i in range(self.limit - ul._minlength + 1, self.limit + 1):
+        for i in range(len(ul) - ul._minlength + 1, len(ul)):
             self.assertRaises(ValueError, delfcn, ul, i)
             self.assertRaises(ValueError, setfcn, ul, i)
-        del ul[:ul._minlength]
+        del ul[:len(ul) - ul._minlength]
 
         ul._maxlength = 4
         for i in range(0, ul._maxlength - len(ul)):

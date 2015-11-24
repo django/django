@@ -94,6 +94,7 @@ create_linearring = GeomOutput('GEOSGeom_createLinearRing', [CS_PTR])
 # Polygon and collection creation routines are special and will not
 # have their argument types defined.
 create_polygon = GeomOutput('GEOSGeom_createPolygon', None)
+create_empty_polygon = GeomOutput('GEOSGeom_createEmptyPolygon', None)
 create_collection = GeomOutput('GEOSGeom_createCollection', None)
 
 # Ring routines

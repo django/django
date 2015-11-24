@@ -35,7 +35,14 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
         if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
             raise TypeError('Invalid initialization input for LineStrings.')
 
+        # If SRID was passed in with the keyword arguments
+        srid = kwargs.get('srid')
+
         ncoords = len(coords)
+        if not ncoords:
+            super(LineString, self).__init__(self._init_func(None), srid=srid)
+            return
+
         if ncoords < self._minlength:
             raise ValueError(
                 '%s requires at least %d points, got %s.' % (
@@ -79,9 +86,6 @@ class LineString(ProjectInterpolateMixin, GEOSGeometry):
                 cs[i] = coords[i].tuple
             else:
                 cs[i] = coords[i]
-
-        # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid')
 
         # Calling the base geometry initialization with the returned pointer
         #  from the function.
