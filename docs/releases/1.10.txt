@@ -92,6 +92,8 @@ Minor features
   :class:`~django.contrib.gis.db.models.functions.SymDifference`
   functions on MySQL.
 
+* Added support for instantiating empty GEOS geometries.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
