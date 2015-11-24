@@ -225,6 +225,9 @@ The ``help_text`` argument lets you specify descriptive text for this
 ``Field`` when the ``Field`` is rendered by one of the convenience ``Form``
 methods (e.g., ``as_ul()``).
 
+Like the model field's :attr:`~django.db.models.Field.help_text`, this value
+isn't HTML-escaped in automatically-generated forms.
+
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
