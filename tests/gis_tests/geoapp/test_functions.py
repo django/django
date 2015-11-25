@@ -177,7 +177,7 @@ class GISFunctionsTests(TestCase):
             qs = qs.exclude(name='Texas')
 
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.diff)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.diff))
 
     @skipUnlessDBFeature("has_Difference_function")
     def test_difference_mixed_srid(self):
@@ -188,7 +188,7 @@ class GISFunctionsTests(TestCase):
         if spatialite or oracle:
             qs = qs.exclude(name='Texas')
         for c in qs:
-            self.assertEqual(c.mpoly.difference(geom), c.difference)
+            self.assertTrue(c.mpoly.difference(geom).equals(c.difference))
 
     @skipUnlessDBFeature("has_Envelope_function")
     def test_envelope(self):
