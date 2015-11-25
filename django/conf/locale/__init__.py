@@ -203,6 +203,12 @@ LANG_INFO = {
         'name': 'Irish',
         'name_local': 'Gaeilge',
     },
+    'gd': {
+        'bidi': False,
+        'code': 'gd',
+        'name': 'Scottish Gaelic',
+        'name_local': 'Gàidhlig',
+    },
     'gl': {
         'bidi': False,
         'code': 'gl',

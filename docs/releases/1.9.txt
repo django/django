@@ -407,7 +407,7 @@ Internationalization
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
 
-* A new language is available: Colombian Spanish.
+* Two new languages are available: Colombian Spanish and Scottish Gaelic.
 
 Management Commands
 ^^^^^^^^^^^^^^^^^^^

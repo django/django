@@ -80,6 +80,7 @@ LANGUAGES = [
     ('fr', gettext_noop('French')),
     ('fy', gettext_noop('Frisian')),
     ('ga', gettext_noop('Irish')),
+    ('gd', gettext_noop('Scottish Gaelic')),
     ('gl', gettext_noop('Galician')),
     ('he', gettext_noop('Hebrew')),
     ('hi', gettext_noop('Hindi')),
