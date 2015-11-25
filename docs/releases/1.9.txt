@@ -451,7 +451,8 @@ Migrations
   :djadminopt:`migrate --fake-initial <--fake-initial>` to more easily detect
   initial migrations.
 
-* Added support for serialization of ``functools.partial`` objects.
+* Added support for serialization of ``functools.partial`` and ``LazyObject``
+  instances.
 
 * When supplying ``None`` as a value in :setting:`MIGRATION_MODULES`, Django
   will consider the app an app without migrations.
