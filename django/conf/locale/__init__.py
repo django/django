@@ -137,6 +137,12 @@ LANG_INFO = {
         'name': 'Argentinian Spanish',
         'name_local': 'español de Argentina',
     },
+    'es-co': {
+        'bidi': False,
+        'code': 'es-co',
+        'name': 'Colombian Spanish',
+        'name_local': 'español de Colombia',
+    },
     'es-mx': {
         'bidi': False,
         'code': 'es-mx',
