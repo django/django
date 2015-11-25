@@ -649,7 +649,7 @@ for technically skilled translators to understand each message's context.
 .. django-admin-option:: --keep-pot
 
 Use the ``--keep-pot`` option to prevent Django from deleting the temporary
-.pot files it generates before creating the .po file. This is useful for
+``.pot`` files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 
 .. seealso::
