@@ -930,6 +930,11 @@ class FormattingTests(TestCase):
     def test_format_arbitrary_settings(self):
         self.assertEqual(get_format('DEBUG'), 'DEBUG')
 
+    def test_get_custom_format(self):
+        with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
+            with translation.override('fr', deactivate=True):
+                self.assertEqual('d/m/Y CUSTOM', get_format('CUSTOM_DAY_FORMAT'))
+
 
 class MiscTests(TestCase):
 
