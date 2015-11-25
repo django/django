@@ -141,6 +141,10 @@ msgstr ""
 msgid "Irish"
 msgstr ""
 
+#: conf/global_settings.py:83
+msgid "Scottish Gaelic"
+msgstr ""
+
 #: conf/global_settings.py:82
 msgid "Galician"
 msgstr ""
