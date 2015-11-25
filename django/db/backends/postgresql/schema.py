@@ -27,12 +27,12 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
             # C locale. See #12234.
-            like_index_statement = self._varchar_operator_index_sql(model, field)
+            like_index_statement = self._create_like_index_sql(model, field)
             if like_index_statement is not None:
                 output.append(like_index_statement)
         return output
 
-    def _varchar_operator_index_sql(self, model, field):
+    def _create_like_index_sql(self, model, field):
         """
         Returns the statement to create an index with varchar operator pattern
         when the column type is 'varchar' or 'text', otherwise returns None.
@@ -121,7 +121,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # a second index that specifies their operator class, which is
             # needed when performing correct LIKE queries outside the
             # C locale. See #12234.
-            like_index_statement = self._varchar_operator_index_sql(model, new_field)
+            like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
 
