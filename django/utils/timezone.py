@@ -146,6 +146,8 @@ class LocalTimezone(ReferenceLocalTimezone):
             exc_value = exc_type(
                 "Unsupported value: %r. You should install pytz." % dt)
             exc_value.__cause__ = exc
+            if not hasattr(exc, '__traceback__'):
+                exc.__traceback__ = sys.exc_info()[2]
             six.reraise(exc_type, exc_value, sys.exc_info()[2])
 
 utc = pytz.utc if pytz else UTC()
