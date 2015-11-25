@@ -110,8 +110,6 @@ def get_format(format_type, lang=None, use_l10n=None):
     be localized (or not), overriding the value of settings.USE_L10N.
     """
     format_type = force_str(format_type)
-    if format_type not in FORMAT_SETTINGS:
-        return format_type
     if use_l10n or (use_l10n is None and settings.USE_L10N):
         if lang is None:
             lang = get_language()
@@ -120,9 +118,6 @@ def get_format(format_type, lang=None, use_l10n=None):
             cached = _format_cache[cache_key]
             if cached is not None:
                 return cached
-            else:
-                # Return the general setting by default
-                return getattr(settings, format_type)
         except KeyError:
             for module in get_format_modules(lang):
                 try:
@@ -137,6 +132,9 @@ def get_format(format_type, lang=None, use_l10n=None):
                 except AttributeError:
                     pass
             _format_cache[cache_key] = None
+    if format_type not in FORMAT_SETTINGS:
+        return format_type
+    # Return the general setting by default
     return getattr(settings, format_type)
 
 get_format_lazy = lazy(get_format, six.text_type, list, tuple)
