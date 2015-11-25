@@ -23,6 +23,7 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
@@ -228,6 +229,11 @@ class WriterTests(SimpleTestCase):
             [list, tuple, dict, set, frozenset],
             ("[list, tuple, dict, set, frozenset]", set())
         )
+
+    def test_serialize_lazy_objects(self):
+        pattern = re.compile(r'^foo$', re.UNICODE)
+        lazy_pattern = SimpleLazyObject(lambda: pattern)
+        self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
     def test_serialize_functions(self):
         with six.assertRaisesRegex(self, ValueError, 'Cannot serialize function: lambda'):

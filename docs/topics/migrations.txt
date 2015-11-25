@@ -659,6 +659,7 @@ Django can serialize the following:
 - ``decimal.Decimal`` instances
 - ``functools.partial`` instances which have serializable ``func``, ``args``,
   and ``keywords`` values.
+- ``LazyObject`` instances which wrap a serializable value.
 - Any Django field
 - Any function or method reference (e.g. ``datetime.datetime.today``) (must be in module's top-level scope)
 - Any class reference (must be in module's top-level scope)
@@ -666,7 +667,8 @@ Django can serialize the following:
 
 .. versionchanged:: 1.9
 
-    Serialization support for `functools.partial` was added.
+    Serialization support for ``functools.partial`` and ``LazyObject``
+    instances was added.
 
 Django can serialize the following on Python 3 only:
 
