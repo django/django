@@ -793,6 +793,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         p[:] = (1, 2, 3)
         self.assertEqual(p, Point(1, 2, 3))
 
+        p[:] = ()
+        self.assertEqual(p.wkt, Point())
+
         p[:] = (1, 2)
         self.assertEqual(p.wkt, Point(1, 2))
 
@@ -804,6 +807,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_linestring_list_assignment(self):
         ls = LineString((0, 0), (1, 1))
 
+        ls[:] = ()
+        self.assertEqual(ls, LineString())
+
         ls[:] = ((0, 0), (1, 1), (2, 2))
         self.assertEqual(ls, LineString((0, 0), (1, 1), (2, 2)))
 
@@ -813,11 +819,33 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_linearring_list_assignment(self):
         ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
 
+        ls[:] = ()
+        self.assertEqual(ls, LinearRing())
+
         ls[:] = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
         self.assertEqual(ls, LinearRing((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
 
         with self.assertRaises(ValueError):
             ls[:] = ((0, 0), (1, 1), (2, 2))
+
+    def test_polygon_list_assignment(self):
+        pol = Polygon()
+
+        pol[:] = (((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)),)
+        self.assertEqual(pol, Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)),))
+
+        pol[:] = ()
+        self.assertEqual(pol, Polygon())
+
+    def test_geometry_collection_list_assignment(self):
+        p = Point()
+        gc = GeometryCollection()
+
+        gc[:] = [p]
+        self.assertEqual(gc, GeometryCollection(p))
+
+        gc[:] = ()
+        self.assertEqual(gc, GeometryCollection())
 
     def test_threed(self):
         "Testing three-dimensional geometries."
@@ -874,16 +902,27 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_emptyCollections(self):
         "Testing empty geometries and collections."
-        gc1 = GeometryCollection([])
-        gc2 = fromstr('GEOMETRYCOLLECTION EMPTY')
-        pnt = fromstr('POINT EMPTY')
-        ls = fromstr('LINESTRING EMPTY')
-        poly = fromstr('POLYGON EMPTY')
-        mls = fromstr('MULTILINESTRING EMPTY')
-        mpoly1 = fromstr('MULTIPOLYGON EMPTY')
-        mpoly2 = MultiPolygon(())
+        geoms = [
+            GeometryCollection([]),
+            fromstr('GEOMETRYCOLLECTION EMPTY'),
+            GeometryCollection(),
+            fromstr('POINT EMPTY'),
+            Point(),
+            fromstr('LINESTRING EMPTY'),
+            LineString(),
+            fromstr('POLYGON EMPTY'),
+            Polygon(),
+            fromstr('MULTILINESTRING EMPTY'),
+            MultiLineString(),
+            fromstr('MULTIPOLYGON EMPTY'),
+            MultiPolygon(()),
+            MultiPolygon(),
+        ]
 
-        for g in [gc1, gc2, pnt, ls, poly, mls, mpoly1, mpoly2]:
+        if numpy:
+            geoms.append(LineString(numpy.array([])))
+
+        for g in geoms:
             self.assertEqual(True, g.empty)
 
             # Testing len() and num_geom.

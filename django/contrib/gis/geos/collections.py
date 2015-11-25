@@ -23,9 +23,6 @@ class GeometryCollection(GEOSGeometry):
         "Initializes a Geometry Collection from a sequence of Geometry objects."
 
         # Checking the arguments
-        if not args:
-            raise TypeError('Must provide at least one Geometry to initialize %s.' % self.__class__.__name__)
-
         if len(args) == 1:
             # If only one geometry provided or a list of geometries is provided
             #  in the first argument.

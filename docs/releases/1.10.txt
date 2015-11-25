@@ -74,6 +74,8 @@ Minor features
 * Added the :meth:`GEOSGeometry.covers()
   <django.contrib.gis.geos.GEOSGeometry.covers>` binary predicate.
 
+* Added support for creation of empty GEOS geometries.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
