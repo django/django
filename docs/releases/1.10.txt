@@ -361,6 +361,10 @@ This prevents confusion about an assignment resulting in an implicit save.
   :class:`~django.contrib.gis.geos.Point` are deprecated in favor of the
   ``tuple`` property.
 
+* The ``cascaded_union`` property of
+  :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
+  :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

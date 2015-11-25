@@ -746,6 +746,10 @@ Geometry Collections
 
    .. attribute:: cascaded_union
 
+   .. deprecated:: 1.10
+
+      Use the :attr:`GEOSGeometry.unary_union` property instead.
+
    Returns a :class:`Polygon` that is the union of all of the component
    polygons in this collection.  The algorithm employed is significantly
    more efficient (faster) than trying to union the geometries together
