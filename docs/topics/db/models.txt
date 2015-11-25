@@ -529,9 +529,22 @@ The only way to create this type of relationship is to create instances of the
 intermediate model.
 
 The :meth:`~django.db.models.fields.related.RelatedManager.remove` method is
-disabled for similar reasons. However, the
-:meth:`~django.db.models.fields.related.RelatedManager.clear` method can be
-used to remove all many-to-many relationships for an instance::
+disabled for similar reasons. If the custom through-table defined by the
+intermediate model does not enforce uniqueness on the ``(model1, model2)`` pair,
+a ``remove`` call will not provide enough information as to which intermediate
+model instance should be deleted::
+
+    >>> m3 = Membership(person=ringo, group=beatles,
+    ...     date_joined=date(1968, 9, 4),
+    ...     invite_reason="You've been gone for a month and we miss you")
+    >>> beatles.members.all()
+    <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>,
+    <Person: Ringo Starr>]>
+    # THIS WILL NOT WORK BECAUSE IT CANNOT TELL WHICH MEMBERSHIP TO REMOVE
+    >>> beatles.members.remove(ringo)
+
+However, the :meth:`~django.db.models.fields.related.RelatedManager.clear`
+method can be used to remove all many-to-many relationships for an instance::
 
     >>> # Beatles have broken up
     >>> beatles.members.clear()
