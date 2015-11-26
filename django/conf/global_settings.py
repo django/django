@@ -387,6 +387,24 @@ NUMBER_GROUPING = 0
 # Thousand separator symbol
 THOUSAND_SEPARATOR = ','
 
+# Allowed formats to prevent leak possibility in the date template filter.
+FORMAT_SETTINGS = (
+    'DECIMAL_SEPARATOR',
+    'THOUSAND_SEPARATOR',
+    'NUMBER_GROUPING',
+    'FIRST_DAY_OF_WEEK',
+    'MONTH_DAY_FORMAT',
+    'TIME_FORMAT',
+    'DATE_FORMAT',
+    'DATETIME_FORMAT',
+    'SHORT_DATE_FORMAT',
+    'SHORT_DATETIME_FORMAT',
+    'YEAR_MONTH_FORMAT',
+    'DATE_INPUT_FORMATS',
+    'TIME_INPUT_FORMATS',
+    'DATETIME_INPUT_FORMATS',
+)
+
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
