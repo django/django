@@ -43,6 +43,18 @@ def require_http_methods(request_method_list):
         return inner
     return decorator
 
+require_HEAD = require_http_methods(["HEAD"])
+require_HEAD.__doc__ = "Decorator to require that a view only accept the HEAD method."
+
+require_DELETE = require_http_methods(["DELETE"])
+require_DELETE.__doc__ = "Decorator to require that a view only accept the DELETE method."
+
+require_PUT = require_http_methods(["PUT"])
+require_PUT.__doc__ = "Decorator to require that a view only accept the PUT method."
+
+require_OPTIONS = require_http_methods(["OPTIONS"])
+require_OPTIONS.__doc__ = "Decorator to require that a view only accept the OPTIONS method."
+
 require_GET = require_http_methods(["GET"])
 require_GET.__doc__ = "Decorator to require that a view only accepts the GET method."
 
