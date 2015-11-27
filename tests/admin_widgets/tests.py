@@ -777,8 +777,8 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
         # Enter test data
         member = models.Member.objects.create(name='Bob', birthdate=datetime(1984, 5, 15), gender='M')
 
-        # Get month names translations for every locales
-        month_string = 'January February March April May June July August September October November December'
+        # Get month name translations for every locale
+        month_string = 'May'
         path = os.path.join(os.path.dirname(import_module('django.contrib.admin').__file__), 'locale')
         for language_code, language_name in settings.LANGUAGES:
             try:
@@ -786,12 +786,12 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
             except IOError:
                 continue
             if month_string in catalog._catalog:
-                month_names = catalog._catalog[month_string]
+                month_name = catalog._catalog[month_string]
             else:
-                month_names = month_string
+                month_name = month_string
 
             # Get the expected caption
-            may_translation = month_names.split(' ')[4]
+            may_translation = month_name
             expected_caption = '{0:s} {1:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
