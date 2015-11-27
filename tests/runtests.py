@@ -409,8 +409,8 @@ if __name__ == "__main__":
         help='Turn on the SQL query logger within tests.')
     parser.add_argument(
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
-        const=default_test_processes(),
-        help='Run tests in parallel processes.')
+        const=default_test_processes(), metavar='N',
+        help='Run tests using up to N parallel processes.')
 
     options = parser.parse_args()
 
