@@ -392,8 +392,8 @@ class DiscoverRunner(object):
             help='Prints logged SQL queries on failure.')
         parser.add_argument(
             '--parallel', dest='parallel', nargs='?', default=1, type=int,
-            const=default_test_processes(),
-            help='Run tests in parallel processes.')
+            const=default_test_processes(), metavar='N',
+            help='Run tests using up to N parallel processes.')
 
     def setup_test_environment(self, **kwargs):
         setup_test_environment()
