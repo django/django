@@ -65,6 +65,16 @@ created by passing in the X and Y coordinates into its constructor::
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(5, 23)
 
+All these constructors take the keyword argument ``srid``. For example::
+
+    >>> from django.contrib.gis.geos import GEOSGeometry, LineString, Point
+    >>> print(GEOSGeometry('POINT (0 0)', srid=4326))
+    SRID=4326;POINT (0.0000000000000000 0.0000000000000000)
+    >>> print(LineString((0, 0), (1, 1), srid=4326))
+    SRID=4326;LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)
+    >>> print(Point(0, 0, srid=32140))
+    SRID=32140;POINT (0.0000000000000000 0.0000000000000000)
+
 Finally, there is the :func:`fromfile` factory method which returns a
 :class:`GEOSGeometry` object from a file::
 
@@ -735,6 +745,10 @@ Geometry Collections
        >>> mp = MultiPolygon([p1, p2])
 
    .. attribute:: cascaded_union
+
+   .. deprecated:: 1.10
+
+      Use the :attr:`GEOSGeometry.unary_union` property instead.
 
    Returns a :class:`Polygon` that is the union of all of the component
    polygons in this collection.  The algorithm employed is significantly

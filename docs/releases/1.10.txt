@@ -74,6 +74,11 @@ Minor features
 * Added the :meth:`GEOSGeometry.covers()
   <django.contrib.gis.geos.GEOSGeometry.covers>` binary predicate.
 
+* Added the :meth:`GDALBand.statistics()
+  <django.contrib.gis.gdal.GDALBand.statistics>` method and
+  :attr:`~django.contrib.gis.gdal.GDALBand.mean`
+  and :attr:`~django.contrib.gis.gdal.GDALBand.std` attributes.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -355,6 +360,10 @@ This prevents confusion about an assignment resulting in an implicit save.
 * The ``get_coords()`` and ``set_coords()`` methods of
   :class:`~django.contrib.gis.geos.Point` are deprecated in favor of the
   ``tuple`` property.
+
+* The ``cascaded_union`` property of
+  :class:`~django.contrib.gis.geos.MultiPolygon` is deprecated in favor of the
+  :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
 
 Miscellaneous
 ~~~~~~~~~~~~~

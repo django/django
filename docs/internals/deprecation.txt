@@ -121,6 +121,9 @@ details on these changes.
 * The ``get_coords()`` and ``set_coords()`` methods of
   ``django.contrib.gis.geos.Point`` will be removed.
 
+* The ``cascaded_union`` property of ``django.contrib.gis.geos.MultiPolygon``
+  will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10

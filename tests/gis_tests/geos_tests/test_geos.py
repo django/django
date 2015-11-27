@@ -1203,3 +1203,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         p.set_coords((3, 2, 1))
         self.assertEqual(p.get_coords(), (3, 2, 1))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_cascaded_union(self):
+        for geom in self.geometries.multipolygons:
+            mpoly = GEOSGeometry(geom.wkt)
+            self.assertEqual(mpoly.cascaded_union, mpoly.unary_union)
