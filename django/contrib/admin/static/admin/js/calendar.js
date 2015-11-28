@@ -1,4 +1,4 @@
-/*global gettext, get_format, quickElement, removeChildren*/
+/*global gettext, pgettext, get_format, quickElement, removeChildren*/
 /*
 calendar.js - Calendar functions by Adrian Holovaty
 depends on core.js for utility functions like removeChildren or quickElement
@@ -8,25 +8,29 @@ depends on core.js for utility functions like removeChildren or quickElement
     'use strict';
     // CalendarNamespace -- Provides a collection of HTML calendar-related helper functions
     var CalendarNamespace = {
-        monthsOfYear = [gettext('January'),
-                        gettext('February'),
-                        gettext('March'),
-                        gettext('April'),
-                        gettext('May'),
-                        gettext('June'),
-                        gettext('July'),
-                        gettext('August'),
-                        gettext('September'),
-                        gettext('October'),
-                        gettext('November'),
-                        gettext('December')],
-        daysOfWeek = [pgettext('one letter Sunday', 'S'),
-                      pgettext('one letter Monday', 'M'),
-                      pgettext('one letter Tuesday', 'T'),
-                      pgettext('one letter Wednesday', 'W'),
-                      pgettext('one letter Thursday', 'T'),
-                      pgettext('one letter Friday', 'F'),
-                      pgettext('one letter Saturday', 'S')],
+        monthsOfYear: [
+            gettext('January'),
+            gettext('February'),
+            gettext('March'),
+            gettext('April'),
+            gettext('May'),
+            gettext('June'),
+            gettext('July'),
+            gettext('August'),
+            gettext('September'),
+            gettext('October'),
+            gettext('November'),
+            gettext('December')
+        ],
+        daysOfWeek: [
+            pgettext('one letter Sunday', 'S'),
+            pgettext('one letter Monday', 'M'),
+            pgettext('one letter Tuesday', 'T'),
+            pgettext('one letter Wednesday', 'W'),
+            pgettext('one letter Thursday', 'T'),
+            pgettext('one letter Friday', 'F'),
+            pgettext('one letter Saturday', 'S')
+        ],
         firstDayOfWeek: parseInt(get_format('FIRST_DAY_OF_WEEK')),
         isLeapYear: function(year) {
             return (((year % 4) === 0) && ((year % 100) !== 0 ) || ((year % 400) === 0));
