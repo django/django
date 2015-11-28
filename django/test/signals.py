@@ -176,3 +176,16 @@ def auth_password_validators_changed(**kwargs):
     if kwargs['setting'] == 'AUTH_PASSWORD_VALIDATORS':
         from django.contrib.auth.password_validation import get_default_password_validators
         get_default_password_validators.cache_clear()
+
+
+@receiver(setting_changed)
+def localize_settings_changed(**kwargs):
+    localize_settings = {
+        'DATETIME_FORMAT', 'SHORT_DATETIME_FORMAT', 'DATE_FORMAT', 'SHORT_DATE_FORMAT',
+        'YEAR_MONTH_FORMAT', 'MONTH_DAY_FORMAT', 'TIME_FORMAT',  'FIRST_DAY_OF_WEEK',
+        'DATETIME_INPUT_FORMATS', 'DATE_INPUT_FORMATS', 'TIME_INPUT_FORMATS',
+        'DECIMAL_SEPARATOR', 'NUMBER_GROUPING', 'THOUSAND_SEPARATOR', 'USE_THOUSAND_SEPARATOR'
+    }
+    if kwargs['setting'] in localize_settings:
+        from django.utils.formats import reset_format_cache
+        reset_format_cache()
