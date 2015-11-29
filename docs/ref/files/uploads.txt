@@ -63,7 +63,7 @@ Here are some useful attributes of ``UploadedFile``:
     handler may not receive the uploaded file content, but instead a URL or
     other pointer to the file. (see `RFC 2388`_ section 5.3).
 
-    .. _RFC 2388: http://www.ietf.org/rfc/rfc2388.txt
+    .. _RFC 2388: https://www.ietf.org/rfc/rfc2388.txt
 
 .. attribute:: UploadedFile.charset
 

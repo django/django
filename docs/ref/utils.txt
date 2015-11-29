@@ -333,13 +333,13 @@ For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
 
 For definitions of the different versions of RSS, see:
-http://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
+https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss
 
 .. function:: get_tag_uri(url, date)
 
     Creates a TagURI.
 
-    See http://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
+    See https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id
 
 SyndicationFeed
 ---------------
@@ -425,7 +425,7 @@ Rss201rev2Feed
 
 .. class:: Rss201rev2Feed(RssFeed)
 
-    Spec: http://cyber.law.harvard.edu/rss/rss.html
+    Spec: https://cyber.law.harvard.edu/rss/rss.html
 
 RssUserland091Feed
 ------------------
@@ -439,7 +439,7 @@ Atom1Feed
 
 .. class:: Atom1Feed(SyndicationFeed)
 
-    Spec: http://tools.ietf.org/html/rfc4287
+    Spec: https://tools.ietf.org/html/rfc4287
 
 ``django.utils.functional``
 ===========================

@@ -165,7 +165,7 @@ and the :setting:`SECRET_KEY` setting.
 
     Finally, the size of a cookie can have an impact on the `speed of your site`_.
 
-.. _`common limit of 4096 bytes`: http://tools.ietf.org/html/rfc2965#section-5.3
+.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
 .. _`speed of your site`: http://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 

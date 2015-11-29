@@ -39,7 +39,7 @@ just skip this section.
 To install from sources, download the latest amalgamation source archive from
 the `SQLite download page`__, and extract::
 
-    $ wget http://sqlite.org/sqlite-amalgamation-3.6.23.1.tar.gz
+    $ wget https://sqlite.org/sqlite-amalgamation-3.6.23.1.tar.gz
     $ tar xzf sqlite-amalgamation-3.6.23.1.tar.gz
     $ cd sqlite-3.6.23.1
 
@@ -51,8 +51,8 @@ needs to be customized so that SQLite knows to build the R*Tree module::
     $ sudo make install
     $ cd ..
 
-__ http://www.sqlite.org/rtree.html
-__ http://www.sqlite.org/download.html
+__ https://www.sqlite.org/rtree.html
+__ https://www.sqlite.org/download.html
 
 .. _spatialitebuild:
 

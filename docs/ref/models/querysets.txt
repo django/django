@@ -724,8 +724,8 @@ object. If it's ``None``, Django uses the :ref:`current time zone
 
     .. _pytz: http://pytz.sourceforge.net/
     .. _Time Zones: http://www.postgresql.org/docs/current/static/datatype-datetime.html#DATATYPE-TIMEZONES
-    .. _Choosing a Time Zone File: http://docs.oracle.com/cd/E11882_01/server.112/e10729/ch4datetime.htm#NLSPG258
-    .. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+    .. _Choosing a Time Zone File: https://docs.oracle.com/cd/E11882_01/server.112/e10729/ch4datetime.htm#NLSPG258
+    .. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 none
 ~~~~
@@ -2789,7 +2789,7 @@ Note this is only available in MySQL and requires direct manipulation of the
 database to add the full-text index. By default Django uses BOOLEAN MODE for
 full text searches. See the `MySQL documentation`_ for additional details.
 
-.. _MySQL documentation: http://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
+.. _MySQL documentation: https://dev.mysql.com/doc/refman/5.6/en/fulltext-boolean.html
 
 .. fieldlookup:: regex
 
@@ -3018,7 +3018,7 @@ Variance
         documentation`_ for instructions on obtaining and installing this
         extension.
 
-.. _SQLite documentation: http://www.sqlite.org/contrib
+.. _SQLite documentation: https://www.sqlite.org/contrib
 
 Query-related classes
 =====================

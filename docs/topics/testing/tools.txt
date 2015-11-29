@@ -73,7 +73,7 @@ Note a few important things about how the test client works:
 
   This is incorrect::
 
-      >>> c.get('http://www.example.com/login/')
+      >>> c.get('https://www.example.com/login/')
 
   The test client is not capable of retrieving Web pages that are not
   powered by your Django project. If you need to retrieve other Web pages,
@@ -940,7 +940,7 @@ out the `full reference`_ for more details.
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: https://pypi.python.org/pypi/selenium
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
-.. _Firefox: http://www.mozilla.com/firefox/
+.. _Firefox: https://www.mozilla.com/firefox/
 
 .. note::
 
@@ -973,7 +973,7 @@ out the `full reference`_ for more details.
     use cases. Please refer to the `Selenium FAQ`_ and
     `Selenium documentation`_ for more information.
 
-    .. _Selenium FAQ: http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
+    .. _Selenium FAQ: https://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
     .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
 Test cases features

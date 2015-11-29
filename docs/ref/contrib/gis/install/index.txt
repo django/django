@@ -67,7 +67,7 @@ SQLite              GEOS, GDAL, PROJ.4, SpatiaLite  3.6.+               Requires
 See also `this comparison matrix`__ on the OSGeo Wiki for
 PostgreSQL/PostGIS/GEOS/GDAL possible combinations.
 
-__ http://trac.osgeo.org/postgis/wiki/UsersWikiPostgreSQLPostGIS
+__ https://trac.osgeo.org/postgis/wiki/UsersWikiPostgreSQLPostGIS
 
 Installation
 ============
@@ -361,7 +361,7 @@ Summary::
 
         export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql93
 
-__ http://www.macports.org/
+__ https://www.macports.org/
 
 .. _windows:
 
@@ -468,7 +468,7 @@ may be unchecked safely.  After clicking next, the packages will be
 automatically downloaded and installed, after which you may exit the
 installer.
 
-.. _OSGeo4W installer: http://trac.osgeo.org/osgeo4w/
+.. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 
 Modify Windows environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

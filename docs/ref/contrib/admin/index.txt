@@ -1260,8 +1260,8 @@ subclass::
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
-                return 'http://example.com' + reverse('person-detail',
-                                                      kwargs={'slug': obj.slug})
+                return 'https://example.com' + reverse('person-detail',
+                                                       kwargs={'slug': obj.slug})
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1943,7 +1943,7 @@ files for the forms and/or formsets. If :setting:`DEBUG` is ``True`` it will
 return the uncompressed versions of the various JavaScript files, including
 ``jquery.js``; if not, it will return the 'minified' versions.
 
-.. _jQuery: http://jquery.com
+.. _jQuery: https://jquery.com
 
 .. _admin-custom-validation:
 

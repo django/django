@@ -76,7 +76,7 @@ generate signatures. You can use a different secret by passing it to the
 
     Returns a signer which uses ``key`` to generate signatures and ``sep`` to
     separate values. ``sep`` cannot be in the `URL safe base64 alphabet
-    <http://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
+    <https://tools.ietf.org/html/rfc4648#section-5>`_.  This alphabet contains
     alphanumeric characters, hyphens, and underscores.
 
 Using the salt argument
