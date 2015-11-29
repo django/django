@@ -26,9 +26,9 @@ If you want to use Django on a production site, use a Java servlet container,
 such as `Apache Tomcat`_. Full JavaEE applications servers such as `GlassFish`_
 or `JBoss`_ are also OK, if you need the extra features they include.
 
-.. _`Apache Tomcat`: http://tomcat.apache.org/
+.. _`Apache Tomcat`: https://tomcat.apache.org/
 .. _GlassFish: https://glassfish.java.net/
-.. _JBoss: http://www.jboss.org/
+.. _JBoss: https://www.jboss.org/
 
 Installing Django
 =================
@@ -71,4 +71,4 @@ running on standard Python. However, are a few differences to keep in mind:
 
 * Any part of Django that requires `Pillow`_ will not work.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/

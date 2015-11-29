@@ -272,4 +272,4 @@ security protection of the Web server, operating system and other components.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 
-.. _LimitRequestBody: http://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
+.. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody

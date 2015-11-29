@@ -444,7 +444,7 @@ the weary! If you'd like to help, discussion of Django development, including
 progress toward the 1.2 release, takes place daily on the django-developers
 mailing list:
 
-* http://groups.google.com/group/django-developers
+* https://groups.google.com/group/django-developers
 
 ... and in the ``#django-dev`` IRC channel on ``irc.freenode.net``. Feel free to
 join the discussions!

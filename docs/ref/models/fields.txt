@@ -911,7 +911,7 @@ optional arguments:
 
 Requires the `Pillow`_ library.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you

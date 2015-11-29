@@ -38,7 +38,7 @@ basic apps`_ project. [#]_
 
 .. _OGC: http://www.opengeospatial.org/
 .. _world borders: http://thematicmapping.org/downloads/world_borders.php
-.. _GeoDjango basic apps: http://code.google.com/p/geodjango-basic-apps/
+.. _GeoDjango basic apps: https://code.google.com/p/geodjango-basic-apps/
 
 Setting Up
 ==========
@@ -735,7 +735,7 @@ may be edited by clicking on a polygon and dragging the vertexes to the desired
 position.
 
 .. _OpenLayers: http://openlayers.org/
-.. _Open Street Map: http://www.openstreetmap.org/
+.. _Open Street Map: https://www.openstreetmap.org/
 .. _Vector Map Level 0: http://earth-info.nga.mil/publications/vmap0.html
 .. _OSGeo: http://www.osgeo.org
 
@@ -771,6 +771,6 @@ option class in your ``admin.py`` file::
 .. [#] GeoDjango basic apps was written by Dane Springmeyer, Josh Livni, and
        Christopher Schmidt.
 .. [#] This point is the `University of Houston Law Center
-       <http://www.law.uh.edu/>`_.
+       <https://www.law.uh.edu/>`_.
 .. [#] Open Geospatial Consortium, Inc., `OpenGIS Simple Feature Specification
        For SQL <http://www.opengeospatial.org/standards/sfs>`_.
