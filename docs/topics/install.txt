@@ -58,7 +58,7 @@ deployment options. One is :doc:`uWSGI </howto/deployment/wsgi/uwsgi>`; it works
 very well with `nginx`_. Additionally, Django follows the WSGI spec
 (:pep:`3333`), which allows it to run on a variety of server platforms.
 
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 .. _nginx: http://nginx.org/
 .. _mod_wsgi: http://www.modwsgi.org/
 
@@ -116,9 +116,9 @@ If you're using Django's :doc:`testing framework</topics/testing/index>` to test
 database queries, Django will need permission to create a test database.
 
 .. _PostgreSQL: http://www.postgresql.org/
-.. _MySQL: http://www.mysql.com/
+.. _MySQL: https://www.mysql.com/
 .. _psycopg2: http://initd.org/psycopg/
-.. _SQLite: http://www.sqlite.org/
+.. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: http://cx-oracle.sourceforge.net/
 .. _Oracle: http://www.oracle.com/
 
@@ -179,7 +179,7 @@ This is the recommended way to install Django.
 
 .. _pip: https://pip.pypa.io/
 .. _virtualenv: http://www.virtualenv.org/
-.. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/en/latest/
+.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.org/en/latest/
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing.html#install-pip
 
 Installing a distribution-specific package

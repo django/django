@@ -1227,7 +1227,7 @@ date
 
 Formats a date according to the given format.
 
-Uses a similar format as PHP's ``date()`` function (http://php.net/date)
+Uses a similar format as PHP's ``date()`` function (https://php.net/date)
 with some differences.
 
 .. note::
@@ -1987,7 +1987,7 @@ output will be ``"Joel is a slug"``.
     more robust, you can use the ``bleach`` Python library, notably its
     `clean`_ method.
 
-.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
+.. _clean: https://bleach.readthedocs.org/en/latest/clean.html
 
 .. templatefilter:: time
 
@@ -2211,8 +2211,8 @@ For example::
 
     {{ value|urlencode }}
 
-If ``value`` is ``"http://www.example.org/foo?a=b&c=d"``, the output will be
-``"http%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
+If ``value`` is ``"https://www.example.org/foo?a=b&c=d"``, the output will be
+``"https%3A//www.example.org/foo%3Fa%3Db%26c%3Dd"``.
 
 An optional argument containing the characters which should not be escaped can
 be provided.
@@ -2222,8 +2222,8 @@ provided when *all* characters should be escaped. For example::
 
     {{ value|urlencode:"" }}
 
-If ``value`` is ``"http://www.example.org/"``, the output will be
-``"http%3A%2F%2Fwww.example.org%2F"``.
+If ``value`` is ``"https://www.example.org/"``, the output will be
+``"https%3A%2F%2Fwww.example.org%2F"``.
 
 .. templatefilter:: urlize
 
@@ -2233,7 +2233,7 @@ urlize
 Converts URLs and email addresses in text into clickable links.
 
 This template tag works on links prefixed with ``http://``, ``https://``, or
-``www.``. For example, ``http://goo.gl/aia1t`` will get converted but
+``www.``. For example, ``https://goo.gl/aia1t`` will get converted but
 ``goo.gl/aia1t`` won't.
 
 It also supports domain-only links ending in one of the original top level
