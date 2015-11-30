@@ -16,7 +16,6 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
     from_text = 'GeomFromText'
 
     Adapter = WKTAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     gis_operators = {
         'bbcontains': SpatialOperator(func='MBRContains'),  # For consistency w/PostGIS API

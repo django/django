@@ -56,7 +56,6 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
 
     Adapter = PostGISAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     gis_operators = {
         'bbcontains': PostGISOperator(op='~'),

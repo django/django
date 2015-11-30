@@ -25,7 +25,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
 
     Adapter = SpatiaLiteAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'
