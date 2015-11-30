@@ -122,8 +122,6 @@ Related objects reference
         the ``blog`` :class:`~django.db.models.ForeignKey` doesn't have
         ``null=True``, this is invalid.
 
-        .. versionchanged 1.7::
-
         For :class:`~django.db.models.ForeignKey` objects, this method accepts
         a ``bulk`` argument to control how to perform the operation.
         If ``True`` (the default), ``QuerySet.update()`` is used.

@@ -1074,8 +1074,6 @@ Attributes
 FileResponse objects
 ====================
 
-.. versionadded:: 1.7.4
-
 .. class:: FileResponse
 
 :class:`FileResponse` is a subclass of :class:`StreamingHttpResponse` optimized
