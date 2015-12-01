@@ -28,6 +28,15 @@ class DummyCache(BaseCache):
     def get_many(self, keys, version=None):
         return {}
 
+    def get_or_set(self, key, default=None, timeout=DEFAULT_TIMEOUT, version=None):
+        if default is None:
+            raise ValueError('You need to specify a value.')
+        key = self.make_key(key, version=version)
+        self.validate_key(key)
+        if callable(default):
+            default = default()
+        return default
+
     def has_key(self, key, version=None):
         key = self.make_key(key, version=version)
         self.validate_key(key)
