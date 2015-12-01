@@ -30,8 +30,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def _create_like_index_sql(self, model, field):
         """
-        Returns the statement to create an index with varchar operator pattern
-        when the column type is 'varchar' or 'text', otherwise returns None.
+        Return the statement to create an index with varchar operator pattern
+        when the column type is 'varchar' or 'text', otherwise return None.
         """
         db_type = field.db_type(connection=self.connection)
         if db_type is not None and (field.db_index or field.unique):
