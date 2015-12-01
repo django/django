@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "September 23, 2015" "1.9" "Django"
+.TH "DJANGO-ADMIN" "1" "December 01, 2015" "1.9" "Django"
 .SH NAME
 django-admin \- Utility script for the Django Web framework
 .
@@ -35,16 +35,14 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 This document outlines all it can do.
 .sp
 In addition, \fBmanage.py\fP is automatically created in each Django project.
-\fBmanage.py\fP is a thin wrapper around \fBdjango\-admin\fP that takes care of
-several things for you before delegating to \fBdjango\-admin\fP:
+\fBmanage.py\fP does the same thing as \fBdjango\-admin\fP but takes care of a few
+things for you:
 .INDENT 0.0
 .IP \(bu 2
 It puts your project\(aqs package on \fBsys.path\fP\&.
 .IP \(bu 2
 It sets the \fBDJANGO_SETTINGS_MODULE\fP environment variable so that
 it points to your project\(aqs \fBsettings.py\fP file.
-.IP \(bu 2
-It calls \fBdjango.setup()\fP to initialize various internals of Django.
 .UNINDENT
 .sp
 The \fBdjango\-admin\fP script should be on your system path if you installed
@@ -860,7 +858,7 @@ for technically skilled translators to understand each message\(aqs context.
 .UNINDENT
 .sp
 Use the \fB\-\-keep\-pot\fP option to prevent Django from deleting the temporary
-.pot files it generates before creating the .po file. This is useful for
+\fB\&.pot\fP files it generates before creating the .po file. This is useful for
 debugging errors which may prevent the final language files from being created.
 .sp
 \fBSEE ALSO:\fP
@@ -1736,6 +1734,10 @@ $ pip install tblib
 This feature isn\(aqt available on Windows. It doesn\(aqt work with the Oracle
 database backend either.
 .sp
+If you want to use \fI\%pdb\fP while debugging tests, you must disable parallel
+execution (\fB\-\-parallel=1\fP). You\(aqll see something like \fBbdb.BdbQuit\fP if you
+don\(aqt.
+.sp
 \fBWARNING:\fP
 .INDENT 0.0
 .INDENT 3.5
@@ -2199,6 +2201,10 @@ number of roles in which color is used:
 .IP \(bu 2
 \fBnotice\fP \- A minor error.
 .IP \(bu 2
+\fBsuccess\fP \- A success.
+.IP \(bu 2
+\fBwarning\fP \- A warning.
+.IP \(bu 2
 \fBsql_field\fP \- The name of a model field in SQL.
 .IP \(bu 2
 \fBsql_coltype\fP \- The type of a model field in SQL.
@@ -2220,7 +2226,14 @@ number of roles in which color is used:
 \fBhttp_bad_request\fP \- A 4XX HTTP Bad Request server response other than 404.
 .IP \(bu 2
 \fBhttp_server_error\fP \- A 5XX HTTP Server Error response.
+.IP \(bu 2
+\fBmigrate_heading\fP \- A heading in a migrations management command.
+.IP \(bu 2
+\fBmigrate_label\fP \- A migration name.
 .UNINDENT
+.sp
+\fBsuccess\fP was added.
+
 .sp
 Each of these roles can be assigned a specific foreground and
 background color, from the following list:
