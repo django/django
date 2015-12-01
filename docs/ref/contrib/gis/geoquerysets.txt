@@ -1297,10 +1297,14 @@ Example::
 
 .. class:: MakeLine(geo_field)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite
 
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
+
+.. versionchanged:: 1.10
+
+    The SpatiaLite support was added.
 
 Example::
 
