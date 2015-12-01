@@ -1731,7 +1731,7 @@ class SchemaTests(TransactionTestCase):
                 name_indexes.append(name)
         self.assertEqual(2, len(name_indexes), 'Indexes are missing for name column')
         # Check that one of the indexes ends with `_like`
-        like_index = list(filter(lambda x: x.endswith('_like'), name_indexes))
+        like_index = [x for x in name_indexes if x.endswith('_like')]
         self.assertEqual(1, len(like_index), 'Index with the operator class is missing for the name column')
         # Remove the index
         with connection.schema_editor() as editor:
@@ -1765,7 +1765,7 @@ class SchemaTests(TransactionTestCase):
                 info_indexes.append(name)
         self.assertEqual(2, len(info_indexes), 'Indexes are missing for info column')
         # Check that one of the indexes ends with `_like`
-        like_index = list(filter(lambda x: x.endswith('_like'), info_indexes))
+        like_index = [x for x in info_indexes if x.endswith('_like')]
         self.assertEqual(1, len(like_index), 'Index with the operator class is missing for the info column')
         # Remove the index
         with connection.schema_editor() as editor:
