@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import ast
 
 import collections
 import copy
@@ -2016,6 +2017,96 @@ class TextField(Field):
         defaults = {'max_length': self.max_length, 'widget': forms.Textarea}
         defaults.update(kwargs)
         return super(TextField, self).formfield(**defaults)
+
+
+class ListField(TextField):
+    description = _("List")
+
+    def __init__(self, *args, **kwargs):
+        super(ListField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value:
+            value = []
+
+        if isinstance(value, list):
+            return value
+
+        return ast.literal_eval(value)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+
+        return unicode(value)
+
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return self.get_db_prep_value(value)
+
+    def validate(self, values, model_instance):
+        """
+        Validates value and throws ValidationError. Subclasses should override
+        this to provide validation logic.
+        """
+        if not self.editable:
+            # Skip validation for non-editable fields.
+            return
+
+        if self._choices and values not in self.empty_values:
+            options = [option_key
+                       for option_key, optgroup_value in self._choices]
+            for value in values:
+                if value not in options:
+                    raise exceptions.ValidationError(
+                        self.error_messages['invalid_choice'],
+                        code='invalid_choice',
+                        params={'value': value},
+                    )
+
+                if value is None and not self.null:
+                    raise exceptions.ValidationError(
+                        self.error_messages['null'], code='null')
+
+                if not self.blank and value in self.empty_values:
+                    raise exceptions.ValidationError(
+                        self.error_messages['blank'], code='blank')
+
+    def formfield(self, **kwargs):
+        db = kwargs.pop('using', None)
+        form_class = forms.MultipleChoiceField
+        defaults = {
+            'widget': forms.CheckboxSelectMultiple,
+            'required': not self.blank, 'label': capfirst(self.verbose_name),
+            'help_text': self.help_text
+        }
+        defaults.update(kwargs)
+        if defaults.get('initial') is not None:
+            initial = defaults['initial']
+            if callable(initial):
+                initial = initial()
+            defaults['initial'] = [i for i in initial]
+        if self.has_default():
+            if callable(self.default):
+                defaults['initial'] = self.default
+                defaults['show_hidden_initial'] = True
+            else:
+                defaults['initial'] = self.get_default()
+        defaults['choices'] = self.get_choices(include_blank=False)
+        if self.null:
+            defaults['empty_value'] = None
+        # Many of the subclass-specific formfield arguments (min_value,
+        # max_value) don't apply for choice fields, so be sure to only pass
+        # the values that MultipleChoiceField will understand.
+        for k in list(kwargs):
+            if k not in ('empty_value', 'choices', 'required', 'widget',
+                         'label', 'initial', 'help_text', 'error_messages',
+                         'show_hidden_initial'):
+                del kwargs[k]
+        defaults.update(kwargs)
+        if form_class is None:
+            form_class = forms.CharField
+        return form_class(**defaults)
 
 
 class TimeField(DateTimeCheckMixin, Field):
