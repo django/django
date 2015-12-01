@@ -485,7 +485,7 @@ pytz_. If you're using MySQL, you must install pytz_ and load the time zone
 tables with `mysql_tzinfo_to_sql`_.
 
 .. _pytz: http://pytz.sourceforge.net/
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Addition of ``QuerySet.datetimes()``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1044,7 +1044,7 @@ occasions, such as:
 This makes the cache effectively work on a per-session basis regardless of the
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting.
 
-__ http://www.google.com/analytics/
+__ https://www.google.com/analytics/
 
 ``SEND_BROKEN_LINK_EMAILS`` setting
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -128,7 +128,7 @@ pygments_style = 'trac'
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'sphinx': ('http://sphinx-doc.org/', None),
-    'six': ('http://pythonhosted.org/six/', None),
+    'six': ('https://pythonhosted.org/six/', None),
     'formtools': ('http://django-formtools.readthedocs.org/en/latest/', None),
     'psycopg2': ('http://initd.org/psycopg/docs/', None),
 }

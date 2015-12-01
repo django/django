@@ -699,7 +699,7 @@ For each field, we describe the default widget used if you don't specify
     ``UploadedFile.content_type`` will be updated with the image's content type
     if Pillow can determine it, otherwise it will be set to ``None``.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 .. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``

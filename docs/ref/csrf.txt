@@ -19,7 +19,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 such as POST, PUT and DELETE, can then be protected by following the steps
 below.
 
-.. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 .. _using-csrf:
 
@@ -142,7 +142,7 @@ The above code could be simplified by using the `JavaScript Cookie library
 
 Finally, you'll have to actually set the header on your AJAX request, while
 protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
 newer:
 
 .. code-block:: javascript

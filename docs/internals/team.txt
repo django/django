@@ -48,7 +48,7 @@ Journal-World`_ of Lawrence, Kansas, USA.
 
 .. _lawrence journal-world: http://ljworld.com/
 .. _adrian holovaty: http://holovaty.com/
-.. _everyblock: http://everyblock.com/
+.. _everyblock: https://everyblock.com/
 .. _soundslice: https://www.soundslice.com/
 .. _simon willison: http://simonwillison.net/
 .. _web-development blog: `simon willison`_
@@ -163,7 +163,7 @@ Karen Tracey
 
     Andrew lives in San Francisco, CA, USA.
 
-    .. _Andrew Godwin: http://www.aeracode.org/
+    .. _Andrew Godwin: https://www.aeracode.org/
 
 `Carl Meyer`_
     Carl has been a Django user since 2007 (long enough to remember
@@ -299,7 +299,7 @@ Florian Apolloner
     For the time being he lives in Graz, Austria (not Australia ;)).
 
     .. _Graz University of Technology: http://tugraz.at/
-    .. _Ubuntuusers webteam: http://wiki.ubuntuusers.de/ubuntuusers/Webteam
+    .. _Ubuntuusers webteam: https://wiki.ubuntuusers.de/ubuntuusers/Webteam
 
 Jeremy Dunck
     Jeremy was rescued from corporate IT drudgery by Free Software and, in part,
@@ -343,7 +343,7 @@ Jeremy Dunck
 
     .. _Simon Charette: https://github.com/charettes
     .. _Ultimate Frisbee: http://www.montrealultimate.ca
-    .. _Reptiletech: http://www.reptiletech.com
+    .. _Reptiletech: https://www.reptiletech.com
 
 Donald Stufft
     Donald found Python and Django in 2007 while trying to find a language,
@@ -366,7 +366,7 @@ Marc Tamlyn
     Marc is currently a full-time parent, part-time developer, and lives in
     Oxford, UK.
 
-    .. _CCBV: http://ccbv.co.uk/
+    .. _CCBV: https://ccbv.co.uk/
 
 Shai Berger
     Shai started working with Python back in 1998, and with Django just
@@ -493,7 +493,7 @@ Daniele Procida
 
     .. _Markus Holtermann: https://github.com/MarkusH
     .. _Technical University of Berlin: http://www.tu-berlin.de/
-    .. _ubuntuusers.de: http://ubuntuusers.de/
+    .. _ubuntuusers.de: https://ubuntuusers.de/
     .. _EuroPython 2014 website: https://ep2014.europython.eu/
 
 `Josh Smeaton`_
@@ -534,7 +534,7 @@ Daniele Procida
     .. _Tomek Paczkowski: https://hauru.eu
     .. _DjangoCon Europe 2013: http://love.djangocircus.com
     .. _Django Girls: https://djangogirls.org
-    .. _Squirrel: http://squirrel.me
+    .. _Squirrel: https://squirrel.me
 
 `Ola Sitarska`_
     Ola started working with Django in 2009, when she discovered the power of
@@ -658,7 +658,7 @@ Joseph Kocherhans
     Gary lives in Austin, Texas, USA.
 
     .. _Gary Wilson: http://thegarywilson.com/
-    .. _The University of Texas: http://www.utexas.edu/
+    .. _The University of Texas: https://www.utexas.edu/
 
 `Brian Rosner`_
     Brian enjoys learning more about programming languages and system

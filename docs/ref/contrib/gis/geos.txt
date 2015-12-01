@@ -17,7 +17,7 @@ implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
-__ http://trac.osgeo.org/geos/
+__ https://trac.osgeo.org/geos/
 __ http://sourceforge.net/projects/jts-topo-suite/
 __ http://www.opengeospatial.org/standards/sfs
 __ http://www.refractions.net/
@@ -779,7 +779,7 @@ In order to obtain a prepared geometry, just access the
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
 geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
-please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
 For example::
 
