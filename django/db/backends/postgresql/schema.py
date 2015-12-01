@@ -23,10 +23,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return output
 
         for field in model._meta.local_fields:
-            # Fields with database column types of `varchar` and `text` need
-            # a second index that specifies their operator class, which is
-            # needed when performing correct LIKE queries outside the
-            # C locale. See #12234.
             like_index_statement = self._create_like_index_sql(model, field)
             if like_index_statement is not None:
                 output.append(like_index_statement)
@@ -117,10 +113,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         )
         # Added an index?
         if ((not old_field.db_index and new_field.db_index) or (not old_field.unique and new_field.unique)):
-            # Fields with database column types of `varchar` and `text` need
-            # a second index that specifies their operator class, which is
-            # needed when performing correct LIKE queries outside the
-            # C locale. See #12234.
             like_index_statement = self._create_like_index_sql(model, new_field)
             if like_index_statement is not None:
                 self.execute(like_index_statement)
