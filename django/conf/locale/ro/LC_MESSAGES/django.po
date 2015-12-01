@@ -3,17 +3,18 @@
 # Translators:
 # mihneasim <contact@mesimian.com>, 2011
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
-# Denis Darii <sinednx@gmail.com>, 2011,2014
+# Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Răzvan Ionescu <ionescu77@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 12:35+0000\n"
+"Last-Translator: Răzvan Ionescu <ionescu77@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,13 +39,13 @@ msgid "Bulgarian"
 msgstr "Bulgară"
 
 msgid "Belarusian"
-msgstr ""
+msgstr "Bielorusă"
 
 msgid "Bengali"
 msgstr "Bengaleză"
 
 msgid "Breton"
-msgstr ""
+msgstr "Bretonă"
 
 msgid "Bosnian"
 msgstr "Bosniacă"
@@ -71,19 +72,22 @@ msgid "English"
 msgstr "Engleză"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Engleză australiană"
 
 msgid "British English"
 msgstr "Engleză britanică"
 
 msgid "Esperanto"
-msgstr ""
+msgstr "Esperanto"
 
 msgid "Spanish"
 msgstr "Spaniolă"
 
 msgid "Argentinian Spanish"
 msgstr "Spaniolă Argentiniană"
+
+msgid "Colombian Spanish"
+msgstr "Spaniolă Columbiană"
 
 msgid "Mexican Spanish"
 msgstr "Spaniolă Mexicană"
@@ -92,7 +96,7 @@ msgid "Nicaraguan Spanish"
 msgstr "Spaniolă Nicaragua"
 
 msgid "Venezuelan Spanish"
-msgstr ""
+msgstr "Spaniolă venezueleană"
 
 msgid "Estonian"
 msgstr "Estonă"
@@ -114,6 +118,9 @@ msgstr "Frizian"
 
 msgid "Irish"
 msgstr "Irlandeză"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "Galiciană"
@@ -164,7 +171,7 @@ msgid "Korean"
 msgstr "Koreană"
 
 msgid "Luxembourgish"
-msgstr ""
+msgstr "Luxemburgheză"
 
 msgid "Lithuanian"
 msgstr "Lituaniană"
@@ -191,7 +198,7 @@ msgid "Norwegian Bokmal"
 msgstr "Norvegiană Bokmal"
 
 msgid "Nepali"
-msgstr ""
+msgstr "Nepaleză"
 
 msgid "Dutch"
 msgstr "Olandeză"
@@ -239,7 +246,7 @@ msgid "Swedish"
 msgstr "Suedeză"
 
 msgid "Swahili"
-msgstr ""
+msgstr "Swahili"
 
 msgid "Tamil"
 msgstr "Limba tamila"
@@ -254,7 +261,7 @@ msgid "Turkish"
 msgstr "Turcă"
 
 msgid "Tatar"
-msgstr ""
+msgstr "Tătară"
 
 msgid "Udmurt"
 msgstr ""
@@ -275,19 +282,19 @@ msgid "Traditional Chinese"
 msgstr "Chineză tradițională"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mesaje"
 
 msgid "Site Maps"
-msgstr ""
+msgstr "Harta sit-ului"
 
 msgid "Static Files"
-msgstr ""
+msgstr "Fișiere statice"
 
 msgid "Syndication"
 msgstr ""
 
 msgid "Web Design"
-msgstr ""
+msgstr "Design web"
 
 msgid "Enter a valid value."
 msgstr "Introduceți o valoare validă."
@@ -296,16 +303,23 @@ msgid "Enter a valid URL."
 msgstr "Introduceți un URL valid."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Introduceți un întreg valid."
 
 msgid "Enter a valid email address."
-msgstr ""
+msgstr "Introduceți o adresă de email validaă."
 
 msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 "Introduceți un 'slug' valabil, compus numai din litere, numere, underscore "
 "sau cratime."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Introduceși un 'slug' valid, compus din caractere Unicode, numere, "
+"underscore sau cratime."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Introduceţi o adresă IPv4 validă."
@@ -352,6 +366,29 @@ msgid ""
 msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
@@ -453,7 +490,7 @@ msgid ""
 msgstr ""
 
 msgid "Duration"
-msgstr ""
+msgstr "Durată"
 
 msgid "Email address"
 msgstr "Adresă e-mail"
@@ -544,6 +581,12 @@ msgstr "Relaţie unul-la-unul"
 msgid "Many-to-many relationship"
 msgstr "Relație multe-la-multe"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Acest câmp este obligatoriu."
 
@@ -552,29 +595,6 @@ msgstr "Introduceţi un număr întreg."
 
 msgid "Enter a number."
 msgstr "Introduceţi un număr."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
 
 msgid "Enter a valid date."
 msgstr "Introduceți o dată validă."
@@ -637,12 +657,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr ""
