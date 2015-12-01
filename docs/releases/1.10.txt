@@ -79,6 +79,9 @@ Minor features
   :attr:`~django.contrib.gis.gdal.GDALBand.mean`
   and :attr:`~django.contrib.gis.gdal.GDALBand.std` attributes.
 
+* Added support for the :class:`~django.contrib.gis.db.models.MakeLine`
+  aggregate on SpatiaLite.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

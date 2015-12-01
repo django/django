@@ -348,7 +348,7 @@ Aggregate                PostGIS  Oracle  SpatiaLite
 :class:`Collect`         X                X
 :class:`Extent`          X        X       X
 :class:`Extent3D`        X
-:class:`MakeLine`        X
+:class:`MakeLine`        X                X
 :class:`Union`           X        X       X
 =======================  =======  ======  ==========
 
