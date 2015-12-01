@@ -45,11 +45,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             if '[' in db_type:
                 return None
             if db_type.startswith('varchar'):
-                return self._create_index_sql(
-                    model, [field], suffix='_like', sql=self.sql_create_varchar_index)
+                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_varchar_index)
             elif db_type.startswith('text'):
-                return self._create_index_sql(
-                    model, [field], suffix='_like', sql=self.sql_create_text_index)
+                return self._create_index_sql(model, [field], suffix='_like', sql=self.sql_create_text_index)
         return None
 
     def _alter_column_type_sql(self, table, old_field, new_field, new_type):
