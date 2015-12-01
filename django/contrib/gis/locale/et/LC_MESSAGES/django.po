@@ -3,16 +3,17 @@
 # Translators:
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janno Liivak <jannolii@gmail.com>, 2013-2014
+# Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
+# Martin <martinpajuste@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-16 20:39+0000\n"
+"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,8 +24,13 @@ msgstr ""
 msgid "GIS"
 msgstr "GIS"
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Baas GIS väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
+msgid "The base GIS field."
+msgstr "Baas GIS väli."
+
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Baas Geomeetria väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
 
 msgid "Point"
 msgstr "Punkt"
@@ -48,7 +54,10 @@ msgid "Geometry collection"
 msgstr "Geomeetriakogum"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Laiendi Agregeeritud Väli"
+
+msgid "Raster Field"
+msgstr "Rastri Väli"
 
 msgid "No geometry value provided."
 msgstr "Geomeetriline väärtus puudub."
@@ -65,16 +74,16 @@ msgid ""
 msgstr "Geomeetria teisendamisel geomeetria vormivälja SRID-ks tekkis viga."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Kustuta kõik Vahendid"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT silumisaken:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps läbi GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Siluri aken (järjestikväärtus)"
 
 msgid "No feeds are registered."
 msgstr "Ühtegi voogu pole registreeritud."

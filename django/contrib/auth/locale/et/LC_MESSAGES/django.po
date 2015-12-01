@@ -2,7 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Janno Liivak <jannolii@gmail.com>, 2013
+# Janno Liivak <jannolii@gmail.com>, 2013,2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin <martinpajuste@gmail.com>, 2015
 # Marti Raudsepp <marti@juffo.org>, 2014
@@ -10,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-19 21:59+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>\n"
-"Language-Team: Estonian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 20:40+0000\n"
+"Last-Translator: Janno Liivak <jannolii@gmail.com>\n"
+"Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,7 +32,7 @@ msgstr "Tähtsad kuupäevad"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "%(name)s objekt primaarvõtmega %(key)r ei eksisteeri."
 
 msgid "Password changed successfully."
 msgstr "Salasõna edukalt muudetud."
@@ -43,6 +43,12 @@ msgstr "Muuda salasõna: %s"
 
 msgid "Authentication and Authorization"
 msgstr "Autentimine ja Volitamine"
+
+msgid "password"
+msgstr "salasõna"
+
+msgid "last login"
+msgstr "viimane sisenemine"
 
 msgid "No password set."
 msgstr "Parool on määramata."
@@ -59,17 +65,17 @@ msgstr "Salasõna"
 msgid "Password confirmation"
 msgstr "Salasõna kinnitus"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr ""
 "Sisestage sama salasõna uuesti veendumaks, et sisestamisel ei tekkinud vigu"
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Paroole ei salvestata töötlemata kujul, seega puudub võimalus selle kasutaja "
-"parooli nägemiseks, kuid saate seda muuta kasutades <a href=\"password/"
+"parooli nägemiseks, kuid saate seda muuta kasutades <a href=\"../password/"
 "\">seda vormi</a>."
 
 #, python-format
@@ -122,6 +128,9 @@ msgstr "kontrollsumma"
 msgid "name"
 msgstr "nimi"
 
+msgid "content type"
+msgstr "sisutüüp"
+
 msgid "codename"
 msgstr "koodnimi"
 
@@ -136,12 +145,6 @@ msgstr "grupp"
 
 msgid "groups"
 msgstr "grupid"
-
-msgid "password"
-msgstr "salasõna"
-
-msgid "last login"
-msgstr "viimane sisenemine"
 
 msgid "superuser status"
 msgstr "superkasutaja staatus"
@@ -217,6 +220,43 @@ msgid "users"
 msgstr "kasutajad"
 
 #, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Salasõna on liiga lühike. Selles peab olema vähemalt %(min_length)d täht."
+msgstr[1] ""
+"Salasõna on liiga lühike. Selles peab olema vähemalt %(min_length)d tähte."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Salasõna peab sisaldama vähemalt %(min_length)d tähte."
+msgstr[1] "Salasõna peab sisaldama vähemalt %(min_length)d tähte."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Salasõna ja %(verbose_name)s on liiga sarnased."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Salasõna ei tohi olla liialt sarnane sinu üldinfos määratuga."
+
+msgid "This password is too common."
+msgstr "Salasõna on liiga teada-tuntud."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Salasõna ei tohi olla teada-tuntud salasõna."
+
+msgid "This password is entirely numeric."
+msgstr "See salasõna koosneb ainult numbritest."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Salasõna ei tohi koosneda ainult numbritest."
+
+#, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "Uue salasõna loomine saidil %(site_name)s"
 
@@ -227,7 +267,7 @@ msgid "Password reset"
 msgstr "Uue salasõna loomine"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "Salasõna lähtestamine saadetud"
 
 msgid "Enter new password"
 msgstr "Sisesta uus salasõna"

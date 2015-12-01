@@ -2,16 +2,16 @@
 #
 # Translators:
 # Georgi Kostadinov <grgkostadinov@gmail.com>, 2012
-# Todor Lubenov <tlubenov@gmail.com>, 2011
+# Todor Lubenov <tgl.sysdev@gmail.com>, 2011,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:35+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 09:11+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
-"language/bg/)\n"
+"Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
+"bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,10 +19,14 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "GIS"
+msgstr "GIS"
+
+msgid "The base GIS field."
 msgstr ""
 
-msgid "The base GIS field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Основно ГИС поле - карти за спецификация от OpenGIS  геометричен тип."
+msgid ""
+"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+msgstr ""
 
 msgid "Point"
 msgstr "Точка"
@@ -46,6 +50,9 @@ msgid "Geometry collection"
 msgstr "Геометрична колекция"
 
 msgid "Extent Aggregate Field"
+msgstr "Разшири Полето за обединяване"
+
+msgid "Raster Field"
 msgstr ""
 
 msgid "No geometry value provided."
@@ -65,16 +72,16 @@ msgstr ""
 "геометрия."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Изтрий всички обекти"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "WKT прозорец за проверка:"
 
 msgid "Google Maps via GeoDjango"
-msgstr ""
+msgstr "Google Maps през GeoDjango"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Debugging прозорец (сериализирана стойност)"
 
 msgid "No feeds are registered."
 msgstr "Няма регистрирани фийда."

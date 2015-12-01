@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Soslan Khubulov <soslanx@gmail.com>, 2013
+# Soslan Khubulov <inactive+soslan@transifex.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:12+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Ossetic (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Ossetic (http://www.transifex.com/django/django/language/"
 "os/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -113,8 +113,8 @@ msgstr[1] ""
 msgid "Now"
 msgstr "Ныр"
 
-msgid "Clock"
-msgstr "Сахат"
+msgid "Choose a Time"
+msgstr ""
 
 msgid "Choose a time"
 msgstr "Рӕстӕг равзарын"
@@ -128,14 +128,17 @@ msgstr "6 ӕ.р."
 msgid "Noon"
 msgstr "Ӕмбисбон"
 
+msgid "6 p.m."
+msgstr ""
+
 msgid "Cancel"
 msgstr "Раздӕхын"
 
 msgid "Today"
 msgstr "Абон"
 
-msgid "Calendar"
-msgstr "Къӕлиндар"
+msgid "Choose a Date"
+msgstr ""
 
 msgid "Yesterday"
 msgstr "Знон"

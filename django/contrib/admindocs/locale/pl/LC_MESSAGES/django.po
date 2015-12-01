@@ -4,6 +4,7 @@
 # Adam Stachowicz <saibamenppl@gmail.com>, 2015
 # angularcircle, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Janusz Harkot <jh@blueice.pl>, 2015
 # Maciek Olko <maciej.olko@gmail.com>, 2014
 # p <inactive+poczciwiec@transifex.com>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
@@ -11,11 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/django/language/"
-"pl/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-11-25 17:02+0000\n"
+"Last-Translator: Janusz Harkot <jh@blueice.pl>\n"
+"Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -39,22 +39,13 @@ msgid "Documentation bookmarklets"
 msgstr "Zakładki Dokumentacji"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Aby zainstalować skryptozakładki, przeciągnij łącze do "
-"paska zakładek\n"
-"lub kliknij prawym klawiszem na łączu i dodaj je do zakładek. Teraz możesz\n"
-"wybrać skryptozakładkę na dowolnej stronie serwisu. Uwaga: niektóre z tych "
-"skryptozakładek wymagają przeglądania serwisu z komputera\n"
-"\"wewnętrznego\" (skontaktuj się z administratorem systemu, jeśli nie jesteś "
-"pewien, czy ten komputer jest \"wewnętrznym\").</p>\n"
+"Aby zainstalować skryptozakładkę, przeciągnij jej link do paska zakładek lub "
+"kliknij prawym przyciskiem na link i wybierz opcję zapisania do zakładek. Po "
+"tym możesz użyć tak zapisanej zakładki na dowolnej podstronie tego serwisu."
 
 msgid "Documentation for this page"
 msgstr "Dokumentacja dla tej strony"
@@ -65,29 +56,6 @@ msgid ""
 msgstr ""
 "Przekierowuje z dowolnej strony do dokumentacji dla widoku, który ją "
 "generuje."
-
-msgid "Show object ID"
-msgstr "Pokaż ID obiektu"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Pokazuje typ i unikalne ID dla stron, które reprezentują pojedynczy obiekt."
-
-msgid "Edit this object (current window)"
-msgstr "Edytuj ten obiekt (bieżące okno)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Przeskok do panelu administratora dla stron reprezentujących pojedynczy "
-"obiekt."
-
-msgid "Edit this object (new window)"
-msgstr "Edytuj ten obiekt (nowe okno)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Jak wyżej, tyle że otwiera nowe okno."
 
 msgid "Tags"
 msgstr "Tagi"
@@ -155,6 +123,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Pola"
+
 msgid "Field"
 msgstr "Pole"
 
@@ -163,6 +134,15 @@ msgstr "Typ"
 
 msgid "Description"
 msgstr "Opis"
+
+msgid "Methods with arguments"
+msgstr "Metody z parametrami"
+
+msgid "Method"
+msgstr "Metoda"
+
+msgid "Arguments"
+msgstr "Parametry"
 
 msgid "Back to Model Documentation"
 msgstr "Powrót do dokumentacji modelu"

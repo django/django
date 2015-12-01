@@ -2,17 +2,18 @@
 #
 # Translators:
 # Daniel Ursache-Dogariu <contact@danniel.net>, 2011
-# Denis Darii <sinednx@gmail.com>, 2011,2014
+# Denis Darii <denis.darii@gmail.com>, 2011,2014
 # Ionel Cristian Mărieș <ionel.mc@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-27 12:24+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Romanian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -37,7 +38,7 @@ msgid "Delete selected %(verbose_name_plural)s"
 msgstr "Elimină %(verbose_name_plural)s selectate"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administrare"
 
 msgid "All"
 msgstr "Toate"
@@ -78,6 +79,12 @@ msgstr "Acțiune:"
 msgid "action time"
 msgstr "timp acțiune"
 
+msgid "user"
+msgstr "utilizator"
+
+msgid "content type"
+msgstr "tip de conținut"
+
 msgid "object id"
 msgstr "id obiect"
 
@@ -117,6 +124,11 @@ msgstr "Nimic"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Ține apăsat \"Control\", sau \"Command\" pe un Mac, pentru a selecta mai "
+"mult de unul."
+
+msgid "Added."
+msgstr "Adăugat."
 
 #, python-format
 msgid "Changed %s."
@@ -152,6 +164,8 @@ msgid ""
 "The %(name)s \"%(obj)s\" was added successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" a fost adăugat cu succes. Poți adăuga alt %(name)s mai "
+"jos."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was added successfully."
@@ -162,12 +176,15 @@ msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may edit it again "
 "below."
 msgstr ""
+"%(name)s \"%(obj)s\" a fost modificat cu succes. Il poți edita mai jos."
 
 #, python-format
 msgid ""
 "The %(name)s \"%(obj)s\" was changed successfully. You may add another "
 "%(name)s below."
 msgstr ""
+"%(name)s \"%(obj)s\" a fost modificat cu succes. Poți adăuga un alt %(name)s "
+"mai jos."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
@@ -235,9 +252,11 @@ msgid ""
 "Deleting %(class_name)s %(instance)s would require deleting the following "
 "protected related objects: %(related_objects)s"
 msgstr ""
+"Ștergerea %(class_name)s %(instance)s ar necesita ștergerea următoarelor "
+"obiecte asociate protejate: %(related_objects)s"
 
 msgid "Django site admin"
-msgstr "Administrare sit Django"
+msgstr "Administrare site Django"
 
 msgid "Django administration"
 msgstr "Administrare Django"
@@ -250,7 +269,7 @@ msgstr "Autentificare"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr ""
+msgstr "administrare %(app)s"
 
 msgid "Page not found"
 msgstr "Pagină inexistentă"
@@ -274,6 +293,8 @@ msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"A apărut o eroare. A fost raportată către administratorii site-ului prin "
+"email și ar trebui să fie reparată în scurt timp. Mulțumesc pentru răbdare."
 
 msgid "Run the selected action"
 msgstr "Pornește acțiunea selectată"
@@ -319,7 +340,7 @@ msgid "Welcome,"
 msgstr "Bun venit,"
 
 msgid "View site"
-msgstr ""
+msgstr "Vizualizare site"
 
 msgid "Documentation"
 msgstr "Documentație"
@@ -334,7 +355,7 @@ msgid "History"
 msgstr "Istoric"
 
 msgid "View on site"
-msgstr "Vizualizează pe sit"
+msgstr "Vizualizează pe site"
 
 #, python-format
 msgid "Add %(name)s"
@@ -468,6 +489,12 @@ msgstr ""
 "baza de date au fost create și verificați dacă baza de date poate fi citită "
 "de utilizatorul potrivit."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "Ați uitat parola sau utilizatorul ?"
 
@@ -492,6 +519,9 @@ msgstr "Arată totul"
 
 msgid "Save"
 msgstr "Salvează"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -623,9 +653,6 @@ msgstr "Resetează-mi parola"
 
 msgid "All dates"
 msgstr "Toate datele"
-
-msgid "(None)"
-msgstr "(Nimic)"
 
 #, python-format
 msgid "Select %s"

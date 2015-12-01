@@ -3,6 +3,7 @@
 # Translators:
 # Bas Peschier <bas.peschier@gmail.com>, 2013
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
 # dokterbob <mathijs@mathijsfietst.nl>, 2015
@@ -12,11 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-04-13 15:01+0000\n"
-"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
-"nl/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 22:01+0000\n"
+"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -82,6 +82,12 @@ msgstr "Actie:"
 msgid "action time"
 msgstr "actietijd"
 
+msgid "user"
+msgstr "gebruiker"
+
+msgid "content type"
+msgstr "inhoudstype"
+
 msgid "object id"
 msgstr "object-id"
 
@@ -123,6 +129,9 @@ msgid ""
 msgstr ""
 "Houdt \"Control\", of \"Command\" op een Mac, ingedrukt om meerdere te "
 "selecteren."
+
+msgid "Added."
+msgstr "Toegevoegd."
 
 #, python-format
 msgid "Changed %s."
@@ -480,6 +489,14 @@ msgstr ""
 "Er is iets mis met de database. Verzeker u ervan dat de benodigde tabellen "
 "zijn aangemaakt en dat de database toegankelijk is voor de juiste gebruiker."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"U bent geverifieerd als %(username)s, maar niet bevoegd om deze pagina te "
+"bekijken. Wilt u inloggen met een ander account?"
+
 msgid "Forgotten your password or username?"
 msgstr "Wachtwoord of gebruikersnaam vergeten?"
 
@@ -504,6 +521,9 @@ msgstr "Alles tonen"
 
 msgid "Save"
 msgstr "Opslaan"
+
+msgid "Popup closing..."
+msgstr "Popup wordt gesloten..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -641,9 +661,6 @@ msgstr "Herstel mijn wachtwoord"
 
 msgid "All dates"
 msgstr "Alle data"
-
-msgid "(None)"
-msgstr "(Geen)"
 
 #, python-format
 msgid "Select %s"
