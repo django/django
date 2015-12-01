@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Hindi (http://www.transifex.com/projects/p/django/language/"
-"hi/)\n"
+"Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,6 +79,12 @@ msgstr " क्रिया:"
 msgid "action time"
 msgstr "कार्य समय"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "वस्तु आई डी "
 
@@ -118,6 +123,9 @@ msgstr "कोई नहीं"
 
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr ""
+
+msgid "Added."
 msgstr ""
 
 #, python-format
@@ -468,6 +476,12 @@ msgstr ""
 "अपने डेटाबेस स्थापना के साथ कुछ गलत तो है | सुनिश्चित करें कि उचित डेटाबेस तालिका बनायीं "
 "गयी है, और सुनिश्चित करें कि डेटाबेस उपयुक्त उपयोक्ता के द्वारा पठनीय है |"
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "अपना पासवर्ड या उपयोगकर्ता नाम भूल गये हैं?"
 
@@ -492,6 +506,9 @@ msgstr "सभी दिखाएँ"
 
 msgid "Save"
 msgstr "सुरक्षित कीजिये"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -623,9 +640,6 @@ msgstr " मेरे कूटशब्द की पुनःस्थाप�
 
 msgid "All dates"
 msgstr "सभी तिथियों"
-
-msgid "(None)"
-msgstr "(कोई नहीं)"
 
 #, python-format
 msgid "Select %s"

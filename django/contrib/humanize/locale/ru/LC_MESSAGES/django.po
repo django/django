@@ -14,14 +14,15 @@ msgstr ""
 "POT-Creation-Date: 2015-01-17 11:07+0100\n"
 "PO-Revision-Date: 2014-10-05 20:12+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Russian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
+"%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Humanize"
 msgstr "Приведение значений к виду, понятному человеку"
@@ -44,6 +45,7 @@ msgid_plural "%(value).1f million"
 msgstr[0] "%(value).1f миллион"
 msgstr[1] "%(value).1f миллиона"
 msgstr[2] "%(value).1f миллионов"
+msgstr[3] "%(value).1f миллионов"
 
 #, python-format
 msgid "%(value)s million"
@@ -51,6 +53,7 @@ msgid_plural "%(value)s million"
 msgstr[0] "%(value)s миллион"
 msgstr[1] "%(value)s миллиона"
 msgstr[2] "%(value)s миллионов"
+msgstr[3] "%(value)s миллионов"
 
 #, python-format
 msgid "%(value).1f billion"
@@ -58,6 +61,7 @@ msgid_plural "%(value).1f billion"
 msgstr[0] "%(value).1f миллиард"
 msgstr[1] "%(value).1f миллиарда"
 msgstr[2] "%(value).1f миллиардов"
+msgstr[3] "%(value).1f миллиардов"
 
 #, python-format
 msgid "%(value)s billion"
@@ -65,6 +69,7 @@ msgid_plural "%(value)s billion"
 msgstr[0] "%(value)s миллиард"
 msgstr[1] "%(value)s миллиарда"
 msgstr[2] "%(value)s миллиардов"
+msgstr[3] "%(value)s миллиардов"
 
 #, python-format
 msgid "%(value).1f trillion"
@@ -72,6 +77,7 @@ msgid_plural "%(value).1f trillion"
 msgstr[0] "%(value).1f триллион"
 msgstr[1] "%(value).1f триллиона"
 msgstr[2] "%(value).1f триллионов"
+msgstr[3] "%(value).1f триллионов"
 
 #, python-format
 msgid "%(value)s trillion"
@@ -79,6 +85,7 @@ msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s триллион"
 msgstr[1] "%(value)s триллиона"
 msgstr[2] "%(value)s триллионов"
+msgstr[3] "%(value)s триллионов"
 
 #, python-format
 msgid "%(value).1f quadrillion"
@@ -86,6 +93,7 @@ msgid_plural "%(value).1f quadrillion"
 msgstr[0] "%(value).1f квадриллион"
 msgstr[1] "%(value).1f квадриллиона"
 msgstr[2] "%(value).1f квадриллионов"
+msgstr[3] "%(value).1f квадриллионов"
 
 #, python-format
 msgid "%(value)s quadrillion"
@@ -93,6 +101,7 @@ msgid_plural "%(value)s quadrillion"
 msgstr[0] "%(value)s квадриллион"
 msgstr[1] "%(value)s квадриллиона"
 msgstr[2] "%(value)s квадриллионов"
+msgstr[3] "%(value)s квадриллионов"
 
 #, python-format
 msgid "%(value).1f quintillion"
@@ -100,6 +109,7 @@ msgid_plural "%(value).1f quintillion"
 msgstr[0] "%(value).1f квинтиллион"
 msgstr[1] "%(value).1f квинтиллиона"
 msgstr[2] "%(value).1f квинтиллионов"
+msgstr[3] "%(value).1f квинтиллионов"
 
 #, python-format
 msgid "%(value)s quintillion"
@@ -107,6 +117,7 @@ msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s квинтиллион"
 msgstr[1] "%(value)s квинтиллиона"
 msgstr[2] "%(value)s квинтиллионов"
+msgstr[3] "%(value)s квинтиллионов"
 
 #, python-format
 msgid "%(value).1f sextillion"
@@ -114,6 +125,7 @@ msgid_plural "%(value).1f sextillion"
 msgstr[0] "%(value).1f секстиллион"
 msgstr[1] "%(value).1f секстиллиона"
 msgstr[2] "%(value).1f секстиллионов"
+msgstr[3] "%(value).1f секстиллионов"
 
 #, python-format
 msgid "%(value)s sextillion"
@@ -121,6 +133,7 @@ msgid_plural "%(value)s sextillion"
 msgstr[0] "%(value)s секстиллион"
 msgstr[1] "%(value)s секстиллиона"
 msgstr[2] "%(value)s секстиллионов"
+msgstr[3] "%(value)s секстиллионов"
 
 #, python-format
 msgid "%(value).1f septillion"
@@ -128,6 +141,7 @@ msgid_plural "%(value).1f septillion"
 msgstr[0] "%(value).1f септиллион"
 msgstr[1] "%(value).1f септиллиона"
 msgstr[2] "%(value).1f септиллионов"
+msgstr[3] "%(value).1f септиллионов"
 
 #, python-format
 msgid "%(value)s septillion"
@@ -135,6 +149,7 @@ msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s септиллион"
 msgstr[1] "%(value)s септиллиона"
 msgstr[2] "%(value)s септиллионов"
+msgstr[3] "%(value)s септиллионов"
 
 #, python-format
 msgid "%(value).1f octillion"
@@ -142,6 +157,7 @@ msgid_plural "%(value).1f octillion"
 msgstr[0] "%(value).1f октиллион"
 msgstr[1] "%(value).1f октиллиона"
 msgstr[2] "%(value).1f октиллионов"
+msgstr[3] "%(value).1f октиллионов"
 
 #, python-format
 msgid "%(value)s octillion"
@@ -149,6 +165,7 @@ msgid_plural "%(value)s octillion"
 msgstr[0] "%(value)s октиллион"
 msgstr[1] "%(value)s октиллиона"
 msgstr[2] "%(value)s октиллионов"
+msgstr[3] "%(value)s октиллионов"
 
 #, python-format
 msgid "%(value).1f nonillion"
@@ -156,6 +173,7 @@ msgid_plural "%(value).1f nonillion"
 msgstr[0] "%(value).1f нониллион"
 msgstr[1] "%(value).1f нониллиона"
 msgstr[2] "%(value).1f нониллионов"
+msgstr[3] "%(value).1f нониллионов"
 
 #, python-format
 msgid "%(value)s nonillion"
@@ -163,6 +181,7 @@ msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s нониллион"
 msgstr[1] "%(value)s нониллиона"
 msgstr[2] "%(value)s нониллионов"
+msgstr[3] "%(value)s нониллионов"
 
 #, python-format
 msgid "%(value).1f decillion"
@@ -170,6 +189,7 @@ msgid_plural "%(value).1f decillion"
 msgstr[0] "%(value).1f дециллион"
 msgstr[1] "%(value).1f дециллиона"
 msgstr[2] "%(value).1f дециллионов"
+msgstr[3] "%(value).1f дециллионов"
 
 #, python-format
 msgid "%(value)s decillion"
@@ -177,6 +197,7 @@ msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s дециллион"
 msgstr[1] "%(value)s дециллиона"
 msgstr[2] "%(value)s дециллионов"
+msgstr[3] "%(value)s дециллионов"
 
 #, python-format
 msgid "%(value).1f googol"
@@ -184,6 +205,7 @@ msgid_plural "%(value).1f googol"
 msgstr[0] "%(value).1f гугол"
 msgstr[1] "%(value).1f гугола"
 msgstr[2] "%(value).1f гуголов"
+msgstr[3] "%(value).1f гуголов"
 
 #, python-format
 msgid "%(value)s googol"
@@ -191,6 +213,7 @@ msgid_plural "%(value)s googol"
 msgstr[0] "%(value)s гугол"
 msgstr[1] "%(value)s гугола"
 msgstr[2] "%(value)s гуголов"
+msgstr[3] "%(value)s гуголов"
 
 msgid "one"
 msgstr "один"
@@ -244,6 +267,7 @@ msgid_plural "%(count)s seconds ago"
 msgstr[0] "%(count)s секунду назад"
 msgstr[1] "%(count)s секунды назад"
 msgstr[2] "%(count)s секунд назад"
+msgstr[3] "%(count)s секунд назад"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -253,6 +277,7 @@ msgid_plural "%(count)s minutes ago"
 msgstr[0] "%(count)s минуту назад"
 msgstr[1] "%(count)s минуты назад"
 msgstr[2] "%(count)s минут назад"
+msgstr[3] "%(count)s минут назад"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -262,6 +287,7 @@ msgid_plural "%(count)s hours ago"
 msgstr[0] "%(count)s час назад"
 msgstr[1] "%(count)s часа назад"
 msgstr[2] "%(count)s часов назад"
+msgstr[3] "%(count)s часов назад"
 
 #, python-format
 msgctxt "naturaltime"
@@ -276,6 +302,7 @@ msgid_plural "%(count)s seconds from now"
 msgstr[0] "через %(count)s секунду"
 msgstr[1] "через %(count)s секунды"
 msgstr[2] "через %(count)s секунд"
+msgstr[3] "через %(count)s секунд"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -285,6 +312,7 @@ msgid_plural "%(count)s minutes from now"
 msgstr[0] "через %(count)s минуту"
 msgstr[1] "через %(count)s минуты"
 msgstr[2] "через %(count)s минут"
+msgstr[3] "через %(count)s минут"
 
 #. Translators: please keep a non-breaking space (U+00A0)
 #. between count and time unit.
@@ -294,3 +322,4 @@ msgid_plural "%(count)s hours from now"
 msgstr[0] "через %(count)s час"
 msgstr[1] "через %(count)s часа"
 msgstr[2] "через %(count)s часов"
+msgstr[3] "через %(count)s часов"

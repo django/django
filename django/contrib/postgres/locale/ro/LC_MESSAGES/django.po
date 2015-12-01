@@ -1,0 +1,125 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-20 12:19+0000\n"
+"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"Language-Team: Romanian (http://www.transifex.com/django/django/language/"
+"ro/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?"
+"2:1));\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Extensiile PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Elementul %(nth)s din vector nu a fost validat:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Vectorii imbricați trebuie să aibă aceeași lungime."
+
+msgid "Map of strings to strings"
+msgstr "Asociere de șiruri de caractere cu șiruri de caractere"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Valoarea lui \"%(key)s\" nu este un șir de caractere."
+
+msgid "A JSON object"
+msgstr "Un obiect JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Valoarea trebuie să fie validă JSON."
+
+msgid "Could not load JSON data."
+msgstr "Nu am putut încărca datele JSON."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Valorile '%(value)s' trebuie să fie valide JSON."
+
+msgid "Enter two valid values."
+msgstr "Introdu două valori valide."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr ""
+"Începutul intervalului nu trebuie să depășească sfârșitul intervalului."
+
+msgid "Enter two whole numbers."
+msgstr "Introdu două numere întregi."
+
+msgid "Enter two numbers."
+msgstr "Introdu două numere."
+
+msgid "Enter two valid date/times."
+msgstr "Introdu două date / ore valide."
+
+msgid "Enter two valid dates."
+msgstr "Introdu două date valide."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai mult de "
+"%(limit_value)d."
+msgstr[1] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai mult de "
+"%(limit_value)d."
+msgstr[2] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai mult de "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai puțin de "
+"%(limit_value)d."
+msgstr[1] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai puțin de "
+"%(limit_value)d."
+msgstr[2] ""
+"Lista conține %(show_value)d, nu ar trebui să conțină mai puțin de "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Unele chei lipsesc: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Au fost furnizate chei necunoscute: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Asigură-te că intervalul este în întregime mai mic sau egal cu  "
+"%(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Asigură-te că intervalul este în întregime mai mare sau egal cu "
+"%(limit_value)s."

@@ -1,0 +1,137 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bashar Al-Abdulhadi, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 08:55+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ar\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "PostgreSQL extensions"
+msgstr "ملحقات PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "العنصر %(nth)s في المجموعة لم يتم التحقق منه: "
+
+msgid "Nested arrays must have the same length."
+msgstr "يجب أن تكون المجموعات المتداخلة بنفس الطول."
+
+msgid "Map of strings to strings"
+msgstr "خريطة السلاسل للسلاسل"
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "القيمة لـ \"%(key)s\" ليست سلسلة."
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
+msgid "Could not load JSON data."
+msgstr "لا يمكن عرض بيانات JSON."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr ""
+
+msgid "Enter two valid values."
+msgstr "إدخال قيمتين صالحتين."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "بداية المدى يجب ألا تتجاوز نهاية المدى."
+
+msgid "Enter two whole numbers."
+msgstr "أدخل رقمين كاملين."
+
+msgid "Enter two numbers."
+msgstr "أدخل رقمين."
+
+msgid "Enter two valid date/times."
+msgstr "أدخل تاريخين/وقتين صحيحين."
+
+msgid "Enter two valid dates."
+msgstr "أدخل تاريخين صحيحين."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+msgstr[1] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+msgstr[2] ""
+"القائمة تحتوي على %(show_value)d عنصرين, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+msgstr[3] ""
+"القائمة تحتوي على %(show_value)d عناصر, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+msgstr[4] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+msgstr[5] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أكثر من "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+msgstr[1] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+msgstr[2] ""
+"القائمة تحتوي على %(show_value)d عنصرين, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+msgstr[3] ""
+"القائمة تحتوي على %(show_value)d عناصر, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+msgstr[4] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+msgstr[5] ""
+"القائمة تحتوي على %(show_value)d عنصر, يجب أن لا تحتوي على أقل من "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "بعض المفاتيح مفقودة: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "بعض المفاتيح المزوّدة غير معرّفه: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr "تأكد من أن هذا المدى أقل من أو يساوي %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr "تأكد من أن هذا المدى أكثر من أو يساوي %(limit_value)s."

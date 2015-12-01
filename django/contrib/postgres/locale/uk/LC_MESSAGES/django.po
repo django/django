@@ -1,0 +1,123 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
+# Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-16 09:02+0000\n"
+"Last-Translator: Andriy Sokolovskiy <me@asokolovskiy.com>\n"
+"Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
+"uk/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "PostgreSQL extensions"
+msgstr "Розширення  PostgreSQL"
+
+#, python-format
+msgid "Item %(nth)s in the array did not validate: "
+msgstr "Елемент масиву №%(nth)s не пройшов перевірку:"
+
+msgid "Nested arrays must have the same length."
+msgstr "Вкладени масиви мусять бути однакової довжини."
+
+msgid "Map of strings to strings"
+msgstr ""
+
+#, python-format
+msgid "The value of \"%(key)s\" is not a string."
+msgstr "Значення \"%(key)s\" не є рядком."
+
+msgid "A JSON object"
+msgstr "Об'єкт JSON"
+
+msgid "Value must be valid JSON."
+msgstr "Значення повинне бути корректним JSON."
+
+msgid "Could not load JSON data."
+msgstr "Не вдалося завантажити JSON-дані."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "Значення '%(value)s' повинне бути корректним JSON."
+
+msgid "Enter two valid values."
+msgstr "Введіть два корректних значення."
+
+msgid "The start of the range must not exceed the end of the range."
+msgstr "Початок діапазону не повинен перевищувати кінець діапазону."
+
+msgid "Enter two whole numbers."
+msgstr "Введіть два ціліх числа."
+
+msgid "Enter two numbers."
+msgstr "Введіть два числа."
+
+msgid "Enter two valid date/times."
+msgstr "Введіть дві коректні дати з часом."
+
+msgid "Enter two valid dates."
+msgstr "Введіть дві коректні дати."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no more than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no more than "
+"%(limit_value)d."
+msgstr[0] ""
+"Список містить %(show_value)d елемент, кількість яких не має перевищувати "
+"%(limit_value)d."
+msgstr[1] ""
+"Список містить %(show_value)d елементів, кількість яких не має перевищувати "
+"%(limit_value)d."
+msgstr[2] ""
+"Список містить %(show_value)d елемента, кількість яких не має перевищувати "
+"%(limit_value)d."
+
+#, python-format
+msgid ""
+"List contains %(show_value)d item, it should contain no fewer than "
+"%(limit_value)d."
+msgid_plural ""
+"List contains %(show_value)d items, it should contain no fewer than "
+"%(limit_value)d."
+msgstr[0] ""
+"Список містить %(show_value)d елемент, кількість яких не має бути не менша "
+"%(limit_value)d."
+msgstr[1] ""
+"Список містить %(show_value)d елементів, кількість яких не має бути не менша "
+"%(limit_value)d."
+msgstr[2] ""
+"Список містить %(show_value)d елемента, кількість яких не має бути не менша "
+"%(limit_value)d."
+
+#, python-format
+msgid "Some keys were missing: %(keys)s"
+msgstr "Не вистачає наступних ключів: %(keys)s"
+
+#, python-format
+msgid "Some unknown keys were provided: %(keys)s"
+msgstr "Були надані наступні невідомі ключі: %(keys)s"
+
+#, python-format
+msgid ""
+"Ensure that this range is completely less than or equal to %(limit_value)s."
+msgstr ""
+"Переконайтеся, що цей діапазон цілком менше чи дорівнює %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure that this range is completely greater than or equal to "
+"%(limit_value)s."
+msgstr ""
+"Переконайтеся, що цей діапазон повністю більше чи дорівнює %(limit_value)s."

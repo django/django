@@ -1,18 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-#   <ilay@ilay.tw>, 2012.
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# tcc <tcchou@tcchou.org>, 2011.
-#   <yyc1217@gmail.com>, 2012.
+# Chun-Chia Chen <ccc.larc@gmail.com>, 2015
+# ilay <ilay@ilay.tw>, 2012
+# Jannis Leidel <jannis@leidel.info>, 2011
+# tcc <tcchou@tcchou.org>, 2011
+# Yeh-Yung <yyc1217@gmail.com>, 2013
+# Yeh-Yung <yyc1217@gmail.com>, 2012
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-15 23:27+0100\n"
-"PO-Revision-Date: 2012-12-16 08:51+0000\n"
-"Last-Translator: yyc1217 <yyc1217@gmail.com>\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-11 08:53+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (Taiwan) (http://www.transifex.com/django/django/"
 "language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,6 +31,10 @@ msgstr "權限"
 msgid "Important dates"
 msgstr "重要日期"
 
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "主鍵 %(key)r 的 %(name)s 物件不存在。"
+
 msgid "Password changed successfully."
 msgstr "密碼修改成功"
 
@@ -36,26 +42,23 @@ msgstr "密碼修改成功"
 msgid "Change password: %s"
 msgstr "修改密碼: %s"
 
+msgid "Authentication and Authorization"
+msgstr ""
+
+msgid "password"
+msgstr "密碼"
+
+msgid "last login"
+msgstr "上次登入"
+
 msgid "No password set."
 msgstr "無設定密碼。"
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "無效的密碼格式或不知名的雜湊演算法。"
 
-msgid "A user with that username already exists."
-msgstr "一個相同名稱的使用者已經存在。"
-
 msgid "The two password fields didn't match."
 msgstr "兩個密碼欄位不相符。"
-
-msgid "Username"
-msgstr "使用者名稱"
-
-msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
-msgstr "必要的。30 個字或更少, 只包含字母、數字和 @/./+/-/_。"
-
-msgid "This value may contain only letters, numbers and @/./+/-/_ characters."
-msgstr "這資料值只能包含字母、數字和 @/./+/-/_ 字元。"
 
 msgid "Password"
 msgstr "密碼"
@@ -63,40 +66,23 @@ msgstr "密碼"
 msgid "Password confirmation"
 msgstr "密碼確認"
 
-msgid "Enter the same password as above, for verification."
-msgstr "為檢查用，請輸入與上面相同的密碼。"
+msgid "Enter the same password as before, for verification."
+msgstr ""
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"原始密碼尚未儲存，因此無法存取此帳號的密碼，但你可以透過<a href=\"password/"
-"\">這個表單</a>來變更密碼。"
 
 #, python-format
 msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
-msgstr ""
-
-msgid ""
-"Your Web browser doesn't appear to have cookies enabled. Cookies are "
-"required for logging in."
-msgstr "你的Web瀏覽器好像不允許使用cookie。登入時需要使用cookie。"
+msgstr "輸入正確的 %(username)s 和密碼。請注意兩者皆區分大小寫。"
 
 msgid "This account is inactive."
 msgstr "這個帳戶未啟用"
-
-msgid ""
-"That email address doesn't have an associated user account. Are you sure "
-"you've registered?"
-msgstr "這個電子郵件地址無對應的使用者帳號。你確定你已經註冊了？"
-
-msgid ""
-"The user account associated with this email address cannot reset the "
-"password."
-msgstr "這個電子郵件地址對應的使用者帳號無法重設密碼。"
 
 msgid "Email"
 msgstr "電子信箱"
@@ -137,6 +123,9 @@ msgstr "校驗"
 msgid "name"
 msgstr "名稱"
 
+msgid "content type"
+msgstr ""
+
 msgid "codename"
 msgstr "代碼"
 
@@ -152,12 +141,6 @@ msgstr "群組"
 msgid "groups"
 msgstr "群組"
 
-msgid "password"
-msgstr "密碼"
-
-msgid "last login"
-msgstr "上次登入"
-
 msgid "superuser status"
 msgstr "超級使用者狀態"
 
@@ -168,21 +151,28 @@ msgstr "指定是否使用者可以登入到這個管理網站"
 
 msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
-"each of his/her group."
-msgstr "此為帳號可加入的群組。其所屬的群組將授予該帳號對應的權限。"
+"each of their groups."
+msgstr ""
 
 msgid "user permissions"
 msgstr "使用者權限"
 
+msgid "Specific permissions for this user."
+msgstr ""
+
 msgid "username"
 msgstr "使用者名稱"
 
-msgid ""
-"Required. 30 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgid "Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "必要的。30 個字或更少, 只包含字母、數字和 @/./+/-/_。"
 
-msgid "Enter a valid username."
-msgstr "輸入有效帳號。"
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers and @/./"
+"+/-/_ characters."
+msgstr ""
+
+msgid "A user with that username already exists."
+msgstr "一個相同名稱的使用者已經存在。"
 
 msgid "first name"
 msgstr "名字"
@@ -216,9 +206,63 @@ msgstr "使用者"
 msgid "users"
 msgstr "使用者"
 
-msgid "Logged out"
-msgstr "登出"
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr ""
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+
+msgid "This password is too common."
+msgstr ""
+
+msgid "Your password can't be a commonly used password."
+msgstr ""
+
+msgid "This password is entirely numeric."
+msgstr ""
+
+msgid "Your password can't be entirely numeric."
+msgstr ""
 
 #, python-format
 msgid "Password reset on %(site_name)s"
 msgstr "在 %(site_name)s 進行密碼重置"
+
+msgid "Logged out"
+msgstr "登出"
+
+msgid "Password reset"
+msgstr "密碼重設"
+
+msgid "Password reset sent"
+msgstr ""
+
+msgid "Enter new password"
+msgstr "輸入新的密碼"
+
+msgid "Password reset unsuccessful"
+msgstr "密碼重設失敗"
+
+msgid "Password reset complete"
+msgstr "密碼重設成功"
+
+msgid "Password change"
+msgstr "變更密碼"
+
+msgid "Password change successful"
+msgstr "成功變更密碼"

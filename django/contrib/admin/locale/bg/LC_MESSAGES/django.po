@@ -5,16 +5,17 @@
 # Claude Paroz <claude@2xlibre.net>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lyuboslav  Petrov <petrov.lyuboslav@gmail.com>, 2014
-# Todor Lubenov <tlubenov@gmail.com>, 2014
+# Todor Lubenov <tgl.sysdev@gmail.com>, 2014-2015
+# Venelin Stoykov <vkstoykov@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:31+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Bulgarian (http://www.transifex.com/projects/p/django/"
-"language/bg/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-27 16:13+0000\n"
+"Last-Translator: Venelin Stoykov <vkstoykov@gmail.com>\n"
+"Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
+"bg/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,6 +81,12 @@ msgstr "Действие:"
 msgid "action time"
 msgstr "време на действие"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "id на обекта"
 
@@ -119,6 +126,10 @@ msgstr "Празно"
 msgid ""
 "Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
 msgstr ""
+"Задръжте \"Control\", или \"Command\" на Mac, за да изберете повече от един."
+
+msgid "Added."
+msgstr "Добавено."
 
 #, python-format
 msgid "Changed %s."
@@ -289,7 +300,7 @@ msgid "Run the selected action"
 msgstr "Стартирай избраните действия"
 
 msgid "Go"
-msgstr "Търси"
+msgstr "Действай"
 
 msgid "Click here to select the objects across all pages"
 msgstr "Щракнете тук, за да изберете обектите във всички страници"
@@ -328,7 +339,7 @@ msgid "Welcome,"
 msgstr "Добре дошли,"
 
 msgid "View site"
-msgstr ""
+msgstr "Виж сайта"
 
 msgid "Documentation"
 msgstr "Документация"
@@ -392,13 +403,13 @@ msgstr ""
 "\"? Следните свързани елементи също ще бъдат изтрити:"
 
 msgid "Objects"
-msgstr ""
+msgstr "Обекти"
 
 msgid "Yes, I'm sure"
 msgstr "Да, сигурен съм"
 
 msgid "No, take me back"
-msgstr ""
+msgstr "Не, върни ме обратно"
 
 msgid "Delete multiple objects"
 msgstr "Изтриване на множество обекти"
@@ -446,7 +457,7 @@ msgid " By %(filter_title)s "
 msgstr " По %(filter_title)s "
 
 msgid "Summary"
-msgstr ""
+msgstr "Резюме"
 
 #, python-format
 msgid "Models in the %(name)s application"
@@ -475,6 +486,14 @@ msgstr ""
 "Проблем с базата данни. Проверете дали необходимите таблици са създадени и "
 "дали съответния потребител има необходимите права за достъп.  "
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Вие сте се автентикиран като %(username)s, но не сте оторизиран да достъпите "
+"тази страница. Бихте ли желали да влезе с друг профил."
+
 msgid "Forgotten your password or username?"
 msgstr "Забравена парола или потребителско име?"
 
@@ -500,17 +519,20 @@ msgstr "Покажи всички"
 msgid "Save"
 msgstr "Запис"
 
+msgid "Popup closing..."
+msgstr ""
+
 #, python-format
 msgid "Change selected %(model)s"
-msgstr ""
+msgstr "Променете избрания %(model)s"
 
 #, python-format
 msgid "Add another %(model)s"
-msgstr ""
+msgstr "Добавяне на друг %(model)s"
 
 #, python-format
 msgid "Delete selected %(model)s"
-msgstr ""
+msgstr "Изтриване на избрания %(model)s"
 
 msgid "Search"
 msgstr "Търсене"
@@ -589,6 +611,8 @@ msgid ""
 "We've emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Ние ви пратихме мейл с инструкции за настройка на вашата парола, ако "
+"съществува профил с имейла, който сте въвели. Вие трябва да ги получат скоро."
 
 msgid ""
 "If you don't receive an email, please make sure you've entered the address "
@@ -633,9 +657,6 @@ msgstr "Нова парола"
 
 msgid "All dates"
 msgstr "Всички дати"
-
-msgid "(None)"
-msgstr "(Празен)"
 
 #, python-format
 msgid "Select %s"

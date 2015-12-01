@@ -2,16 +2,15 @@
 #
 # Translators:
 # André Hagenbruch, 2012
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2014
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:34+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-12 12:27+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/django/language/"
-"de/)\n"
+"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -76,6 +75,9 @@ msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
 "Wenn hier ein Haken gesetzt ist, können nur angemeldete Benutzer die Seite "
 "sehen."
+
+msgid "sites"
+msgstr "Seiten"
 
 msgid "flat page"
 msgstr "Flat Page"

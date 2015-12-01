@@ -2,6 +2,7 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jon <jon@funkbit.no>, 2015
 # Jon <jon@funkbit.no>, 2014
 # Jon <jon@funkbit.no>, 2013
 # Jon <jon@funkbit.no>, 2012
@@ -9,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-11-17 11:46+0000\n"
+"Last-Translator: Jon <jon@funkbit.no>\n"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -36,21 +37,13 @@ msgid "Documentation bookmarklets"
 msgstr "Dokumentasjonsbokmerker"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">For å installere bokmerker, dra linken til verktøylinja\n"
-"for bokmerker, eller høyreklikk og legg til i bokmerker. Nå kan du du velge\n"
-"bokmerket fra hvilken som helst side på nettstedet. Noen av disse\n"
-"bokmerkene krever at datamaskinen du bruker er markert som \"intern\"\n"
-"(kontakt din systemadministrator hvis du er usikker på om maskinen din er "
-"\"intern\").</p>\n"
+"For å installere bokmerker, dra linken til verktøylinjen for bokmerker, "
+"eller høyreklikk og legg til i bokmerker. Nå kan du du velge bokmerket fra "
+"hvilken som helst side på nettstedet."
 
 msgid "Documentation for this page"
 msgstr "Dokumentasjon for denne siden"
@@ -61,29 +54,6 @@ msgid ""
 msgstr ""
 "Hopp fra hvilken som helst side til dokumentasjonen for visningsfunksjonen "
 "som genererte den siden."
-
-msgid "Show object ID"
-msgstr "Vis objekt-ID"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Viser \"content-type\" og en unik ID for sider som representerer et enkelt "
-"objekt."
-
-msgid "Edit this object (current window)"
-msgstr "Rediger dette objektet (nåværende vindu)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Hopper til administrasjonssiden for sider som representerer et enkelt objekt."
-
-msgid "Edit this object (new window)"
-msgstr "Rediger dette objektet (nytt vindu)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Samme som over, men åpner administrasjonssiden i et nytt vindu."
 
 msgid "Tags"
 msgstr "Tags"
@@ -148,6 +118,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Modell: %(name)s"
 
+msgid "Fields"
+msgstr "Felter"
+
 msgid "Field"
 msgstr "Felt"
 
@@ -156,6 +129,15 @@ msgstr "Type"
 
 msgid "Description"
 msgstr "Beskrivelse"
+
+msgid "Methods with arguments"
+msgstr "Metoder med argumenter"
+
+msgid "Method"
+msgstr "Metode"
+
+msgid "Arguments"
+msgstr "Argumenter"
 
 msgid "Back to Model Documentation"
 msgstr "Tilbake til modell-dokumentasjon"
