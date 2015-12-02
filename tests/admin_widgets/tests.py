@@ -1166,6 +1166,28 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.assertSelectOptions('#id_alumni_from', expected_unselected_values)
         self.assertSelectOptions('#id_alumni_to', expected_selected_values)
 
+    def test_refresh_page(self):
+        """
+        Horizontal and vertical filters keep selected options on page reload. (#22955)
+        """
+        self.school.students.add(self.arthur, self.jason)
+        self.school.alumni.add(self.arthur, self.jason)
+
+        self.admin_login(username='super', password='secret', login_url='/')
+        change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
+        self.selenium.get(self.live_server_url + change_url)
+
+        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
+        self.assertEqual(options_len, 2)
+
+        # self.selenium.refresh() or send_keys(Keys.F5) does hard reload and it doesn't
+        # demostrate what really happens when user clicks on 'Refresh' button in browser.
+        self.selenium.execute_script("location.reload()")
+        self.wait_page_loaded()
+
+        options_len = len(self.selenium.find_elements_by_css_selector('#id_students_to > option'))
+        self.assertEqual(options_len, 2)
+
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
