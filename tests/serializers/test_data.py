@@ -297,7 +297,7 @@ The end."""),
 
     (im2m_obj, 470, M2MIntermediateData, None),
 
-    # testing post- and prereferences and extra fields
+    # testing post- and pre-references and extra fields
     (im_obj, 480, Intermediate, {'right': 300, 'left': 470}),
     (im_obj, 481, Intermediate, {'right': 300, 'left': 490}),
     (im_obj, 482, Intermediate, {'right': 500, 'left': 470}),

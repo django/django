@@ -29,7 +29,7 @@ Fragments
 <center> ![image](http://iontech.files.wordpress.com/2013/01/androidfragmentation1-264x300.png) </center>
 Fragments encompass both layout resource and Java source. Hence, unlike ``, they allow us to reuse the View components along with their functionality, if needed.
 Fragments were first introduced in Honeycomb(API 11), living under the `android.app` package.
-**Note**: API 11 implies that Fragments have no support for devices less than Honeycomb and, for the record, as of writing this post, [more than 50% of Android devices worldwide run versions of Android below Honeycomb](http://developer.android.com/about/dashboards/index.html). Developer dissapointed? You don't have to be, cause google has been cautious enough to add the Fragment APIs to the support library. Yay!
+**Note**: API 11 implies that Fragments have no support for devices less than Honeycomb and, for the record, as of writing this post, [more than 50% of Android devices worldwide run versions of Android below Honeycomb](http://developer.android.com/about/dashboards/index.html). Developer disappointed? You don't have to be, cause google has been cautious enough to add the Fragment APIs to the support library. Yay!
 
 In the support library Fragment APIs sit in the `android.support.v4.app` package. This post assumes that your `minSdk` support is below API 11. Hence we concentrate on the Fragment APIs of the support library.
 

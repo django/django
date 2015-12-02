@@ -749,7 +749,7 @@ class FormsTestCase(SimpleTestCase):
             '<input type="hidden" name="when_1" value="01:01" id="id_when_1" />'
         )
 
-    def test_mulitple_choice_checkbox(self):
+    def test_multiple_choice_checkbox(self):
         # MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
         class SongForm(Form):
             name = CharField()

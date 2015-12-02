@@ -351,7 +351,7 @@ class FieldNamesTests(IsolatedModelsTestCase):
             ]
 
         # Second error because the FK specified in the `through` model
-        # `m2msimple` has auto-genererated name longer than allowed.
+        # `m2msimple` has auto-generated name longer than allowed.
         # There will be no check errors in the other M2M because it
         # specifies db_column for the FK in `through` model even if the actual
         # name is longer than the limits of the database.

@@ -75,7 +75,7 @@ class TestUtilsHttp(unittest.TestCase):
         for bad_url in ('http://example.com',
                         'http:///example.com',
                         'https://example.com',
-                        'ftp://exampel.com',
+                        'ftp://example.com',
                         r'\\example.com',
                         r'\\\example.com',
                         r'/\\/example.com',
@@ -96,7 +96,7 @@ class TestUtilsHttp(unittest.TestCase):
             self.assertFalse(http.is_safe_url(bad_url, host='testserver'), "%s should be blocked" % bad_url)
         for good_url in ('/view/?param=http://example.com',
                      '/view/?param=https://example.com',
-                     '/view?param=ftp://exampel.com',
+                     '/view?param=ftp://example.com',
                      'view/?param=//example.com',
                      'https://testserver/',
                      'HTTPS://testserver/',
