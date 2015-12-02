@@ -26,7 +26,7 @@ def get_protocol(base):
             self.reply_channel = Channel.new_name("!websocket.send")
             self.request_info["reply_channel"] = self.reply_channel
             self.last_keepalive = time.time()
-            self.factory.protocols[self.reply_channel] = self
+            self.factory.reply_protocols[self.reply_channel] = self
             # Send news that this channel is open
             Channel("websocket.connect").send(self.request_info)
 
@@ -61,7 +61,7 @@ def get_protocol(base):
 
         def onClose(self, wasClean, code, reason):
             if hasattr(self, "reply_channel"):
-                del self.factory.protocols[self.reply_channel]
+                del self.factory.reply_protocols[self.reply_channel]
                 Channel("websocket.disconnect").send({
                     "reply_channel": self.reply_channel,
                 })
@@ -90,15 +90,15 @@ def get_factory(base):
 
         def __init__(self, *args, **kwargs):
             super(InterfaceFactory, self).__init__(*args, **kwargs)
-            self.protocols = {}
+            self.reply_protocols = {}
 
         def reply_channels(self):
-            return self.protocols.keys()
+            return self.reply_protocols.keys()
 
         def dispatch_send(self, channel, message):
             if message.get("content", None):
-                self.protocols[channel].serverSend(**message)
+                self.reply_protocols[channel].serverSend(**message)
             if message.get("close", False):
-                self.protocols[channel].serverClose()
+                self.reply_protocols[channel].serverClose()
 
     return InterfaceFactory

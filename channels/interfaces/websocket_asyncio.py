@@ -65,7 +65,7 @@ class WebsocketAsyncioInterface(object):
         (channel_backend expiry / 2) seconds.
         """
         expiry_window = int(self.channel_backend.expiry / 2)
-        for protocol in self.factory.protocols.values():
+        for protocol in self.factory.reply_protocols.values():
             if time.time() - protocol.last_keepalive > expiry_window:
                 protocol.sendKeepalive()
         if self.loop.is_running():

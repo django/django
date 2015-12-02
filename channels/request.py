@@ -20,6 +20,14 @@ def encode_request(request):
         "path": request.path,
         "method": request.method,
         "reply_channel": request.reply_channel,
+        "server": [
+            request.META.get("SERVER_NAME", None),
+            request.META.get("SERVER_PORT", None),
+        ],
+        "client": [
+            request.META.get("REMOTE_ADDR", None),
+            request.META.get("REMOTE_PORT", None),
+        ],
     }
     return value
 
