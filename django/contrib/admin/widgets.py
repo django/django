@@ -47,6 +47,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
 
         attrs['data-field-name'] = self.verbose_name
         attrs['data-is-stacked'] = int(self.is_stacked)
+        attrs['autocomplete'] = 'off'
         output = super(FilteredSelectMultiple, self).render(name, value, attrs, choices)
         return mark_safe(output)
 

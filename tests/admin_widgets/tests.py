@@ -272,7 +272,7 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilter" '
-            'data-field-name="test\\" data-is-stacked="0">\n</select>'
+            'data-field-name="test\\" data-is-stacked="0" autocomplete="off">\n</select>'
         )
 
     def test_stacked_render(self):
@@ -281,7 +281,7 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         self.assertHTMLEqual(
             w.render('test', 'test'),
             '<select multiple="multiple" name="test" class="selectfilterstacked" '
-            'data-field-name="test\\" data-is-stacked="1">\n</select>'
+            'data-field-name="test\\" data-is-stacked="1" autocomplete="off">\n</select>'
         )
 
 
