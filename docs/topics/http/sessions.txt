@@ -663,7 +663,7 @@ Technical details
 
 * The session dictionary accepts any :mod:`json` serializable value when using
   :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
-  pickleable Python object when using
+  picklable Python object when using
   :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
   :mod:`pickle` module for more information.
 

@@ -1504,7 +1504,7 @@ class M2mThroughFieldsTests(IsolatedModelsTestCase):
         ]
         self.assertEqual(expected, errors)
 
-    def test_insersection_foreign_object(self):
+    def test_intersection_foreign_object(self):
         class Parent(models.Model):
             a = models.PositiveIntegerField()
             b = models.PositiveIntegerField()

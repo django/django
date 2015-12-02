@@ -820,7 +820,7 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
 
     def test_add_row_selection(self):
         """
-        Ensure that the status line for selected rows gets updated correcly (#22038)
+        Ensure that the status line for selected rows gets updated correctly (#22038)
         """
         self.admin_login(username='super', password='secret')
         self.selenium.get('%s%s' % (self.live_server_url,

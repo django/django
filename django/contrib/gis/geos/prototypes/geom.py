@@ -78,7 +78,7 @@ to_hex = BinOutput('GEOSGeomToHEX_buf')
 to_wkb = BinOutput('GEOSGeomToWKB_buf')
 to_wkt = StringFromGeom('GEOSGeomToWKT')
 
-# The GEOS geometry type, typeid, num_coordites and number of geometries
+# The GEOS geometry type, typeid, num_coordinates and number of geometries
 geos_normalize = IntFromGeom('GEOSNormalize')
 geos_type = StringFromGeom('GEOSGeomType')
 geos_typeid = IntFromGeom('GEOSGeomTypeId')

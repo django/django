@@ -839,7 +839,7 @@ def do_for(parser, token):
     than -- the following::
 
         <ul>
-          {% if althete_list %}
+          {% if athlete_list %}
             {% for athlete in athlete_list %}
               <li>{{ athlete.name }}</li>
             {% endfor %}

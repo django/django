@@ -434,7 +434,7 @@ class GISFunctionsTests(TestCase):
             union=functions.Union('mpoly', geom),
         )
 
-        # For some reason SpatiaLite does something screwey with the Texas geometry here.
+        # For some reason SpatiaLite does something screwy with the Texas geometry here.
         # Also, it doesn't like the null intersection.
         if spatialite:
             qs = qs.exclude(name='Texas')

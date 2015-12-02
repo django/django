@@ -356,9 +356,9 @@ class Token(object):
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
-                sentinal = bit[2] + ')'
+                sentinel = bit[2] + ')'
                 trans_bit = [bit]
-                while not bit.endswith(sentinal):
+                while not bit.endswith(sentinel):
                     bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)

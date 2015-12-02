@@ -199,7 +199,7 @@ class TestQuerying(TestCase):
 
 
 @skipUnlessPG92
-class TestQueringWithRanges(TestCase):
+class TestQueryingWithRanges(TestCase):
     def test_date_range(self):
         objs = [
             RangeLookupsModel.objects.create(date='2015-01-01'),

@@ -56,7 +56,7 @@ class PickleabilityTestCase(TestCase):
 
     def test_model_pickle(self):
         """
-        Test that a model not defined on module level is pickleable.
+        Test that a model not defined on module level is picklable.
         """
         original = Container.SomeModel(pk=1)
         dumped = pickle.dumps(original)

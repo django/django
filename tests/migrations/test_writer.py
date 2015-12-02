@@ -575,9 +575,9 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructableInstances(object):
+        class DeconstructibleInstances(object):
             def deconstruct(self):
-                return ('DeconstructableInstances', [], {})
+                return ('DeconstructibleInstances', [], {})
 
-        string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+        string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")

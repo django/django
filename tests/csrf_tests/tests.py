@@ -392,7 +392,7 @@ class CsrfViewMiddlewareTest(SimpleTestCase):
     def test_https_csrf_wildcard_trusted_origin_allowed(self):
         """
         A POST HTTPS request with a referer that matches a CSRF_TRUSTED_ORIGINS
-        wilcard is accepted.
+        wildcard is accepted.
         """
         req = self._get_POST_request_with_token()
         req._is_secure_override = True

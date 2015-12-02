@@ -510,7 +510,7 @@ class AggregateTestCase(TestCase):
 
     def test_sum_distinct_aggregate(self):
         """
-        Sum on a distict() QuerySet should aggregate only the distinct items.
+        Sum on a distinct() QuerySet should aggregate only the distinct items.
         """
         authors = Author.objects.filter(book__in=[5, 6])
         self.assertEqual(authors.count(), 3)

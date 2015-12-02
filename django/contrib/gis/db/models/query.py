@@ -502,7 +502,7 @@ class GeoQuerySet(QuerySet):
           SQL function to call.
 
          settings:
-          Dictonary of internal settings to customize for the spatial procedure.
+          Dictionary of internal settings to customize for the spatial procedure.
 
         Public Keyword Arguments:
 
