@@ -202,6 +202,15 @@ class DummyCacheTests(SimpleTestCase):
         self.assertRaises(ValueError, cache.decr_version, 'answer')
         self.assertRaises(ValueError, cache.decr_version, 'does_not_exist')
 
+    def test_get_or_set(self):
+        self.assertEqual(cache.get_or_set('mykey', 'default'), 'default')
+
+    def test_get_or_set_callable(self):
+        def my_callable():
+            return 'default'
+
+        self.assertEqual(cache.get_or_set('mykey', my_callable), 'default')
+
 
 def custom_key_func(key, key_prefix, version):
     "A customized cache key function"
