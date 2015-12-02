@@ -6,7 +6,7 @@
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # The contents of this file are pickled, so don't put values in the namespace
-# that aren't pickleable (module imports are okay, they're removed automatically).
+# that aren't picklable (module imports are okay, they're removed automatically).
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.

@@ -51,7 +51,7 @@ class PostGISGeometryColumns(models.Model):
 class PostGISSpatialRefSys(models.Model, SpatialRefSysMixin):
     """
     The 'spatial_ref_sys' table from PostGIS. See the PostGIS
-    documentaiton at Ch. 4.2.1.
+    documentation at Ch. 4.2.1.
     """
     srid = models.IntegerField(primary_key=True)
     auth_name = models.CharField(max_length=256)

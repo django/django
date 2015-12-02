@@ -4,7 +4,7 @@ from django.db import models
 from .base import IsolatedModelsTestCase
 
 
-class DeprecatedFieldssTests(IsolatedModelsTestCase):
+class DeprecatedFieldsTests(IsolatedModelsTestCase):
     def test_IPAddressField_deprecated(self):
         class IPAddressModel(models.Model):
             ip = models.IPAddressField()

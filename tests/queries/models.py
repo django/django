@@ -60,7 +60,7 @@ class Note(models.Model):
     def __init__(self, *args, **kwargs):
         super(Note, self).__init__(*args, **kwargs)
         # Regression for #13227 -- having an attribute that
-        # is unpickleable doesn't stop you from cloning queries
+        # is unpicklable doesn't stop you from cloning queries
         # that use objects of that type as an argument.
         self.lock = threading.Lock()
 

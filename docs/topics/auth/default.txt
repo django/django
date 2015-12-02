@@ -715,7 +715,7 @@ To apply permission checks to :doc:`class-based views
 
     .. versionadded:: 1.9
 
-    This mixin, just like the ``permisison_required``
+    This mixin, just like the ``permission_required``
     decorator, checks whether the user accessing a view has all given
     permissions. You should specify the permission (or an iterable of
     permissions) using the ``permission_required`` parameter::

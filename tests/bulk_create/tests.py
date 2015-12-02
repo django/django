@@ -65,10 +65,10 @@ class BulkCreateTests(TestCase):
         }, attrgetter("name"), ordered=False)
 
         ProxyProxyCountry.objects.bulk_create([
-            ProxyProxyCountry(name="Neitherlands", iso_two_letter="NT"),
+            ProxyProxyCountry(name="Netherlands", iso_two_letter="NT"),
         ])
         self.assertQuerysetEqual(ProxyProxyCountry.objects.all(), {
-            "Qwghlm", "Tortall", "Neitherlands",
+            "Qwghlm", "Tortall", "Netherlands",
         }, attrgetter("name"), ordered=False)
 
     def test_non_auto_increment_pk(self):

@@ -1,5 +1,5 @@
 """
-A subset of the tests in tests/servers/tests exercicing
+A subset of the tests in tests/servers/tests exercising
 django.contrib.staticfiles.testing.StaticLiveServerTestCase instead of
 django.test.LiveServerTestCase.
 """

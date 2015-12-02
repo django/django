@@ -184,7 +184,7 @@ class FormsModelTestCase(TestCase):
         m.delete()
 
     def test_boundary_conditions(self):
-        # Boundary conditions on a PostitiveIntegerField #########################
+        # Boundary conditions on a PositiveIntegerField #########################
         class BoundaryForm(ModelForm):
             class Meta:
                 model = BoundaryModel
