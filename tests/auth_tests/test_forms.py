@@ -304,7 +304,7 @@ class UserChangeFormTest(TestCase):
         # Just check we can create it
         MyUserForm({})
 
-    def test_unsuable_password(self):
+    def test_unusable_password(self):
         user = User.objects.get(username='empty_password')
         user.set_unusable_password()
         user.save()

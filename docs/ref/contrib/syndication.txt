@@ -823,7 +823,7 @@ This example illustrates all possible attributes and methods for a
 
         def item_updateddate(self):
             """
-            Returns the updateddated for every item in the feed.
+            Returns the updateddate for every item in the feed.
             """
 
         item_updateddate = datetime.datetime(2005, 5, 3) # Hard-coded updateddate.

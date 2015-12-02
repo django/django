@@ -504,7 +504,7 @@ class LoginTest(AuthViewsTestCase):
         for bad_url in ('http://example.com',
                         'http:///example.com',
                         'https://example.com',
-                        'ftp://exampel.com',
+                        'ftp://example.com',
                         '///example.com',
                         '//example.com',
                         'javascript:alert("XSS")'):
@@ -525,7 +525,7 @@ class LoginTest(AuthViewsTestCase):
         # These URLs *should* still pass the security check
         for good_url in ('/view/?param=http://example.com',
                          '/view/?param=https://example.com',
-                         '/view?param=ftp://exampel.com',
+                         '/view?param=ftp://example.com',
                          'view/?param=//example.com',
                          'https://testserver/',
                          'HTTPS://testserver/',
@@ -782,7 +782,7 @@ class LogoutTest(AuthViewsTestCase):
         for bad_url in ('http://example.com',
                         'http:///example.com',
                         'https://example.com',
-                        'ftp://exampel.com',
+                        'ftp://example.com',
                         '///example.com',
                         '//example.com',
                         'javascript:alert("XSS")'):
@@ -801,7 +801,7 @@ class LogoutTest(AuthViewsTestCase):
         # These URLs *should* still pass the security check
         for good_url in ('/view/?param=http://example.com',
                          '/view/?param=https://example.com',
-                         '/view?param=ftp://exampel.com',
+                         '/view?param=ftp://example.com',
                          'view/?param=//example.com',
                          'https://testserver/',
                          'HTTPS://testserver/',
@@ -947,6 +947,6 @@ class UUIDUserTests(TestCase):
             })
         self.assertRedirects(response, user_change_url)
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.user_id, 1)  # harcoded in CustomUserAdmin.log_change()
+        self.assertEqual(row.user_id, 1)  # hardcoded in CustomUserAdmin.log_change()
         self.assertEqual(row.object_id, str(u.pk))
         self.assertEqual(row.change_message, 'Changed password.')

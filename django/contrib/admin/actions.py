@@ -16,7 +16,7 @@ def delete_selected(modeladmin, request, queryset):
     """
     Default action which deletes the selected objects.
 
-    This action first displays a confirmation page whichs shows all the
+    This action first displays a confirmation page which shows all the
     deleteable objects, or, if the user has no permission one of the related
     childs (foreignkeys), a "permission denied" message.
 

@@ -1113,9 +1113,9 @@ class AggregationTests(TestCase):
         in group by.
         """
         qs = Book.objects.annotate(
-            acount=Count('authors')
+            account=Count('authors')
         ).filter(
-            acount=F('publisher__num_awards')
+            account=F('publisher__num_awards')
         )
         self.assertQuerysetEqual(
             qs, ['Sams Teach Yourself Django in 24 Hours'],

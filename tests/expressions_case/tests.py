@@ -1098,7 +1098,7 @@ class CaseExpressionTests(TestCase):
             lambda x: (x, x.foo)
         )
 
-    def test_join_promotion_multiple_annonations(self):
+    def test_join_promotion_multiple_annotations(self):
         o = CaseTestModel.objects.create(integer=1, integer2=1, string='1')
         # Testing that:
         # 1. There isn't any object on the remote side of the fk_rel

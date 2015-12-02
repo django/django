@@ -163,7 +163,7 @@ class CommonMiddlewareTest(TestCase):
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
         self.assertIsNotNone(r,
-            "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
+            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, 'http://testserver/customurlconf/slash/')
 
@@ -199,7 +199,7 @@ class CommonMiddlewareTest(TestCase):
         request.urlconf = 'middleware.extra_urls'
         r = CommonMiddleware().process_request(request)
         self.assertIsNotNone(r,
-            "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
+            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,

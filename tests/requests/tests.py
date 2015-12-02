@@ -587,7 +587,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
             'anything.multitenant.com',
             'multitenant.com',
             'insensitive.com',
@@ -657,7 +657,7 @@ class HostValidationTests(SimpleTestCase):
             '12.34.56.78:443',
             '[2001:19f0:feee::dead:beef:cafe]',
             '[2001:19f0:feee::dead:beef:cafe]:8080',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
         ]
 
         for host in legit_hosts:
@@ -703,7 +703,7 @@ class HostValidationTests(SimpleTestCase):
             'example.com',
             '12.34.56.78',
             '[2001:19f0:feee::dead:beef:cafe]',
-            'xn--4ca9at.com',  # Punnycode for öäü.com
+            'xn--4ca9at.com',  # Punycode for öäü.com
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}

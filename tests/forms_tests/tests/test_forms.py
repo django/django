@@ -517,7 +517,7 @@ class FormsTestCase(TestCase):
         self.assertHTMLEqual(str(f['when']), '<input type="text" name="when_0" value="1992-01-01" id="id_when_0" /><input type="text" name="when_1" value="01:01" id="id_when_1" />')
         self.assertHTMLEqual(f['when'].as_hidden(), '<input type="hidden" name="when_0" value="1992-01-01" id="id_when_0" /><input type="hidden" name="when_1" value="01:01" id="id_when_1" />')
 
-    def test_mulitple_choice_checkbox(self):
+    def test_multiple_choice_checkbox(self):
         # MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
         class SongForm(Form):
             name = CharField()
