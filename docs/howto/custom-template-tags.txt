@@ -647,8 +647,6 @@ positional arguments. For example:
 
     {% my_tag 123 "abcd" book.title warning=message|lower profile=user.profile %}
 
-.. _howto-custom-template-tags-assignment-tags:
-
 Assignment tags
 ~~~~~~~~~~~~~~~
 
@@ -1120,10 +1118,9 @@ The difference here is that ``do_current_time()`` grabs the format string and
 the variable name, passing both to ``CurrentTimeNode3``.
 
 Finally, if you only need to have a simple syntax for your custom
-context-updating template tag, you might want to consider using the
-:ref:`assignment tag <howto-custom-template-tags-assignment-tags>` shortcut
-we introduced above.
-
+context-updating template tag, consider using the
+:meth:`~django.template.Library.simple_tag` shortcut, which supports assigning
+the tag results to a template variable.
 
 Parsing until another block tag
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
