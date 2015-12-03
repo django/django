@@ -1121,8 +1121,8 @@ the variable name, passing both to ``CurrentTimeNode3``.
 
 Finally, if you only need to have a simple syntax for your custom
 context-updating template tag, you might want to consider using the
-:ref:`assignment tag <howto-custom-template-tags-assignment-tags>` shortcut
-we introduced above.
+:ref:`simple tag<howto-custom-template-tags-simple-tags>` shortcut,
+which supports assigning the tag results to a template variable.
 
 
 Parsing until another block tag
