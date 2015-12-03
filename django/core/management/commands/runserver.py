@@ -172,9 +172,16 @@ class Command(BaseCommand):
 
         plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
         if plan:
-            self.stdout.write(self.style.NOTICE(
-                "\nYou have unapplied migrations; your app may not work properly until they are applied."
-            ))
+            apps_waiting_migration = sorted(set(migration.app_label for migration, backwards in plan))
+            self.stdout.write(
+                self.style.NOTICE(
+                    "\nYou have %(unpplied_migration_count)s unapplied migrations; your project may not work properly "
+                    "until apps [%(apps_waiting_migration)s] have their migrations applied." % {
+                        "unpplied_migration_count": len(plan),
+                        "apps_waiting_migration": ", ".join(apps_waiting_migration)
+                    }
+                )
+            )
             self.stdout.write(self.style.NOTICE("Run 'python manage.py migrate' to apply them.\n"))
 
 # Kept for backward compatibility

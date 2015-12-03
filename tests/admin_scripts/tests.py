@@ -1383,6 +1383,49 @@ class ManageRunserver(AdminScriptTestCase):
         self.assertIn("Not checking migrations", self.output.getvalue())
 
 
+class ManageRunserverMigrationWarning(SimpleTestCase):
+    allow_database_queries = True
+
+    def setUp(self):
+        from django.core.management.commands.runserver import Command
+
+        self.output = StringIO()
+        self.runserver_command = Command(stdout=self.output)
+
+    @override_settings(
+        INSTALLED_APPS=["admin_scripts.app_waiting_migration"]
+    )
+    def test_migration_warning_one_app(self):
+
+        self.runserver_command.check_migrations()
+        self.assertIn(
+            'You have 1 unapplied migrations;',
+            self.output.getvalue()
+        )
+        self.assertIn(
+            'until apps [app_waiting_migration] have',
+            self.output.getvalue()
+        )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "admin_scripts.app_waiting_migration",
+            "admin_scripts.another_app_waiting_migration"
+        ]
+    )
+    def test_migration_warning_multiple_apps(self):
+
+        self.runserver_command.check_migrations()
+        self.assertIn(
+            'You have 2 unapplied migrations;',
+            self.output.getvalue()
+        )
+        self.assertIn(
+            'until apps [another_app_waiting_migration, app_waiting_migration] have',
+            self.output.getvalue()
+        )
+
+
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
     def setUp(self):
         self.write_settings('settings.py', sdict={
