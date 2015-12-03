@@ -272,6 +272,8 @@ class MigrationLoader(object):
                         ),
                         missing)
                     exc_value.__cause__ = exc
+                    if not hasattr(exc, '__traceback__'):
+                        exc.__traceback__ = sys.exc_info()[2]
                     six.reraise(NodeNotFoundError, exc_value, sys.exc_info()[2])
             raise exc
 
