@@ -26,7 +26,7 @@ from django.db import ConnectionHandler
 from django.db.migrations.exceptions import MigrationSchemaMissing
 from django.db.migrations.recorder import MigrationRecorder
 from django.test import (
-    LiveServerTestCase, SimpleTestCase, mock, override_settings,
+    LiveServerTestCase, SimpleTestCase, TestCase, mock, override_settings,
 )
 from django.test.runner import DiscoverRunner
 from django.utils._os import npath, upath
@@ -1381,6 +1381,36 @@ class ManageRunserver(AdminScriptTestCase):
             self.cmd.check_migrations()
         # Check a warning is emitted
         self.assertIn("Not checking migrations", self.output.getvalue())
+
+
+class ManageRunserverMigrationWarning(TestCase):
+
+    def setUp(self):
+        from django.core.management.commands.runserver import Command
+        self.stdout = StringIO()
+        self.runserver_command = Command(stdout=self.stdout)
+
+    @override_settings(INSTALLED_APPS=["admin_scripts.app_waiting_migration"])
+    def test_migration_warning_one_app(self):
+        self.runserver_command.check_migrations()
+        output = self.stdout.getvalue()
+        self.assertIn('You have 1 unapplied migration(s)', output)
+        self.assertIn('apply the migrations for app(s): app_waiting_migration.', output)
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "admin_scripts.app_waiting_migration",
+            "admin_scripts.another_app_waiting_migration",
+        ],
+    )
+    def test_migration_warning_multiple_apps(self):
+        self.runserver_command.check_migrations()
+        output = self.stdout.getvalue()
+        self.assertIn('You have 2 unapplied migration(s)', output)
+        self.assertIn(
+            'apply the migrations for app(s): another_app_waiting_migration, '
+            'app_waiting_migration.', output
+        )
 
 
 class ManageRunserverEmptyAllowedHosts(AdminScriptTestCase):
