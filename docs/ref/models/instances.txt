@@ -613,7 +613,7 @@ For example::
             return '%s %s' % (self.first_name, self.last_name)
 
 If you'd like compatibility with Python 2, you can decorate your model class
-with :func:`~django.utils.encoding.python_2_unicode_compatible` as show above.
+with :func:`~django.utils.encoding.python_2_unicode_compatible` as shown above.
 
 ``__eq__``
 ----------
