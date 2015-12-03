@@ -1972,8 +1972,6 @@ unescaped output will be ``"<B>Joel</B> <button>is</button> a slug"``.
     looking for something more robust, you can use the ``bleach`` Python
     library, notably its `clean`_ method.
 
-.. _clean: http://bleach.readthedocs.org/en/latest/clean.html
-
 .. templatefilter:: rjust
 
 rjust
