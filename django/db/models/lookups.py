@@ -449,22 +449,31 @@ class YearExact(YearLookup):
     def as_sql(self, compiler, connection):
         # We will need to skip the extract part and instead go
         # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
-        bounds = self.year_lookup_bounds(connection, rhs_params[0])
-        params.extend(bounds)
-        return '%s BETWEEN %%s AND %%s' % lhs_sql, params
+        if len(rhs_params) == 0:
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs)
+
+            return '%s = %s' % (lhs_sql, rhs_sql), params
+        else:
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs)
+            bounds = self.year_lookup_bounds(connection, rhs_params[0])
+            params.extend(bounds)
+            return '%s BETWEEN %%s AND %%s' % lhs_sql, params
 
 
 class YearComparisonLookup(YearLookup):
     def as_sql(self, compiler, connection):
         # We will need to skip the extract part and instead go
         # directly with the originating field, that is self.lhs.lhs.
-        lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
         rhs_sql, rhs_params = self.process_rhs(compiler, connection)
         rhs_sql = self.get_rhs_op(connection, rhs_sql)
-        start, finish = self.year_lookup_bounds(connection, rhs_params[0])
-        params.append(self.get_bound(start, finish))
+        if len(rhs_params) == 0:
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs)
+
+        else:
+            lhs_sql, params = self.process_lhs(compiler, connection, self.lhs.lhs)
+            start, finish = self.year_lookup_bounds(connection, rhs_params[0])
+            params.append(self.get_bound(start, finish))
         return '%s %s' % (lhs_sql, rhs_sql), params
 
     def get_rhs_op(self, connection, rhs):
