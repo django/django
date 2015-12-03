@@ -82,6 +82,12 @@ Minor features
 * Added support for the :class:`~django.contrib.gis.db.models.MakeLine`
   aggregate on SpatiaLite.
 
+* Added support for the
+  :class:`~django.contrib.gis.db.models.functions.Difference`,
+  :class:`~django.contrib.gis.db.models.functions.Intersection` and
+  :class:`~django.contrib.gis.db.models.functions.SymDifference`
+  functions on MySQL.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
