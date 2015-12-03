@@ -406,19 +406,17 @@ object generic views.
 Assignment template tags
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-A new :ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` helper
-function was added to ``template.Library`` to ease the creation of template
-tags that store data in a specified context variable.
+A new ``assignment_tag`` helper function was added to ``template.Library`` to
+ease the creation of template tags that store data in a specified context
+variable.
 
 ``*args`` and ``**kwargs`` support for template tag helper functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
-:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and
-newly introduced
-:ref:`assignment_tag<howto-custom-template-tags-assignment-tags>` template
-helper functions may now accept any number of positional or keyword arguments.
-For example::
+:ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and newly
+introduced ``assignment_tag`` template helper functions may now accept any
+number of positional or keyword arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
