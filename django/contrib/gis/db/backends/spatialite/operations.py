@@ -25,7 +25,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     version_regex = re.compile(r'^(?P<major>\d)\.(?P<minor1>\d)\.(?P<minor2>\d+)')
 
     Adapter = SpatiaLiteAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'Area'
     centroid = 'Centroid'
@@ -40,6 +39,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     intersection = 'Intersection'
     kml = 'AsKML'
     length = 'GLength'  # OpenGis defines Length, but this conflicts with an SQLite reserved keyword
+    makeline = 'MakeLine'
     num_geom = 'NumGeometries'
     num_points = 'NumPoints'
     point_on_surface = 'PointOnSurface'
@@ -81,6 +81,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         'distance_lte': SpatialOperator(func='Distance', op='<='),
     }
 
+    disallowed_aggregates = (aggregates.Extent3D,)
+
     @cached_property
     def function_names(self):
         return {
@@ -114,11 +116,6 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         if version < (3, 0, 0):
             raise ImproperlyConfigured('GeoDjango only supports SpatiaLite versions 3.0.0 and above.')
         return version
-
-    @cached_property
-    def disallowed_aggregates(self):
-        disallowed = (aggregates.Extent3D, aggregates.MakeLine)
-        return disallowed
 
     def convert_extent(self, box, srid):
         """

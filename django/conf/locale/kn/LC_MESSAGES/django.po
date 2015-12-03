@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 09:35+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Kannada (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Kannada (http://www.transifex.com/django/django/language/"
 "kn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -82,6 +82,9 @@ msgstr "ಸ್ಪ್ಯಾನಿಷ್"
 msgid "Argentinian Spanish"
 msgstr "ಅರ್ಜೆಂಟಿನಿಯನ್ ಸ್ಪಾನಿಷ್"
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr "ಮೆಕ್ಸಿಕನ್ ಸ್ಪಾನಿಷ್"
 
@@ -111,6 +114,9 @@ msgstr "ಫ್ರಿಸಿಯನ್"
 
 msgid "Irish"
 msgstr "ಐರಿಶ್"
+
+msgid "Scottish Gaelic"
+msgstr ""
 
 msgid "Galician"
 msgstr "ಗೆಲಿಶಿಯನ್"
@@ -304,6 +310,11 @@ msgstr ""
 "ಅಕ್ಷರಗಳು, ಅಂಕೆಗಳು, ಅಡಿಗೆರೆಗಳು (ಅಂಡರ್ಸ್ಕೋರ್) ಹಾಗು ಅಡ್ಡಗೆರೆಗಳನ್ನು ಹೊಂದಿರುವ ಒಂದು "
 "ಸರಿಯಾದ 'slug' ಅನ್ನು ನಮೂದಿಸಿ."
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
 msgid "Enter a valid IPv4 address."
 msgstr "ಒಂದು ಸರಿಯಾದ IPv4 ವಿಳಾಸವನ್ನು ನಮೂದಿಸಿ."
 
@@ -349,6 +360,23 @@ msgid ""
 msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 
 msgid "and"
@@ -540,6 +568,12 @@ msgstr "ಒನ್-ಟು-ಒನ್ (ಪರಸ್ಪರ) ಸಂಬಂಧ"
 msgid "Many-to-many relationship"
 msgstr "ಮೆನಿ-ಟು-ಮೆನಿ (ಸಾರ್ವಜನಿಕ) ಸಂಬಂಧ"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
+
 msgid "This field is required."
 msgstr "ಈ ಸ್ಥಳವು ಅಗತ್ಯವಿರುತ್ತದೆ."
 
@@ -548,23 +582,6 @@ msgstr "ಪೂರ್ಣಾಂಕವೊಂದನ್ನು ನಮೂದಿಸಿ."
 
 msgid "Enter a number."
 msgstr "ಒಂದು ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
 
 msgid "Enter a valid date."
 msgstr "ಸರಿಯಾದ ದಿನಾಂಕವನ್ನು ನಮೂದಿಸಿ."
@@ -626,12 +643,6 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"

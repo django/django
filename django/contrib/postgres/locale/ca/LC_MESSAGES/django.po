@@ -2,14 +2,16 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2015
+# duub qnnp, 2015
+# Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Catalan (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-21 12:22+0000\n"
+"Last-Translator: Roger Pons <rogerpons@gmail.com>\n"
+"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,14 +30,24 @@ msgid "Nested arrays must have the same length."
 msgstr "Les matrius niades han de tenir la mateixa longitud."
 
 msgid "Map of strings to strings"
-msgstr "Mapa de cadenas a cadenes"
+msgstr "Mapa de cadenes a cadenes"
 
 #, python-format
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "El valor de \"%(key)s\" no és una cadena."
 
+msgid "A JSON object"
+msgstr "Un objecte JSON"
+
+msgid "Value must be valid JSON."
+msgstr "El valor ha de ser JSON vàlid."
+
 msgid "Could not load JSON data."
 msgstr "No es poden carregar les dades JSON"
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "El valor '%(value)s' ha de ser JSON vàlid."
 
 msgid "Enter two valid values."
 msgstr "Introdueixi dos valors vàlids."
@@ -44,16 +56,16 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "L'inici del rang no pot excedir el seu final."
 
 msgid "Enter two whole numbers."
-msgstr ""
+msgstr "Introduïu dos números enters positius."
 
 msgid "Enter two numbers."
-msgstr ""
+msgstr "Introduïu dos números."
 
 msgid "Enter two valid date/times."
-msgstr ""
+msgstr "Introduïu dues data/hora vàlides."
 
 msgid "Enter two valid dates."
-msgstr ""
+msgstr "Introduïu dos dates vàlides."
 
 #, python-format
 msgid ""

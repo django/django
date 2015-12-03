@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-02-02 19:32+0000\n"
-"Last-Translator: Giannis Meletakis <meletakis@gmail.com>\n"
-"Language-Team: Greek (http://www.transifex.com/projects/p/django/language/"
-"el/)\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -81,6 +80,12 @@ msgstr "Ενέργεια:"
 msgid "action time"
 msgstr "ώρα ενέργειας"
 
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
+
 msgid "object id"
 msgstr "κωδικός αντικειμένου"
 
@@ -122,6 +127,9 @@ msgid ""
 msgstr ""
 "Κρατήστε πατημένο το \"Control\", ή το \"Command\" αν έχετε Mac, για να "
 "επιλέξετε παραπάνω από ένα."
+
+msgid "Added."
+msgstr ""
 
 #, python-format
 msgid "Changed %s."
@@ -487,6 +495,12 @@ msgstr ""
 "βεβαιωθείτε ότι οι απαραίτητοι πίνακες έχουν δημιουργηθεί και ότι η βάση "
 "είναι προσβάσιμη από τον αντίστοιχο χρήστη που έχετε δηλώσει."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+
 msgid "Forgotten your password or username?"
 msgstr "Ξεχάσατε το συνθηματικό ή τον κωδικό χρήστη σας;"
 
@@ -511,6 +525,9 @@ msgstr "Εμφάνιση όλων"
 
 msgid "Save"
 msgstr "Αποθήκευση"
+
+msgid "Popup closing..."
+msgstr ""
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -658,9 +675,6 @@ msgstr "Επαναφορά του συνθηματικού μου"
 
 msgid "All dates"
 msgstr "Όλες οι ημερομηνίες"
-
-msgid "(None)"
-msgstr "(Κενό)"
 
 #, python-format
 msgid "Select %s"

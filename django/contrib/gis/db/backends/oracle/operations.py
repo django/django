@@ -60,7 +60,6 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
     disallowed_aggregates = (aggregates.Collect, aggregates.Extent3D, aggregates.MakeLine)
 
     Adapter = OracleSpatialAdapter
-    Adaptor = Adapter  # Backwards-compatibility alias.
 
     area = 'SDO_GEOM.SDO_AREA'
     gml = 'SDO_UTIL.TO_GMLGEOMETRY'

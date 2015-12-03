@@ -2,17 +2,17 @@
 #
 # Translators:
 # Bouke Haarsma <bouke@webatoom.nl>, 2013
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jeffrey Gelens <jeffrey@noppo.pro>, 2012,2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
-"nl/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-11-25 19:49+0000\n"
+"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,25 +35,13 @@ msgid "Documentation bookmarklets"
 msgstr "Documentatie bookmarklets"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Om bookmarklets te installeren, sleep de link naar uw "
-"bladwijzers\n"
-"werkbalk, of rechtermuis klik op de link en voeg het toe aan de bladwijzer. "
-"Nu kan\n"
-"de bookmarklet vanuit elke pagina op de site worden gekozen. Let erop dat "
-"het soms\n"
-"noodzakelijk is dat de computer van waaruit de pagina wordt bekeken intern "
-"is.\n"
-"(Raadpleeg uw systeembeheerder of uw computer zich op het interne netwerk "
-"bevind).<p>\n"
+"Om bookmarklets te installeren, sleep de link naar uw Favorieten balk, of "
+"rechts-klik op de link en voeg toe aan Favorieten. De bookmarklet kan nu "
+"vanuit elke pagina op de site worden gekozen. "
 
 msgid "Documentation for this page"
 msgstr "Documentatie voor deze pagina"
@@ -64,29 +52,6 @@ msgid ""
 msgstr ""
 "Springt vanuit elke pagina naar de documentatie voor de view die gegenereerd "
 "wordt door die pagina."
-
-msgid "Show object ID"
-msgstr "Toon object-ID"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Toont het content-type en unieke ID voor pagina's die een enkel object "
-"voorstellen."
-
-msgid "Edit this object (current window)"
-msgstr "Bewerk dit object (huidig venster)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Gaat naar de beheerpagina voor pagina's die een enkel object weergeven."
-
-msgid "Edit this object (new window)"
-msgstr "Bewerk dit object (nieuw venster)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Zoals hierboven, maar opent de beheerpagina in een nieuw venster."
 
 msgid "Tags"
 msgstr "Tags"
@@ -151,6 +116,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Model: %(name)s"
 
+msgid "Fields"
+msgstr "Velden"
+
 msgid "Field"
 msgstr "Veld"
 
@@ -160,11 +128,20 @@ msgstr "Type"
 msgid "Description"
 msgstr "Beschrijving"
 
+msgid "Methods with arguments"
+msgstr "Methode met argumenten"
+
+msgid "Method"
+msgstr "Methode"
+
+msgid "Arguments"
+msgstr "Argumenten"
+
 msgid "Back to Model Documentation"
-msgstr "Terug naar Model Documentatie"
+msgstr "Terug naar Model documentatie"
 
 msgid "Model documentation"
-msgstr "Overzicht van modellen"
+msgstr "Model documentatie"
 
 msgid "Model groups"
 msgstr "Modules"
@@ -234,7 +211,7 @@ msgid "Templates:"
 msgstr "Templates:"
 
 msgid "Back to Views Documentation"
-msgstr "Terug naar lijst van views"
+msgstr "Terug naar Views documentatie"
 
 msgid "View documentation"
 msgstr "Bekijk documentatie"

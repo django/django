@@ -10,11 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-19 08:40+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-10-15 17:40+0000\n"
 "Last-Translator: Vláďa Macek <macek@sandbox.cz>\n"
-"Language-Team: Czech (http://www.transifex.com/projects/p/django/language/"
-"cs/)\n"
+"Language-Team: Czech (http://www.transifex.com/django/django/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -44,6 +43,12 @@ msgstr "Heslo pro uživatele %s: změnit"
 msgid "Authentication and Authorization"
 msgstr "Autentizace a autorizace"
 
+msgid "password"
+msgstr "heslo"
+
+msgid "last login"
+msgstr "poslední přihlášení"
+
 msgid "No password set."
 msgstr "Heslo nenastaveno."
 
@@ -59,16 +64,16 @@ msgstr "Heslo"
 msgid "Password confirmation"
 msgstr "Potvrzení hesla"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Pro ověření zadejte stejné heslo znovu."
+msgid "Enter the same password as before, for verification."
+msgstr "Zadejte pro ověření stejné heslo jako předtím."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Hesla se neukládají přímo a tak je nelze zobrazit. Je ale možné je změnit "
-"pomocí <a href=\"password/\">tohoto formuláře</a>."
+"Hesla v původní podobě se vůbec neukládají a tak je nelze zobrazit. Je ale "
+"možné heslo změnit pomocí <a href=\"../password/\">tohoto formuláře</a>."
 
 #, python-format
 msgid ""
@@ -120,6 +125,9 @@ msgstr "kontrolní součet"
 msgid "name"
 msgstr "název"
 
+msgid "content type"
+msgstr "typ obsahu"
+
 msgid "codename"
 msgstr "kódový název"
 
@@ -134,12 +142,6 @@ msgstr "skupina"
 
 msgid "groups"
 msgstr "skupiny"
-
-msgid "password"
-msgstr "heslo"
-
-msgid "last login"
-msgstr "poslední přihlášení"
 
 msgid "superuser status"
 msgstr "superuživatel"
@@ -214,6 +216,43 @@ msgstr "uživatel"
 
 msgid "users"
 msgstr "uživatelé"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znak."
+msgstr[1] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaky."
+msgstr[2] "Heslo je příliš krátké. Musí mít délku aspoň %(min_length)d znaků."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Heslo musí mít délku aspoň %(min_length)d znak."
+msgstr[1] "Heslo musí mít délku aspoň %(min_length)d znaky."
+msgstr[2] "Heslo musí mít délku aspoň %(min_length)d znaků."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Heslo je příliš podobné obsahu pole %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr "Heslo nemůže být příliš podobné jinému údaji ve vašem účtu."
+
+msgid "This password is too common."
+msgstr "Heslo je příliš běžné."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Vaše heslo nemůže být takové, které je často používané."
+
+msgid "This password is entirely numeric."
+msgstr "Heslo se skládá pouze z čísel."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Vaše heslo nemůže být čistě číselné."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

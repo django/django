@@ -74,7 +74,7 @@ type of web server -- faster but less full-featured. Some common choices are:
 * A stripped-down version of Apache_
 
 .. _Nginx: http://wiki.nginx.org/Main
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 
 Configuring these servers is out of scope of this document; check each
 server's respective documentation for instructions.

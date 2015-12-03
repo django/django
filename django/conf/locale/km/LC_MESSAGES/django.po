@@ -6,11 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 09:34+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Khmer (http://www.transifex.com/projects/p/django/language/"
-"km/)\n"
+"Language-Team: Khmer (http://www.transifex.com/django/django/language/km/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -80,6 +79,9 @@ msgstr "ភាសាអេស្ប៉ាញ"
 msgid "Argentinian Spanish"
 msgstr ""
 
+msgid "Colombian Spanish"
+msgstr ""
+
 msgid "Mexican Spanish"
 msgstr ""
 
@@ -108,6 +110,9 @@ msgid "Frisian"
 msgstr ""
 
 msgid "Irish"
+msgstr ""
+
+msgid "Scottish Gaelic"
 msgstr ""
 
 msgid "Galician"
@@ -300,6 +305,11 @@ msgid ""
 "Enter a valid 'slug' consisting of letters, numbers, underscores or hyphens."
 msgstr ""
 
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+
 msgid "Enter a valid IPv4 address."
 msgstr ""
 
@@ -340,6 +350,23 @@ msgid ""
 msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] ""
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] ""
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
 
 msgid "and"
@@ -530,6 +557,12 @@ msgstr ""
 msgid "Many-to-many relationship"
 msgstr ""
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ""
+
 msgid "This field is required."
 msgstr "ចាំបាច់បំពេញទិន្នន័យកន្លែងនេះ។"
 
@@ -538,23 +571,6 @@ msgstr "បំពេញចំនួនទាំងអស់។"
 
 msgid "Enter a number."
 msgstr ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
 
 msgid "Enter a valid date."
 msgstr ""
@@ -610,12 +626,6 @@ msgstr ""
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
 msgstr ""
 
 msgid "ManagementForm data is missing or has been tampered with"

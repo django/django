@@ -2,24 +2,27 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# andrewsmedina <andrewsmedina@gmail.com>, 2014
+# andrewsmedina <andrewsmedina@gmail.com>, 2014-2015
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2014-2015
 # Gladson <gladsonbrito@gmail.com>, 2013
-# Guilherme Gondim <semente@taurinus.org>, 2011-2014
+# Guilherme Gondim, 2011-2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Lucas Infante <maccinza@gmail.com>, 2015
 # Sandro <sandrossv@hotmail.com>, 2011
+# Sergio Garcia <sergio@ginx.com.br>, 2015
+# Wiliam Souza <wiliamsouza83@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 08:44+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/projects/p/"
-"django/language/pt_BR/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-27 19:35+0000\n"
+"Last-Translator: Sergio Garcia <sergio@ginx.com.br>\n"
+"Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
+"language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -89,6 +92,9 @@ msgstr "Espanhol"
 msgid "Argentinian Spanish"
 msgstr "Espanhol Argentino"
 
+msgid "Colombian Spanish"
+msgstr "Espanhol Colombiano"
+
 msgid "Mexican Spanish"
 msgstr "Espanhol Mexicano"
 
@@ -118,6 +124,9 @@ msgstr "Frísia"
 
 msgid "Irish"
 msgstr "Irlandês"
+
+msgid "Scottish Gaelic"
+msgstr "Gaélico Escocês"
 
 msgid "Galician"
 msgstr "Galiciano"
@@ -279,7 +288,7 @@ msgid "Traditional Chinese"
 msgstr "Chinês Tradicional"
 
 msgid "Messages"
-msgstr ""
+msgstr "Mensagens"
 
 msgid "Site Maps"
 msgstr "Site Maps"
@@ -310,6 +319,12 @@ msgid ""
 msgstr ""
 "Insira um \"slug\" válido consistindo de letras, números, sublinhados (_) ou "
 "hífens."
+
+msgid ""
+"Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
+"hyphens."
+msgstr ""
+"Insira um 'slug' válido composto de letras, números, sublinhados ou hífens."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Insira um endereço IPv4 válido."
@@ -362,6 +377,29 @@ msgstr[0] ""
 msgstr[1] ""
 "Certifique-se de que o valor tenha no máximo %(limit_value)d caracteres (ele "
 "possui %(show_value)d)."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s digit in total."
+msgid_plural "Ensure that there are no more than %(max)s digits in total."
+msgstr[0] "Certifique-se de que não tenha mais de %(max)s dígito no total."
+msgstr[1] "Certifique-se de que não tenha mais de %(max)s dígitos no total."
+
+#, python-format
+msgid "Ensure that there are no more than %(max)s decimal place."
+msgid_plural "Ensure that there are no more than %(max)s decimal places."
+msgstr[0] "Certifique-se de que não tenha mais de %(max)s casa decimal."
+msgstr[1] "Certifique-se de que não tenha mais de %(max)s casas decimais."
+
+#, python-format
+msgid ""
+"Ensure that there are no more than %(max)s digit before the decimal point."
+msgid_plural ""
+"Ensure that there are no more than %(max)s digits before the decimal point."
+msgstr[0] ""
+"Certifique-se de que não tenha mais de %(max)s dígito antes do ponto decimal."
+msgstr[1] ""
+"Certifique-se de que não tenha mais de %(max)s dígitos antes do ponto "
+"decimal."
 
 msgid "and"
 msgstr "e"
@@ -566,6 +604,12 @@ msgstr "Relacionamento um-para-um"
 msgid "Many-to-many relationship"
 msgstr "Relacionamento muitos-para-muitos"
 
+#. Translators: If found as last label character, these punctuation
+#. characters will prevent the default label_suffix to be appended to the
+#. label
+msgid ":?.!"
+msgstr ":?.!"
+
 msgid "This field is required."
 msgstr "Este campo é obrigatório."
 
@@ -574,29 +618,6 @@ msgstr "Informe um número inteiro."
 
 msgid "Enter a number."
 msgstr "Informe um número."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s digit in total."
-msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] "Certifique-se de que não tenha mais de %(max)s dígito no total."
-msgstr[1] "Certifique-se de que não tenha mais de %(max)s dígitos no total."
-
-#, python-format
-msgid "Ensure that there are no more than %(max)s decimal place."
-msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] "Certifique-se de que não tenha mais de %(max)s casa decimal."
-msgstr[1] "Certifique-se de que não tenha mais de %(max)s casas decimais."
-
-#, python-format
-msgid ""
-"Ensure that there are no more than %(max)s digit before the decimal point."
-msgid_plural ""
-"Ensure that there are no more than %(max)s digits before the decimal point."
-msgstr[0] ""
-"Certifique-se de que não tenha mais de %(max)s dígito antes do ponto decimal."
-msgstr[1] ""
-"Certifique-se de que não tenha mais de %(max)s dígitos antes do ponto "
-"decimal."
 
 msgid "Enter a valid date."
 msgstr "Informe uma data válida."
@@ -660,12 +681,6 @@ msgstr ":"
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
 msgstr "(Campo oculto %(name)s) %(error)s"
-
-#. Translators: If found as last label character, these punctuation
-#. characters will prevent the default label_suffix to be appended to the
-#. label
-msgid ":?.!"
-msgstr ":?.!"
 
 msgid "ManagementForm data is missing or has been tampered with"
 msgstr "Os dados do ManagementForm não foram encontrados ou foram adulterados"
@@ -1101,7 +1116,7 @@ msgstr ""
 "origem'."
 
 msgid "More information is available with DEBUG=True."
-msgstr "Mais informações estão disponíveis com DEBUG = True."
+msgstr "Mais informações estão disponíveis com DEBUG=True."
 
 msgid "Welcome to Django"
 msgstr "Bem-vindo ao Django"

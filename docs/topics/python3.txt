@@ -6,7 +6,7 @@ Django 1.5 is the first version of Django to support Python 3. The same code
 runs both on Python 2 (≥ 2.6.5) and Python 3 (≥ 3.2), thanks to the six_
 compatibility layer.
 
-.. _six: http://pythonhosted.org/six/
+.. _six: https://pythonhosted.org/six/
 
 This document is primarily targeted at authors of pluggable applications
 who want to support both Python 2 and 3. It also describes guidelines that
