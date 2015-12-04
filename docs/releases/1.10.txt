@@ -80,7 +80,8 @@ Minor features
   and :attr:`~django.contrib.gis.gdal.GDALBand.std` attributes.
 
 * Added support for the :class:`~django.contrib.gis.db.models.MakeLine`
-  aggregate on SpatiaLite.
+  aggregate and :class:`~django.contrib.gis.db.models.functions.GeoHash`
+  function on SpatiaLite.
 
 * Added support for the
   :class:`~django.contrib.gis.db.models.functions.Difference`,
