@@ -347,7 +347,9 @@ class TestChecks(PostgreSQLTestCase):
         model = MyModel()
         errors = model.check()
         self.assertEqual(len(errors), 1)
+        # The inner CharField is missing a max_length.
         self.assertEqual(errors[0].id, 'postgres.E001')
+        self.assertIn('max_length', errors[0].msg)
 
     def test_invalid_base_fields(self):
         test_apps = Apps(['postgres_tests'])
@@ -362,6 +364,25 @@ class TestChecks(PostgreSQLTestCase):
         errors = model.check()
         self.assertEqual(len(errors), 1)
         self.assertEqual(errors[0].id, 'postgres.E002')
+
+    def test_nested_field_checks(self):
+        """
+        Nested ArrayFields are permitted.
+        """
+        test_apps = Apps(['postgres_tests'])
+
+        class MyModel(PostgreSQLModel):
+            field = ArrayField(ArrayField(models.CharField()))
+
+            class Meta:
+                apps = test_apps
+
+        model = MyModel()
+        errors = model.check()
+        self.assertEqual(len(errors), 1)
+        # The inner CharField is missing a max_length.
+        self.assertEqual(errors[0].id, 'postgres.E001')
+        self.assertIn('max_length', errors[0].msg)
 
 
 @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific tests")

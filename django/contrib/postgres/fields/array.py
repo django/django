@@ -29,9 +29,17 @@ class ArrayField(Field):
             self.default_validators.append(ArrayMaxLengthValidator(self.size))
         super(ArrayField, self).__init__(**kwargs)
 
-    def contribute_to_class(self, cls, name, **kwargs):
-        super(ArrayField, self).contribute_to_class(cls, name, **kwargs)
-        self.base_field.model = cls
+    @property
+    def model(self):
+        try:
+            return self.__dict__['model']
+        except KeyError:
+            raise AttributeError("'%s' object has no attribute 'model'" % self.__class__.__name__)
+
+    @model.setter
+    def model(self, model):
+        self.__dict__['model'] = model
+        self.base_field.model = model
 
     def check(self, **kwargs):
         errors = super(ArrayField, self).check(**kwargs)
