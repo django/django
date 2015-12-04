@@ -9,4 +9,5 @@ Django 1.9.1 fixes several bugs in 1.9.
 Bugfixes
 ========
 
-* ...
+* Fixed the faulty behaviour of ``BaseCache.get_or_set()`` when DummyCache
+  selected as a cache backend (:ticket:`25840`).

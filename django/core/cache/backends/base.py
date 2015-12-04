@@ -165,7 +165,7 @@ class BaseCache(object):
                 default = default()
             val = self.add(key, default, timeout=timeout, version=version)
             if val:
-                return self.get(key, version=version)
+                return self.get(key, default, version)
         return val
 
     def has_key(self, key, version=None):
