@@ -18,10 +18,7 @@ from django.utils.functional import cached_property, curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.version import get_docs_version
 
-from . import (
-    AutoField, Field, IntegerField, PositiveIntegerField,
-    PositiveSmallIntegerField,
-)
+from . import Field
 from .related_descriptors import (
     ForwardManyToOneDescriptor, ManyToManyDescriptor,
     ReverseManyToOneDescriptor, ReverseOneToOneDescriptor,
@@ -935,19 +932,7 @@ class ForeignKey(ForeignObject):
         return super(ForeignKey, self).formfield(**defaults)
 
     def db_type(self, connection):
-        # The database column type of a ForeignKey is the column type
-        # of the field to which it points. An exception is if the ForeignKey
-        # points to an AutoField/PositiveIntegerField/PositiveSmallIntegerField,
-        # in which case the column type is simply that of an IntegerField.
-        # If the database needs similar types for key fields however, the only
-        # thing we can do is making AutoField an IntegerField.
-        rel_field = self.target_field
-        if (isinstance(rel_field, AutoField) or
-                (not connection.features.related_fields_match_type and
-                isinstance(rel_field, (PositiveIntegerField,
-                                       PositiveSmallIntegerField)))):
-            return IntegerField().db_type(connection=connection)
-        return rel_field.db_type(connection=connection)
+        return self.target_field.rel_db_type(connection=connection)
 
     def db_parameters(self, connection):
         return {"type": self.db_type(connection), "check": []}
