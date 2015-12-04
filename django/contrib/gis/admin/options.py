@@ -59,6 +59,12 @@ class GeoModelAdmin(ModelAdmin):
         3D editing).
         """
         if isinstance(db_field, models.GeometryField) and db_field.dim < 3:
+            if not HAS_GDAL and db_field.srid != self.map_srid:
+                raise ImproperlyConfigured(
+                    "Map SRID is %s and SRID of `%s` is %s. GDAL must be "
+                    "installed to perform the transformation."
+                    % (self.map_srid, db_field, db_field.srid)
+                )
             # Setting the widget with the newly defined widget.
             kwargs['widget'] = self.get_map_widget(db_field)
             return db_field.formfield(**kwargs)
@@ -134,8 +140,3 @@ class OSMGeoAdmin(GeoModelAdmin):
     max_resolution = '156543.0339'
     point_zoom = num_zoom - 6
     units = 'm'
-
-    def __init__(self, *args):
-        if not HAS_GDAL:
-            raise ImproperlyConfigured("OSMGeoAdmin is not usable without GDAL libs installed")
-        super(OSMGeoAdmin, self).__init__(*args)
