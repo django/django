@@ -266,10 +266,14 @@ GeoHash
 
 .. class:: GeoHash(expression, **extra)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite (≥ 4.0, LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
+
+.. versionchanged:: 1.10
+
+    SpatiaLite support was added.
 
 __ https://en.wikipedia.org/wiki/Geohash
 

@@ -1,6 +1,7 @@
 """
 SQL functions reference lists:
 http://www.gaia-gis.it/spatialite-3.0.0-BETA/spatialite-sql-3.0.0.html
+https://web.archive.org/web/20130407175746/http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.0.0.html
 http://www.gaia-gis.it/gaia-sins/spatialite-sql-4.2.1.html
 """
 import re
@@ -95,11 +96,13 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def unsupported_functions(self):
-        unsupported = {'BoundingCircle', 'ForceRHR', 'GeoHash', 'MemSize'}
+        unsupported = {'BoundingCircle', 'ForceRHR', 'MemSize'}
         if self.spatial_version < (3, 1, 0):
             unsupported.add('SnapToGrid')
         if self.spatial_version < (4, 0, 0):
             unsupported.update({'Perimeter', 'Reverse'})
+        elif not self.lwgeom_version():
+            unsupported.add('GeoHash')
         return unsupported
 
     @cached_property
@@ -211,6 +214,10 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     def proj4_version(self):
         "Returns the version of the PROJ.4 library used by SpatiaLite."
         return self._get_spatialite_func('proj4_version()')
+
+    def lwgeom_version(self):
+        """Return the version of LWGEOM library used by SpatiaLite."""
+        return self._get_spatialite_func('lwgeom_version()')
 
     def spatialite_version(self):
         "Returns the SpatiaLite library version as a string."

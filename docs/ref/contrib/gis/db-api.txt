@@ -316,7 +316,7 @@ Function                              PostGIS  Oracle  MySQL        SpatiaLite
 :class:`Distance`                     X        X       X (≥ 5.6.1)  X
 :class:`Envelope`                     X                X            X
 :class:`ForceRHR`                     X
-:class:`GeoHash`                      X
+:class:`GeoHash`                      X                             X (≥ 4.0, LWGEOM)
 :class:`Intersection`                 X        X       X (≥ 5.6.1)  X
 :class:`Length`                       X        X       X            X
 :class:`MemSize`                      X
