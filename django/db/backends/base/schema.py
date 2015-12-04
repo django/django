@@ -53,7 +53,9 @@ class BaseDatabaseSchemaEditor(object):
     sql_create_check = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s CHECK (%(check)s)"
     sql_delete_check = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
-    sql_create_unique = "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s)"
+    sql_create_unique = (
+        "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s UNIQUE (%(columns)s) DEFERRABLE INITIALLY DEFERRED"
+    )
     sql_delete_unique = "ALTER TABLE %(table)s DROP CONSTRAINT %(name)s"
 
     sql_create_fk = (
