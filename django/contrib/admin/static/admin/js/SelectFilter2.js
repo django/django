@@ -195,7 +195,7 @@ Requires core.js, SelectBox.js and addevent.js.
         }
     };
 
-    addEvent(window, "load", function(e) {
+    addEvent(window, 'load', function(e) {
         $('select.selectfilter, select.selectfilterstacked').each(function() {
             var $el = $(this),
                 data = $el.data();

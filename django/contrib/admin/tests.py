@@ -15,7 +15,7 @@ class CSPMiddleware(object):
 
 
 @modify_settings(
-    MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'}
+    MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'},
 )
 class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
 

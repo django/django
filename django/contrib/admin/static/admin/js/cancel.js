@@ -1,5 +1,5 @@
 (function($) {
-    "use strict";
+    'use strict';
     $(function() {
         $('.cancel-link').click(function(e) {
             e.preventDefault();

@@ -132,9 +132,7 @@ class AuthenticationForm(forms.Form):
     """
     username = forms.CharField(
         max_length=254,
-        widget=forms.TextInput(
-            attrs={'autofocus': ''},
-        )
+        widget=forms.TextInput(attrs={'autofocus': ''}),
     )
     password = forms.CharField(label=_("Password"), widget=forms.PasswordInput)
 

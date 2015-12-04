@@ -734,7 +734,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         actor = Actor.objects.create(name="Palin", age=27)
         response = self.client.get("%s?%s" % (reverse('admin:admin_views_actor_changelist'), IS_POPUP_VAR))
-        self.assertContains(response, "data-popup-opener=\"%s\"" % actor.pk)
+        self.assertContains(response, 'data-popup-opener="%s"' % actor.pk)
 
     def test_hide_change_password(self):
         """
@@ -3451,7 +3451,7 @@ action)</option>
             'value': 'value\\',
         })
         context = {
-            'popup_response_data': popup_response_data
+            'popup_response_data': popup_response_data,
         }
         output = render_to_string('admin/popup_response.html', context)
         self.assertIn(
@@ -4269,13 +4269,9 @@ class PrePopulatedTest(TestCase):
 
     def test_prepopulated_on(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_add'))
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "&quot;id&quot;: &quot;#id_slug&quot;")
         self.assertContains(response, "&quot;dependency_ids&quot;: [&quot;#id_title&quot;]")
-        self.assertContains(
-            response,
-            "&quot;id&quot;: &quot;#id_prepopulatedsubpost_set-0-subslug&quot;",
-        )
+        self.assertContains(response, "&quot;id&quot;: &quot;#id_prepopulatedsubpost_set-0-subslug&quot;")
 
     def test_prepopulated_off(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_change', args=(self.p1.pk,)))

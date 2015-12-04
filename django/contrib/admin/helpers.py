@@ -244,7 +244,7 @@ class InlineAdminFormSet(object):
             'options': {
                 'prefix': self.formset.prefix,
                 'addText': ugettext('Add another %(verbose_name)s') % {
-                    'verbose_name': capfirst(verbose_name)
+                    'verbose_name': capfirst(verbose_name),
                 },
                 'deleteText': ugettext('Remove'),
             }

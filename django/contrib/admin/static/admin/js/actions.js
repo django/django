@@ -145,8 +145,9 @@
         selectedClass: "selected"
     };
     $(document).ready(function() {
-        if( $("#actions_enabled").length && JSON.parse($("#actions_enabled").text())) {
-            $("tr input.action-select").actions();
+        var $actionsEls = $('tr input.action-select');
+        if ($actionsEls.length > 0) {
+            $actionsEls.actions();
         }
     });
 

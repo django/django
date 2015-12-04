@@ -1143,7 +1143,7 @@ class ModelAdmin(BaseModelAdmin):
                 'new_value': new_value,
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
-                'popup_response_data': popup_response_data
+                'popup_response_data': popup_response_data,
             })
 
         opts = self.model._meta
