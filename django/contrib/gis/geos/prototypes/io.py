@@ -54,6 +54,9 @@ wkt_writer_set_outdim = GEOSFuncFactory(
     'GEOSWKTWriter_setOutputDimension', argtypes=[WKT_WRITE_PTR, c_int]
 )
 
+wkt_writer_set_trim = GEOSFuncFactory('GEOSWKTWriter_setTrim', argtypes=[WKT_WRITE_PTR, c_char])
+wkt_writer_set_precision = GEOSFuncFactory('GEOSWKTWriter_setRoundingPrecision', argtypes=[WKT_WRITE_PTR, c_int])
+
 # WKBReader routines
 wkb_reader_create = GEOSFuncFactory('GEOSWKBReader_create', restype=WKB_READ_PTR)
 wkb_reader_destroy = GEOSFuncFactory('GEOSWKBReader_destroy', argtypes=[WKB_READ_PTR])
@@ -175,6 +178,15 @@ class WKTWriter(IOBase):
         if new_dim not in (2, 3):
             raise ValueError('WKT output dimension must be 2 or 3')
         wkt_writer_set_outdim(self.ptr, new_dim)
+
+    def set_trim(self, trim):
+        wkt_writer_set_trim(self.ptr, b'\x01' if trim else b'\x00')
+
+    def set_precision(self, precision):
+        if isinstance(precision, int) and precision >= 0 or precision is None:
+            wkt_writer_set_precision(self.ptr, -1 if precision is None else precision)
+        else:
+            raise ValueError('WKT output rounding precision must be non-negative integer or None.')
 
 
 class WKBWriter(IOBase):

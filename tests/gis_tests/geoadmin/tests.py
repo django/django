@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.contrib.gis import admin
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import Point
-from django.test import TestCase, override_settings, skipUnlessDBFeature
+from django.core.exceptions import ImproperlyConfigured
+from django.test import TestCase, mock, override_settings, skipUnlessDBFeature
 
 from .admin import UnmodifiableAdmin
-from .models import City, site
+from .models import City, CityMercator, site
 
 
 @skipUnlessDBFeature("gis_enabled")
@@ -52,6 +56,18 @@ class GeoAdminTest(TestCase):
             """"http://vmap0.tiles.osgeo.org/wms/vmap0", {layers: 'basic', format: 'image/jpeg'});""",
             result)
 
+    @mock.patch('django.contrib.gis.admin.options.HAS_GDAL', False)
+    def test_no_gdal_admin_model_diffent_srid(self):
+        with self.assertRaises(ImproperlyConfigured):
+            geoadmin = site._registry[City]
+            geoadmin.get_changelist_form(None)()
+
+    @mock.patch('django.contrib.gis.admin.options.HAS_GDAL', False)
+    def test_no_gdal_admin_model_same_srid(self):
+        geoadmin = site._registry[CityMercator]
+        geoadmin.get_changelist_form(None)()
+
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     def test_olwidget_has_changed(self):
         """
         Check that changes are accurately noticed by OpenLayersWidget.
