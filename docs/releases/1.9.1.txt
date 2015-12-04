@@ -14,3 +14,5 @@ Bugfixes
 
 * Fixed a regression in ``FormMixin`` causing forms to be validated twice
   (:ticket:`25548`).
+
+* Fixed a system check crash with nested ``ArrayField``\s (:ticket:`25867`).
