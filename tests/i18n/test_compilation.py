@@ -10,6 +10,8 @@ import unittest
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
 )
+from django.core.management.commands.makemessages import \
+    Command as MakeMessagesCommand
 from django.core.management.utils import find_command
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
@@ -173,6 +175,9 @@ class CompilationErrorHandling(MessageCompilationTests):
             except CommandError as err:
                 self.assertIn("'�' cannot start a field name", six.text_type(err))
         else:
+            cmd = MakeMessagesCommand()
+            if cmd.gettext_version < (0, 18, 3):
+                raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
             with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
                 call_command('compilemessages', locale=['ko'], verbosity=0)
 
