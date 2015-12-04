@@ -33,8 +33,9 @@ In your custom ``change_form.html`` template, extend the
     </script>
     {% endblock %}
 
-.. snippet:: javascript
+.. snippet::
     :filename: app/static/app/formset_handlers.js
+
     (function($) {
         $(document).on('formset:added', function(event, $row, formsetName) {
             if (formsetName == 'author_set') {
@@ -71,12 +72,11 @@ namespace, just listen to the event triggered from there. For example:
 
 .. snippet::
     :filename: app/static/app/unregistered_hanlders.js
-    <script type="text/javascript">
-        django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
-            // Row added
-        });
 
-        django.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
-            // Row removed
-        });
-    </script>
+    django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
+        // Row added
+    });
+
+    django.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
+        // Row removed
+    });
