@@ -1061,7 +1061,7 @@ implementation details see :ref:`using-the-views`.
             {% endif %}
         {% endif %}
 
-        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <table>
         <tr>
