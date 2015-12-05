@@ -237,19 +237,6 @@ class InlineAdminFormSet(object):
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
 
-    def inline_formset_data(self):
-        verbose_name = self.opts.verbose_name
-        return json.dumps({
-            'name': '#%s' % self.formset.prefix,
-            'options': {
-                'prefix': self.formset.prefix,
-                'addText': ugettext('Add another %(verbose_name)s') % {
-                    'verbose_name': capfirst(verbose_name),
-                },
-                'deleteText': ugettext('Remove'),
-            }
-        })
-
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             view_on_site_url = self.opts.get_view_on_site_url(original)
@@ -289,6 +276,19 @@ class InlineAdminFormSet(object):
                     'required': form_field.required,
                     'help_text': form_field.help_text,
                 }
+
+    def inline_formset_data(self):
+        verbose_name = self.opts.verbose_name
+        return json.dumps({
+            'name': '#%s' % self.formset.prefix,
+            'options': {
+                'prefix': self.formset.prefix,
+                'addText': ugettext('Add another %(verbose_name)s') % {
+                    'verbose_name': capfirst(verbose_name),
+                },
+                'deleteText': ugettext('Remove'),
+            }
+        })
 
     def _media(self):
         media = self.opts.media + self.formset.media

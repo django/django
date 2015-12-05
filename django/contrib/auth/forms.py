@@ -315,9 +315,7 @@ class PasswordChangeForm(SetPasswordForm):
     })
     old_password = forms.CharField(
         label=_("Old password"),
-        widget=forms.PasswordInput(
-            attrs={'autofocus': ''},
-        )
+        widget=forms.PasswordInput(attrs={'autofocus': ''}),
     )
 
     field_order = ['old_password', 'new_password1', 'new_password2']
@@ -345,9 +343,7 @@ class AdminPasswordChangeForm(forms.Form):
     required_css_class = 'required'
     password1 = forms.CharField(
         label=_("Password"),
-        widget=forms.PasswordInput(
-            attrs={'autofocus': ''},
-        ),
+        widget=forms.PasswordInput(attrs={'autofocus': ''}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(

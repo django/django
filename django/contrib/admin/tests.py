@@ -8,7 +8,7 @@ from django.utils.translation import ugettext as _
 
 
 class CSPMiddleware(object):
-
+    """The admin's JavaScript should be compatible with CSP."""
     def process_response(self, request, response):
         response['Content-Security-Policy'] = "default-src 'self'"
         return response

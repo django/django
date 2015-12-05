@@ -1,7 +1,7 @@
 /*global showAddAnotherPopup, showRelatedObjectLookupPopup showRelatedObjectPopup updateRelatedObjectLinks*/
 
 (function($) {
-    "use strict";
+    'use strict';
     $(document).ready(function() {
         var modelName = $('#django-admin-form-add-constants').data('modelName');
         $('.add-another').click(function(e) {
@@ -39,7 +39,7 @@
         });
         $('.related-widget-wrapper select').trigger('change');
 
-        if(modelName) {
+        if (modelName) {
             $('form#' + modelName + '_form :input:visible:enabled:first').focus();
         }
     });

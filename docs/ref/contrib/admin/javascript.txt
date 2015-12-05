@@ -26,6 +26,7 @@ In your custom ``change_form.html`` template, extend the
 .. code-block:: html+django
 
     {% extends 'admin/change_form.html' %}
+    {% load admin_static %}
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
@@ -33,7 +34,7 @@ In your custom ``change_form.html`` template, extend the
     </script>
     {% endblock %}
 
-.. snippet::
+.. snippet:: javascript
     :filename: app/static/app/formset_handlers.js
 
     (function($) {
@@ -64,14 +65,15 @@ namespace, just listen to the event triggered from there. For example:
 .. code-block:: html+django
 
     {% extends 'admin/change_form.html' %}
+    {% load admin_static %}
 
     {% block admin_change_form_document_ready %}
     {{ block.super }}
     <script type="text/javascript" src="{% static 'app/unregistered_handlers.js' %}></script>
     {% endblock %}
 
-.. snippet::
-    :filename: app/static/app/unregistered_hanlders.js
+.. snippet:: javascript
+    :filename: app/static/app/unregistered_handlers.js
 
     django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
         // Row added
