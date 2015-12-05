@@ -201,6 +201,9 @@ class FileDescriptor(object):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
+        # Also, make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+                file.instance = instance
 
         # Make sure that the instance is correct.
         elif isinstance(file, FieldFile) and instance is not file.instance:
