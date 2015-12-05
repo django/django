@@ -158,3 +158,7 @@
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
 })();
+django.jQuery(function($) {
+    "use strict"
+    $('.django-ajax-autocomplete-foreignkey').select2();
+});

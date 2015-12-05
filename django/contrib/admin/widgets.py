@@ -17,6 +17,7 @@ from django.utils.encoding import force_text
 from django.utils.html import (
     escape, escapejs, format_html, format_html_join, smart_urlquote,
 )
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import Truncator
 from django.utils.translation import ugettext as _
@@ -232,6 +233,125 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
         value = data.get(name)
         if value:
             return value.split(',')
+
+
+class ForeignKeyAjaxAutocompleteWidget(forms.Select):
+    """
+    A Widget for selecting a related object by searching for values vi ajax.
+    """
+    @property
+    def media(self):
+        css = ["vendor/select2/select2.min.css"]
+        return forms.Media(css={'all': [static("admin/js/%s" % path) for path in css]})
+
+    def __init__(self, rel, admin_site, attrs=None, using=None):
+        self.rel = rel
+        self.admin_site = admin_site
+        self.db = using
+        super(ForeignKeyAjaxAutocompleteWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        rel_to = self.rel.model
+        if attrs is None:
+            attrs = {}
+        extra = []
+        assert rel_to in self.admin_site._registry, 'Sorry, remote model must be registered with the same AdminSite'
+        related_url = reverse(
+            'admin:%s_%s_changelist' % (
+                rel_to._meta.app_label,
+                rel_to._meta.model_name,
+            ),
+            current_app=self.admin_site.name,
+        )
+        params = self.url_parameters()
+        if 'class' not in attrs:
+            attrs['class'] = 'django-ajax-autocomplete-foreignkey'  # The JavaScript code looks for this hook.
+        # TODO: "lookup_id_" is hard-coded here. This should instead use
+        # the correct API to determine the ID dynamically.
+        attrs['data-ajax--url'] = '%s?%s' % (related_url, urlencode(params))
+        attrs['data-width'] = 'style'
+        key = self.rel.get_related_field().name
+        try:
+            obj = self.rel.model._default_manager.using(self.db).get(**{key: value})
+        except (ValueError, self.rel.model.DoesNotExist):
+            obj = value
+        self.choices = [(value, force_text(obj))]
+        output = [super(ForeignKeyAjaxAutocompleteWidget, self).render(name, value, attrs)] + extra
+        return mark_safe(''.join(output))
+
+    def base_url_parameters(self):
+        limit_choices_to = self.rel.limit_choices_to
+        if callable(limit_choices_to):
+            limit_choices_to = limit_choices_to()
+        return url_params_from_lookup_dict(limit_choices_to)
+
+    def url_parameters(self):
+        from django.contrib.admin.views.main import TO_FIELD_VAR, IS_AJAX_AUTOCOMPLETE_VAR
+        params = self.base_url_parameters()
+        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
+        params.update({IS_AJAX_AUTOCOMPLETE_VAR: '1'})
+        return params
+
+
+class ManyToManyAjaxAutocompleteWidget(forms.SelectMultiple):
+    """
+    A Widget for selecting a related object by searching for values vi ajax.
+    """
+    @property
+    def media(self):
+        css = ["vendor/select2/select2.min.css"]
+        return forms.Media(css={'all': [static("admin/js/%s" % path) for path in css]})
+
+    def __init__(self, rel, admin_site, attrs=None, using=None):
+        self.rel = rel
+        self.admin_site = admin_site
+        self.db = using
+        super(ManyToManyAjaxAutocompleteWidget, self).__init__(attrs)
+
+    def render(self, name, value, attrs=None):
+        rel_to = self.rel.model
+        if attrs is None:
+            attrs = {}
+        extra = []
+        assert rel_to in self.admin_site._registry, 'Sorry, remote model must be registered with the same AdminSite'
+        related_url = reverse(
+            'admin:%s_%s_changelist' % (
+                rel_to._meta.app_label,
+                rel_to._meta.model_name,
+            ),
+            current_app=self.admin_site.name,
+        )
+        params = self.url_parameters()
+        if 'class' not in attrs:
+            attrs['class'] = 'django-ajax-autocomplete-foreignkey'  # The JavaScript code looks for this hook.
+        # TODO: "lookup_id_" is hard-coded here. This should instead use
+        # the correct API to determine the ID dynamically.
+        attrs['data-ajax--url'] = '%s?%s' % (related_url, urlencode(params))
+        attrs['data-ajax--dataType'] = 'json'
+        attrs['data-width'] = 'style'
+        self.choices = []
+        key = self.rel.get_related_field().name
+        for v in value or []:
+            try:
+                obj = self.rel.model._default_manager.using(self.db).get(**{key: v})
+            except (ValueError, self.rel.model.DoesNotExist):
+                obj = v
+            self.choices.append((v, force_text(obj)))
+        output = [super(ManyToManyAjaxAutocompleteWidget, self).render(name, value, attrs)] + extra
+        return mark_safe(''.join(output))
+
+    def base_url_parameters(self):
+        limit_choices_to = self.rel.limit_choices_to
+        if callable(limit_choices_to):
+            limit_choices_to = limit_choices_to()
+        return url_params_from_lookup_dict(limit_choices_to)
+
+    def url_parameters(self):
+        from django.contrib.admin.views.main import TO_FIELD_VAR, IS_AJAX_AUTOCOMPLETE_VAR
+        params = self.base_url_parameters()
+        params.update({TO_FIELD_VAR: self.rel.get_related_field().name})
+        params.update({IS_AJAX_AUTOCOMPLETE_VAR: '1'})
+        return params
 
 
 class RelatedFieldWidgetWrapper(forms.Widget):
