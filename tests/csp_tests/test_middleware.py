@@ -1,9 +1,7 @@
+from django.contrib.csp.middleware import CSPMiddleware
 from django.http import HttpResponse, HttpResponseServerError
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
-
-from django.contrib.csp.middleware import CSPMiddleware
-
 
 HEADER = 'Content-Security-Policy'
 mw = CSPMiddleware()

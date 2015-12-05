@@ -1,9 +1,9 @@
+from django.contrib.csp.decorators import (
+    csp, csp_exempt, csp_replace, csp_update,
+)
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
-
-from django.contrib.csp.decorators import csp, csp_replace, csp_update, csp_exempt
-
 
 REQUEST = RequestFactory().get('/')
 

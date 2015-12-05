@@ -1,7 +1,6 @@
 from django.conf import settings
-from django.utils.six.moves import http_client
-
 from django.contrib.csp.utils import build_policy
+from django.utils.six.moves import http_client
 
 
 class CSPMiddleware(object):

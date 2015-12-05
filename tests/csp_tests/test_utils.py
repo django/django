@@ -1,7 +1,6 @@
+from django.contrib.csp.utils import build_policy
 from django.test import TestCase
 from django.test.utils import override_settings
-
-from django.contrib.csp.utils import build_policy
 
 
 def policy_eq(a, b, msg='%r != %r'):
