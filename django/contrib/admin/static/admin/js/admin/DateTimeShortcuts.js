@@ -116,6 +116,7 @@
             clock_link.id = DateTimeShortcuts.clockLinkName + num;
             addEvent(clock_link, 'click', function(e) {
                 e.preventDefault();
+                // avoid triggering the document click handler to dismiss the clock
                 e.stopPropagation();
                 DateTimeShortcuts.openClock(num);
             });
@@ -259,6 +260,7 @@
             cal_link.id = DateTimeShortcuts.calendarLinkName + num;
             addEvent(cal_link, 'click', function(e) {
                 e.preventDefault();
+                // avoid triggering the document click handler to dismiss the calendar
                 e.stopPropagation();
                 DateTimeShortcuts.openCalendar(num);
             });
