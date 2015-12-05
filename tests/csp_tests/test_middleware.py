@@ -2,9 +2,7 @@ from django.http import HttpResponse, HttpResponseServerError
 from django.test import RequestFactory, TestCase
 from django.test.utils import override_settings
 
-from nose.tools import eq_
-
-from csp.middleware import CSPMiddleware
+from django.contrib.csp.middleware import CSPMiddleware
 
 
 HEADER = 'Content-Security-Policy'
@@ -45,21 +43,21 @@ class MiddlewareTests(TestCase):
         response = HttpResponse()
         response[HEADER] = 'default-src example.com'
         mw.process_response(request, response)
-        eq_(response[HEADER], 'default-src example.com')
+        self.assertEqual(response[HEADER], 'default-src example.com')
 
     def test_use_config(self):
         request = rf.get('/')
         response = HttpResponse()
         response._csp_config = {'default-src': ['example.com']}
         mw.process_response(request, response)
-        eq_(response[HEADER], 'default-src example.com')
+        self.assertEqual(response[HEADER], 'default-src example.com')
 
     def test_use_update(self):
         request = rf.get('/')
         response = HttpResponse()
         response._csp_update = {'default-src': ['example.com']}
         mw.process_response(request, response)
-        eq_(response[HEADER], "default-src 'self' example.com")
+        self.assertEqual(response[HEADER], "default-src 'self' example.com")
 
     @override_settings(CSP_IMG_SRC=['foo.com'])
     def test_use_replace(self):
@@ -67,7 +65,7 @@ class MiddlewareTests(TestCase):
         response = HttpResponse()
         response._csp_replace = {'img-src': ['bar.com']}
         mw.process_response(request, response)
-        eq_(response[HEADER], "default-src 'self'; img-src bar.com")
+        self.assertEqual(response[HEADER], "default-src 'self'; img-src bar.com")
 
     @override_settings(DEBUG=True)
     def test_debug_exempt(self):

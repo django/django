@@ -1,9 +1,7 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from nose.tools import eq_
-
-from csp.utils import build_policy
+from django.contrib.csp.utils import build_policy
 
 
 def policy_eq(a, b, msg='%r != %r'):
@@ -15,12 +13,12 @@ def policy_eq(a, b, msg='%r != %r'):
 class UtilsTests(TestCase):
     def test_empty_policy(self):
         policy = build_policy()
-        eq_("default-src 'self'", policy)
+        self.assertEqual("default-src 'self'", policy)
 
     @override_settings(CSP_DEFAULT_SRC=['example.com', 'example2.com'])
     def test_default_src(self):
         policy = build_policy()
-        eq_('default-src example.com example2.com', policy)
+        self.assertEqual('default-src example.com example2.com', policy)
 
     @override_settings(CSP_SCRIPT_SRC=['example.com'])
     def test_script_src(self):
