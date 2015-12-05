@@ -39,12 +39,12 @@
         var maxForms = $("#id_" + options.prefix + "-MAX_NUM_FORMS").prop("autocomplete", "off");
         // only show the add button if we are allowed to add more items,
         // note that max_num = None translates to a blank string.
+        var addButton;
         var showAddButton = maxForms.val() === '' || (maxForms.val() - totalForms.val()) > 0;
         $this.each(function(i) {
             $(this).not("." + options.emptyCssClass).addClass(options.formCssClass);
         });
         if ($this.length && showAddButton) {
-            var addButton;
             if ($this.prop("tagName") === "TR") {
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
@@ -63,19 +63,6 @@
                 row.removeClass(options.emptyCssClass)
                 .addClass(options.formCssClass)
                 .attr("id", options.prefix + "-" + nextIndex);
-                if (row.is("tr")) {
-                    // If the forms are laid out in table rows, insert
-                    // the remove button into the last table cell:
-                    row.children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
-                } else if (row.is("ul") || row.is("ol")) {
-                    // If they're laid out as an ordered/unordered list,
-                    // insert an <li> after the last list item:
-                    row.append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
-                } else {
-                    // Otherwise, just insert the remove button as the
-                    // last child element of the form's container:
-                    row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
-                }
                 row.find("*").each(function() {
                     updateElementIndex(this, options.prefix, totalForms.val());
                 });
@@ -88,10 +75,35 @@
                 if ((maxForms.val() !== '') && (maxForms.val() - totalForms.val()) <= 0) {
                     addButton.parent().hide();
                 }
+                // If a post-add callback was supplied, call it with the added form:
+                if (options.added) {
+                    options.added(row);
+                }
+                $(document).trigger('formset:added', [row, options.prefix]);
+            });
+        }
+        // add delete buttons to all rows that don't have a delete checkbox
+        $(this).each(function() {
+            // skip rows that have an original
+            if (!$(this).find("[name=" + $(this).attr("id") + "-id]").val()) {
+                if ($(this).is("tr")) {
+                    // If the forms are laid out in table rows, insert
+                    // the remove button into the last table cell:
+                    $(this).children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
+                } else if ($(this).is("ul") || $(this).is("ol")) {
+                    // If they're laid out as an ordered/unordered list,
+                    // insert an <li> after the last list item:
+                    $(this).append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
+                } else {
+                    // Otherwise, just insert the remove button as the
+                    // last child element of the form's container:
+                    $(this).children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
+                }
                 // The delete button of each row triggers a bunch of other things
-                row.find("a." + options.deleteCssClass).click(function(e1) {
+                $(this).find("a." + options.deleteCssClass).click(function(e1) {
                     e1.preventDefault();
                     // Remove the parent form containing this button:
+                    var row = $(this).parents("." + options.formCssClass);
                     row.remove();
                     nextIndex -= 1;
                     // If a post-delete callback was provided, call it with the deleted form:
@@ -117,13 +129,8 @@
                         $(forms.get(i)).find("*").each(updateElementCallback);
                     }
                 });
-                // If a post-add callback was supplied, call it with the added form:
-                if (options.added) {
-                    options.added(row);
-                }
-                $(document).trigger('formset:added', [row, options.prefix]);
-            });
-        }
+            }
+        });
         return this;
     };
 

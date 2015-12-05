@@ -43,7 +43,7 @@ test('add/remove form events', function(assert) {
     });
     addButton.click();
     var deletedRow = $('.row2');
-    var deleteLink = this.table.find('.inline-deletelink');
+    var deleteLink = this.table.find('.row2 .inline-deletelink');
     $document.on('formset:removed', function(event, $row, formsetName) {
         assert.ok(true, 'event `formset:removed` triggered');
         assert.equal(true, $row.is(deletedRow));

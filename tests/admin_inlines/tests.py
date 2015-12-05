@@ -749,9 +749,8 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
         add_button.click()
 
         self.assertEqual(rows_length(), 5, msg="sanity check")
-        for delete_link in self.selenium.find_elements_by_css_selector(
-                '%s .inline-deletelink' % inline_id):
-            delete_link.click()
+        self.selenium.find_element_by_css_selector('%s .inline-deletelink' % inline_id).click()
+        self.selenium.find_element_by_css_selector('%s .inline-deletelink' % inline_id).click()
         self.assertEqual(rows_length(), 3)
 
     def test_add_inlines(self):
@@ -852,6 +851,47 @@ class SeleniumFirefoxTests(AdminSeleniumWebDriverTestCase):
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-1')), 1)
         self.assertEqual(len(self.selenium.find_elements_by_css_selector(
             'form#profilecollection_form tr.dynamic-profile_set#profile_set-2')), 1)
+
+    def test_form_validation_error(self):
+        """
+        Ensure that the delete buttons are also present in the form after
+        a form validation error.
+        """
+        self.admin_login(username='super', password='secret')
+        self.selenium.get('%s%s' % (self.live_server_url,
+            reverse('admin:admin_inlines_holder2_add')))
+
+        inlines = lambda: self.selenium.find_elements_by_css_selector(
+            '#inner2_set-group div.dynamic-inner2_set')
+        inline = lambda x: self.selenium.find_elements_by_css_selector(
+            'form#holder2_form div.dynamic-inner2_set#inner2_set-%d' % x)
+        inline_delete = lambda x: self.selenium.find_elements_by_css_selector(
+            'form#holder2_form div.dynamic-inner2_set#inner2_set-%d .inline-deletelink' % x)
+        add_another = lambda: self.selenium.find_element_by_css_selector(
+            'form#holder2_form .add-row a')
+
+        # Add a few inlines
+        add_another().click()
+        add_another().click()
+        self.assertEqual(len(inlines()), 5)
+        self.assertEqual(len(inline(0)), 1)
+        self.assertEqual(len(inline(1)), 1)
+        self.assertEqual(len(inline(2)), 1)
+        self.assertEqual(len(inline(3)), 1)
+        self.assertEqual(len(inline(4)), 1)
+
+        # The last two inlines should have delete links
+        self.assertEqual(len(inline_delete(3)), 1)
+        self.assertEqual(len(inline_delete(4)), 1)
+
+        # Submit the form to force a form validation error
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.wait_page_loaded()
+
+        # There still should be 5 inlines and delete links
+        self.assertEqual(len(inlines()), 5)
+        self.assertEqual(len(inline_delete(3)), 1)
+        self.assertEqual(len(inline_delete(4)), 1)
 
     def test_alternating_rows(self):
         self.admin_login(username='super', password='secret')
