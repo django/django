@@ -5,7 +5,7 @@ Modifying the Policy with Decorators
 ====================================
 
 Content Security Policies should be restricted and paranoid by default.
-You may, on some views, need to expand or change the policy. django-csp
+You may, on some views, need to expand or change the policy. csp
 includes four decorators to help.
 
 
@@ -17,7 +17,7 @@ view.
 
 ::
 
-    from csp.decorators import csp_exempt
+    from django.contrib.csp.decorators import csp_exempt
 
     # Will not have a CSP header.
     @csp_exempt
@@ -55,7 +55,7 @@ or tuples.
 
 ::
 
-    from csp.decorators import csp_update
+    from django.contrib.csp.decorators import csp_update
 
     # Will allow images from imgsrv.com.
     @csp_update(IMG_SRC='imgsrv.com')
@@ -72,7 +72,7 @@ decorator will be used verbatim. (See the note under ``@csp_update``.)
 
 The arguments and values are the same as ``@csp_update``::
 
-    from csp.decorators import csp_replace
+    from django.contrib.csp.decorators import csp_replace
 
     # settings.CSP_IMG_SRC = ['imgsrv.com']
     # Will allow images from imgsrv2.com, but not imgsrv.com.
@@ -88,7 +88,7 @@ If you need to set the entire policy on a view, ignoring all the
 settings, you can use the ``@csp`` decorator. The arguments and values
 are as above::
 
-    from csp.decorators import csp
+    from django.contrib.csp.decorators import csp
 
     @csp(DEFAULT_SRC="'self'", IMG_SRC='imgsrv.com',
          SCRIPT_SRC=['scriptsrv.com', 'googleanalytics.com'])
