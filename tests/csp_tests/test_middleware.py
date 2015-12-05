@@ -8,6 +8,12 @@ mw = CSPMiddleware()
 rf = RequestFactory()
 
 
+def policy_eq(a, b, msg='%r != %r'):
+    parts_a = sorted(a.split('; '))
+    parts_b = sorted(b.split('; '))
+    assert parts_a == parts_b, msg % (a, b)
+
+
 class MiddlewareTests(TestCase):
     def test_add_header(self):
         request = rf.get('/')
@@ -55,7 +61,7 @@ class MiddlewareTests(TestCase):
         response = HttpResponse()
         response._csp_update = {'default-src': ['example.com']}
         mw.process_response(request, response)
-        self.assertEqual(response[HEADER], "default-src 'self' example.com")
+        policy_eq(response[HEADER], "default-src 'self' example.com")
 
     @override_settings(CSP_IMG_SRC=['foo.com'])
     def test_use_replace(self):
@@ -63,7 +69,7 @@ class MiddlewareTests(TestCase):
         response = HttpResponse()
         response._csp_replace = {'img-src': ['bar.com']}
         mw.process_response(request, response)
-        self.assertEqual(response[HEADER], "default-src 'self'; img-src bar.com")
+        policy_eq(response[HEADER], "default-src 'self'; img-src bar.com")
 
     @override_settings(DEBUG=True)
     def test_debug_exempt(self):
