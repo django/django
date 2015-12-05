@@ -1,27 +1,15 @@
 .. _installation-chapter:
 
-=====================
-Installing django-csp
-=====================
+=============
+Enabling  csp
+=============
 
-First, install django-csp via pip or from source::
-
-    # pip
-    $ pip install django-csp
-
-::
-
-    # source
-    $ git clone https://github.com/mozilla/django-csp.git
-    $ cd django-csp
-    $ python setup.py install
-
-Now edit your project's ``settings`` module. If you are not using the
+Edit your project's ``settings`` module. If you are not using the
 built in report processor, all you need to do is::
 
     MIDDLEWARE_CLASSES = (
         # ...
-        'csp.middleware.CSPMiddleware',
+        'django.contrib.csp.middleware.CSPMiddleware',
         # ...
     )
 

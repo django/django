@@ -1,8 +1,8 @@
 .. _configuration-chapter:
 
-======================
-Configuring django-csp
-======================
+===============
+Configuring csp
+===============
 
 Content-Security-Policy_ is a complicated header. There are many values
 you may need to tweak here.
@@ -12,7 +12,7 @@ you may need to tweak here.
    are iterable, you may get very strange policies and errors.
 
 It's worth reading the latest CSP spec and making sure you understand it
-before configuring django-csp.
+before configuring csp.
 
 
 Policy Settings
@@ -63,8 +63,7 @@ the :ref:`decorator documentation <decorator-chapter>` for more details.
 Other Settings
 ==============
 
-These settings control the behavior of django-csp. Defaults are in
-*italics*.
+These settings control the behavior of csp. Defaults are in *italics*.
 
 ``CSP_REPORT_ONLY``
     Send "report-only" headers instead of real headers. See the spec_
