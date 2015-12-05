@@ -792,6 +792,11 @@ class FileFieldTests(unittest.TestCase):
         except OSError:
             self.fail("Deleting an unset FileField should not raise OSError.")
 
+    def test_refresh_from_db(self):
+        d = Document.objects.create(myfile='something.txt')
+        d.refresh_from_db()
+        self.assertIs(d.myfile.instance, d)
+
 
 class BinaryFieldTests(test.TestCase):
     binary_data = b'\x00\x46\xFE'
