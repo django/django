@@ -94,6 +94,11 @@ Minor features
 
 * Added support for instantiating empty GEOS geometries.
 
+* The new :attr:`~django.contrib.gis.geos.WKTWriter.trim` and
+  :attr:`~django.contrib.gis.geos.WKTWriter.precision` properties
+  of :class:`~django.contrib.gis.geos.WKTWriter` allow controlling
+  output of the fractional part of the coordinates in WKT.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
