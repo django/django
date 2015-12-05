@@ -164,9 +164,9 @@ This is the recommended way to install Django.
 
 1. Install pip_. The easiest is to use the `standalone pip installer`_. If your
    distribution already has ``pip`` installed, you might need to update it if
-   it's outdated. (If it's outdated, you'll know because installation won't
-   work. You might see some :ref:`harmless SyntaxErrors
-   <syntax-error-old-pip-django-19>` also.)
+   it's outdated. If it's outdated, you'll know because installation won't
+   work. If you're using an old version of setuptools, you might see some
+   :ref:`harmless SyntaxErrors <syntax-error-old-setuptools-django-19>` also.
 
 2. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
    isolated Python environments, which are more practical than installing
