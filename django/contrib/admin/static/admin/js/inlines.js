@@ -49,11 +49,11 @@
                 // If forms are laid out as table rows, insert the
                 // "add" button in a new table row:
                 var numCols = this.eq(-1).children().length;
-                $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="javascript:void(0)">' + options.addText + "</a></tr>");
+                $parent.append('<tr class="' + options.addCssClass + '"><td colspan="' + numCols + '"><a href="#">' + options.addText + "</a></tr>");
                 addButton = $parent.find("tr:last a");
             } else {
                 // Otherwise, insert it immediately after the last form:
-                $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="javascript:void(0)">' + options.addText + "</a></div>");
+                $this.filter(":last").after('<div class="' + options.addCssClass + '"><a href="#">' + options.addText + "</a></div>");
                 addButton = $this.filter(":last").next().find("a");
             }
             addButton.click(function(e) {
@@ -66,15 +66,15 @@
                 if (row.is("tr")) {
                     // If the forms are laid out in table rows, insert
                     // the remove button into the last table cell:
-                    row.children(":last").append('<div><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></div>");
+                    row.children(":last").append('<div><a class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></div>");
                 } else if (row.is("ul") || row.is("ol")) {
                     // If they're laid out as an ordered/unordered list,
                     // insert an <li> after the last list item:
-                    row.append('<li><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></li>");
+                    row.append('<li><a class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></li>");
                 } else {
                     // Otherwise, just insert the remove button as the
                     // last child element of the form's container:
-                    row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="javascript:void(0)">' + options.deleteText + "</a></span>");
+                    row.children(":first").append('<span><a class="' + options.deleteCssClass + '" href="#">' + options.deleteText + "</a></span>");
                 }
                 row.find("*").each(function() {
                     updateElementIndex(this, options.prefix, totalForms.val());
@@ -272,4 +272,19 @@
 
         return $rows;
     };
+
+    $(document).ready(function() {
+        $(".js-inline-admin-formset").each(function() {
+            var data = $(this).data(),
+                inlineOptions = data.inlineFormset;
+            switch(data.inlineType) {
+            case "stacked":
+                $(inlineOptions.name + "-group .inline-related").stackedFormset(inlineOptions.options);
+                break;
+            case "tabular":
+                $(inlineOptions.name + "-group .tabular.inline-related tbody tr").tabularFormset(inlineOptions.options);
+                break;
+            }
+        });
+    });
 })(django.jQuery);

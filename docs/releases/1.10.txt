@@ -39,6 +39,8 @@ Minor features
 * The success message that appears after adding or editing an object now
   contains a link to the object's change form.
 
+* All inline JavaScript is removed so you can enable a Content Security Policy.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

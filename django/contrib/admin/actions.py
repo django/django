@@ -74,6 +74,7 @@ def delete_selected(modeladmin, request, queryset):
         protected=protected,
         opts=opts,
         action_checkbox_name=helpers.ACTION_CHECKBOX_NAME,
+        media=modeladmin.media,
     )
 
     request.current_app = modeladmin.admin_site.name

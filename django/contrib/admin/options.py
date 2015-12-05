@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import copy
+import json
 import operator
 from collections import OrderedDict
 from functools import partial, reduce, update_wrapper
@@ -40,7 +41,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, escapejs, format_html
+from django.utils.html import escape, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
@@ -568,9 +569,9 @@ class ModelAdmin(BaseModelAdmin):
         extra = '' if settings.DEBUG else '.min'
         js = [
             'core.js',
-            'admin/RelatedObjectLookups.js',
             'vendor/jquery/jquery%s.js' % extra,
             'jquery.init.js',
+            'admin/RelatedObjectLookups.js',
             'actions%s.js' % extra,
             'urlify.js',
             'prepopulate%s.js' % extra,
@@ -1084,9 +1085,12 @@ class ModelAdmin(BaseModelAdmin):
             else:
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            popup_response_data = json.dumps({
                 'value': value,
-                'obj': obj,
+                'obj': six.text_type(obj),
+            })
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'popup_response_data': popup_response_data,
             })
 
         elif "_continue" in request.POST:
@@ -1132,11 +1136,14 @@ class ModelAdmin(BaseModelAdmin):
             # Retrieve the `object_id` from the resolved pattern arguments.
             value = request.resolver_match.args[0]
             new_value = obj.serializable_value(attr)
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            popup_response_data = json.dumps({
                 'action': 'change',
-                'value': escape(value),
-                'obj': escapejs(obj),
-                'new_value': escape(new_value),
+                'value': value,
+                'obj': six.text_type(obj),
+                'new_value': new_value,
+            })
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'popup_response_data': popup_response_data,
             })
 
         opts = self.model._meta
@@ -1300,9 +1307,12 @@ class ModelAdmin(BaseModelAdmin):
         opts = self.model._meta
 
         if IS_POPUP_VAR in request.POST:
-            return SimpleTemplateResponse('admin/popup_response.html', {
+            popup_response_data = json.dumps({
                 'action': 'delete',
-                'value': escape(obj_id),
+                'value': obj_id,
+            })
+            return SimpleTemplateResponse('admin/popup_response.html', {
+                'popup_response_data': popup_response_data,
             })
 
         self.message_user(request,
@@ -1332,6 +1342,7 @@ class ModelAdmin(BaseModelAdmin):
         context.update(
             to_field_var=TO_FIELD_VAR,
             is_popup_var=IS_POPUP_VAR,
+            media=self.media,
         )
 
         return TemplateResponse(request,
