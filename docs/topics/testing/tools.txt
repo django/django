@@ -694,13 +694,22 @@ then you should use :class:`~django.test.TransactionTestCase` or
 
             @classmethod
             def setUpClass(cls):
-                super(MyTestCase, cls).setUpClass()     # Call parent first
+                super(MyTestCase, cls).setUpClass()
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(MyTestCase, cls).tearDownClass()  # Call parent last
+                super(MyTestCase, cls).tearDownClass()
+
+    Be sure to account for Python's behavior if an exception is raised during
+    ``setUpClass()``. If that happens, neither the tests in the class nor
+    ``tearDownClass()`` are run. In the case of :class:`django.test.TestCase`,
+    this will leak the transaction created in ``super()``  which results in
+    various symptoms including a segmentation fault on some platforms (reported
+    on OS X). If you want to intentionally raise an exception such as
+    :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
+    calling ``super()`` to avoid this.
 
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
