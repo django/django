@@ -78,6 +78,17 @@ class UserCreationFormTest(TestDataMixin, TestCase):
         self.assertEqual(form["username"].errors,
                          [force_text(User._meta.get_field('username').error_messages['unique'])])
 
+    def test_case_insensitive_user_already_exists(self):
+        data = {
+            'username': 'Testclient',
+            'password1': 'test123',
+            'password2': 'test123',
+        }
+        form = UserCreationForm(data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form["username"].errors,
+                         [force_text(User._meta.get_field('username').error_messages['unique'])])
+
     def test_invalid_data(self):
         data = {
             'username': 'jsmith!',
@@ -140,9 +151,9 @@ class UserCreationFormTest(TestDataMixin, TestCase):
     ])
     def test_validates_password(self):
         data = {
-            'username': 'testclient',
-            'password1': 'testclient',
-            'password2': 'testclient',
+            'username': 'testclient2',
+            'password1': 'testclient2',
+            'password2': 'testclient2',
         }
         form = UserCreationForm(data)
         self.assertFalse(form.is_valid())

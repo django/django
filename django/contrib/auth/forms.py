@@ -78,6 +78,15 @@ class UserCreationForm(forms.ModelForm):
         model = User
         fields = ("username",)
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username__iexact=username).exists():
+            raise forms.ValidationError(
+                User._meta.get_field('username').error_messages['unique'],
+                code='unique',
+            )
+        return username
+
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
