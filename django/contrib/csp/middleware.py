@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.utils.six.moves import http_client
 
-from csp.utils import build_policy
+from django.contrib.csp.utils import build_policy
 
 
 class CSPMiddleware(object):
@@ -19,7 +19,7 @@ class CSPMiddleware(object):
             return response
 
         # Check for ignored path prefix.
-        prefixes = getattr(settings, 'CSP_EXCLUDE_URL_PREFIXES', ('/admin',))
+        prefixes = getattr(settings, 'CSP_EXCLUDE_URL_PREFIXES', ())
         if request.path_info.startswith(prefixes):
             return response
 
