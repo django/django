@@ -202,6 +202,10 @@ class FileDescriptor(object):
             file.field = self.field
             file.storage = self.field.storage
 
+        # Make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+            file.instance = instance
+
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]
 

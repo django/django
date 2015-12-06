@@ -652,8 +652,6 @@ class GeoQuerySetTest(TestCase):
         Testing the `MakeLine` aggregate.
         """
         if not connection.features.supports_make_line_aggr:
-            # Only PostGIS has support for the MakeLine aggregate. For other
-            # backends, test that NotImplementedError is raised
             self.assertRaises(
                 NotImplementedError,
                 City.objects.all().aggregate, MakeLine('point')

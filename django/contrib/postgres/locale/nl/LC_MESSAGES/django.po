@@ -1,16 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Sander Steffann <sander@steffann.nl>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-20 22:56+0000\n"
-"Last-Translator: Sander Steffann <sander@steffann.nl>\n"
-"Language-Team: Dutch (http://www.transifex.com/projects/p/django/language/"
-"nl/)\n"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-16 22:22+0000\n"
+"Last-Translator: Ilja Maas <iljamaas@dreamsolution.nl>\n"
+"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,8 +34,18 @@ msgstr "Vertaling van strings naar strings"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "De waarde van \"%(key)s\" is geen string."
 
+msgid "A JSON object"
+msgstr "Een JSON object"
+
+msgid "Value must be valid JSON."
+msgstr "De waarde moet valide JSON zijn."
+
 msgid "Could not load JSON data."
 msgstr "Kon de JSON gegevens niet inlezen."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s' waarde moet valide JSON zijn."
 
 msgid "Enter two valid values."
 msgstr "Geef twee geldige waarden op."

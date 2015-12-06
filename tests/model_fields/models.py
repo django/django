@@ -251,7 +251,7 @@ if Image:
         name = models.CharField(max_length=50)
         mugshot = TestImageField(storage=temp_storage, upload_to='tests')
 
-    class AbsctractPersonWithHeight(models.Model):
+    class AbstractPersonWithHeight(models.Model):
         """
         Abstract model that defines an ImageField with only one dimension field
         to make sure the dimension update is correctly run on concrete subclass
@@ -264,9 +264,9 @@ if Image:
         class Meta:
             abstract = True
 
-    class PersonWithHeight(AbsctractPersonWithHeight):
+    class PersonWithHeight(AbstractPersonWithHeight):
         """
-        Concrete model that subclass an abctract one with only on dimension
+        Concrete model that subclass an abstract one with only on dimension
         field.
         """
         name = models.CharField(max_length=50)
@@ -298,7 +298,7 @@ if Image:
         Model that:
         * Defines two ImageFields
         * Defines the height/width fields before the ImageFields
-        * Has a nullalble ImageField
+        * Has a nullable ImageField
         """
         name = models.CharField(max_length=50)
         mugshot_height = models.PositiveSmallIntegerField()

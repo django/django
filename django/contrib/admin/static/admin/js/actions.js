@@ -1,4 +1,4 @@
-/*global _actions_icnt, gettext, interpolate, ngettext*/
+/*global gettext, interpolate, ngettext*/
 (function($) {
     'use strict';
     var lastChecked;
@@ -41,12 +41,13 @@
         },
         updateCounter = function() {
             var sel = $(actionCheckboxes).filter(":checked").length;
-            // _actions_icnt is defined in the generated HTML
+            // data-actions-icnt is defined in the generated HTML
             // and contains the total amount of objects in the queryset
+            var actions_icnt = $('.action-counter').data('actionsIcnt');
             $(options.counterContainer).html(interpolate(
             ngettext('%(sel)s of %(cnt)s selected', '%(sel)s of %(cnt)s selected', sel), {
                 sel: sel,
-                cnt: _actions_icnt
+                cnt: actions_icnt
             }, true));
             $(options.allToggle).prop("checked", function() {
                 var value;
@@ -143,4 +144,10 @@
         allToggle: "#action-toggle",
         selectedClass: "selected"
     };
+    $(document).ready(function() {
+        var $actionsEls = $('tr input.action-select');
+        if ($actionsEls.length > 0) {
+            $actionsEls.actions();
+        }
+    });
 })(django.jQuery);

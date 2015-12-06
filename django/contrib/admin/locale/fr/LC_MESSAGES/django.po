@@ -8,11 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 19:41+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 19:45+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
-"Language-Team: French (http://www.transifex.com/projects/p/django/language/"
-"fr/)\n"
+"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -79,6 +78,12 @@ msgstr "Action :"
 msgid "action time"
 msgstr "heure de l'action"
 
+msgid "user"
+msgstr "utilisateur"
+
+msgid "content type"
+msgstr "type de contenu"
+
 msgid "object id"
 msgstr "id de l'objet"
 
@@ -121,9 +126,12 @@ msgstr ""
 "Maintenez appuyé « Ctrl », ou « Commande (touche pomme) » sur un Mac, pour "
 "en sélectionner plusieurs."
 
+msgid "Added."
+msgstr "Ajout."
+
 #, python-format
 msgid "Changed %s."
-msgstr "Modifié %s."
+msgstr "Modification de %s."
 
 msgid "and"
 msgstr "et"
@@ -482,6 +490,15 @@ msgstr ""
 "tables utiles ont été créées, et que la base est accessible par "
 "l'utilisateur concerné."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Vous êtes authentifié sous le nom %(username)s, mais vous n'êtes pas "
+"autorisé à accéder à cette page. Souhaitez-vous vous connecter avec un autre "
+"compte utilisateur ?"
+
 msgid "Forgotten your password or username?"
 msgstr "Mot de passe ou nom d'utilisateur oublié ?"
 
@@ -506,6 +523,9 @@ msgstr "Tout afficher"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Popup closing..."
+msgstr "Fenêtre en cours de fermeture…"
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -648,9 +668,6 @@ msgstr "Réinitialiser mon mot de passe"
 
 msgid "All dates"
 msgstr "Toutes les dates"
-
-msgid "(None)"
-msgstr "(aucun-e)"
 
 #, python-format
 msgid "Select %s"

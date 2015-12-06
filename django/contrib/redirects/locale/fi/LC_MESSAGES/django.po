@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Aarni Koskela, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2014-10-05 20:11+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Finnish (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-11 11:43+0000\n"
+"Last-Translator: Aarni Koskela\n"
+"Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,6 +21,9 @@ msgstr ""
 
 msgid "Redirects"
 msgstr "Edelleenohjaukset"
+
+msgid "site"
+msgstr "sivusto"
 
 msgid "redirect from"
 msgstr "ohjaa osoitteesta"

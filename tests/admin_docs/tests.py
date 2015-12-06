@@ -485,3 +485,8 @@ class TestUtils(AdminDocsTestCase):
             '</p>\n'
         )
         self.assertHTMLEqual(description_output, description_rendered)
+
+    def test_initial_header_level(self):
+        header = 'should be h3...\n\nHeader\n------\n'
+        output = utils.parse_rst(header, 'header')
+        self.assertIn('<h3>Header</h3>', output)

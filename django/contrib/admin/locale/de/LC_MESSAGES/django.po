@@ -11,11 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-20 09:38+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-25 19:31+0000\n"
 "Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: German (http://www.transifex.com/projects/p/django/language/"
-"de/)\n"
+"Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -81,6 +80,12 @@ msgstr "Aktion:"
 msgid "action time"
 msgstr "Zeitpunkt der Aktion"
 
+msgid "user"
+msgstr "Benutzer"
+
+msgid "content type"
+msgstr "Inhaltstyp"
+
 msgid "object id"
 msgstr "Objekt-ID"
 
@@ -122,6 +127,9 @@ msgid ""
 msgstr ""
 "Halten Sie die Strg-Taste (⌘ für Mac) während des Klickens gedrückt, um "
 "mehrere Einträge auszuwählen."
+
+msgid "Added."
+msgstr "Hinzugefügt."
 
 #, python-format
 msgid "Changed %s."
@@ -484,6 +492,14 @@ msgstr ""
 "die richtigen Datenbanktabellen angelegt wurden und die Datenbank vom "
 "verwendeten Datenbankbenutzer auch lesbar ist."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Sie sind als %(username)s angemeldet, aber nicht autorisiert auf diese Seite "
+"zuzugreifen. Wollen Sie sich mit einem anderen Account anmelden?"
+
 msgid "Forgotten your password or username?"
 msgstr "Benutzername oder Passwort vergessen?"
 
@@ -508,6 +524,9 @@ msgstr "Zeige alle"
 
 msgid "Save"
 msgstr "Sichern"
+
+msgid "Popup closing..."
+msgstr "Popup wird geschlossen..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -646,9 +665,6 @@ msgstr "Mein Passwort zurücksetzen"
 
 msgid "All dates"
 msgstr "Alle Daten"
-
-msgid "(None)"
-msgstr "(leer)"
 
 #, python-format
 msgid "Select %s"

@@ -14,3 +14,7 @@ Bugfixes
 
 * Corrected ``__len`` query lookup on ``ArrayField`` for empty arrays
   (:ticket:`25772`).
+
+* Restored the ability to use custom formats from ``formats.py`` with
+  ``django.utils.formats.get_format()`` and the ``date`` template filter
+  (:ticket:`25812`).

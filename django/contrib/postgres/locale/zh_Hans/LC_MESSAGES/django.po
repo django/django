@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 12:30+0000\n"
-"Last-Translator: Lele Long <schemacs@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-10-10 08:55+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +34,18 @@ msgstr "包含字符串对应字串符的映射。"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "“%(key)s”的值不是字符串。"
 
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
+
 msgid "Could not load JSON data."
 msgstr "不能加载JSON数据。"
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr ""
 
 msgid "Enter two valid values."
 msgstr "输入两个有效的值。"

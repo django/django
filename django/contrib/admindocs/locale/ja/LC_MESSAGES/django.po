@@ -3,15 +3,15 @@
 # Translators:
 # Fandekasp <lemaire.adrien@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2013-2014
+# Shinya Okano <tokibito@gmail.com>, 2013-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Japanese (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-10-31 12:07+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,23 +35,13 @@ msgid "Documentation bookmarklets"
 msgstr "ドキュメントへのブックマークレット"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">ブックマークレットをインストールするには、リンクをブック"
-"マークツールバーにドラッグするか、\n"
-"リンクを右クリックしてブックマークに追加してください。これで\n"
-"サイトのどのページからでもブックマークレットを選択可能になりました。\n"
-"ブックマークレットによっては、内部ネットワークにあるコンピューターからこのサ"
-"イトを\n"
-"参照していなければならないことがあります。内部ネットワークにあるかどうか不明"
-"な場合は、システム管理者に確認してください。</p>\n"
+"ブックマークレットをインストールするには、リンクをブックマークツールバーにド"
+"ラッグするか、 リンクを右クリックしてブックマークに追加してください。これでサ"
+"イトのどのページからでもブックマークレットを選択可能になります。"
 
 msgid "Documentation for this page"
 msgstr "このページのドキュメント"
@@ -60,27 +50,6 @@ msgid ""
 "Jumps you from any page to the documentation for the view that generates "
 "that page."
 msgstr "各ページから、ページを生成したビューのドキュメントにジャンプします。"
-
-msgid "Show object ID"
-msgstr "オブジェクト ID を表示"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"単一のオブジェクトを表示するページのコンテンツタイプと一意な IDを表示します。"
-
-msgid "Edit this object (current window)"
-msgstr "オブジェクトを (現在のウィンドウで) 編集"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr "単一のオブジェクトを表示するページの管理ページへジャンプします。"
-
-msgid "Edit this object (new window)"
-msgstr "オブジェクトを (新しいウィンドウで) 編集"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "上と同じですが、新しいウィンドウで管理ページを開きます。"
 
 msgid "Tags"
 msgstr "タグ"
@@ -147,6 +116,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "モデル: %(name)s"
 
+msgid "Fields"
+msgstr "フィールド"
+
 msgid "Field"
 msgstr "フィールド"
 
@@ -155,6 +127,15 @@ msgstr "型"
 
 msgid "Description"
 msgstr "説明"
+
+msgid "Methods with arguments"
+msgstr "メソッドと引数"
+
+msgid "Method"
+msgstr "メソッド"
+
+msgid "Arguments"
+msgstr "引数"
 
 msgid "Back to Model Documentation"
 msgstr "モデルドキュメントに戻る"

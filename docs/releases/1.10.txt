@@ -39,6 +39,9 @@ Minor features
 * The success message that appears after adding or editing an object now
   contains a link to the object's change form.
 
+* All inline JavaScript is removed so you can enable the
+  ``Content-Security-Policy`` HTTP header if you wish.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -78,6 +81,16 @@ Minor features
   <django.contrib.gis.gdal.GDALBand.statistics>` method and
   :attr:`~django.contrib.gis.gdal.GDALBand.mean`
   and :attr:`~django.contrib.gis.gdal.GDALBand.std` attributes.
+
+* Added support for the :class:`~django.contrib.gis.db.models.MakeLine`
+  aggregate and :class:`~django.contrib.gis.db.models.functions.GeoHash`
+  function on SpatiaLite.
+
+* Added support for the
+  :class:`~django.contrib.gis.db.models.functions.Difference`,
+  :class:`~django.contrib.gis.db.models.functions.Intersection`, and
+  :class:`~django.contrib.gis.db.models.functions.SymDifference`
+  functions on MySQL.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -192,6 +205,10 @@ Models
   :class:`~django.db.models.ForeignKey` pointing to a proxy model is now
   accessible as a descriptor on the proxied model class and may be referenced in
   queryset filtering.
+
+* The new :meth:`Field.rel_db_type() <django.db.models.Field.rel_db_type>`
+  method returns the database column data type for fields such as ``ForeignKey``
+  and ``OneToOneField`` that point to another field.
 
 * The :attr:`~django.db.models.Func.arity` class attribute is added to
   :class:`~django.db.models.Func`. This attribute can be used to set the number

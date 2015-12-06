@@ -374,14 +374,14 @@ For example::
             else:
                 return 'timestamp'
 
-The :meth:`~Field.db_type` method is called by Django when the framework
-constructs the ``CREATE TABLE`` statements for your application -- that is,
-when you first create your tables. It is also called when constructing a
-``WHERE`` clause that includes the model field -- that is, when you retrieve data
-using QuerySet methods like ``get()``, ``filter()``, and ``exclude()`` and have
-the model field as an argument. It's not called at any other time, so it can afford to
-execute slightly complex code, such as the ``connection.settings_dict`` check in
-the above example.
+The :meth:`~Field.db_type` and :meth:`~Field.rel_db_type` methods are called by
+Django when the framework constructs the ``CREATE TABLE`` statements for your
+application -- that is, when you first create your tables. The methods are also
+called when constructing a ``WHERE`` clause that includes the model field --
+that is, when you retrieve data using QuerySet methods like ``get()``,
+``filter()``, and ``exclude()`` and have the model field as an argument. They
+are not called at any other time, so it can afford to execute slightly complex
+code, such as the ``connection.settings_dict`` check in the above example.
 
 Some database column types accept parameters, such as ``CHAR(25)``, where the
 parameter ``25`` represents the maximum column length. In cases like these,
@@ -422,6 +422,23 @@ Finally, if your column requires truly complex SQL setup, return ``None`` from
 over this field. You are then responsible for creating the column in the right
 table in some other way, of course, but this gives you a way to tell Django to
 get out of the way.
+
+The :meth:`~Field.rel_db_type` method is called by fields such as ``ForeignKey``
+and ``OneToOneField`` that point to another field to determine their database
+column data types. For example, if you have an ``UnsignedAutoField``, you also
+need the foreign keys that point to that field to use the same data type::
+
+    # MySQL unsigned integer (range 0 to 4294967295).
+    class UnsignedAutoField(models.AutoField):
+        def db_type(self, connection):
+            return 'integer UNSIGNED AUTO_INCREMENT'
+
+        def rel_db_type(self, connection):
+            return 'integer UNSIGNED'
+
+.. versionadded:: 1.10
+
+    The :meth:`~Field.rel_db_type` method was added.
 
 .. _converting-values-to-python-objects:
 

@@ -5,7 +5,7 @@ How to use Django with Apache and mod_wsgi
 Deploying Django with Apache_ and `mod_wsgi`_ is a tried and tested way to get
 Django into production.
 
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 .. _mod_wsgi: http://www.modwsgi.org/
 
 mod_wsgi is an Apache module which can host any Python WSGI_ application,
@@ -18,8 +18,8 @@ The `official mod_wsgi documentation`_ is fantastic; it's your source for all
 the details about how to use mod_wsgi. You'll probably want to start with the
 `installation and configuration documentation`_.
 
-.. _official mod_wsgi documentation: http://modwsgi.readthedocs.org/
-.. _installation and configuration documentation: http://modwsgi.readthedocs.org/en/develop/installation.html
+.. _official mod_wsgi documentation: https://modwsgi.readthedocs.org/
+.. _installation and configuration documentation: https://modwsgi.readthedocs.org/en/develop/installation.html
 
 Basic configuration
 ===================
@@ -127,7 +127,7 @@ use ``WSGIPythonPath``; instead you should use the ``python-path`` option to
     WSGIProcessGroup example.com
 
 If you want to serve your project in a subdirectory
-(``http://example.com/mysite`` in this example), you can add ``WSGIScriptAlias``
+(``https://example.com/mysite`` in this example), you can add ``WSGIScriptAlias``
 to the configuration above:
 
 .. code-block:: apache
@@ -137,7 +137,7 @@ to the configuration above:
 See the official mod_wsgi documentation for `details on setting up daemon
 mode`_.
 
-.. _details on setting up daemon mode: http://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide#Delegation_To_Daemon_Process
+.. _details on setting up daemon mode: https://code.google.com/p/modwsgi/wiki/QuickConfigurationGuide#Delegation_To_Daemon_Process
 
 .. _serving-files:
 
@@ -191,12 +191,12 @@ If you are using a version of Apache older than 2.4, replace
 ``Order deny,allow`` above it.
 
 .. _Nginx: http://wiki.nginx.org/Main
-.. _Apache: http://httpd.apache.org/
+.. _Apache: https://httpd.apache.org/
 
 .. More details on configuring a mod_wsgi site to serve static files can be found
 .. in the mod_wsgi documentation on `hosting static files`_.
 
-.. _hosting static files: http://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Hosting_Of_Static_Files
+.. _hosting static files: https://code.google.com/p/modwsgi/wiki/ConfigurationGuidelines#Hosting_Of_Static_Files
 
 .. _serving-the-admin-files:
 

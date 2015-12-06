@@ -318,18 +318,23 @@ class GDALBandTests(unittest.TestCase):
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
         self.assertEqual(self.band.nodata_value, 15)
         try:
-            self.assertEqual(
-                self.band.statistics(approximate=True),
-                (0.0, 9.0, 2.842331288343558, 2.3965567248965356)
-            )
-            self.assertEqual(
-                self.band.statistics(approximate=False, refresh=True),
-                (0.0, 9.0, 2.828326634228898, 2.4260526986669095)
-            )
+            smin, smax, smean, sstd = self.band.statistics(approximate=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.842331288343558)
+            self.assertAlmostEqual(sstd, 2.3965567248965356)
+
+            smin, smax, smean, sstd = self.band.statistics(approximate=False, refresh=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.828326634228898)
+            self.assertAlmostEqual(sstd, 2.4260526986669095)
+
             self.assertEqual(self.band.min, 0)
             self.assertEqual(self.band.max, 9)
-            self.assertEqual(self.band.mean, 2.8283266342289)
-            self.assertEqual(self.band.std, 2.4260526986669)
+            self.assertAlmostEqual(self.band.mean, 2.828326634228898)
+            self.assertAlmostEqual(self.band.std, 2.4260526986669095)
+
             # Check that statistics are persisted into PAM file on band close
             self.band = None
             self.assertTrue(os.path.isfile(pam_file))

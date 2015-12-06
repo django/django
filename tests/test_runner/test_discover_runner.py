@@ -157,11 +157,11 @@ class DiscoverRunnerTest(TestCase):
         self.assertIn('test_2', suite[8].id(),
                       msg="Methods of unittest cases should be reversed.")
 
-    def test_overrideable_test_suite(self):
+    def test_overridable_test_suite(self):
         self.assertEqual(DiscoverRunner().test_suite, TestSuite)
 
-    def test_overrideable_test_runner(self):
+    def test_overridable_test_runner(self):
         self.assertEqual(DiscoverRunner().test_runner, TextTestRunner)
 
-    def test_overrideable_test_loader(self):
+    def test_overridable_test_loader(self):
         self.assertEqual(DiscoverRunner().test_loader, defaultTestLoader)

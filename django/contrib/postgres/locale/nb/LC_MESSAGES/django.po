@@ -6,10 +6,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:21+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-10-09 17:42+0200\n"
+"PO-Revision-Date: 2015-11-17 11:50+0000\n"
+"Last-Translator: Jon <jon@funkbit.no>\n"
+"Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,8 +34,18 @@ msgstr "Oversikt over strenger til strenger"
 msgid "The value of \"%(key)s\" is not a string."
 msgstr "Verdien av \"%(key)s\" er ikke en streng."
 
+msgid "A JSON object"
+msgstr "Et JSON-objekt"
+
+msgid "Value must be valid JSON."
+msgstr "Verdi må være gyldig JSON."
+
 msgid "Could not load JSON data."
 msgstr "Kunne ikke laste JSON-data."
+
+#, python-format
+msgid "'%(value)s' value must be valid JSON."
+msgstr "'%(value)s'-verdien må være gyldig JSON."
 
 msgid "Enter two valid values."
 msgstr "Oppgi to gyldige verdier."
@@ -44,16 +54,16 @@ msgid "The start of the range must not exceed the end of the range."
 msgstr "Starten på serien må ikke overstige enden av serien."
 
 msgid "Enter two whole numbers."
-msgstr ""
+msgstr "Oppgi to heltall."
 
 msgid "Enter two numbers."
-msgstr ""
+msgstr "Oppgi to tall."
 
 msgid "Enter two valid date/times."
-msgstr ""
+msgstr "Oppgi to gyldige datoer og tidspunkter."
 
 msgid "Enter two valid dates."
-msgstr ""
+msgstr "Oppgi to gyldige datoer."
 
 #, python-format
 msgid ""

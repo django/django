@@ -17,7 +17,7 @@ implements the OpenGIS `Simple Features for SQL`__ spatial predicate functions
 and spatial operators. GEOS, now an OSGeo project, was initially developed and
 maintained by `Refractions Research`__ of Victoria, Canada.
 
-__ http://trac.osgeo.org/geos/
+__ https://trac.osgeo.org/geos/
 __ http://sourceforge.net/projects/jts-topo-suite/
 __ http://www.opengeospatial.org/standards/sfs
 __ http://www.refractions.net/
@@ -140,6 +140,35 @@ just like a Python list::
     >>> line.append((1.0, 1.0))
     >>> line.coords
     ((1.0, 1.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (1.0, 1.0))
+
+Geometries support set-like operators::
+
+    >>> from django.contrib.gis.geos import LineString
+    >>> ls1 = LineString((0, 0), (2, 2))
+    >>> ls2 = LineString((1, 1), (3, 3))
+    >>> print(ls1 | ls2)  # equivalent to `ls1.union(ls2)`
+    MULTILINESTRING ((0 0, 1 1), (1 1, 2 2), (2 2, 3 3))
+    >>> print(ls1 & ls2)  # equivalent to `ls1.intersection(ls2)`
+    LINESTRING (1 1, 2 2)
+    >>> print(ls1 - ls2)  # equivalent to `ls1.difference(ls2)`
+    LINESTRING(0 0, 1 1)
+    >>> print(ls1 ^ ls2)  # equivalent to `ls1.sym_difference(ls2)`
+    MULTILINESTRING ((0 0, 1 1), (2 2, 3 3))
+
+.. admonition:: Equality operator doesn't check spatial equality
+
+    The :class:`~GEOSGeometry` equality operator uses
+    :meth:`~GEOSGeometry.equals_exact`, not :meth:`~GEOSGeometry.equals`, i.e.
+    it requires the compared geometries to have the same coordinates in the
+    same positions::
+
+      >>> from django.contrib.gis.geos import LineString
+      >>> ls1 = LineString((0, 0), (1, 1))
+      >>> ls2 = LineString((1, 1), (0, 0))
+      >>> ls1.equals(ls2)
+      True
+      >>> ls1 == ls2
+      False
 
 Geometry Objects
 ================
@@ -779,7 +808,7 @@ In order to obtain a prepared geometry, just access the
 may be used with other ``GEOSGeometry`` objects.  An operation with a prepared
 geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
-please consult the `GEOS wiki page on prepared geometries <http://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
+please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
 For example::
 

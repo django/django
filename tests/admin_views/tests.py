@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import datetime
+import json
 import os
 import re
 import unittest
@@ -260,8 +261,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             'date_1': '14:55:39',
         }
         response = self.client.post(reverse('admin:admin_views_article_add'), post_data)
-        self.assertContains(response, 'dismissAddRelatedObjectPopup')
-        self.assertContains(response, 'title with a new\\u000Aline')
+        self.assertContains(response, 'title with a new\\nline')
 
     def test_basic_edit_POST(self):
         """
@@ -734,7 +734,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         """
         actor = Actor.objects.create(name="Palin", age=27)
         response = self.client.get("%s?%s" % (reverse('admin:admin_views_actor_changelist'), IS_POPUP_VAR))
-        self.assertContains(response, "opener.dismissRelatedLookupPopup(window, &#39;%s&#39;)" % actor.pk)
+        self.assertContains(response, 'data-popup-opener="%s"' % actor.pk)
 
     def test_hide_change_password(self):
         """
@@ -3445,27 +3445,23 @@ action)</option>
         self.assertEqual(response.template_name, 'admin/popup_response.html')
 
     def test_popup_template_escaping(self):
-        context = {
+        popup_response_data = json.dumps({
             'new_value': 'new_value\\',
             'obj': 'obj\\',
             'value': 'value\\',
+        })
+        context = {
+            'popup_response_data': popup_response_data,
         }
         output = render_to_string('admin/popup_response.html', context)
         self.assertIn(
-            'opener.dismissAddRelatedObjectPopup(window, "value\\u005C", "obj\\u005C");', output
+            r'&quot;value\\&quot;', output
         )
-
-        context['action'] = 'change'
-        output = render_to_string('admin/popup_response.html', context)
         self.assertIn(
-            'opener.dismissChangeRelatedObjectPopup(window, '
-            '"value\\u005C", "obj\\u005C", "new_value\\u005C");', output
+            r'&quot;new_value\\&quot;', output
         )
-
-        context['action'] = 'delete'
-        output = render_to_string('admin/popup_response.html', context)
         self.assertIn(
-            'opener.dismissDeleteRelatedObjectPopup(window, "value\\u005C");', output
+            r'&quot;obj\\&quot;', output
         )
 
 
@@ -4273,16 +4269,19 @@ class PrePopulatedTest(TestCase):
 
     def test_prepopulated_on(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_add'))
-        self.assertContains(response, "id: '#id_slug',")
-        self.assertContains(response, "field['dependency_ids'].push('#id_title');")
-        self.assertContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
+        self.assertContains(response, "&quot;id&quot;: &quot;#id_slug&quot;")
+        self.assertContains(response, "&quot;dependency_ids&quot;: [&quot;#id_title&quot;]")
+        self.assertContains(response, "&quot;id&quot;: &quot;#id_prepopulatedsubpost_set-0-subslug&quot;")
 
     def test_prepopulated_off(self):
         response = self.client.get(reverse('admin:admin_views_prepopulatedpost_change', args=(self.p1.pk,)))
         self.assertContains(response, "A Long Title")
-        self.assertNotContains(response, "id: '#id_slug'")
-        self.assertNotContains(response, "field['dependency_ids'].push('#id_title');")
-        self.assertNotContains(response, "id: '#id_prepopulatedsubpost_set-0-subslug',")
+        self.assertNotContains(response, "&quot;id&quot;: &quot;#id_slug&quot;")
+        self.assertNotContains(response, "&quot;dependency_ids&quot;: [&quot;#id_title&quot;]")
+        self.assertNotContains(
+            response,
+            "&quot;id&quot;: &quot;#id_prepopulatedsubpost_set-0-subslug&quot;"
+        )
 
     @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
     def test_prepopulated_maxlength_localized(self):
@@ -4291,7 +4290,7 @@ class PrePopulatedTest(TestCase):
         that maxLength (in the JavaScript) is rendered without separators.
         """
         response = self.client.get(reverse('admin:admin_views_prepopulatedpostlargeslug_add'))
-        self.assertContains(response, "maxLength: 1000")  # instead of 1,000
+        self.assertContains(response, "&quot;maxLength&quot;: 1000")  # instead of 1,000
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
@@ -4933,7 +4932,7 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(reverse('admin:auth_user_add') + '?_popup=1', data, follow=True)
-        self.assertContains(response, 'dismissAddRelatedObjectPopup')
+        self.assertContains(response, '&quot;obj&quot;: &quot;newuser&quot;')
 
     def test_user_fk_change_popup(self):
         """User change through a FK popup should return the appropriate JavaScript response."""
@@ -4957,7 +4956,8 @@ class UserAdminTest(TestCase):
             '_save': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertContains(response, 'dismissChangeRelatedObjectPopup')
+        self.assertContains(response, '&quot;obj&quot;: &quot;newuser&quot;')
+        self.assertContains(response, '&quot;action&quot;: &quot;change&quot;')
 
     def test_user_fk_delete_popup(self):
         """User deletion through a FK popup should return the appropriate JavaScript response."""
@@ -4973,7 +4973,7 @@ class UserAdminTest(TestCase):
             '_popup': '1',
         }
         response = self.client.post(url, data, follow=True)
-        self.assertContains(response, 'dismissDeleteRelatedObjectPopup')
+        self.assertContains(response, '&quot;action&quot;: &quot;delete&quot;')
 
     def test_save_add_another_button(self):
         user_count = User.objects.count()

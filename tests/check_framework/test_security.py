@@ -224,7 +224,7 @@ class CheckStrictTransportSecurityTest(SimpleTestCase):
     @override_settings(
         MIDDLEWARE_CLASSES=[],
         SECURE_HSTS_SECONDS=0)
-    def test_no_sts_no_middlware(self):
+    def test_no_sts_no_middleware(self):
         """
         Don't warn if SECURE_HSTS_SECONDS isn't > 0 and SecurityMiddleware isn't
         installed.
@@ -258,7 +258,7 @@ class CheckStrictTransportSecuritySubdomainsTest(SimpleTestCase):
         MIDDLEWARE_CLASSES=[],
         SECURE_HSTS_INCLUDE_SUBDOMAINS=False,
         SECURE_HSTS_SECONDS=3600)
-    def test_no_sts_subdomains_no_middlware(self):
+    def test_no_sts_subdomains_no_middleware(self):
         """
         Don't warn if SecurityMiddleware isn't installed.
         """
@@ -415,7 +415,7 @@ class CheckSSLRedirectTest(SimpleTestCase):
     @override_settings(
         MIDDLEWARE_CLASSES=[],
         SECURE_SSL_REDIRECT=False)
-    def test_no_ssl_redirect_no_middlware(self):
+    def test_no_ssl_redirect_no_middleware(self):
         """
         Don't warn if SECURE_SSL_REDIRECT is False and SecurityMiddleware isn't
         installed.

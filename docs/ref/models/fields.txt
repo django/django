@@ -911,7 +911,7 @@ optional arguments:
 
 Requires the `Pillow`_ library.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 
 :class:`ImageField` instances are created in your database as ``varchar``
 columns with a default max length of 100 characters. As with other fields, you
@@ -1701,7 +1701,8 @@ Field API reference
 
         where the arguments are interpolated from the field's ``__dict__``.
 
-    To map a ``Field`` to a database-specific type, Django exposes two methods:
+    To map a ``Field`` to a database-specific type, Django exposes several
+    methods:
 
     .. method:: get_internal_type()
 
@@ -1713,6 +1714,16 @@ Field API reference
     .. method:: db_type(connection)
 
         Returns the database column data type for the :class:`Field`, taking
+        into account the ``connection``.
+
+        See :ref:`custom-database-types` for usage in custom fields.
+
+    .. method:: rel_db_type(connection)
+
+        .. versionadded:: 1.10
+
+        Returns the database column data type for fields such as ``ForeignKey``
+        and ``OneToOneField`` that point to the :class:`Field`, taking
         into account the ``connection``.
 
         See :ref:`custom-database-types` for usage in custom fields.

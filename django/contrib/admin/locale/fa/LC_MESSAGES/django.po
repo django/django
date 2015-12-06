@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Ali Nikneshan <ali@nikneshan.com>, 2015
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Arash Fazeli <a.fazeli@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -9,10 +10,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-04-12 12:11+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-29 23:38+0000\n"
 "Last-Translator: Ali Vakilzade <ali.vakilzade@gmail.com>\n"
-"Language-Team: Persian (http://www.transifex.com/projects/p/django/language/"
+"Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -26,7 +27,7 @@ msgstr "%(count)d تا %(items)s با موفقیت حذف شدند."
 
 #, python-format
 msgid "Cannot delete %(name)s"
-msgstr "ناتوان در حذف %(name)s"
+msgstr "امکان حذف %(name)s نیست."
 
 msgid "Are you sure?"
 msgstr "آیا مطمئن هستید؟"
@@ -79,6 +80,12 @@ msgstr "اقدام:"
 msgid "action time"
 msgstr "زمان اقدام"
 
+msgid "user"
+msgstr "کاربر"
+
+msgid "content type"
+msgstr "نوع محتوی"
+
 msgid "object id"
 msgstr "شناسهٔ شیء"
 
@@ -120,6 +127,9 @@ msgid ""
 msgstr ""
 "برای انتخاب بیش از یکی \"Control\"، یا \"Command\" روی Mac، را پایین نگه "
 "دارید."
+
+msgid "Added."
+msgstr "اضافه شد"
 
 #, python-format
 msgid "Changed %s."
@@ -185,11 +195,11 @@ msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"آیتم ها باید به منظور انجام عملیات بر روی آنها انتخاب شود. هیچ آیتمی با "
+"آیتم ها باید به منظور انجام عملیات بر روی آنها انتخاب شوند. هیچ آیتمی با "
 "تغییر نیافته است."
 
 msgid "No action selected."
-msgstr "حرکتی انتخاب نشده"
+msgstr "فعالیتی انتخاب نشده"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -265,7 +275,7 @@ msgid "We're sorry, but the requested page could not be found."
 msgstr "شرمنده، صفحه مورد تقاضا یافت نشد."
 
 msgid "Home"
-msgstr "آغازه"
+msgstr "شروع"
 
 msgid "Server error"
 msgstr "خطای سرور"
@@ -313,7 +323,7 @@ msgid "Change password"
 msgstr "تغییر گذرواژه"
 
 msgid "Please correct the error below."
-msgstr "لطفاً خطای زیر را حل کنید."
+msgstr "لطفاً خطای زیر را تصحیح کنید."
 
 msgid "Please correct the errors below."
 msgstr "لطفاً خطاهای زیر را تصحیح کنید."
@@ -473,6 +483,14 @@ msgstr ""
 "درستی ایجاد شده‌اند و اطمینان حاصل کنید که بانک اطلاعاتی توسط کاربر مربوطه "
 "قابل خواندن می باشد."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"شما به عنوان %(username)sوارد شده اید. ولی اجازه مشاهده صفحه فوق را نداریدو "
+"آیا مایلید با کاربر دیگری وارد شوید؟"
+
 msgid "Forgotten your password or username?"
 msgstr "گذرواژه یا نام کاربری خود را فراموش کرده‌اید؟"
 
@@ -497,6 +515,9 @@ msgstr "نمایش همه"
 
 msgid "Save"
 msgstr "ذخیره"
+
+msgid "Popup closing..."
+msgstr "در حال بستن پنجره..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -632,9 +653,6 @@ msgstr "ایجاد گذرواژهٔ جدید"
 
 msgid "All dates"
 msgstr "همهٔ تاریخ‌ها"
-
-msgid "(None)"
-msgstr "(هیچ)"
 
 #, python-format
 msgid "Select %s"

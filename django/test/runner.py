@@ -84,7 +84,7 @@ class RemoteTestResult(object):
     def test_index(self):
         return self.testsRun - 1
 
-    def check_pickleable(self, test, err):
+    def check_picklable(self, test, err):
         # Ensure that sys.exc_info() tuples are picklable. This displays a
         # clear multiprocessing.pool.RemoteTraceback generated in the child
         # process instead of a multiprocessing.pool.MaybeEncodingError, making
@@ -152,12 +152,12 @@ failure and get a correct traceback.
         self.events.append(('stopTest', self.test_index))
 
     def addError(self, test, err):
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addError', self.test_index, err))
         self.stop_if_failfast()
 
     def addFailure(self, test, err):
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addFailure', self.test_index, err))
         self.stop_if_failfast()
 
@@ -177,7 +177,7 @@ failure and get a correct traceback.
         # expected failure occurs.
         if tblib is None:
             err = err[0], err[1], None
-        self.check_pickleable(test, err)
+        self.check_picklable(test, err)
         self.events.append(('addExpectedFailure', self.test_index, err))
 
     def addUnexpectedSuccess(self, test):
@@ -299,7 +299,7 @@ class ParallelTestSuite(unittest.TestSuite):
         To minimize pickling errors when getting results from workers:
 
         - pass back numeric indexes in self.subsuites instead of tests
-        - make tracebacks pickleable with tblib, if available
+        - make tracebacks picklable with tblib, if available
 
         Even with tblib, errors may still occur for dynamically created
         exception classes such Model.DoesNotExist which cannot be unpickled.

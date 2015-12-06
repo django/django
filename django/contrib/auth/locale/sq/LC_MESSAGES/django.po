@@ -2,14 +2,15 @@
 #
 # Translators:
 # Besnik <besnik@programeshqip.org>, 2011
+# Besnik <besnik@programeshqip.org>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-18 10:30+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Albanian (http://www.transifex.com/projects/p/django/language/"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-11-25 15:31+0000\n"
+"Last-Translator: Besnik <besnik@programeshqip.org>\n"
+"Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,7 +29,7 @@ msgstr "Të dhëna të rëndësishme"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
-msgstr ""
+msgstr "S’ekziston objekt %(name)s me kyç parësor %(key)r."
 
 msgid "Password changed successfully."
 msgstr "Fjalëkalimi u ndryshua me sukses."
@@ -40,14 +41,20 @@ msgstr "Ndryshoni fjalëkalimin: %s"
 msgid "Authentication and Authorization"
 msgstr "Mirëfilltësim dhe Autorizim"
 
+msgid "password"
+msgstr "fjalëkalim"
+
+msgid "last login"
+msgstr "hyrja e fundit"
+
 msgid "No password set."
-msgstr "Nuk ka fjalëkalim të caktuar."
+msgstr "S’ka fjalëkalim të caktuar."
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Format i pavlefshëm fjalëkalimi ose algoritëm i panjohur hashi."
 
 msgid "The two password fields didn't match."
-msgstr "Dy fushat për fjalëkalim nuk u përputhën."
+msgstr "Dy fushat për fjalëkalim s’u përputhën."
 
 msgid "Password"
 msgstr "Fjalëkalim"
@@ -55,17 +62,17 @@ msgstr "Fjalëkalim"
 msgid "Password confirmation"
 msgstr "Ripohim fjalëkalimi"
 
-msgid "Enter the same password as above, for verification."
-msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më sipër."
+msgid "Enter the same password as before, for verification."
+msgstr "Jepni, për verifikim, të njëjtin fjalëkalim si më parë."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Fjalëkalimet shqeto nuk depozitohenm ndaj nuk ka ndonjë mënyrë si të shihet "
+"Fjalëkalimet shqeto nuk depozitohen, ndaj s’ka ndonjë mënyrë si të shihet "
 "fjalëkalimi i këtij përdoruesi, por mund ta ndryshoni fjalëkalimin duke "
-"përdorur <a href=\"password/\">këtë formular</a>."
+"përdorur <a href=\"../password/\">këtë formular</a>."
 
 #, python-format
 msgid ""
@@ -77,7 +84,7 @@ msgstr ""
 "mëdha ose të vogla."
 
 msgid "This account is inactive."
-msgstr "Kjo llogari nuk është aktive."
+msgstr "Kjo llogari s’është aktive."
 
 msgid "Email"
 msgstr "Email"
@@ -89,7 +96,8 @@ msgid "New password confirmation"
 msgstr "Ripohim fjalëkalimi të ri"
 
 msgid "Your old password was entered incorrectly. Please enter it again."
-msgstr "Fjalëkalimi juaj i vjetër u dha pasaktësisht. Ju lutem, jepeni sërish."
+msgstr ""
+"Fjalëkalimi juaj i vjetër u dha pasaktësisht. Ju lutemi, jepeni sërish."
 
 msgid "Old password"
 msgstr "Fjalëkalim i vjetër"
@@ -118,6 +126,9 @@ msgstr ""
 msgid "name"
 msgstr "emër"
 
+msgid "content type"
+msgstr "lloj lënde"
+
 msgid "codename"
 msgstr "emër i koduar"
 
@@ -133,12 +144,6 @@ msgstr "grup"
 msgid "groups"
 msgstr "grupe"
 
-msgid "password"
-msgstr "fjalëkalim"
-
-msgid "last login"
-msgstr "hyrja e fundit"
-
 msgid "superuser status"
 msgstr "gjendje superpërdoruesi"
 
@@ -152,6 +157,8 @@ msgid ""
 "The groups this user belongs to. A user will get all permissions granted to "
 "each of their groups."
 msgstr ""
+"Grupet te të cilët bën pjesë ky përdorues. Një përdorues do të gëzojë krejt "
+"lejet e akorduara secilit te këto grupe."
 
 msgid "user permissions"
 msgstr "leje përdoruesi"
@@ -171,6 +178,8 @@ msgid ""
 "Enter a valid username. This value may contain only letters, numbers and @/./"
 "+/-/_ characters."
 msgstr ""
+"Jepni një emër të vlefshëm përdoruesi. Kjo vlerë mund të përmbajë vetëm "
+"shkronja, numra dhe shenja si @/./+/-/_ ."
 
 msgid "A user with that username already exists."
 msgstr "Ka tashmë një emër të tillë përdoruesi."
@@ -197,7 +206,7 @@ msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
 msgstr ""
-"Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Çpërzgjidhni "
+"Përcakton nëse ky përdorues do të duhej trajtuar si aktiv. Shpërzgjidheni "
 "këtë, në vend se të fshihni llogarira."
 
 msgid "date joined"
@@ -207,7 +216,48 @@ msgid "user"
 msgstr "përdorues"
 
 msgid "users"
-msgstr "përdoruesa"
+msgstr "përdorues"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Ky fjalëkalim është shumë i shkurtër. Duhet të përmbajë të paktën "
+"%(min_length)d shenjë."
+msgstr[1] ""
+"Ky fjalëkalim është shumë i shkurtër. Duhet të përmbajë të paktën "
+"%(min_length)d shenja."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Fjalëkalimi juaj duhet të përmbajë të paktën %(min_length)d shenjë."
+msgstr[1] "Fjalëkalimi juaj duhet të përmbajë të paktën %(min_length)d shenja."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Fjalëkalimi është shumë i ngjashëm me %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Fjalëkalimi juaj s’mund të jetë shumë i ngjashëm me të tjera të dhëna "
+"personale tuajat."
+
+msgid "This password is too common."
+msgstr "Ky fjalëkalim është shumë i zakonshëm."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Fjalëkalim juaj s’mund të jetë një fjalëkalim i përdorur rëndom."
+
+msgid "This password is entirely numeric."
+msgstr "Ky fjalëkalim është tërësisht numerik."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Fjalëkalimi juaj s’mund të jetë tërësisht numerik."
 
 #, python-format
 msgid "Password reset on %(site_name)s"
@@ -220,7 +270,7 @@ msgid "Password reset"
 msgstr "Ricaktim fjalëkalimi"
 
 msgid "Password reset sent"
-msgstr ""
+msgstr "U dërgua ricaktim fjalëkalimi"
 
 msgid "Enter new password"
 msgstr "Jepni fjalëkalimin e ri"
