@@ -10,7 +10,7 @@ but the modern Web includes things like WebSockets and HTTP2 server push,
 which allow websites to communicate outside of this traditional cycle.
 
 And, beyond that, there are plenty of non-critical tasks that applications
-could easily offload until after a response as been sent - like saving things
+could easily offload until after a response has been sent - like saving things
 into a cache or thumbnailing newly-uploaded images.
 
 Channels changes the way Django runs to be "event oriented" - rather than 
