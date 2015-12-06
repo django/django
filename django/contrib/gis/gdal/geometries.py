@@ -121,8 +121,10 @@ class OGRGeometry(GDALBase):
 
     def __del__(self):
         "Deletes this Geometry."
-        if self._ptr and capi:
+        try:
             capi.destroy_geom(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     # Pickle routines
     def __getstate__(self):

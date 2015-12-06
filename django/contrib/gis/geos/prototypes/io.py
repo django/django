@@ -120,8 +120,10 @@ class IOBase(GEOSBase):
 
     def __del__(self):
         # Cleaning up with the appropriate destructor.
-        if self._ptr:
+        try:
             self._destructor(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
 # ### Base WKB/WKT Reading and Writing objects ###
 
