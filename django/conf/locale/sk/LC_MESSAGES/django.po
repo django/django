@@ -219,7 +219,7 @@ msgid "Russian"
 msgstr "ruský"
 
 msgid "Slovak"
-msgstr "slovenský"
+msgstr "slovensky"
 
 msgid "Slovenian"
 msgstr "slovinský"
