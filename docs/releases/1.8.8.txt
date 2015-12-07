@@ -6,6 +6,15 @@ Django 1.8.8 release notes
 
 Django 1.8.8 fixes several bugs in 1.8.7.
 
+Python 3.2 users, please be advised that we've decided to drop support for
+Python 3.2 in Django 1.8.x at the end of 2016. We won't break things
+intentionally after that, but we won't test subsequent releases against Python
+3.2 either. Upstream support for Python 3.2 ends February 2016 so we don't find
+much value in providing security updates for a version of Python that could be
+insecure. To read more about the decision and to let us know if this will be
+problematic for you, please read the `django-developers thread
+<https://groups.google.com/d/topic/django-developers/eMu5UQpUdWs/discussion>`_.
+
 Bugfixes
 ========
 
