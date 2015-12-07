@@ -457,7 +457,7 @@ class:
 
     def create_question(question_text, days):
         """
-        Creates a question with the given `question_text` published the given
+        Creates a question with the given `question_text` published, given the
         number of `days` offset to now (negative for questions published
         in the past, positive for questions that have yet to be published).
         """
