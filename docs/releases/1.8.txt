@@ -28,6 +28,9 @@ Python compatibility
 Django 1.8 requires Python 2.7, 3.2, 3.3, 3.4, or 3.5. We **highly recommend**
 and only officially support the latest release of each series.
 
+Due to the end of upstream support for Python 3.2 in February 2016, we won't
+test Django 1.8.x on Python 3.2 after the end of 2016.
+
 What's new in Django 1.8
 ========================
 
