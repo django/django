@@ -25,9 +25,8 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-``httpd.conf`` file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+``000-default.conf`` file and add the following. If you are using a version of Apache
+older than 2.4, edit your Apache server's ``httpd.conf`` file and remember to replace ``Require all granted`` with ``Allow from all`` and also add the line ``Order deny,allow`` above it.
 
 .. code-block:: apache
 
