@@ -190,9 +190,8 @@ Combining multiple aggregations
 -------------------------------
 
 Combining multiple aggregations with ``annotate()`` will `yield the wrong
-results <https://code.djangoproject.com/ticket/10060>`_, as multiple tables are
-cross joined. Due to the use of ``LEFT OUTER JOIN``, duplicate records will be
-generated if some of the joined tables contain more records than the others:
+results <https://code.djangoproject.com/ticket/10060>`_ because joins are used
+instead of subqueries:
 
     >>> Book.objects.first().authors.count()
     2
@@ -374,8 +373,8 @@ Both queries return a list of publishers that have at least one book with a
 rating exceeding 3.0, hence publisher C is excluded.
 
 In the first query, the annotation precedes the filter, so the filter has no
-effect on the annotation. ``distinct=True`` is required to avoid a
-:ref:`cross-join bug <combining-multiple-aggregations>`.
+effect on the annotation. ``distinct=True`` is required to avoid a :ref:`query
+bug <combining-multiple-aggregations>`.
 
 The second query counts the number of books that have a rating exceeding 3.0
 for each publisher. The filter precedes the annotation, so the filter
