@@ -16,3 +16,6 @@ Bugfixes
   (:ticket:`25548`).
 
 * Fixed a system check crash with nested ``ArrayField``\s (:ticket:`25867`).
+
+* Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
+  backwards (:ticket:`25896`).
