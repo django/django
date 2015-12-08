@@ -513,7 +513,7 @@ redirects to the login page::
             return redirect('/login/?next=%s' % request.path)
         # ...
 
-.. function:: user_passes_test(func, login_url=None, redirect_field_name='next')
+.. function:: user_passes_test(test_func, login_url=None, redirect_field_name='next')
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator
     which performs a redirect when the callable returns ``False``::
