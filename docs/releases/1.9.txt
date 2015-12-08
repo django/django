@@ -23,7 +23,7 @@ Python compatibility
 Django 1.9 requires Python 2.7, 3.4, or 3.5. We **highly recommend** and only
 officially support the latest release of each series.
 
-Since Django 1.8, we've dropped support for Python 3.2 and 3.3.
+The Django 1.8 series is the last to support Python 3.2 and 3.3.
 
 What's new in Django 1.9
 ========================
