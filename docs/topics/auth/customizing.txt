@@ -329,7 +329,7 @@ add it to a ``UserAdmin`` class which is registered with the
 :class:`~django.contrib.auth.models.User` class::
 
     from django.contrib import admin
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
     from my_user_profile_app.models import Employee
@@ -342,7 +342,7 @@ add it to a ``UserAdmin`` class which is registered with the
         verbose_name_plural = 'employee'
 
     # Define a new User admin
-    class UserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         inlines = (EmployeeInline, )
 
     # Re-register UserAdmin
@@ -1071,7 +1071,7 @@ code would be required in the app's ``admin.py`` file::
     from django import forms
     from django.contrib import admin
     from django.contrib.auth.models import Group
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
     from customauth.models import MyUser
@@ -1122,7 +1122,7 @@ code would be required in the app's ``admin.py`` file::
             return self.initial["password"]
 
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         # The forms to add and change user instances
         form = UserChangeForm
         add_form = UserCreationForm
@@ -1150,7 +1150,7 @@ code would be required in the app's ``admin.py`` file::
         filter_horizontal = ()
 
     # Now register the new UserAdmin...
-    admin.site.register(MyUser, MyUserAdmin)
+    admin.site.register(MyUser, UserAdmin)
     # ... and, since we're not using Django's built-in permissions,
     # unregister the Group model from admin.
     admin.site.unregister(Group)
