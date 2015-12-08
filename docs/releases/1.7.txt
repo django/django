@@ -23,8 +23,8 @@ Python compatibility
 Django 1.7 requires Python 2.7, 3.2, 3.3, or 3.4. We **highly recommend** and
 only officially support the latest release of each series.
 
-Since Django 1.6, support for Python 2.6 has been dropped and support for
-Python 3.4 has been added.
+The Django 1.6 series is the last to support Python 2.6. Django 1.7 is the
+first release to support Python 3.4.
 
 This change should affect only a small number of Django users, as most
 operating-system vendors today are shipping Python 2.7 or newer as their default
