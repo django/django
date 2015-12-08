@@ -50,7 +50,7 @@ class SeparateDatabaseAndState(Operation):
             to_state = base_state.clone()
             for dbop in self.database_operations[:-(pos + 1)]:
                 dbop.state_forwards(app_label, to_state)
-            from_state = base_state.clone()
+            from_state = to_state.clone()
             database_operation.state_forwards(app_label, from_state)
             database_operation.database_backwards(app_label, schema_editor, from_state, to_state)
 
