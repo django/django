@@ -27,3 +27,6 @@ Bugfixes
 * Restored the ability to use custom formats from ``formats.py`` with
   ``django.utils.formats.get_format()`` and the ``date`` template filter
   (:ticket:`25812`).
+
+* Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
+  backwards (:ticket:`25896`).
