@@ -190,10 +190,10 @@ The implementation is::
 There are a couple of notable things going on. First, ``AbsoluteValueLessThan``
 isn't calling ``process_lhs()``. Instead it skips the transformation of the
 ``lhs`` done by ``AbsoluteValue`` and uses the original ``lhs``. That is, we
-want to get ``27`` not ``ABS(27)``. Referring directly to ``self.lhs.lhs`` is
-safe as ``AbsoluteValueLessThan`` can be accessed only from the
-``AbsoluteValue`` lookup, that is the ``lhs`` is always an instance of
-``AbsoluteValue``.
+want to get ``"experiments"."change"`` not ``ABS("experiments"."change")``.
+Referring directly to ``self.lhs.lhs`` is safe as ``AbsoluteValueLessThan``
+can be accessed only from the ``AbsoluteValue`` lookup, that is the ``lhs``
+is always an instance of ``AbsoluteValue``.
 
 Notice also that  as both sides are used multiple times in the query the params
 need to contain ``lhs_params`` and ``rhs_params`` multiple times.
