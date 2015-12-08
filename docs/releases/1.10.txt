@@ -323,14 +323,14 @@ when creating a user or changing usernames::
 If you wish to keep this restriction in the admin, set ``UserAdmin.add_form``
 to use this form::
 
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         add_form = MyUserCreationForm
 
     admin.site.unregister(User)
-    admin.site.register(User, MyUserAdmin)
+    admin.site.register(User, UserAdmin)
 
 Miscellaneous
 ~~~~~~~~~~~~~
