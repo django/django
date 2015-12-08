@@ -24,7 +24,7 @@
   WGS 84
   >>> print(mpnt.srs.proj)
   +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
-  >>> mpnt.transform_to(SpatialReference('NAD27'))
+  >>> mpnt.transform(SpatialReference('NAD27'))
   >>> print(mpnt.proj)
   +proj=longlat +ellps=clrk66 +datum=NAD27 +no_defs
   >>> print(mpnt)
@@ -396,10 +396,6 @@ class OGRGeometry(GDALBase):
         else:
             raise TypeError('Transform only accepts CoordTransform, '
                             'SpatialReference, string, and integer objects.')
-
-    def transform_to(self, srs):
-        "For backwards-compatibility."
-        self.transform(srs)
 
     # #### Topology Methods ####
     def _topology(self, func, other):
