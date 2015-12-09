@@ -853,8 +853,9 @@ It was redundant to display the full details of the
 :class:`~django.http.HttpRequest` each time it appeared as a stack frame
 variable in the HTML version of the debug page and error email. Thus, the HTTP
 request will now display the same standard representation as other variables
-(``repr(request)``). As a result, the method
-``ExceptionReporterFilter.get_request_repr()`` was removed.
+(``repr(request)``). As a result, the
+``ExceptionReporterFilter.get_request_repr()`` method and the undocumented
+``django.http.build_request_repr()`` function were removed.
 
 The contents of the text version of the email were modified to provide a
 traceback of the same structure as in the case of AJAX requests. The traceback
