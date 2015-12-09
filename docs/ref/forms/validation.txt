@@ -75,7 +75,7 @@ overridden:
 
 * The form subclass's ``clean()`` method can perform validation that requires
   access to multiple form fields. This is where you might put in checks such as
-  "if field ``A``is supplied, field ``B`` must contain a valid email address".
+  "if field ``A`` is supplied, field ``B`` must contain a valid email address".
   This method can return a completely different dictionary if it wishes, which
   will be used as the ``cleaned_data``.
 
