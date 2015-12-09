@@ -1,10 +1,12 @@
 import copy
 import inspect
+import warnings
 from importlib import import_module
 
 from django.db import router
 from django.db.models.query import QuerySet
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -161,7 +163,7 @@ class BaseManager(object):
             setattr(model, name, SwappedManagerDescriptor(model))
         else:
             # if not model._meta.abstract and not model._meta.swapped:
-            setattr(model, name, ManagerDescriptor(self))
+            setattr(model, name, ManagerDescriptor(self, model._meta.model))
         if (not getattr(model, '_default_manager', None) or
                 self.creation_counter < model._default_manager.creation_counter):
             model._default_manager = self
@@ -242,12 +244,25 @@ class Manager(BaseManager.from_queryset(QuerySet)):
 class ManagerDescriptor(object):
     # This class ensures managers aren't accessible via model instances.
     # For example, Poll.objects works, but poll_obj.objects raises AttributeError.
-    def __init__(self, manager):
+    # It also ensures managers defined on non-abstract base classes are not inherited by child classes.
+    def __init__(self, manager, model):
         self.manager = manager
+        self.model = model
 
     def __get__(self, instance, cls=None):
         if instance is not None:
             raise AttributeError("Manager isn't accessible via %s instances" % cls.__name__)
+
+        if not (cls == self.model or (cls._meta.proxy and cls._meta.concrete_model is None)):
+            # We should check second condition because for proxy models default and base
+            # managers are copied to model using python mro before cls._meta.concrete_model is set.
+            warnings.warn(
+                "Access to manager '%s' defined on non-abstract base "
+                "class '%s' from child class '%s' is deprecated. "
+                "Add the manager to the child class to silence this warning."
+                % (self.manager.name, self.model.__name__, cls.__name__),
+                RemovedInDjango20Warning, stacklevel=2
+            )
         return self.manager
 
 

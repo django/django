@@ -287,8 +287,7 @@ class ModelBase(type):
         # This is in-place sorting of an Options attribute, but that's fine.
         base_managers.sort()
         for _, mgr_name, manager in base_managers:  # NOQA (redefinition of _)
-            val = getattr(cls, mgr_name, None)
-            if not val or val is manager:
+            if mgr_name not in cls.__dict__:
                 new_manager = manager._copy_to_model(cls)
                 cls.add_to_class(mgr_name, new_manager)
 
