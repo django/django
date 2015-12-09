@@ -363,6 +363,10 @@ Miscellaneous
   :class:`~django.http.HttpResponse` are now closed immediately instead of when
   the WSGI server calls ``close()`` on the response.
 
+* A redundant ``transaction.atomic()`` call in ``QuerySet.update_or_create()``
+  is removed. This may affect query counts tested by
+  ``TransactionTestCase.assertNumQueries()``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
