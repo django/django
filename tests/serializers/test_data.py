@@ -392,12 +392,12 @@ def serializerTest(format, self):
 
     # Create all the objects defined in the test data
     objects = []
-    classes = set()
+    tables = set()
     instance_count = {}
     for (_, _, klass, _) in test_data:
-        classes.add(klass._meta.db_table)
+        tables.add(klass._meta.db_table)
 
-    with connection.constraint_checks_disabled(classes):
+    with connection.constraint_checks_disabled(tables):
         for (func, pk, klass, datum) in test_data:
             objects.extend(func[0](pk, klass, datum))
 
