@@ -73,16 +73,22 @@ class SchemaTests(TransactionTestCase):
     def delete_tables(self):
         "Deletes all model tables for our models for a clean test environment"
         converter = connection.introspection.table_name_converter
+        table_names = connection.introspection.table_names()
+        tables_to_delete = set()
+        for model in itertools.chain(SchemaTests.models, self.local_models):
+            tbl = converter(model._meta.db_table)
+            if tbl in table_names:
+                tables_to_delete.add(model._meta.db_table)
+
         with atomic():
-            connection.disable_constraint_checking()
-            table_names = connection.introspection.table_names()
+            connection.disable_constraint_checking(tables_to_delete)
             for model in itertools.chain(SchemaTests.models, self.local_models):
                 tbl = converter(model._meta.db_table)
                 if tbl in table_names:
                     with connection.schema_editor() as editor:
                         editor.delete_model(model)
                     table_names.remove(tbl)
-            connection.enable_constraint_checking()
+            connection.enable_constraint_checking(tables_to_delete)
 
     def column_classes(self, model):
         with connection.cursor() as cursor:

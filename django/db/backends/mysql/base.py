@@ -288,7 +288,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         with self.wrap_database_errors:
             self.connection.autocommit(autocommit)
 
-    def disable_constraint_checking(self):
+    def disable_constraint_checking(self, table_names):
         """
         Disables foreign key checks, primarily for use in adding rows with forward references. Always returns True,
         to indicate constraint checks need to be re-enabled.
@@ -296,7 +296,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.cursor().execute('SET foreign_key_checks=0')
         return True
 
-    def enable_constraint_checking(self):
+    def enable_constraint_checking(self, table_names):
         """
         Re-enable foreign key checks after they have been disabled.
         """

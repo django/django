@@ -1009,7 +1009,7 @@ class UUIDUserTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # A LogEntry is created with pk=1 which breaks a FK constraint on MySQL
-        with connection.constraint_checks_disabled():
+        with connection.constraint_checks_disabled([LogEntry._meta.db_table]):
             response = self.client.post(password_change_url, {
                 'password1': 'password1',
                 'password2': 'password1',

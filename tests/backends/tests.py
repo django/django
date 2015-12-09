@@ -893,9 +893,9 @@ class FkConstraintsTests(TransactionTestCase):
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
-                connection.disable_constraint_checking()
+                connection.disable_constraint_checking([models.Article._meta.db_table])
                 a.save()
-                connection.enable_constraint_checking()
+                connection.enable_constraint_checking([models.Article._meta.db_table])
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
             transaction.set_rollback(True)
@@ -916,7 +916,7 @@ class FkConstraintsTests(TransactionTestCase):
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
             try:
-                with connection.constraint_checks_disabled():
+                with connection.constraint_checks_disabled([models.Article._meta.db_table]):
                     a.save()
             except IntegrityError:
                 self.fail("IntegrityError should not have occurred.")
@@ -936,7 +936,7 @@ class FkConstraintsTests(TransactionTestCase):
             # Retrieve it from the DB
             a = models.Article.objects.get(headline="Test article")
             a.reporter_id = 30
-            with connection.constraint_checks_disabled():
+            with connection.constraint_checks_disabled([models.Article._meta.db_table]):
                 a.save()
                 with self.assertRaises(IntegrityError):
                     connection.check_constraints()

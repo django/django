@@ -14,7 +14,7 @@ class NaturalKeySerializerTests(TestCase):
 
 def natural_key_serializer_test(format, self):
     # Create all the objects defined in the test data
-    with connection.constraint_checks_disabled():
+    with connection.constraint_checks_disabled([NaturalKeyAnchor._meta.db_table, FKDataNaturalKey._meta.db_table]):
         objects = [
             NaturalKeyAnchor.objects.create(id=1100, data="Natural Key Anghor"),
             FKDataNaturalKey.objects.create(id=1101, data_id=1100),
