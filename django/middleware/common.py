@@ -120,7 +120,9 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 return get_conditional_response(
                     request,
-                    etag=response['ETag'],
+                    # get_conditional_response() requires an unquoted version
+                    # of the response's ETag.
+                    etag=response['ETag'].strip('"'),
                     response=response,
                 )
 

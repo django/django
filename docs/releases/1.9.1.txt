@@ -19,3 +19,6 @@ Bugfixes
 
 * Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
   backwards (:ticket:`25896`).
+
+* Fixed a regression in ``CommonMiddleware`` causing ``If-None-Match`` checks
+  to always return HTTP 200 (:ticket:`25900`).
