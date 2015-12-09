@@ -291,6 +291,16 @@ class CommonMiddlewareTest(SimpleTestCase):
         res = StreamingHttpResponse(['content'])
         self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
 
+    @override_settings(USE_ETAGS=True)
+    def test_if_none_match(self):
+        first_req = HttpRequest()
+        first_res = CommonMiddleware().process_response(first_req, HttpResponse('content'))
+        second_req = HttpRequest()
+        second_req.method = 'GET'
+        second_req.META['HTTP_IF_NONE_MATCH'] = first_res['ETag']
+        second_res = CommonMiddleware().process_response(second_req, HttpResponse('content'))
+        self.assertEqual(second_res.status_code, 304)
+
     # Other tests
 
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
