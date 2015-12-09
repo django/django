@@ -485,8 +485,7 @@ class QuerySet(object):
         for k, v in six.iteritems(defaults):
             setattr(obj, k, v)
 
-        with transaction.atomic(using=self.db, savepoint=False):
-            obj.save(using=self.db)
+        obj.save(using=self.db)
         return obj, False
 
     def _create_object_from_params(self, lookup, params):
@@ -495,8 +494,7 @@ class QuerySet(object):
         Used by get_or_create and update_or_create
         """
         try:
-            with transaction.atomic(using=self.db):
-                obj = self.create(**params)
+            obj = self.create(**params)
             return obj, True
         except IntegrityError:
             exc_info = sys.exc_info()
