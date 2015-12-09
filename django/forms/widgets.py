@@ -79,11 +79,9 @@ class Media(object):
 
     def absolute_path(self, path):
         """
-        Return absolute path to static asset given both a relative or absolute path.
-
-        Both absolute and relative paths are accepted.
-        An absolute path will be returned unchanged, where an relative
-        path will be transformed into the staticfile storage absolute path.
+        Given a relative or absolute path to a static asset, return an absolute
+        path. An absolute path will be returned unchanged while a relative path
+        will be passed to django.templatetags.static.static().
         """
         if path.startswith(('http://', 'https://', '/')):
             return path

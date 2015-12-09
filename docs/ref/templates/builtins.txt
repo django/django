@@ -2399,8 +2399,9 @@ static
 """"""
 
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
-with a :ttag:`static` template tag. You can use this regardless if you're
-using :class:`~django.template.RequestContext` or not. For example::
+with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
+app is installed, the tag will serve files using ``url()`` method of the
+storage specified by :setting:`STATICFILES_STORAGE`. For example::
 
     {% load static %}
     <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
@@ -2425,10 +2426,9 @@ defined storage by :setting:`STATICFILES_STORAGE`.
 
 .. versionchanged:: 1.10
 
-    In older versions, static had to be loaded from
-    :mod:`~django.contrib.staticfiles` to serve files
-    from the storage defined in :setting:`STATICFILES_STORAGE`.
-    This is no longer required.
+    In older versions, you had to use ``{% load static from staticfiles %}`` in
+    your template to serve files from the storage defined in
+    :setting:`STATICFILES_STORAGE`. This is no longer required.
 
 .. templatetag:: get_static_prefix
 

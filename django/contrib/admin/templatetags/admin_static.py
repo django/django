@@ -6,6 +6,6 @@ register = Library()
 
 @register.simple_tag
 def static(path):
-    # Implementation has been moved to django.templatetags.static.
-    # Deprecation should start in Django 2.0
+    # Backwards compatibility alias for django.templatetags.static.static().
+    # Deprecation should start in Django 2.0.
     return _static(path)

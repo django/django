@@ -204,12 +204,12 @@ Paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
 interpreted as an absolute path, and left as-is. All other paths will
 be prepended with the value of the appropriate prefix. If the
-:doc:`staticfiles app </ref/contrib/staticfiles>` is configured, assets
-will be automatically served from the ``staticfiles`` storage.
+:mod:`django.contrib.staticfiles` app is installed, it will be used to serve
+assets.
 
-Whether or not you use the :doc:`staticfiles app </ref/contrib/staticfiles>`
-the settings :setting:`STATIC_URL` and :setting:`STATIC_ROOT` are required
-to render a complete web page.
+Whether or not you use :mod:`django.contrib.staticfiles`,  the
+:setting:`STATIC_URL` and :setting:`STATIC_ROOT` settings are required to
+render a complete web page.
 
 To find the appropriate prefix to use, Django will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
@@ -239,7 +239,6 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
     <script type="text/javascript" src="http://static.example.com/animations.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
 
-
 Or if staticfiles is configured using the
 `~django.contib.staticfiles.ManifestStaticFilesStorage`::
 
@@ -248,6 +247,14 @@ Or if staticfiles is configured using the
     <link href="/css/pretty.css" type="text/css" media="all" rel="stylesheet" />
     <script type="text/javascript" src="https://static.example.com/animations.27e20196a850.js"></script>
     <script type="text/javascript" src="http://othersite.com/actions.js"></script>
+
+.. versionchanged:: 1.10
+
+    Older versions didn't serve assets using :mod:`django.contrib.staticfiles`.
+
+.. versionchanged:: 1.10
+
+    Older versions didn't serve assets using :mod:`django.contrib.staticfiles`.
 
 ``Media`` objects
 -----------------

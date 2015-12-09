@@ -7,13 +7,13 @@ register = template.Library()
 
 
 def static(path):
-    # Implementation has been moved to django.templatetags.static.
-    # Deprecation should start in Django 2.0
+    # Backwards compatibility alias for django.templatetags.static.static().
+    # Deprecation should start in Django 2.0.
     return _static(path)
 
 
 @register.tag('static')
 def do_static(parser, token):
-    # Implementation has been moved to django.templatetags.static.
-    # Deprecation should start in Django 2.0
+    # Backwards compatibility alias for django.templatetags.static.do_static().
+    # Deprecation should start in Django 2.0.
     return _do_static(parser, token)
