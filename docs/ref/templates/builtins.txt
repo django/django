@@ -12,7 +12,7 @@ documentation for any custom tags or filters installed.
 Built-in tag reference
 ----------------------
 
-.. highlightlang:: html+django
+.. highlight:: html+django
 
 .. templatetag:: autoescape
 
@@ -548,9 +548,7 @@ operators, from lowest to highest, is as follows:
 * ``==``, ``!=``, ``<``, ``>``, ``<=``, ``>=``
 
 (This follows Python exactly). So, for example, the following complex
-:ttag:`if` tag:
-
-.. code-block:: django
+:ttag:`if` tag::
 
     {% if a == b or c == d and e %}
 
@@ -1894,9 +1892,7 @@ autoescaping is off, this filter has no effect.
 
     If you are chaining filters, a filter applied after ``safe`` can
     make the contents unsafe again. For example, the following code
-    prints the variable as is, unescaped:
-
-    .. code-block:: html+django
+    prints the variable as is, unescaped::
 
         {{ var|safe|escape }}
 
@@ -2402,29 +2398,21 @@ static
 static
 """"""
 
-.. highlight:: html+django
-
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
 with a :ttag:`static` template tag. You can use this regardless if you're
-using :class:`~django.template.RequestContext` or not.
-
-.. code-block:: html+django
+using :class:`~django.template.RequestContext` or not. For example::
 
     {% load static %}
     <img src="{% static "images/hi.jpg" %}" alt="Hi!" />
 
 It is also able to consume standard context variables, e.g. assuming a
-``user_stylesheet`` variable is passed to the template:
-
-.. code-block:: html+django
+``user_stylesheet`` variable is passed to the template::
 
     {% load static %}
     <link rel="stylesheet" href="{% static user_stylesheet %}" type="text/css" media="screen" />
 
 If you'd like to retrieve a static URL without displaying it, you can use a
-slightly different call:
-
-.. code-block:: html+django
+slightly different call::
 
     {% load static %}
     {% static "images/hi.jpg" as myphoto %}
@@ -2448,8 +2436,6 @@ slightly different call:
 get_static_prefix
 """""""""""""""""
 
-.. highlight:: html+django
-
 You should prefer the :ttag:`static` template tag, but if you need more control
 over exactly where and how :setting:`STATIC_URL` is injected into the template,
 you can use the :ttag:`get_static_prefix` template tag::
@@ -2470,8 +2456,6 @@ the value multiple times::
 
 get_media_prefix
 """"""""""""""""
-
-.. highlight:: html+django
 
 Similar to the :ttag:`get_static_prefix`, ``get_media_prefix`` populates a
 template variable with the media prefix :setting:`MEDIA_URL`, e.g.::
