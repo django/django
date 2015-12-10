@@ -127,7 +127,11 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :ttag:`static` template tag uses ``django.contrib.staticfiles``
+  if it's in ``INSTALLED_APPS``.  This is especially useful for third-party
+  apps which can now always use ``{% load static %}`` (instead of
+  ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
+  not worry about whether or not the ``statcifiles`` app is installed.
 
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -169,7 +173,8 @@ File Uploads
 Forms
 ^^^^^
 
-* ...
+* Form and widget ``Media`` is now served using
+  :mod:`django.contrib.staticfiles` if installed.
 
 Generic Views
 ^^^^^^^^^^^^^
