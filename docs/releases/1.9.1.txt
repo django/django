@@ -26,3 +26,6 @@ Bugfixes
 * Fixed missing ``varchar/text_pattern_ops`` index on ``CharField`` and
   ``TextField`` respectively when using ``AlterField`` on PostgreSQL
   (:ticket:`25412`).
+
+* Fixed admin's delete confirmation page's summary counts of related objects
+  (:ticket:`25883`).
