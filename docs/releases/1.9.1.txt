@@ -37,3 +37,6 @@ Bugfixes
 
 * Prevented ``QuerySet.delete()`` from crashing on MySQL when querying across
   relations (:ticket`25882`).
+
+* Fixed evaluation of zero-length slices of ``QuerySet.values()``
+  (:ticket:`25894`).
