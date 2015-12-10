@@ -40,6 +40,7 @@ class Article(models.Model):
     content = models.TextField()
     date = models.DateTimeField()
     section = models.ForeignKey(Section, models.CASCADE, null=True, blank=True)
+    another_section = models.ForeignKey(Section, models.CASCADE, null=True, blank=True, related_name='+')
     sub_section = models.ForeignKey(Section, models.SET_NULL, null=True, blank=True, related_name='+')
 
     def __str__(self):

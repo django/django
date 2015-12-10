@@ -19,3 +19,5 @@ Bugfixes
 
 * Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
   backwards (:ticket:`25896`).
+
+* Fixed admin deletion page summary counts for related objects (:ticket:`25883`).
