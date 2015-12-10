@@ -19,3 +19,5 @@ Bugfixes
 
 * Fixed a state bug when migrating a ``SeparateDatabaseAndState`` operation
   backwards (:ticket:`25896`).
+
+* Fixed evaluation of zero-length slices of ``QuerySet.values()`` (:ticket:`25894`).
