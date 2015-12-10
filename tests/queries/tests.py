@@ -2429,6 +2429,12 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
     def test_empty_sliced_subquery_exclude(self):
         self.assertEqual(Eaten.objects.exclude(food__in=Food.objects.all()[0:0]).count(), 1)
 
+    def test_zero_length_values_slicing(self):
+        N = 42
+        with self.assertNumQueries(0):
+            self.assertQuerysetEqual(Article.objects.values()[N:N], [])
+            self.assertQuerysetEqual(Article.objects.values_list()[N:N], [])
+
 
 class EscapingTests(TestCase):
     def test_ticket_7302(self):
