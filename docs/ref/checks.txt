@@ -319,6 +319,14 @@ with the admin site:
 * **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
   attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
 
+The following checks are performed on the default 
+:class:`~django.contrib.admin.AdminSite`:
+
+* **admin.E401**: :mod:`django.contrib.contenttypes` must be in 
+  :setting:`INSTALLED_APPS` in order to use the admin application.
+* **admin.E402**: :mod:`django.contrib.auth.context_processors.auth`
+  must be in :setting:`TEMPLATES` in order to use the admin application.
+
 ModelAdmin
 ~~~~~~~~~~
 
