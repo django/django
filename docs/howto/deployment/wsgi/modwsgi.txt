@@ -29,7 +29,7 @@ Once you've got mod_wsgi installed and activated, edit your Apache server's
 Apache older than 2.4, replace ``Require all granted`` with ``Allow from all``
 and also add the line ``Order deny,allow`` above it.
 
-.. _httpd.conf: http://wiki.apache.org/httpd/DistrosDefaultLayout
+.. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
 
 .. code-block:: apache
 
