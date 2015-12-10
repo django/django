@@ -610,17 +610,17 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         self.addCleanup(shutil.rmtree, app_path)
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
+        unicode_literals_import = "from __future__ import unicode_literals\n"
         with open(os.path.join(app_path, 'apps.py'), 'r') as f:
             content = f.read()
             self.assertIn("class SettingsTestConfig(AppConfig)", content)
             self.assertIn("name = 'settings_test'", content)
+            if not PY3:
+                self.assertIn(unicode_literals_import, content)
         if not PY3:
             with open(os.path.join(app_path, 'models.py'), 'r') as fp:
                 content = fp.read()
-            self.assertIn(
-                "from __future__ import unicode_literals\n",
-                content,
-            )
+            self.assertIn(unicode_literals_import, content)
 
     def test_setup_environ_custom_template(self):
         "directory: startapp creates the correct directory with a custom template"
