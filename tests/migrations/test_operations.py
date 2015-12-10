@@ -1867,7 +1867,10 @@ class OperationTests(OperationTestBase):
             ),
             migrations.CreateModel(
                 "ILoveMorePonies",
-                [("id", models.AutoField(primary_key=True))],
+                # We use IntegerField and not AutoField because
+                # the model is going to be deleted immediately
+                # and with an AutoField this fails on Oracle
+                [("id", models.IntegerField(primary_key=True))],
                 options={"db_table": "ilovemoreponies"},
             ),
             migrations.DeleteModel("ILoveMorePonies"),
