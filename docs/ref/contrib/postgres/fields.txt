@@ -222,9 +222,9 @@ lookups available after the transform do not change. For example::
     >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
 
     >>> Post.objects.filter(tags__0_1=['thoughts'])
-    [<Post: First post>]
+    [<Post: First post>, <Post: Second post>]
 
-    >>> Post.objects.filter(tags__0_2__contains='thoughts')
+    >>> Post.objects.filter(tags__0_2__contains=['thoughts'])
     [<Post: First post>, <Post: Second post>]
 
 .. note::
