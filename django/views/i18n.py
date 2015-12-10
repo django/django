@@ -206,7 +206,7 @@ def get_javascript_catalog(locale, domain, packages):
     packages = [p for p in packages if p in allowable_packages]
     t = {}
     paths = []
-    en_selected = locale.startswith('en')
+    en_selected = locale.startswith(settings.LANGUAGE_CODE)
     en_catalog_missing = True
     # paths of requested packages
     for package in packages:
@@ -218,7 +218,7 @@ def get_javascript_catalog(locale, domain, packages):
     # first load all english languages files for defaults
     for path in paths:
         try:
-            catalog = gettext_module.translation(domain, path, ['en'])
+            catalog = gettext_module.translation(domain, path, [settings.LANGUAGE_CODE])
             t.update(catalog._catalog)
         except IOError:
             pass
