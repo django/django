@@ -29,3 +29,8 @@ Bugfixes
 
 * Fixed admin's delete confirmation page's summary counts of related objects
   (:ticket:`25883`).
+
+* Added ``from __future__ import unicode_literals`` to the default ``apps.py``
+  created by ``startapp`` on Python 2 (:ticket:`25909`). Add this line to your
+  own ``apps.py`` files created using Django 1.9 if you want your migrations
+  to work on both Python 2 and Python 3.
