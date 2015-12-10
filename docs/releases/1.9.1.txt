@@ -16,3 +16,5 @@ Bugfixes
   (:ticket:`25548`).
 
 * Fixed a system check crash with nested ``ArrayField``\s (:ticket:`25867`).
+
+* Fixed a regression in ``CommonMixin`` causing If-None-Match checks to always return HTTP 200.
