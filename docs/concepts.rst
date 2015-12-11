@@ -28,7 +28,7 @@ The core of Channels is, unsurprisingly, a datastructure called a *channel*.
 What is a channel? It is an *ordered*, *first-in first-out queue* with
 *message expiry* and *at-most-once delivery* to *only one listener at a time*.
 
-You can think of it as analagous to a task queue - messages are put onto
+You can think of it as analogous to a task queue - messages are put onto
 the channel by *producers*, and then given to just one of the *consumers*
 listening to that channnel.
 
