@@ -45,7 +45,7 @@ def ping_google(sitemap_url=None, ping_url=PING_URL):
 
 class Sitemap(object):
     # This limit is defined by Google. See the index documentation at
-    # http://sitemaps.org/protocol.php#index.
+    # http://www.sitemaps.org/protocol.html#index.
     limit = 50000
 
     # If protocol is None, the URLs in the sitemap will use the protocol
@@ -66,6 +66,9 @@ class Sitemap(object):
 
     def location(self, obj):
         return obj.get_absolute_url()
+
+    def get_latest_lastmod(self):
+        return self.lastmod if hasattr(self, 'lastmod') and not callable(self.lastmod) else None
 
     def _get_paginator(self):
         return paginator.Paginator(self.items(), self.limit)
@@ -148,6 +151,11 @@ class GenericSitemap(Sitemap):
     def lastmod(self, item):
         if self.date_field is not None:
             return getattr(item, self.date_field)
+        return None
+
+    def get_latest_lastmod(self):
+        if self.date_field is not None:
+            return self.queryset.order_by('-' + self.date_field).values_list(self.date_field, flat=True).first()
         return None
 
 

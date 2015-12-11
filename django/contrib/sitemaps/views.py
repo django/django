@@ -35,9 +35,10 @@ def index(request, sitemaps,
         sitemap_url = urlresolvers.reverse(
             sitemap_url_name, kwargs={'section': section})
         absolute_url = '%s://%s%s' % (protocol, req_site.domain, sitemap_url)
-        sites.append(absolute_url)
+        lastmod = site.get_latest_lastmod()
+        sites.append({'location': absolute_url, 'lastmod': lastmod})
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append('%s?p=%s' % (absolute_url, page))
+            sites.append({'location': '%s?p=%s' % (absolute_url, page),  'lastmod': lastmod})
 
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)

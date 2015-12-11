@@ -249,6 +249,15 @@ Sitemap class reference
         be generated using all of your :setting:`LANGUAGES`. The default is
         ``False``.
 
+    .. function:: Sitemap.get_latest_lastmod()
+
+        **Optional.** A method that returns the latest value returned by :attr:`~Sitemap.lastmod()`.
+
+        By default :attr:`~Sitemap.get_latest_lastmod()` returns:
+
+        * If :attr:`~Sitemap.lastmod` is an attribute: :attr:`~Sitemap.lastmod`.
+        * If :attr:`~Sitemap.lastmod` is a method: ``None``.
+
 Shortcuts
 =========
 
@@ -261,7 +270,8 @@ The sitemap framework provides a convenience class for a common case:
     a ``queryset`` entry. This queryset will be used to generate the items
     of the sitemap. It may also have a ``date_field`` entry that
     specifies a date field for objects retrieved from the ``queryset``.
-    This will be used for the :attr:`~Sitemap.lastmod` attribute in the
+    This will be used for the :attr:`~Sitemap.lastmod()` and 
+    :attr:`~Sitemap.get_latest_lastmod()` methods in the
     generated sitemap. You may also pass :attr:`~Sitemap.priority` and
     :attr:`~Sitemap.changefreq` keyword arguments to the
     :class:`~django.contrib.sitemaps.GenericSitemap`  constructor to specify
@@ -426,6 +436,10 @@ Index
 -----
 
 The variable ``sitemaps`` is a list of absolute URLs to each of the sitemaps.
+Each URL exposes the following attributes:
+
+- ``location``
+- ``lastmod``
 
 Sitemap
 -------

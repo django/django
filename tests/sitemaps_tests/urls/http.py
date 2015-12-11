@@ -14,7 +14,7 @@ class SimpleSitemap(Sitemap):
     changefreq = "never"
     priority = 0.5
     location = '/location/'
-    lastmod = datetime.now()
+    lastmod = date.today()
 
     def items(self):
         return [object()]
