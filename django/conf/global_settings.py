@@ -481,8 +481,6 @@ AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 LOGIN_URL = '/accounts/login/'
 
-LOGOUT_URL = '/accounts/logout/'
-
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 
 # The number of days a password reset link is valid for

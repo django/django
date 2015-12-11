@@ -350,6 +350,10 @@ Miscellaneous
 * ``utils.version.get_version()`` returns :pep:`440` compliant release
   candidate versions (e.g. '1.10rc1' instead of '1.10c1').
 
+* The ``LOGOUT_URL`` setting is removed as Django hasn't made use of it
+  since pre-1.0. If you use it in your project, you can add it to your
+  project's settings. The default value was ``'/accounts/login/'``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
