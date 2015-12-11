@@ -38,7 +38,7 @@ def index(request, sitemaps,
         lastmod = site.get_latest_lastmod()
         sites.append({'location': absolute_url, 'lastmod': lastmod})
         for page in range(2, site.paginator.num_pages + 1):
-            sites.append({'location': '%s?p=%s' % (absolute_url, page),  'lastmod': lastmod})
+            sites.append({'location': '%s?p=%s' % (absolute_url, page), 'lastmod': lastmod})
 
     return TemplateResponse(request, template_name, {'sitemaps': sites},
                             content_type=content_type)
