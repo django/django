@@ -352,7 +352,7 @@ Miscellaneous
 
 * The ``LOGOUT_URL`` setting is removed as Django hasn't made use of it
   since pre-1.0. If you use it in your project, you can add it to your
-  project's settings. The default value was ``'/accounts/login/'``.
+  project's settings. The default value was ``'/accounts/logout/'``.
 
 .. _deprecated-features-1.10:
 
