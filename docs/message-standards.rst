@@ -15,7 +15,7 @@ the received data (or something else based on ``reply_channel``).
 
 All messages must be able to be encoded as JSON; channel backends don't
 necessarily have to use JSON, but we consider it the lowest common denominator
-for serialisation format compatability.
+for serialisation format compatibility.
 
 The size limit on messages is 1MB (while channel backends may support larger
 sizes, all message formats should stay under this limit, which might include

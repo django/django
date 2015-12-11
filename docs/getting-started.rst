@@ -244,7 +244,7 @@ connection, as part of the query string (e.g. ``wss://host/websocket?room=abc``)
 
 The ``reply_channel`` attribute you've seen before is our unique pointer to the
 open WebSocket - because it varies between different clients, it's how we can
-keep track of "who" a message is from. Remember, Channels is network-trasparent
+keep track of "who" a message is from. Remember, Channels is network-transparent
 and can run on multiple workers, so you can't just store things locally in
 global variables or similar.
 
@@ -384,7 +384,7 @@ Django session ID as part of the URL, like this::
 
 You can get the current session key in a template with ``{{ request.session.session_key }}``.
 Note that Channels can't work with signed cookie sessions - since only HTTP
-responses can set cookies, it needs a backend it can write to to separately to
+responses can set cookies, it needs a backend it can write to to separately
 store state.
 
 
@@ -484,7 +484,7 @@ whereas you'd naturally expect ``receive`` to run after ``connect``.
 But, of course, Channels has a solution - the ``linearize`` decorator. Any
 handler decorated with this will use locking to ensure it does not run at the
 same time as any other view with ``linearize`` **on messages with the same reply channel**.
-That means your site will happily mutitask with lots of different people's messages,
+That means your site will happily multitask with lots of different people's messages,
 but if two happen to try to run at the same time for the same client, they'll
 be deconflicted.
 

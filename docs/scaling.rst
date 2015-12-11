@@ -1,7 +1,7 @@
 Scaling
 =======
 
-Of course, one of the downsides of introducing a channel layer to Django it
+Of course, one of the downsides of introducing a channel layer to Django is
 that it's something else that must scale. Scaling traditional Django as a
 WSGI application is easy - you just add more servers and a loadbalancer. Your
 database is likely to be the thing that stopped scaling before, and there's

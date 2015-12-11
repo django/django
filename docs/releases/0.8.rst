@@ -13,7 +13,7 @@ more efficient and user friendly:
   added to allow moving the user details from the HTTP session to the channel session in the ``connect`` consumer.
 
 * A ``@linearize`` decorator was added to help ensure a ``connect``/``receive`` pair are not executed
-  simultanously on two different workers.
+  simultaneously on two different workers.
 
 * Channel backends gained locking mechanisms to support the ``linearize`` feature.
 
