@@ -117,7 +117,7 @@ Minor features
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Added support for generated ``<sitemapindex>`` to include ``<lastmod>`` 
-  through  :attr:`~django.contrib.sitemaps.Sitemap.get_latest_lastmod()`.
+  through  :meth:`~django.contrib.sitemaps.Sitemap.get_latest_lastmod()`.
 
 * Updated generated ``<sitemap>`` to include the time value of ``<lastmod>``.
 

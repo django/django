@@ -188,6 +188,10 @@ Sitemap class reference
         Django respond appropriately to requests with an ``If-Modified-Since``
         header which will prevent sending the sitemap if it hasn't changed.
 
+        .. versionadded:: 1.10
+
+            Default template now includes time value of :attr:`~Sitemap.lastmod`
+
     .. attribute:: Sitemap.changefreq
 
         **Optional.** Either a method or attribute.
@@ -253,10 +257,12 @@ Sitemap class reference
 
         **Optional.** A method that returns the latest value returned by :attr:`~Sitemap.lastmod()`.
 
-        By default :attr:`~Sitemap.get_latest_lastmod()` returns:
+        By default :meth:`~Sitemap.get_latest_lastmod()` returns:
 
         * If :attr:`~Sitemap.lastmod` is an attribute: :attr:`~Sitemap.lastmod`.
         * If :attr:`~Sitemap.lastmod` is a method: ``None``.
+
+        .. versionadded:: 1.10
 
 Shortcuts
 =========
