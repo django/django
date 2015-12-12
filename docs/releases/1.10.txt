@@ -402,6 +402,10 @@ Miscellaneous
 * The ``makemigrations --exit`` option is deprecated in favor of the
   :djadminopt:`--check` option.
 
+* ``django.utils.functional.allow_lazy()`` is deprecated in favor of the new
+  :func:`~django.utils.functional.keep_lazy` function which can be used with a
+  more natural decorator syntax.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10

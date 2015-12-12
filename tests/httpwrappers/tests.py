@@ -21,10 +21,8 @@ from django.http import (
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
-from django.utils.encoding import force_text, smart_str
-from django.utils.functional import lazy
-
-lazystr = lazy(force_text, six.text_type)
+from django.utils.encoding import smart_str
+from django.utils.functional import lazystr
 
 
 class QueryDictTests(unittest.TestCase):
