@@ -354,6 +354,9 @@ Miscellaneous
   since pre-1.0. If you use it in your project, you can add it to your
   project's settings. The default value was ``'/accounts/logout/'``.
 
+* The ``add_postgis_srs()`` backwards compatibility alias for
+  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
