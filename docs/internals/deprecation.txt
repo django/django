@@ -126,6 +126,8 @@ details on these changes.
 
 * ``django.utils.functional.allow_lazy()`` will be removed.
 
+* The ``shell --plain`` option will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
