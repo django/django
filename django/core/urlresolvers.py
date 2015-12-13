@@ -12,6 +12,7 @@ import re
 from importlib import import_module
 from threading import local
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.http import Http404
 from django.utils import lru_cache, six
@@ -469,7 +470,11 @@ class LocaleRegexURLResolver(RegexURLResolver):
     def regex(self):
         language_code = get_language()
         if language_code not in self._regex_dict:
-            regex_compiled = re.compile('^%s/' % language_code, re.UNICODE)
+            regex_compiled = (
+                re.compile('', re.UNICODE) if language_code == settings.LANGUAGE_CODE and
+                not getattr(settings, 'I18N_PREFIX_DEFAULT_LANGUAGE', True) else
+                re.compile('^%s/' % language_code, re.UNICODE)
+            )
             self._regex_dict[language_code] = regex_compiled
         return self._regex_dict[language_code]
 
