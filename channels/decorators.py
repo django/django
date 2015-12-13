@@ -81,7 +81,7 @@ def channel_session(func):
 def http_session(func):
     """
     Wraps a HTTP or WebSocket connect consumer (or any consumer of messages
-    that provides a "cooikies" or "get" attribute) to provide a "http_session"
+    that provides a "cookies" or "get" attribute) to provide a "http_session"
     attribute that behaves like request.session; that is, it's hung off of
     a per-user session key that is saved in a cookie or passed as the
     "session_key" GET parameter.
