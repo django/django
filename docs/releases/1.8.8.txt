@@ -34,3 +34,6 @@ Bugfixes
 * Fixed missing ``varchar/text_pattern_ops`` index on ``CharField`` and
   ``TextField`` respectively when using ``AlterField`` on PostgreSQL
   (:ticket:`25412`).
+
+* Fixed a state bug when using an ``AlterModelManagers`` operation
+  (:ticket:`25852`).
