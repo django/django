@@ -120,6 +120,7 @@ clearable
 clearsessions
 clickable
 clickjacking
+closeable
 cms
 codebase
 codec
