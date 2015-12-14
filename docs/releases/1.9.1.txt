@@ -40,3 +40,6 @@ Bugfixes
 
 * Fixed evaluation of zero-length slices of ``QuerySet.values()``
   (:ticket:`25894`).
+
+* Fixed a state bug when using an ``AlterModelManagers`` operation
+  (:ticket:`25852`).
