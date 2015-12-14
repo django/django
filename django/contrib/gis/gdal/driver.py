@@ -49,7 +49,7 @@ class Driver(GDALBase):
 
             # Attempting to get the GDAL/OGR driver by the string name.
             for iface in (vcapi, rcapi):
-                driver = iface.get_driver_by_name(force_bytes(name))
+                driver = c_void_p(iface.get_driver_by_name(force_bytes(name)))
                 if driver:
                     break
         elif isinstance(dr_input, int):

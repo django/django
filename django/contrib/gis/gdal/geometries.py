@@ -62,6 +62,8 @@ from django.utils.six.moves import range
 class OGRGeometry(GDALBase):
     "Generally encapsulates an OGR geometry."
 
+    destructor = capi.destroy_geom
+
     def __init__(self, geom_input, srs=None):
         "Initializes Geometry on either WKT or an OGR pointer as input."
 
@@ -118,13 +120,6 @@ class OGRGeometry(GDALBase):
 
         # Setting the class depending upon the OGR Geometry Type
         self.__class__ = GEO_CLASSES[self.geom_type.num]
-
-    def __del__(self):
-        "Deletes this Geometry."
-        try:
-            capi.destroy_geom(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     # Pickle routines
     def __getstate__(self):

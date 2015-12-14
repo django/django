@@ -14,7 +14,6 @@ from django.contrib.gis.geos import (
     LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
     fromfile, fromstr,
 )
-from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -29,49 +28,6 @@ from ..test_data import TestDataMixin
 
 @skipUnless(HAS_GEOS, "Geos is required.")
 class GEOSTest(SimpleTestCase, TestDataMixin):
-
-    def test_base(self):
-        "Tests out the GEOSBase class."
-        # Testing out GEOSBase class, which provides a `ptr` property
-        # that abstracts out access to underlying C pointers.
-        class FakeGeom1(GEOSBase):
-            pass
-
-        # This one only accepts pointers to floats
-        c_float_p = ctypes.POINTER(ctypes.c_float)
-
-        class FakeGeom2(GEOSBase):
-            ptr_type = c_float_p
-
-        # Default ptr_type is `c_void_p`.
-        fg1 = FakeGeom1()
-        # Default ptr_type is C float pointer
-        fg2 = FakeGeom2()
-
-        # These assignments are OK -- None is allowed because
-        # it's equivalent to the NULL pointer.
-        fg1.ptr = ctypes.c_void_p()
-        fg1.ptr = None
-        fg2.ptr = c_float_p(ctypes.c_float(5.23))
-        fg2.ptr = None
-
-        # Because pointers have been set to NULL, an exception should be
-        # raised when we try to access it.  Raising an exception is
-        # preferable to a segmentation fault that commonly occurs when
-        # a C method is given a NULL memory reference.
-        for fg in (fg1, fg2):
-            # Equivalent to `fg.ptr`
-            self.assertRaises(GEOSException, fg._get_ptr)
-
-        # Anything that is either not None or the acceptable pointer type will
-        # result in a TypeError when trying to assign it to the `ptr` property.
-        # Thus, memory addresses (integers) and pointers of the incorrect type
-        # (in `bad_ptrs`) will not be allowed.
-        bad_ptrs = (5, ctypes.c_char_p(b'foobar'))
-        for bad_ptr in bad_ptrs:
-            # Equivalent to `fg.ptr = bad_ptr`
-            self.assertRaises(TypeError, fg1._set_ptr, bad_ptr)
-            self.assertRaises(TypeError, fg2._set_ptr, bad_ptr)
 
     def test_wkt(self):
         "Testing WKT output."
