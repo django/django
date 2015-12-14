@@ -745,6 +745,16 @@ class ExpressionOperatorTests(TestCase):
         self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -64)
         self.assertEqual(Number.objects.get(pk=self.n.pk).float, Approximate(15.500, places=3))
 
+    def test_lefthand_bitwise_left_shift_operator(self):
+        Number.objects.update(integer=F('integer').bitleftshift(2))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 168)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -168)
+
+    def test_lefthand_bitwise_right_shift_operator(self):
+        Number.objects.update(integer=F('integer').bitrightshift(2))
+        self.assertEqual(Number.objects.get(pk=self.n.pk).integer, 10)
+        self.assertEqual(Number.objects.get(pk=self.n1.pk).integer, -11)
+
     def test_lefthand_bitwise_or(self):
         # LH Bitwise or on integers
         Number.objects.update(integer=F('integer').bitor(48))

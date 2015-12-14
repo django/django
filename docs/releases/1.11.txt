@@ -367,6 +367,9 @@ Models
   :meth:`~django.db.models.Expression.desc` to control
   the ordering of null values.
 
+* The new ``F`` expression ``bitleftshift()`` and ``bitrightshift()`` methods
+  allow :ref:`bitwise shift operations <using-f-expressions-in-filters>`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
