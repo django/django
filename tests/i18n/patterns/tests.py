@@ -7,6 +7,7 @@ from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
+from django.test.client import RequestFactory
 from django.test.utils import override_script_prefix
 from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
@@ -90,6 +91,18 @@ class URLDisabledTests(URLTestCaseBase):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
         with translation.override('nl'):
             self.assertEqual(reverse('prefixed'), '/prefixed/')
+
+
+class RequestURLConfTests(SimpleTestCase):
+
+    @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')
+    def test_request_urlconf_considered(self):
+        request = RequestFactory().get('/nl/')
+        request.urlconf = 'i18n.patterns.urls.default'
+        middleware = LocaleMiddleware()
+        with translation.override('nl'):
+            middleware.process_request(request)
+        self.assertEqual(request.LANGUAGE_CODE, 'nl')
 
 
 @override_settings(ROOT_URLCONF='i18n.patterns.urls.path_unused')

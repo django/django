@@ -1328,7 +1328,7 @@ Language prefix in URL patterns
 
 .. function:: i18n_patterns(*pattern_list)
 
-This function can be used in your root URLconf and Django will automatically
+This function can be used in a root URLconf and Django will automatically
 prepend the current active language code to all url patterns defined within
 :func:`~django.conf.urls.i18n.i18n_patterns`. Example URL patterns::
 
@@ -1373,9 +1373,15 @@ function. Example::
 
 .. warning::
 
-    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in your root
+    :func:`~django.conf.urls.i18n.i18n_patterns` is only allowed in a root
     URLconf. Using it within an included URLconf will throw an
     :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+
+.. versionchanged:: 1.10
+
+    In older version, using ``i18n_patterns`` in a root URLconf different from
+    :setting:`ROOT_URLCONF` by setting :attr:`request.urlconf
+    <django.http.HttpRequest.urlconf>` wasn't supported.
 
 .. warning::
 

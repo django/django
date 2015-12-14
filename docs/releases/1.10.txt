@@ -244,7 +244,9 @@ Generic Views
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The :func:`~django.conf.urls.i18n.i18n_patterns` helper function can now be
+  used in a root URLConf specified using :attr:`request.urlconf
+  <django.http.HttpRequest.urlconf>`.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
