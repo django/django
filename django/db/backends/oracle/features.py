@@ -20,6 +20,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_timezones = False
     has_zoneinfo_database = pytz is not None
     supports_bitwise_or = False
+    supports_bitwise_leftshift = False
+    supports_bitwise_rightshift = False
     has_native_duration_field = True
     can_defer_constraint_checks = True
     supports_partially_nullable_unique_constraints = False

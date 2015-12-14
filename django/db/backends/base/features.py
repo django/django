@@ -58,6 +58,8 @@ class BaseDatabaseFeatures(object):
     has_real_datatype = False
     supports_subqueries_in_group_by = True
     supports_bitwise_or = True
+    supports_bitwise_leftshift = True
+    supports_bitwise_rightshift = True
 
     # Is there a true datatype for uuid?
     has_native_uuid_field = False

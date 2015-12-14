@@ -652,10 +652,14 @@ that were modified more than 3 days after they were published::
     >>> from datetime import timedelta
     >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
 
-The ``F()`` objects support bitwise operations by ``.bitand()`` and
-``.bitor()``, for example::
+The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
+``.bitrightshift()`` and ``.bitleftshift()``, for example::
 
     >>> F('somefield').bitand(16)
+.. warning::
+
+    Oracle does *not* have a binary shift operator.
+
 
 The ``pk`` lookup shortcut
 --------------------------
