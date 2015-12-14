@@ -46,8 +46,9 @@ The channels have capacity, so a load of producers can write lots of messages
 into a channel with no consumers and then a consumer can come along later and
 will start getting served those queued messages.
 
-If you've used `channels in Go <https://gobyexample.com/channels>`_, these are reasonably similar to those. The key
-difference is that these channels are network-transparent; the implementations
+If you've used `channels in Go <https://gobyexample.com/channels>`_: Go channels 
+are reasonably similar to Django ones. The key difference is that 
+Django channels channels are network-transparent; the implementations
 of channels we provide are all accessible across a network to consumers
 and producers running in different processes or on different machines.
 
