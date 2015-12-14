@@ -1,4 +1,4 @@
-============
+h============
 Applications
 ============
 
@@ -44,18 +44,16 @@ introspection. That's why the application registry maintains metadata in an
 Here is a comparison of "Project vs Application" for better understanding:
 
 +--------------------+--------------------+------------------------------+
-| Topic              | Project            |Application                   |
+| Topic              | Project            | Application                  |
 +====================+====================+==============================+
 |Contains            | Settings           | Code, Views, Templates, ...  |
 +--------------------+--------------------+------------------------------+
-|Size                | Only view lines    | Can be huge                  |
+|Size                | Only few lines     | Can be huge                  |
 +--------------------+--------------------+------------------------------+
 |Can have Models     | No                 | Yes                          |
 +--------------------+--------------------+------------------------------+
-|May be re-usable    | No                 | Yes                          |
+|May be reusable     | No                 | Yes                          |
 +--------------------+--------------------+------------------------------+
-
-
 
 .. _configuring-applications-ref:
 
