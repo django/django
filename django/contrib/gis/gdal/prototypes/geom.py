@@ -26,7 +26,7 @@ def pnt_func(f):
 def topology_func(f):
     f.argtypes = [c_void_p, c_void_p]
     f.restype = c_int
-    f.errchck = bool
+    f.errcheck = lambda result, func, cargs: bool(result)
     return f
 
 # ### OGR_G ctypes function prototypes ###
