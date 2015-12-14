@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
 from datetime import datetime
@@ -5,6 +6,7 @@ from operator import attrgetter
 
 from django.db.models import Q
 from django.test import TestCase
+from django.utils.encoding import force_str
 
 from .models import Article
 
@@ -122,6 +124,12 @@ class OrLookupsTests(TestCase):
             ],
             attrgetter("headline"),
         )
+
+    def test_q_repr(self):
+        or_expr = Q(baz=Article(headline="Foö"))
+        self.assertEqual(repr(or_expr), force_str("<Q: (AND: ('baz', <Article: Foö>))>"))
+        negated_or = ~Q(baz=Article(headline="Foö"))
+        self.assertEqual(repr(negated_or), force_str("<Q: (NOT (AND: ('baz', <Article: Foö>)))>"))
 
     def test_q_negated(self):
         # Q objects can be negated

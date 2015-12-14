@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import datetime
 import warnings
 
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field, display_for_value, label_for_field, lookup_field,
@@ -16,6 +15,7 @@ from django.core.urlresolvers import NoReverseMatch
 from django.db import models
 from django.template import Library
 from django.template.loader import get_template
+from django.templatetags.static import static
 from django.utils import formats
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text

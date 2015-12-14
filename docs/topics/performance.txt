@@ -223,7 +223,7 @@ QuerySet <when-querysets-are-evaluated>`. Avoiding the premature evaluation of
 a ``QuerySet`` can save making an expensive and unnecessary trip to the
 database.
 
-Django also offers an :meth:`~django.utils.functional.allow_lazy` decorator.
+Django also offers a :meth:`~django.utils.functional.keep_lazy` decorator.
 This allows a function that has been called with a lazy argument to behave
 lazily itself, only being evaluated when it needs to be. Thus the lazy argument
 - which could be an expensive one - will not be called upon for evaluation

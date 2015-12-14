@@ -127,7 +127,11 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-* ...
+* The :ttag:`static` template tag now uses ``django.contrib.staticfiles``
+  if it's in ``INSTALLED_APPS``. This is especially useful for third-party apps
+  which can now always use ``{% load static %}`` (instead of
+  ``{% load staticfiles %}`` or ``{% load static from staticfiles %}``) and
+  not worry about whether or not the ``staticfiles`` app is installed.
 
 :mod:`django.contrib.syndication`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -169,7 +173,8 @@ File Uploads
 Forms
 ^^^^^
 
-* ...
+* Form and widget ``Media`` is now served using
+  :mod:`django.contrib.staticfiles` if installed.
 
 Generic Views
 ^^^^^^^^^^^^^
@@ -258,7 +263,9 @@ URLs
 Validators
 ^^^^^^^^^^
 
-* ...
+* :class:`~django.core.validators.URLValidator` now limits the length of
+  domain name labels to 63 characters and the total length of domain
+  names to 253 characters per :rfc:`1034`.
 
 Backwards incompatible changes in 1.10
 ======================================
@@ -323,14 +330,14 @@ when creating a user or changing usernames::
 If you wish to keep this restriction in the admin, set ``UserAdmin.add_form``
 to use this form::
 
-    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
-    class MyUserAdmin(UserAdmin):
+    class UserAdmin(BaseUserAdmin):
         add_form = MyUserCreationForm
 
     admin.site.unregister(User)
-    admin.site.register(User, MyUserAdmin)
+    admin.site.register(User, UserAdmin)
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -342,6 +349,13 @@ Miscellaneous
 
 * ``utils.version.get_version()`` returns :pep:`440` compliant release
   candidate versions (e.g. '1.10rc1' instead of '1.10c1').
+
+* The ``LOGOUT_URL`` setting is removed as Django hasn't made use of it
+  since pre-1.0. If you use it in your project, you can add it to your
+  project's settings. The default value was ``'/accounts/logout/'``.
+
+* The ``add_postgis_srs()`` backwards compatibility alias for
+  ``django.contrib.gis.utils.add_srs_entry()`` is removed.
 
 .. _deprecated-features-1.10:
 
@@ -387,6 +401,10 @@ Miscellaneous
 
 * The ``makemigrations --exit`` option is deprecated in favor of the
   :djadminopt:`--check` option.
+
+* ``django.utils.functional.allow_lazy()`` is deprecated in favor of the new
+  :func:`~django.utils.functional.keep_lazy` function which can be used with a
+  more natural decorator syntax.
 
 .. _removed-features-1.10:
 

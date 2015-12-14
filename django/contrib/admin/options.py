@@ -14,7 +14,6 @@ from django.contrib.admin.checks import (
     BaseModelAdminChecks, InlineModelAdminChecks, ModelAdminChecks,
 )
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects, flatten_fieldsets, get_deleted_objects,
@@ -577,7 +576,7 @@ class ModelAdmin(BaseModelAdmin):
             'prepopulate%s.js' % extra,
             'vendor/xregexp/xregexp.min.js',
         ]
-        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
     def get_model_perms(self, request):
         """
@@ -1820,7 +1819,7 @@ class InlineModelAdmin(BaseModelAdmin):
               'inlines%s.js' % extra]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(['SelectBox.js', 'SelectFilter2.js'])
-        return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+        return forms.Media(js=['admin/js/%s' % url for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""

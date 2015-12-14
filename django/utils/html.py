@@ -6,7 +6,7 @@ import re
 
 from django.utils import six
 from django.utils.encoding import force_str, force_text
-from django.utils.functional import allow_lazy
+from django.utils.functional import keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
 from django.utils.safestring import SafeData, SafeText, mark_safe
 from django.utils.six.moves.urllib.parse import (
@@ -38,6 +38,7 @@ hard_coded_bullets_re = re.compile(
 trailing_empty_content_re = re.compile(r'(?:<p>(?:&nbsp;|\s|<br \/>)*?</p>\s*)+\Z')
 
 
+@keep_lazy(six.text_type, SafeText)
 def escape(text):
     """
     Returns the given text with ampersands, quotes and angle brackets encoded
@@ -49,7 +50,6 @@ def escape(text):
     """
     return mark_safe(force_text(text).replace('&', '&amp;').replace('<', '&lt;')
         .replace('>', '&gt;').replace('"', '&quot;').replace("'", '&#39;'))
-escape = allow_lazy(escape, six.text_type, SafeText)
 
 _js_escapes = {
     ord('\\'): '\\u005C',
@@ -69,10 +69,10 @@ _js_escapes = {
 _js_escapes.update((ord('%c' % z), '\\u%04X' % z) for z in range(32))
 
 
+@keep_lazy(six.text_type, SafeText)
 def escapejs(value):
     """Hex encodes characters for use in JavaScript strings."""
     return mark_safe(force_text(value).translate(_js_escapes))
-escapejs = allow_lazy(escapejs, six.text_type, SafeText)
 
 
 def conditional_escape(text):
@@ -118,16 +118,16 @@ def format_html_join(sep, format_string, args_generator):
         for args in args_generator))
 
 
+@keep_lazy_text
 def linebreaks(value, autoescape=False):
     """Converts newlines into <p> and <br />s."""
-    value = normalize_newlines(value)
+    value = normalize_newlines(force_text(value))
     paras = re.split('\n{2,}', value)
     if autoescape:
         paras = ['<p>%s</p>' % escape(p).replace('\n', '<br />') for p in paras]
     else:
         paras = ['<p>%s</p>' % p.replace('\n', '<br />') for p in paras]
     return '\n\n'.join(paras)
-linebreaks = allow_lazy(linebreaks, six.text_type)
 
 
 class MLStripper(HTMLParser):
@@ -166,10 +166,12 @@ def _strip_once(value):
         return s.get_data()
 
 
+@keep_lazy_text
 def strip_tags(value):
     """Returns the given HTML with all tags stripped."""
     # Note: in typical case this loop executes _strip_once once. Loop condition
     # is redundant, but helps to reduce number of executions of _strip_once.
+    value = force_text(value)
     while '<' in value and '>' in value:
         new_value = _strip_once(value)
         if len(new_value) >= len(value):
@@ -179,13 +181,12 @@ def strip_tags(value):
             break
         value = new_value
     return value
-strip_tags = allow_lazy(strip_tags)
 
 
+@keep_lazy_text
 def strip_spaces_between_tags(value):
     """Returns the given HTML with spaces between tags removed."""
     return re.sub(r'>\s+<', '><', force_text(value))
-strip_spaces_between_tags = allow_lazy(strip_spaces_between_tags, six.text_type)
 
 
 def smart_urlquote(url):
@@ -224,6 +225,7 @@ def smart_urlquote(url):
     return urlunsplit((scheme, netloc, path, query, fragment))
 
 
+@keep_lazy_text
 def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.
@@ -321,7 +323,6 @@ def urlize(text, trim_url_limit=None, nofollow=False, autoescape=False):
         elif autoescape:
             words[i] = escape(word)
     return ''.join(words)
-urlize = allow_lazy(urlize, six.text_type)
 
 
 def avoid_wrapping(value):

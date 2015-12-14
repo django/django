@@ -2637,15 +2637,6 @@ This setting also accepts view function names and :ref:`named URL patterns
 <naming-url-patterns>` which can be used to reduce configuration duplication
 since you don't have to define the URL in two places (``settings`` and URLconf).
 
-.. setting:: LOGOUT_URL
-
-LOGOUT_URL
-----------
-
-Default: ``'/accounts/logout/'``
-
-LOGIN_URL counterpart.
-
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 
 PASSWORD_RESET_TIMEOUT_DAYS

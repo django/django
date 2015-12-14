@@ -68,13 +68,11 @@ Next, add the following at the top of ``polls/templates/polls/index.html``:
 .. snippet:: html+django
     :filename: polls/templates/polls/index.html
 
-    {% load staticfiles %}
+    {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
 
-``{% load staticfiles %}`` loads the :ttag:`{% static %} <staticfiles-static>`
-template tag from the ``staticfiles`` template library. The ``{% static %}``
-template tag generates the absolute URL of the static file.
+The ``{% static %}`` template tag generates the absolute URL of static files.
 
 That's all you need to do for development. Reload
 ``http://localhost:8000/polls/`` and you should see that the question links are

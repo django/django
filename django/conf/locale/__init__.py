@@ -429,7 +429,7 @@ LANG_INFO = {
         'bidi': False,
         'code': 'sk',
         'name': 'Slovak',
-        'name_local': 'slovenský',
+        'name_local': 'Slovensky',
     },
     'sl': {
         'bidi': False,

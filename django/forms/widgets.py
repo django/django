@@ -11,6 +11,7 @@ from itertools import chain
 
 from django.conf import settings
 from django.forms.utils import flatatt, to_current_timezone
+from django.templatetags.static import static
 from django.utils import datetime_safe, formats, six
 from django.utils.datastructures import MultiValueDict
 from django.utils.dates import MONTHS
@@ -21,7 +22,6 @@ from django.utils.formats import get_format
 from django.utils.html import conditional_escape, format_html, html_safe
 from django.utils.safestring import mark_safe
 from django.utils.six.moves import range
-from django.utils.six.moves.urllib.parse import urljoin
 from django.utils.translation import ugettext_lazy
 
 __all__ = (
@@ -77,12 +77,15 @@ class Media(object):
             ) for path in self._css[medium]
         ] for medium in media])
 
-    def absolute_path(self, path, prefix=None):
+    def absolute_path(self, path):
+        """
+        Given a relative or absolute path to a static asset, return an absolute
+        path. An absolute path will be returned unchanged while a relative path
+        will be passed to django.templatetags.static.static().
+        """
         if path.startswith(('http://', 'https://', '/')):
             return path
-        if prefix is None:
-            prefix = settings.STATIC_URL
-        return urljoin(prefix, path)
+        return static(path)
 
     def __getitem__(self, name):
         "Returns a Media object that only contains media of the given type"
