@@ -363,6 +363,10 @@ Miscellaneous
   :class:`~django.http.HttpResponse` are now closed immediately instead of when
   the WSGI server calls ``close()`` on the response.
 
+* ``obj.save()`` call in ``dlango.db.models.query.update_or_create`` is not
+  wrapped in transaction.atomic context anymore. This may affect query
+  counts tested by ``assertNumQueries`` in ``TransactionTestCase``.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
