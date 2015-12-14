@@ -1378,6 +1378,11 @@ class OperationTests(OperationTestBase):
         self.assertEqual(managers[2][0], "food_mgr_kwargs")
         self.assertIsInstance(managers[2][1], FoodManager)
         self.assertEqual(managers[2][1].args, ("x", "y", 3, 4))
+        rendered_state = new_state.apps
+        model = rendered_state.get_model('test_almoma', 'pony')
+        self.assertIsInstance(model.food_qs, models.Manager)
+        self.assertIsInstance(model.food_mgr, FoodManager)
+        self.assertIsInstance(model.food_mgr_kwargs, FoodManager)
 
     def test_alter_model_managers_emptying(self):
         """
