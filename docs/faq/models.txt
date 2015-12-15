@@ -3,8 +3,8 @@ FAQ: Databases and models
 
 .. _faq-see-raw-sql-queries:
 
-How can I see the raw SQL queries Django is running?
-----------------------------------------------------
+How can I see the raw SQL queries while Django is running?
+----------------------------------------------------------
 
 Make sure your Django :setting:`DEBUG` setting is set to ``True``.
 Then, just do this::
