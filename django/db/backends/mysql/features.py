@@ -47,6 +47,12 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self._mysql_storage_engine != 'MyISAM'
 
     @cached_property
+    def can_return_last_inserted_id_with_auto_is_null(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT @@SQL_AUTO_IS_NULL")
+            return cursor.fetchone()[0] == 1
+
+    @cached_property
     def supports_microsecond_precision(self):
         # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
         # about requiring MySQLdb 1.2.5
