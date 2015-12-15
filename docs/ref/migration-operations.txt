@@ -237,7 +237,18 @@ equivalent to the SQL in terms of project state; for example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
 model (otherwise, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again).
+operation that adds that field and so will try to run it again). For example::
+
+    migrations.RunSQL(
+        "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
+        state_operations=[
+            migrations.AddField(
+                'musician',
+                'name',
+                models.CharField(max_length=255),
+            ),
+        ],
+    )
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making
