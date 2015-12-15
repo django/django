@@ -36,7 +36,7 @@ here's an example for a remote Redis server::
 
     CHANNEL_BACKENDS = {
         "default": {
-            "BACKEND": "channels.backends.redis.RedisChannelBackend",
+            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
             "HOSTS": [("redis-channel", 6379)],
         },
     }

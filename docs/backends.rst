@@ -21,7 +21,7 @@ but you can override this with the ``HOSTS`` setting::
 
     CHANNEL_BACKENDS = {
         "default": {
-            "BACKEND": "channels.backends.redis.RedisChannelBackend",
+            "BACKEND": "channels.backends.redis_py.RedisChannelBackend",
             "HOSTS": [("redis-channel-1", 6379), ("redis-channel-2", 6379)],
         },
     }
