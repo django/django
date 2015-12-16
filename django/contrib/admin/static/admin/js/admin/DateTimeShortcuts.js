@@ -21,7 +21,7 @@
         init: function() {
             var body = document.getElementsByTagName('body')[0];
             var serverOffset = body.getAttribute('data-admin-utc-offset');
-            if (serverOffset !== undefined) {
+            if (serverOffset) {
                 var localOffset = new Date().getTimezoneOffset() * -60;
                 DateTimeShortcuts.timezoneOffset = localOffset - serverOffset;
             }
@@ -43,7 +43,7 @@
         now: function() {
             var body = document.getElementsByTagName('body')[0];
             var serverOffset = body.getAttribute('data-admin-utc-offset');
-            if (serverOffset !== undefined) {
+            if (serverOffset) {
                 var localNow = new Date();
                 var localOffset = localNow.getTimezoneOffset() * -60;
                 localNow.setTime(localNow.getTime() + 1000 * (serverOffset - localOffset));

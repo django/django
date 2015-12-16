@@ -46,3 +46,7 @@ Bugfixes
 
 * Fixed ``TypedChoiceField`` change detection with nullable fields
   (:ticket:`25942`).
+
+* Fixed incorrect timezone warnings in custom admin templates that don't have
+  a ``data-admin-utc-offset`` attribute in the ``body`` tag.
+  (:ticket:`25845`).
