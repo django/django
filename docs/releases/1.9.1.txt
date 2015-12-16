@@ -43,3 +43,6 @@ Bugfixes
 
 * Fixed a state bug when using an ``AlterModelManagers`` operation
   (:ticket:`25852`).
+
+* Fixed ``TypedChoiceField`` change detection with nullable fields
+  (:ticket:`25942`).
