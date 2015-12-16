@@ -22,10 +22,12 @@ class RedisChannelBackend(BaseChannelBackend):
         # Make sure they provided some hosts, or provide a default
         if not hosts:
             hosts = [("localhost", 6379)]
-        for host, port in hosts:
-            assert isinstance(host, six.string_types)
-            assert int(port)
-        self.hosts = hosts
+        self.hosts = []
+        for entry in hosts:
+            if isinstance(entry, six.string_types):
+                self.hosts.append(entry)
+            else:
+                self.hosts.append("redis://%s:%d/0" % (entry[0],entry[1]))
         self.prefix = prefix
         # Precalculate some values for ring selection
         self.ring_size = len(self.hosts)
@@ -57,8 +59,7 @@ class RedisChannelBackend(BaseChannelBackend):
         # Catch bad indexes
         if not (0 <= index < self.ring_size):
             raise ValueError("There are only %s hosts - you asked for %s!" % (self.ring_size, index))
-        host, port = self.hosts[index]
-        return redis.Redis(host=host, port=port)
+        return redis.Redis.from_url(self.hosts[index])
 
     def send(self, channel, message):
         # if channel is no str (=> bytes) convert it
