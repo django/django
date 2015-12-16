@@ -43,3 +43,7 @@ Bugfixes
 
 * Fixed a state bug when using an ``AlterModelManagers`` operation
   (:ticket:`25852`).
+
+* Fixed incorrect timezone warnings in custom admin templates that don't have
+  a data-admin-utc-offset attribute in the body tag.
+  (:ticket:`25845`).
