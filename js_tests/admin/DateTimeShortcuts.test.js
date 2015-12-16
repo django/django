@@ -16,4 +16,8 @@ test('init', function(assert) {
     assert.equal(shortcuts.length, 1);
     assert.equal(shortcuts.find('a:first').text(), 'Today');
     assert.equal(shortcuts.find('a:last .date-icon').length, 1);
+
+    // To prevent incorrect timezone warnings on date/time widgets, timezoneOffset
+    // should be 0 when a timezone offset isn't set in the HTML body attribute.
+    assert.equal(DateTimeShortcuts.timezoneOffset, 0);
 });
