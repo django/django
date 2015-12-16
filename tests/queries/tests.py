@@ -3861,14 +3861,15 @@ class Ticket23622Tests(TestCase):
 
 
 class ExcludeCombineTests(TestCase):
-    def setUp(self):
-        self.o1 = Order.objects.create(id=1)
-        self.o2 = Order.objects.create(id=2)
-        self.o3 = Order.objects.create(id=3)
-        OrderItem.objects.create(order=self.o1, status=1)
-        OrderItem.objects.create(order=self.o2, status=1)
-        OrderItem.objects.create(order=self.o3, status=1)
-        OrderItem.objects.create(order=self.o1, status=2)
+    @classmethod
+    def setUpTestData(cls):
+        cls.o1 = Order.objects.create(id=1)
+        cls.o2 = Order.objects.create(id=2)
+        cls.o3 = Order.objects.create(id=3)
+        OrderItem.objects.create(order=cls.o1, status=1)
+        OrderItem.objects.create(order=cls.o2, status=1)
+        OrderItem.objects.create(order=cls.o3, status=1)
+        OrderItem.objects.create(order=cls.o1, status=2)
 
     def test_dual_filter_multijoin(self):
         self.assertQuerysetEqual(
