@@ -1191,12 +1191,13 @@ class Query(object):
     def add_filter(self, filter_clause):
         self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
-    def find_base_splits(self, q_object, found_splits, in_negated=False, path=None):
+    def find_base_splits(self, q_object, in_negated=False, path=None):
         """
         Finds those q-objects that have a reference to a multivalued join.
         """
         if isinstance(q_object, dict):
             raise FieldError("Cannot parse keyword query as dict")
+        found_splits = {}
         if q_object.negated:
             in_negated = True
         if path is None:
@@ -1204,31 +1205,78 @@ class Query(object):
         for pos, obj in enumerate(q_object.children):
             path.append(pos)
             if isinstance(obj, tuple):
-                try:
-                    self.names_to_path(obj[0].split(LOOKUP_SEP), self.get_meta(), fail_on_missing=False, allow_many=False)
-                except FieldError:
-                    pass
-                except MultiJoin as e:
-                    found_splits[tuple(path)] = (LOOKUP_SEP.join(i[0] for i in e.names_with_path), in_negated)
+                if in_negated:
+                    # obj if of form (somefield__lte, value)
+                    try:
+                        self.names_to_path(obj[0].split(LOOKUP_SEP), self.get_meta(), fail_on_missing=False,
+                                           allow_many=False)
+                    except FieldError:
+                        # Erroneous filters will be reported to the user later on.
+                        pass
+                    except MultiJoin as e:
+                        found_splits[tuple(path)] = LOOKUP_SEP.join(i[0] for i in e.names_with_path)
             else:
-                self.find_base_splits(obj, found_splits, in_negated, path)
+                found_splits.update(self.find_base_splits(obj, in_negated, path))
             path.pop()
+        return found_splits
 
-    def find_m2m_ancestors(self, found_splits):
+    def find_common_multirefs(self, q_object, found_prefixes, found_paths, path=None):
+        """
+        Find those Q-objects that references a multivalued join mentioned
+        in for_prefixes. The for_prefixes is a set of lookup paths
+        ('friends', 'best_friend__books').
+        """
+        if isinstance(q_object, dict):
+            raise FieldError("Cannot parse keyword query as dict")
+        found_splits = {}
+        if path is None:
+            path = [0]
+        for pos, obj in enumerate(q_object.children):
+            path.append(pos)
+            if isinstance(obj, tuple):
+                if tuple(path) not in found_paths:
+                    try:
+                        self.names_to_path(obj[0].split(LOOKUP_SEP), self.get_meta(), fail_on_missing=False,
+                                           allow_many=False)
+                    except FieldError:
+                        # Erroneous filters will be reported to the user later on.
+                        pass
+                    except MultiJoin as e:
+                        # Check if this is a reference to a path passed in prefixes.
+                        lookup_path = LOOKUP_SEP.join(i[0] for i in e.names_with_path)
+                        if lookup_path in found_prefixes:
+                            found_splits[tuple(path)] = lookup_path
+            else:
+                found_splits.update(self.find_common_multirefs(obj, found_prefixes, found_paths, path))
+            path.pop()
+        return found_splits
+
+    def find_ancestors(self, found_splits):
+        """
+        Finds the upmost node combining the items in found_splits.
+        """
+        # Example, if found_splits is:
+        #    (0, 1, 0) => 'friends'
+        #    (0, 2, 0) => 'friends'
+        # results in path (0,). If found_splits is:
+        #    (0, 1, 0) => 'friends'
+        #    (0, 1, 1) => 'friends'
+        #    (0, 2) => 'books'
+        # Results in path (0, 1), (0, 2)
         seen_names = {}
-        for path, (names, forced_subq) in found_splits.items():
+        for path, names in found_splits.items():
             if names in seen_names:
-                path2, forced_subq2 = seen_names[names]
+                path2 = seen_names[names]
                 common_path = []
                 for p1, p2 in zip(path, path2):
                     if p1 == p2:
                         common_path.append(p1)
                     else:
                         break
-                seen_names[names] = (tuple(common_path), forced_subq or forced_subq2)
+                seen_names[names] = tuple(common_path)
             else:
-                seen_names[names] = (path, forced_subq)
-        return dict((v, k) for k, (v, forced_subq) in seen_names.items() if forced_subq)
+                seen_names[names] = path
+        return set(seen_names.values())
 
     def mark_split_nodes(self, q_object, found_splits, path=None):
         """
@@ -1253,35 +1301,52 @@ class Query(object):
             else:
                 if tuple(path) in found_splits:
                     obj.subq_split_pos = True
-                self.mark_split_nodes(obj, found_splits, path)
+                else:
+                    self.mark_split_nodes(obj, found_splits, path)
             path.pop()
         return q_object
 
-    def split_q_to_subqueries(self, q_object, found_splits=None, in_negated=False, path=None):
+    def mark_q_for_subqueries(self, q_object):
         """
         Returns q_object to be used directly with .filter(), and then
         another q_object that needs to be pushed into a subquery.
         """
         # The rules for when a clause needs to be changed to an subquery clause:
         #    A. base case is a negated reference to multivalued join (~Q(books__pages__lte=100))
-        #    B. if two clauses refer to the *same* multivalued join, then the upmost node
-        #      combining the clauses must be pushed to the subquery clause
-        # found_splits is a dictionary of the node's path (expressed as node.children
-        # positions, for example [0, 1] -> first node's second child) to the lookup name
-        # found, and if the clause requires a subquery.
+        #    B. if two clauses refer to the *same* multivalued join, and at least one of them
+        #      matches case A, then the upmost node combining the clauses must be pushed to the
+        #      subquery clause
         #
-        # Note that we are effectively doing a transform like this here:
+        # The found_splits variable is a dictionary of the node's path (expressed as
+        # node.children positions, for example [0, 1] -> first node's second child) to the
+        # lookup name found, and if the clause requires a subquery.
+        #
+        # Note that we are aiming for a transform like:
         #   qs.exclude(m2m_join__foo=bar) == qs.exclude(pk__in=qs.filter(m2m_join__foo=bar))
+        #
         # That is, if we assume we generate correct filter() for the m2m_join__foo=bar, then
         # we can always generate a correct exclude by using exclude(pk__in=filtered_qs).
+        #
         # If we have more than one clause targeting the same multijoin, then all such clauses
         # must be pushed to the same subquery.
-        found_splits = found_splits if found_splits is not None else {}
-        self.find_base_splits(q_object, found_splits)
+        #
+        # An example:
+        #   qs.filter(Q(authors__age__lte=20), ~Q(authors__height__gte=180))
+        #
+        # The second Q-object matches case A. The first Q-object targets the same
+        # relation, so it must also be pushed to the subquery by case B.
+
+        # Find the cases matching A.
+        found_splits = self.find_base_splits(q_object)
         if not found_splits:
             return q_object
-        found_splits = self.find_m2m_ancestors(found_splits)
-        return self.mark_split_nodes(q_object.clone(), found_splits)
+        # Add in the cases matching B.
+        found_splits.update(
+            self.find_common_multirefs(q_object, set(found_splits.values()),
+                                       set(found_splits.keys())))
+        # Find the upmost node combining the clauses.
+        found_split_paths = self.find_ancestors(found_splits)
+        return self.mark_split_nodes(q_object.clone(), found_split_paths)
 
     def add_q(self, q_object, reuse_joins=False):
         """
@@ -1298,7 +1363,7 @@ class Query(object):
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
         # Determine which clauses must be pushed to same subquery, the base
         # model for that subquery, and trimmed subquery path.
-        q_object = self.split_q_to_subqueries(q_object)
+        q_object = self.mark_q_for_subqueries(q_object)
         clause, _ = self._add_q(q_object, set() if not reuse_joins else set(self.tables))
         if clause:
             self.where.add(clause, AND)
