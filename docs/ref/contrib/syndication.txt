@@ -759,7 +759,7 @@ This example illustrates all possible attributes and methods for a
             ``django.utils.feedgenerator.Enclosure`` objects.
             """
 
-        def item_enclosure_url(self):
+        def item_enclosures(self):
             """
             Returns the ``django.utils.feedgenerator.Enclosure`` list for every
             item in the feed.
