@@ -18,8 +18,8 @@ This would then be supplemented by two implementations of the "worker" end of th
 
 All three components would need to share the channel backend implementations - there is still an unanswered question here about if those should be separate packages, or somehow bundled into the implementations themselves.
 
-Preserving Simplicty
---------------------
+Preserving Simplicity
+---------------------
 
 A main goal of the channels project is to keep the ability to just download and use Django as simple as it is now, which means that for every external dependency we introduce, there needs to be a way to work round it to just run Django in "classic" mode if the user wants to.
 
@@ -38,7 +38,7 @@ Message format standardisation shouldn't be too hard; the top-level constraint o
 
 Transport standardisation is different, though; the current approach is to have a standard backend interface that either core backends or third-party ones can implement, much like Django's database support; this would seem to fill the immediate need of both having core, tested and scalable transports as well as the option for more complex projects with special requirements to write their own.
 
-That said, the current proposed system is just one transport standard away from being able to interoperate with other languages; specifically, one can imagine an interface server written in a compiled language like Go or Rust that is more efficient that its Python equivalent (or even a Python implementation that uses a concurrency model that doesn't fit the channel backend's poll-style interface).
+That said, the current proposed system is just one transport standard away from being able to interoperate with other languages; specifically, one can imagine an interface server written in a compiled language like Go or Rust that is more efficient than its Python equivalent (or even a Python implementation that uses a concurrency model that doesn't fit the channel backend's poll-style interface).
 
 It may be that the Redis backend itself is written up and standardised as well to provide a clear spec that third parties can code against from scratch; however, this will need to be after a period of iterative testing to ensure whatever is proposed can scale to handle both large messages and large volumes of messages, and can shard horizontally.
 
