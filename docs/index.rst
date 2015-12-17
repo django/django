@@ -30,5 +30,6 @@ Contents:
    message-standards
    scaling
    backends
+   integration-plan
    faqs
    releases/index
