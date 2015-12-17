@@ -1,11 +1,12 @@
 from django.apps import apps
 from django.core import management
+from django.db import migrations
 from django.db.models import signals
 from django.test import TestCase, override_settings
 from django.utils import six
 
 APP_CONFIG = apps.get_app_config('migrate_signals')
-PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using']
+PRE_MIGRATE_ARGS = ['app_config', 'verbosity', 'interactive', 'using', 'plan']
 MIGRATE_DATABASE = 'default'
 MIGRATE_VERBOSITY = 1
 MIGRATE_INTERACTIVE = False
@@ -74,6 +75,7 @@ class MigrateSignalTests(TestCase):
         self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
         self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
         self.assertEqual(args['using'], 'default')
+        self.assertEqual(args['plan'], [])
 
     @override_settings(MIGRATION_MODULES={'migrate_signals': 'migrate_signals.custom_migrations'})
     def test_pre_migrate_migrations_only(self):
@@ -93,3 +95,6 @@ class MigrateSignalTests(TestCase):
         self.assertEqual(args['verbosity'], MIGRATE_VERBOSITY)
         self.assertEqual(args['interactive'], MIGRATE_INTERACTIVE)
         self.assertEqual(args['using'], 'default')
+        self.assertIsInstance(args['plan'][0][0], migrations.Migration)
+        # The migration isn't applied backward.
+        self.assertFalse(args['plan'][0][1])

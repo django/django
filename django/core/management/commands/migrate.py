@@ -140,7 +140,7 @@ class Command(BaseCommand):
                         % (targets[0][1], targets[0][0])
                     )
 
-        emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias)
+        emit_pre_migrate_signal(self.verbosity, self.interactive, connection.alias, plan)
 
         # Run the syncdb phase.
         if run_syncdb:
@@ -178,7 +178,7 @@ class Command(BaseCommand):
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
-        emit_post_migrate_signal(self.verbosity, self.interactive, connection.alias)
+        emit_post_migrate_signal(self.verbosity, self.interactive, connection.alias, plan)
 
     def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:
