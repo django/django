@@ -1527,3 +1527,22 @@ class TranslationFilesMissing(TestCase):
         self.patchGettextFind()
         trans_real._translations = {}
         self.assertRaises(IOError, activate, 'en')
+
+
+class NonDjangoLanguageTests(SimpleTestCase):
+    """
+    A language non present in default Django languages can still be
+    installed/used by a Django project.
+    """
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en-us', 'English'),
+            ('xxx', 'Somelanguage'),
+        ],
+        LANGUAGE_CODE='xxx',
+        LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
+    )
+    def test_non_django_language(self):
+        self.assertEqual(get_language(), 'xxx')
+        self.assertEqual(ugettext("year"), "reay")
