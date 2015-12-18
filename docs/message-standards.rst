@@ -36,9 +36,13 @@ Contains the following keys:
 * get: Dict of {key: [value, ...]} of GET variables (keys and values are strings)
 * post: Dict of {key: [value, ...]} of POST variables (keys and values are strings)
 * cookies: Dict of cookies as {cookie_name: cookie_value} (names and values are strings)
+* headers: Dict of {header name: value}. Multiple headers of the same name are concatenated into one value separated by commas.
 * meta: Dict of HTTP headers and info as defined in the Django Request docs (names and values are strings)
 * path: String, full path to the requested page, without query string or domain
+* root_path: Path designated as the "root" of the application (SCRIPT_NAME)
 * method: String, upper-cased HTTP method
+* server: [host, port] showing the address the client connected to
+* client: [host, port] of the remote client
 
 Should come with an associated ``reply_channel`` which accepts HTTP Responses.
 
