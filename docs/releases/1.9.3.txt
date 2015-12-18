@@ -49,3 +49,6 @@ Bugfixes
 
 * Fixed a crash when passing a nonexistent template name to the cached template
   loader's ``load_template()`` method (:ticket:`26280`).
+
+* Prevented ``ContentTypeManager`` instances from sharing their cache
+  (:ticket:`26286`).
