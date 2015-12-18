@@ -152,6 +152,7 @@ class Command(BaseCommand):
         if self.verbosity >= 1:
             self.stdout.write(self.style.MIGRATE_HEADING("Running migrations:"))
         if not plan:
+            post_migrate_project_state = None
             executor.check_replacements()
             if self.verbosity >= 1:
                 self.stdout.write("  No migrations to apply.")
@@ -174,11 +175,16 @@ class Command(BaseCommand):
         else:
             fake = options.get("fake")
             fake_initial = options.get("fake_initial")
-            executor.migrate(targets, plan, fake=fake, fake_initial=fake_initial)
+            post_migrate_project_state = executor.migrate(
+                targets, plan, fake=fake, fake_initial=fake_initial,
+            )
 
         # Send the post_migrate signal, so individual apps can do whatever they need
         # to do at this point.
-        emit_post_migrate_signal(self.verbosity, self.interactive, connection.alias)
+        emit_post_migrate_signal(
+            self.verbosity, self.interactive, connection.alias, plan=plan,
+            project_state=post_migrate_project_state, loader=executor.loader,
+        )
 
     def migration_progress_callback(self, action, migration=None, fake=False):
         if self.verbosity >= 1:
