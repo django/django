@@ -1,7 +1,55 @@
 from django.apps import apps
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
+from django.db.utils import IntegrityError
 from django.utils import six
 from django.utils.six.moves import input
+
+
+class RenameContentType(migrations.RunPython):
+    def __init__(self, app_label, old_name, new_name):
+        self.app_label = app_label
+        self.old_name = old_name
+        self.new_name = new_name
+        super(RenameContentType, self).__init__(self.rename_forward, self.rename_backward)
+
+    def _rename(self, apps, old_name, new_name):
+        ContentType = apps.get_model('contenttypes', 'ContentType')
+        try:
+            content_type = ContentType.objects.get_by_natural_key(self.app_label, old_name.lower())
+        except ContentType.DoesNotExist:
+            pass
+        else:
+            content_type.model = new_name.lower()
+            using = router.db_for_write(ContentType, instance=content_type)
+            try:
+                with transaction.atomic(using=using):
+                    content_type.save(update_fields={'model'})
+            except IntegrityError:
+                # Gracefully fallback if a stale content type causes a conflict.
+                pass
+
+    def rename_forward(self, apps, schema_editor):
+        self._rename(apps, self.old_name, self.new_name)
+
+    def rename_backward(self, apps, schema_editor):
+        self._rename(apps, self.new_name, self.old_name)
+
+
+def rename_contenttypes(plan=None, **kwargs):
+    """
+    Inserts a `RenameContentType` operation after every planned
+    `RenameModel` operation.
+    """
+    if plan is None:
+        plan = []
+    for migration, _backward in plan:
+        inserts = []
+        for index, operation in enumerate(migration.operations):
+            if isinstance(operation, migrations.RenameModel):
+                operation = RenameContentType(migration.app_label, operation.old_name, operation.new_name)
+                inserts.append((index + 1, operation))
+        for inserted, (index, operation) in enumerate(inserts):
+            migration.operations.insert(inserted + index, operation)
 
 
 def update_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
