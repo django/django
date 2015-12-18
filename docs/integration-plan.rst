@@ -23,9 +23,9 @@ Preserving Simplicity
 
 A main goal of the channels project is to keep the ability to just download and use Django as simple as it is now, which means that for every external dependency we introduce, there needs to be a way to work round it to just run Django in "classic" mode if the user wants to.
 
-The first key part of this is the WSGI interface server - it just plugs in as a WSGI application and routes things to the channel layer. Combined with an in-memory channel backend option, this means that the existing out-of-the-box setup will continue to work, with no need to have Redis around, or Autobahn/Twisted/asyncio installed.
+To this end, Django will still be deployable with a WSGI server as it is now, with all channels-dependent features disabled, and when it ships, will fall back to a standard WSGI `runserver` if the dependencies to run a more complex interface server aren't installed (but if they are, `runserver` will become websocket-aware).
 
-It's possible that Django 1.10 would come bundled with the interface server (``daphne``) in the tarball download, but bring it in as a dependency for package-manager-based installations (``pip`` as well as OS packages). This could also be how we handle sharing channel backend code between them.
+There will also be options to plug Channels into a WSGI server as a WSGI application that then forwards into a channel backend, if users wish to keep using familiar webservers but still run a worker cluster and gain things like background tasks (or WebSockets using a second server process)
 
 Standardization
 ---------------
@@ -61,9 +61,8 @@ Neither are perfect; the first likely means some nasty monkeypatching or more, e
 WSGI attribute access
 ---------------------
 
-While Channels transports across a lot of the data available on a WSGI request - like paths, remote client IPs, POST data and so forth - it cannot reproduce everything. Specifically, the following changes will happen to Django request objects:
+While Channels transports across a lot of the data available on a WSGI request - like paths, remote client IPs, POST data and so forth - it cannot reproduce everything. Specifically, the following changes will happen to Django request objects when they come via Channels:
 
-- The SCRIPT_NAME attribute will always be ``""``, and so the ``PATH_INFO`` will always be the full path.
 - ``request.META`` will not contain any environment variables from the system.
 - The ``wsgi`` keys in ``request.META`` will change as follows:
   - ``wsgi.version`` will be set to ``(1, 0)``
