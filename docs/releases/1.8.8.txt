@@ -37,3 +37,6 @@ Bugfixes
 
 * Fixed a state bug when using an ``AlterModelManagers`` operation
   (:ticket:`25852`).
+
+* Fixed a regression which prevented using a language not in Django's default
+  language list (:setting:`LANGUAGES`) (:ticket:`25915`).

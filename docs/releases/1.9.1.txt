@@ -50,3 +50,6 @@ Bugfixes
 * Fixed incorrect timezone warnings in custom admin templates that don't have
   a ``data-admin-utc-offset`` attribute in the ``body`` tag.
   (:ticket:`25845`).
+
+* Fixed a regression which prevented using a language not in Django's default
+  language list (:setting:`LANGUAGES`) (:ticket:`25915`).
