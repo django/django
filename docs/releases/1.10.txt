@@ -199,6 +199,9 @@ Management Commands
   command exit with a non-zero status when model changes without migrations are
   detected.
 
+* The new :djadminopt:`shell --command <command>` option lets you run a command
+  as Django and exit (instead of opening the interactive shell).
+
 Migrations
 ^^^^^^^^^^
 
