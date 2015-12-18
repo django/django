@@ -18,6 +18,7 @@ def encode_request(request):
             if k.lower().startswith("http_")
         },
         "path": request.path,
+        "root_path": request.META.get("SCRIPT_NAME", ""),
         "method": request.method,
         "reply_channel": request.reply_channel,
         "server": [
@@ -51,11 +52,14 @@ def decode_request(value):
         "SERVER_PORT": value["server"][1],
         "REMOTE_ADDR": value["client"][0],
         "REMOTE_HOST": value["client"][0],  # Not the DNS name, hopefully fine.
+        "SCRIPT_NAME": value["root_path"],
     }
     for header, header_value in value.get("headers", {}).items():
         request.META["HTTP_%s" % header.upper()] = header_value
-    # We don't support non-/ script roots
-    request.path_info = value['path']
+    # Derive path_info from script root
+    request.path_info = request.path
+    if request.META.get("SCRIPT_NAME", ""):
+        request.path_info = request.path_info[len(request.META["SCRIPT_NAME"]):]
     return request
 
 
