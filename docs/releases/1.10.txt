@@ -99,6 +99,11 @@ Minor features
   of :class:`~django.contrib.gis.geos.WKTWriter` allow controlling
   output of the fractional part of the coordinates in WKT.
 
+* Added the :attr:`LineString.closed
+  <django.contrib.gis.geos.LineString.closed>` and
+  :attr:`MultiLineString.closed
+  <django.contrib.gis.geos.MultiLineString.closed>` properties.
+
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
