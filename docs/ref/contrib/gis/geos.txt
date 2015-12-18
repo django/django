@@ -484,7 +484,7 @@ The normalized version takes the distance as a float between 0 (origin) and 1
 
 Reverse of :meth:`GEOSGeometry.project`.
 
-.. method:: GEOSGeometry:intersection(other)
+.. method:: GEOSGeometry.intersection(other)
 
 Returns a :class:`GEOSGeometry` representing the points shared by this
 geometry and other.
