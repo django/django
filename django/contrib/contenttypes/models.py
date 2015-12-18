@@ -13,13 +13,15 @@ from django.utils.translation import ugettext_lazy as _
 class ContentTypeManager(models.Manager):
     use_in_migrations = True
 
-    # Cache to avoid re-looking up ContentType objects all over the place.
-    # This cache is shared by all the get_for_* methods.
-    _cache = {}
+    def __init__(self, *args, **kwargs):
+        super(ContentTypeManager, self).__init__(*args, **kwargs)
+        # Cache shared by all the get_for_* methods to speed up
+        # ContentType retrieval.
+        self._cache = {}
 
     def get_by_natural_key(self, app_label, model):
         try:
-            ct = self.__class__._cache[self.db][(app_label, model)]
+            ct = self._cache[self.db][(app_label, model)]
         except KeyError:
             ct = self.get(app_label=app_label, model=model)
             self._add_to_cache(self.db, ct)
@@ -34,7 +36,7 @@ class ContentTypeManager(models.Manager):
 
     def _get_from_cache(self, opts):
         key = (opts.app_label, opts.model_name)
-        return self.__class__._cache[self.db][key]
+        return self._cache[self.db][key]
 
     def create(self, **kwargs):
         if 'name' in kwargs:
@@ -129,7 +131,7 @@ class ContentTypeManager(models.Manager):
         (though ContentTypes are obviously not created on-the-fly by get_by_id).
         """
         try:
-            ct = self.__class__._cache[self.db][id]
+            ct = self._cache[self.db][id]
         except KeyError:
             # This could raise a DoesNotExist; that's correct behavior and will
             # make sure that only correct ctypes get stored in the cache dict.
@@ -144,15 +146,15 @@ class ContentTypeManager(models.Manager):
         django.contrib.contenttypes.management.update_contenttypes for where
         this gets called).
         """
-        self.__class__._cache.clear()
+        self._cache.clear()
 
     def _add_to_cache(self, using, ct):
         """Insert a ContentType into the cache."""
         # Note it's possible for ContentType objects to be stale; model_class() will return None.
         # Hence, there is no reliance on model._meta.app_label here, just using the model fields instead.
         key = (ct.app_label, ct.model)
-        self.__class__._cache.setdefault(using, {})[key] = ct
-        self.__class__._cache.setdefault(using, {})[ct.id] = ct
+        self._cache.setdefault(using, {})[key] = ct
+        self._cache.setdefault(using, {})[ct.id] = ct
 
 
 @python_2_unicode_compatible

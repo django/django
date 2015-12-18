@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 import warnings
 
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.models import ContentType, ContentTypeManager
 from django.contrib.contenttypes.views import shortcut
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.utils import IntegrityError, OperationalError, ProgrammingError
@@ -169,6 +169,18 @@ class ContentTypesTests(TestCase):
             DeferredConcreteModel: concrete_model_ct,
             DeferredProxyModel: proxy_model_ct,
         })
+
+    def test_cache_not_shared_between_managers(self):
+        with self.assertNumQueries(1):
+            ContentType.objects.get_for_model(ContentType)
+        with self.assertNumQueries(0):
+            ContentType.objects.get_for_model(ContentType)
+        other_manager = ContentTypeManager()
+        other_manager.model = ContentType
+        with self.assertNumQueries(1):
+            other_manager.get_for_model(ContentType)
+        with self.assertNumQueries(0):
+            other_manager.get_for_model(ContentType)
 
     @override_settings(ALLOWED_HOSTS=['example.com'])
     def test_shortcut_view(self):
