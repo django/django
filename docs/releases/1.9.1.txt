@@ -58,3 +58,6 @@ Bugfixes
   behind ``AppRegistryNotReady`` when starting ``runserver`` (:ticket:`25510`).
   This regression appeared in 1.8.5 as a side effect of fixing :ticket:`24704`
   and by mistake the fix wasn't applied to the ``stable/1.9.x`` branch.
+
+* Fixed ``migrate --fake-initial`` detection of many-to-many tables
+  (:ticket:`25922`).
