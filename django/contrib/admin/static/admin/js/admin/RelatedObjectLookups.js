@@ -2,7 +2,7 @@
 // Handles related-objects functionality: lookup link for raw_id_fields
 // and Add Another links.
 
-(function() {
+(function($) {
     'use strict';
 
     function html_unescape(text) {
@@ -157,4 +157,25 @@
     window.showAddAnotherPopup = showRelatedObjectPopup;
     window.dismissAddAnotherPopup = dismissAddRelatedObjectPopup;
 
-})();
+    $(document).ready(function() {
+        $('body').on('click', '.related-widget-wrapper-link', function(e) {
+            e.preventDefault();
+            if (this.href) {
+                var event = $.Event('django:show-related', {href: this.href});
+                $(this).trigger(event);
+                if (!event.isDefaultPrevented()) {
+                    showRelatedObjectPopup(this);
+                }
+            }
+        });
+        $('body').on('change', '.related-widget-wrapper select', function(e) {
+            var event = $.Event('django:update-related');
+            $(this).trigger(event);
+            if (!event.isDefaultPrevented()) {
+                updateRelatedObjectLinks(this);
+            }
+        });
+        $('.related-widget-wrapper select').trigger('change');
+    });
+
+})(django.jQuery);
