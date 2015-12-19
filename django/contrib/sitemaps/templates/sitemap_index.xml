@@ -4,7 +4,7 @@
 {% for section in sitemaps %}
   <sitemap>
     <loc>{{ section.location }}</loc>
-    {% if section.lastmod %}<lastmod>{{ section.lastmod|date:"c" }}</lastmod>{% endif %}
+    {% if section.lastmod %}<lastmod>{{ section.lastmod|date:"c" }}{% if section.lastmod.time and not section.lastmod.tzinfo %}Z{% endif %}</lastmod>{% endif %}
   </sitemap>
 {% endfor %}
 {% endspaceless %}
