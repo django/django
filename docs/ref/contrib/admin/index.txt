@@ -1615,8 +1615,9 @@ templates used by the :class:`ModelAdmin` views:
                     kwargs["queryset"] = Car.objects.filter(owner=request.user)
                 return super(MyModelAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-    This uses the ``HttpRequest`` instance to filter the ``Car`` foreign key
-    field to only display the cars owned by the ``User`` instance.
+    This uses the :class:`~django.http.HttpRequest` instance to filter the
+    ``Car`` foreign key field to only display the cars owned by the ``User``
+    instance.
 
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
