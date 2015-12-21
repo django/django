@@ -48,7 +48,7 @@ will start getting served those queued messages.
 
 If you've used `channels in Go <https://gobyexample.com/channels>`_: Go channels 
 are reasonably similar to Django ones. The key difference is that 
-Django channels channels are network-transparent; the implementations
+Django channels are network-transparent; the implementations
 of channels we provide are all accessible across a network to consumers
 and producers running in different processes or on different machines.
 
