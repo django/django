@@ -471,7 +471,8 @@ class TestContentTypeRenaming(TransactionTestCase):
         # Models with no prior contenttypes should't be renamed.
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='bar').exists())
         self.assertFalse(ContentType.objects.filter(app_label='contenttypes_tests', model='renamedbar').exists())
-        # Create a stale content type to make sure conflicts are correctly handled.
+        # Create a stale content type to make sure the operation correctly
+        # ignores integrity errors on rename attempts and displays a warning.
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
         # Migrate backward to assert the inserted operation works correctly.
         # See the rolled back migration for more details about the assertions.
