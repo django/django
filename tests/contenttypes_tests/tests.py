@@ -475,6 +475,11 @@ class TestContentTypeRenaming(TransactionTestCase):
         ContentType.objects.create(app_label='contenttypes_tests', model='foo')
         # Migrate backward to assert the inserted operation works correctly.
         # See the rolled back migration for more details about the assertions.
-        management.call_command(
-            'migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, stdout=stdout
+        with captured_stdout() as stdout:
+            management.call_command(
+                'migrate', 'contenttypes_tests', 'zero', database='default', interactive=False, stdout=stdout
+            )
+        self.assertIn(
+            "Failed to rename content type 'contenttypes_tests.RenamedFoo' to 'contenttypes_tests.Foo'.\n"
+            "You might have stale content types in conflict.", stdout.getvalue()
         )

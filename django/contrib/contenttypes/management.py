@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.core.management.color import color_style
 from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
 from django.db.utils import IntegrityError
 from django.utils import six
@@ -6,10 +7,11 @@ from django.utils.six.moves import input
 
 
 class RenameContentType(migrations.RunPython):
-    def __init__(self, app_label, old_name, new_name):
+    def __init__(self, app_label, old_name, new_name, verbosity):
         self.app_label = app_label
         self.old_name = old_name
         self.new_name = new_name
+        self.verbosity = verbosity
         super(RenameContentType, self).__init__(self.rename_forward, self.rename_backward)
 
     def _rename(self, apps, old_name, new_name):
@@ -26,7 +28,15 @@ class RenameContentType(migrations.RunPython):
                     content_type.save(update_fields={'model'})
             except IntegrityError:
                 # Gracefully fallback if a stale content type causes a conflict.
-                pass
+                if self.verbosity:
+                    print(color_style().WARNING(
+                        "Failed to rename content type '%(app_label)s.%(old_name)s' "
+                        "to '%(app_label)s.%(new_name)s'.\nYou might have stale content types in conflict." % {
+                            'app_label': self.app_label,
+                            'old_name': old_name,
+                            'new_name': new_name,
+                        }
+                    ))
 
     def rename_forward(self, apps, schema_editor):
         self._rename(apps, self.old_name, self.new_name)
@@ -35,18 +45,16 @@ class RenameContentType(migrations.RunPython):
         self._rename(apps, self.new_name, self.old_name)
 
 
-def rename_contenttypes(plan=None, **kwargs):
+def rename_contenttypes(plan, verbosity, **kwargs):
     """
     Inserts a `RenameContentType` operation after every planned
     `RenameModel` operation.
     """
-    if plan is None:
-        plan = []
     for migration, _backward in plan:
         inserts = []
         for index, operation in enumerate(migration.operations):
             if isinstance(operation, migrations.RenameModel):
-                operation = RenameContentType(migration.app_label, operation.old_name, operation.new_name)
+                operation = RenameContentType(migration.app_label, operation.old_name, operation.new_name, verbosity)
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):
             migration.operations.insert(inserted + index, operation)
