@@ -61,3 +61,6 @@ Bugfixes
 
 * Fixed ``migrate --fake-initial`` detection of many-to-many tables
   (:ticket:`25922`).
+
+* Restored the functionality of the admin's ``list_editable`` add and change
+  buttons (:ticket:`25903`).
