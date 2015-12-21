@@ -36,6 +36,22 @@ Minor features
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
   will now point to ``request.META['SCRIPT_NAME']`` if set, instead of ``/``.
 
+* Added ``view`` permission to the
+  :attr:`~django.db.models.Options.default_permissions`.
+  This allows to define read only access to the models and admin pages.
+  The :meth:`ModelAdmin.has_view_permission()
+  <django.contrib.admin.ModelAdmin.has_view_permission>` function was introduced.
+  The ``view`` permission has been made with backward compatibility in mind, so
+  ``change`` permission imply that user can also view objects.
+
+  The ``change`` permission is newly needed to trigger :doc:`/ref/contrib/admin/actions`
+  by user.
+
+  To use list_editable option, the ``change`` permission is also needed.
+
+  This works also for inlines. To display the change view of the base object,
+  at least ``view`` permission is needed.
+
 * The success message that appears after adding or editing an object now
   contains a link to the object's change form.
 

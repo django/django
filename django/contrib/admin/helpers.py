@@ -224,7 +224,8 @@ class InlineAdminFormSet(object):
     A wrapper around an inline formset for use in the admin system.
     """
     def __init__(self, inline, formset, fieldsets, prepopulated_fields=None,
-            readonly_fields=None, model_admin=None):
+            readonly_fields=None, uneditable_fields=None, has_add_permission=True,
+            model_admin=None):
         self.opts = inline
         self.formset = formset
         self.fieldsets = fieldsets
@@ -232,30 +233,35 @@ class InlineAdminFormSet(object):
         if readonly_fields is None:
             readonly_fields = ()
         self.readonly_fields = readonly_fields
+        if uneditable_fields is None:
+            uneditable_fields = ()
+        self.uneditable_fields = uneditable_fields
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.has_add_permission = has_add_permission
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
             view_on_site_url = self.opts.get_view_on_site_url(original)
             yield InlineAdminForm(self.formset, form, self.fieldsets,
-                self.prepopulated_fields, original, self.readonly_fields,
+                self.prepopulated_fields, original, self.uneditable_fields,
                 model_admin=self.opts, view_on_site_url=view_on_site_url)
         for form in self.formset.extra_forms:
             yield InlineAdminForm(self.formset, form, self.fieldsets,
                 self.prepopulated_fields, None, self.readonly_fields,
                 model_admin=self.opts)
-        yield InlineAdminForm(self.formset, self.formset.empty_form,
-            self.fieldsets, self.prepopulated_fields, None,
-            self.readonly_fields, model_admin=self.opts)
+        if self.has_add_permission:
+            yield InlineAdminForm(self.formset, self.formset.empty_form,
+                self.fieldsets, self.prepopulated_fields, None,
+                self.readonly_fields, model_admin=self.opts)
 
     def fields(self):
         fk = getattr(self.formset, "fk", None)
         for i, field_name in enumerate(flatten_fieldsets(self.fieldsets)):
             if fk and fk.name == field_name:
                 continue
-            if field_name in self.readonly_fields:
+            if field_name in self.uneditable_fields:
                 yield {
                     'label': label_for_field(field_name, self.opts.model, self.opts),
                     'widget': {

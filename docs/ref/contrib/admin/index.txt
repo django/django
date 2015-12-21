@@ -1469,7 +1469,7 @@ templates used by the :class:`ModelAdmin` views:
     a ``list`` or ``tuple`` of :class:`~django.contrib.admin.InlineModelAdmin`
     objects, as described below in the :class:`~django.contrib.admin.InlineModelAdmin`
     section. For example, the following would return inlines without the default
-    filtering based on add, change, and delete permissions::
+    filtering based on view, add, change, and delete permissions::
 
         class MyModelAdmin(admin.ModelAdmin):
             inlines = (MyInline,)
@@ -1712,6 +1712,18 @@ templates used by the :class:`ModelAdmin` views:
     Should return ``True`` if adding an object is permitted, ``False``
     otherwise.
 
+.. method:: ModelAdmin.has_view_permission(request, obj=None)
+
+    .. versionadded:: 1.10
+
+    Should return ``True`` if viewing obj is permitted, ``False`` otherwise.
+    If obj is ``None``, should return ``True`` or ``False`` to indicate whether
+    viewing of objects of this type is permitted in general (e.g., ``False``
+    will be interpreted as meaning that the current user is not permitted to
+    view any object of this type).
+    The ``view`` permission has been made with backward compatibility in mind, so
+    ``change`` permission imply that user can also view objects.
+
 .. method:: ModelAdmin.has_change_permission(request, obj=None)
 
     Should return ``True`` if editing obj is permitted, ``False`` otherwise.
@@ -1734,7 +1746,8 @@ templates used by the :class:`ModelAdmin` views:
     accessing the module's index page is permitted, ``False`` otherwise.
     Uses :meth:`User.has_module_perms()
     <django.contrib.auth.models.User.has_module_perms>` by default. Overriding
-    it does not restrict access to the add, change or delete views,
+    it does not restrict access to the view, add, change, or delete views,
+    :meth:`~ModelAdmin.has_view_permission`,
     :meth:`~ModelAdmin.has_add_permission`,
     :meth:`~ModelAdmin.has_change_permission`, and
     :meth:`~ModelAdmin.has_delete_permission` should be used for that.
@@ -2023,6 +2036,7 @@ adds some of its own (the shared features are actually defined in the
 - :meth:`~ModelAdmin.formfield_for_choice_field`
 - :meth:`~ModelAdmin.formfield_for_foreignkey`
 - :meth:`~ModelAdmin.formfield_for_manytomany`
+- :meth:`~ModelAdmin.has_view_permission`
 - :meth:`~ModelAdmin.has_add_permission`
 - :meth:`~ModelAdmin.has_change_permission`
 - :meth:`~ModelAdmin.has_delete_permission`
