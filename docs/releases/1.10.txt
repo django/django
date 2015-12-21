@@ -380,6 +380,9 @@ Miscellaneous
   is removed. This may affect query counts tested by
   ``TransactionTestCase.assertNumQueries()``.
 
+* Support for ``skip_validation`` in ``BaseCommand.execute(**options)`` is
+  removed. Use ``skip_checks`` (added in Django 1.7) instead.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
