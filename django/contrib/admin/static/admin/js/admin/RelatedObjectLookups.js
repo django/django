@@ -67,7 +67,7 @@
     }
 
     function updateRelatedObjectLinks(triggeringLink) {
-        var $this = django.jQuery(triggeringLink);
+        var $this = $(triggeringLink);
         var siblings = $this.nextAll('.change-related, .delete-related');
         if (!siblings.length) {
             return;
@@ -75,7 +75,7 @@
         var value = $this.val();
         if (value) {
             siblings.each(function() {
-                var elm = django.jQuery(this);
+                var elm = $(this);
                 elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
             });
         } else {
@@ -102,7 +102,7 @@
                 }
             }
             // Trigger a change event to update related links if required.
-            django.jQuery(elem).trigger('change');
+            $(elem).trigger('change');
         } else {
             var toId = name + "_to";
             var o = new Option(newRepr, newId);
@@ -117,7 +117,7 @@
         newRepr = html_unescape(newRepr);
         var id = windowname_to_id(win.name).replace(/^edit_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
-        var selects = django.jQuery(selectsSelector);
+        var selects = $(selectsSelector);
         selects.find('option').each(function() {
             if (this.value === objId) {
                 this.innerHTML = newRepr;
@@ -131,10 +131,10 @@
         objId = html_unescape(objId);
         var id = windowname_to_id(win.name).replace(/^delete_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
-        var selects = django.jQuery(selectsSelector);
+        var selects = $(selectsSelector);
         selects.find('option').each(function() {
             if (this.value === objId) {
-                django.jQuery(this).remove();
+                $(this).remove();
             }
         }).trigger('change');
         win.close();
