@@ -1391,9 +1391,9 @@ your test suite.
 
     Asserts that execution of ``callable`` raises ``expected_exception`` and
     that ``expected_message`` is found in the exception's message. Any other
-    outcome is reported as a failure. Similar to unittest's
-    :meth:`~unittest.TestCase.assertRaisesRegex` with the difference that
-    ``expected_message`` isn't a regular expression.
+    outcome is reported as a failure. It's a simpler version of
+    :meth:`unittest.TestCase.assertRaisesRegex` with the difference that
+    ``expected_message`` isn't treated as a regular expression.
 
     If only the ``expected_exception`` and ``expected_message`` parameters are
     given, returns a context manager so that the code being tested can be
