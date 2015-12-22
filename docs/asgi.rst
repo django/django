@@ -9,6 +9,8 @@ Content-Type: text/x-rst
 Created: ?
 Post-History: ?
 
+**NOTE: This is still heavily in-progress, and should not even be
+considered draft yet. Even the name might change.**
 
 Abstract
 ========
