@@ -933,9 +933,16 @@ Starts the Python interactive interpreter.
 
 Django will use IPython_ or bpython_ if either is installed. If you have a
 rich shell installed but want to force use of the "plain" Python interpreter,
-use the ``--plain`` option, like so::
+use the ``-i python``, ``--interface python``, or ``--plain`` option, like so::
 
+    django-admin shell -i python
+    django-admin shell --interface python
     django-admin shell --plain
+
+.. deprecated:: 1.10
+
+   The ``--plain`` option is deprecated. Use the ``-i python`` or ``--interface
+   python`` option instead.
 
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
@@ -957,12 +964,12 @@ bpython::
 .. _bpython: http://bpython-interpreter.org/
 
 When the "plain" Python interactive interpreter starts (be it because
-``--plain`` was specified or because no other interactive interface is
-available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
+``--interface python`` was specified or because no other interactive interface
+is available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
 environment variable and the ``~/.pythonrc.py`` script. If you don't wish this
 behavior you can use the ``--no-startup`` option. e.g.::
 
-    django-admin shell --plain --no-startup
+    django-admin shell --interface python --no-startup
 
 showmigrations [<app_label> [<app_label>]]
 ------------------------------------------
