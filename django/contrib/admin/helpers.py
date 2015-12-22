@@ -5,7 +5,6 @@ import warnings
 
 from django import forms
 from django.conf import settings
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.utils import (
     display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
     lookup_field,
@@ -77,7 +76,7 @@ class Fieldset(object):
             js = ['vendor/jquery/jquery%s.js' % extra,
                   'jquery.init.js',
                   'collapse%s.js' % extra]
-            return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+            return forms.Media(js=['admin/js/%s' % url for url in js])
         return forms.Media()
     media = property(_media)
 
@@ -236,6 +235,7 @@ class InlineAdminFormSet(object):
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.classes = ' '.join(inline.classes) if inline.classes else ''
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):

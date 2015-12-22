@@ -222,9 +222,9 @@ lookups available after the transform do not change. For example::
     >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
 
     >>> Post.objects.filter(tags__0_1=['thoughts'])
-    <QuerySet [<Post: First post>]>
+    <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__0_2__contains='thoughts')
+    >>> Post.objects.filter(tags__0_2__contains=['thoughts'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
 .. note::
@@ -483,8 +483,7 @@ JSONField
     of the JSON which allows indexing. The trade-off is a small additional cost
     on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
 
-    **As a result, the usage of this field is only supported on PostgreSQL
-    versions at least 9.4**.
+    **As a result, this field requires PostgreSQL ≥ 9.4 and Psycopg2 ≥ 2.5.4**.
 
 Querying JSONField
 ^^^^^^^^^^^^^^^^^^

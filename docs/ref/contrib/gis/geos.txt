@@ -484,7 +484,7 @@ The normalized version takes the distance as a float between 0 (origin) and 1
 
 Reverse of :meth:`GEOSGeometry.project`.
 
-.. method:: GEOSGeometry:intersection(other)
+.. method:: GEOSGeometry.intersection(other)
 
 Returns a :class:`GEOSGeometry` representing the points shared by this
 geometry and other.
@@ -647,7 +647,7 @@ is returned instead.
 ``Point``
 ---------
 
-.. class:: Point(x, y, z=None, srid=None)
+.. class:: Point(x=None, y=None, z=None, srid=None)
 
    ``Point`` objects are instantiated using arguments that represent
    the component coordinates of the point or with a single sequence
@@ -655,6 +655,16 @@ is returned instead.
 
        >>> pnt = Point(5, 23)
        >>> pnt = Point([5, 23])
+
+   Empty ``Point`` objects may be instantiated by passing no arguments or an
+   empty sequence. The following are equivalent::
+
+       >>> pnt = Point()
+       >>> pnt = Point([])
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``Point`` couldn't be instantiated.
 
 ``LineString``
 --------------
@@ -673,6 +683,16 @@ is returned instead.
 
        >>> ls = LineString( ((0, 0), (1, 1)) )
        >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
+
+   Empty ``LineString`` objects may be instantiated by passing no arguments
+   or an empty sequence. The following are equivalent::
+
+       >>> ls = LineString()
+       >>> ls = LineString([])
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``LineString`` couldn't be instantiated.
 
 ``LinearRing``
 --------------
@@ -694,15 +714,19 @@ is returned instead.
 
 .. class:: Polygon(*args, **kwargs)
 
-   ``Polygon`` objects may be instantiated by passing in one or
-   more parameters that represent the rings of the polygon.  The
-   parameters must either be :class:`LinearRing` instances, or
-   a sequence that may be used to construct a :class:`LinearRing`::
+   ``Polygon`` objects may be instantiated by passing in parameters that
+   represent the rings of the polygon.  The parameters must either be
+   :class:`LinearRing` instances, or a sequence that may be used to construct a
+   :class:`LinearRing`::
 
        >>> ext_coords = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
        >>> int_coords = ((0.4, 0.4), (0.4, 0.6), (0.6, 0.6), (0.6, 0.4), (0.4, 0.4))
        >>> poly = Polygon(ext_coords, int_coords)
        >>> poly = Polygon(LinearRing(ext_coords), LinearRing(int_coords))
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``Polygon`` couldn't be instantiated.
 
    .. classmethod:: from_bbox(bbox)
 
@@ -732,26 +756,34 @@ Geometry Collections
 
 .. class:: MultiPoint(*args, **kwargs)
 
-   ``MultiPoint`` objects may be instantiated by passing in one
-   or more :class:`Point` objects as arguments, or a single
-   sequence of :class:`Point` objects::
+   ``MultiPoint`` objects may be instantiated by passing in :class:`Point`
+   objects as arguments, or a single sequence of :class:`Point` objects::
 
        >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
        >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``MultiPoint`` couldn't be instantiated.
 
 ``MultiLineString``
 -------------------
 
 .. class:: MultiLineString(*args, **kwargs)
 
-   ``MultiLineString`` objects may be instantiated by passing in one
-   or more :class:`LineString` objects as arguments, or a single
-   sequence of :class:`LineString` objects::
+   ``MultiLineString`` objects may be instantiated by passing in
+   :class:`LineString` objects as arguments, or a single sequence of
+   :class:`LineString` objects::
 
        >>> ls1 = LineString((0, 0), (1, 1))
        >>> ls2 = LineString((2, 2), (3, 3))
        >>> mls = MultiLineString(ls1, ls2)
        >>> mls = MultiLineString([ls1, ls2])
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``MultiLineString`` couldn't be
+       instantiated.
 
    .. attribute:: merged
 
@@ -764,14 +796,18 @@ Geometry Collections
 
 .. class:: MultiPolygon(*args, **kwargs)
 
-   ``MultiPolygon`` objects may be instantiated by passing one or
-   more :class:`Polygon` objects as arguments, or a single sequence
-   of :class:`Polygon` objects::
+   ``MultiPolygon`` objects may be instantiated by passing :class:`Polygon`
+   objects as arguments, or a single sequence of :class:`Polygon` objects::
 
        >>> p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
        >>> p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
        >>> mp = MultiPolygon(p1, p2)
        >>> mp = MultiPolygon([p1, p2])
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``MultiPolygon`` couldn't be
+       instantiated.
 
    .. attribute:: cascaded_union
 
@@ -789,13 +825,18 @@ Geometry Collections
 
 .. class:: GeometryCollection(*args, **kwargs)
 
-   ``GeometryCollection`` objects may be instantiated by passing in
-   one or more other :class:`GEOSGeometry` as arguments, or a single
-   sequence of :class:`GEOSGeometry` objects::
+   ``GeometryCollection`` objects may be instantiated by passing in other
+   :class:`GEOSGeometry` as arguments, or a single sequence of
+   :class:`GEOSGeometry` objects::
 
        >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
        >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
        >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
+
+   .. versionchanged:: 1.10
+
+       In previous versions, an empty ``GeometryCollection`` couldn't be
+       instantiated.
 
 .. _prepared-geometries:
 
@@ -1011,6 +1052,44 @@ Returns the WKT of the given geometry. Example::
     >>> wkt_w.write(pnt)
     'POINT (1.0000000000000000 1.0000000000000000)'
 
+.. attribute:: WKTWriter.trim
+
+.. versionadded:: 1.10
+
+This property is used to enable or disable trimming of
+unnecessary decimals.
+
+    >>> from django.contrib.gis.geos import Point, WKTWriter
+    >>> pnt = Point(1, 1)
+    >>> wkt_w = WKTWriter()
+    >>> wkt_w.trim
+    False
+    >>> wkt_w.write(pnt)
+    'POINT (1.0000000000000000 1.0000000000000000)'
+    >>> wkt_w.trim = True
+    >>> wkt_w.write(pnt)
+    'POINT (1 1)'
+
+.. attribute:: WKTWriter.precision
+
+.. versionadded:: 1.10
+
+This property controls the rounding precision of coordinates;
+if set to ``None`` rounding is disabled.
+
+    >>> from django.contrib.gis.geos import Point, WKTWriter
+    >>> pnt = Point(1.44, 1.66)
+    >>> wkt_w = WKTWriter()
+    >>> print(wkt_w.precision)
+    None
+    >>> wkt_w.write(pnt)
+    'POINT (1.4399999999999999 1.6599999999999999)'
+    >>> wkt_w.precision = 0
+    >>> wkt_w.write(pnt)
+    'POINT (1 2)'
+    >>> wkt_w.precision = 1
+    >>> wkt_w.write(pnt)
+    'POINT (1.4 1.7)'
 
 .. rubric:: Footnotes
 .. [#fnogc] *See* `PostGIS EWKB, EWKT and Canonical Forms <http://postgis.net/docs/using_postgis_dbmanagement.html#EWKB_EWKT>`_, PostGIS documentation at Ch. 4.1.2.

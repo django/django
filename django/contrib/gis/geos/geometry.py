@@ -123,8 +123,10 @@ class GEOSGeometry(GEOSBase, ListMixin):
         Destroys this Geometry; in other words, frees the memory used by the
         GEOS C++ object.
         """
-        if self._ptr and capi:
+        try:
             capi.destroy_geom(self._ptr)
+        except (AttributeError, TypeError):
+            pass  # Some part might already have been garbage collected
 
     def __copy__(self):
         """

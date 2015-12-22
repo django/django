@@ -67,6 +67,14 @@ class TestQuerying(PostgreSQLTestCase):
             self.objs[:2]
         )
 
+    def test_in_generator(self):
+        def search():
+            yield {'a': 'b'}
+        self.assertSequenceEqual(
+            HStoreModel.objects.filter(field__in=search()),
+            self.objs[:1]
+        )
+
     def test_has_key(self):
         self.assertSequenceEqual(
             HStoreModel.objects.filter(field__has_key='c'),

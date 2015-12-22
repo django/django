@@ -68,7 +68,7 @@ class DeleteQuery(Query):
                 # We can't do the delete using subquery.
                 values = list(query.values_list('pk', flat=True))
                 if not values:
-                    return
+                    return 0
                 return self.delete_batch(values, using)
             else:
                 innerq.clear_select_clause()

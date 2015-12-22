@@ -270,6 +270,37 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.url,
             'http://www.testserver/customurlconf/slash/')
 
+    # ETag + If-Not-Modified support tests
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag(self):
+        req = HttpRequest()
+        res = HttpResponse('content')
+        self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        res['ETag'] = 'tomatoes'
+        self.assertEqual(CommonMiddleware().process_response(req, res).get('ETag'), 'tomatoes')
+
+    @override_settings(USE_ETAGS=True)
+    def test_no_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_if_none_match(self):
+        first_req = HttpRequest()
+        first_res = CommonMiddleware().process_response(first_req, HttpResponse('content'))
+        second_req = HttpRequest()
+        second_req.method = 'GET'
+        second_req.META['HTTP_IF_NONE_MATCH'] = first_res['ETag']
+        second_res = CommonMiddleware().process_response(second_req, HttpResponse('content'))
+        self.assertEqual(second_res.status_code, 304)
+
     # Other tests
 
     @override_settings(DISALLOWED_USER_AGENTS=[re.compile(r'foo')])
@@ -473,29 +504,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.resp.status_code = 400
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 400)
-
-    @override_settings(USE_ETAGS=True)
-    def test_etag(self):
-        req = HttpRequest()
-        res = HttpResponse('content')
-        self.assertTrue(
-            CommonMiddleware().process_response(req, res).has_header('ETag'))
-
-    @override_settings(USE_ETAGS=True)
-    def test_etag_streaming_response(self):
-        req = HttpRequest()
-        res = StreamingHttpResponse(['content'])
-        res['ETag'] = 'tomatoes'
-        self.assertEqual(
-            CommonMiddleware().process_response(req, res).get('ETag'),
-            'tomatoes')
-
-    @override_settings(USE_ETAGS=True)
-    def test_no_etag_streaming_response(self):
-        req = HttpRequest()
-        res = StreamingHttpResponse(['content'])
-        self.assertFalse(
-            CommonMiddleware().process_response(req, res).has_header('ETag'))
 
     # Tests for the Last-Modified header
 
