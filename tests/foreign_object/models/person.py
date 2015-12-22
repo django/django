@@ -56,19 +56,19 @@ class Membership(models.Model):
     date_joined = models.DateTimeField(default=datetime.datetime.now)
     invite_reason = models.CharField(max_length=64, null=True)
     person_id = models.IntegerField()
-    group_id = models.IntegerField()
+    group_id = models.IntegerField(blank=True, null=True)
 
     # Relation Fields
     person = models.ForeignObject(
         Person,
-        from_fields=['membership_country', 'person_id'],
-        to_fields=['person_country_id', 'id'],
+        from_fields=['person_id', 'membership_country'],
+        to_fields=['id', 'person_country_id'],
         on_delete=models.CASCADE,
     )
     group = models.ForeignObject(
         Group,
-        from_fields=['membership_country', 'group_id'],
-        to_fields=['group_country', 'id'],
+        from_fields=['group_id', 'membership_country'],
+        to_fields=['id', 'group_country'],
         on_delete=models.CASCADE,
     )
 
@@ -76,7 +76,8 @@ class Membership(models.Model):
         ordering = ('date_joined', 'invite_reason')
 
     def __str__(self):
-        return "%s is a member of %s" % (self.person.name, self.group.name)
+        group_name = self.group.name if self.group_id else 'NULL'
+        return "%s is a member of %s" % (self.person.name, group_name)
 
 
 class Friendship(models.Model):
