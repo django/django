@@ -345,8 +345,7 @@ Using TemplateResponse and SimpleTemplateResponse
 
 A :class:`TemplateResponse` object can be used anywhere that a normal
 :class:`django.http.HttpResponse` can be used. It can also be used as an
-alternative to calling :func:`~django.shortcuts.render()` or
-:func:`~django.shortcuts.render_to_response()`.
+alternative to calling :func:`~django.shortcuts.render()`.
 
 For example, the following simple view returns a :class:`TemplateResponse`
 with a simple template and a context containing a queryset::

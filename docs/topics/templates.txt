@@ -309,9 +309,8 @@ templates, Django provides a shortcut function which automates the process.
 
             The ``request`` argument was added.
 
-See also the :func:`~django.shortcuts.render()` and
-:func:`~django.shortcuts.render_to_response()` shortcuts, which call
-:func:`render_to_string()` and feed the result into an
+See also the :func:`~django.shortcuts.render()` shortcut which calls
+:func:`render_to_string()` and feeds the result into an
 :class:`~django.http.HttpResponse` suitable for returning from a view.
 
 Finally, you can use configured engines directly:
