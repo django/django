@@ -327,6 +327,9 @@ details on these changes.
   become compulsory for all apps unless you pass the ``--run-syncdb`` option to
   ``migrate``.
 
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, will be removed.
+
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data will be removed.
 

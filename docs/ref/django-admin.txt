@@ -1556,7 +1556,7 @@ that ``django-admin`` should print to the console.
 
 Example usage::
 
-    django-admin sqlall --no-color
+    django-admin runserver --no-color
 
 By default, ``django-admin`` will format the output to be colorized. For
 example, errors will be printed to the console in red and SQL statements will

@@ -1406,6 +1406,9 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
   compulsory for all apps unless you pass the :djadminopt:`--run-syncdb`
   option to ``migrate``.
 
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, are removed.
+
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data is removed.
 
