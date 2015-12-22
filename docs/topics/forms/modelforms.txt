@@ -942,7 +942,7 @@ Model formsets are very similar to formsets. Let's say we want to present a
 formset to edit ``Author`` model instances::
 
     from django.forms import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -954,9 +954,7 @@ formset to edit ``Author`` model instances::
                 # do something.
         else:
             formset = AuthorFormSet()
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html', {'formset': formset})
 
 As you can see, the view logic of a model formset isn't drastically different
 than that of a "normal" formset. The only difference is that we call
@@ -1010,7 +1008,7 @@ As stated earlier, you can override the default queryset used by the model
 formset::
 
     from django.forms import modelformset_factory
-    from django.shortcuts import render_to_response
+    from django.shortcuts import render
     from myapp.models import Author
 
     def manage_authors(request):
@@ -1023,9 +1021,7 @@ formset::
                 # Do something.
         else:
             formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
-        return render_to_response("manage_authors.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_authors.html", {'formset': formset})
 
 Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
 cases in this example.
@@ -1201,9 +1197,7 @@ of a model. Here's how you can do that::
                 return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
-        return render_to_response("manage_books.html", {
-            "formset": formset,
-        })
+        return render(request, 'manage_books.html', {'formset': formset})
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 

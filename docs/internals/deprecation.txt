@@ -553,8 +553,8 @@ details on these changes.
   :class:`~django.template.response.SimpleTemplateResponse`, and
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
-  :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
+  ``render_to_response()`` shortcut and the sitemap views,
+  :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,

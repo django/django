@@ -1578,7 +1578,7 @@ The following functions will no longer accept a ``dirs`` parameter to override
 * :func:`django.template.loader.get_template()`
 * :func:`django.template.loader.select_template()`
 * :func:`django.shortcuts.render()`
-* :func:`django.shortcuts.render_to_response()`
+* ``django.shortcuts.render_to_response()``
 
 The parameter didn't work consistently across different template loaders and
 didn't work for included templates.
