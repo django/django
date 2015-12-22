@@ -1571,6 +1571,19 @@ pass a :class:`dict` in the ``context`` parameter instead. If you're passing a
 :class:`~django.template.RequestContext`, pass the request separately in the
 ``request`` parameter.
 
+If you're using ``context_instance=RequestContext(request))`` with
+``render_to_response()``, use :func:`django.shortcuts.render`, which always
+makes ``RequestContext`` available, instead. For example::
+
+    from django.shortcuts import render_to_response
+    from django.template import RequestContext
+    render_to_response('template.html', {...}, context_instance=RequestContext(request))
+
+becomes::
+
+    from django.shortcuts import render
+    render(request, 'template.html', {...})
+
 ``dirs`` argument of template-finding functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
