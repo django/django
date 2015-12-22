@@ -24,6 +24,8 @@ and Django's handling of database schema:
 
 * :djadmin:`sqlmigrate`, which displays the SQL statements for a migration.
 
+* :djadmin:`showmigrations`, which lists migrations available for a project.
+
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
 into individual migration files - analogous to commits - and ``migrate`` is
