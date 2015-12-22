@@ -31,6 +31,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
     _GEOS_CLASSES = None
 
     ptr_type = GEOM_PTR
+    destructor = capi.destroy_geom
     has_cs = False  # Only Point, LineString, LinearRing have coordinate sequences
 
     def __init__(self, geo_input, srid=None):
@@ -117,16 +118,6 @@ class GEOSGeometry(GEOSBase, ListMixin):
         # Setting the coordinate sequence for the geometry (will be None on
         # geometries that do not have coordinate sequences)
         self._set_cs()
-
-    def __del__(self):
-        """
-        Destroys this Geometry; in other words, frees the memory used by the
-        GEOS C++ object.
-        """
-        try:
-            capi.destroy_geom(self._ptr)
-        except (AttributeError, TypeError):
-            pass  # Some part might already have been garbage collected
 
     def __copy__(self):
         """
