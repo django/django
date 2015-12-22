@@ -15,6 +15,7 @@ from django.contrib.gis.geos import (
     fromfile, fromstr,
 )
 from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -659,6 +660,20 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         poly = Polygon(((0, 0), (0, 10), (10, 10), (10, 0), (0, 0)))
         self.assertTrue(poly.covers(Point(5, 5)))
         self.assertFalse(poly.covers(Point(100, 100)))
+
+    def test_closed(self):
+        ls_closed = LineString((0, 0), (1, 1), (0, 0))
+        ls_not_closed = LineString((0, 0), (1, 1))
+        self.assertFalse(ls_not_closed.closed)
+        self.assertTrue(ls_closed.closed)
+
+        if geos_version_info()['version'] >= '3.5':
+            self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
+            self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
+
+        with mock.patch('django.contrib.gis.geos.collections.geos_version_info', lambda: {'version': '3.4.9'}):
+            with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
+                MultiLineString().closed
 
     def test_srid(self):
         "Testing the SRID property and keyword."

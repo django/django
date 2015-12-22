@@ -685,7 +685,7 @@ class GEOSGeometry(GEOSBase, ListMixin):
         return GEOSGeometry(capi.geom_clone(self.ptr), srid=self.srid)
 
 
-class ProjectInterpolateMixin(object):
+class LinearGeometryMixin(object):
     """
     Used for LineString and MultiLineString.
     """
@@ -706,3 +706,17 @@ class ProjectInterpolateMixin(object):
         if not isinstance(point, Point):
             raise TypeError('locate_point argument must be a Point')
         return capi.geos_project_normalized(self.ptr, point.ptr)
+
+    @property
+    def merged(self):
+        """
+        Return the line merge of this Geometry.
+        """
+        return self._topology(capi.geos_linemerge(self.ptr))
+
+    @property
+    def closed(self):
+        """
+        Return whether or not this Geometry is closed.
+        """
+        return capi.geos_isclosed(self.ptr)

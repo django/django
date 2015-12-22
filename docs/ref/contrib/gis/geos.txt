@@ -694,6 +694,12 @@ is returned instead.
 
        In previous versions, an empty ``LineString`` couldn't be instantiated.
 
+    .. attribute:: LineString.closed
+
+        .. versionadded:: 1.10
+
+        Returns whether or not this ``LineString`` is closed.
+
 ``LinearRing``
 --------------
 
@@ -790,6 +796,15 @@ Geometry Collections
    Returns a :class:`LineString` representing the line merge of
    all the components in this ``MultiLineString``.
 
+    .. attribute:: MultiLineString.closed
+
+        .. versionadded:: 1.10
+
+        Returns `True` if and only if all elements are closed.
+
+        ..note::
+
+            Requires GEOS 3.5.
 
 ``MultiPolygon``
 ----------------
