@@ -56,8 +56,8 @@ Post-installation
 Creating a spatial database
 ---------------------------
 
-PostGIS 2 includes an extension for Postgres 9.1+ that can be used to enable
-spatial functionality::
+PostGIS 2 includes an extension for PostgreSQL that's used to enable spatial
+functionality::
 
     $ createdb  <db name>
     $ psql <db name>

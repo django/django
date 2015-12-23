@@ -362,6 +362,12 @@ to use this form::
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
+Dropped support for PostgreSQL 9.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
+Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
