@@ -189,14 +189,14 @@ given ``geo_input`` argument, and then assumes the proper geometry subclass
 The following input formats, along with their corresponding Python types,
 are accepted:
 
-=============  ======================
-Format         Input Type
-=============  ======================
-WKT / EWKT     ``str`` or ``unicode``
-HEX / HEXEWKB  ``str`` or ``unicode``
-WKB / EWKB     ``buffer``
-GeoJSON        ``str`` or ``unicode``
-=============  ======================
+=======================  ======================
+Format                   Input Type
+=======================  ======================
+WKT / EWKT               ``str`` or ``unicode``
+HEX / HEXEWKB            ``str`` or ``unicode``
+WKB / EWKB               ``buffer``
+GeoJSON (requires GDAL)  ``str`` or ``unicode``
+=======================  ======================
 
 .. note::
 
