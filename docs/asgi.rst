@@ -82,7 +82,8 @@ specific in-process async solution, such as ``asyncio``, ``twisted``, or
 returns ``None`` or a ``(channel, message)`` tuple immediately. This approach
 should work with either synchronous or asynchronous code; part of the design
 of ASGI is to allow developers to still write synchronous code where possible,
-as this makes for easier maintenance and less bugs, at the cost of performance.
+as this generally makes for easier maintenance and less bugs,
+but at the cost of performance.
 
 The distinction between protocol servers and applications in this document
 is mostly to distinguish their roles and to make illustrating concepts easier.
@@ -751,6 +752,9 @@ TODOs
 * Maybe remove ``http_version`` and replace with ``supports_server_push``?
 
 * Be sure we want to leave HTTP ``get`` and ``post`` out.
+
+* ``receive_many`` can't easily be implemented with async/cooperative code
+  behind it as it's nonblocking - possible alternative call type? Extension?
 
 
 Copyright
