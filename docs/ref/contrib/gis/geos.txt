@@ -330,10 +330,6 @@ Returns the GeoJSON representation of the geometry. Note that the result is not
 a complete GeoJSON structure but only the ``geometry`` key content of a
 GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
 
-.. note::
-
-    Requires GDAL.
-
 .. attribute:: GEOSGeometry.geojson
 
 Alias for :attr:`GEOSGeometry.json`.
