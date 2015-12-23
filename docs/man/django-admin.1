@@ -2588,7 +2588,7 @@ support the \fBstdout\fP and \fBstderr\fP options. For example, you could write:
 .sp
 .nf
 .ft C
-with open(\(aq/tmp/command_output\(aq) as f:
+with open(\(aq/path/to/command_output\(aq) as f:
     management.call_command(\(aqdumpdata\(aq, stdout=f)
 .ft P
 .fi
