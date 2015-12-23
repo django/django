@@ -32,4 +32,5 @@ Contents:
    backends
    integration-plan
    faqs
+   asgi
    releases/index
