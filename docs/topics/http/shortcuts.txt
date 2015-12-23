@@ -119,7 +119,7 @@ This example is equivalent to::
 .. function:: render_to_response(template_name, context=None, context_instance=_context_instance_undefined, content_type=None, status=None, dirs=_dirs_undefined, using=None)
 
    This function preceded the introduction of :func:`render` and works
-   similarly except that it doesn't making the ``request`` available in the
+   similarly except that it doesn't make the ``request`` available in the
    response. It's not recommended and is likely to be deprecated in the future.
 
 Required arguments
