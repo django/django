@@ -78,12 +78,10 @@ via the channel layer.
 
 Despite the name of the proposal, ASGI does not specify or design to any
 specific in-process async solution, such as ``asyncio``, ``twisted``, or
-``gevent``. Instead, the ``receive_many`` function is nonblocking - it either
-returns ``None`` or a ``(channel, message)`` tuple immediately. This approach
-should work with either synchronous or asynchronous code; part of the design
-of ASGI is to allow developers to still write synchronous code where possible,
-as this generally makes for easier maintenance and less bugs,
-but at the cost of performance.
+``gevent``. Instead, the ``receive_many`` function can be switched between
+nonblocking or synchronous. This approach allows applications to choose what's
+best for their current runtime environment; further improvements may provide
+extensions where cooperative versions of receive_many are provided.
 
 The distinction between protocol servers and applications in this document
 is mostly to distinguish their roles and to make illustrating concepts easier.
@@ -278,14 +276,17 @@ A *channel layer* should provide an object with these attributes
   channel to send on, as a byte string, and the message
   to send, as a serializable ``dict``.
 
-* ``receive_many(channels)``, a callable that takes a list of channel
-  names as byte strings, and returns immediately with either ``None``
-  or ``(channel, message)`` if a message is available.
+* ``receive_many(channels, block=False)``, a callable that takes a list of channel
+  names as byte strings, and returns with either ``(None, None)``
+  or ``(channel, message)`` if a message is available. If ``block`` is True, then
+  it will not return until after a built-in timeout or a message arrives; if
+  ``block`` is false, it will always return immediately. It is perfectly
+  valid to ignore ``block`` and always return immediately.
 
-* ``new_channel(format)``, a callable that takes a byte string pattern,
+* ``new_channel(pattern)``, a callable that takes a byte string pattern,
   and returns a new valid channel name that does not already exist, by
   substituting any occurrences of the question mark character ``?`` in
-  ``format`` with a single random byte string and checking for
+  ``pattern`` with a single random byte string and checking for
   existence of that name in the channel layer. This is NOT called prior to
   a message being sent on a channel, and should not be used for channel
   initialization.
@@ -293,7 +294,7 @@ A *channel layer* should provide an object with these attributes
 * ``MessageTooLarge``, the exception raised when a send operation fails
   because the encoded message is over the layer's size limit.
 
-* ``extensions``, a list of byte string names indicating which
+* ``extensions``, a list of unicode string names indicating which
   extensions this layer provides, or empty if it supports none.
   The only valid extension name is ``groups``.
 
@@ -343,7 +344,7 @@ Message Formats
 These describe the standardized message formats for the protocols this
 specification supports. All messages are ``dicts`` at the top level,
 and all keys are required unless otherwise specified (with a default to
-use if the key is missing).
+use if the key is missing). Keys are unicode strings.
 
 The one common key across all protocols is ``reply_channel``, a way to indicate
 the client-specific channel to send responses to. Protocols are generally
@@ -754,7 +755,8 @@ TODOs
 * Be sure we want to leave HTTP ``get`` and ``post`` out.
 
 * ``receive_many`` can't easily be implemented with async/cooperative code
-  behind it as it's nonblocking - possible alternative call type? Extension?
+  behind it as it's nonblocking - possible alternative call type?
+  Asyncio extension that provides ``receive_many_yield``?
 
 
 Copyright
