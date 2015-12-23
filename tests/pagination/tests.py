@@ -1,9 +1,10 @@
+import unittest
 import warnings
 from datetime import datetime
 
 from django.core.paginator import (
-    EmptyPage, InvalidPage, PageNotAnInteger, Paginator, QuerySetPaginator,
-    UnorderedObjectListWarning,
+    DOT, EllipsisPaginator, EmptyPage, InvalidPage, PageNotAnInteger,
+    Paginator, QuerySetPaginator, UnorderedObjectListWarning,
 )
 from django.test import SimpleTestCase, TestCase
 from django.utils.deprecation import RemovedInDjango31Warning
@@ -12,10 +13,7 @@ from .custom import ValidAdjacentNumsPaginator
 from .models import Article
 
 
-class PaginationTests(SimpleTestCase):
-    """
-    Tests for the Paginator and Page classes.
-    """
+class BasePaginationTests(SimpleTestCase):
 
     def check_paginator(self, params, output):
         """
@@ -41,6 +39,12 @@ class PaginationTests(SimpleTestCase):
             "For '%s', expected %s but got %s.  Paginator parameters were: %s"
             % (name, expected, got, params)
         )
+
+
+class PaginationTests(BasePaginationTests):
+    """
+    Tests for the Paginator and Page classes.
+    """
 
     def test_paginator(self):
         """
@@ -303,6 +307,27 @@ class PaginationTests(SimpleTestCase):
         with self.assertWarnsMessage(RemovedInDjango31Warning, msg) as cm:
             QuerySetPaginator([], 1)
         self.assertEqual(cm.filename, __file__)
+
+
+class EllipsisPaginationTests(unittest.TestCase):
+
+    def test_ellipsis_pagination(self):
+        items = range(5000)
+        tests = (
+            (1, [1, 2, 3, 4, DOT, 49, 50]),
+            (2, [1, 2, 3, 4, 5, DOT, 49, 50]),
+            (4, [1, 2, 3, 4, 5, 6, 7, DOT, 49, 50]),
+            (7, [1, 2, DOT, 4, 5, 6, 7, 8, 9, 10, DOT, 49, 50]),
+            (10, [1, 2, DOT, 7, 8, 9, 10, 11, 12, 13, DOT, 49, 50]),
+            (43, [1, 2, DOT, 40, 41, 42, 43, 44, 45, 46, DOT, 49, 50]),
+            (46, [1, 2, DOT, 43, 44, 45, 46, 47, 48, 49, 50]),
+            (49, [1, 2, DOT, 46, 47, 48, 49, 50])
+        )
+        for page_num, page_range in tests:
+            params = (items, 100)
+            paginator = EllipsisPaginator(*params)
+            ellipsis_page_range = paginator.get_ellipsed_page_range(page_num)
+            self.assertEqual(ellipsis_page_range, page_range)
 
 
 class ModelPaginationTests(TestCase):

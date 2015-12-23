@@ -254,7 +254,7 @@ class ChangeListTests(TestCase):
         Regression test for #14312: list_editable with pagination
         """
         new_parent = Parent.objects.create(name='parent')
-        for i in range(200):
+        for i in range(1, 201):
             Child.objects.create(name='name %s' % i, parent=new_parent)
         request = self.factory.get('/child/', data={'p': -1})  # Anything outside range
         request.user = self.superuser
@@ -269,7 +269,7 @@ class ChangeListTests(TestCase):
 
     def test_custom_paginator(self):
         new_parent = Parent.objects.create(name='parent')
-        for i in range(200):
+        for i in range(1, 201):
             Child.objects.create(name='name %s' % i, parent=new_parent)
 
         request = self.factory.get('/child/')
@@ -555,7 +555,7 @@ class ChangeListTests(TestCase):
         use queryset set by modeladmin.
         """
         parent = Parent.objects.create(name='anything')
-        for i in range(30):
+        for i in range(1, 31):
             Child.objects.create(name='name %s' % i, parent=parent)
             Child.objects.create(name='filtered %s' % i, parent=parent)
 
@@ -631,7 +631,7 @@ class ChangeListTests(TestCase):
 
     def test_show_all(self):
         parent = Parent.objects.create(name='anything')
-        for i in range(30):
+        for i in range(1, 31):
             Child.objects.create(name='name %s' % i, parent=parent)
             Child.objects.create(name='filtered %s' % i, parent=parent)
 
@@ -866,7 +866,7 @@ class ChangeListTests(TestCase):
             custom_site.register(UnorderedObject, UnorderedObjectAdmin)
             model_admin = UnorderedObjectAdmin(UnorderedObject, custom_site)
             counter = 0 if ascending else 51
-            for page in range(0, 5):
+            for page in range(1, 6):
                 request = self._mocked_authenticated_request('/unorderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
@@ -910,7 +910,7 @@ class ChangeListTests(TestCase):
             custom_site.register(OrderedObject, OrderedObjectAdmin)
             model_admin = OrderedObjectAdmin(OrderedObject, custom_site)
             counter = 0 if ascending else 51
-            for page in range(0, 5):
+            for page in range(1, 6):
                 request = self._mocked_authenticated_request('/orderedobject/?p=%s' % page, superuser)
                 response = model_admin.changelist_view(request)
                 for result in response.context_data['cl'].result_list:
@@ -979,12 +979,12 @@ class ChangeListTests(TestCase):
         per_page = cl.list_per_page = 10
 
         for page_num, objects_count, expected_page_range in [
-            (0, per_page, []),
-            (0, per_page * 2, list(range(2))),
-            (5, per_page * 11, list(range(11))),
-            (5, per_page * 12, [0, 1, 2, 3, 4, 5, 6, 7, 8, '.', 10, 11]),
-            (6, per_page * 12, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, 10, 11]),
-            (6, per_page * 13, [0, 1, '.', 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
+            (1, per_page, []),
+            (1, per_page * 2, list(range(1, 3))),
+            (6, per_page * 11, list(range(1, 12))),
+            (6, per_page * 12, [1, 2, 3, 4, 5, 6, 7, 8, 9, '.', 11, 12]),
+            (7, per_page * 12, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, 11, 12]),
+            (7, per_page * 13, [1, 2, '.', 4, 5, 6, 7, 8, 9, 10, '.', 12, 13]),
         ]:
             # assuming we have exactly `objects_count` objects
             Group.objects.all().delete()
@@ -995,7 +995,11 @@ class ChangeListTests(TestCase):
             cl.page_num = page_num
             cl.get_results(request)
             real_page_range = pagination(cl)['page_range']
-            self.assertEqual(expected_page_range, list(real_page_range))
+            self.assertListEqual(
+                expected_page_range,
+                list(real_page_range),
+                (page_num, objects_count)
+            )
 
     def test_object_tools_displayed_no_add_permission(self):
         """
