@@ -198,6 +198,10 @@ WKB / EWKB     ``buffer``
 GeoJSON        ``str`` or ``unicode``
 =============  ======================
 
+.. note::
+
+    Initializing from JSON input requires GDAL.
+
 Properties
 ~~~~~~~~~~
 
