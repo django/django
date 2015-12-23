@@ -235,7 +235,7 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
     :filename: polls/views.py
 
     from django.http import HttpResponse
-    from django.template import RequestContext, loader
+    from django.template import loader
 
     from .models import Question
 
@@ -243,10 +243,10 @@ Now let's update our ``index`` view in ``polls/views.py`` to use the template:
     def index(request):
         latest_question_list = Question.objects.order_by('-pub_date')[:5]
         template = loader.get_template('polls/index.html')
-        context = RequestContext(request, {
+        context = {
             'latest_question_list': latest_question_list,
-        })
-        return HttpResponse(template.render(context))
+        }
+        return HttpResponse(template.render(context, request))
 
 That code loads the template called  ``polls/index.html`` and passes it a
 context. The context is a dictionary mapping template variable names to Python
@@ -278,9 +278,9 @@ rewritten:
         return render(request, 'polls/index.html', context)
 
 Note that once we've done this in all these views, we no longer need to import
-:mod:`~django.template.loader`, :class:`~django.template.RequestContext` and
-:class:`~django.http.HttpResponse` (you'll want to keep ``HttpResponse`` if you
-still have the stub methods for ``detail``, ``results``, and ``vote``).
+:mod:`~django.template.loader` and :class:`~django.http.HttpResponse` (you'll
+want to keep ``HttpResponse`` if you still have the stub methods for ``detail``,
+``results``, and ``vote``).
 
 The :func:`~django.shortcuts.render` function takes the request object as its
 first argument, a template name as its second argument and a dictionary as its
