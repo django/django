@@ -1005,14 +1005,15 @@ command.
 The :djadminopt:`--database` option can be used to specify the database for
 which to print the SQL.
 
-sqlmigrate <app_label> <migrationname>
---------------------------------------
+sqlmigrate [<app_label> [<migration_name>]]
+-------------------------------------------
 
 .. django-admin:: sqlmigrate
 
-Prints the SQL for the named migration. This requires an active database
-connection, which it will use to resolve constraint names; this means you must
-generate the SQL against a copy of the database you wish to later apply it on.
+Prints the SQL migrations. This requires an active database
+connection, which it will use to resolve constraint names; this means
+you must generate the SQL against a copy of the database you wish to
+later apply it on.
 
 Note that ``sqlmigrate`` doesn't colorize its output.
 
@@ -1022,8 +1023,9 @@ which to generate the SQL.
 .. django-admin-option:: --backwards
 
 By default, the SQL created is for running the migration in the forwards
-direction. Pass ``--backwards`` to generate the SQL for
-unapplying the migration instead.
+direction. Pass ``--backwards`` to generate the SQL for unapplying the
+migration instead. ``--backwards`` works only for named migrations
+ie., both <app_label> and <migration_name> should be provided.
 
 .. versionchanged:: 1.9
 
