@@ -294,3 +294,41 @@ Attributes
 .. attribute:: Page.paginator
 
     The associated :class:`Paginator` object.
+
+
+Custom pagination
+=================
+
+Class `EllipsisPaginator` derived from `Paginator` but has one custom method. This paginator
+originally used in admin change list to display compactly page range for a large amount of data.
+The class accepts three optional parameters for class constructor - `on_each_side`, `on_ends`,
+`max_pages_num` and also custom method :meth:`~EllipsisPaginator.get_ellipsed_page_range`.
+
+Optional arguments
+------------------
+
+``on_each_side``
+    Number of pages on the both sides of current page number, defaults to 3.
+    For example, if current page is 7, then our page range will look like this:
+    ``[1, 2, ..., 4, 5, 6, 7, 8, 9, 10, ..., 49, 50]`` - pages 4, 5, 6 at the
+    left side and 8, 9, 19 at the right side of current page.
+
+
+``on_ends``
+    Number of pages at the beginning and end of pagination range, defaults to 2.
+    For example, if current page is 10, then our page range will look like this:
+    ``[1, 2, ..., 7, 8, 9, 10, 11, 12, 13, ..., 49, 50]`` - page range starts with
+    1, 2 and ends with 49, 50.
+
+``max_pages_num``
+    Maximum number of pages in the page range for generating page range without
+    ellipsis. In this case, method `EllipsisPaginator.get_ellipsed_page_range`
+    will return :attr:`Paginator.page_range` of a parent class. Otherwise, page
+    range will be generated with ellipsis.
+
+Methods
+-------
+
+.. method:: EllipsisPaginator.get_ellipsed_page_range(page_num)
+
+    List with the page numbers and ellipsis.

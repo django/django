@@ -3,6 +3,8 @@ from math import ceil
 
 from django.utils import six
 
+DOT = '.'
+
 
 class InvalidPage(Exception):
     pass
@@ -101,6 +103,44 @@ class Paginator(object):
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
+
+
+class EllipsisPaginator(Paginator):
+    """
+    Paginator with a special method, which builds page range in a compact form - does not
+    display whole range if it does not fit into given size. Instead of full form, it displays
+    beginning, middle and end parts of range with ellipsis between them, e.g.:
+    1, 2, ..., 40, 41, 42, 43, 44, 45, 46, ..., 49, 50. Originally used in `django.contrib.admin`.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.on_each_side = kwargs.pop('on_each_side', 3)
+        self.on_ends = kwargs.pop('on_ends', 2)
+        self.max_pages_num = kwargs.pop('max_pages_num', 10)
+        super(EllipsisPaginator, self).__init__(*args, **kwargs)
+
+    def get_ellipsed_page_range(self, page_num=1):
+        if self.num_pages > self.max_pages_num:
+            # Insert "smart" pagination links, so that there are always `on_ends`
+            # links at either end of the list of pages, and there are always
+            # `on_each_side` links at either end of the "current page" link.
+            page_range = []
+            if page_num > (self.on_each_side + self.on_ends + 1):
+                page_range.extend(six.moves.range(1, self.on_ends + 1))
+                page_range.append(DOT)
+                page_range.extend(six.moves.range(page_num - self.on_each_side, page_num + 1))
+            else:
+                page_range.extend(six.moves.range(1, page_num + 1))
+
+            if page_num < (self.num_pages - self.on_each_side - self.on_ends):
+                page_range.extend(six.moves.range(page_num + 1, page_num + self.on_each_side + 1))
+                page_range.append(DOT)
+                page_range.extend(six.moves.range(self.num_pages - self.on_ends + 1, self.num_pages + 1))
+            else:
+                page_range.extend(six.moves.range(page_num + 1, self.num_pages + 1))
+        else:
+            page_range = self.page_range
+        return page_range
 
 
 class Page(collections.Sequence):

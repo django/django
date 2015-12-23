@@ -23,7 +23,7 @@ from django.contrib.auth import get_permission_codename
 from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
 )
-from django.core.paginator import Paginator
+from django.core.paginator import EllipsisPaginator
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -490,7 +490,7 @@ class ModelAdmin(BaseModelAdmin):
     date_hierarchy = None
     save_as = False
     save_on_top = False
-    paginator = Paginator
+    paginator = EllipsisPaginator
     preserve_filters = True
     inlines = []
 

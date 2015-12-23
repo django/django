@@ -55,9 +55,9 @@ class ChangeList(object):
 
         # Get search parameters from the query string.
         try:
-            self.page_num = int(request.GET.get(PAGE_VAR, 0))
+            self.page_num = int(request.GET.get(PAGE_VAR, 1))
         except ValueError:
-            self.page_num = 0
+            self.page_num = 1
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
         to_field = request.GET.get(TO_FIELD_VAR)
@@ -186,7 +186,7 @@ class ChangeList(object):
             result_list = self.queryset._clone()
         else:
             try:
-                result_list = paginator.page(self.page_num + 1).object_list
+                result_list = paginator.page(self.page_num).object_list
             except InvalidPage:
                 raise IncorrectLookupParameters
 
