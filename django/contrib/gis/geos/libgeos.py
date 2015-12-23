@@ -9,12 +9,13 @@
 import logging
 import os
 import re
+import threading
 from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
 from django.contrib.gis.geos.error import GEOSException
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import SimpleLazyObject, cached_property
 
 logger = logging.getLogger('django.contrib.gis')
 
@@ -63,10 +64,12 @@ def load_geos():
     _lgeos = CDLL(lib_path)
     # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
     # routines.  These functions aren't actually called until they are
-    # attached to a GEOS context handle -- this actually occurs in
-    # geos/prototypes/threadsafe.py.
+    # attached to a GEOS context handle.
     _lgeos.initGEOS_r.restype = CONTEXT_PTR
     _lgeos.finishGEOS_r.argtypes = [CONTEXT_PTR]
+    # Have to set the restype to c_char_p to ensure compatibility
+    # across 32 and 64-bit platforms.
+    _lgeos.GEOSversion.restype = c_char_p
     return _lgeos
 
 
@@ -134,6 +137,27 @@ def get_pointer_arr(n):
 lgeos = SimpleLazyObject(load_geos)
 
 
+class GEOSContextHandle(object):
+    def __init__(self):
+        # Initializing the context handle for this thread with
+        # the notice and error handler.
+        self.ptr = lgeos.initGEOS_r(notice_h, error_h)
+
+    def __del__(self):
+        if self.ptr and lgeos:
+            lgeos.finishGEOS_r(self.ptr)
+
+
+class GEOSContext(threading.local):
+
+    @cached_property
+    def ptr(self):
+        # Assign handle so it will will garbage collected when
+        # thread is finished.
+        self.handle = GEOSContextHandle()
+        return self.handle.ptr
+
+
 class GEOSFuncFactory(object):
     """
     Lazy loading of GEOS functions.
@@ -141,6 +165,7 @@ class GEOSFuncFactory(object):
     argtypes = None
     restype = None
     errcheck = None
+    thread_context = GEOSContext()
 
     def __init__(self, func_name, *args, **kwargs):
         self.func_name = func_name
@@ -154,21 +179,23 @@ class GEOSFuncFactory(object):
     def __call__(self, *args, **kwargs):
         if self.func is None:
             self.func = self.get_func(*self.args, **self.kwargs)
-        return self.func(*args, **kwargs)
+        # Call the threaded GEOS routine with pointer of the context handle
+        # as the first argument.
+        return self.func(self.thread_context.ptr, *args)
 
     def get_func(self, *args, **kwargs):
-        from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
-        func = GEOSFunc(self.func_name)
-        func.argtypes = self.argtypes or []
+        # GEOS thread-safe function signatures end with '_r' and
+        # take an additional context handle parameter.
+        func = getattr(lgeos, self.func_name + '_r')
+        func.argtypes = [CONTEXT_PTR] + (self.argtypes or [])
         func.restype = self.restype
         if self.errcheck:
             func.errcheck = self.errcheck
         return func
 
 
-# Returns the string version of the GEOS library. Have to set the restype
-# explicitly to c_char_p to ensure compatibility across 32 and 64-bit platforms.
-geos_version = GEOSFuncFactory('GEOSversion', restype=c_char_p)
+# Returns the string version of the GEOS library.
+geos_version = lambda: lgeos.GEOSversion()
 
 # Regular expression should be able to parse version strings such as
 # '3.0.0rc4-CAPI-1.3.3', '3.0.0-CAPI-1.4.1', '3.4.0dev-CAPI-1.8.0' or '3.4.0dev-CAPI-1.8.0 r0'
