@@ -119,15 +119,13 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         overrides.update(self.formfield_overrides)
         self.formfield_overrides = overrides
 
-    def formfield_for_dbfield(self, db_field, **kwargs):
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
         """
         Hook for specifying the form Field instance for a given database Field
         instance.
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        request = kwargs.pop("request", None)
-
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
@@ -177,7 +175,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
         # For any other type of field, just call its formfield() method.
         return db_field.formfield(**kwargs)
 
-    def formfield_for_choice_field(self, db_field, request=None, **kwargs):
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
         """
         Get a form Field for a database Field that has declared choices.
         """
@@ -208,7 +206,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
                 return db_field.remote_field.model._default_manager.using(db).order_by(*ordering)
         return None
 
-    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """
         Get a form Field for a ForeignKey.
         """
@@ -229,7 +227,7 @@ class BaseModelAdmin(six.with_metaclass(forms.MediaDefiningClass)):
 
         return db_field.formfield(**kwargs)
 
-    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
         """
         Get a form Field for a ManyToManyField.
         """
