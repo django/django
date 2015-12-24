@@ -1710,6 +1710,18 @@ class ModelMultipleChoiceFieldTests(TestCase):
         sql, params = queryset.query.sql_with_params()
         self.assertEqual(len(params), 1)
 
+    def test_clean_handles_querysets_25980(self):
+        """
+        #25980 - ModelMultipleChoiceFields should be able to deal with querysets
+        when cleaning. This happens e.g. when the field is disabled and has a
+        queryset as initial value.
+        """
+        person1 = Writer.objects.create(name="Person 1")
+        f = forms.ModelMultipleChoiceField(queryset=Writer.objects.all(), disabled=True, required=False)
+        f.clean([person1.pk])
+        f.clean(Writer.objects.none())
+        f.clean(Writer.objects.all()) # used to throw a ValidationError: ['Enter a list of values.']
+
 
 class ModelOneToOneFieldTests(TestCase):
     def test_modelform_onetoonefield(self):
