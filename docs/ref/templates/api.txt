@@ -628,13 +628,10 @@ example, the :class:`RequestContext` instance gets a ``ip_address`` variable::
         }, [ip_address_processor])
         return HttpResponse(t.render(c))
 
-Built-in template context processors
-------------------------------------
-
 .. _context-processors:
 
-Context processors
-------------------
+Built-in template context processors
+------------------------------------
 
 Here's what each of the built-in processors does:
 
