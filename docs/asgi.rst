@@ -90,6 +90,12 @@ to have a process that does both, or middleware-like code that transforms
 messages between two different channel layers or channel names. It is
 expected, however, that most deployments will fall into this pattern.
 
+There is even room for a WSGI-like application abstraction with a callable
+which takes ``(channel, message, send_func)``, but this would be slightly
+too restrictive for many use cases and does not cover how to specify
+channel names to listen on; it is expected that frameworks will cover this
+use case.
+
 
 Channels and Messages
 ---------------------
@@ -180,8 +186,9 @@ not required for basic application code and nearly all protocol server
 code, and so has been made optional in order to encourage lighter-weight
 channel layers to be written.
 
-The only extension in this document is the ``groups`` extension, defined
-below.
+There are two extensions defined here: the ``groups`` extension, which
+is expanded on below, and the ``statistics`` extension, which allows
+channel layers to provide global and per-channel statistics.
 
 There is potential to add further extensions; these may be defined by
 a separate specification, or a new version of this specification.
@@ -212,25 +219,15 @@ the group feature is still optional; its presence is indicated by the
 Thus, there is a simple Group concept in ASGI, which acts as the
 broadcast/multicast mechanism across channels. Channels are added to a group,
 and then messages sent to that group are sent to all members of the group.
-Channels expire from being in a group after a certain amount of time,
-and must be refreshed periodically to remain in it, and can also be
-explicitly removed.
+Channels can be removed from a group manually (e.g. based on a disconnect
+event), and the channel layer will garbage collect "old" channels in groups
+on a periodic basis.
 
-The expiry is because this specification assumes that at some point
-message delivery will fail, and so disconnection events by themselves
-are not sufficient to tie to an explicit group removal - over time, the
-number of group members will slowly increase as old response channels
-leak as disconnections get dropped.
-
-Instead, all protocol servers that have an ongoing connection
-(for example, long-poll HTTP or WebSockets) will instead send periodic
-"keepalive" messages, which can be used to refresh the response channel's
-group membership - each call to ``group_add`` should reset the expiry timer.
-
-Keepalive message intervals should be one-third as long as the group expiry
-timeout, to allow for slow or missed delivery of keepalives; protocol servers
-and anything else sending keepalives can retrieve the group expiry time from
-the channel layer in order to do this correctly.
+How this garbage collection happens is not specified here, as it depends on
+the internal implementation of the channel layer. The recommended approach,
+however, is when a message on a single-listener channel expires, the channel
+layer should remove that channel from all groups it's currently a member of;
+this is deemed an acceptable indication that the channel's listener is gone.
 
 *Implementation of the group functionality is optional*. If it is not provided
 and an application or protocol server requires it, they should hard error
@@ -301,7 +298,8 @@ A *channel layer* should provide an object with these attributes
 A channel layer implementing the ``groups`` extension must also provide:
 
 * ``group_add(group, channel)``, a callable that takes a ``channel`` and adds
-  it to the group given by ``group``. Both are byte strings.
+  it to the group given by ``group``. Both are byte strings. If the channel
+  is already in the group, the function should return normally.
 
 * ``group_discard(group, channel)``, a callable that removes the ``channel``
   from the ``group`` if it is in it, and does nothing otherwise.
@@ -310,8 +308,22 @@ A channel layer implementing the ``groups`` extension must also provide:
   arguments; the group to send to, as a byte string, and the message
   to send, as a serializable ``dict``.
 
-* ``group_expiry``, an integer number of seconds describing the minimum
-  group membership age before a channel is removed from a group.
+A channel layer implementing the ``statistics`` extension must also provide:
+
+* ``global_statistics()``, a callable that returns a dict with zero
+  or more of (unicode string keys):
+
+  * ``count``, the current number of messages waiting in all channels
+
+* ``channel_statistics(channel)``, a callable that returns a dict with zero
+  or more of (unicode string keys):
+
+  * ``length``, the current number of messages waiting on the channel
+  * ``age``, how long the oldest message has been waiting, in seconds
+  * ``per_second``, the number of messages processed in the last second
+
+
+
 
 
 Channel Semantics
@@ -336,6 +348,24 @@ They are not expected to deliver all messages, but a success rate of at least
 99.99% is expected under normal circumstances. Implementations may want to
 have a "resilience testing" mode where they deliberately drop more messages
 than usual so developers can test their code's handling of these scenarios.
+
+
+Persistence
+-----------
+
+Channel layers do not need to persist data long-term; group
+memberships only need to live as long as a connection does, and messages
+only as long as the message expiry time, which is usually a couple of minutes.
+
+That said, if a channel server goes down momentarily and loses all data,
+persistent socket connections will continue to transfer incoming data and
+send out new generated data, but will have lost all of their group memberships
+and in-flight messages.
+
+In order to avoid a nasty set of bugs caused by these half-deleted sockets,
+protocol servers should quit and hard restart if they detect that the channel
+layer has gone down or lost data; shedding all existing connections and letting
+clients reconnect will immediately resolve the problem.
 
 
 Message Formats
@@ -376,7 +406,7 @@ them; if a protocol server or connection incapable of Server Push receives
 these, it should simply drop them.
 
 The HTTP specs are somewhat vague on the subject of multiple headers;
-RFC7230 explicitly says they must be mergeable with commas, while RFC6265
+RFC7230 explicitly says they must be merge-able with commas, while RFC6265
 says that ``Set-Cookie`` headers cannot be combined this way. This is why
 request ``headers`` is a ``dict``, and response ``headers`` is a list of
 tuples, which matches WSGI.
@@ -757,6 +787,12 @@ TODOs
 * ``receive_many`` can't easily be implemented with async/cooperative code
   behind it as it's nonblocking - possible alternative call type?
   Asyncio extension that provides ``receive_many_yield``?
+
+* Possible extension to allow detection of channel layer flush/restart and
+  prompt protocol servers to restart?
+
+* Maybe WSGI-app like spec for simple "applications" that allows standardized
+  application-running servers?
 
 
 Copyright
