@@ -53,9 +53,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for ForeignKey in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 
@@ -90,9 +90,9 @@ class RelativeFieldTests(IsolatedModelsTestCase):
             self.assertEqual(
                 str(warns[0].message),
                 'on_delete will be a required arg for OneToOneField in Django '
-                '2.0. Set it to models.CASCADE if you want to maintain the '
-                'current default behavior. See '
-                'https://docs.djangoproject.com/en/%s/ref/models/fields/'
+                '2.0. Set it to models.CASCADE on models and in existing '
+                'migrations if you want to maintain the current default '
+                'behavior. See https://docs.djangoproject.com/en/%s/ref/models/fields/'
                 '#django.db.models.ForeignKey.on_delete' % get_docs_version(),
             )
 

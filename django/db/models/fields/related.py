@@ -747,8 +747,9 @@ class ForeignKey(ForeignObject):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,
@@ -977,8 +978,9 @@ class OneToOneField(ForeignKey):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,
