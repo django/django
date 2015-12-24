@@ -240,8 +240,8 @@ The full documentation for `dictConfig format`_ is the best source of
 information about logging configuration dictionaries. However, to give
 you a taste of what is possible, here are several examples.
 
-First, here's a simple configuration which writes all request logging from the
-:ref:`django-request-logger` logger to a local file::
+First, here's a simple configuration which writes all logging from the
+:ref:`django-logger` logger to a local file::
 
     LOGGING = {
         'version': 1,
@@ -254,7 +254,7 @@ First, here's a simple configuration which writes all request logging from the
             },
         },
         'loggers': {
-            'django.request': {
+            'django': {
                 'handlers': ['file'],
                 'level': 'DEBUG',
                 'propagate': True,
@@ -458,6 +458,8 @@ Loggers
 -------
 
 Django provides several built-in loggers.
+
+.. _django-logger:
 
 ``django``
 ~~~~~~~~~~
