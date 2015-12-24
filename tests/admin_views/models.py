@@ -419,6 +419,7 @@ class Link(models.Model):
     )
     url = models.URLField()
     post = models.ForeignKey("Post")
+    readonly_link_content = models.TextField()
 
 
 class PrePopulatedPost(models.Model):
@@ -436,6 +437,7 @@ class PrePopulatedSubPost(models.Model):
 class Post(models.Model):
     title = models.CharField(max_length=100, help_text="Some help text for the title (with unicode ŠĐĆŽćžšđ)")
     content = models.TextField(help_text="Some help text for the content (with unicode ŠĐĆŽćžšđ)")
+    readonly_content = models.TextField()
     posted = models.DateField(
         default=datetime.date.today,
         help_text="Some help text for the date (with unicode ŠĐĆŽćžšđ)"
