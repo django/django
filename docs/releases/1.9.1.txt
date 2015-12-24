@@ -79,3 +79,7 @@ Bugfixes
 
 * Restored ``contrib.auth`` hashers compatibility with py-bcrypt
   (:ticket:`26016`).
+
+* Fixed a crash in ``QuerySet.values()/values_list()`` after an ``annotate()``
+  and ``order_by()`` when ``values()/values_list()`` includes a field not in
+  the ``order_by()`` (:ticket:`25316`).

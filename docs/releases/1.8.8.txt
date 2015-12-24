@@ -54,3 +54,7 @@ Bugfixes
 
 * Made ``loaddata`` skip disabling and enabling database constraints when it
   doesn't load any fixtures (:ticket:`23372`).
+
+* Fixed a crash in ``QuerySet.values()/values_list()`` after an ``annotate()``
+  and ``order_by()`` when ``values()/values_list()`` includes a field not in
+  the ``order_by()`` (:ticket:`25316`).
