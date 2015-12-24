@@ -50,7 +50,7 @@ from .models import (
     CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
-    Inquisition, Language, MainPrepopulated, ModelWithStringPrimaryKey,
+    Inquisition, Language, Link, MainPrepopulated, ModelWithStringPrimaryKey,
     OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
     Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
     PrePopulatedPost, Promo, Question, Recommendation, Recommender,
@@ -4644,6 +4644,22 @@ class ReadonlyTest(TestCase):
         p = Post.objects.create(title="I worked on readonly_fields", content="Its good stuff")
         response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
         self.assertContains(response, "%d amount of cool" % p.pk)
+
+    @ignore_warnings(category=RemovedInDjango20Warning)  # for allow_tags deprecation
+    def test_readonly_text_field(self):
+        p = Post.objects.create(
+            title="Readonly test", content="test",
+            readonly_content='test\r\n\r\ntest\r\n\r\ntest\r\n\r\ntest',
+        )
+        Link.objects.create(
+            url="http://www.djangoproject.com", post=p,
+            readonly_link_content="test\r\nlink",
+        )
+        response = self.client.get(reverse('admin:admin_views_post_change', args=(p.pk,)))
+        # Checking readonly field.
+        self.assertContains(response, 'test<br /><br />test<br /><br />test<br /><br />test')
+        # Checking readonly field in inline.
+        self.assertContains(response, 'test<br />link')
 
     def test_readonly_post(self):
         data = {

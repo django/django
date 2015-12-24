@@ -387,7 +387,7 @@ class LinkInline(admin.TabularInline):
     model = Link
     extra = 1
 
-    readonly_fields = ("posted", "multiline")
+    readonly_fields = ("posted", "multiline", "readonly_link_content")
 
     def multiline(self, instance):
         return "InlineMultiline\ntest\nstring"
@@ -435,7 +435,7 @@ class PostAdmin(admin.ModelAdmin):
     readonly_fields = (
         'posted', 'awesomeness_level', 'coolness', 'value',
         'multiline', 'multiline_html', lambda obj: "foo",
-        'multiline_html_allow_tags',
+        'multiline_html_allow_tags', 'readonly_content',
     )
 
     inlines = [

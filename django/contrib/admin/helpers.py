@@ -219,6 +219,7 @@ class AdminReadonlyField(object):
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f, self.empty_value_display)
+                result_repr = linebreaksbr(result_repr)
         return conditional_escape(result_repr)
 
 
