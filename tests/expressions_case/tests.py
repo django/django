@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import F, Q, Max, Min, Value
+from django.db.models import F, Q, CharField, IntegerField, Max, Min, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
@@ -1243,3 +1243,31 @@ class CaseDocumentationExamples(TestCase):
             ),
             {'regular': 2, 'gold': 1, 'platinum': 3}
         )
+
+    def test_annotation_with_values_and_when(self):
+        """
+        checking if it works with annotated field not included in the order_by
+        """
+        a = Client.objects.annotate(
+            discount=Case(
+                When(account_type=Client.GOLD, then=Value('5%')),
+                When(account_type=Client.PLATINUM, then=Value('10%')),
+                default=Value('0%'),
+                output_field=CharField(),
+            ),
+        ).order_by('id').values('id')
+        self.assertEqual(list(a), [{'id': 1}, {'id': 2}, {'id': 3}])
+
+    def test_annotation_with_annotated_field(self):
+        """
+        checking if it works with annotated field included in the order_by
+        """
+        query = Client.objects.annotate(
+            discount=Case(
+                When(account_type=Client.GOLD, then=Value(5)),
+                When(account_type=Client.PLATINUM, then=Value(10)),
+                default=Value(0),
+                output_field=IntegerField(),
+            ),
+        ).order_by('discount').values('id')
+        self.assertEqual(list(query), [{'id': 1}, {'id': 2}, {'id': 3}])
