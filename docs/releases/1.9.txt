@@ -303,7 +303,7 @@ Cache
 
 * :func:`django.views.decorators.cache.never_cache` now sends more persuasive
   headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
-  to better prevent caching.
+  to better prevent caching. This was also added in Django 1.8.8.
 
 CSRF
 ^^^^
