@@ -67,3 +67,5 @@ Bugfixes
 
 * Fixed ``isnull`` query lookup for ``ForeignObject``
   (:ticket:`25972`).
+* Fixed a regression in admin which made line breaks in plain read-only text fields
+  and in tabular inline being ignored (:ticket:`25465`).

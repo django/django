@@ -48,3 +48,5 @@ Bugfixes
   ``filter_horizontal`` and ``filter_vertical`` widgets, which could result
   in inadvertent data loss if a user didn't notice that and then submitted the
   form (:ticket:`22955`).
+* Fixed a regression in admin which made line breaks in plain read-only text fields
+  and in tabular inline being ignored (:ticket:`25465`).
