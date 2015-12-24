@@ -76,8 +76,7 @@ ALWAYS_MIDDLEWARE_CLASSES = [
 
 # Need to add the associated contrib app to INSTALLED_APPS in some cases to
 # avoid "RuntimeError: Model class X doesn't declare an explicit app_label
-# and either isn't in an application in INSTALLED_APPS or else was imported
-# before its application was loaded."
+# and isn't in an application in INSTALLED_APPS."
 CONTRIB_TESTS_TO_APPS = {
     'flatpages_tests': 'django.contrib.flatpages',
     'redirects_tests': 'django.contrib.redirects',
