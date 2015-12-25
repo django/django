@@ -4,6 +4,7 @@ Migration Operations
 
 .. module:: django.db.migrations.operations
 
+
 Migration files are composed of one or more ``Operation``\s, objects that
 declaratively record what the migration should do to your database.
 
@@ -236,20 +237,14 @@ For example::
 
     migrations.RunSQL(
         "ALTER TABLE musician "
-        "ADD COLUMN name varchar(255) NOT NULL, "
-        "ADD COLUMN genre varchar(128) NOT NULL;",
+        "ADD COLUMN name varchar(255) NOT NULL;",
         state_operations=[
             migrations.AddField(
                 'musician',
                 'name',
-                models.CharField(max_length=255),
-            ),
-            migrations.AddField(
-                'musician',
-                'genre',
-                models.CharField(max_length=128),
+                models.CharField(max_length=255)
             )
-        ],
+        ]
     )
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
