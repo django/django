@@ -6,7 +6,7 @@ from django.db import connection
 from django.db.utils import DatabaseError
 from django.test import TransactionTestCase, mock, skipUnlessDBFeature
 
-from .models import Article, Reporter
+from .models import Article, City, Reporter
 
 
 class IntrospectionTests(TransactionTestCase):
@@ -102,6 +102,12 @@ class IntrospectionTests(TransactionTestCase):
             [r[6] for r in desc],
             [False, nullable_by_backend, nullable_by_backend, nullable_by_backend, True, True, False]
         )
+
+    @skipUnlessDBFeature('can_introspect_autofield')
+    def test_get_bigautofield(self):
+        with connection.cursor() as cursor:
+            desc = connection.introspection.get_table_description(cursor, City._meta.db_table)
+            self.assertTrue('BigAutoField' in [datatype(r[1], r) for r in desc])
 
     # Regression test for #9991 - 'real' types in postgres
     @skipUnlessDBFeature('has_real_datatype')

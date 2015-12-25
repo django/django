@@ -54,14 +54,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         """
         Makes ALTER TYPE with SERIAL make sense.
         """
-        if new_type.lower() == "serial":
+        if new_type.lower() in ("serial", "bigserial"):
             column = new_field.column
             sequence_name = "%s_%s_seq" % (table, column)
+            col_type = "integer" if new_type.lower() == "serial" else "bigint"
             return (
                 (
                     self.sql_alter_column_type % {
                         "column": self.quote_name(column),
-                        "type": "integer",
+                        "type": col_type
                     },
                     [],
                 ),
