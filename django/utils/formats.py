@@ -94,7 +94,9 @@ def get_format_modules(lang=None, reverse=False):
     """
     if lang is None:
         lang = get_language()
-    modules = _format_modules_cache.setdefault(lang, list(iter_format_modules(lang, settings.FORMAT_MODULE_PATH)))
+    if lang not in _format_modules_cache:
+        _format_modules_cache[lang] = list(iter_format_modules(lang, settings.FORMAT_MODULE_PATH))
+    modules = _format_modules_cache[lang]
     if reverse:
         return list(reversed(modules))
     return modules

@@ -30,7 +30,9 @@ class LocMemCache(BaseCache):
         BaseCache.__init__(self, params)
         self._cache = _caches.setdefault(name, {})
         self._expire_info = _expire_info.setdefault(name, {})
-        self._lock = _locks.setdefault(name, RWLock())
+        if name not in _locks:
+            _locks[name] = RWLock()
+        self._lock = _locks[name]
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         key = self.make_key(key, version=version)
