@@ -240,7 +240,10 @@ function findPosY(obj) {
             }
             ++i;
         }
-        return new Date(year, month, day);
+        // Creating Date object from universal time explicitly, since parsed value supposed to be in UTC, not local
+        // time. More than that, calendar uses UTC functions for date extraction which could give incorrect day value
+        // extracted from local time.
+        return new Date(Date.UTC(year, month, day));
     };
 
 })();
