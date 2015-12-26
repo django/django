@@ -105,7 +105,7 @@ CPLErrorHandler = CFUNCTYPE(None, c_int, c_int, c_char_p)
 
 
 def err_handler(error_class, error_number, message):
-    logger.error('GDAL_ERROR %d: %s' % (error_number, message))
+    logger.error('GDAL_ERROR %d: %s', error_number, message)
 err_handler = CPLErrorHandler(err_handler)
 
 
