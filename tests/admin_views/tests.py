@@ -47,19 +47,19 @@ from .models import (
     Actor, AdminOrderedAdminMethod, AdminOrderedCallable, AdminOrderedField,
     AdminOrderedModelMethod, Answer, Article, BarAccount, Book, Bookmark,
     Category, Chapter, ChapterXtra1, ChapterXtra2, Character, Child, Choice,
-    City, Collector, Color, Color2, ComplexSortedPerson, CoverLetter,
-    CustomArticle, CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel,
-    ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
-    FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
-    Inquisition, Language, MainPrepopulated, ModelWithStringPrimaryKey,
-    OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
-    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, Promo, Question, Recommendation, Recommender,
-    RelatedPrepopulated, Report, Restaurant, RowLevelChangePermissionModel,
-    SecretHideout, Section, ShortMessage, Simple, State, Story, Subscriber,
-    SuperSecretHideout, SuperVillain, Telegram, TitleTranslation, Topping,
-    UnchangeableObject, UndeletableObject, UnorderedObject, Villain, Vodcast,
-    Whatsit, Widget, Worker, WorkHour,
+    City, Collector, Color, ComplexSortedPerson, CoverLetter, CustomArticle,
+    CyclicOne, CyclicTwo, DooHickey, Employee, EmptyModel, ExternalSubscriber,
+    Fabric, FancyDoodad, FieldOverridePost, FilteredManager, FooAccount,
+    FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language,
+    MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
+    ParentWithDependentChildren, Person, Persona, Picture, Pizza, Plot,
+    PlotDetails, PluggableSearchPerson, Podcast, Post, PrePopulatedPost, Promo,
+    Question, Recommendation, Recommender, RelatedPrepopulated, Report,
+    Restaurant, RowLevelChangePermissionModel, SecretHideout, Section,
+    ShortMessage, Simple, State, Story, Subscriber, SuperSecretHideout,
+    SuperVillain, Telegram, TitleTranslation, Topping, UnchangeableObject,
+    UndeletableObject, UnorderedObject, Villain, Vodcast, Whatsit, Widget,
+    Worker, WorkHour,
 )
 
 
@@ -808,38 +808,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         list_match = resolve('/test_admin/admin4/auth/user/')
         self.assertIs(index_match.func.admin_site, customadmin.simple_site)
         self.assertIsInstance(list_match.func.model_admin, customadmin.CustomPwdTemplateUserAdmin)
-
-    def test_proxy_model_content_type_is_used_for_log_entries(self):
-        """
-        Log entries for proxy models should have the proxy model's content
-        type.
-
-        Regression test for #21084.
-        """
-        color2_content_type = ContentType.objects.get_for_model(Color2, for_concrete_model=False)
-
-        # add
-        color2_add_url = reverse('admin:admin_views_color2_add')
-        self.client.post(color2_add_url, {'value': 'orange'})
-
-        color2_addition_log = LogEntry.objects.all()[0]
-        self.assertEqual(color2_content_type, color2_addition_log.content_type)
-
-        # change
-        color_id = color2_addition_log.object_id
-        color2_change_url = reverse('admin:admin_views_color2_change', args=(color_id,))
-
-        self.client.post(color2_change_url, {'value': 'blue'})
-
-        color2_change_log = LogEntry.objects.all()[0]
-        self.assertEqual(color2_content_type, color2_change_log.content_type)
-
-        # delete
-        color2_delete_url = reverse('admin:admin_views_color2_delete', args=(color_id,))
-        self.client.post(color2_delete_url)
-
-        color2_delete_log = LogEntry.objects.all()[0]
-        self.assertEqual(color2_content_type, color2_delete_log.content_type)
 
     def test_adminsite_display_site_url(self):
         """
@@ -2269,58 +2237,6 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
-
-    def test_recentactions_without_content_type(self):
-        "If a LogEntry is missing content_type it will not display it in span tag under the hyperlink."
-        response = self.client.get(reverse('admin:index'))
-        link = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-        should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
-        self.assertContains(response, should_contain)
-        should_contain = "Model with string primary key"  # capitalized in Recent Actions
-        self.assertContains(response, should_contain)
-        logentry = LogEntry.objects.get(content_type__model__iexact='modelwithstringprimarykey')
-        # http://code.djangoproject.com/ticket/10275
-        # if the log entry doesn't have a content type it should still be
-        # possible to view the Recent Actions part
-        logentry.content_type = None
-        logentry.save()
-
-        counted_presence_before = response.content.count(force_bytes(should_contain))
-        response = self.client.get(reverse('admin:index'))
-        counted_presence_after = response.content.count(force_bytes(should_contain))
-        self.assertEqual(counted_presence_before - 1,
-            counted_presence_after)
-
-    def test_logentry_get_admin_url(self):
-        """
-        LogEntry.get_admin_url returns a URL to edit the entry's object or
-        None for non-existent (possibly deleted) models.
-        """
-        log_entry_model = "modelwithstringprimarykey"  # capitalized in Recent Actions
-        logentry = LogEntry.objects.get(content_type__model__iexact=log_entry_model)
-        desired_admin_url = reverse('admin:admin_views_modelwithstringprimarykey_change', args=(quote(self.pk),))
-
-        self.assertEqual(logentry.get_admin_url(), desired_admin_url)
-        self.assertIn(iri_to_uri(quote(self.pk)), logentry.get_admin_url())
-
-        logentry.content_type.model = "non-existent"
-        self.assertEqual(logentry.get_admin_url(), None)
-
-    def test_logentry_get_edited_object(self):
-        "LogEntry.get_edited_object returns the edited object of a given LogEntry object"
-        logentry = LogEntry.objects.get(content_type__model__iexact="modelwithstringprimarykey")
-        edited_obj = logentry.get_edited_object()
-        self.assertEqual(logentry.object_id, str(edited_obj.pk))
-
-    def test_logentry_save(self):
-        """
-        LogEntry.action_time is a timestamp of the date when the entry was
-        created. It shouldn't be updated on a subsequent save().
-        """
-        logentry = LogEntry.objects.get(content_type__model__iexact="modelwithstringprimarykey")
-        action_time = logentry.action_time
-        logentry.save()
-        self.assertEqual(logentry.action_time, action_time)
 
     def test_deleteconfirmation_link(self):
         "The link from the delete confirmation page referring back to the changeform of the object should be quoted"
