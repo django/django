@@ -110,6 +110,38 @@ class HTTPSitemapTests(SitemapTestsBase):
         response = self.client.get('/lastmod-mixed/sitemap.xml')
         self.assertFalse(response.has_header('Last-Modified'))
 
+    def test_sitemaps_lastmod_mixed_ascending_last_modified_missing(self):
+        """
+        Tests that Last-Modified header is omitted when lastmod not found in
+        all sitemaps. Test sitemaps are sorted by lastmod in ascending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/mixed-ascending.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemaps_lastmod_mixed_descending_last_modified_missing(self):
+        """
+        Tests that Last-Modified header is omitted when lastmod not found in
+        all sitemaps. Test sitemaps are sorted by lastmod in descending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/mixed-descending.xml')
+        self.assertFalse(response.has_header('Last-Modified'))
+
+    def test_sitemaps_lastmod_ascending(self):
+        """
+        Tests that Last-Modified header is set to most recent sitemap lastmod.
+        Test sitemaps are sorted by lastmod in ascending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/ascending.xml')
+        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+
+    def test_sitemaps_lastmod_descending(self):
+        """
+        Tests that Last-Modified header is set to most recent sitemap lastmod.
+        Test sitemaps are sorted by lastmod in descending order.
+        """
+        response = self.client.get('/lastmod-sitemaps/descending.xml')
+        self.assertEqual(response['Last-Modified'], 'Sat, 20 Apr 2013 05:00:00 GMT')
+
     @skipUnless(settings.USE_I18N, "Internationalization is not enabled")
     @override_settings(USE_L10N=True)
     def test_localized_priority(self):
