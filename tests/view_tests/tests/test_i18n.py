@@ -211,6 +211,15 @@ class JsI18NTests(SimpleTestCase):
             self.assertContains(response, 'emoji')
             self.assertContains(response, '\\ud83d\\udca9')
 
+    @modify_settings(INSTALLED_APPS={'append': ['view_tests.app6']})
+    def test_jsoni18n_with_missing_default_language_files(self):
+        """
+        Use LANGUAGE_CODE for missing files lookup (#22822)
+        """
+        with self.settings(LANGUAGE_CODE='ru'):
+            response = self.client.get('/jsi18n/app6/')
+            self.assertContains(response, 'перевод')
+
 
 @override_settings(ROOT_URLCONF='view_tests.urls')
 class JsI18NTestsMultiPackage(SimpleTestCase):
