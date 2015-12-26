@@ -14,3 +14,7 @@ Bugfixes
 
 * Fixed a crash in the translations system when the current language has no
   translations (:ticket:`26046`).
+
+* Fixed a regression that caused the incorrect day to be selected when opening
+  the admin calendar widget for timezones from GMT+0100 to GMT+1200
+  (:ticket:`24980`).
