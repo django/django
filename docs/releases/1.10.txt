@@ -241,6 +241,8 @@ Models
 * The :attr:`~django.db.models.Func.arity` class attribute is added to
   :class:`~django.db.models.Func`. This attribute can be used to set the number
   of arguments the function accepts.
+* :meth:`QuerySet.in_bulk() <django.db.models.query.QuerySet.in_bulk>`
+  may be called without any arguments to return all objects in the queryset.
 
 * Added :class:`~django.db.models.BigAutoField` which acts much like an
   :class:`~django.db.models.AutoField` except that it is guaranteed
