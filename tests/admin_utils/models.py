@@ -28,6 +28,11 @@ class Article(models.Model):
     test_from_model_with_override.short_description = "not What you Expect"
 
 
+class ArticleProxy(Article):
+    class Meta:
+        proxy = True
+
+
 @python_2_unicode_compatible
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
