@@ -49,6 +49,7 @@ setup(
     ]},
     extras_require={
         "bcrypt": ["bcrypt"],
+        "argon2": ["argon2-cffi >= 16.0.0"],
     },
     zip_safe=False,
     classifiers=[

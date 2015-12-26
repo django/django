@@ -297,6 +297,79 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     digest = hashlib.sha1
 
 
+class Argon2PasswordHasher(BasePasswordHasher):
+    """
+    Secure password hashing using the argon2 algorithm.
+
+    This is the winner of the Password Hashing Competition 2013-2015
+    (https://password-hashing.net). It requires the argon2-cffi library which
+    depends on native C code and might cause portability issues.
+    """
+    algorithm = 'argon2'
+    library = 'argon2'
+
+    time_cost = 2
+    memory_cost = 512
+    parallelism = 2
+
+    def encode(self, password, salt):
+        argon2 = self._load_library()
+        data = argon2.low_level.hash_secret(
+            force_bytes(password),
+            force_bytes(salt),
+            time_cost=self.time_cost,
+            memory_cost=self.memory_cost,
+            parallelism=self.parallelism,
+            hash_len=argon2.DEFAULT_HASH_LENGTH,
+            type=argon2.low_level.Type.I,
+        )
+        return self.algorithm + data.decode('utf-8')
+
+    def verify(self, password, encoded):
+        argon2 = self._load_library()
+        algorithm, data = encoded.split('$', 1)
+        assert algorithm == self.algorithm
+        try:
+            return argon2.low_level.verify_secret(
+                force_bytes('$' + data),
+                force_bytes(password),
+                type=argon2.low_level.Type.I,
+            )
+        except argon2.exceptions.VerificationError:
+            return False
+
+    def safe_summary(self, encoded):
+        algorithm, variety, raw_pars, salt, data = encoded.split('$', 5)
+        pars = dict(bit.split('=', 1) for bit in raw_pars.split(','))
+        assert algorithm == self.algorithm
+        assert len(pars) == 3 and 't' in pars and 'm' in pars and 'p' in pars
+        return OrderedDict([
+            (_('algorithm'), algorithm),
+            (_('variety'), variety),
+            (_('memory cost'), int(pars['m'])),
+            (_('time cost'), int(pars['t'])),
+            (_('parallelism'), int(pars['p'])),
+            (_('salt'), mask_hash(salt)),
+            (_('hash'), mask_hash(data)),
+        ])
+
+    def must_update(self, encoded):
+        algorithm, variety, raw_pars, salt, data = encoded.split('$', 5)
+        pars = dict([bit.split('=', 1) for bit in raw_pars.split(',')])
+        assert algorithm == self.algorithm
+        assert len(pars) == 3 and 't' in pars and 'm' in pars and 'p' in pars
+        return (
+            self.time_cost != int(pars['t']) or
+            self.memory_cost != int(pars['m']) or
+            self.parallelism != int(pars['p'])
+        )
+
+    def harden_runtime(self, password, encoded):
+        # The runtime for Argon2 is too complicated to implement a sensible
+        # hardening algorithm.
+        pass
+
+
 class BCryptSHA256PasswordHasher(BasePasswordHasher):
     """
     Secure password hashing using the bcrypt algorithm (recommended)

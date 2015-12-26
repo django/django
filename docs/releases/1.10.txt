@@ -70,6 +70,10 @@ Minor features
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Added support for the :ref:`Argon2 password hash <argon2_usage>`. It's
+  recommended over PBKDF2, however, it's not the default as it requires a
+  third-party library.
+
 * The default iteration count for the PBKDF2 password hasher has been increased
   by 25%. This backwards compatible change will not affect users who have
   subclassed ``django.contrib.auth.hashers.PBKDF2PasswordHasher`` to change the
