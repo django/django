@@ -51,6 +51,11 @@ Minor features
   model's changelist will now be rendered (without the add button, of course).
   This makes it easier to add custom tools in this case.
 
+* The :class:`~django.contrib.admin.models.LogEntry` model now stores change
+  messages in a JSON structure so that the message can be dynamically translated
+  using the current active language. A new ``LogEntry.get_change_message()``
+  method is now the preferred way of retrieving the change message.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -416,6 +421,10 @@ Miscellaneous
 
 * :djadmin:`loaddata` now raises a ``CommandError`` instead of showing a
   warning when the specified fixture file is not found.
+
+* Instead of directly accessing the ``LogEntry.change_message`` attribute, it's
+  now better to call the ``LogEntry.get_change_message()`` method which will
+  provide the message in the current language.
 
 .. _deprecated-features-1.10:
 

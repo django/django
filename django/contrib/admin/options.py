@@ -44,7 +44,9 @@ from django.utils.html import escape, format_html
 from django.utils.http import urlencode, urlquote
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
-from django.utils.translation import string_concat, ugettext as _, ungettext
+from django.utils.translation import (
+    override as translation_override, string_concat, ugettext as _, ungettext,
+)
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic import RedirectView
 
@@ -924,33 +926,44 @@ class ModelAdmin(BaseModelAdmin):
                 return urlencode({'_changelist_filters': preserved_filters})
         return ''
 
+    @translation_override(None)
     def construct_change_message(self, request, form, formsets, add=False):
         """
-        Construct a change message from a changed object.
+        Construct a JSON structure describing changes from a changed object.
+        Translations are deactivated so that strings are stored untranslated.
+        Translation happens later on LogEntry access.
         """
         change_message = []
         if add:
-            change_message.append(_('Added.'))
+            change_message.append({'added': {}})
         elif form.changed_data:
-            change_message.append(_('Changed %s.') % get_text_list(form.changed_data, _('and')))
+            change_message.append({'changed': {'fields': form.changed_data}})
 
         if formsets:
             for formset in formsets:
                 for added_object in formset.new_objects:
-                    change_message.append(_('Added %(name)s "%(object)s".')
-                                          % {'name': force_text(added_object._meta.verbose_name),
-                                             'object': force_text(added_object)})
+                    change_message.append({
+                        'added': {
+                            'name': force_text(added_object._meta.verbose_name),
+                            'object': force_text(added_object),
+                        }
+                    })
                 for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
-                                          % {'list': get_text_list(changed_fields, _('and')),
-                                             'name': force_text(changed_object._meta.verbose_name),
-                                             'object': force_text(changed_object)})
+                    change_message.append({
+                        'changed': {
+                            'name': force_text(changed_object._meta.verbose_name),
+                            'object': force_text(changed_object),
+                            'fields': changed_fields,
+                        }
+                    })
                 for deleted_object in formset.deleted_objects:
-                    change_message.append(_('Deleted %(name)s "%(object)s".')
-                                          % {'name': force_text(deleted_object._meta.verbose_name),
-                                             'object': force_text(deleted_object)})
-        change_message = ' '.join(change_message)
-        return change_message or _('No fields changed.')
+                    change_message.append({
+                        'deleted': {
+                            'name': force_text(deleted_object._meta.verbose_name),
+                            'object': force_text(deleted_object),
+                        }
+                    })
+        return change_message
 
     def message_user(self, request, message, level=messages.INFO, extra_tags='',
                      fail_silently=False):

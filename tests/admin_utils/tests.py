@@ -203,12 +203,12 @@ class UtilsTests(SimpleTestCase):
             "title"
         )
         self.assertEqual(
-            label_for_field("title2", Article),
-            "another name"
+            label_for_field("hist", Article),
+            "History"
         )
         self.assertEqual(
-            label_for_field("title2", Article, return_attr=True),
-            ("another name", None)
+            label_for_field("hist", Article, return_attr=True),
+            ("History", None)
         )
 
         self.assertEqual(

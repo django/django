@@ -931,7 +931,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'Changed email.')
+        self.assertEqual(row.get_change_message(), 'Changed email.')
 
     def test_user_not_change(self):
         response = self.client.post(
@@ -940,7 +940,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, reverse('auth_test_admin:auth_user_changelist'))
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'No fields changed.')
+        self.assertEqual(row.get_change_message(), 'No fields changed.')
 
     def test_user_change_password(self):
         user_change_url = reverse('auth_test_admin:auth_user_change', args=(self.admin.pk,))
@@ -966,7 +966,7 @@ class ChangelistTests(AuthViewsTestCase):
         )
         self.assertRedirects(response, user_change_url)
         row = LogEntry.objects.latest('id')
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')
         self.logout()
         self.login(password='password1')
 
@@ -983,7 +983,7 @@ class ChangelistTests(AuthViewsTestCase):
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, self.admin.pk)
         self.assertEqual(row.object_id, str(u.pk))
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')
 
     def test_password_change_bad_url(self):
         response = self.client.get(reverse('auth_test_admin:auth_user_password_change', args=('foobar',)))
@@ -1018,4 +1018,4 @@ class UUIDUserTests(TestCase):
         row = LogEntry.objects.latest('id')
         self.assertEqual(row.user_id, 1)  # hardcoded in CustomUserAdmin.log_change()
         self.assertEqual(row.object_id, str(u.pk))
-        self.assertEqual(row.change_message, 'Changed password.')
+        self.assertEqual(row.get_change_message(), 'Changed password.')

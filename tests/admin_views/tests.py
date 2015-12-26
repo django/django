@@ -1542,7 +1542,7 @@ class AdminViewPermissionsTest(TestCase):
         self.assertEqual(addition_log.object_id, str(new_article.pk))
         self.assertEqual(addition_log.object_repr, "Døm ikke")
         self.assertEqual(addition_log.action_flag, ADDITION)
-        self.assertEqual(addition_log.change_message, "Added.")
+        self.assertEqual(addition_log.get_change_message(), "Added.")
 
         # Super can add too, but is redirected to the change list view
         self.client.force_login(self.superuser)
