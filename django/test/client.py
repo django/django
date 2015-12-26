@@ -146,7 +146,9 @@ def store_rendered_templates(store, signal, sender, template, context, **kwargs)
     of rendering.
     """
     store.setdefault('templates', []).append(template)
-    store.setdefault('context', ContextList()).append(copy(context))
+    if 'context' not in store:
+        store['context'] = ContextList()
+    store['context'].append(copy(context))
 
 
 def encode_multipart(boundary, data):
