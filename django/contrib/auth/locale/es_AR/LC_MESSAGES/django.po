@@ -7,11 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-18 09:16+0100\n"
-"PO-Revision-Date: 2015-03-24 00:36+0000\n"
+"POT-Creation-Date: 2015-10-10 15:10+0200\n"
+"PO-Revision-Date: 2015-11-30 00:25+0000\n"
 "Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
-"django/language/es_AR/)\n"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -41,6 +41,12 @@ msgstr "Cambiar contraseña: %s"
 msgid "Authentication and Authorization"
 msgstr "Autenticación y Autorización"
 
+msgid "password"
+msgstr "contraseña"
+
+msgid "last login"
+msgstr "último ingreso"
+
 msgid "No password set."
 msgstr "No se ha establecido una contraseña."
 
@@ -56,18 +62,18 @@ msgstr "Contraseña"
 msgid "Password confirmation"
 msgstr "Confirmación de contraseña"
 
-msgid "Enter the same password as above, for verification."
+msgid "Enter the same password as before, for verification."
 msgstr ""
-"Para verificación, introduzca la misma contraseña que introdujo arriba."
+"Introduzca la misma contraseña nuevamente, para poder verificar la misma."
 
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a href=\"password/\">this "
-"form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
-"Las contraseñas no se almacenan por lo cual no es posible visualizar la "
-"contraseña de este usuario, pero puede modificarla usando <a href=\"password/"
-"\">este formulario</a>."
+"El sistema no almacena las contraseñas originales por lo cual no es posible "
+"visualizar la contraseña de este usuario, pero puede modificarla usando <a "
+"href=\"../password/\">este formulario</a>."
 
 #, python-format
 msgid ""
@@ -78,7 +84,7 @@ msgstr ""
 "cuenta que ambos campos son sensibles a mayúsculas/minúsculas."
 
 msgid "This account is inactive."
-msgstr "Esta cuenta está inactiva"
+msgstr "Esta cuenta está inactiva."
 
 msgid "Email"
 msgstr "Email"
@@ -121,6 +127,9 @@ msgstr "suma de verificación"
 msgid "name"
 msgstr "nombre"
 
+msgid "content type"
+msgstr "tipo de contenido"
+
 msgid "codename"
 msgstr "nombre en código"
 
@@ -135,12 +144,6 @@ msgstr "grupo"
 
 msgid "groups"
 msgstr "grupos"
-
-msgid "password"
-msgstr "contraseña"
-
-msgid "last login"
-msgstr "último ingreso"
 
 msgid "superuser status"
 msgstr "es superusuario"
@@ -216,6 +219,47 @@ msgstr "usuario"
 
 msgid "users"
 msgstr "usuarios"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
+"caracter."
+msgstr[1] ""
+"La contraseña es demasiado corta. Debe contener por lo menos %(min_length)d "
+"caracteres."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] "Su contraseña debe contener por lo menos %(min_length)d caracter."
+msgstr[1] "Su contraseña debe contener por lo menos %(min_length)d caracteres."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "La contraseña es muy similar a %(verbose_name)s."
+
+msgid "Your password can't be too similar to your other personal information."
+msgstr ""
+"Su contraseña no puede ser similar a otros componentes de su información "
+"personal."
+
+msgid "This password is too common."
+msgstr "La contraseña tiene un valor demasiado común."
+
+msgid "Your password can't be a commonly used password."
+msgstr "Su contraseña no puede ser una contraseña muy comunmente usada."
+
+msgid "This password is entirely numeric."
+msgstr "La contraseña está formada completamente por dígitos."
+
+msgid "Your password can't be entirely numeric."
+msgstr "Su contraseña no puede estar formada exclusivamente por números."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

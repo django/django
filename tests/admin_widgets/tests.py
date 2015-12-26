@@ -45,7 +45,7 @@ class TestDataMixin(object):
             is_staff=True, last_login=datetime(2007, 5, 30, 13, 20, 10),
             date_joined=datetime(2007, 5, 30, 13, 20, 10)
         )
-        models.Car.objects.create(id=1, owner=cls.u1, make='Volkswagon', model='Passat')
+        models.Car.objects.create(id=1, owner=cls.u1, make='Volkswagen', model='Passat')
         models.Car.objects.create(id=2, owner=cls.u2, make='BMW', model='M3')
 
 
@@ -206,7 +206,7 @@ class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
         self.client.login(username="super", password="secret")
         response = self.client.get(reverse('admin:admin_widgets_cartire_add'))
         self.assertNotContains(response, "BMW M3")
-        self.assertContains(response, "Volkswagon Passat")
+        self.assertContains(response, "Volkswagen Passat")
 
 
 @override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.SHA1PasswordHasher'],
@@ -271,9 +271,8 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', False)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilter">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 0); });</script>\n'
+            '<select multiple="multiple" name="test" class="selectfilter" '
+            'data-field-name="test\\" data-is-stacked="0">\n</select>'
         )
 
     def test_stacked_render(self):
@@ -281,9 +280,8 @@ class FilteredSelectMultipleWidgetTest(SimpleTestCase):
         w = widgets.FilteredSelectMultiple('test\\', True)
         self.assertHTMLEqual(
             w.render('test', 'test'),
-            '<select multiple="multiple" name="test" class="selectfilterstacked">\n</select>'
-            '<script type="text/javascript">addEvent(window, "load", function(e) '
-            '{SelectFilter.init("id_test", "test\\u005C", 1); });</script>\n'
+            '<select multiple="multiple" name="test" class="selectfilterstacked" '
+            'data-field-name="test\\" data-is-stacked="1">\n</select>'
         )
 
 
@@ -777,8 +775,8 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
         # Enter test data
         member = models.Member.objects.create(name='Bob', birthdate=datetime(1984, 5, 15), gender='M')
 
-        # Get month names translations for every locales
-        month_string = 'January February March April May June July August September October November December'
+        # Get month name translations for every locale
+        month_string = 'May'
         path = os.path.join(os.path.dirname(import_module('django.contrib.admin').__file__), 'locale')
         for language_code, language_name in settings.LANGUAGES:
             try:
@@ -786,12 +784,12 @@ class DateTimePickerSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWebDriv
             except IOError:
                 continue
             if month_string in catalog._catalog:
-                month_names = catalog._catalog[month_string]
+                month_name = catalog._catalog[month_string]
             else:
-                month_names = month_string
+                month_name = month_string
 
             # Get the expected caption
-            may_translation = month_names.split(' ')[4]
+            may_translation = month_name
             expected_caption = '{0:s} {1:d}'.format(may_translation.upper(), 1984)
 
             # Test with every locale
@@ -1258,6 +1256,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_id('add_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
+        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1276,6 +1275,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
 
+        self.wait_for('#id_username')
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
         username_field.clear()

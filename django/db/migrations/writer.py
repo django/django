@@ -19,7 +19,7 @@ from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.encoding import force_text
-from django.utils.functional import Promise
+from django.utils.functional import LazyObject, Promise
 from django.utils.inspect import get_func_args
 from django.utils.module_loading import module_dir
 from django.utils.timezone import now, utc
@@ -350,6 +350,10 @@ class MigrationWriter(object):
         # process.
         if isinstance(value, Promise):
             value = force_text(value)
+        elif isinstance(value, LazyObject):
+            # The unwrapped value is returned as the first item of the
+            # arguments tuple.
+            value = value.__reduce__()[1][0]
 
         # Sequences
         if isinstance(value, (frozenset, list, set, tuple)):

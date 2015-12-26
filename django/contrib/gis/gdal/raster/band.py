@@ -1,4 +1,5 @@
-from ctypes import byref, c_int
+import math
+from ctypes import byref, c_double, c_int, c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
@@ -18,6 +19,14 @@ class GDALBand(GDALBase):
     def __init__(self, source, index):
         self.source = source
         self._ptr = capi.get_ds_raster_band(source._ptr, index)
+
+    def _flush(self):
+        """
+        Call the flush method on the Band's parent raster and force a refresh
+        of the statistics attribute when requested the next time.
+        """
+        self.source._flush()
+        self._stats_refresh = True
 
     @property
     def description(self):
@@ -47,19 +56,80 @@ class GDALBand(GDALBase):
         """
         return self.width * self.height
 
+    _stats_refresh = False
+
+    def statistics(self, refresh=False, approximate=False):
+        """
+        Compute statistics on the pixel values of this band.
+
+        The return value is a tuple with the following structure:
+        (minimum, maximum, mean, standard deviation).
+
+        If approximate=True, the statistics may be computed based on overviews
+        or a subset of image tiles.
+
+        If refresh=True, the statistics will be computed from the data directly,
+        and the cache will be updated where applicable.
+
+        For empty bands (where all pixel values are nodata), all statistics
+        values are returned as None.
+
+        For raster formats using Persistent Auxiliary Metadata (PAM) services,
+        the statistics might be cached in an auxiliary file.
+        """
+        # Prepare array with arguments for capi function
+        smin, smax, smean, sstd = c_double(), c_double(), c_double(), c_double()
+        stats_args = [
+            self._ptr, c_int(approximate), byref(smin), byref(smax),
+            byref(smean), byref(sstd), c_void_p(), c_void_p(),
+        ]
+
+        if refresh or self._stats_refresh:
+            capi.compute_band_statistics(*stats_args)
+        else:
+            # Add additional argument to force computation if there is no
+            # existing PAM file to take the values from.
+            force = True
+            stats_args.insert(2, c_int(force))
+            capi.get_band_statistics(*stats_args)
+
+        result = smin.value, smax.value, smean.value, sstd.value
+
+        # Check if band is empty (in that case, set all statistics to None)
+        if any((math.isnan(val) for val in result)):
+            result = (None, None, None, None)
+
+        self._stats_refresh = False
+
+        return result
+
     @property
     def min(self):
         """
-        Returns the minimum pixel value for this band.
+        Return the minimum pixel value for this band.
         """
-        return capi.get_band_minimum(self._ptr, byref(c_int()))
+        return self.statistics()[0]
 
     @property
     def max(self):
         """
-        Returns the maximum pixel value for this band.
+        Return the maximum pixel value for this band.
         """
-        return capi.get_band_maximum(self._ptr, byref(c_int()))
+        return self.statistics()[1]
+
+    @property
+    def mean(self):
+        """
+        Return the mean of all pixel values of this band.
+        """
+        return self.statistics()[2]
+
+    @property
+    def std(self):
+        """
+        Return the standard deviation of all pixel values of this band.
+        """
+        return self.statistics()[3]
 
     @property
     def nodata_value(self):
@@ -84,7 +154,7 @@ class GDALBand(GDALBase):
         if not isinstance(value, (int, float)):
             raise ValueError('Nodata value must be numeric.')
         capi.set_band_nodata_value(self._ptr, value)
-        self.source._flush()
+        self._flush()
 
     def datatype(self, as_string=False):
         """
@@ -149,7 +219,7 @@ class GDALBand(GDALBase):
             else:
                 return list(data_array)
         else:
-            self.source._flush()
+            self._flush()
 
 
 class BandList(list):

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
+import threading
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import skipUnless
@@ -12,9 +13,10 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import (
     HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, LinearRing,
     LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
-    fromfile, fromstr,
+    fromfile, fromstr, libgeos,
 )
 from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -325,11 +327,19 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(ls, LineString(numpy.array(ls.tuple)))  # as numpy array
 
-            with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
-                LineString((0, 0))
+        with self.assertRaisesMessage(TypeError, 'Each coordinate should be a sequence (list or tuple)'):
+            LineString((0, 0))
 
-            with self.assertRaisesMessage(TypeError, 'LineString requires at least 2 points, got 1.'):
-                LineString([(0, 0)])
+        with self.assertRaisesMessage(ValueError, 'LineString requires at least 2 points, got 1.'):
+            LineString([(0, 0)])
+
+        if numpy:
+            with self.assertRaisesMessage(ValueError, 'LineString requires at least 2 points, got 1.'):
+                LineString(numpy.array([(0, 0)]))
+
+        with mock.patch('django.contrib.gis.geos.linestring.numpy', False):
+            with self.assertRaisesMessage(TypeError, 'Invalid initialization input for LineStrings.'):
+                LineString('wrong input')
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -374,11 +384,15 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             if numpy:
                 self.assertEqual(lr, LinearRing(numpy.array(lr.tuple)))
 
-        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 3.'):
+        with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 3.'):
             LinearRing((0, 0), (1, 1), (0, 0))
 
-        with self.assertRaisesMessage(TypeError, 'LinearRing requires at least 4 points, got 1.'):
+        with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 1.'):
             LinearRing([(0, 0)])
+
+        if numpy:
+            with self.assertRaisesMessage(ValueError, 'LinearRing requires at least 4 points, got 1.'):
+                LinearRing(numpy.array([(0, 0)]))
 
     def test_polygons_from_bbox(self):
         "Testing `from_bbox` class method."
@@ -648,6 +662,20 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertTrue(poly.covers(Point(5, 5)))
         self.assertFalse(poly.covers(Point(100, 100)))
 
+    def test_closed(self):
+        ls_closed = LineString((0, 0), (1, 1), (0, 0))
+        ls_not_closed = LineString((0, 0), (1, 1))
+        self.assertFalse(ls_not_closed.closed)
+        self.assertTrue(ls_closed.closed)
+
+        if geos_version_info()['version'] >= '3.5':
+            self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
+            self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
+
+        with mock.patch('django.contrib.gis.geos.collections.geos_version_info', lambda: {'version': '3.4.9'}):
+            with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
+                MultiLineString().closed
+
     def test_srid(self):
         "Testing the SRID property and keyword."
         # Testing SRID keyword on Point
@@ -781,6 +809,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         p[:] = (1, 2, 3)
         self.assertEqual(p, Point(1, 2, 3))
 
+        p[:] = ()
+        self.assertEqual(p.wkt, Point())
+
         p[:] = (1, 2)
         self.assertEqual(p.wkt, Point(1, 2))
 
@@ -792,6 +823,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_linestring_list_assignment(self):
         ls = LineString((0, 0), (1, 1))
 
+        ls[:] = ()
+        self.assertEqual(ls, LineString())
+
         ls[:] = ((0, 0), (1, 1), (2, 2))
         self.assertEqual(ls, LineString((0, 0), (1, 1), (2, 2)))
 
@@ -801,11 +835,33 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
     def test_linearring_list_assignment(self):
         ls = LinearRing((0, 0), (0, 1), (1, 1), (0, 0))
 
+        ls[:] = ()
+        self.assertEqual(ls, LinearRing())
+
         ls[:] = ((0, 0), (0, 1), (1, 1), (1, 0), (0, 0))
         self.assertEqual(ls, LinearRing((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)))
 
         with self.assertRaises(ValueError):
             ls[:] = ((0, 0), (1, 1), (2, 2))
+
+    def test_polygon_list_assignment(self):
+        pol = Polygon()
+
+        pol[:] = (((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)),)
+        self.assertEqual(pol, Polygon(((0, 0), (0, 1), (1, 1), (1, 0), (0, 0)),))
+
+        pol[:] = ()
+        self.assertEqual(pol, Polygon())
+
+    def test_geometry_collection_list_assignment(self):
+        p = Point()
+        gc = GeometryCollection()
+
+        gc[:] = [p]
+        self.assertEqual(gc, GeometryCollection(p))
+
+        gc[:] = ()
+        self.assertEqual(gc, GeometryCollection())
 
     def test_threed(self):
         "Testing three-dimensional geometries."
@@ -862,16 +918,27 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_emptyCollections(self):
         "Testing empty geometries and collections."
-        gc1 = GeometryCollection([])
-        gc2 = fromstr('GEOMETRYCOLLECTION EMPTY')
-        pnt = fromstr('POINT EMPTY')
-        ls = fromstr('LINESTRING EMPTY')
-        poly = fromstr('POLYGON EMPTY')
-        mls = fromstr('MULTILINESTRING EMPTY')
-        mpoly1 = fromstr('MULTIPOLYGON EMPTY')
-        mpoly2 = MultiPolygon(())
+        geoms = [
+            GeometryCollection([]),
+            fromstr('GEOMETRYCOLLECTION EMPTY'),
+            GeometryCollection(),
+            fromstr('POINT EMPTY'),
+            Point(),
+            fromstr('LINESTRING EMPTY'),
+            LineString(),
+            fromstr('POLYGON EMPTY'),
+            Polygon(),
+            fromstr('MULTILINESTRING EMPTY'),
+            MultiLineString(),
+            fromstr('MULTIPOLYGON EMPTY'),
+            MultiPolygon(()),
+            MultiPolygon(),
+        ]
 
-        for g in [gc1, gc2, pnt, ls, poly, mls, mpoly1, mpoly2]:
+        if numpy:
+            geoms.append(LineString(numpy.array([])))
+
+        for g in geoms:
             self.assertEqual(True, g.empty)
 
             # Testing len() and num_geom.
@@ -1166,6 +1233,48 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
 
+    def test_geos_threads(self):
+        pnt = Point()
+        context_ptrs = []
+
+        geos_init = libgeos.lgeos.initGEOS_r
+        geos_finish = libgeos.lgeos.finishGEOS_r
+
+        def init(*args, **kwargs):
+            result = geos_init(*args, **kwargs)
+            context_ptrs.append(result)
+            return result
+
+        def finish(*args, **kwargs):
+            result = geos_finish(*args, **kwargs)
+            destructor_called.set()
+            return result
+
+        for i in range(2):
+            destructor_called = threading.Event()
+            patch_path = 'django.contrib.gis.geos.libgeos.lgeos'
+            with mock.patch.multiple(patch_path, initGEOS_r=mock.DEFAULT, finishGEOS_r=mock.DEFAULT) as mocked:
+                mocked['initGEOS_r'].side_effect = init
+                mocked['finishGEOS_r'].side_effect = finish
+                with mock.patch('django.contrib.gis.geos.prototypes.predicates.geos_hasz.func') as mocked_hasz:
+                    thread = threading.Thread(target=lambda: pnt.hasz)
+                    thread.start()
+                    thread.join()
+
+                    # We can't be sure that members of thread locals are
+                    # garbage collected right after `thread.join()` so
+                    # we must wait until destructor is actually called.
+                    # Fail if destructor wasn't called within a second.
+                    self.assertTrue(destructor_called.wait(1))
+
+                    context_ptr = context_ptrs[i]
+                    self.assertIsInstance(context_ptr, libgeos.CONTEXT_PTR)
+                    mocked_hasz.assert_called_once_with(context_ptr, pnt.ptr)
+                    mocked['finishGEOS_r'].assert_called_once_with(context_ptr)
+
+        # Check that different contexts were used for the different threads.
+        self.assertNotEqual(context_ptrs[0], context_ptrs[1])
+
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):
         p = Point(1, 2, srid=123)
@@ -1191,3 +1300,9 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
         p.set_coords((3, 2, 1))
         self.assertEqual(p.get_coords(), (3, 2, 1))
+
+    @ignore_warnings(category=RemovedInDjango20Warning)
+    def test_deprecated_cascaded_union(self):
+        for geom in self.geometries.multipolygons:
+            mpoly = GEOSGeometry(geom.wkt)
+            self.assertEqual(mpoly.cascaded_union, mpoly.unary_union)

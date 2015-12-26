@@ -91,7 +91,7 @@ using a Python built-in ``file`` object::
     >>> from django.core.files import File
 
     # Create a Python file object using open()
-    >>> f = open('/tmp/hello.world', 'w')
+    >>> f = open('/path/to/hello.world', 'w')
     >>> myfile = File(f)
 
 Now you can use any of the documented attributes and methods
@@ -103,7 +103,7 @@ The following approach may be used to close files automatically::
     >>> from django.core.files import File
 
     # Create a Python file object using open() and the with statement
-    >>> with open('/tmp/hello.world', 'w') as f:
+    >>> with open('/path/to/hello.world', 'w') as f:
     ...     myfile = File(f)
     ...     myfile.write('Hello World')
     ...

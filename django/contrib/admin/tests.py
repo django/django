@@ -2,10 +2,21 @@ import os
 from unittest import SkipTest
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import modify_settings
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext as _
 
 
+class CSPMiddleware(object):
+    """The admin's JavaScript should be compatible with CSP."""
+    def process_response(self, request, response):
+        response['Content-Security-Policy'] = "default-src 'self'"
+        return response
+
+
+@modify_settings(
+    MIDDLEWARE_CLASSES={'append': 'django.contrib.admin.tests.CSPMiddleware'},
+)
 class AdminSeleniumWebDriverTestCase(StaticLiveServerTestCase):
 
     available_apps = [

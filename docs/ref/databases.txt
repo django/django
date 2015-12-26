@@ -92,7 +92,7 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 9.1 and higher. It requires the use of `psycopg2`_
+Django supports PostgreSQL 9.2 and higher. It requires the use of `psycopg2`_
 2.4.5 or higher (or 2.5+ if you want to use :mod:`django.contrib.postgres`).
 
 .. _psycopg2: http://initd.org/psycopg/
@@ -225,9 +225,9 @@ running ``migrate``::
         1005, "Can't create table '\\db_name\\.#sql-4a8_ab' (errno: 150)"
     )
 
-.. _storage engines: http://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
-.. _MyISAM: http://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
-.. _InnoDB: http://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
+.. _storage engines: https://dev.mysql.com/doc/refman/5.6/en/storage-engines.html
+.. _MyISAM: https://dev.mysql.com/doc/refman/5.6/en/myisam-storage-engine.html
+.. _InnoDB: https://dev.mysql.com/doc/refman/5.6/en/innodb-storage-engine.html
 
 .. [#] Unless this was changed by the packager of your MySQL package. We've
    had reports that the Windows Community Server installer sets up InnoDB as
@@ -252,7 +252,7 @@ drivers that implement this API:
 
 .. _MySQLdb: https://pypi.python.org/pypi/MySQL-python/1.2.4
 .. _mysqlclient: https://pypi.python.org/pypi/mysqlclient
-.. _MySQL Connector/Python: http://dev.mysql.com/downloads/connector/python
+.. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python
 
 All these drivers are thread-safe and provide connection pooling. ``MySQLdb``
 is the only one not supporting Python 3 currently.
@@ -261,7 +261,7 @@ In addition to a DB API driver, Django needs an adapter to access the database
 drivers from its ORM. Django provides an adapter for MySQLdb/mysqlclient while
 MySQL Connector/Python includes `its own`_.
 
-.. _its own: http://dev.mysql.com/doc/connector-python/en/connector-python-django-backend.html
+.. _its own: https://dev.mysql.com/doc/connector-python/en/connector-python-django-backend.html
 
 MySQLdb
 ~~~~~~~
@@ -295,7 +295,7 @@ MySQL Connector/Python is available from the `download page`_.
 The Django adapter is available in versions 1.1.X and later. It may not
 support the most recent releases of Django.
 
-.. _download page: http://dev.mysql.com/downloads/connector/python/
+.. _download page: https://dev.mysql.com/downloads/connector/python/
 
 .. _mysql-time-zone-definitions:
 
@@ -306,7 +306,7 @@ If you plan on using Django's :doc:`timezone support </topics/i18n/timezones>`,
 use `mysql_tzinfo_to_sql`_ to load time zone tables into the MySQL database.
 This needs to be done just once for your MySQL server, not per database.
 
-.. _mysql_tzinfo_to_sql: http://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
+.. _mysql_tzinfo_to_sql: https://dev.mysql.com/doc/refman/5.6/en/mysql-tzinfo-to-sql.html
 
 Creating your database
 ----------------------
@@ -317,7 +317,7 @@ You can `create your database`_ using the command-line tools and this SQL::
 
 This ensures all tables and columns will use UTF-8 by default.
 
-.. _create your database: http://dev.mysql.com/doc/refman/5.6/en/create-database.html
+.. _create your database: https://dev.mysql.com/doc/refman/5.6/en/create-database.html
 
 .. _mysql-collation:
 
@@ -331,7 +331,7 @@ the MySQL documentation. In all cases, you set the collation by directly
 manipulating the database tables; Django doesn't provide a way to set this on
 the model definition.
 
-.. _documented thoroughly: http://dev.mysql.com/doc/refman/5.6/en/charset.html
+.. _documented thoroughly: https://dev.mysql.com/doc/refman/5.6/en/charset.html
 
 By default, with a UTF-8 database, MySQL will use the
 ``utf8_general_ci`` collation. This results in all string equality
@@ -387,7 +387,7 @@ you should use ``utf8_general_ci`` because it is faster. If this is not acceptab
 (for example, if you require German dictionary order), use ``utf8_unicode_ci``
 because it is more accurate.
 
-.. _MySQL Unicode Character Sets: http://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
+.. _MySQL Unicode Character Sets: https://dev.mysql.com/doc/refman/5.7/en/charset-unicode-sets.html
 
 .. warning::
 
@@ -436,7 +436,7 @@ Several other MySQLdb connection options may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``. Consult the `MySQLdb documentation`_ for
 more details.
 
-.. _MySQL option file: http://dev.mysql.com/doc/refman/5.6/en/option-files.html
+.. _MySQL option file: https://dev.mysql.com/doc/refman/5.6/en/option-files.html
 .. _MySQLdb documentation: http://mysql-python.sourceforge.net/
 
 Creating your tables
@@ -480,7 +480,7 @@ Django uses lowercase table names when it auto-generates table names from
 models, so this is mainly a consideration if you are overriding the table name
 via the :class:`~django.db.models.Options.db_table` parameter.
 
-.. _known issues: http://bugs.mysql.com/bug.php?id=48875
+.. _known issues: https://bugs.mysql.com/bug.php?id=48875
 
 Savepoints
 ----------
@@ -583,7 +583,7 @@ are predominantly read-only or require a smaller installation footprint. As
 with all database servers, though, there are some differences that are
 specific to SQLite that you should be aware of.
 
-.. _SQLite: http://www.sqlite.org/
+.. _SQLite: https://www.sqlite.org/
 
 .. _sqlite-string-matching:
 
@@ -609,7 +609,7 @@ would be fairly difficult to do robustly. Thus, Django exposes the default
 SQLite behavior and you should be aware of this when doing case-insensitive or
 substring filtering.
 
-.. _documented at sqlite.org: http://www.sqlite.org/faq.html#q18
+.. _documented at sqlite.org: https://www.sqlite.org/faq.html#q18
 
 Old SQLite and ``CASE`` expressions
 -----------------------------------
@@ -624,7 +624,7 @@ the notable exception of the Python 2.7 installers for Windows.
 As of this writing, the latest release for Windows - Python 2.7.10 - includes
 SQLite 3.6.21. You can install ``pysqlite2`` or replace ``sqlite3.dll`` (by
 default installed in ``C:\Python27\DLLs``) with a newer version from
-http://www.sqlite.org/ to remedy this issue.
+https://www.sqlite.org/ to remedy this issue.
 
 .. _handling query parameters: https://code.djangoproject.com/ticket/24148
 

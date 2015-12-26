@@ -197,7 +197,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         response = HttpResponseNotFound()
         r = CommonMiddleware().process_response(request, response)
         self.assertIsNotNone(r,
-            "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
+            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/customurlconf/slash/')
 
@@ -236,7 +236,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         response = HttpResponseNotFound()
         r = CommonMiddleware().process_response(request, response)
         self.assertIsNotNone(r,
-            "CommonMiddlware failed to return APPEND_SLASH redirect using request.urlconf")
+            "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(
             r.url,
@@ -269,6 +269,37 @@ class CommonMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url,
             'http://www.testserver/customurlconf/slash/')
+
+    # ETag + If-Not-Modified support tests
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag(self):
+        req = HttpRequest()
+        res = HttpResponse('content')
+        self.assertTrue(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        res['ETag'] = 'tomatoes'
+        self.assertEqual(CommonMiddleware().process_response(req, res).get('ETag'), 'tomatoes')
+
+    @override_settings(USE_ETAGS=True)
+    def test_no_etag_streaming_response(self):
+        req = HttpRequest()
+        res = StreamingHttpResponse(['content'])
+        self.assertFalse(CommonMiddleware().process_response(req, res).has_header('ETag'))
+
+    @override_settings(USE_ETAGS=True)
+    def test_if_none_match(self):
+        first_req = HttpRequest()
+        first_res = CommonMiddleware().process_response(first_req, HttpResponse('content'))
+        second_req = HttpRequest()
+        second_req.method = 'GET'
+        second_req.META['HTTP_IF_NONE_MATCH'] = first_res['ETag']
+        second_res = CommonMiddleware().process_response(second_req, HttpResponse('content'))
+        self.assertEqual(second_res.status_code, 304)
 
     # Other tests
 
@@ -383,9 +414,18 @@ class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
         self.req.META['HTTP_REFERER'] = self.req.path
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
+
         # URL with scheme and domain should also be ignored
         self.req.META['HTTP_REFERER'] = 'http://testserver%s' % self.req.path
         BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(len(mail.outbox), 0)
+
+        # URL with a different scheme should be ignored as well because bots
+        # tend to use http:// in referers even when browsing HTTPS websites.
+        self.req.META['HTTP_X_PROTO'] = 'https'
+        self.req.META['SERVER_PORT'] = 443
+        with self.settings(SECURE_PROXY_SSL_HEADER=('HTTP_X_PROTO', 'https')):
+            BrokenLinkEmailsMiddleware().process_response(self.req, self.resp)
         self.assertEqual(len(mail.outbox), 0)
 
     def test_referer_equal_to_requested_url_on_another_domain(self):
@@ -464,29 +504,6 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.resp.status_code = 400
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 400)
-
-    @override_settings(USE_ETAGS=True)
-    def test_etag(self):
-        req = HttpRequest()
-        res = HttpResponse('content')
-        self.assertTrue(
-            CommonMiddleware().process_response(req, res).has_header('ETag'))
-
-    @override_settings(USE_ETAGS=True)
-    def test_etag_streaming_response(self):
-        req = HttpRequest()
-        res = StreamingHttpResponse(['content'])
-        res['ETag'] = 'tomatoes'
-        self.assertEqual(
-            CommonMiddleware().process_response(req, res).get('ETag'),
-            'tomatoes')
-
-    @override_settings(USE_ETAGS=True)
-    def test_no_etag_streaming_response(self):
-        req = HttpRequest()
-        res = StreamingHttpResponse(['content'])
-        self.assertFalse(
-            CommonMiddleware().process_response(req, res).has_header('ETag'))
 
     # Tests for the Last-Modified header
 

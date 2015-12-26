@@ -310,14 +310,39 @@ class GDALBandTests(unittest.TestCase):
         self.band = rs.bands[0]
 
     def test_band_data(self):
+        pam_file = self.rs_path + '.aux.xml'
         self.assertEqual(self.band.width, 163)
         self.assertEqual(self.band.height, 174)
         self.assertEqual(self.band.description, '')
         self.assertEqual(self.band.datatype(), 1)
         self.assertEqual(self.band.datatype(as_string=True), 'GDT_Byte')
-        self.assertEqual(self.band.min, 0)
-        self.assertEqual(self.band.max, 255)
         self.assertEqual(self.band.nodata_value, 15)
+        try:
+            smin, smax, smean, sstd = self.band.statistics(approximate=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.842331288343558)
+            self.assertAlmostEqual(sstd, 2.3965567248965356)
+
+            smin, smax, smean, sstd = self.band.statistics(approximate=False, refresh=True)
+            self.assertEqual(smin, 0)
+            self.assertEqual(smax, 9)
+            self.assertAlmostEqual(smean, 2.828326634228898)
+            self.assertAlmostEqual(sstd, 2.4260526986669095)
+
+            self.assertEqual(self.band.min, 0)
+            self.assertEqual(self.band.max, 9)
+            self.assertAlmostEqual(self.band.mean, 2.828326634228898)
+            self.assertAlmostEqual(self.band.std, 2.4260526986669095)
+
+            # Check that statistics are persisted into PAM file on band close
+            self.band = None
+            self.assertTrue(os.path.isfile(pam_file))
+        finally:
+            # Close band and remove file if created
+            self.band = None
+            if os.path.isfile(pam_file):
+                os.remove(pam_file)
 
     def test_read_mode_error(self):
         # Open raster in read mode
@@ -413,3 +438,31 @@ class GDALBandTests(unittest.TestCase):
             )
         else:
             self.assertEqual(bandmemjson.data(), list(range(25)))
+
+    def test_band_statistics_automatic_refresh(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 2,
+            'height': 2,
+            'bands': [{'data': [0] * 4, 'nodata_value': 99}],
+        })
+        band = rsmem.bands[0]
+        # Populate statistics cache
+        self.assertEqual(band.statistics(), (0, 0, 0, 0))
+        # Change data
+        band.data([1, 1, 0, 0])
+        # Statistics are properly updated
+        self.assertEqual(band.statistics(), (0.0, 1.0, 0.5, 0.5))
+        # Change nodata_value
+        band.nodata_value = 0
+        # Statistics are properly updated
+        self.assertEqual(band.statistics(), (1.0, 1.0, 1.0, 0.0))
+
+    def test_band_statistics_empty_band(self):
+        rsmem = GDALRaster({
+            'srid': 4326,
+            'width': 1,
+            'height': 1,
+            'bands': [{'data': [0], 'nodata_value': 0}],
+        })
+        self.assertEqual(rsmem.bands[0].statistics(), (None, None, None, None))

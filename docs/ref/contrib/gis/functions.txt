@@ -186,11 +186,15 @@ Difference
 
 .. class:: Difference(expr1, expr2, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL (≥ 5.6.1), PostGIS, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 difference, that is the part of geometry A that does not intersect with
 geometry B.
+
+.. versionchanged:: 1.10
+
+    MySQL support was added.
 
 Distance
 --------
@@ -262,10 +266,14 @@ GeoHash
 
 .. class:: GeoHash(expression, **extra)
 
-*Availability*: PostGIS
+*Availability*: PostGIS, SpatiaLite (≥ 4.0, LWGEOM)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
+
+.. versionchanged:: 1.10
+
+    SpatiaLite support was added.
 
 __ https://en.wikipedia.org/wiki/Geohash
 
@@ -274,10 +282,14 @@ Intersection
 
 .. class:: Intersection(expr1, expr2, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL (≥ 5.6.1), PostGIS, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
+
+.. versionchanged:: 1.10
+
+    MySQL support was added.
 
 Length
 ------
@@ -395,11 +407,15 @@ SymDifference
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
-*Availability*: PostGIS, Oracle, SpatiaLite
+*Availability*: MySQL (≥ 5.6.1), PostGIS, Oracle, SpatiaLite
 
 Accepts two geographic fields or expressions and returns the geometric
 symmetric difference (union without the intersection) between the given
 parameters.
+
+.. versionchanged:: 1.10
+
+    MySQL support was added.
 
 Transform
 ---------

@@ -74,7 +74,6 @@ class AdminCustomUrlsTest(TestCase):
             "description": "Description of added action",
         }
         response = self.client.post(reverse('admin_custom_urls:admin_custom_urls_action_add'), post_data)
-        self.assertContains(response, 'dismissAddRelatedObjectPopup')
         self.assertContains(response, 'Action added through a popup')
 
     def test_admin_URLs_no_clash(self):

@@ -1,6 +1,8 @@
-============================================
-Django 1.9 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 1.9 release notes
+========================
+
+*December 1, 2015*
 
 Welcome to Django 1.9!
 
@@ -21,8 +23,7 @@ Python compatibility
 Django 1.9 requires Python 2.7, 3.4, or 3.5. We **highly recommend** and only
 officially support the latest release of each series.
 
-Since Django 1.8, we've dropped support for Python 3.2 and 3.3, and added
-support for Python 3.5.
+The Django 1.8 series is the last to support Python 3.2 and 3.3.
 
 What's new in Django 1.9
 ========================
@@ -302,7 +303,7 @@ Cache
 
 * :func:`django.views.decorators.cache.never_cache` now sends more persuasive
   headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
-  to better prevent caching.
+  to better prevent caching. This was also added in Django 1.8.8.
 
 CSRF
 ^^^^
@@ -410,6 +411,8 @@ Internationalization
 * :ttag:`blocktrans` supports assigning its output to a variable using
   ``asvar``.
 
+* Two new languages are available: Colombian Spanish and Scottish Gaelic.
+
 Management Commands
 ^^^^^^^^^^^^^^^^^^^
 
@@ -451,7 +454,8 @@ Migrations
   :djadminopt:`migrate --fake-initial <--fake-initial>` to more easily detect
   initial migrations.
 
-* Added support for serialization of ``functools.partial`` objects.
+* Added support for serialization of ``functools.partial`` and ``LazyObject``
+  instances.
 
 * When supplying ``None`` as a value in :setting:`MIGRATION_MODULES`, Django
   will consider the app an app without migrations.
@@ -849,8 +853,9 @@ It was redundant to display the full details of the
 :class:`~django.http.HttpRequest` each time it appeared as a stack frame
 variable in the HTML version of the debug page and error email. Thus, the HTTP
 request will now display the same standard representation as other variables
-(``repr(request)``). As a result, the method
-``ExceptionReporterFilter.get_request_repr()`` was removed.
+(``repr(request)``). As a result, the
+``ExceptionReporterFilter.get_request_repr()`` method and the undocumented
+``django.http.build_request_repr()`` function were removed.
 
 The contents of the text version of the email were modified to provide a
 traceback of the same structure as in the case of AJAX requests. The traceback
@@ -1008,12 +1013,12 @@ a Django application with this structure::
         jquery.js
         jquery.min.js
 
-.. _syntax-error-old-pip-django-19:
+.. _syntax-error-old-setuptools-django-19:
 
-``SyntaxError`` when installing Django with pip ≤ 1.5.6
+``SyntaxError`` when installing Django setuptools 5.5.x
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When installing Django 1.9+ with pip ≤ 1.5.6, you'll see::
+When installing Django 1.9+ with setuptools 5.5.x, you'll see::
 
     Compiling django/conf/app_template/apps.py ...
       File "django/conf/app_template/apps.py", line 4
@@ -1027,9 +1032,10 @@ When installing Django 1.9+ with pip ≤ 1.5.6, you'll see::
                                  ^
     SyntaxError: invalid syntax
 
-It's safe to ignore these errors (Django will still install just fine), and you
-can avoid them by upgrading pip to a more recent version using
-``pip install -U pip``.
+It's safe to ignore these errors (Django will still install just fine), but you
+can avoid them by upgrading setuptools to a more recent version. If you're
+using pip, you can upgrade pip using ``pip install -U pip`` which will also
+upgrade setuptools.
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -1399,6 +1405,9 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * Automatic syncing of apps without migrations is removed. Migrations are
   compulsory for all apps unless you pass the :djadminopt:`--run-syncdb`
   option to ``migrate``.
+
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, are removed.
 
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data is removed.

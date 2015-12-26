@@ -223,6 +223,9 @@ The ``help_text`` argument lets you specify descriptive text for this
 ``Field`` when the ``Field`` is rendered by one of the convenience ``Form``
 methods (e.g., ``as_ul()``).
 
+Like the model field's :attr:`~django.db.models.Field.help_text`, this value
+isn't HTML-escaped in automatically-generated forms.
+
 Here's a full example ``Form`` that implements ``help_text`` for two of its
 fields. We've specified ``auto_id=False`` to simplify the output::
 
@@ -696,7 +699,7 @@ For each field, we describe the default widget used if you don't specify
     ``UploadedFile.content_type`` will be updated with the image's content type
     if Pillow can determine it, otherwise it will be set to ``None``.
 
-.. _Pillow: http://pillow.readthedocs.org/en/latest/
+.. _Pillow: https://pillow.readthedocs.org/en/latest/
 .. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``

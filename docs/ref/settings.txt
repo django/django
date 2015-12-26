@@ -681,7 +681,7 @@ backend-specific.
 Supported by the PostgreSQL_ (``postgresql``) and MySQL_ (``mysql``) backends.
 
 .. _PostgreSQL: http://www.postgresql.org/docs/current/static/multibyte.html
-.. _MySQL: http://dev.mysql.com/doc/refman/5.6/en/charset-database.html
+.. _MySQL: https://dev.mysql.com/doc/refman/5.6/en/charset-database.html
 
 .. setting:: TEST_COLLATION
 
@@ -2636,15 +2636,6 @@ The URL where requests are redirected for login, especially when using the
 This setting also accepts view function names and :ref:`named URL patterns
 <naming-url-patterns>` which can be used to reduce configuration duplication
 since you don't have to define the URL in two places (``settings`` and URLconf).
-
-.. setting:: LOGOUT_URL
-
-LOGOUT_URL
-----------
-
-Default: ``'/accounts/logout/'``
-
-LOGIN_URL counterpart.
 
 .. setting:: PASSWORD_RESET_TIMEOUT_DAYS
 

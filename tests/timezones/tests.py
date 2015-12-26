@@ -127,7 +127,7 @@ class LegacyDatabaseTests(TestCase):
         self.assertEqual(event.dt.replace(tzinfo=EAT), dt)
 
     @skipIfDBFeature('supports_timezones')
-    def test_aware_datetime_unspported(self):
+    def test_aware_datetime_unsupported(self):
         dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
         with self.assertRaises(ValueError):
             Event.objects.create(dt=dt)
@@ -1209,7 +1209,7 @@ class AdminTests(TestCase):
     def setUpTestData(cls):
         # password = "secret"
         cls.u1 = User.objects.create(
-            id=100, password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
+            password='sha1$995a3$6011485ea3834267d719b4c801409b8b1ddd0158',
             last_login=datetime.datetime(2007, 5, 30, 13, 20, 10, tzinfo=UTC),
             is_superuser=True, username='super', first_name='Super', last_name='User',
             email='super@example.com', is_staff=True, is_active=True,

@@ -33,7 +33,7 @@ class ProxyModelTests(TestCase):
             DEFAULT_DB_ALIAS).as_sql()
         self.assertEqual(my_person_sql, person_sql)
 
-    def test_inheretance_new_table(self):
+    def test_inheritance_new_table(self):
         """
         The StatusPerson models should have its own table (it's using ORM-level
         inheritance).

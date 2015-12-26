@@ -107,7 +107,7 @@ class ModelAdminTests(TestCase):
         self.assertTrue(ma.lookup_allowed('name__nonexistent', 'test_value'))
 
     def test_field_arguments(self):
-        # If we specify the fields argument, fieldsets_add and fielsets_change should
+        # If we specify the fields argument, fieldsets_add and fieldsets_change should
         # just stick the fields into a formsets structure and return it.
         class BandAdmin(ModelAdmin):
             fields = ['name']

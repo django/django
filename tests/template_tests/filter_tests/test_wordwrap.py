@@ -1,5 +1,6 @@
 from django.template.defaultfilters import wordwrap
 from django.test import SimpleTestCase
+from django.utils.functional import lazystr
 from django.utils.safestring import mark_safe
 
 from ..utils import setup
@@ -41,3 +42,11 @@ class FunctionTests(SimpleTestCase):
 
     def test_non_string_input(self):
         self.assertEqual(wordwrap(123, 2), '123')
+
+    def test_wrap_lazy_string(self):
+        self.assertEqual(
+            wordwrap(lazystr(
+                'this is a long paragraph of text that really needs to be wrapped I\'m afraid'
+            ), 14),
+            'this is a long\nparagraph of\ntext that\nreally needs\nto be wrapped\nI\'m afraid',
+        )

@@ -23,6 +23,7 @@ from django.test import SimpleTestCase, ignore_warnings, mock
 from django.utils import datetime_safe, six
 from django.utils._os import upath
 from django.utils.deconstruct import deconstructible
+from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import FixedOffset, get_default_timezone, utc
 from django.utils.translation import ugettext_lazy as _
 
@@ -233,6 +234,11 @@ class WriterTests(SimpleTestCase):
             [list, tuple, dict, set, frozenset],
             ("[list, tuple, dict, set, frozenset]", set())
         )
+
+    def test_serialize_lazy_objects(self):
+        pattern = re.compile(r'^foo$', re.UNICODE)
+        lazy_pattern = SimpleLazyObject(lambda: pattern)
+        self.assertEqual(self.serialize_round_trip(lazy_pattern), pattern)
 
     @unittest.skipUnless(enum, "enum34 is required on Python 2")
     def test_serialize_enums(self):
@@ -629,9 +635,9 @@ class WriterTests(SimpleTestCase):
         # Yes, it doesn't make sense to use a class as a default for a
         # CharField. It does make sense for custom fields though, for example
         # an enumfield that takes the enum class as an argument.
-        class DeconstructableInstances(object):
+        class DeconstructibleInstances(object):
             def deconstruct(self):
-                return ('DeconstructableInstances', [], {})
+                return ('DeconstructibleInstances', [], {})
 
-        string = MigrationWriter.serialize(models.CharField(default=DeconstructableInstances))[0]
-        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructableInstances)")
+        string = MigrationWriter.serialize(models.CharField(default=DeconstructibleInstances))[0]
+        self.assertEqual(string, "models.CharField(default=migrations.test_writer.DeconstructibleInstances)")

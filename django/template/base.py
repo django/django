@@ -151,6 +151,9 @@ class Origin(object):
             self.loader == other.loader
         )
 
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     @property
     def loader_name(self):
         if self.loader:
@@ -354,9 +357,9 @@ class Token(object):
         for bit in bits:
             # Handle translation-marked template pieces
             if bit.startswith(('_("', "_('")):
-                sentinal = bit[2] + ')'
+                sentinel = bit[2] + ')'
                 trans_bit = [bit]
-                while not bit.endswith(sentinal):
+                while not bit.endswith(sentinel):
                     bit = next(bits)
                     trans_bit.append(bit)
                 bit = ' '.join(trans_bit)
@@ -459,7 +462,7 @@ class Parser(object):
 
     def parse(self, parse_until=None):
         """
-        Iterate through the parser tokens and compils each one into a node.
+        Iterate through the parser tokens and compiles each one into a node.
 
         If parse_until is provided, parsing will stop once one of the
         specified tokens has been reached. This is formatted as a list of

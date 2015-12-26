@@ -334,9 +334,7 @@ class BaseCommand(object):
             translation.deactivate_all()
 
         try:
-            if (self.requires_system_checks and
-                    not options.get('skip_validation') and  # Remove at the end of deprecation for `skip_validation`.
-                    not options.get('skip_checks')):
+            if self.requires_system_checks and not options.get('skip_checks'):
                 self.check()
             output = self.handle(*args, **options)
             if output:

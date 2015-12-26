@@ -1249,6 +1249,14 @@ class FormattingTests(SimpleTestCase):
                 '<input id="id_cents_paid" name="cents_paid" type="hidden" value="59,47" />'
             )
 
+    def test_format_arbitrary_settings(self):
+        self.assertEqual(get_format('DEBUG'), 'DEBUG')
+
+    def test_get_custom_format(self):
+        with self.settings(FORMAT_MODULE_PATH='i18n.other.locale'):
+            with translation.override('fr', deactivate=True):
+                self.assertEqual('d/m/Y CUSTOM', get_format('CUSTOM_DAY_FORMAT'))
+
 
 class MiscTests(SimpleTestCase):
 
@@ -1841,3 +1849,22 @@ class TranslationFilesMissing(SimpleTestCase):
         self.patchGettextFind()
         trans_real._translations = {}
         self.assertRaises(IOError, activate, 'en')
+
+
+class NonDjangoLanguageTests(SimpleTestCase):
+    """
+    A language non present in default Django languages can still be
+    installed/used by a Django project.
+    """
+    @override_settings(
+        USE_I18N=True,
+        LANGUAGES=[
+            ('en-us', 'English'),
+            ('xxx', 'Somelanguage'),
+        ],
+        LANGUAGE_CODE='xxx',
+        LOCALE_PATHS=[os.path.join(here, 'commands', 'locale')],
+    )
+    def test_non_django_language(self):
+        self.assertEqual(get_language(), 'xxx')
+        self.assertEqual(ugettext("year"), "reay")

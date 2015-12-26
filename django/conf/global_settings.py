@@ -68,6 +68,7 @@ LANGUAGES = [
     ('eo', gettext_noop('Esperanto')),
     ('es', gettext_noop('Spanish')),
     ('es-ar', gettext_noop('Argentinian Spanish')),
+    ('es-co', gettext_noop('Colombian Spanish')),
     ('es-mx', gettext_noop('Mexican Spanish')),
     ('es-ni', gettext_noop('Nicaraguan Spanish')),
     ('es-ve', gettext_noop('Venezuelan Spanish')),
@@ -78,6 +79,7 @@ LANGUAGES = [
     ('fr', gettext_noop('French')),
     ('fy', gettext_noop('Frisian')),
     ('ga', gettext_noop('Irish')),
+    ('gd', gettext_noop('Scottish Gaelic')),
     ('gl', gettext_noop('Galician')),
     ('he', gettext_noop('Hebrew')),
     ('hi', gettext_noop('Hindi')),
@@ -478,8 +480,6 @@ AUTH_USER_MODEL = 'auth.User'
 AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 LOGIN_URL = '/accounts/login/'
-
-LOGOUT_URL = '/accounts/logout/'
 
 LOGIN_REDIRECT_URL = '/accounts/profile/'
 

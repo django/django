@@ -19,7 +19,7 @@ The first defense against CSRF attacks is to ensure that GET requests (and other
 such as POST, PUT and DELETE, can then be protected by following the steps
 below.
 
-.. _Cross Site Request Forgeries: http://www.squarefree.com/securitytips/web-developers.html#CSRF
+.. _Cross Site Request Forgeries: https://www.squarefree.com/securitytips/web-developers.html#CSRF
 
 .. _using-csrf:
 
@@ -45,31 +45,11 @@ To take advantage of CSRF protection in your views, follow these steps:
    This should not be done for POST forms that target external URLs, since
    that would cause the CSRF token to be leaked, leading to a vulnerability.
 
-3. In the corresponding view functions, ensure that the
-   ``'django.template.context_processors.csrf'`` context processor is
-   being used. Usually, this can be done in one of two ways:
-
-   1. Use RequestContext, which always uses
-      ``'django.template.context_processors.csrf'`` (no matter what template
-      context processors are configured in the :setting:`TEMPLATES` setting).
-      If you are using generic views or contrib apps, you are covered already,
-      since these apps use RequestContext throughout.
-
-   2. Manually import and use the processor to generate the CSRF token and
-      add it to the template context. e.g.::
-
-          from django.shortcuts import render_to_response
-          from django.template.context_processors import csrf
-
-          def my_view(request):
-              c = {}
-              c.update(csrf(request))
-              # ... view code here
-              return render_to_response("a_template.html", c)
-
-      You may want to write your own
-      :func:`~django.shortcuts.render_to_response()` wrapper that takes care
-      of this step for you.
+3. In the corresponding view functions, ensure that
+   :class:`~django.template.RequestContext` is used to render the response so
+   that ``{% csrf_token %}`` will work properly. If you're using the
+   :func:`~django.shortcuts.render` function, generic views, or contrib apps,
+   you are covered already since these all use ``RequestContext``.
 
 .. _csrf-ajax:
 
@@ -142,7 +122,7 @@ The above code could be simplified by using the `JavaScript Cookie library
 
 Finally, you'll have to actually set the header on your AJAX request, while
 protecting the CSRF token from being sent to other domains using
-`settings.crossDomain <http://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
+`settings.crossDomain <https://api.jquery.com/jQuery.ajax>`_ in jQuery 1.5.1 and
 newer:
 
 .. code-block:: javascript

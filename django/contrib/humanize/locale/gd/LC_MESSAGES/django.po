@@ -1,0 +1,319 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# GunChleoc, 2015
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-01-17 11:07+0100\n"
+"PO-Revision-Date: 2015-11-26 13:07+0000\n"
+"Last-Translator: GunChleoc\n"
+"Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
+"language/gd/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: gd\n"
+"Plural-Forms: nplurals=4; plural=(n==1 || n==11) ? 0 : (n==2 || n==12) ? 1 : "
+"(n > 2 && n < 20) ? 2 : 3;\n"
+
+msgid "Humanize"
+msgstr "Humanize"
+
+msgid "th"
+msgstr "mh"
+
+msgid "st"
+msgstr "d"
+
+msgid "nd"
+msgstr "na"
+
+msgid "rd"
+msgstr "as"
+
+#, python-format
+msgid "%(value).1f million"
+msgid_plural "%(value).1f million"
+msgstr[0] "%(value).1f mhillean"
+msgstr[1] "%(value).1f mhillean"
+msgstr[2] "%(value).1f milleanan"
+msgstr[3] "%(value).1f millean"
+
+#, python-format
+msgid "%(value)s million"
+msgid_plural "%(value)s million"
+msgstr[0] "%(value)s mhillean"
+msgstr[1] "%(value)s mhillean"
+msgstr[2] "%(value)s milleanan"
+msgstr[3] "%(value)s millean"
+
+#, python-format
+msgid "%(value).1f billion"
+msgid_plural "%(value).1f billion"
+msgstr[0] "%(value).1f bhillean"
+msgstr[1] "%(value).1f bhillean"
+msgstr[2] "%(value).1f billeanan"
+msgstr[3] "%(value).1f billean"
+
+#, python-format
+msgid "%(value)s billion"
+msgid_plural "%(value)s billion"
+msgstr[0] "%(value)s bhillean"
+msgstr[1] "%(value)s bhillean"
+msgstr[2] "%(value)s billeanan"
+msgstr[3] "%(value)s billean"
+
+#, python-format
+msgid "%(value).1f trillion"
+msgid_plural "%(value).1f trillion"
+msgstr[0] "%(value).1f trillean"
+msgstr[1] "%(value).1f thrillean"
+msgstr[2] "%(value).1f trilleanan"
+msgstr[3] "%(value).1f trillean"
+
+#, python-format
+msgid "%(value)s trillion"
+msgid_plural "%(value)s trillion"
+msgstr[0] "%(value)s trillean"
+msgstr[1] "%(value)s thrillean"
+msgstr[2] "%(value)s trilleanan"
+msgstr[3] "%(value)s trillean"
+
+#, python-format
+msgid "%(value).1f quadrillion"
+msgid_plural "%(value).1f quadrillion"
+msgstr[0] "%(value).1f quadrillean"
+msgstr[1] "%(value).1f quadrillean"
+msgstr[2] "%(value).1f quadrillean"
+msgstr[3] "%(value).1f quadrillean"
+
+#, python-format
+msgid "%(value)s quadrillion"
+msgid_plural "%(value)s quadrillion"
+msgstr[0] "%(value)s quadrillean"
+msgstr[1] "%(value)s quadrillean"
+msgstr[2] "%(value)s quadrillean"
+msgstr[3] "%(value)s quadrillean"
+
+#, python-format
+msgid "%(value).1f quintillion"
+msgid_plural "%(value).1f quintillion"
+msgstr[0] "%(value).1f quintillean"
+msgstr[1] "%(value).1f quintillean"
+msgstr[2] "%(value).1f quintillean"
+msgstr[3] "%(value).1f quintillean"
+
+#, python-format
+msgid "%(value)s quintillion"
+msgid_plural "%(value)s quintillion"
+msgstr[0] "%(value)s quintillean"
+msgstr[1] "%(value)s quintillean"
+msgstr[2] "%(value)s quintillean"
+msgstr[3] "%(value)s quintillean"
+
+#, python-format
+msgid "%(value).1f sextillion"
+msgid_plural "%(value).1f sextillion"
+msgstr[0] "%(value).1f sextillean"
+msgstr[1] "%(value).1f shextillean"
+msgstr[2] "%(value).1f sextillean"
+msgstr[3] "%(value).1f sextillean"
+
+#, python-format
+msgid "%(value)s sextillion"
+msgid_plural "%(value)s sextillion"
+msgstr[0] "%(value)s sextillean"
+msgstr[1] "%(value)s shextillean"
+msgstr[2] "%(value)s sextillean"
+msgstr[3] "%(value)s sextillean"
+
+#, python-format
+msgid "%(value).1f septillion"
+msgid_plural "%(value).1f septillion"
+msgstr[0] "%(value).1f septillean"
+msgstr[1] "%(value).1f sheptillean"
+msgstr[2] "%(value).1f septillean"
+msgstr[3] "%(value).1f septillean"
+
+#, python-format
+msgid "%(value)s septillion"
+msgid_plural "%(value)s septillion"
+msgstr[0] "%(value)s septillean"
+msgstr[1] "%(value)s sheptillean"
+msgstr[2] "%(value)s septillean"
+msgstr[3] "%(value)s septillean"
+
+#, python-format
+msgid "%(value).1f octillion"
+msgid_plural "%(value).1f octillion"
+msgstr[0] "%(value).1f octillean"
+msgstr[1] "%(value).1f octillean"
+msgstr[2] "%(value).1f octillean"
+msgstr[3] "%(value).1f octillean"
+
+#, python-format
+msgid "%(value)s octillion"
+msgid_plural "%(value)s octillion"
+msgstr[0] "%(value)s octillean"
+msgstr[1] "%(value)s octillean"
+msgstr[2] "%(value)s octillean"
+msgstr[3] "%(value)s octillean"
+
+#, python-format
+msgid "%(value).1f nonillion"
+msgid_plural "%(value).1f nonillion"
+msgstr[0] "%(value).1f nonillean"
+msgstr[1] "%(value).1f nonillean"
+msgstr[2] "%(value).1f nonillean"
+msgstr[3] "%(value).1f nonillean"
+
+#, python-format
+msgid "%(value)s nonillion"
+msgid_plural "%(value)s nonillion"
+msgstr[0] "%(value)s nonillean"
+msgstr[1] "%(value)s nonillean"
+msgstr[2] "%(value)s nonillean"
+msgstr[3] "%(value)s nonillean"
+
+#, python-format
+msgid "%(value).1f decillion"
+msgid_plural "%(value).1f decillion"
+msgstr[0] "%(value).1f decillean"
+msgstr[1] "%(value).1f dhecillean"
+msgstr[2] "%(value).1f decillean"
+msgstr[3] "%(value).1f decillean"
+
+#, python-format
+msgid "%(value)s decillion"
+msgid_plural "%(value)s decillion"
+msgstr[0] "%(value)s decillean"
+msgstr[1] "%(value)s dhecillean"
+msgstr[2] "%(value)s decillean"
+msgstr[3] "%(value)s decillean"
+
+#, python-format
+msgid "%(value).1f googol"
+msgid_plural "%(value).1f googol"
+msgstr[0] "%(value).1f ghoogol"
+msgstr[1] "%(value).1f ghoogol"
+msgstr[2] "%(value).1f googol"
+msgstr[3] "%(value).1f googol"
+
+#, python-format
+msgid "%(value)s googol"
+msgid_plural "%(value)s googol"
+msgstr[0] "%(value)s ghoogol"
+msgstr[1] "%(value)s ghoogol"
+msgstr[2] "%(value)s googol"
+msgstr[3] "%(value)s googol"
+
+msgid "one"
+msgstr "aon"
+
+msgid "two"
+msgstr "dà"
+
+msgid "three"
+msgstr "trì"
+
+msgid "four"
+msgstr "ceithir"
+
+msgid "five"
+msgstr "còig"
+
+msgid "six"
+msgstr "sia"
+
+msgid "seven"
+msgstr "seachd"
+
+msgid "eight"
+msgstr "ochd"
+
+msgid "nine"
+msgstr "naoidh"
+
+msgid "today"
+msgstr "an-diugh"
+
+msgid "tomorrow"
+msgstr "a-màireach"
+
+msgid "yesterday"
+msgstr "an-dè"
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s ago"
+msgstr "%(delta)s air ais"
+
+msgid "now"
+msgstr "an-dràsta"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second ago"
+msgid_plural "%(count)s seconds ago"
+msgstr[0] "%(count)s diog air ais"
+msgstr[1] "%(count)s dhiog air ais"
+msgstr[2] "%(count)s diogan air ais"
+msgstr[3] "%(count)s diog air ais"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute ago"
+msgid_plural "%(count)s minutes ago"
+msgstr[0] "%(count)s mhionaid air ais"
+msgstr[1] "%(count)s mhionaid air ais"
+msgstr[2] "%(count)s mionaidean air ais"
+msgstr[3] "%(count)s mionaid air ais"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour ago"
+msgid_plural "%(count)s hours ago"
+msgstr[0] "%(count)s uair a thìde air ais"
+msgstr[1] "%(count)s uair a thìde air ais"
+msgstr[2] "%(count)s uairean a thìde air ais"
+msgstr[3] "%(count)s uair a thìde air ais"
+
+#, python-format
+msgctxt "naturaltime"
+msgid "%(delta)s from now"
+msgstr "an ceann %(delta)s"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a second from now"
+msgid_plural "%(count)s seconds from now"
+msgstr[0] "an ceann %(count)s diog"
+msgstr[1] "an ceann %(count)s dhiog"
+msgstr[2] "an ceann %(count)s diogan"
+msgstr[3] "an ceann %(count)s diog"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "a minute from now"
+msgid_plural "%(count)s minutes from now"
+msgstr[0] "an ceann %(count)s mhionaid"
+msgstr[1] "an ceann %(count)s mhionaid"
+msgstr[2] "an ceann %(count)s mionaidean"
+msgstr[3] "an ceann %(count)s mionaid"
+
+#. Translators: please keep a non-breaking space (U+00A0)
+#. between count and time unit.
+#, python-format
+msgid "an hour from now"
+msgid_plural "%(count)s hours from now"
+msgstr[0] "an ceann %(count)s uair a thìde"
+msgstr[1] "an ceann %(count)s uair a thìde"
+msgstr[2] "an ceann %(count)s uairean a thìde"
+msgstr[3] "an ceann %(count)s uair a thìde"

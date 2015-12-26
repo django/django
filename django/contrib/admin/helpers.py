@@ -1,10 +1,10 @@
 from __future__ import unicode_literals
 
+import json
 import warnings
 
 from django import forms
 from django.conf import settings
-from django.contrib.admin.templatetags.admin_static import static
 from django.contrib.admin.utils import (
     display_for_field, flatten_fieldsets, help_text_for_field, label_for_field,
     lookup_field,
@@ -18,7 +18,7 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import conditional_escape, format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
 ACTION_CHECKBOX_NAME = '_selected_action'
 
@@ -76,7 +76,7 @@ class Fieldset(object):
             js = ['vendor/jquery/jquery%s.js' % extra,
                   'jquery.init.js',
                   'collapse%s.js' % extra]
-            return forms.Media(js=[static('admin/js/%s' % url) for url in js])
+            return forms.Media(js=['admin/js/%s' % url for url in js])
         return forms.Media()
     media = property(_media)
 
@@ -235,6 +235,7 @@ class InlineAdminFormSet(object):
         if prepopulated_fields is None:
             prepopulated_fields = {}
         self.prepopulated_fields = prepopulated_fields
+        self.classes = ' '.join(inline.classes) if inline.classes else ''
 
     def __iter__(self):
         for form, original in zip(self.formset.initial_forms, self.formset.get_queryset()):
@@ -275,6 +276,19 @@ class InlineAdminFormSet(object):
                     'required': form_field.required,
                     'help_text': form_field.help_text,
                 }
+
+    def inline_formset_data(self):
+        verbose_name = self.opts.verbose_name
+        return json.dumps({
+            'name': '#%s' % self.formset.prefix,
+            'options': {
+                'prefix': self.formset.prefix,
+                'addText': ugettext('Add another %(verbose_name)s') % {
+                    'verbose_name': capfirst(verbose_name),
+                },
+                'deleteText': ugettext('Remove'),
+            }
+        })
 
     def _media(self):
         media = self.opts.media + self.formset.media

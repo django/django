@@ -3,16 +3,16 @@
 # Translators:
 # Federico Bond <federicobond@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Ramiro Morales, 2012-2014
+# Ramiro Morales, 2012-2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-01-18 08:34+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
-"django/language/es_AR/)\n"
+"POT-Creation-Date: 2015-10-10 14:49+0200\n"
+"PO-Revision-Date: 2015-11-30 00:25+0000\n"
+"Last-Translator: Ramiro Morales\n"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,23 +35,14 @@ msgid "Documentation bookmarklets"
 msgstr "Bookmarklets de documentación"
 
 msgid ""
-"\n"
-"<p class=\"help\">To install bookmarklets, drag the link to your bookmarks\n"
-"toolbar, or right-click the link and add it to your bookmarks. Now you can\n"
-"select the bookmarklet from any page in the site.  Note that some of these\n"
-"bookmarklets require you to be viewing the site from a computer designated\n"
-"as \"internal\" (talk to your system administrator if you aren't sure if\n"
-"your computer is \"internal\").</p>\n"
+"To install bookmarklets, drag the link to your bookmarks toolbar, or right-"
+"click the link and add it to your bookmarks. Now you can select the "
+"bookmarklet from any page in the site."
 msgstr ""
-"\n"
-"<p class=\"help\">Para instalar bookmarklets, arrastre el enlace a su barra\n"
+"Para instalar bookmarklets, arrastre el enlace a su barra\n"
 "de favoritos, o pulse con el botón derecho el enlace y añádalo a sus "
 "favoritos.\n"
-"Ahora puede seleccionar el bookmarklet desde cualquier página en el sitio.\n"
-"Tenga en cuenta que algunos de estos bookmarklets precisan que esté viendo\n"
-"el sitio desde un equipo señalado como \"interno\" (hable\n"
-"con su administrador de sistemas si no está seguro de si el suyo lo es).</"
-"p>\n"
+"Ahora puede seleccionar el bookmarklet desde cualquier página en el sitio."
 
 msgid "Documentation for this page"
 msgstr "Documentación de esta página"
@@ -61,30 +52,6 @@ msgid ""
 "that page."
 msgstr ""
 "Le lleva desde cualquier página a la documentación de la vista que la genera."
-
-msgid "Show object ID"
-msgstr "Mostrar ID de objeto"
-
-msgid ""
-"Shows the content-type and unique ID for pages that represent a single "
-"object."
-msgstr ""
-"Muestra el tipo de contenido e ID unívoco de las páginas que representan un "
-"único objeto."
-
-msgid "Edit this object (current window)"
-msgstr "Editar este objeto (ventana actual)"
-
-msgid "Jumps to the admin page for pages that represent a single object."
-msgstr ""
-"Le lleva a la página de administración de páginas que representan un único "
-"objeto."
-
-msgid "Edit this object (new window)"
-msgstr "Editar este objeto (nueva ventana)"
-
-msgid "As above, but opens the admin page in a new window."
-msgstr "Ídem, pero abre la página de administración en una nueva ventana."
 
 msgid "Tags"
 msgstr "Etiquetas"
@@ -110,7 +77,7 @@ msgid ""
 "associated fields. Each model has a list of fields which can be accessed as "
 "template variables"
 msgstr ""
-"Los modelos son especificaciones de todos los objetos en el sistema y sus "
+"Los modelos son descripciones de todos los objetos en el sistema y sus "
 "campos asociados. Cada modelo contiene una lista de campos accesibles como "
 "variables de plantilla"
 
@@ -128,7 +95,7 @@ msgstr ""
 
 msgid "Tools for your browser to quickly access admin functionality."
 msgstr ""
-"Herramientas para tu navegador para acceder rápidamente a la funcionalidad "
+"Herramientas para su navegador para acceder rápidamente a la funcionalidad "
 "de administración."
 
 msgid "Please install docutils"
@@ -153,6 +120,9 @@ msgstr ""
 msgid "Model: %(name)s"
 msgstr "Modelo: %(name)s"
 
+msgid "Fields"
+msgstr "Campos"
+
 msgid "Field"
 msgstr "Campo"
 
@@ -161,6 +131,15 @@ msgstr "Tipo"
 
 msgid "Description"
 msgstr "Descripción"
+
+msgid "Methods with arguments"
+msgstr "Métodos con argumentos"
+
+msgid "Method"
+msgstr "Método"
+
+msgid "Arguments"
+msgstr "Argumentos"
 
 msgid "Back to Model Documentation"
 msgstr "Volver a la documentación de modelos"
@@ -262,7 +241,7 @@ msgid ""
 "code>.\n"
 msgstr ""
 "\n"
-"    Función vista: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
+"Función vista: <code>%(full_name)s</code>. Nombre: <code>%(url_name)s</"
 "code>.\n"
 
 msgid "Boolean (Either True or False)"

@@ -42,14 +42,14 @@ from django.utils.translation import ugettext_lazy as _
 # Avoid "TypeError: Item in ``from list'' not a string" -- unicode_literals
 # makes these strings unicode
 __all__ = [str(x) for x in (
-    'AutoField', 'BLANK_CHOICE_DASH', 'BigIntegerField', 'BinaryField',
-    'BooleanField', 'CharField', 'CommaSeparatedIntegerField', 'DateField',
-    'DateTimeField', 'DecimalField', 'DurationField', 'EmailField', 'Empty',
-    'Field', 'FieldDoesNotExist', 'FilePathField', 'FloatField',
-    'GenericIPAddressField', 'IPAddressField', 'IntegerField', 'NOT_PROVIDED',
-    'NullBooleanField', 'PositiveIntegerField', 'PositiveSmallIntegerField',
-    'SlugField', 'SmallIntegerField', 'TextField', 'TimeField', 'URLField',
-    'UUIDField',
+    'AutoField', 'BLANK_CHOICE_DASH', 'BigAutoField', 'BigIntegerField',
+    'BinaryField', 'BooleanField', 'CharField', 'CommaSeparatedIntegerField',
+    'DateField', 'DateTimeField', 'DecimalField', 'DurationField',
+    'EmailField', 'Empty', 'Field', 'FieldDoesNotExist', 'FilePathField',
+    'FloatField', 'GenericIPAddressField', 'IPAddressField', 'IntegerField',
+    'NOT_PROVIDED', 'NullBooleanField', 'PositiveIntegerField',
+    'PositiveSmallIntegerField', 'SlugField', 'SmallIntegerField', 'TextField',
+    'TimeField', 'URLField', 'UUIDField',
 )]
 
 
@@ -626,6 +626,14 @@ class Field(RegisterLookupMixin):
         except KeyError:
             return None
 
+    def rel_db_type(self, connection):
+        """
+        Return the data type that a related field pointing to this field should
+        use. For example, this method is called by ForeignKey and OneToOneField
+        to determine its data type.
+        """
+        return self.db_type(connection)
+
     def db_parameters(self, connection):
         """
         Extension of db_type(), providing a range of different return
@@ -960,6 +968,9 @@ class AutoField(Field):
                 params={'value': value},
             )
 
+    def rel_db_type(self, connection):
+        return IntegerField().db_type(connection=connection)
+
     def validate(self, value, model_instance):
         pass
 
@@ -984,6 +995,16 @@ class AutoField(Field):
 
     def formfield(self, **kwargs):
         return None
+
+
+class BigAutoField(AutoField):
+    description = _("Big (8 byte) integer")
+
+    def get_internal_type(self):
+        return "BigAutoField"
+
+    def rel_db_type(self, connection):
+        return BigIntegerField().db_type(connection=connection)
 
 
 class BooleanField(Field):
@@ -2072,7 +2093,24 @@ class NullBooleanField(Field):
         return super(NullBooleanField, self).formfield(**defaults)
 
 
-class PositiveIntegerField(IntegerField):
+class PositiveIntegerRelDbTypeMixin(object):
+
+    def rel_db_type(self, connection):
+        """
+        Return the data type that a related field pointing to this field should
+        use. In most cases, a foreign key pointing to a positive integer
+        primary key will have an integer column data type but some databases
+        (e.g. MySQL) have an unsigned integer type. In that case
+        (related_fields_match_type=True), the primary key should return its
+        db_type.
+        """
+        if connection.features.related_fields_match_type:
+            return self.db_type(connection)
+        else:
+            return IntegerField().db_type(connection=connection)
+
+
+class PositiveIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
     description = _("Positive integer")
 
     def get_internal_type(self):
@@ -2084,7 +2122,7 @@ class PositiveIntegerField(IntegerField):
         return super(PositiveIntegerField, self).formfield(**defaults)
 
 
-class PositiveSmallIntegerField(IntegerField):
+class PositiveSmallIntegerField(PositiveIntegerRelDbTypeMixin, IntegerField):
     description = _("Positive small integer")
 
     def get_internal_type(self):

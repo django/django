@@ -73,8 +73,7 @@ ALWAYS_MIDDLEWARE_CLASSES = [
 
 # Need to add the associated contrib app to INSTALLED_APPS in some cases to
 # avoid "RuntimeError: Model class X doesn't declare an explicit app_label
-# and either isn't in an application in INSTALLED_APPS or else was imported
-# before its application was loaded."
+# and isn't in an application in INSTALLED_APPS."
 CONTRIB_TESTS_TO_APPS = {
     'flatpages_tests': 'django.contrib.flatpages',
     'redirects_tests': 'django.contrib.redirects',
@@ -409,8 +408,8 @@ if __name__ == "__main__":
         help='Turn on the SQL query logger within tests.')
     parser.add_argument(
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
-        const=default_test_processes(),
-        help='Run tests in parallel processes.')
+        const=default_test_processes(), metavar='N',
+        help='Run tests using up to N parallel processes.')
 
     options = parser.parse_args()
 

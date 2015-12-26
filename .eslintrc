@@ -14,7 +14,7 @@
         "no-octal-escape": [2],
         "no-underscore-dangle": [2],
         "no-unused-vars": [2, {"vars": "local", "args": "none"}],
-        "no-script-url": [1],
+        "no-script-url": [2],
         "no-shadow": [2, {"hoist": "functions"}],
         "quotes": [0, "single"],
         "linebreak-style": [2, "unix"],

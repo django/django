@@ -1256,8 +1256,8 @@ subclass::
 
         class PersonAdmin(admin.ModelAdmin):
             def view_on_site(self, obj):
-                return 'http://example.com' + reverse('person-detail',
-                                                      kwargs={'slug': obj.slug})
+                return 'https://example.com' + reverse('person-detail',
+                                                       kwargs={'slug': obj.slug})
 
 Custom template options
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1929,7 +1929,7 @@ files for the forms and/or formsets. If :setting:`DEBUG` is ``True`` it will
 return the uncompressed versions of the various JavaScript files, including
 ``jquery.js``; if not, it will return the 'minified' versions.
 
-.. _jQuery: http://jquery.com
+.. _jQuery: https://jquery.com
 
 .. _admin-custom-validation:
 
@@ -2057,6 +2057,16 @@ The ``InlineModelAdmin`` class adds:
     of writing validation that relies on features of the parent model. If the
     parent model fails to validate, it may be left in an inconsistent state as
     described in the warning in :ref:`validation-on-modelform`.
+
+.. attribute:: InlineModelAdmin.classes
+
+    .. versionadded:: 1.10
+
+    A list or tuple containing extra CSS classes to apply to the fieldset that
+    is rendered for the inlines. Defaults to ``None``. As with classes
+    configured in :attr:`~ModelAdmin.fieldsets`, inlines with a ``collapse``
+    class will be initially collapsed and their header will have a small "show"
+    link.
 
 .. attribute:: InlineModelAdmin.extra
 

@@ -289,7 +289,7 @@ Methods
     Otherwise the absolute URI is built using the server variables available in
     this request.
 
-    Example: ``"http://example.com/music/bands/the_beatles/?print=true"``
+    Example: ``"https://example.com/music/bands/the_beatles/?print=true"``
 
     .. note::
 
@@ -608,10 +608,16 @@ Passing iterators
 
 Finally, you can pass ``HttpResponse`` an iterator rather than strings.
 ``HttpResponse`` will consume the iterator immediately, store its content as a
-string, and discard it.
+string, and discard it. Objects with a ``close()`` method such as files and
+generators are immediately closed.
 
 If you need the response to be streamed from the iterator to the client, you
 must use the :class:`StreamingHttpResponse` class instead.
+
+.. versionchanged:: 1.10
+
+    Objects with a ``close()`` method used to be closed when the WSGI server
+    called ``close()`` on the response.
 
 Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
@@ -860,7 +866,7 @@ types of HTTP responses. Like ``HttpResponse``, these subclasses live in
 
     The first argument to the constructor is required -- the path to redirect
     to. This can be a fully qualified URL
-    (e.g. ``'http://www.yahoo.com/search/'``), an absolute path with no domain
+    (e.g. ``'https://www.yahoo.com/search/'``), an absolute path with no domain
     (e.g. ``'/search/'``), or even a relative path (e.g. ``'search/'``). In that
     last case, the client browser will reconstruct the full URL itself
     according to the current path. See :class:`HttpResponse` for other optional
@@ -1065,8 +1071,6 @@ Attributes
 
 FileResponse objects
 ====================
-
-.. versionadded:: 1.7.4
 
 .. class:: FileResponse
 

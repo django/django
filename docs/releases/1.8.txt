@@ -28,6 +28,11 @@ Python compatibility
 Django 1.8 requires Python 2.7, 3.2, 3.3, 3.4, or 3.5. We **highly recommend**
 and only officially support the latest release of each series.
 
+Django 1.8 is the first release to support Python 3.5.
+
+Due to the end of upstream support for Python 3.2 in February 2016, we won't
+test Django 1.8.x on Python 3.2 after the end of 2016.
+
 What's new in Django 1.8
 ========================
 
@@ -1573,7 +1578,7 @@ The following functions will no longer accept a ``dirs`` parameter to override
 * :func:`django.template.loader.get_template()`
 * :func:`django.template.loader.select_template()`
 * :func:`django.shortcuts.render()`
-* :func:`django.shortcuts.render_to_response()`
+* ``django.shortcuts.render_to_response()``
 
 The parameter didn't work consistently across different template loaders and
 didn't work for included templates.

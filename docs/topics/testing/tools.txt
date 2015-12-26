@@ -73,7 +73,7 @@ Note a few important things about how the test client works:
 
   This is incorrect::
 
-      >>> c.get('http://www.example.com/login/')
+      >>> c.get('https://www.example.com/login/')
 
   The test client is not capable of retrieving Web pages that are not
   powered by your Django project. If you need to retrieve other Web pages,
@@ -685,13 +685,22 @@ then you should use :class:`~django.test.TransactionTestCase` or
 
             @classmethod
             def setUpClass(cls):
-                super(MyTestCase, cls).setUpClass()     # Call parent first
+                super(MyTestCase, cls).setUpClass()
                 ...
 
             @classmethod
             def tearDownClass(cls):
                 ...
-                super(MyTestCase, cls).tearDownClass()  # Call parent last
+                super(MyTestCase, cls).tearDownClass()
+
+    Be sure to account for Python's behavior if an exception is raised during
+    ``setUpClass()``. If that happens, neither the tests in the class nor
+    ``tearDownClass()`` are run. In the case of :class:`django.test.TestCase`,
+    this will leak the transaction created in ``super()``  which results in
+    various symptoms including a segmentation fault on some platforms (reported
+    on OS X). If you want to intentionally raise an exception such as
+    :exc:`unittest.SkipTest` in ``setUpClass()``, be sure to do it before
+    calling ``super()`` to avoid this.
 
 TransactionTestCase
 ~~~~~~~~~~~~~~~~~~~
@@ -921,7 +930,7 @@ out the `full reference`_ for more details.
 .. _Selenium: http://seleniumhq.org/
 .. _selenium package: https://pypi.python.org/pypi/selenium
 .. _full reference: http://selenium-python.readthedocs.org/en/latest/api.html
-.. _Firefox: http://www.mozilla.com/firefox/
+.. _Firefox: https://www.mozilla.com/firefox/
 
 .. note::
 
@@ -954,7 +963,7 @@ out the `full reference`_ for more details.
     use cases. Please refer to the `Selenium FAQ`_ and
     `Selenium documentation`_ for more information.
 
-    .. _Selenium FAQ: http://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
+    .. _Selenium FAQ: https://code.google.com/p/selenium/wiki/FrequentlyAskedQuestions#Q:_WebDriver_fails_to_find_elements_/_Does_not_block_on_page_loa
     .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
 Test cases features
@@ -1336,9 +1345,9 @@ your test suite.
 
     Asserts that execution of ``callable`` raises ``expected_exception`` and
     that ``expected_message`` is found in the exception's message. Any other
-    outcome is reported as a failure. Similar to unittest's
-    :meth:`~unittest.TestCase.assertRaisesRegex` with the difference that
-    ``expected_message`` isn't a regular expression.
+    outcome is reported as a failure. It's a simpler version of
+    :meth:`unittest.TestCase.assertRaisesRegex` with the difference that
+    ``expected_message`` isn't treated as a regular expression.
 
     If only the ``expected_exception`` and ``expected_message`` parameters are
     given, returns a context manager so that the code being tested can be

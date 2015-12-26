@@ -6,12 +6,15 @@ import os
 import shutil
 import stat
 import unittest
+from subprocess import Popen
 
 from django.core.management import (
     CommandError, call_command, execute_from_command_line,
 )
+from django.core.management.commands.makemessages import \
+    Command as MakeMessagesCommand
 from django.core.management.utils import find_command
-from django.test import SimpleTestCase, override_settings
+from django.test import SimpleTestCase, mock, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.utils import six, translation
 from django.utils._os import upath
@@ -162,6 +165,10 @@ class CompilationErrorHandling(MessageCompilationTests):
         with self.assertRaises(CommandError):
             call_command('compilemessages', locale=['ja'], verbosity=0)
 
+    # We will check the output of msgfmt, so we need to make sure its output
+    # is unaffected by the current locale.
+    @mock.patch('django.core.management.utils.Popen',
+        lambda *args, **kwargs: Popen(*args, env={'LANG': 'C'}, **kwargs))
     def test_msgfmt_error_including_non_ascii(self):
         # po file contains invalid msgstr content (triggers non-ascii error content).
         mo_file = 'locale/ko/LC_MESSAGES/django.mo'
@@ -173,6 +180,9 @@ class CompilationErrorHandling(MessageCompilationTests):
             except CommandError as err:
                 self.assertIn("'�' cannot start a field name", six.text_type(err))
         else:
+            cmd = MakeMessagesCommand()
+            if cmd.gettext_version < (0, 18, 3):
+                raise unittest.SkipTest("python-brace-format is a recent gettext addition.")
             with self.assertRaisesMessage(CommandError, "'�' cannot start a field name"):
                 call_command('compilemessages', locale=['ko'], verbosity=0)
 

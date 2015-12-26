@@ -309,7 +309,7 @@ class BaseExpression(object):
         Does this expression contain a reference to some of the
         existing aggregates? If so, returns the aggregate and also
         the lookup parts that *weren't* found. So, if
-            exsiting_aggregates = {'max_id': Max('id')}
+            existing_aggregates = {'max_id': Max('id')}
             self.name = 'max_id'
             queryset.filter(max_id__range=[10,100])
         then this method will return Max('id') and those parts of the

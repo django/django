@@ -555,7 +555,7 @@ redirects to the login page::
             return redirect('/login/?next=%s' % request.path)
         # ...
 
-.. function:: user_passes_test(func, login_url=None, redirect_field_name='next')
+.. function:: user_passes_test(test_func, login_url=None, redirect_field_name='next')
 
     As a shortcut, you can use the convenient ``user_passes_test`` decorator
     which performs a redirect when the callable returns ``False``::
@@ -715,7 +715,7 @@ To apply permission checks to :doc:`class-based views
 
     .. versionadded:: 1.9
 
-    This mixin, just like the ``permisison_required``
+    This mixin, just like the ``permission_required``
     decorator, checks whether the user accessing a view has all given
     permissions. You should specify the permission (or an iterable of
     permissions) using the ``permission_required`` parameter::
@@ -1045,7 +1045,7 @@ implementation details see :ref:`using-the-views`.
             {% endif %}
         {% endif %}
 
-        <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
+        <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         <table>
         <tr>

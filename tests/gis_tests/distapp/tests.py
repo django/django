@@ -1,13 +1,16 @@
 from __future__ import unicode_literals
 
+from unittest import skipUnless
+
 from django.contrib.gis.db.models.functions import (
     Area, Distance, Length, Perimeter, Transform,
 )
+from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import GEOSGeometry, LineString, Point
 from django.contrib.gis.measure import D  # alias for Distance
 from django.db import connection
 from django.db.models import F, Q
-from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, mock, skipUnlessDBFeature
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from ..utils import no_oracle, oracle, postgis
@@ -487,6 +490,7 @@ class DistanceFunctionsTests(TestCase):
             tol
         )
 
+    @skipUnless(HAS_GDAL, "GDAL is required.")
     @skipUnlessDBFeature("has_Distance_function", "has_Transform_function")
     def test_distance_projected(self):
         """
@@ -509,24 +513,26 @@ class DistanceFunctionsTests(TestCase):
                         455411.438904354, 519386.252102563, 696139.009211594,
                         232513.278304279, 542445.630586414, 456679.155883207]
 
-        # Testing using different variations of parameters and using models
-        # with different projected coordinate systems.
-        dist1 = SouthTexasCity.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-        if oracle:
-            dist_qs = [dist1]
-        else:
-            dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
-            dist_qs = [dist1, dist2]
+        for has_gdal in [False, True]:
+            with mock.patch('django.contrib.gis.gdal.HAS_GDAL', has_gdal):
+                # Testing using different variations of parameters and using models
+                # with different projected coordinate systems.
+                dist1 = SouthTexasCity.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
+                if oracle:
+                    dist_qs = [dist1]
+                else:
+                    dist2 = SouthTexasCityFt.objects.annotate(distance=Distance('point', lagrange)).order_by('id')
+                    dist_qs = [dist1, dist2]
 
-        # Original query done on PostGIS, have to adjust AlmostEqual tolerance
-        # for Oracle.
-        tol = 2 if oracle else 5
+                # Original query done on PostGIS, have to adjust AlmostEqual tolerance
+                # for Oracle.
+                tol = 2 if oracle else 5
 
-        # Ensuring expected distances are returned for each distance queryset.
-        for qs in dist_qs:
-            for i, c in enumerate(qs):
-                self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
-                self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
+                # Ensuring expected distances are returned for each distance queryset.
+                for qs in dist_qs:
+                    for i, c in enumerate(qs):
+                        self.assertAlmostEqual(m_distances[i], c.distance.m, tol)
+                        self.assertAlmostEqual(ft_distances[i], c.distance.survey_ft, tol)
 
     @skipUnlessDBFeature("has_Distance_function", "supports_distance_geodetic")
     def test_distance_geodetic(self):

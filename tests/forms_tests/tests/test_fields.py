@@ -1246,6 +1246,14 @@ class FieldsTests(SimpleTestCase):
         self.assertFalse(f.has_changed(1, '1'))
         self.assertFalse(f.has_changed('1', '1'))
 
+        f = TypedChoiceField(
+            choices=[('', '---------'), ('a', "a"), ('b', "b")], coerce=six.text_type,
+            required=False, initial=None, empty_value=None,
+        )
+        self.assertFalse(f.has_changed(None, ''))
+        self.assertTrue(f.has_changed('', 'a'))
+        self.assertFalse(f.has_changed('a', 'a'))
+
     def test_typedchoicefield_special_coerce(self):
         """
         Test a coerce function which results in a value not present in choices.

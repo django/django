@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management.color import no_style
 from django.utils.encoding import smart_text
+from django.utils.functional import cached_property
 from django.utils.six.moves import input
 
 
@@ -28,12 +29,14 @@ class Command(BaseCommand):
         self.post_processed_files = []
         self.storage = staticfiles_storage
         self.style = no_style()
+
+    @cached_property
+    def local(self):
         try:
             self.storage.path('')
         except NotImplementedError:
-            self.local = False
-        else:
-            self.local = True
+            return False
+        return True
 
     def add_arguments(self, parser):
         parser.add_argument('--noinput', '--no-input',

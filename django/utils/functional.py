@@ -1,8 +1,10 @@
 import copy
 import operator
+import warnings
 from functools import total_ordering, wraps
 
 from django.utils import six
+from django.utils.deprecation import RemovedInDjango20Warning
 
 
 # You can't trivially replace this with `functools.partial` because this binds
@@ -176,24 +178,52 @@ def _lazy_proxy_unpickle(func, args, kwargs, *resultclasses):
     return lazy(func, *resultclasses)(*args, **kwargs)
 
 
+def lazystr(text):
+    """
+    Shortcut for the common case of a lazy callable that returns str.
+    """
+    from django.utils.encoding import force_text  # Avoid circular import
+    return lazy(force_text, six.text_type)(text)
+
+
 def allow_lazy(func, *resultclasses):
+    warnings.warn(
+        "django.utils.functional.allow_lazy() is deprecated in favor of "
+        "django.utils.functional.keep_lazy()",
+        RemovedInDjango20Warning, 2)
+    return keep_lazy(*resultclasses)(func)
+
+
+def keep_lazy(*resultclasses):
     """
     A decorator that allows a function to be called with one or more lazy
     arguments. If none of the args are lazy, the function is evaluated
     immediately, otherwise a __proxy__ is returned that will evaluate the
     function when needed.
     """
-    lazy_func = lazy(func, *resultclasses)
+    if not resultclasses:
+        raise TypeError("You must pass at least one argument to keep_lazy().")
 
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        for arg in list(args) + list(kwargs.values()):
-            if isinstance(arg, Promise):
-                break
-        else:
-            return func(*args, **kwargs)
-        return lazy_func(*args, **kwargs)
-    return wrapper
+    def decorator(func):
+        lazy_func = lazy(func, *resultclasses)
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for arg in list(args) + list(six.itervalues(kwargs)):
+                if isinstance(arg, Promise):
+                    break
+            else:
+                return func(*args, **kwargs)
+            return lazy_func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def keep_lazy_text(func):
+    """
+    A decorator for functions that accept lazy arguments and return text.
+    """
+    return keep_lazy(six.text_type)(func)
 
 empty = object()
 

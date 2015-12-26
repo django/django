@@ -21,10 +21,8 @@ from django.http import (
 from django.test import SimpleTestCase
 from django.utils import six
 from django.utils._os import upath
-from django.utils.encoding import force_text, smart_str
-from django.utils.functional import lazy
-
-lazystr = lazy(force_text, six.text_type)
+from django.utils.encoding import smart_str
+from django.utils.functional import lazystr
 
 
 class QueryDictTests(unittest.TestCase):
@@ -309,7 +307,7 @@ class HttpResponseTests(unittest.TestCase):
         h['Content-Disposition'] = 'attachment; filename="%s"' % f
         # This one is triggering http://bugs.python.org/issue20747, that is Python
         # will itself insert a newline in the header
-        h['Content-Disposition'] = 'attachement; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
+        h['Content-Disposition'] = 'attachment; filename="EdelRot_Blu\u0308te (3)-0.JPG"'
 
     def test_newlines_in_headers(self):
         # Bug #10188: Do not allow newlines in headers (CR or LF)
@@ -590,18 +588,8 @@ class FileCloseTests(SimpleTestCase):
         # file isn't closed until we close the response.
         file1 = open(filename)
         r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        r.close()
         self.assertTrue(file1.closed)
-
-        # don't automatically close file when we finish iterating the response.
-        file1 = open(filename)
-        r = HttpResponse(file1)
-        self.assertFalse(file1.closed)
-        list(r)
-        self.assertFalse(file1.closed)
         r.close()
-        self.assertTrue(file1.closed)
 
         # when multiple file are assigned as content, make sure they are all
         # closed with the response.
@@ -609,9 +597,6 @@ class FileCloseTests(SimpleTestCase):
         file2 = open(filename)
         r = HttpResponse(file1)
         r.content = file2
-        self.assertFalse(file1.closed)
-        self.assertFalse(file2.closed)
-        r.close()
         self.assertTrue(file1.closed)
         self.assertTrue(file2.closed)
 

@@ -8,11 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2015-03-24 00:56+0000\n"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-30 00:25+0000\n"
 "Last-Translator: Ramiro Morales\n"
-"Language-Team: Spanish (Argentina) (http://www.transifex.com/projects/p/"
-"django/language/es_AR/)\n"
+"Language-Team: Spanish (Argentina) (http://www.transifex.com/django/django/"
+"language/es_AR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -79,6 +79,12 @@ msgstr "Acción:"
 msgid "action time"
 msgstr "hora de la acción"
 
+msgid "user"
+msgstr "usuario"
+
+msgid "content type"
+msgstr "tipo de contenido"
+
 msgid "object id"
 msgstr "id de objeto"
 
@@ -120,6 +126,9 @@ msgid ""
 msgstr ""
 "Mantenga presionada \"Control\" (\"Command\" en una Mac) para seleccionar "
 "más de uno."
+
+msgid "Added."
+msgstr "Agregado."
 
 #, python-format
 msgid "Changed %s."
@@ -281,7 +290,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Ha ocurrido un error. Se ha reportado el mismo a los administradores del "
-"sitio vía email y debería ser solucionado en breve. Le damos gracias por su "
+"sitio vía email y debería ser solucionado en breve. Le agradecemos por su "
 "paciencia."
 
 msgid "Run the selected action"
@@ -480,6 +489,14 @@ msgstr ""
 "tablas de la misma hayan sido creadas, y asegúrese de que el usuario "
 "apropiado tenga permisos de lectura en la base de datos."
 
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Ud. se halla autenticado como %(username)s, pero no está autorizado a "
+"acceder a esta página ¿Desea autenticarse con una cuenta diferente?"
+
 msgid "Forgotten your password or username?"
 msgstr "¿Olvidó su contraseña o nombre de usuario?"
 
@@ -504,6 +521,9 @@ msgstr "Mostrar todos/as"
 
 msgid "Save"
 msgstr "Guardar"
+
+msgid "Popup closing..."
+msgstr "Cerrando ventana emergente..."
 
 #, python-format
 msgid "Change selected %(model)s"
@@ -645,9 +665,6 @@ msgstr "Recuperar mi contraseña"
 
 msgid "All dates"
 msgstr "Todas las fechas"
-
-msgid "(None)"
-msgstr "(Ninguno/a)"
 
 #, python-format
 msgid "Select %s"

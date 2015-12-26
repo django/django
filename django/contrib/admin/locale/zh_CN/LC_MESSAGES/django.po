@@ -1,19 +1,24 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Jannis Leidel <jannis@leidel.info>, 2011.
-# Lele Long <schemacs@gmail.com>, 2011.
-# slene <vslene@gmail.com>, 2011.
-# Ziang Song <songziang@gmail.com>, 2012.
-# 磊 施 <leiarix@gmail.com>, 2012.
+# Jannis Leidel <jannis@leidel.info>, 2011
+# Kevin Sze <leiarix@gmail.com>, 2012
+# Lele Long <schemacs@gmail.com>, 2011,2015
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2013-2014
+# Sean Lee <iseansay@gmail.com>, 2013
+# Sean Lee <iseansay@gmail.com>, 2013
+# slene <vslene@gmail.com>, 2011
+# Ziang Song <songziang@gmail.com>, 2012
+# Kevin Sze <leiarix@gmail.com>, 2012
+# ouyanghongyu <ouyanghongyu@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: Django\n"
+"Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-01-01 16:10+0100\n"
-"PO-Revision-Date: 2013-01-02 08:52+0000\n"
-"Last-Translator: 磊 施 <leiarix@gmail.com>\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/projects/p/django/"
+"POT-Creation-Date: 2015-11-15 11:06+0100\n"
+"PO-Revision-Date: 2015-11-16 08:16+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,6 +40,9 @@ msgstr "你确定吗？"
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
 msgstr "删除所选的 %(verbose_name_plural)s"
+
+msgid "Administration"
+msgstr "管理"
 
 msgid "All"
 msgstr "全部"
@@ -67,16 +75,19 @@ msgstr "今年"
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
-msgstr ""
-
-msgid "Please log in again, because your session has expired."
-msgstr "请重新登录，因为你的会话已经过期。"
+msgstr "请输入一个正确的 %(username)s 和密码. 注意他们都是区分大小写的."
 
 msgid "Action:"
 msgstr "动作"
 
 msgid "action time"
 msgstr "动作时间"
+
+msgid "user"
+msgstr ""
+
+msgid "content type"
+msgstr ""
 
 msgid "object id"
 msgstr "对象id"
@@ -113,6 +124,13 @@ msgstr "LogEntry对象"
 
 msgid "None"
 msgstr "无"
+
+msgid ""
+"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgstr "按住 ”Control“，或者Mac上的 “Command”，可以选择多个。"
+
+msgid "Added."
+msgstr ""
 
 #, python-format
 msgid "Changed %s."
@@ -178,12 +196,16 @@ msgid "No action selected."
 msgstr "未选择动作"
 
 #, python-format
-msgid "Add %s"
-msgstr "增加 %s"
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" 删除成功。"
 
 #, python-format
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "具有主键 %(key)r 的对象 %(name)s 不存在。"
+
+#, python-format
+msgid "Add %s"
+msgstr "增加 %s"
 
 #, python-format
 msgid "Change %s"
@@ -207,40 +229,38 @@ msgid "0 of %(cnt)s selected"
 msgstr "%(cnt)s 个中 0 个被选"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" 删除成功。"
-
-#, python-format
 msgid "Change history: %s"
 msgstr "变更历史： %s"
 
-msgid "Log in"
-msgstr "登录"
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"删除 %(class_name)s %(instance)s 将需要删除以下受保护的相关对象: "
+"%(related_objects)s"
+
+msgid "Django site admin"
+msgstr "Django 站点管理员"
+
+msgid "Django administration"
+msgstr "Django 管理"
 
 msgid "Site administration"
 msgstr "站点管理"
 
+msgid "Log in"
+msgstr "登录"
+
 #, python-format
-msgid "%s administration"
-msgstr "%s 管理"
-
-msgid "Date:"
-msgstr "日期："
-
-msgid "Time:"
-msgstr "时间："
-
-msgid "Lookup"
-msgstr "查询"
-
-msgid "Add Another"
-msgstr "添加另一个"
-
-msgid "Currently:"
-msgstr "当前："
-
-msgid "Change:"
-msgstr "更改："
+msgid "%(app)s administration"
+msgstr "%(app)s 管理"
 
 msgid "Page not found"
 msgstr "页面没有找到"
@@ -283,27 +303,38 @@ msgstr "选中所有的 %(total_count)s 个 %(module_name)s"
 msgid "Clear selection"
 msgstr "清除选中"
 
-#, python-format
-msgid "%(name)s"
-msgstr "%(name)s"
+msgid ""
+"First, enter a username and password. Then, you'll be able to edit more user "
+"options."
+msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
 
-msgid "Welcome,"
-msgstr "欢迎，"
-
-msgid "Documentation"
-msgstr "文档"
+msgid "Enter a username and password."
+msgstr "输入用户名和"
 
 msgid "Change password"
 msgstr "修改密码"
 
+msgid "Please correct the error below."
+msgstr "请修正下面的错误。"
+
+msgid "Please correct the errors below."
+msgstr "请更正下列错误。"
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
+
+msgid "Welcome,"
+msgstr "欢迎，"
+
+msgid "View site"
+msgstr "查看站点"
+
+msgid "Documentation"
+msgstr "文档"
+
 msgid "Log out"
 msgstr "注销"
-
-msgid "Django site admin"
-msgstr "Django 站点管理员"
-
-msgid "Django administration"
-msgstr "Django 管理"
 
 msgid "Add"
 msgstr "增加"
@@ -313,10 +344,6 @@ msgstr "历史"
 
 msgid "View on site"
 msgstr "在站点上查看"
-
-msgid "Please correct the error below."
-msgid_plural "Please correct the errors below."
-msgstr[0] "请修正下面的错误。"
 
 #, python-format
 msgid "Add %(name)s"
@@ -362,8 +389,14 @@ msgstr ""
 "你确认想要删除 %(object_name)s \"%(escaped_object)s\"？ 下列所有相关的项目都"
 "将被删除："
 
+msgid "Objects"
+msgstr "对象"
+
 msgid "Yes, I'm sure"
 msgstr "是的，我确定"
+
+msgid "No, take me back"
+msgstr "不，返回"
 
 msgid "Delete multiple objects"
 msgstr "删除多个对象"
@@ -391,16 +424,29 @@ msgstr ""
 "请确认要删除选中的 %(objects_name)s 吗？以下所有对象和余它们相关的条目将都会"
 "被删除："
 
+msgid "Change"
+msgstr "修改"
+
+msgid "Remove"
+msgstr "删除"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "添加另一个 %(verbose_name)s"
+
+msgid "Delete?"
+msgstr "删除？"
+
 #, python-format
 msgid " By %(filter_title)s "
 msgstr " 以 %(filter_title)s"
 
+msgid "Summary"
+msgstr "概览"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "在应用程序 %(name)s 中的模型"
-
-msgid "Change"
-msgstr "修改"
 
 msgid "You don't have permission to edit anything."
 msgstr "你无权修改任何东西。"
@@ -425,8 +471,11 @@ msgstr ""
 "你的数据库安装有误。确保已经创建了相应的数据库表，并确保数据库可被相关的用户"
 "读取。"
 
-msgid "Password:"
-msgstr "密码："
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
 
 msgid "Forgotten your password or username?"
 msgstr "忘记了您的密码或用户名？"
@@ -451,6 +500,21 @@ msgstr "显示全部"
 msgid "Save"
 msgstr "保存"
 
+msgid "Popup closing..."
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "更改选中的%(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "增加另一个 %(model)s"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "取消选中 %(model)s"
+
 msgid "Search"
 msgstr "搜索"
 
@@ -472,37 +536,6 @@ msgstr "保存并增加另一个"
 msgid "Save and continue editing"
 msgstr "保存并继续编辑"
 
-msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
-"options."
-msgstr "首先，输入一个用户名和密码。然后，你就可以编辑更多的用户选项。"
-
-msgid "Enter a username and password."
-msgstr "输入用户名和"
-
-#, python-format
-msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
-
-msgid "Password"
-msgstr "密码"
-
-msgid "Password (again)"
-msgstr "密码(重复)"
-
-msgid "Enter the same password as above, for verification."
-msgstr "为了校验，输入与上面相同的密码。"
-
-msgid "Remove"
-msgstr "删除"
-
-#, python-format
-msgid "Add another %(verbose_name)s"
-msgstr "添加另一个 %(verbose_name)s"
-
-msgid "Delete?"
-msgstr "删除？"
-
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "感谢您今天在本站花费了一些宝贵时间。"
 
@@ -511,9 +544,6 @@ msgstr "重新登录"
 
 msgid "Password change"
 msgstr "密码修改"
-
-msgid "Password change successful"
-msgstr "密码修改成功"
 
 msgid "Your password was changed."
 msgstr "你的密码已修改。"
@@ -525,29 +555,17 @@ msgstr ""
 "请输入你的旧密码，为了安全起见，接着要输入两遍新密码，以便我们校验你输入的是"
 "否正确。"
 
-msgid "Old password"
-msgstr "旧密码"
-
-msgid "New password"
-msgstr "新密码"
-
 msgid "Change my password"
 msgstr "修改我的密码"
 
 msgid "Password reset"
 msgstr "密码重设"
 
-msgid "Password reset complete"
-msgstr "完成密码重设"
-
 msgid "Your password has been set.  You may go ahead and log in now."
 msgstr "你的口令己经设置。现在你可以继续进行登录。"
 
 msgid "Password reset confirmation"
 msgstr "密码重设确认"
-
-msgid "Enter new password"
-msgstr "输入新密码"
 
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
@@ -560,23 +578,23 @@ msgstr "新密码："
 msgid "Confirm password:"
 msgstr "确认密码："
 
-msgid "Password reset unsuccessful"
-msgstr "密码重设失败"
-
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr "密码重置链接无效，可能是因为它已使用。可以请求一次新的密码重置。"
 
-msgid "Password reset successful"
-msgstr "密码重设成功"
+msgid ""
+"We've emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"如果您输入的邮件地址所对应的账户存在，设置密码的提示已经发送邮件给您，您将很"
+"快收到。"
 
 msgid ""
-"We've emailed you instructions for setting your password to the email "
-"address you submitted. You should be receiving it shortly."
+"If you don't receive an email, please make sure you've entered the address "
+"you registered with, and check your spam folder."
 msgstr ""
-"我们已经使用你提供的电子邮件地址发送了电子邮件，以便你设置密码。不久之后你应"
-"当可以收到这封邮件。"
+"如果你没有收到邮件, 请确保您所输入的地址是正确的, 并检查您的垃圾邮件文件夹."
 
 #, python-format
 msgid ""
@@ -613,9 +631,6 @@ msgstr "重设我的密码"
 msgid "All dates"
 msgstr "所有日期"
 
-msgid "(None)"
-msgstr "(None)"
-
 #, python-format
 msgid "Select %s"
 msgstr "选择 %s"
@@ -623,3 +638,18 @@ msgstr "选择 %s"
 #, python-format
 msgid "Select %s to change"
 msgstr "选择 %s 来修改"
+
+msgid "Date:"
+msgstr "日期："
+
+msgid "Time:"
+msgstr "时间："
+
+msgid "Lookup"
+msgstr "查询"
+
+msgid "Currently:"
+msgstr "当前："
+
+msgid "Change:"
+msgstr "更改："

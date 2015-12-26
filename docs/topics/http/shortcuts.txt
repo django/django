@@ -20,9 +20,6 @@ introduce controlled coupling for convenience's sake.
    Combines a given template with a given context dictionary and returns an
    :class:`~django.http.HttpResponse` object with that rendered text.
 
-   :func:`render()` is the same as a call to :func:`render_to_response()` but
-   it also makes the current request available in the template.
-
    Django does not provide a shortcut function which returns a
    :class:`~django.template.response.TemplateResponse` because the constructor
    of :class:`~django.template.response.TemplateResponse` offers the same level
@@ -35,7 +32,10 @@ Required arguments
     The request object used to generate this response.
 
 ``template_name``
-    The full name of a template to use or sequence of template names.
+    The full name of a template to use or sequence of template names. If a
+    sequence is given, the first template that exists will be used. See the
+    :ref:`template loading documentation <template-loading>` for more
+    information on how templates are found.
 
 Optional arguments
 ------------------
@@ -72,13 +72,13 @@ MIME type :mimetype:`application/xhtml+xml`::
 This example is equivalent to::
 
     from django.http import HttpResponse
-    from django.template import RequestContext, loader
+    from django.template import loader
 
     def my_view(request):
         # View code here...
         t = loader.get_template('myapp/index.html')
-        c = RequestContext(request, {'foo': 'bar'})
-        return HttpResponse(t.render(c),
+        c = {'foo': 'bar'}
+        return HttpResponse(t.render(c, request),
             content_type="application/xhtml+xml")
 
 ``render_to_response``
@@ -86,61 +86,9 @@ This example is equivalent to::
 
 .. function:: render_to_response(template_name, context=None, content_type=None, status=None, using=None)
 
-   Renders a given template with a given context dictionary and returns an
-   :class:`~django.http.HttpResponse` object with that rendered text.
-
-Required arguments
-------------------
-
-``template_name``
-    The full name of a template to use or sequence of template names. If a
-    sequence is given, the first template that exists will be used. See the
-    :ref:`template loading documentation <template-loading>` for more
-    information on how templates are found.
-
-Optional arguments
-------------------
-
-``context``
-    A dictionary of values to add to the template context. By default, this
-    is an empty dictionary. If a value in the dictionary is callable, the
-    view will call it just before rendering the template.
-
-``content_type``
-    The MIME type to use for the resulting document. Defaults to the value of
-    the :setting:`DEFAULT_CONTENT_TYPE` setting.
-
-``status``
-    The status code for the response. Defaults to ``200``.
-
-``using``
-    The :setting:`NAME <TEMPLATES-NAME>` of a template engine to use for
-    loading the template.
-
-Example
--------
-
-The following example renders the template ``myapp/index.html`` with the
-MIME type :mimetype:`application/xhtml+xml`::
-
-    from django.shortcuts import render_to_response
-
-    def my_view(request):
-        # View code here...
-        return render_to_response('myapp/index.html', {"foo": "bar"},
-            content_type="application/xhtml+xml")
-
-This example is equivalent to::
-
-    from django.http import HttpResponse
-    from django.template import Context, loader
-
-    def my_view(request):
-        # View code here...
-        t = loader.get_template('myapp/index.html')
-        c = Context({'foo': 'bar'})
-        return HttpResponse(t.render(c),
-            content_type="application/xhtml+xml")
+   This function preceded the introduction of :func:`render` and works
+   similarly except that it doesn't make the ``request`` available in the
+   response. It's not recommended and is likely to be deprecated in the future.
 
 ``redirect``
 ============
@@ -199,7 +147,7 @@ You can use the :func:`redirect` function in a number of ways.
 
         def my_view(request):
             ...
-            return redirect('http://example.com/')
+            return redirect('https://example.com/')
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect

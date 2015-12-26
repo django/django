@@ -149,7 +149,7 @@ class FileDescriptor(object):
 
     Assigns a file object on assignment so you can do::
 
-        >>> with open('/tmp/hello.world', 'r') as f:
+        >>> with open('/path/to/hello.world', 'r') as f:
         ...     instance.file = File(f)
     """
     def __init__(self, field):
@@ -201,6 +201,10 @@ class FileDescriptor(object):
             file.instance = instance
             file.field = self.field
             file.storage = self.field.storage
+
+        # Make sure that the instance is correct.
+        elif isinstance(file, FieldFile) and instance is not file.instance:
+            file.instance = instance
 
         # That was fun, wasn't it?
         return instance.__dict__[self.field.name]

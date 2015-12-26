@@ -78,7 +78,7 @@ to_hex = BinOutput('GEOSGeomToHEX_buf')
 to_wkb = BinOutput('GEOSGeomToWKB_buf')
 to_wkt = StringFromGeom('GEOSGeomToWKT')
 
-# The GEOS geometry type, typeid, num_coordites and number of geometries
+# The GEOS geometry type, typeid, num_coordinates and number of geometries
 geos_normalize = IntFromGeom('GEOSNormalize')
 geos_type = StringFromGeom('GEOSGeomType')
 geos_typeid = IntFromGeom('GEOSGeomTypeId')
@@ -94,6 +94,7 @@ create_linearring = GeomOutput('GEOSGeom_createLinearRing', [CS_PTR])
 # Polygon and collection creation routines are special and will not
 # have their argument types defined.
 create_polygon = GeomOutput('GEOSGeom_createPolygon', None)
+create_empty_polygon = GeomOutput('GEOSGeom_createEmptyPolygon', None)
 create_collection = GeomOutput('GEOSGeom_createCollection', None)
 
 # Ring routines

@@ -6,6 +6,7 @@ from django.db import connection
 from django.db.models import Prefetch
 from django.db.models.query import get_prefetcher
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.utils import six
 from django.utils.encoding import force_text
 
@@ -244,6 +245,27 @@ class PrefetchRelatedTests(TestCase):
         # Without the ValueError, a book was deleted due to the implicit
         # save of reverse relation assignment.
         self.assertEqual(self.author1.books.count(), 2)
+
+    def test_m2m_then_reverse_fk_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__addresses'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(self.author1.name), 1)
+
+    def test_m2m_then_m2m_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__favorite_authors'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(self.author1.name), 1)
+
+    def test_m2m_then_reverse_one_to_one_object_ids(self):
+        with CaptureQueriesContext(connection) as queries:
+            list(Book.objects.prefetch_related('authors__authorwithage'))
+
+        sql = queries[-1]['sql']
+        self.assertEqual(sql.count(str(self.author1.id)), 1, sql)
 
 
 class CustomPrefetchTests(TestCase):

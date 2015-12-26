@@ -150,14 +150,14 @@ You can prevent the test databases from being destroyed by adding the
 database between runs. If the database does not exist, it will first be
 created. Any migrations will also be applied in order to keep it p to date.
 
-By default the test databases get their names by prepending ``test_``
-to the value of the :setting:`NAME` settings for the databases
-defined in :setting:`DATABASES`. When using the SQLite database engine
-the tests will by default use an in-memory database (i.e., the
-database will be created in memory, bypassing the filesystem
-entirely!). If you want to use a different database name, specify
-:setting:`NAME <TEST_NAME>` in the :setting:`TEST <DATABASE-TEST>`
-dictionary for any given database in :setting:`DATABASES`.
+The default test database names are created by prepending ``test_`` to the
+value of each :setting:`NAME` in :setting:`DATABASES`. When using SQLite, the
+tests will use an in-memory database by default (i.e., the database will be
+created in memory, bypassing the filesystem entirely!). The :setting:`TEST
+<DATABASE-TEST>` dictionary in :setting:`DATABASES` offers a number of settings
+to configure your test database. For example, if you want to use a different
+database name, specify :setting:`NAME <TEST_NAME>` in the :setting:`TEST
+<DATABASE-TEST>` dictionary for any given database in :setting:`DATABASES`.
 
 On PostgreSQL, :setting:`USER` will also need read access to the built-in
 ``postgres`` database.

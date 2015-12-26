@@ -182,7 +182,7 @@ translation string and the number of objects.
 
 This function is useful when you need your Django application to be localizable
 to languages where the number and complexity of `plural forms
-<http://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
+<https://www.gnu.org/software/gettext/manual/gettext.html#Plural-forms>`_ is
 greater than the two forms used in English ('object' for the singular and
 'objects' for all the cases where ``count`` is different from one, irrespective
 of its value.)

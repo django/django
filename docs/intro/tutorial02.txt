@@ -227,7 +227,7 @@ You should see something similar to the following:
 .. code-block:: text
 
     Migrations for 'polls':
-      0001_initial.py:
+      polls/migrations/0001_initial.py:
         - Create model Choice
         - Create model Question
         - Add field question to choice

@@ -9,6 +9,6 @@ dummy2 = _("This is another translatable string.")
 # This file has a literal with plural forms. When processed first, makemessages
 # shouldn't create a .po file with duplicate `Plural-Forms` headers
 number = 3
-dummuy3 = ungettext("%(number)s Foo", "%(number)s Foos", number) % {'number': number}
+dummy3 = ungettext("%(number)s Foo", "%(number)s Foos", number) % {'number': number}
 
 dummy4 = _('Size')
