@@ -85,7 +85,7 @@ class CursorDebugWrapper(CursorWrapper):
                 'sql': sql,
                 'time': "%.3f" % duration,
             })
-            logger.debug('(%.3f) %s; args=%s' % (duration, sql, params),
+            logger.debug('(%.3f) %s; args=%s', duration, sql, params,
                 extra={'duration': duration, 'sql': sql, 'params': params}
             )
 
@@ -104,7 +104,7 @@ class CursorDebugWrapper(CursorWrapper):
                 'sql': '%s times: %s' % (times, sql),
                 'time': "%.3f" % duration,
             })
-            logger.debug('(%.3f) %s; args=%s' % (duration, sql, param_list),
+            logger.debug('(%.3f) %s; args=%s', duration, sql, param_list,
                 extra={'duration': duration, 'sql': sql, 'params': param_list}
             )
 
