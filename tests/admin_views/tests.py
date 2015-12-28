@@ -299,16 +299,16 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         (column 6 is 'model_year_reverse' in ArticleAdmin)
         """
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '6'})
-        self.assertContentBefore(response, '2009', '2008',
+        self.assertContentBefore(response, '2009,', '2008,',
             "Results of sorting on ModelAdmin method are out of order.")
-        self.assertContentBefore(response, '2008', '2000',
+        self.assertContentBefore(response, '2008,', '2000,',
             "Results of sorting on ModelAdmin method are out of order.")
         # Let's make sure the ordering is right and that we don't get a
         # FieldError when we change to descending order
         response = self.client.get(reverse('admin:admin_views_article_changelist'), {'o': '-6'})
-        self.assertContentBefore(response, '2000', '2008',
+        self.assertContentBefore(response, '2000,', '2008,',
             "Results of sorting on ModelAdmin method are out of order.")
-        self.assertContentBefore(response, '2008', '2009',
+        self.assertContentBefore(response, '2008,', '2009,',
             "Results of sorting on ModelAdmin method are out of order.")
 
     def test_change_list_sorting_multiple(self):
