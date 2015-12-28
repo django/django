@@ -162,8 +162,11 @@ class AdminViewBasicTestCase(TestCase):
         content.
         """
         self.assertEqual(response.status_code, 200)
-        self.assertLess(response.content.index(force_bytes(text1)), response.content.index(force_bytes(text2)),
-            failing_msg)
+        self.assertLess(
+            response.content.index(force_bytes(text1)),
+            response.content.index(force_bytes(text2)),
+            (failing_msg or '') + '\nResponse:\n' + response.content
+        )
 
 
 class AdminViewBasicTest(AdminViewBasicTestCase):
