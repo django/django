@@ -580,34 +580,10 @@ that were published in 2008. The entries selected by the second filter may or
 may not be the same as the entries in the first filter. We are filtering the
 ``Blog`` items with each filter statement, not the ``Entry`` items.
 
-.. note::
+.. versionchanged:: 1.10
 
-    The behavior of :meth:`~django.db.models.query.QuerySet.filter` for queries
-    that span multi-value relationships, as described above, is not implemented
-    equivalently for :meth:`~django.db.models.query.QuerySet.exclude`. Instead,
-    the conditions in a single :meth:`~django.db.models.query.QuerySet.exclude`
-    call will not necessarily refer to the same item.
-
-    For example, the following query would exclude blogs that contain *both*
-    entries with *"Lennon"* in the headline *and* entries published in 2008::
-
-        Blog.objects.exclude(
-            entry__headline__contains='Lennon',
-            entry__pub_date__year=2008,
-        )
-
-    However, unlike the behavior when using
-    :meth:`~django.db.models.query.QuerySet.filter`, this will not limit blogs
-    based on entries that satisfy both conditions. In order to do that, i.e.
-    to select all blogs that do not contain entries published with *"Lennon"*
-    that were published in 2008, you need to make two queries::
-
-        Blog.objects.exclude(
-            entry=Entry.objects.filter(
-                headline__contains='Lennon',
-                pub_date__year=2008,
-            ),
-        )
+Previously ``exclude()`` queries and negated ``Q-object`` queries didn't use
+the same rules than ``filter()``.
 
 .. _using-f-expressions-in-filters:
 
