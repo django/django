@@ -9,7 +9,7 @@ from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
-from django.urls import get_resolver
+from django.urls import get_dispatcher, get_urlconf
 from django.views import View
 from django.views.debug import (
     SafeExceptionReporterFilter, technical_500_response,
@@ -56,8 +56,8 @@ def raises403(request):
 
 
 def raises404(request):
-    resolver = get_resolver(None)
-    resolver.resolve('/not-in-urls')
+    dispatcher = get_dispatcher(get_urlconf())
+    dispatcher.resolve('/not-in-urls')
 
 
 def technical404(request):

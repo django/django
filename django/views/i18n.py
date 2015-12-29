@@ -43,7 +43,7 @@ def set_language(request):
         lang_code = request.POST.get(LANGUAGE_QUERY_PARAMETER)
         if lang_code and check_for_language(lang_code):
             if next:
-                next_trans = translate_url(next, lang_code)
+                next_trans = translate_url(next, lang_code, request)
                 if next_trans != next:
                     response = http.HttpResponseRedirect(next_trans)
             if hasattr(request, 'session'):

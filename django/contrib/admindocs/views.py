@@ -8,11 +8,13 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
-from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
-from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
+from django.urls import (
+    describe_constraints, get_dispatcher, get_mod_func, get_urlconf, reverse,
+)
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -147,8 +149,11 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        urlconf = get_urlconf()
-        if get_resolver(urlconf)._is_callback(view):
+        dispatcher = get_dispatcher(get_urlconf())
+        # Private API, may not exist if using a custom dispatcher
+        if not hasattr(dispatcher, 'is_callback'):
+            raise Http404
+        if dispatcher.is_callback(view):
             mod, func = get_mod_func(view)
             view_func = getattr(import_module(mod), func)
         else:
@@ -360,32 +365,32 @@ def get_readable_field_data_type(field):
     return field.description % field.__dict__
 
 
-def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
+def extract_views_from_urlpatterns(urlpatterns, base=None, namespace=None):
     """
     Return a list of views from a list of urlpatterns.
 
     Each object in the returned list is a two-tuple: (view_func, regex)
     """
     views = []
-    for p in urlpatterns:
-        if hasattr(p, 'url_patterns'):
+    for urlpattern in urlpatterns:
+        try:
+            name = urlpattern.target.namespace if not urlpattern.is_endpoint() else None
+        except AttributeError:
+            raise TypeError(_("%s does not appear to be a URLPattern object") % urlpattern)
+        if urlpattern.is_endpoint():
+            views.append((
+                urlpattern.target.view, describe_constraints((base or []) + urlpattern.constraints),
+                namespace, urlpattern.target.url_name,
+            ))
+        else:
             try:
-                patterns = p.url_patterns
+                sub_urlpatterns = urlpattern.target.urlpatterns
             except ImportError:
                 continue
             views.extend(extract_views_from_urlpatterns(
-                patterns,
-                base + p.regex.pattern,
-                (namespace or []) + (p.namespace and [p.namespace] or [])
+                sub_urlpatterns, (base or []) + urlpattern.constraints,
+                (namespace or []) + (name and [name] or []),
             ))
-        elif hasattr(p, 'callback'):
-            try:
-                views.append((p.callback, base + p.regex.pattern,
-                              namespace, p.name))
-            except ViewDoesNotExist:
-                continue
-        else:
-            raise TypeError(_("%s does not appear to be a urlpattern object") % p)
     return views
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')

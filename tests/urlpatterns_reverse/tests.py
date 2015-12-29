@@ -22,8 +22,8 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix
 from django.urls import (
-    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
-    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    NoReverseMatch, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
+    get_callable, get_dispatcher, resolve, reverse, reverse_lazy,
 )
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -248,9 +248,9 @@ class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
-        RegexURLResolver should raise an exception when no urlpatterns exist.
+        Resolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
+        resolver = get_dispatcher(settings.ROOT_URLCONF).resolver
 
         with self.assertRaisesMessage(
             ImproperlyConfigured,
@@ -258,7 +258,7 @@ class NoURLPatternsTests(SimpleTestCase):
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import."
         ):
-            getattr(resolver, 'url_patterns')
+            getattr(resolver, "resolvers")
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')
@@ -317,7 +317,7 @@ class URLPatternReverse(SimpleTestCase):
             # this url exists, but requires an argument
             reverse("people", args=[])
         except NoReverseMatch as e:
-            pattern_description = r"1 pattern(s) tried: ['people/(?P<name>\\w+)/$']"
+            pattern_description = r"1 pattern(s) tried: ['^people/(?P<name>\\w+)/$']"
             self.assertIn(pattern_description, str(e))
         else:
             # we can't use .assertRaises, since we want to inspect the
@@ -343,13 +343,13 @@ class ResolverTests(unittest.TestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_repr(self):
         """
-        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        Test repr of Resolver, especially when urlconf_name is a list
         (#17892).
         """
         # Pick a resolver from a namespaced URLconf
-        resolver = get_resolver('urlpatterns_reverse.namespace_urls')
-        sub_resolver = resolver.namespace_dict['test-ns1'][1]
-        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+        resolver = get_dispatcher('urlpatterns_reverse.namespace_urls').resolver
+        sub_resolver = resolver.resolvers[-1]
+        self.assertIn('<ResolverEndpoint list>', repr(sub_resolver))
 
     def test_reverse_lazy_object_coercion_by_resolve(self):
         """
@@ -358,9 +358,9 @@ class ResolverTests(unittest.TestCase):
         """
         urls = 'urlpatterns_reverse.named_urls'
         proxy_url = reverse_lazy('named-url1', urlconf=urls)
-        resolver = get_resolver(urls)
+        dispatcher = get_dispatcher(urls)
         try:
-            resolver.resolve(proxy_url)
+            dispatcher.resolve(proxy_url)
         except TypeError:
             self.fail('Failed to coerce lazy object to text')
 
@@ -393,39 +393,35 @@ class ResolverTests(unittest.TestCase):
         # you try to resolve a non-existent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/non-existent-url')
         url_types_names = [
-            [{'type': RegexURLPattern, 'name': 'named-url1'}],
-            [{'type': RegexURLPattern, 'name': 'named-url2'}],
-            [{'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+            [{'type': ResolverEndpoint, 'name': 'named-url1'}],
+            [{'type': ResolverEndpoint, 'name': 'named-url2'}],
+            [{'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url3'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url4'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': Resolver}],
         ]
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
         except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
-            self.assertIn('tried', e.args[0])
-            tried = e.args[0]['tried']
+            self.assertTrue(hasattr(e, 'tried'))
             self.assertEqual(
-                len(e.args[0]['tried']),
-                len(url_types_names),
-                'Wrong number of tried URLs returned.  Expected %s, got %s.' % (
-                    len(url_types_names), len(e.args[0]['tried'])
-                )
+                len(e.tried), len(url_types_names),
+                'Wrong number of tried URLs returned.  Expected %s, got %s.' %
+                (len(url_types_names), len(e.tried))
             )
-            for tried, expected in zip(e.args[0]['tried'], url_types_names):
-                for t, e in zip(tried, expected):
-                    self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
+            for tried, expected in zip(e.tried, url_types_names):
+                for r, e in zip(tried, expected):
+                    self.assertIsInstance(r, e['type']), str('%s is not an instance of %s') % (r, e['type'])
                     if 'name' in e:
                         if not e['name']:
-                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
+                            self.assertIsNone(r.url_name, 'Expected no URL name but found %s.' % r.url_name)
                         else:
                             self.assertEqual(
-                                t.name,
-                                e['name'],
-                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
+                                r.url_name, e['name'],
+                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], r.url_name)
                             )
 
 
@@ -842,7 +838,7 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a response middleware.
         """
-        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        message = "'outer' is not a registered view name"
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
 
@@ -872,7 +868,7 @@ class RequestURLconfTests(SimpleTestCase):
         Test reversing an URL from the *default* URLconf from inside
         a streaming response.
         """
-        message = "Reverse for 'outer' with arguments '()' and keyword arguments '{}' not found."
+        message = "'outer' is not a registered view name"
         with self.assertRaisesMessage(NoReverseMatch, message):
             self.client.get('/second_test/')
             b''.join(self.client.get('/second_test/'))
@@ -884,8 +880,8 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
     def setUp(self):
         urlconf = 'urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
-        self.resolver = RegexURLResolver(r'^$', urlconf)
-        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+        self.resolver = get_dispatcher(urlconf)
+        self.callable_resolver = get_dispatcher(urlconf_callables)
 
     def test_named_handlers(self):
         handler = (empty_view, {})

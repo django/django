@@ -450,14 +450,16 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        error_url = exception.args[0]['path']
-    except (IndexError, TypeError, KeyError):
+        error_url = exception.path
+    except AttributeError:
         error_url = request.path_info[1:]  # Trim leading slash
 
     try:
-        tried = exception.args[0]['tried']
-    except (IndexError, TypeError, KeyError):
+        tried = exception.tried
+        urlpatterns = exception.tried_patterns
+    except AttributeError:
         tried = []
+        urlpatterns = []
     else:
         if (not tried                           # empty URLconf
             or (request.path == '/'
@@ -472,7 +474,7 @@ def technical_404_response(request, exception):
 
     caller = ''
     try:
-        resolver_match = resolve(request.path)
+        resolver_match = resolve(request.path, request=request)
     except Resolver404:
         pass
     else:
@@ -492,7 +494,7 @@ def technical_404_response(request, exception):
         'urlconf': urlconf,
         'root_urlconf': settings.ROOT_URLCONF,
         'request_path': error_url,
-        'urlpatterns': tried,
+        'urlpatterns': urlpatterns,
         'reason': force_bytes(exception, errors='replace'),
         'request': request,
         'settings': get_safe_settings(),
@@ -1175,12 +1177,7 @@ TECHNICAL_404_TEMPLATE = """
       </p>
       <ol>
         {% for pattern in urlpatterns %}
-          <li>
-            {% for pat in pattern %}
-                {{ pat.regex.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
-            {% endfor %}
-          </li>
+          <li>{{ pattern }}</li>
         {% endfor %}
       </ol>
       <p>The current URL, <code>{{ request_path|escape }}</code>, didn't match any of these.</p>

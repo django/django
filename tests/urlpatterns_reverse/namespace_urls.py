@@ -55,4 +55,9 @@ urlpatterns = [
     ),
 
     url(r'^\+\\\$\*/', include('urlpatterns_reverse.namespace_urls', namespace='special')),
+
+    # Keep this as the last entry
+    url(r'inline-patterns/', include([
+        url(r'^$', views.empty_view),
+    ])),
 ]

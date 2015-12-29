@@ -1,6 +1,10 @@
+from __future__ import unicode_literals
+
+from importlib import import_module
+
 from django.conf import settings
-from django.conf.urls import url
-from django.urls import LocaleRegexURLResolver, get_resolver
+from django.conf.urls import URLConf, URLPattern, url
+from django.urls import LocalePrefix
 from django.utils import lru_cache
 from django.views.i18n import set_language
 
@@ -15,20 +19,22 @@ def i18n_patterns(*urls, **kwargs):
         return urls
     prefix_default_language = kwargs.pop('prefix_default_language', True)
     assert not kwargs, 'Unexpected kwargs for i18n_patterns(): %s' % kwargs
-    return [LocaleRegexURLResolver(list(urls), prefix_default_language=prefix_default_language)]
+    return [URLPattern([LocalePrefix(prefix_default_language)], URLConf(urls))]
 
 
 @lru_cache.lru_cache(maxsize=None)
 def is_language_prefix_patterns_used(urlconf):
     """
     Return a tuple of two booleans: (
-        `True` if LocaleRegexURLResolver` is used in the `urlconf`,
+        `True` if `i18n_patterns()` is used in the `urlconf`,
         `True` if the default language should be prefixed
     )
     """
-    for url_pattern in get_resolver(urlconf).url_patterns:
-        if isinstance(url_pattern, LocaleRegexURLResolver):
-            return True, url_pattern.prefix_default_language
+    urlconf_module = import_module(urlconf)
+    for urlpattern in urlconf_module.urlpatterns:
+        for constraint in urlpattern.constraints:
+            if isinstance(constraint, LocalePrefix):
+                return True, constraint.prefix_default_language
     return False, False
 
 
