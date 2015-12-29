@@ -354,12 +354,19 @@ to its proxied concrete class. This inconsistency was fixed by returning the
 full set of fields pointing to a concrete class or one of its proxies in both
 cases.
 
-:attr:`AbstractUser.username <django.contrib.auth.models.User.username>` ``max_length`` increased to 254
+:attr:`AbstractUser.username <django.contrib.auth.models.User.username>` ``max_length`` increased to 150
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A migration for :attr:`django.contrib.auth.models.User.username` is included.
 If you have a custom user model inheriting from ``AbstractUser``, you'll need
 to generate and apply a database migration for your user model.
+
+We considered an increase to 254 characters to more easily allow the use of
+email addresses (which are limited to 254 characters) as usernames but rejected
+it due to a MySQL limitation.  When using the ``utf8mb4`` encoding (recommended
+for proper Unicode support), MySQL can only create unique indexes with 191
+characters by default. Therefore, if you need a longer length, please use a
+custom user model.
 
 If you want to preserve the 30 character limit for usernames, use a custom form
 when creating a user or changing usernames::
