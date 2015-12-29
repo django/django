@@ -9,7 +9,7 @@ from django.contrib.sites.models import Site
 from django.core import management
 from django.db import IntegrityError, connection
 from django.test import (
-    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, ignore_warnings, mock, skipUnlessDBFeature,
 )
 from django.utils import six
 from django.utils.encoding import force_text
@@ -416,6 +416,18 @@ class NonExistentFixtureTests(TestCase):
         with warnings.catch_warnings(record=True) as w:
             management.call_command('loaddata', 'initial_data.json', verbosity=0)
         self.assertEqual(len(w), 0)
+
+    @mock.patch('django.db.connection.enable_constraint_checking')
+    @mock.patch('django.db.connection.disable_constraint_checking')
+    def test_nonexistent_fixture_no_constraint_checking(self,
+            disable_constraint_checking, enable_constraint_checking):
+        """
+        If no fixtures match the loaddata command, constraints checks on the
+        database shouldn't be disabled. This is performance critical on MSSQL.
+        """
+        management.call_command('loaddata', 'this_fixture_doesnt_exist', verbosity=0)
+        disable_constraint_checking.assert_not_called()
+        enable_constraint_checking.assert_not_called()
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
