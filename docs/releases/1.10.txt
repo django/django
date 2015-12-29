@@ -343,7 +343,7 @@ to its proxied concrete class. This inconsistency was fixed by returning the
 full set of fields pointing to a concrete class or one of its proxies in both
 cases.
 
-:attr:`AbstractUser.username <django.contrib.auth.models.User.username>` ``max_length`` increased to 254
+:attr:`AbstractUser.username <django.contrib.auth.models.User.username>` ``max_length`` increased to 150
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A migration for :attr:`django.contrib.auth.models.User.username` is included.

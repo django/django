@@ -21,12 +21,12 @@ Fields
 
     .. attribute:: username
 
-        Required. 254 characters or fewer. Usernames may contain alphanumeric,
+        Required. 150 characters or fewer. Usernames may contain alphanumeric,
         ``_``, ``@``, ``+``, ``.`` and ``-`` characters.
 
         .. versionchanged:: 1.10
 
-            The ``max_length`` increased from 30 to 254 characters.
+            The ``max_length`` increased from 30 to 150 characters.
 
     .. attribute:: first_name
 
