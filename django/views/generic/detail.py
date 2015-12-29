@@ -89,7 +89,7 @@ class SingleObjectMixin(ContextMixin):
         if self.context_object_name:
             return self.context_object_name
         elif isinstance(obj, models.Model):
-            if self.object._deferred:
+            if obj._deferred:
                 obj = obj._meta.proxy_for_model
             return obj._meta.model_name
         else:

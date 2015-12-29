@@ -70,3 +70,6 @@ Bugfixes
 
 * Fixed a regression in the admin which ignored line breaks in read-only fields
   instead of converting them to ``<br>`` (:ticket:`25465`).
+
+* Fixed incorrect object reference in
+  ``SingleObjectMixin.get_context_object_name()``. (:ticket:`26006`).
