@@ -82,7 +82,8 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     for klass in app_config.get_models():
         # Force looking up the content types in the current database
         # before creating foreign keys to them.
-        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+        ctype = ContentType.objects.db_manager(using).get_for_model(klass,
+                                                                    for_concrete_model=False)
 
         if len(klass._meta.verbose_name) > verbose_name_max_length:
             raise exceptions.ValidationError(

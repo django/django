@@ -218,6 +218,16 @@ to test for basic permissions you should use:
 The :class:`~django.contrib.auth.models.Permission` model is rarely accessed
 directly.
 
+.. versionchanged:: 1.9
+
+Add, change and delete permissions are also created for :ref:`proxy models <proxy-models>`.
+
+This allows you to have different permissions for a proxy and its concrete
+model. One use case would be if you were using
+:meth:`~django.contrib.auth.models.User.has_perm` in your application, but you
+wanted a different behavior in the admin. In this case, you would register a
+proxy model for the admin.
+
 Groups
 ------
 

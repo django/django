@@ -224,6 +224,7 @@ Minor features
 * It's now possible to use
   :attr:`~django.db.models.Options.order_with_respect_to` with a
   ``GenericForeignKey``.
+* Permissions will now be created for :ref:`proxy models <proxy-models>`.
 
 :mod:`django.contrib.gis`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

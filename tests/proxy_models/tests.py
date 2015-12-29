@@ -224,6 +224,11 @@ class ProxyModelTests(TestCase):
             Permission.objects.get(name="May display users information")
         except Permission.DoesNotExist:
             self.fail("The permission 'May display users information' has not been created")
+        try:
+            Permission.objects.get(content_type__model='myperson',
+                                   codename='add_myperson')
+        except Permission.DoesNotExist:
+            self.fail("There's no 'add_myperson' permission associated with the MyPerson model")
 
     def test_proxy_model_signals(self):
         """
