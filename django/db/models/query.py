@@ -176,14 +176,13 @@ class QuerySet(object):
         self._known_related_objects = {}  # {rel_field, {pk: rel_obj}}
         self._iterable_class = ModelIterable
         self._fields = None
-        # Sticky filter is a horrific hack to support the following API:
+        # Sticky filter is a hack to support the following API:
         #   Foo.tags.filter(foo__name='Bar')  # No new join created for foo
         #   Foo.tags.all().filter(foo__name='Bar')  # New join created for foo
-        # So, filters directly after access to related manager reuse joins
-        # created by the related manager, but if there is any operation in between,
-        # then the same join isn't targeted anymore.
-        # While it would be nice to get rid of this API, deprecation for this ages
-        # old feature seems hard.
+        # Filters directly after accessing a related manager reuse joins
+        # created by the related manager, but if there is any operation
+        # in-between, then the same join isn't targeted anymore. It would be
+        # nice to remove this, but deprecation for this old feature seems hard.
         self.filter_is_sticky = False
 
     def as_manager(cls):
@@ -1162,8 +1161,8 @@ class QuerySet(object):
         """
         Calling _sticky_filter(foo=bar).filter(fuu=baz) is equivalent
         to calling filter(foo=bar, fuu=baz). Notably doing
-        ._sticky_filter(foo=bar).all().filter(fuu=baz) is *not*
-        equivalent to .filter(foo=bar, fuu=baz).
+        ._sticky_filter(foo=bar).all().filter(fuu=baz) is *not* equivalent to
+        .filter(foo=bar, fuu=baz).
 
         A hack needed by m2m relations.
         """
