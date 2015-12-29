@@ -104,6 +104,11 @@ class BaseDatabaseFeatures(object):
     # deferred
     can_defer_constraint_checks = False
 
+    # Does the backend support disabling/enabling of constraints with
+    # table_names param? The table_names param was added post-release
+    # to speed up test execution speed on mssql.
+    accepts_table_names_for_constraint_switching = False
+
     # date_interval_sql can properly handle mixed Date/DateTime fields and timedeltas
     supports_mixed_date_datetime_comparisons = True
 
