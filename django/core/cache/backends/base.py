@@ -195,7 +195,7 @@ class BaseCache(object):
 
     def delete_many(self, keys, version=None):
         """
-        Set a bunch of values in the cache at once.  For certain backends
+        Delete a bunch of values in the cache at once. For certain backends
         (memcached), this is much more efficient than calling delete() multiple
         times.
         """
