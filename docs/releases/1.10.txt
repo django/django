@@ -385,13 +385,10 @@ different sets were used for the different conditions.
 As an example, consider query ``Author.objects.exclude(friends__age__gte=20,
 friends__age__lte=40)``. In Django 1.10 any author with a friend aged
 between 20 and 40 will be removed from the results. In previous versions
-any author with a friend aged over 20 and a friend aged below 40 is
-removed from the results.
+any author with a friend aged over 20 and a (**possibly different**) friend
+aged below 40 is removed from the results.
 
-It is possible to get the old behavior by using 
-``.exclude(friends__age__gte=20).exclude(friends__age__lte=40)``.
-
-See `Spanning multi-valued relationships` (TODO:link) documentation
+See :ref:`spanning-multi-valued-relationships` documentation
 for details. This change was done as a bug fix to make ``.exclude()``
 function similarly to ``.filter()``.
 
