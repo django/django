@@ -73,3 +73,6 @@ Bugfixes
 
 * Fixed incorrect object reference in
   ``SingleObjectMixin.get_context_object_name()`` (:ticket:`26006`).
+
+* Made ``loaddata`` skip disabling and enabling database constraints when it
+  doesn't load any fixtures (:ticket:`23372`).
