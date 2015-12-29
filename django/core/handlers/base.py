@@ -13,7 +13,7 @@ from django.core.exceptions import (
 )
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
-from django.urls import get_resolver, set_urlconf
+from django.urls import get_dispatcher, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -83,9 +83,9 @@ class BaseHandler(object):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
-    def get_exception_response(self, request, resolver, status_code, exception):
+    def get_exception_response(self, request, dispatcher, status_code, exception):
         try:
-            callback, param_dict = resolver.resolve_error_handler(status_code)
+            callback, param_dict = dispatcher.resolve_error_handler(status_code)
             # Unfortunately, inspect.getargspec result is not trustable enough
             # depending on the callback wrapping in decorators (frequent for handlers).
             # Falling back on try/except:
@@ -100,20 +100,20 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
         except Exception:
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, dispatcher, sys.exc_info())
 
         return response
 
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
 
-        # Setup default url resolver for this thread, this code is outside
+        # Setup default url dispatcher for this thread, this code is outside
         # the try/except so we don't get a spurious "unbound local
         # variable" exception in the event an exception is raised before
-        # resolver is set
+        # dispatcher is set
         urlconf = settings.ROOT_URLCONF
         set_urlconf(urlconf)
-        resolver = get_resolver(urlconf)
+        dispatcher = get_dispatcher(urlconf)
         # Use a flag to check if the response was rendered to prevent
         # multiple renderings or to force rendering if necessary.
         response_is_rendered = False
@@ -126,13 +126,19 @@ class BaseHandler(object):
                     break
 
             if response is None:
-                if hasattr(request, 'urlconf'):
-                    # Reset url resolver with a custom URLconf.
+                if hasattr(request, 'dispatcher'):
+                    urlconf = getattr(request.dispatcher, 'urlconf', None)
+                    set_urlconf(urlconf)
+                    dispatcher = request.dispatcher
+                elif hasattr(request, 'urlconf'):
+                    # Reset url dispatcher with a custom URLconf.
                     urlconf = request.urlconf
                     set_urlconf(urlconf)
-                    resolver = get_resolver(urlconf)
+                    dispatcher = request.dispatcher = get_dispatcher(urlconf)
+                else:
+                    request.dispatcher = dispatcher
 
-                resolver_match = resolver.resolve(request.path_info)
+                resolver_match = dispatcher.resolve(request.path_info, request)
                 callback, callback_args, callback_kwargs = resolver_match
                 request.resolver_match = resolver_match
 
@@ -185,7 +191,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 response = debug.technical_404_response(request, exc)
             else:
-                response = self.get_exception_response(request, resolver, 404, exc)
+                response = self.get_exception_response(request, dispatcher, 404, exc)
 
         except PermissionDenied as exc:
             logger.warning(
@@ -194,7 +200,7 @@ class BaseHandler(object):
                     'status_code': 403,
                     'request': request
                 })
-            response = self.get_exception_response(request, resolver, 403, exc)
+            response = self.get_exception_response(request, dispatcher, 403, exc)
 
         except MultiPartParserError as exc:
             logger.warning(
@@ -203,7 +209,7 @@ class BaseHandler(object):
                     'status_code': 400,
                     'request': request
                 })
-            response = self.get_exception_response(request, resolver, 400, exc)
+            response = self.get_exception_response(request, dispatcher, 400, exc)
 
         except SuspiciousOperation as exc:
             # The request logger receives events for any problematic request
@@ -219,7 +225,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
 
-            response = self.get_exception_response(request, resolver, 400, exc)
+            response = self.get_exception_response(request, dispatcher, 400, exc)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
@@ -228,7 +234,7 @@ class BaseHandler(object):
         except Exception:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, dispatcher, sys.exc_info())
 
         try:
             # Apply response middleware, regardless of the response
@@ -243,7 +249,7 @@ class BaseHandler(object):
             response = self.apply_response_fixes(request, response)
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, dispatcher, sys.exc_info())
 
         response._closable_objects.append(request)
 
@@ -265,7 +271,7 @@ class BaseHandler(object):
                 return response
         raise
 
-    def handle_uncaught_exception(self, request, resolver, exc_info):
+    def handle_uncaught_exception(self, request, dispatcher, exc_info):
         """
         Processing for any otherwise uncaught exceptions (those that will
         generate HTTP 500 responses). Can be overridden by subclasses who want
@@ -290,10 +296,10 @@ class BaseHandler(object):
             return debug.technical_500_response(request, *exc_info)
 
         # If Http500 handler is not installed, re-raise last exception
-        if resolver.urlconf_module is None:
+        if dispatcher.urlconf_module is None:
             six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
-        callback, param_dict = resolver.resolve_error_handler(500)
+        callback, param_dict = dispatcher.resolve_error_handler(500)
         return callback(request, **param_dict)
 
     def apply_response_fixes(self, request, response):

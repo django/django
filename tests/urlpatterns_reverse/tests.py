@@ -22,8 +22,8 @@ from django.test import (
 )
 from django.test.utils import override_script_prefix
 from django.urls import (
-    NoReverseMatch, RegexURLPattern, RegexURLResolver, Resolver404,
-    ResolverMatch, get_callable, get_resolver, resolve, reverse, reverse_lazy,
+    NoReverseMatch, Resolver, Resolver404, ResolverEndpoint, ResolverMatch,
+    get_callable, get_dispatcher, get_resolver, resolve, reverse, reverse_lazy,
 )
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
@@ -248,16 +248,16 @@ class NoURLPatternsTests(SimpleTestCase):
 
     def test_no_urls_exception(self):
         """
-        RegexURLResolver should raise an exception when no urlpatterns exist.
+        Resolver should raise an exception when no urlpatterns exist.
         """
-        resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
+        resolver = get_resolver(settings.ROOT_URLCONF)
 
         self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
             "the file then the issue is probably caused by a circular import.",
-            getattr, resolver, 'url_patterns'
+            getattr, resolver, "resolvers"
         )
 
 
@@ -342,13 +342,13 @@ class ResolverTests(unittest.TestCase):
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_resolver_repr(self):
         """
-        Test repr of RegexURLResolver, especially when urlconf_name is a list
+        Test repr of Resolver, especially when urlconf_name is a list
         (#17892).
         """
         # Pick a resolver from a namespaced URLconf
         resolver = get_resolver('urlpatterns_reverse.namespace_urls')
-        sub_resolver = resolver.namespace_dict['test-ns1'][1]
-        self.assertIn('<RegexURLPattern list>', repr(sub_resolver))
+        sub_resolver = resolver.resolvers[-1]
+        self.assertIn('<ResolverEndpoint list>', repr(sub_resolver))
 
     def test_reverse_lazy_object_coercion_by_resolve(self):
         """
@@ -388,39 +388,35 @@ class ResolverTests(unittest.TestCase):
         # you try to resolve a non-existent URL in the first level of included
         # URLs in named_urls.py (e.g., '/included/non-existent-url')
         url_types_names = [
-            [{'type': RegexURLPattern, 'name': 'named-url1'}],
-            [{'type': RegexURLPattern, 'name': 'named-url2'}],
-            [{'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url3'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': 'named-url4'}],
-            [{'type': RegexURLResolver}, {'type': RegexURLPattern, 'name': None}],
-            [{'type': RegexURLResolver}, {'type': RegexURLResolver}],
+            [{'type': ResolverEndpoint, 'name': 'named-url1'}],
+            [{'type': ResolverEndpoint, 'name': 'named-url2'}],
+            [{'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url3'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': 'named-url4'}],
+            [{'type': Resolver}, {'type': ResolverEndpoint, 'name': None}],
+            [{'type': Resolver}, {'type': Resolver}],
         ]
         try:
             resolve('/included/non-existent-url', urlconf=urls)
             self.fail('resolve did not raise a 404')
         except Resolver404 as e:
             # make sure we at least matched the root ('/') url resolver:
-            self.assertIn('tried', e.args[0])
-            tried = e.args[0]['tried']
+            self.assertTrue(hasattr(e, 'tried'))
             self.assertEqual(
-                len(e.args[0]['tried']),
-                len(url_types_names),
-                'Wrong number of tried URLs returned.  Expected %s, got %s.' % (
-                    len(url_types_names), len(e.args[0]['tried'])
-                )
+                len(e.tried), len(url_types_names),
+                'Wrong number of tried URLs returned.  Expected %s, got %s.' %
+                (len(url_types_names), len(e.tried))
             )
-            for tried, expected in zip(e.args[0]['tried'], url_types_names):
-                for t, e in zip(tried, expected):
-                    self.assertIsInstance(t, e['type']), str('%s is not an instance of %s') % (t, e['type'])
+            for tried, expected in zip(e.tried, url_types_names):
+                for r, e in zip(tried, expected):
+                    self.assertIsInstance(r, e['type']), str('%s is not an instance of %s') % (r, e['type'])
                     if 'name' in e:
                         if not e['name']:
-                            self.assertIsNone(t.name, 'Expected no URL name but found %s.' % t.name)
+                            self.assertIsNone(r.url_name, 'Expected no URL name but found %s.' % r.url_name)
                         else:
                             self.assertEqual(
-                                t.name,
-                                e['name'],
-                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], t.name)
+                                r.url_name, e['name'],
+                                'Wrong URL name.  Expected "%s", got "%s".' % (e['name'], r.url_name)
                             )
 
 
@@ -869,8 +865,8 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
     def setUp(self):
         urlconf = 'urlpatterns_reverse.urls_error_handlers'
         urlconf_callables = 'urlpatterns_reverse.urls_error_handlers_callables'
-        self.resolver = RegexURLResolver(r'^$', urlconf)
-        self.callable_resolver = RegexURLResolver(r'^$', urlconf_callables)
+        self.resolver = get_dispatcher(urlconf)
+        self.callable_resolver = get_dispatcher(urlconf_callables)
 
     def test_named_handlers(self):
         handler = (empty_view, {})
@@ -990,57 +986,65 @@ class IncludeTests(SimpleTestCase):
     ]
     app_urls = URLObject('inc-app')
 
+    def assertIncludeEqual(self, include, patterns, app_name, namespace):
+        self.assertIsInstance(include, tuple, "include() did not return a 2-tuple.")
+        self.assertEqual(len(include), 2, "include() did not return a 2-tuple.")
+        urlconf, ns = include
+        self.assertEqual(urlconf.urlpatterns, patterns)
+        self.assertEqual(urlconf.app_name, app_name)
+        self.assertEqual(ns, namespace)
+
     def test_include_app_name_but_no_namespace(self):
         msg = "Must specify a namespace if specifying app_name."
         with self.assertRaisesMessage(ValueError, msg):
             include(self.url_patterns, app_name='bar')
 
     def test_include_urls(self):
-        self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
+        self.assertIncludeEqual(include(self.url_patterns), self.url_patterns, None, None)
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace(self):
         # no app_name -> deprecated
-        self.assertEqual(include(self.url_patterns, 'namespace'), (self.url_patterns, None, 'namespace'))
+        self.assertIncludeEqual(include(self.url_patterns, 'namespace'), self.url_patterns, None, 'namespace')
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace_app_name(self):
         # app_name argument to include -> deprecated
-        self.assertEqual(
+        self.assertIncludeEqual(
             include(self.url_patterns, 'namespace', 'app_name'),
-            (self.url_patterns, 'app_name', 'namespace')
+            self.url_patterns, 'app_name', 'namespace'
         )
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_3_tuple(self):
         # 3-tuple -> deprecated
-        self.assertEqual(
+        self.assertIncludeEqual(
             include((self.url_patterns, 'app_name', 'namespace')),
-            (self.url_patterns, 'app_name', 'namespace')
+            self.url_patterns, 'app_name', 'namespace'
         )
 
     def test_include_2_tuple(self):
-        self.assertEqual(
+        self.assertIncludeEqual(
             include((self.url_patterns, 'app_name')),
-            (self.url_patterns, 'app_name', 'app_name')
+            self.url_patterns, 'app_name', 'app_name'
         )
 
     def test_include_2_tuple_namespace(self):
-        self.assertEqual(
+        self.assertIncludeEqual(
             include((self.url_patterns, 'app_name'), namespace='namespace'),
-            (self.url_patterns, 'app_name', 'namespace')
+            self.url_patterns, 'app_name', 'namespace'
         )
 
     def test_include_app_name(self):
-        self.assertEqual(
+        self.assertIncludeEqual(
             include(self.app_urls),
-            (self.app_urls, 'inc-app', 'inc-app')
+            self.app_urls.urlpatterns, 'inc-app', 'inc-app'
         )
 
     def test_include_app_name_namespace(self):
-        self.assertEqual(
+        self.assertIncludeEqual(
             include(self.app_urls, 'namespace'),
-            (self.app_urls, 'inc-app', 'namespace')
+            self.app_urls.urlpatterns, 'inc-app', 'namespace'
         )
 
 

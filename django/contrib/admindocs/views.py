@@ -12,7 +12,9 @@ from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
-from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
+from django.urls import (
+    get_dispatcher, get_mod_func, get_resolver, get_urlconf, reverse,
+)
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -128,8 +130,8 @@ class ViewIndexView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         views = []
-        urlconf = import_module(settings.ROOT_URLCONF)
-        view_functions = extract_views_from_urlpatterns(urlconf.urlpatterns)
+        resolver = get_resolver(settings.ROOT_URLCONF)
+        view_functions = extract_views_from_urlpatterns(resolver.resolvers)
         for (func, regex, namespace, name) in view_functions:
             views.append({
                 'full_name': '%s.%s' % (func.__module__, getattr(func, '__name__', func.__class__.__name__)),
@@ -148,7 +150,7 @@ class ViewDetailView(BaseAdminDocsView):
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
         urlconf = get_urlconf()
-        if get_resolver(urlconf)._is_callback(view):
+        if get_dispatcher(urlconf)._is_callback(view):
             mod, func = get_mod_func(view)
             view_func = getattr(import_module(mod), func)
         else:
@@ -367,25 +369,26 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     Each object in the returned list is a two-tuple: (view_func, regex)
     """
     views = []
-    for p in urlpatterns:
-        if hasattr(p, 'url_patterns'):
+    for resolver in urlpatterns:
+        name = resolver.namespace if not resolver.is_endpoint() else None
+        if hasattr(resolver, 'resolvers'):
             try:
-                patterns = p.url_patterns
+                sub_resolvers = resolver.resolvers
             except ImportError:
                 continue
             views.extend(extract_views_from_urlpatterns(
-                patterns,
-                base + p.regex.pattern,
-                (namespace or []) + (p.namespace and [p.namespace] or [])
+                sub_resolvers,
+                base + ''.join(c.describe() for c in resolver.constraints),
+                (namespace or []) + (name and [name] or [])
             ))
-        elif hasattr(p, 'callback'):
+        elif hasattr(resolver, 'func'):
             try:
-                views.append((p.callback, base + p.regex.pattern,
-                              namespace, p.name))
+                views.append((resolver.func, base + ''.join(c.describe() for c in resolver.constraints),
+                              namespace, resolver.url_name))
             except ViewDoesNotExist:
                 continue
         else:
-            raise TypeError(_("%s does not appear to be a urlpattern object") % p)
+            raise TypeError(_("%s does not appear to be a resolver object") % resolver)
     return views
 
 named_group_matcher = re.compile(r'\(\?P(<\w+>).+?\)')

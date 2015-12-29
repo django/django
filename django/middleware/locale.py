@@ -3,7 +3,7 @@
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.urls import (
-    LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
+    LocalePrefix, get_resolver, get_script_prefix, is_valid_path,
 )
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
@@ -33,11 +33,11 @@ class LocaleMiddleware(object):
                 and self.is_language_prefix_patterns_used):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
-            path_valid = is_valid_path(language_path, urlconf)
+            path_valid = is_valid_path(language_path, urlconf, request)
             path_needs_slash = (
                 not path_valid and (
                     settings.APPEND_SLASH and not language_path.endswith('/')
-                    and is_valid_path('%s/' % language_path, urlconf)
+                    and is_valid_path('%s/' % language_path, urlconf, request)
                 )
             )
 
@@ -65,7 +65,7 @@ class LocaleMiddleware(object):
         Returns `True` if the `LocaleRegexURLResolver` is used
         at root level of the urlpatterns, else it returns `False`.
         """
-        for url_pattern in get_resolver(None).url_patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+        for resolver in get_resolver(None).resolvers:
+            if resolver.constraints and isinstance(resolver.constraints[0], LocalePrefix):
                 return True
         return False
