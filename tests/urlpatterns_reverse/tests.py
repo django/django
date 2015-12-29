@@ -908,7 +908,7 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.assertEqual(self.resolver.resolve_error_handler(404), handler)
         self.assertEqual(self.resolver.resolve_error_handler(500), handler)
 
-    def test_callable_handers(self):
+    def test_callable_handlers(self):
         handler = (empty_view, {})
         self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
         self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)
