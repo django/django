@@ -84,11 +84,18 @@ class Command(BaseCommand):
         }
         if has_bz2:
             self.compression_formats['bz2'] = (bz2.BZ2File, 'r')
-
+        # Django's test suite repeatedly tries to load initial_data fixture
+        # from apps that do not have any fixtures. Because disabling constraint
+        # checks can be expensive on some database (especially MSSQL), bail
+        # out early if no fixtures are found.
+        for fixture_label in fixture_labels:
+            if self.find_fixtures(fixture_label):
+                break
+        else:
+            return
         with connection.constraint_checks_disabled():
             for fixture_label in fixture_labels:
                 self.load_label(fixture_label)
-
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
         table_names = [model._meta.db_table for model in self.models]

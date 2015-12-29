@@ -643,6 +643,31 @@ class NonExistentFixtureTests(TestCase):
         self.assertEqual(force_text(w[0].message),
             "No fixture named 'this_fixture_doesnt_exist' found.")
 
+    def test_not_existent_file_no_constraint_checking(self):
+        """
+        In cases where no file match the loaddata command shouldn't disable
+        constraint checks on the used connection. This is performance
+        critical on mssql at least.
+        """
+        # With verbosity=2, we get both stdout output and a warning
+        original_methods = connection.disable_constraint_checking, connection.enable_constraint_checking
+        calls = []
+
+        def check_calls():
+            calls.append(None)
+            return True
+        connection.disable_constraint_checking = check_calls
+        connection.enable_constraint_checking = check_calls
+        try:
+            management.call_command(
+                'loaddata',
+                'this_fixture_doesnt_exist',
+                verbosity=0
+            )
+            self.assertEqual(len(calls), 0)
+        finally:
+            connection.disable_constraint_checking, connection.enable_constraint_checking = original_methods
+
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
 

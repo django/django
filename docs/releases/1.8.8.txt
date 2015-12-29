@@ -51,3 +51,6 @@ Bugfixes
 
 * Fixed a regression in the admin which ignored line breaks in read-only fields
   instead of converting them to ``<br>`` (:ticket:`25465`).
+
+* Made loaddata skip disabling and enabling constraints when loaddata doesn't
+  actually load any fixtures.
