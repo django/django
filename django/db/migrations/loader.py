@@ -56,6 +56,40 @@ class MigrationLoader(object):
             app_package_name = apps.get_app_config(app_label).name
             return '%s.%s' % (app_package_name, MIGRATIONS_MODULE_NAME)
 
+    @classmethod
+    def from_changes(cls, changes):
+        """
+        Rather than loading migrations from disk, takes the output of the
+        autodetector's changes() function and loads those in as the disk
+        migrations, in order to operate on them straight away.
+
+        Implicitly sets the connection to None, as the names will not be
+        sensible and match up with the database (you should never try and
+        partially apply migrations with a from_changes loader - only
+        ever a full database create/teardown, or SQL output).
+        """
+        from django.db.migrations.writer import MigrationWriter
+        # Make loader
+        loader = cls(None, load=False)
+        # Make the fake disk migration entries from the changes
+        loader.disk_migrations = {}
+        loader.unmigrated_apps = set()
+        loader.migrated_apps = set()
+        for app_label, app_migrations in changes.items():
+            loader.migrated_apps.add(app_label)
+            for migration in app_migrations:
+                # Write it out to a string then re-exec it to ensure
+                # we behave exactly like writing to disk and reading back again
+                # (this prevents edge cases with e.g. model bindings left over)
+                contents = MigrationWriter(migration).as_string()
+                context = {}
+                exec(contents, context, context)
+                # Save it to the loader
+                loader.disk_migrations[app_label, migration.name] = context['Migration'](migration.name, app_label)
+        # Run the rest of the build
+        loader.build_graph(skip_load=True)
+        return loader
+
     def load_disk(self):
         """
         Loads the migrations from all INSTALLED_APPS from disk.
@@ -160,14 +194,15 @@ class MigrationLoader(object):
                     raise ValueError("Dependency on app with no migrations: %s" % key[0])
         raise ValueError("Dependency on unknown app: %s" % key[0])
 
-    def build_graph(self):
+    def build_graph(self, skip_load=False):
         """
         Builds a migration dependency graph using both the disk and database.
         You'll need to rebuild the graph if you apply migrations. This isn't
         usually a problem as generally migration stuff runs in a one-shot process.
         """
         # Load disk data
-        self.load_disk()
+        if not skip_load:
+            self.load_disk()
         # Load database data
         if self.connection is None:
             self.applied_migrations = set()

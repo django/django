@@ -994,6 +994,21 @@ beyond those apps. Same as ``--list``, applied migrations are marked by an
 ``[X]``. For a verbosity of 2 and above, all dependencies of a migration will
 also be shown.
 
+sql
+---
+
+.. django-admin:: sql
+
+Prints the SQL statements to create a new database from scratch.
+
+The output of this tool *will not* match the SQL emitted by migrations, and
+*should not* be used for any sort of production or development database
+creation, as it will be incompatible with migrations. It is intended for
+testing and information use only.
+
+The :djadminopt:`--database` option can be used to specify the database for
+which to print the SQL.
+
 sqlflush
 --------
 
