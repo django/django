@@ -3938,6 +3938,6 @@ class ExcludeCombineTests(TestCase):
         self.assertQuerysetEqual(
             RelatedObject.objects.values('f').exclude(
                 plaything__name='foo'
-            ).annotate(plaything_cnt=Count('plaything')).order_by('plaything_cnt'),
+            ).annotate(plaything_cnt=Count('plaything')).order_by('f', 'plaything_cnt'),
             [{'f': 1, 'plaything_cnt': 1}, {'f': 2, 'plaything_cnt': 1}], lambda x: x
         )
