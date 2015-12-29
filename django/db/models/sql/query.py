@@ -1732,7 +1732,7 @@ class Query(object):
         if tables:
             # TODO - resolve circular import
             from django.db.models import ModelTable
-            self.extra_tables += tuple(ModelTable(t) for t in tables)
+            self.extra_tables += tuple(ModelTable(None, t) for t in tables)
         if order_by:
             self.extra_order_by = order_by
 
