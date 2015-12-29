@@ -24,3 +24,6 @@ Bugfixes
 
 * Fixed a data loss possibility with :class:`~django.db.models.Prefetch` if
   ``to_attr`` is set to a ``ManyToManyField`` (:ticket:`25693`).
+
+* Fixed a regression in admin which made line breaks in plain read-only text fields
+  and in tabular inline being ignored (:ticket:`25465`).
