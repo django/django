@@ -128,10 +128,11 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
         Return a list of template names to be used for the request. May not be
         called if render_to_response is overridden. Returns the following list:
 
-        * the value of ``template_name`` on the view (if provided)
         * the contents of the ``template_name_field`` field on the
           object instance that the view is operating upon (if available)
-        * ``<app_label>/<model_name><template_name_suffix>.html``
+        * the value of ``template_name`` on the view (if provided)
+        * ``<app_label>/<model_name><template_name_suffix>.html`` from the model obtained
+          from ``self.object`` or ``self.model`` (if available)
         """
         try:
             names = super(SingleObjectTemplateResponseMixin, self).get_template_names()
@@ -140,36 +141,39 @@ class SingleObjectTemplateResponseMixin(TemplateResponseMixin):
             # we just start with an empty list.
             names = []
 
-            # If self.template_name_field is set, grab the value of the field
-            # of that name from the object; this is the most specific template
-            # name, if given.
-            if self.object and self.template_name_field:
-                name = getattr(self.object, self.template_name_field, None)
-                if name:
-                    names.insert(0, name)
+        # The most specific option is if self.template_name_field is set, grab the
+        # value of the field of that name from the object.
+        if hasattr(self, 'object') and self.object and self.template_name_field:
+            name = getattr(self.object, self.template_name_field, None)
+            if name:
+                names.insert(0, name)
 
-            # The least-specific option is the default <app>/<model>_detail.html;
-            # only use this if the object in question is a model.
-            if isinstance(self.object, models.Model):
-                object_meta = self.object._meta
-                if self.object._deferred:
-                    object_meta = self.object._meta.proxy_for_model._meta
-                names.append("%s/%s%s.html" % (
-                    object_meta.app_label,
-                    object_meta.model_name,
-                    self.template_name_suffix
-                ))
-            elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
-                names.append("%s/%s%s.html" % (
-                    self.model._meta.app_label,
-                    self.model._meta.model_name,
-                    self.template_name_suffix
-                ))
+        # The least-specific option is the default <app>/<model>_detail.html;
+        # only use this if the object in question is a model.
+        if hasattr(self, 'object') and isinstance(self.object, models.Model):
+            object_meta = self.object._meta
+            if self.object._deferred:
+                object_meta = self.object._meta.proxy_for_model._meta
+        elif hasattr(self, 'model') and self.model is not None and issubclass(self.model, models.Model):
+            object_meta = self.model._meta
+        else:
+            object_meta = None
+        if object_meta is not None:
+            names.append("%s/%s%s.html" % (
+                object_meta.app_label,
+                object_meta.model_name,
+                self.template_name_suffix
+            ))
 
+        if not names:
             # If we still haven't managed to find any template names, we should
-            # re-raise the ImproperlyConfigured to alert the user.
-            if not names:
-                raise
+            # raise ImproperlyConfigured to alert the developer.
+            raise ImproperlyConfigured(
+                "SingleObjectTemplateResponseMixin requires either a definition of "
+                "'template_name', an implementation of 'get_template_names()', "
+                "a non-empty 'template_name_field' on the object, "
+                "self.object is an instance of models.Model, "
+                "or a definition of 'model'.")
 
         return names
 

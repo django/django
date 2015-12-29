@@ -29,6 +29,9 @@ class DetailViewTest(TestCase):
         cls.page1 = Page.objects.create(
             content='I was once bitten by a moose.', template='generic_views/page_template.html'
         )
+        cls.page2 = Page.objects.create(
+            content='The moose came back for more.', template=''
+        )
 
     def test_simple_object(self):
         res = self.client.get('/detail/obj/')
@@ -124,6 +127,13 @@ class DetailViewTest(TestCase):
         self.assertEqual(res.context['object'], self.page1)
         self.assertEqual(res.context['page'], self.page1)
         self.assertTemplateUsed(res, 'generic_views/page_template.html')
+
+    def test_template_name_field_fallback_to_verbose_name(self):
+        res = self.client.get('/detail/page/%s/field/' % self.page2.pk)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.context['object'], self.page2)
+        self.assertEqual(res.context['page'], self.page2)
+        self.assertTemplateUsed(res, 'generic_views/page_detail.html')
 
     def test_context_object_name(self):
         res = self.client.get('/detail/author/%s/context_object_name/' % self.author1.pk)
