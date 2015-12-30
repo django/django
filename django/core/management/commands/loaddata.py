@@ -84,14 +84,19 @@ class Command(BaseCommand):
         }
         if has_bz2:
             self.compression_formats['bz2'] = (bz2.BZ2File, 'r')
-
-        with connection.constraint_checks_disabled():
-            for fixture_label in fixture_labels:
-                self.load_label(fixture_label)
-
+        if connection.features.accepts_table_names_for_constraint_switching:
+            models = self.find_models_from_labels(fixture_labels)
+            table_names = [model._meta.db_table for model in models]
+            with connection.constraint_checks_disabled(table_names):
+                for fixture_label in fixture_labels:
+                    self.load_label(fixture_label)
+        else:
+            with connection.constraint_checks_disabled():
+                for fixture_label in fixture_labels:
+                    self.load_label(fixture_label)
+            table_names = [model._meta.db_table for model in self.models]
         # Since we disabled constraint checks, we must manually check for
         # any invalid keys that might have been added
-        table_names = [model._meta.db_table for model in self.models]
         try:
             connection.check_constraints(table_names=table_names)
         except Exception as e:
@@ -118,6 +123,29 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("Installed %d object(s) (of %d) from %d fixture(s)" %
                     (self.loaded_object_count, self.fixture_object_count, self.fixture_count))
+
+    def find_models_from_labels(self, fixture_labels):
+        """
+        Find models in the fixture_labels.
+        """
+        models = set()
+        for fixture_label in fixture_labels:
+            for fixture_file, fixture_dir, fixture_name in self.find_fixtures(fixture_label):
+                _, ser_fmt, cmp_fmt = self.parse_name(os.path.basename(fixture_file))
+                open_method, mode = self.compression_formats[cmp_fmt]
+                fixture = open_method(fixture_file, mode)
+                try:
+                    objects = serializers.deserialize(ser_fmt, fixture,
+                        using=self.using, ignorenonexistent=self.ignore)
+                    for obj in objects:
+                        if router.allow_migrate_model(self.using, obj.object.__class__):
+                            models.add(obj.object._meta.concrete_model)
+                            for m2m_set in obj.m2m_data.keys():
+                                m2m_field = obj.object._meta.get_field(m2m_set)
+                                models.add(m2m_field.remote_field.through)
+                finally:
+                    fixture.close()
+        return models
 
     def load_label(self, fixture_label):
         """

@@ -14,6 +14,10 @@ from django.utils.six.moves import _thread as thread
 
 NO_DB_ALIAS = '__no_db__'
 
+tables_seen = 0
+max_seen = 0
+times = 0
+
 
 class BaseDatabaseWrapper(object):
     """
@@ -330,16 +334,24 @@ class BaseDatabaseWrapper(object):
     # ##### Foreign key constraints checks handling #####
 
     @contextmanager
-    def constraint_checks_disabled(self):
+    def constraint_checks_disabled(self, table_names=None):
         """
         Context manager that disables foreign key constraint checking.
         """
-        disabled = self.disable_constraint_checking()
-        try:
-            yield
-        finally:
-            if disabled:
-                self.enable_constraint_checking()
+        if self.features.accepts_table_names_for_constraint_switching:
+            disabled = self.disable_constraint_checking(table_names)
+            try:
+                yield
+            finally:
+                if disabled:
+                    self.enable_constraint_checking(table_names)
+        else:
+            disabled = self.disable_constraint_checking()
+            try:
+                yield
+            finally:
+                if disabled:
+                    self.enable_constraint_checking()
 
     def disable_constraint_checking(self):
         """
