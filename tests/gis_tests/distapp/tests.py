@@ -670,6 +670,13 @@ class DistanceFunctionsTests(TestCase):
             SouthTexasInterstate.objects.annotate(length=Length('path')).filter(length__gt=4000).exists()
         )
 
+        qs = Interstate.objects.annotate(length=Length(LineString((0, 0), (1, 1), srid=4326)))
+        if connection.features.supports_length_geodetic:
+            list(qs)
+        else:
+            with self.assertRaises(NotImplementedError):
+                list(qs)
+
     @skipUnlessDBFeature("has_Perimeter_function")
     def test_perimeter(self):
         """

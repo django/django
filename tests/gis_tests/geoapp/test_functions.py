@@ -95,7 +95,7 @@ class GISFunctionsTests(TestCase):
         # Should throw a TypeError when tyring to obtain GML from a
         # non-geometry field.
         qs = City.objects.all()
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             qs.annotate(gml=functions.AsGML('name'))
         ptown = City.objects.annotate(gml=functions.AsGML('point', precision=9)).get(name='Pueblo')
 
@@ -124,7 +124,7 @@ class GISFunctionsTests(TestCase):
     def test_askml(self):
         # Should throw a TypeError when trying to obtain KML from a
         # non-geometry field.
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             City.objects.annotate(kml=functions.AsKML('name'))
 
         # Ensuring the KML is as expected.
@@ -447,9 +447,63 @@ class GISFunctionsTests(TestCase):
     @skipUnlessDBFeature("has_Union_function")
     def test_union(self):
         geom = Point(-95.363151, 29.763374, srid=4326)
-        ptown = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas')
-        tol = 0.00001
-        # Undefined ordering
-        expected1 = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
-        expected2 = fromstr('MULTIPOINT(-95.363151 29.763374,-96.801611 32.782057)', srid=4326)
-        self.assertTrue(expected1.equals_exact(ptown.union, tol) or expected2.equals_exact(ptown.union, tol))
+
+        union = City.objects.annotate(union=functions.Union('point', geom)).get(name='Dallas').union
+        expected = fromstr('MULTIPOINT(-96.801611 32.782057,-95.363151 29.763374)', srid=4326)
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union(geom, 'point')).get(name='Dallas').union
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union('point', 'point')).get(name='Dallas').union
+        expected = fromstr('POINT(-96.801611 32.782057)', srid=4326)
+        self.assertTrue(expected.equals(union))
+
+        union = City.objects.annotate(union=functions.Union(geom, geom)).get(name='Dallas').union
+        self.assertTrue(geom.equals(union))
+
+        with self.assertRaises(TypeError):
+            City.objects.annotate(union=functions.Union(1, 'point')).get(name='Dallas')
+
+        with self.assertRaises(ValueError):
+            City.objects.annotate(union=functions.Union('name', 'point')).get(name='Dallas')
+
+        with self.assertRaises(ValueError):
+            City.objects.annotate(union=functions.Union('point', Point(1, 1))).get(name='Dallas')
+
+        with self.assertRaises(ValueError):
+            City.objects.annotate(union=functions.Union(Point(1, 1), 'point')).get(name='Dallas')
+
+    @skipUnlessDBFeature("has_Union_function")
+    def test_union_mixed_srid(self):
+        geom = Point(556597.4, 2632018.6, srid=3857)
+        qs = City.objects.annotate(union=functions.Union('point', geom))
+        if connection.features.has_Transform_function:
+            union = qs.get(name='Dallas').union
+
+            tol = 0.00001
+            expected1 = fromstr('MULTIPOINT(-96.801611 32.782057, 5 23)', srid=4326)
+            expected2 = fromstr('MULTIPOINT(5 23, -96.801611 32.782057)', srid=4326)
+            self.assertTrue(expected1.equals_exact(union, tol) or expected2.equals_exact(union, tol))
+        else:
+            with self.assertRaises(NotImplementedError):
+                qs.get(name='Dallas')
+
+    @skipUnlessDBFeature("has_Union_function", "has_Transform_function")
+    def test_union_transformed(self):
+        tol = 0.001
+
+        for city in City.objects.annotate(
+            union=functions.Union('point', functions.Transform('point', 2774)),
+            transformed_point=functions.Transform('point', 2774),
+        ):
+            expected = city.point | city.transformed_point.transform(4326, clone=True)
+            self.assertTrue(city.union.equals_exact(expected, tol))
+            self.assertEqual(city.union.srid, 4326)
+
+        for city in City.objects.annotate(
+            union=functions.Union(functions.Transform('point', 2774), 'point')
+        ):
+            expected = city.point.transform(2774, clone=True)
+            self.assertTrue(expected.equals_exact(city.union, tol))
+            self.assertEqual(city.union.srid, 2774)
