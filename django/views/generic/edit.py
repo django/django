@@ -118,7 +118,8 @@ class FormMixin(six.with_metaclass(FormMixinBase, ContextMixin)):
         """
         Insert the form into the context dict.
         """
-        kwargs.setdefault('form', self.get_form())
+        if 'form' not in kwargs:
+            kwargs['form'] = self.get_form()
         return super(FormMixin, self).get_context_data(**kwargs)
 
 

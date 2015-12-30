@@ -13,7 +13,7 @@ Bugfixes
   (:ticket:`25840`).
 
 * Fixed a regression in ``FormMixin`` causing forms to be validated twice
-  (:ticket:`25548`).
+  (:ticket:`25548`, :ticket:`26018`).
 
 * Fixed a system check crash with nested ``ArrayField``\s (:ticket:`25867`).
 
