@@ -10,8 +10,8 @@ from collections import OrderedDict, deque
 from django.conf import settings
 from django.core import exceptions
 from django.db import (
-    DJANGO_VERSION_PICKLE_KEY, IntegrityError, connections, router,
-    transaction,
+    DJANGO_VERSION_PICKLE_KEY, IntegrityError, NotSupportedError, connections,
+    router, transaction,
 )
 from django.db.models import sql
 from django.db.models.constants import LOOKUP_SEP
@@ -398,7 +398,7 @@ class QuerySet(object):
         """
         obj = self.model(**kwargs)
         self._for_write = True
-        obj.save(force_insert=True, using=self.db)
+        obj.save(force_insert=True, using=self.db, ignore_delegated=self.query.get_ignored_delegated())
         return obj
 
     def _populate_pk_values(self, objs):
@@ -626,7 +626,7 @@ class QuerySet(object):
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_values(kwargs)
         with transaction.atomic(using=self.db, savepoint=False):
-            rows = query.get_compiler(self.db).execute_sql(CURSOR)
+            rows, _ = query.get_compiler(self.db).execute_sql(CURSOR)
         self._result_cache = None
         return rows
     update.alters_data = True
@@ -642,8 +642,12 @@ class QuerySet(object):
             "Cannot update a query once a slice has been taken."
         query = self.query.clone(sql.UpdateQuery)
         query.add_update_fields(values)
+        if not query.values:
+            raise NotSupportedError('Updating a row without any values is not supported')
         self._result_cache = None
-        return query.get_compiler(self.db).execute_sql(CURSOR)
+        return query.get_compiler(self.db).execute_sql(
+            CURSOR, self.query.get_meta().return_on_update_fields
+        )
     _update.alters_data = True
     _update.queryset_only = False
 
@@ -999,6 +1003,11 @@ class QuerySet(object):
         clone._db = alias
         return clone
 
+    def ignore_delegated(self, *fields):
+        clone = self._clone()
+        clone.query.add_ignored_delegated(fields)
+        return clone
+
     ###################################
     # PUBLIC INTROSPECTION ATTRIBUTES #
     ###################################
@@ -1036,8 +1045,11 @@ class QuerySet(object):
         if using is None:
             using = self.db
         query = sql.InsertQuery(self.model)
+        query.add_ignored_delegated(self.query.get_ignored_delegated())
         query.insert_values(fields, objs, raw=raw)
-        return query.get_compiler(using=using).execute_sql(return_id)
+        return query.get_compiler(using=using).execute_sql(
+            return_id, return_fields=self.query.get_meta().return_on_insert_fields
+        )
     _insert.alters_data = True
     _insert.queryset_only = False
 
@@ -1053,8 +1065,9 @@ class QuerySet(object):
         batch_size = (batch_size or max(ops.bulk_batch_size(fields, objs), 1))
         for batch in [objs[i:i + batch_size]
                       for i in range(0, len(objs), batch_size)]:
-            self.model._base_manager._insert(batch, fields=fields,
-                                             using=self.db)
+            self.model._base_manager.ignore_delegated(
+                *self.query.get_ignored_delegated()
+            )._insert(batch, fields=fields, using=self.db)
 
     def _clone(self, **kwargs):
         query = self.query.clone()

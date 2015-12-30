@@ -71,13 +71,14 @@ def _load_field(app_label, model_name, field_name):
 
 # A guide to Field parameters:
 #
-#   * name:      The name of the field specified in the model.
-#   * attname:   The attribute to use on the model object. This is the same as
-#                "name", except in the case of ForeignKeys, where "_id" is
-#                appended.
-#   * db_column: The db_column specified in the model (or None).
-#   * column:    The database column for this field. This is the same as
-#                "attname", except if db_column is specified.
+#   * name:          The name of the field specified in the model.
+#   * attname:       The attribute to use on the model object. This is the same as
+#                    "name", except in the case of ForeignKeys, where "_id" is
+#                    appended.
+#   * delegated:  Whether field value is set in DB or not
+#   * db_column:     The db_column specified in the model (or None).
+#   * column:        The database column for this field. This is the same as
+#                    "attname", except if db_column is specified.
 #
 # Code that introspects values, or does other dynamic things, should use
 # attname. For example, this gets the primary key value of object "obj":
@@ -141,8 +142,9 @@ class Field(RegisterLookupMixin):
             db_index=False, rel=None, default=NOT_PROVIDED, editable=True,
             serialize=True, unique_for_date=None, unique_for_month=None,
             unique_for_year=None, choices=None, help_text='', db_column=None,
-            db_tablespace=None, auto_created=False, validators=[],
-            error_messages=None):
+            db_tablespace=None, return_on_insert=None, return_on_update=None,
+            delegate=False, delegate_on_insert=None, delegate_on_update=None,
+            auto_created=False, validators=[], error_messages=None):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
         self._verbose_name = verbose_name  # Store original for deconstruction
@@ -165,6 +167,13 @@ class Field(RegisterLookupMixin):
         self.db_column = db_column
         self.db_tablespace = db_tablespace or settings.DEFAULT_INDEX_TABLESPACE
         self.auto_created = auto_created
+        self.delegate = delegate
+
+        default_if_None = lambda field, default: default if field is None else field
+        self.delegate_on_insert = default_if_None(delegate_on_insert, self.delegate)
+        self.delegate_on_update = default_if_None(delegate_on_update, self.delegate)
+        self.return_on_insert = default_if_None(return_on_insert, self.delegate_on_insert)
+        self.return_on_update = default_if_None(return_on_update, self.delegate_on_update)
 
         # Adjust the appropriate creation counter, and save our local copy.
         if auto_created:
@@ -414,6 +423,11 @@ class Field(RegisterLookupMixin):
             "help_text": '',
             "db_column": None,
             "db_tablespace": settings.DEFAULT_INDEX_TABLESPACE,
+            "delegate": False,
+            "delegate_on_update": False,
+            "delegate_on_insert": False,
+            "return_on_insert": False,
+            "return_on_update": False,
             "auto_created": False,
             "validators": [],
             "error_messages": None,
@@ -623,6 +637,12 @@ class Field(RegisterLookupMixin):
         data = DictWrapper(self.__dict__, connection.ops.quote_name, "qn_")
         try:
             return connection.data_types[self.get_internal_type()] % data
+        except KeyError:
+            return None
+
+    def db_return_type(self, connection):
+        try:
+            return connection.return_data_types[self.get_internal_type()]
         except KeyError:
             return None
 

@@ -143,7 +143,9 @@ class UpdateQuery(Query):
         that will be used to generate the UPDATE query. Might be more usefully
         called add_update_targets() to hint at the extra information here.
         """
-        self.values.extend(values_seq)
+        for field, model, value in values_seq:
+            if not field.delegate_on_update or field.attname in self._ignored_delegated:
+                self.values.append((field, model, value,))
 
     def add_related_update(self, model, field, value):
         """
@@ -183,7 +185,7 @@ class InsertQuery(Query):
         extras = {
             'fields': self.fields[:],
             'objs': self.objs[:],
-            'raw': self.raw,
+            'raw': self.raw
         }
         extras.update(kwargs)
         return super(InsertQuery, self).clone(klass, **extras)
@@ -198,7 +200,8 @@ class InsertQuery(Query):
         parameters. This provides a way to insert NULL and DEFAULT keywords
         into the query, for example.
         """
-        self.fields = fields
+        self.fields = [field for field in fields
+                       if not field.delegate_on_insert or field.attname in self._ignored_delegated]
         self.objs = objs
         self.raw = raw
 

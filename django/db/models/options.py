@@ -73,6 +73,8 @@ class Options(object):
         self._get_fields_cache = {}
         self.local_fields = []
         self.local_many_to_many = []
+        self.return_on_insert_fields = []
+        self.return_on_update_fields = []
         self.virtual_fields = []
         self.model_name = None
         self.verbose_name = None
@@ -256,6 +258,13 @@ class Options(object):
         # the "creation_counter" attribute of the field.
         # Move many-to-many related fields from self.fields into
         # self.many_to_many.
+
+        if field.return_on_insert:
+            self.return_on_insert_fields.append(field)
+
+        if field.return_on_update:
+            self.return_on_update_fields.append(field)
+
         if virtual:
             self.virtual_fields.append(field)
         elif field.is_relation and field.many_to_many:

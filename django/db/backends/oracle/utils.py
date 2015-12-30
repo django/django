@@ -27,6 +27,19 @@ class InsertIdVar(object):
         return param
 
 
+class InsertReturningVar(object):
+    def __init__(self, db_type):
+        self._db_type = db_type
+
+    def bind_parameter(self, cursor):
+        param = cursor.cursor.var(self._db_type)
+        cursor._insert_returning_vars = getattr(
+            cursor, '_insert_returning_vars', []
+        )
+        cursor._insert_returning_vars.append(param)
+        return param
+
+
 class Oracle_datetime(datetime.datetime):
     """
     A datetime object, with an additional class attribute

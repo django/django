@@ -98,6 +98,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'TimeField': 'time',
         'UUIDField': 'uuid',
     }
+    return_data_types = {}
     data_type_check_constraints = {
         'PositiveIntegerField': '"%(column)s" >= 0',
         'PositiveSmallIntegerField': '"%(column)s" >= 0',

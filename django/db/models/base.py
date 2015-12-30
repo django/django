@@ -614,7 +614,7 @@ class Model(six.with_metaclass(ModelBase)):
         return getattr(self, field.attname)
 
     def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+             update_fields=None, ignore_delegated=None):
         """
         Saves the current instance. Override this in a subclass if you want to
         control the saving process.
@@ -696,11 +696,13 @@ class Model(six.with_metaclass(ModelBase)):
                 update_fields = frozenset(loaded_fields)
 
         self.save_base(using=using, force_insert=force_insert,
-                       force_update=force_update, update_fields=update_fields)
+                       force_update=force_update, update_fields=update_fields,
+                       ignore_delegated=ignore_delegated)
     save.alters_data = True
 
     def save_base(self, raw=False, force_insert=False,
-                  force_update=False, using=None, update_fields=None):
+                  force_update=False, using=None, update_fields=None,
+                  ignore_delegated=None):
         """
         Handles the parts of saving which should be done only once per save,
         yet need to be done in raw saves, too. This includes some sanity
@@ -720,11 +722,14 @@ class Model(six.with_metaclass(ModelBase)):
         meta = cls._meta
         if not meta.auto_created:
             signals.pre_save.send(sender=origin, instance=self, raw=raw, using=using,
-                                  update_fields=update_fields)
+                                  update_fields=update_fields,
+                                  ignore_delegated=ignore_delegated)
         with transaction.atomic(using=using, savepoint=False):
             if not raw:
-                self._save_parents(cls, using, update_fields)
-            updated = self._save_table(raw, cls, force_insert, force_update, using, update_fields)
+                self._save_parents(cls, using, update_fields, ignore_delegated)
+            updated = self._save_table(
+                raw, cls, force_insert, force_update, using, update_fields, ignore_delegated
+            )
         # Store the database on which the object was saved
         self._state.db = using
         # Once saved, this is no longer a to-be-added instance.
@@ -732,12 +737,15 @@ class Model(six.with_metaclass(ModelBase)):
 
         # Signal that the save is complete
         if not meta.auto_created:
-            signals.post_save.send(sender=origin, instance=self, created=(not updated),
-                                   update_fields=update_fields, raw=raw, using=using)
+            signals.post_save.send(
+                sender=origin, instance=self, created=(not updated),
+                update_fields=update_fields, ignore_delegated=ignore_delegated,
+                raw=raw, using=using
+            )
 
     save_base.alters_data = True
 
-    def _save_parents(self, cls, using, update_fields):
+    def _save_parents(self, cls, using, update_fields, ignore_delegated):
         """
         Saves all the parents of cls using values from self.
         """
@@ -747,8 +755,14 @@ class Model(six.with_metaclass(ModelBase)):
             if (field and getattr(self, parent._meta.pk.attname) is None
                     and getattr(self, field.attname) is not None):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            self._save_parents(cls=parent, using=using, update_fields=update_fields)
-            self._save_table(cls=parent, using=using, update_fields=update_fields)
+            self._save_parents(
+                cls=parent, using=using, update_fields=update_fields,
+                ignore_delegated=ignore_delegated
+            )
+            self._save_table(
+                cls=parent, using=using, update_fields=update_fields,
+                ignore_delegated=ignore_delegated
+            )
             # Set the parent's PK value to self.
             if field:
                 setattr(self, field.attname, self._get_pk_val(parent._meta))
@@ -762,7 +776,8 @@ class Model(six.with_metaclass(ModelBase)):
                     delattr(self, cache_name)
 
     def _save_table(self, raw=False, cls=None, force_insert=False,
-                    force_update=False, using=None, update_fields=None):
+                    force_update=False, using=None, update_fields=None,
+                    ignore_delegated=None):
         """
         Does the heavy-lifting involved in saving. Updates or inserts the data
         for a single table.
@@ -785,15 +800,21 @@ class Model(six.with_metaclass(ModelBase)):
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
         if pk_set and not force_insert:
             base_qs = cls._base_manager.using(using)
+            if ignore_delegated:
+                base_qs = base_qs.ignore_delegated(*ignore_delegated)
             values = [(f, None, (getattr(self, f.attname) if raw else f.pre_save(self, False)))
                       for f in non_pks]
             forced_update = update_fields or force_update
-            updated = self._do_update(base_qs, using, pk_val, values, update_fields,
-                                      forced_update)
+            updated, return_values = self._do_update(
+                base_qs, using, pk_val, values, update_fields, forced_update
+            )
             if force_update and not updated:
                 raise DatabaseError("Forced update did not affect any rows.")
             if update_fields and not updated:
                 raise DatabaseError("Save with update_fields did not affect any rows.")
+            if return_values:
+                for field, value in zip(meta.return_on_update_fields, return_values):
+                    setattr(self, field.attname, value)
         if not updated:
             if meta.order_with_respect_to:
                 # If this is a model with an order_with_respect_to
@@ -808,9 +829,20 @@ class Model(six.with_metaclass(ModelBase)):
                 fields = [f for f in fields if not isinstance(f, AutoField)]
 
             update_pk = bool(meta.has_auto_field and not pk_set)
-            result = self._do_insert(cls._base_manager, using, fields, update_pk, raw)
-            if update_pk:
-                setattr(self, meta.pk.attname, result)
+            manager = cls._base_manager
+            if ignore_delegated:
+                manager = manager.ignore_delegated(*ignore_delegated)
+            result = self._do_insert(
+                manager, using, fields, update_pk, raw
+            )
+            if update_pk and result:
+                pk = result[0]
+                setattr(self, meta.pk.attname, pk)
+                if meta.return_on_insert_fields:
+                    result = result[1:]
+            if meta.return_on_insert_fields:
+                for field, value in zip(meta.return_on_insert_fields, result):
+                    setattr(self, field.attname, value)
         return updated
 
     def _do_update(self, base_qs, using, pk_val, values, update_fields, forced_update):
@@ -825,8 +857,9 @@ class Model(six.with_metaclass(ModelBase)):
             # update_fields doesn't target any field in current model. In that
             # case we just say the update succeeded. Another case ending up here
             # is a model with just PK - in that case check that the PK still
-            # exists.
-            return update_fields is not None or filtered.exists()
+            # exists.However, we still want to update if there is a DB
+            # generated field present in the model
+            return (update_fields is not None or filtered.exists(), [])
         if self._meta.select_on_save and not forced_update:
             if filtered.exists():
                 # It may happen that the object is deleted from the DB right after
@@ -836,18 +869,24 @@ class Model(six.with_metaclass(ModelBase)):
                 # successfully (a row is matched and updated). In order to
                 # distinguish these two cases, the object's existence in the
                 # database is again checked for if the UPDATE query returns 0.
-                return filtered._update(values) > 0 or filtered.exists()
+                updated, values = filtered._update(values)
+                if updated > 0:
+                    return True, values
+                return filtered.exists(), []
             else:
-                return False
-        return filtered._update(values) > 0
+                return False, []
+        updated, values = filtered._update(values)
+        updated = updated > 0
+        return updated, values
 
     def _do_insert(self, manager, using, fields, update_pk, raw):
         """
         Do an INSERT. If update_pk is defined then this method should return
         the new pk for the model.
         """
-        return manager._insert([self], fields=fields, return_id=update_pk,
-                               using=using, raw=raw)
+        return manager._insert(
+            [self], fields=fields, return_id=update_pk, using=using, raw=raw
+        )
 
     def delete(self, using=None, keep_parents=False):
         using = using or router.db_for_write(self.__class__, instance=self)

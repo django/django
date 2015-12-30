@@ -25,6 +25,8 @@ class SQLCompiler(object):
         # these are set as a side-effect of executing the query. Note that we calculate
         # separately a list of extra select columns needed for grammatical correctness
         # of the query, but these columns are not included in self.select.
+        self.should_return_id = False
+        self.should_return_fields = False
         self.select = None
         self.annotation_col_map = None
         self.klass_info = None
@@ -1018,15 +1020,26 @@ class SQLInsertCompiler(SQLCompiler):
 
         placeholder_rows, param_rows = self.assemble_as_sql(fields, value_rows)
 
-        if self.return_id and self.connection.features.can_return_id_from_insert:
+        if self.should_return_id or self.should_return_fields:
+
             params = param_rows[0]
-            col = "%s.%s" % (qn(opts.db_table), qn(opts.pk.column))
             result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
-            r_fmt, r_params = self.connection.ops.return_insert_id()
+
             # Skip empty r_fmt to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
+            if self.should_return_fields:
+                cols = ["%s.%s" % (qn(opts.db_table), qn(field.column),)
+                        for field in self.return_fields]
+                return_columns = [(qn(field.column), field.db_return_type(self.connection),)
+                                  for field in self.return_fields]
+                r_fmt, r_params = self.connection.ops.return_values(return_columns)
+
+            elif self.should_return_id:
+                cols = ["%s.%s" % (qn(opts.db_table), qn(opts.pk.column))]
+                r_fmt, r_params = self.connection.ops.return_insert_id()
+
             if r_fmt:
-                result.append(r_fmt % col)
+                result.append(r_fmt % ",".join(cols))
                 params += r_params
             return [(" ".join(result), tuple(params))]
 
@@ -1039,18 +1052,29 @@ class SQLInsertCompiler(SQLCompiler):
                 for p, vals in zip(placeholder_rows, param_rows)
             ]
 
-    def execute_sql(self, return_id=False):
-        assert not (return_id and len(self.query.objs) != 1)
+    def execute_sql(self, return_id=False, return_fields=None):
+        insert_many = len(self.query.objs) != 1
+        assert not (return_id and insert_many)
         self.return_id = return_id
+        self.return_fields = [] if insert_many else (return_fields or [])[:]
+
+        self.should_return_id = bool(self.return_id and self.connection.features.can_return_id_from_insert)
+        self.should_return_fields = bool(self.return_fields and self.connection.features.can_return_multiple_values)
+        if self.should_return_fields:
+            meta = self.query.get_meta()
+            self.return_fields.insert(0, meta.auto_field)
+
         with self.connection.cursor() as cursor:
             for sql, params in self.as_sql():
                 cursor.execute(sql, params)
-            if not (return_id and cursor):
+            if not ((return_id or return_fields) and cursor):
                 return
-            if self.connection.features.can_return_id_from_insert:
-                return self.connection.ops.fetch_returned_insert_id(cursor)
-            return self.connection.ops.last_insert_id(cursor,
-                    self.query.get_meta().db_table, self.query.get_meta().pk.column)
+            if self.should_return_fields:
+                return self.connection.ops.fetch_returned_fields(cursor, self.return_fields)
+            if self.should_return_id:
+                return [self.connection.ops.fetch_returned_insert_id(cursor)]
+            return [self.connection.ops.last_insert_id(cursor,
+                    self.query.get_meta().db_table, self.query.get_meta().pk.column)]
 
 
 class SQLDeleteCompiler(SQLCompiler):
@@ -1076,6 +1100,7 @@ class SQLUpdateCompiler(SQLCompiler):
         parameters.
         """
         self.pre_sql_setup()
+
         if not self.query.values:
             return '', ()
         qn = self.quote_name_unless_alias
@@ -1125,28 +1150,49 @@ class SQLUpdateCompiler(SQLCompiler):
         where, params = self.compile(self.query.where)
         if where:
             result.append('WHERE %s' % where)
+        if self.should_return_fields:
+            r_fmt, r_params = self.connection.ops.return_values(
+                [(qn(field.column), field.db_return_type(self.connection),)
+                 for field in self.return_fields]
+            )
+            if r_fmt:
+                result.append(
+                    r_fmt % ", ".join(
+                        ["%s.%s" % (qn(table), qn(field.column),)
+                        for field in self.return_fields]
+                    ))
+            if r_params:
+                params += r_params
         return ' '.join(result), tuple(update_params + params)
 
-    def execute_sql(self, result_type):
+    def execute_sql(self, result_type, return_fields=None):
         """
         Execute the specified update. Returns the number of rows affected by
         the primary update query. The "primary update query" is the first
         non-empty query that is executed. Row counts for any subsequent,
         related queries are not available.
         """
+        self.return_fields = (return_fields or [])[:]
+        self.should_return_fields = bool(self.return_fields and self.connection.features.can_return_multiple_values)
+
         cursor = super(SQLUpdateCompiler, self).execute_sql(result_type)
         try:
             rows = cursor.rowcount if cursor else 0
+            if self.should_return_fields:
+                return_values = self.connection.ops.fetch_returned_fields(cursor, self.return_fields)
+            else:
+                return_values = []
             is_empty = cursor is None
         finally:
             if cursor:
                 cursor.close()
         for query in self.query.get_related_updates():
-            aux_rows = query.get_compiler(self.using).execute_sql(result_type)
+            aux_rows, aux_vals = query.get_compiler(self.using).execute_sql(result_type)
             if is_empty and aux_rows:
                 rows = aux_rows
+                return_values = aux_vals
                 is_empty = False
-        return rows
+        return rows, return_values
 
     def pre_sql_setup(self):
         """
