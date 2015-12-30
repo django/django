@@ -298,6 +298,11 @@ an :func:`~django.conf.urls.include` in the ``urlpatterns`` list, so you have:
         url(r'^admin/', admin.site.urls),
     ]
 
+.. admonition:: When to use :func:`~django.conf.urls.include()`
+
+    You should always use ``include()`` when you include other URL patterns.
+    ``admin.site.urls`` is the only exception to this.
+
 .. admonition:: Doesn't match what you see?
 
     If you're seeing ``include(admin.site.urls)`` instead of just
