@@ -2,7 +2,7 @@ import warnings
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import (
+from django.urls import (
     LocaleRegexURLResolver, RegexURLPattern, RegexURLResolver,
 )
 from django.utils import six

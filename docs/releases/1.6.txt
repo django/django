@@ -583,16 +583,17 @@ be at the end of a line. If they are not, the comments are ignored and
     {{ title }}{# Translators: Extracted and associated with 'Welcome' below #}
     <h1>{% trans "Welcome" %}</h1>
 
-Quoting in :func:`~django.core.urlresolvers.reverse`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Quoting in ``reverse()``
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 When reversing URLs, Django didn't apply :func:`~django.utils.http.urlquote`
 to arguments before interpolating them in URL patterns. This bug is fixed in
 Django 1.6. If you worked around this bug by applying URL quoting before
-passing arguments to :func:`~django.core.urlresolvers.reverse`, this may
-result in double-quoting. If this happens, simply remove the URL quoting from
-your code. You will also have to replace special characters in URLs used in
-:func:`~django.test.SimpleTestCase.assertRedirects` with their encoded versions.
+passing arguments to ``reverse()``, this may result in double-quoting. If this
+happens, simply remove the URL quoting from your code. You will also have to
+replace special characters in URLs used in
+:func:`~django.test.SimpleTestCase.assertRedirects` with their encoded
+versions.
 
 Storage of IP addresses in the comments app
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -902,12 +903,12 @@ Miscellaneous
   stored as ``null``. Previously, storing a ``blank`` value in a field which
   did not allow ``null`` would cause a database exception at runtime.
 
-* If a :class:`~django.core.urlresolvers.NoReverseMatch` exception is raised
-  from a method when rendering a template, it is not silenced. For example,
-  ``{{ obj.view_href }}`` will cause template rendering to fail if
-  ``view_href()`` raises ``NoReverseMatch``. There is no change to the
-  :ttag:`{% url %}<url>` tag, it causes template rendering to fail like always
-  when ``NoReverseMatch`` is raised.
+* If a ``NoReverseMatch`` exception is raised from a method when rendering a
+  template, it is not silenced. For example, ``{{ obj.view_href }}`` will
+  cause template rendering to fail if ``view_href()`` raises 
+  ``NoReverseMatch``. There is no change to the :ttag:`{% url %}<url>` tag, it
+  causes template rendering to fail like always when ``NoReverseMatch`` is
+  raised.
 
 * :meth:`django.test.Client.logout` now calls
   :meth:`django.contrib.auth.logout` which will send the

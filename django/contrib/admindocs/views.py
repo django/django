@@ -8,11 +8,11 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.admindocs import utils
-from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured, ViewDoesNotExist
 from django.db import models
 from django.http import Http404
 from django.template.engine import Engine
+from django.urls import get_mod_func, get_resolver, get_urlconf, reverse
 from django.utils.decorators import method_decorator
 from django.utils.inspect import (
     func_accepts_kwargs, func_accepts_var_args, func_has_no_args,
@@ -38,7 +38,7 @@ class BaseAdminDocsView(TemplateView):
         return super(BaseAdminDocsView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        kwargs.update({'root_path': urlresolvers.reverse('admin:index')})
+        kwargs.update({'root_path': reverse('admin:index')})
         kwargs.update(admin.site.each_context(self.request))
         return super(BaseAdminDocsView, self).get_context_data(**kwargs)
 
@@ -147,9 +147,9 @@ class ViewDetailView(BaseAdminDocsView):
 
     def get_context_data(self, **kwargs):
         view = self.kwargs['view']
-        urlconf = urlresolvers.get_urlconf()
-        if urlresolvers.get_resolver(urlconf)._is_callback(view):
-            mod, func = urlresolvers.get_mod_func(view)
+        urlconf = get_urlconf()
+        if get_resolver(urlconf)._is_callback(view):
+            mod, func = get_mod_func(view)
             view_func = getattr(import_module(mod), func)
         else:
             raise Http404

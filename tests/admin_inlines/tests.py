@@ -7,8 +7,8 @@ from django.contrib.admin.helpers import InlineAdminForm
 from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.test import RequestFactory, TestCase, override_settings
+from django.urls import reverse
 
 from .admin import InnerInline, site as admin_site
 from .models import (

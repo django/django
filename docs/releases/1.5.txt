@@ -293,8 +293,8 @@ Django 1.5 also includes several smaller improvements worth noting:
   objects fetched into memory. See :meth:`QuerySet.delete()
   <django.db.models.query.QuerySet.delete>` for details.
 
-* An instance of :class:`~django.core.urlresolvers.ResolverMatch` is stored on
-  the request as ``resolver_match``.
+* An instance of ``ResolverMatch`` is stored on the request as
+  ``resolver_match``.
 
 * By default, all logging messages reaching the ``django`` logger when
   :setting:`DEBUG` is ``True`` are sent to the console (unless you redefine the

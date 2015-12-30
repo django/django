@@ -371,8 +371,8 @@ Django 1.4 to store the wizard's state in the user's cookies.
 ``reverse_lazy``
 ~~~~~~~~~~~~~~~~
 
-A lazily evaluated version of :func:`django.core.urlresolvers.reverse` was
-added to allow using URL reversals before the project's URLconf gets loaded.
+A lazily evaluated version of ``reverse()`` was added to allow using URL
+reversals before the project's URLconf gets loaded.
 
 Translating URL patterns
 ~~~~~~~~~~~~~~~~~~~~~~~~

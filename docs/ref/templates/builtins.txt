@@ -1024,8 +1024,8 @@ such as this:
 The template tag will output the string ``/clients/client/123/``.
 
 Note that if the URL you're reversing doesn't exist, you'll get an
-:exc:`~django.core.urlresolvers.NoReverseMatch` exception raised, which will
-cause your site to display an error page.
+:exc:`~django.urls.NoReverseMatch` exception raised, which will cause your
+site to display an error page.
 
 If you'd like to retrieve a URL without displaying it, you can use a slightly
 different call::

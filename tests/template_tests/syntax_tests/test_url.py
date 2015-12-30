@@ -1,7 +1,7 @@
 # coding: utf-8
-from django.core.urlresolvers import NoReverseMatch, resolve
 from django.template import RequestContext, TemplateSyntaxError
 from django.test import RequestFactory, SimpleTestCase, override_settings
+from django.urls import NoReverseMatch, resolve
 
 from ..utils import setup
 

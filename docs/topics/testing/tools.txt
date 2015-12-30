@@ -507,9 +507,8 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: resolver_match
 
-        An instance of :class:`~django.core.urlresolvers.ResolverMatch` for the
-        response. You can use the
-        :attr:`~django.core.urlresolvers.ResolverMatch.func` attribute, for
+        An instance of :class:`~django.urls.ResolverMatch` for the response.
+        You can use the :attr:`~django.urls.ResolverMatch.func` attribute, for
         example, to verify the view that served the response::
 
             # my_view here is a function based view
@@ -520,7 +519,7 @@ Specifically, a ``Response`` object has the following attributes:
             self.assertEqual(response.resolver_match.func.__name__, MyView.as_view().__name__)
 
         If the given URL is not found, accessing this attribute will raise a
-        :exc:`~django.core.urlresolvers.Resolver404` exception.
+        :exc:`~django.urls.Resolver404` exception.
 
 You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the
