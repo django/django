@@ -26,11 +26,11 @@ import datetime
 
 from django.contrib.auth.models import User
 from django.core import mail
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.test import (
     Client, RequestFactory, SimpleTestCase, TestCase, override_settings,
 )
+from django.urls import reverse_lazy
 
 from .views import get_view, post_view, trace_view
 

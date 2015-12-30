@@ -3,12 +3,12 @@ from __future__ import unicode_literals
 import os
 
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import clear_url_caches, reverse, translate_url
 from django.http import HttpResponsePermanentRedirect
 from django.middleware.locale import LocaleMiddleware
 from django.template import Context, Template
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import override_script_prefix
+from django.urls import clear_url_caches, reverse, translate_url
 from django.utils import translation
 from django.utils._os import upath
 

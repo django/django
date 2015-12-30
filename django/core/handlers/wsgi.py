@@ -12,7 +12,7 @@ from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.handlers import base
-from django.core.urlresolvers import set_script_prefix
+from django.urls import set_script_prefix
 from django.utils import six
 from django.utils.encoding import force_str, force_text
 from django.utils.functional import cached_property

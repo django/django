@@ -10,7 +10,6 @@ import os
 
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.http import HttpResponse
 from django.template import (
     Context, RequestContext, TemplateSyntaxError, engines,
@@ -21,6 +20,7 @@ from django.test import (
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
+from django.urls import NoReverseMatch, reverse
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy

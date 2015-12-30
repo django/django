@@ -9,5 +9,5 @@ Django 1.5.7 fixes a regression in the 1.5.6 security release.
 Bugfixes
 ========
 
-* Restored the ability to :meth:`~django.core.urlresolvers.reverse` views
-  created using :func:`functools.partial()` (:ticket:`22486`).
+* Restored the ability to ``reverse()`` views created using
+  :func:`functools.partial()` (:ticket:`22486`).

@@ -460,6 +460,9 @@ Miscellaneous
 * The ``shell --plain`` option is deprecated in favor of ``-i python`` or
   ``--interface python``.
 
+* The ``django.core.urlresolvers`` module is deprecated in favor of its new
+  location, :mod:`django.urls`.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10
@@ -485,8 +488,8 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 * Using an incorrect count of unpacked values in the ``for`` template tag
   raises an exception rather than failing silently.
 
-* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
-  Python path is removed.
+* The ability to :func:`~django.urls.reverse` URLs using a dotted Python path
+  is removed.
 
 * Support for ``optparse`` is dropped for custom management commands.
 

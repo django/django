@@ -10,10 +10,10 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.admin.views.main import ALL_VAR, SEARCH_VAR, ChangeList
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.template import Context, Template
 from django.test import TestCase, ignore_warnings, override_settings
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils import formats, six
 from django.utils.deprecation import RemovedInDjango20Warning
 

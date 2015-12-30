@@ -13,7 +13,7 @@ views for displaying drilldown pages for date-based data.
     defined as follows in ``myapp/models.py``::
 
         from django.db import models
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
 
         class Article(models.Model):
             title = models.CharField(max_length=200)

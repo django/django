@@ -3,7 +3,6 @@ This module collects helper functions and classes that "span" multiple levels
 of MVC. In other words, these functions/classes introduce controlled coupling
 for convenience's sake.
 """
-from django.core import urlresolvers
 from django.db.models.base import ModelBase
 from django.db.models.manager import Manager
 from django.db.models.query import QuerySet
@@ -11,6 +10,7 @@ from django.http import (
     Http404, HttpResponse, HttpResponsePermanentRedirect, HttpResponseRedirect,
 )
 from django.template import loader
+from django.urls import NoReverseMatch, reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
@@ -43,8 +43,8 @@ def redirect(to, *args, **kwargs):
 
         * A model: the model's `get_absolute_url()` function will be called.
 
-        * A view name, possibly with arguments: `urlresolvers.reverse()` will
-          be used to reverse-resolve the name.
+        * A view name, possibly with arguments: `urls.reverse()` will  used to
+          reverse-resolve the name.
 
         * A URL, which will be used as-is for the redirect location.
 
@@ -123,8 +123,8 @@ def resolve_url(to, *args, **kwargs):
 
         * A model: the model's `get_absolute_url()` function will be called.
 
-        * A view name, possibly with arguments: `urlresolvers.reverse()` will
-          be used to reverse-resolve the name.
+        * A view name, possibly with arguments: `urls.reverse()` will be used
+          to reverse-resolve the name.
 
         * A URL, which will be returned as-is.
     """
@@ -144,8 +144,8 @@ def resolve_url(to, *args, **kwargs):
 
     # Next try a reverse URL resolution.
     try:
-        return urlresolvers.reverse(to, args=args, kwargs=kwargs)
-    except urlresolvers.NoReverseMatch:
+        return reverse(to, args=args, kwargs=kwargs)
+    except NoReverseMatch:
         # If this is a callable, re-raise.
         if callable(to):
             raise

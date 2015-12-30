@@ -1112,9 +1112,8 @@ Miscellaneous
 * The default max size of the Oracle test tablespace has increased from 300M
   (or 200M, before 1.7.2) to 500M.
 
-* :func:`~django.core.urlresolvers.reverse` and
-  :func:`~django.core.urlresolvers.reverse_lazy` now return Unicode strings
-  instead of byte strings.
+* ``reverse()`` and ``reverse_lazy()`` now return Unicode strings instead of
+  byte strings.
 
 * The ``CacheClass`` shim has been removed from all cache backends.
   These aliases were provided for backwards compatibility with Django 1.3.
@@ -1334,8 +1333,8 @@ Using an incorrect count of unpacked values in the :ttag:`for` template tag
 Using an incorrect count of unpacked values in :ttag:`for` tag will raise an
 exception rather than fail silently in Django 1.10.
 
-Passing a dotted path to :func:`~django.core.urlresolvers.reverse()` and :ttag:`url`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Passing a dotted path to ``reverse()`` and :ttag:`url`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Reversing URLs by Python path is an expensive operation as it causes the
 path being reversed to be imported. This behavior has also resulted in a
