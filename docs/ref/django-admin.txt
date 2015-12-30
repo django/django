@@ -933,9 +933,15 @@ Starts the Python interactive interpreter.
 
 Django will use IPython_ or bpython_ if either is installed. If you have a
 rich shell installed but want to force use of the "plain" Python interpreter,
-use the ``--plain`` option, like so::
+use the ``-i python`` or ``--interface python`` option, like so::
 
-    django-admin shell --plain
+    django-admin shell -i python
+    django-admin shell --interface python
+
+.. deprecated:: 1.10
+
+   In older versions, use the ``--plain`` option. This is deprecated and will
+   be removed in Django 2.0.
 
 If you would like to specify either IPython or bpython as your interpreter if
 you have both installed you can specify an alternative interpreter interface
@@ -957,12 +963,12 @@ bpython::
 .. _bpython: http://bpython-interpreter.org/
 
 When the "plain" Python interactive interpreter starts (be it because
-``--plain`` was specified or because no other interactive interface is
-available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
+``--interface python`` was specified or because no other interactive interface
+is available) it reads the script pointed to by the :envvar:`PYTHONSTARTUP`
 environment variable and the ``~/.pythonrc.py`` script. If you don't wish this
 behavior you can use the ``--no-startup`` option. e.g.::
 
-    django-admin shell --plain --no-startup
+    django-admin shell --interface python --no-startup
 
 showmigrations [<app_label> [<app_label>]]
 ------------------------------------------
@@ -1550,7 +1556,7 @@ that ``django-admin`` should print to the console.
 
 Example usage::
 
-    django-admin sqlall --no-color
+    django-admin runserver --no-color
 
 By default, ``django-admin`` will format the output to be colorized. For
 example, errors will be printed to the console in red and SQL statements will
@@ -1778,5 +1784,5 @@ Output redirection
 Note that you can redirect standard output and error streams as all commands
 support the ``stdout`` and ``stderr`` options. For example, you could write::
 
-    with open('/tmp/command_output') as f:
+    with open('/path/to/command_output') as f:
         management.call_command('dumpdata', stdout=f)

@@ -98,9 +98,9 @@ class ModelBase(type):
                 if not abstract:
                     raise RuntimeError(
                         "Model class %s.%s doesn't declare an explicit "
-                        "app_label and either isn't in an application in "
-                        "INSTALLED_APPS or else was imported before its "
-                        "application was loaded. " % (module, name))
+                        "app_label and isn't in an application in "
+                        "INSTALLED_APPS." % (module, name)
+                    )
 
             else:
                 app_label = app_config.label

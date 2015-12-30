@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import ctypes
 import json
 import random
+import threading
 from binascii import a2b_hex, b2a_hex
 from io import BytesIO
 from unittest import skipUnless
@@ -12,9 +13,10 @@ from django.contrib.gis.gdal import HAS_GDAL
 from django.contrib.gis.geos import (
     HAS_GEOS, GeometryCollection, GEOSException, GEOSGeometry, LinearRing,
     LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon,
-    fromfile, fromstr,
+    fromfile, fromstr, libgeos,
 )
 from django.contrib.gis.geos.base import GEOSBase
+from django.contrib.gis.geos.libgeos import geos_version_info
 from django.contrib.gis.shortcuts import numpy
 from django.template import Context
 from django.template.engine import Engine
@@ -660,6 +662,20 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertTrue(poly.covers(Point(5, 5)))
         self.assertFalse(poly.covers(Point(100, 100)))
 
+    def test_closed(self):
+        ls_closed = LineString((0, 0), (1, 1), (0, 0))
+        ls_not_closed = LineString((0, 0), (1, 1))
+        self.assertFalse(ls_not_closed.closed)
+        self.assertTrue(ls_closed.closed)
+
+        if geos_version_info()['version'] >= '3.5':
+            self.assertFalse(MultiLineString(ls_closed, ls_not_closed).closed)
+            self.assertTrue(MultiLineString(ls_closed, ls_closed).closed)
+
+        with mock.patch('django.contrib.gis.geos.collections.geos_version_info', lambda: {'version': '3.4.9'}):
+            with self.assertRaisesMessage(GEOSException, "MultiLineString.closed requires GEOS >= 3.5.0."):
+                MultiLineString().closed
+
     def test_srid(self):
         "Testing the SRID property and keyword."
         # Testing SRID keyword on Point
@@ -1216,6 +1232,48 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             self.assertTrue(m, msg="Unable to parse the version string '%s'" % v_init)
             self.assertEqual(m.group('version'), v_geos)
             self.assertEqual(m.group('capi_version'), v_capi)
+
+    def test_geos_threads(self):
+        pnt = Point()
+        context_ptrs = []
+
+        geos_init = libgeos.lgeos.initGEOS_r
+        geos_finish = libgeos.lgeos.finishGEOS_r
+
+        def init(*args, **kwargs):
+            result = geos_init(*args, **kwargs)
+            context_ptrs.append(result)
+            return result
+
+        def finish(*args, **kwargs):
+            result = geos_finish(*args, **kwargs)
+            destructor_called.set()
+            return result
+
+        for i in range(2):
+            destructor_called = threading.Event()
+            patch_path = 'django.contrib.gis.geos.libgeos.lgeos'
+            with mock.patch.multiple(patch_path, initGEOS_r=mock.DEFAULT, finishGEOS_r=mock.DEFAULT) as mocked:
+                mocked['initGEOS_r'].side_effect = init
+                mocked['finishGEOS_r'].side_effect = finish
+                with mock.patch('django.contrib.gis.geos.prototypes.predicates.geos_hasz.func') as mocked_hasz:
+                    thread = threading.Thread(target=lambda: pnt.hasz)
+                    thread.start()
+                    thread.join()
+
+                    # We can't be sure that members of thread locals are
+                    # garbage collected right after `thread.join()` so
+                    # we must wait until destructor is actually called.
+                    # Fail if destructor wasn't called within a second.
+                    self.assertTrue(destructor_called.wait(1))
+
+                    context_ptr = context_ptrs[i]
+                    self.assertIsInstance(context_ptr, libgeos.CONTEXT_PTR)
+                    mocked_hasz.assert_called_once_with(context_ptr, pnt.ptr)
+                    mocked['finishGEOS_r'].assert_called_once_with(context_ptr)
+
+        # Check that different contexts were used for the different threads.
+        self.assertNotEqual(context_ptrs[0], context_ptrs[1])
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_deprecated_srid_getters_setters(self):

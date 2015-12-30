@@ -72,6 +72,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # If a column type is set to None, it won't be included in the output.
     data_types = {
         'AutoField': 'serial',
+        'BigAutoField': 'bigserial',
         'BinaryField': 'bytea',
         'BooleanField': 'boolean',
         'CharField': 'varchar(%(max_length)s)',

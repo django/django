@@ -25,7 +25,7 @@ from .related_descriptors import (
 )
 from .related_lookups import (
     RelatedExact, RelatedGreaterThan, RelatedGreaterThanOrEqual, RelatedIn,
-    RelatedLessThan, RelatedLessThanOrEqual,
+    RelatedIsNull, RelatedLessThan, RelatedLessThanOrEqual,
 )
 from .reverse_related import (
     ForeignObjectRel, ManyToManyRel, ManyToOneRel, OneToOneRel,
@@ -672,9 +672,10 @@ class ForeignObject(RelatedField):
             return RelatedLessThan
         elif lookup_name == 'lte':
             return RelatedLessThanOrEqual
-        elif lookup_name != 'isnull':
+        elif lookup_name == 'isnull':
+            return RelatedIsNull
+        else:
             raise TypeError('Related Field got invalid lookup: %s' % lookup_name)
-        return super(ForeignObject, self).get_lookup(lookup_name)
 
     def get_transform(self, *args, **kwargs):
         raise NotImplementedError('Relational fields do not support transforms.')
@@ -746,8 +747,9 @@ class ForeignKey(ForeignObject):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,
@@ -976,8 +978,9 @@ class OneToOneField(ForeignKey):
 
         if on_delete is None:
             warnings.warn(
-                "on_delete will be a required arg for %s in Django 2.0. "
-                "Set it to models.CASCADE if you want to maintain the current default behavior. "
+                "on_delete will be a required arg for %s in Django 2.0. Set "
+                "it to models.CASCADE on models and in existing migrations "
+                "if you want to maintain the current default behavior. "
                 "See https://docs.djangoproject.com/en/%s/ref/models/fields/"
                 "#django.db.models.ForeignKey.on_delete" % (
                     self.__class__.__name__,

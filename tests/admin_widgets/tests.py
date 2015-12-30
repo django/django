@@ -1256,6 +1256,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_id('add_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
+        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1274,6 +1275,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
 
+        self.wait_for('#id_username')
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
         username_field.clear()

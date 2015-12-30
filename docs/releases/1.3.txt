@@ -321,7 +321,7 @@ requests. These include:
   template tags that require access to template context.
 
 * A new :meth:`~django.shortcuts.render()` shortcut -- an alternative
-  to :meth:`~django.shortcuts.render_to_response()` providing a
+  to ``django.shortcuts.render_to_response()`` providing a
   :class:`~django.template.RequestContext` by default.
 
 * Support for combining :class:`F expressions <django.db.models.F>`

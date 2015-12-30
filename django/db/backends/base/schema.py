@@ -98,7 +98,7 @@ class BaseDatabaseSchemaEditor(object):
         Executes the given SQL statement, with optional parameters.
         """
         # Log the command we're running, then run it
-        logger.debug("%s; (params %r)" % (sql, params))
+        logger.debug("%s; (params %r)", sql, params)
         if self.collect_sql:
             ending = "" if sql.endswith(";") else ";"
             if params is not None:
@@ -261,7 +261,7 @@ class BaseDatabaseSchemaEditor(object):
                 definition,
             ))
             # Autoincrement SQL (for backends with post table definition variant)
-            if field.get_internal_type() == "AutoField":
+            if field.get_internal_type() in ("AutoField", "BigAutoField"):
                 autoinc_sql = self.connection.ops.autoinc_sql(model._meta.db_table, field.column)
                 if autoinc_sql:
                     self.deferred_sql.extend(autoinc_sql)

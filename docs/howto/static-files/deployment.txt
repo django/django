@@ -95,7 +95,7 @@ Here's how this might look in a fabfile::
     from fabric.contrib import project
 
     # Where the static files get collected locally. Your STATIC_ROOT setting.
-    env.local_static_root = '/tmp/static'
+    env.local_static_root = '/path/to/static'
 
     # Where the static files should go remotely
     env.remote_static_root = '/home/www/static.example.com'

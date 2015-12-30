@@ -303,7 +303,7 @@ Cache
 
 * :func:`django.views.decorators.cache.never_cache` now sends more persuasive
   headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
-  to better prevent caching.
+  to better prevent caching. This was also added in Django 1.8.8.
 
 CSRF
 ^^^^
@@ -1405,6 +1405,9 @@ removed in Django 1.9 (please see the :ref:`deprecation timeline
 * Automatic syncing of apps without migrations is removed. Migrations are
   compulsory for all apps unless you pass the :djadminopt:`--run-syncdb`
   option to ``migrate``.
+
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, are removed.
 
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data is removed.

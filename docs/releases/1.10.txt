@@ -47,6 +47,10 @@ Minor features
   classes on inline fieldsets. Inlines with a ``collapse`` class will be
   initially collapsed and their header will have a small "show" link.
 
+* If a user doesn't have the add permission, the ``object-tools`` block on a
+  model's changelist will now be rendered (without the add button, of course).
+  This makes it easier to add custom tools in this case.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -103,6 +107,11 @@ Minor features
   :attr:`~django.contrib.gis.geos.WKTWriter.precision` properties
   of :class:`~django.contrib.gis.geos.WKTWriter` allow controlling
   output of the fractional part of the coordinates in WKT.
+
+* Added the :attr:`LineString.closed
+  <django.contrib.gis.geos.LineString.closed>` and
+  :attr:`MultiLineString.closed
+  <django.contrib.gis.geos.MultiLineString.closed>` properties.
 
 :mod:`django.contrib.messages`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -212,6 +221,9 @@ Management Commands
 * :djadmin:`makemigrations` now displays the path to the migration files that
   it generates.
 
+* The :djadmin:`shell` ``--interface`` option now accepts ``python`` to force
+  use of the "plain" Python interpreter.
+
 Migrations
 ^^^^^^^^^^
 
@@ -233,6 +245,13 @@ Models
 * The :attr:`~django.db.models.Func.arity` class attribute is added to
   :class:`~django.db.models.Func`. This attribute can be used to set the number
   of arguments the function accepts.
+
+* Added :class:`~django.db.models.BigAutoField` which acts much like an
+  :class:`~django.db.models.AutoField` except that it is guaranteed
+  to fit numbers from ``1`` to ``9223372036854775807``.
+
+* :meth:`QuerySet.in_bulk() <django.db.models.query.QuerySet.in_bulk>`
+  may be called without any arguments to return all objects in the queryset.
 
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -354,6 +373,12 @@ to use this form::
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
+Dropped support for PostgreSQL 9.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
+Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -431,6 +456,9 @@ Miscellaneous
 * ``django.utils.functional.allow_lazy()`` is deprecated in favor of the new
   :func:`~django.utils.functional.keep_lazy` function which can be used with a
   more natural decorator syntax.
+
+* The ``shell --plain`` option is deprecated in favor of ``-i python`` or
+  ``--interface python``.
 
 .. _removed-features-1.10:
 

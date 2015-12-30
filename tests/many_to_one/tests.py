@@ -9,8 +9,8 @@ from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
 
 from .models import (
-    Article, Category, Child, First, Parent, Record, Relation, Reporter,
-    School, Student, Third, ToFieldChild,
+    Article, Category, Child, City, District, First, Parent, Record, Relation,
+    Reporter, School, Student, Third, ToFieldChild,
 )
 
 
@@ -568,6 +568,15 @@ class ManyToOneTests(TestCase):
         c = Child(parent_id=p.id)
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
+
+    def test_fk_to_bigautofield(self):
+        ch = City.objects.create(name='Chicago')
+        District.objects.create(city=ch, name='Far South')
+        District.objects.create(city=ch, name='North')
+
+        ny = City.objects.create(name='New York', id=2 ** 33)
+        District.objects.create(city=ny, name='Brooklyn')
+        District.objects.create(city=ny, name='Manhattan')
 
     def test_multiple_foreignkeys(self):
         # Test of multiple ForeignKeys to the same model (bug #7125).

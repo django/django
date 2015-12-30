@@ -64,3 +64,9 @@ Bugfixes
 
 * Restored the functionality of the admin's ``list_editable`` add and change
   buttons (:ticket:`25903`).
+
+* Fixed ``isnull`` query lookup for ``ForeignObject``
+  (:ticket:`25972`).
+
+* Fixed a regression in the admin which ignored line breaks in read-only fields
+  instead of converting them to ``<br>`` (:ticket:`25465`).

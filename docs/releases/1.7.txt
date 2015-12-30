@@ -853,7 +853,7 @@ Templates
   * :func:`django.template.loader.get_template()`
   * :func:`django.template.loader.select_template()`
   * :func:`django.shortcuts.render()`
-  * :func:`django.shortcuts.render_to_response()`
+  * ``django.shortcuts.render_to_response()``
 
 * The :tfilter:`time` filter now accepts timezone-related :ref:`format
   specifiers <date-and-time-formatting-specifiers>` ``'e'``, ``'O'`` , ``'T'``
@@ -1824,8 +1824,7 @@ removed in Django 1.7 (please see the
 * :class:`~django.http.HttpResponse`,
   :class:`~django.template.response.SimpleTemplateResponse`,
   :class:`~django.template.response.TemplateResponse`,
-  :func:`~django.shortcuts.render_to_response`,
-  :func:`~django.contrib.sitemaps.views.index`, and
+  ``render_to_response()``, :func:`~django.contrib.sitemaps.views.index`, and
   :func:`~django.contrib.sitemaps.views.sitemap` no longer take a ``mimetype``
   argument
 

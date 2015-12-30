@@ -29,6 +29,7 @@ from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 
 from . import middleware, urlconf_outer, views
+from .utils import URLObject
 from .views import empty_view
 
 resolve_test_data = (
@@ -240,26 +241,6 @@ test_data = (
     # Security tests
     ('security', '/%2Fexample.com/security/', ['/example.com'], {}),
 )
-
-
-class URLObject(object):
-    urlpatterns = [
-        url(r'^inner/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/(?P<arg1>[0-9]+)/(?P<arg2>[0-9]+)/$', views.empty_view, name='urlobject-view'),
-        url(r'^inner/\+\\\$\*/$', views.empty_view, name='urlobject-special-view'),
-    ]
-
-    def __init__(self, app_name, namespace=None):
-        self.app_name = app_name
-        self.namespace = namespace
-
-    @property
-    def urls(self):
-        return self.urlpatterns, self.app_name, self.namespace
-
-    @property
-    def app_urls(self):
-        return self.urlpatterns, self.app_name
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.no_urls')
@@ -897,7 +878,7 @@ class ErrorHandlerResolutionTests(SimpleTestCase):
         self.assertEqual(self.resolver.resolve_error_handler(404), handler)
         self.assertEqual(self.resolver.resolve_error_handler(500), handler)
 
-    def test_callable_handers(self):
+    def test_callable_handlers(self):
         handler = (empty_view, {})
         self.assertEqual(self.callable_resolver.resolve_error_handler(400), handler)
         self.assertEqual(self.callable_resolver.resolve_error_handler(404), handler)

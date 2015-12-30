@@ -126,6 +126,8 @@ details on these changes.
 
 * ``django.utils.functional.allow_lazy()`` will be removed.
 
+* The ``shell --plain`` option will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
@@ -324,6 +326,9 @@ details on these changes.
 * Automatic syncing of apps without migrations will be removed. Migrations will
   become compulsory for all apps unless you pass the ``--run-syncdb`` option to
   ``migrate``.
+
+* The SQL management commands for apps without migrations, ``sql``, ``sqlall``,
+  ``sqlclear``, ``sqldropindexes``, and ``sqlindexes``, will be removed.
 
 * Support for automatic loading of ``initial_data`` fixtures and initial SQL
   data will be removed.
@@ -548,8 +553,8 @@ details on these changes.
   :class:`~django.template.response.SimpleTemplateResponse`, and
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
-  :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
+  ``render_to_response()`` shortcut and the sitemap views,
+  :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,
