@@ -218,7 +218,7 @@ def get_javascript_catalog(locale, domain, packages):
     # first load all english languages files for defaults
     for path in paths:
         try:
-            catalog = gettext_module.translation(domain, path, [default_selected])
+            catalog = gettext_module.translation(domain, path, [settings.LANGUAGE_CODE])
             t.update(catalog._catalog)
         except IOError:
             pass
