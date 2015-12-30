@@ -147,9 +147,14 @@ class NaiveAuthorUpdate(generic.UpdateView):
 
 
 class AuthorUpdate(generic.UpdateView):
+    get_form_called_count = 0  # Used to ensure get form called only once. (see #26018)
     model = Author
     success_url = '/list/authors/'
     fields = '__all__'
+
+    def get_form(self, *args, **kwargs):
+        self.get_form_called_count += 1
+        return super(AuthorUpdate, self).get_form(*args, **kwargs)
 
 
 class OneAuthorUpdate(generic.UpdateView):
