@@ -34,6 +34,17 @@ class AuthorDetail(generic.DetailView):
     queryset = Author.objects.all()
 
 
+class AuthorCustomDetail(generic.detail.TemplateResponseMixin,
+                         generic.detail.SingleObjectMixin, generic.View):
+    template_name = "generic_views/author_detail.html"
+    queryset = Author.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        author = self.get_object()
+        context = {"custom_" + self.get_context_object_name(author): author}
+        return self.render_to_response(context)
+
+
 class PageDetail(generic.DetailView):
     queryset = Page.objects.all()
     template_name_field = 'template'

@@ -50,6 +50,8 @@ urlpatterns = [
         views.AuthorDetail.as_view(template_name='generic_views/about.html')),
     url(r'^detail/author/(?P<pk>[0-9]+)/context_object_name/$',
         views.AuthorDetail.as_view(context_object_name='thingy')),
+    url(r'^detail/author/(?P<pk>[0-9]+)/custom_detail/$',
+        views.AuthorCustomDetail.as_view()),
     url(r'^detail/author/(?P<pk>[0-9]+)/dupe_context_object_name/$',
         views.AuthorDetail.as_view(context_object_name='object')),
     url(r'^detail/page/(?P<pk>[0-9]+)/field/$',
