@@ -41,6 +41,20 @@ interact with installed applications, mainly for configuration and also for
 introspection. That's why the application registry maintains metadata in an
 :class:`~django.apps.AppConfig` instance for each installed application.
 
+Here is a comparison of "Project vs Application" for better understanding:
+
++--------------------+--------------------+------------------------------+
+| Topic              | Project            | Application                  |
++====================+====================+==============================+
+|Contains            | Settings           | Code, Views, Templates, ...  |
++--------------------+--------------------+------------------------------+
+|Size                | Only few lines     | Can be huge                  |
++--------------------+--------------------+------------------------------+
+|Can have Models     | No                 | Yes                          |
++--------------------+--------------------+------------------------------+
+|May be reusable     | No                 | Yes                          |
++--------------------+--------------------+------------------------------+
+
 .. _configuring-applications-ref:
 
 Configuring applications
