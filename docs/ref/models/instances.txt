@@ -672,14 +672,14 @@ For example::
     def get_absolute_url(self):
         return "/people/%i/" % self.id
 
-(Whilst this code is correct and simple, it may not be the most portable way to
-write this kind of method. The :func:`~django.core.urlresolvers.reverse`
-function is usually the best approach.)
+(Whilst this code is correct and simple, it may not be the most portable way
+to write this kind of method. The :func:`~django.urls.reverse` function is
+usually the best approach.)
 
 For example::
 
     def get_absolute_url(self):
-        from django.core.urlresolvers import reverse
+        from django.urls import reverse
         return reverse('people.views.details', args=[str(self.id)])
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object

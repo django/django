@@ -7,10 +7,10 @@ from django.contrib import admin
 from django.contrib.auth.models import User as AuthUser
 from django.contrib.contenttypes.models import ContentType
 from django.core import checks, management
-from django.core.urlresolvers import reverse
 from django.db import DEFAULT_DB_ALIAS, models
 from django.db.models import signals
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
 from .admin import admin as force_admin_model_registration  # NOQA
 from .models import (

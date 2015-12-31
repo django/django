@@ -53,7 +53,7 @@ This simple example, taken from a hypothetical police beat news site describes
 a feed of the latest five news items::
 
     from django.contrib.syndication.views import Feed
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from policebeat.models import NewsItem
 
     class LatestEntriesFeed(Feed):

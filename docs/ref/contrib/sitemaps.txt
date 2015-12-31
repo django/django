@@ -300,13 +300,12 @@ Sitemap for static views
 
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
-names for these views in ``items`` and call
-:func:`~django.core.urlresolvers.reverse` in the ``location`` method of
-the sitemap. For example::
+names for these views in ``items`` and call :func:`~django.urls.reverse` in
+the ``location`` method of the sitemap. For example::
 
     # sitemaps.py
     from django.contrib import sitemaps
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5

@@ -24,7 +24,6 @@ from django.core.exceptions import (
     FieldDoesNotExist, FieldError, PermissionDenied, ValidationError,
 )
 from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
 from django.db import models, router, transaction
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -37,6 +36,7 @@ from django.forms.widgets import CheckboxSelectMultiple, SelectMultiple
 from django.http import Http404, HttpResponseRedirect
 from django.http.response import HttpResponseBase
 from django.template.response import SimpleTemplateResponse, TemplateResponse
+from django.urls import reverse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible

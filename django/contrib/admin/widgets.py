@@ -6,11 +6,11 @@ from __future__ import unicode_literals
 import copy
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.db.models.deletion import CASCADE
 from django.forms.utils import flatatt
 from django.forms.widgets import RadioFieldRenderer
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.html import (

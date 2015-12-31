@@ -160,11 +160,11 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.resolver_match
 
-    An instance of :class:`~django.core.urlresolvers.ResolverMatch` representing
-    the resolved url. This attribute is only set after url resolving took place,
-    which means it's available in all views but not in middleware methods which
-    are executed before url resolving takes place (like ``process_request``, you
-    can use ``process_view`` instead).
+    An instance of :class:`~django.urls.ResolverMatch` representing the
+    resolved url. This attribute is only set after url resolving took place,
+    which means it's available in all views but not in middleware methods
+    which are executed before url resolving takes place (like
+    ``process_request``, you can use ``process_view`` instead).
 
 Attributes set by application code
 ----------------------------------
@@ -175,7 +175,7 @@ application.
 .. attribute:: HttpRequest.current_app
 
     The :ttag:`url` template tag will use its value as the ``current_app``
-    argument to :func:`~django.core.urlresolvers.reverse()`.
+    argument to :func:`~django.urls.reverse()`.
 
 .. attribute:: HttpRequest.urlconf
 

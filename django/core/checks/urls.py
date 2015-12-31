@@ -5,7 +5,7 @@ from . import Tags, Warning, register
 
 @register(Tags.urls)
 def check_url_config(app_configs, **kwargs):
-    from django.core.urlresolvers import get_resolver
+    from django.urls import get_resolver
     resolver = get_resolver()
     return check_resolver(resolver)
 
@@ -14,7 +14,7 @@ def check_resolver(resolver):
     """
     Recursively check the resolver.
     """
-    from django.core.urlresolvers import RegexURLPattern, RegexURLResolver
+    from django.urls import RegexURLPattern, RegexURLResolver
     warnings = []
     for pattern in resolver.url_patterns:
         if isinstance(pattern, RegexURLResolver):
