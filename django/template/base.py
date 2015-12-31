@@ -418,6 +418,11 @@ class Lexer(object):
 
 
 class DebugLexer(Lexer):
+    def __init__(self, template_string, origin):
+        super(DebugLexer, self).__init__(template_string)
+        self.origin = origin
+
+
     def tokenize(self):
         """
         Split a template string into tokens and annotates each token with its
@@ -442,6 +447,13 @@ class DebugLexer(Lexer):
         if last_bit:
             result.append(self.create_token(last_bit, (upto, upto + len(last_bit)), lineno, in_tag=False))
         return result
+        
+    def create_token(self, token_string, position, lineno, in_tag):
+        token = super(DebugLexer, self).create_token(token_string, position, lineno, in_tag)
+        token.source = self.origin, position
+        return token
+
+        
 
 
 class Parser(object):
