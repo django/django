@@ -76,3 +76,6 @@ Bugfixes
 
 * Made ``loaddata`` skip disabling and enabling database constraints when it
   doesn't load any fixtures (:ticket:`23372`).
+
+* Fixed ``APPEND_SLASH`` failure if the project contains an invalid
+  ``404.html`` template (:ticket:`25878`).

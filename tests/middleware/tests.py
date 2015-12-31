@@ -67,8 +67,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         APPEND_SLASH should redirect slashless URLs to a valid pattern.
         """
         request = self.rf.get('/slash')
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/slash/')
 
@@ -78,8 +77,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         APPEND_SLASH should preserve querystrings when redirecting.
         """
         request = self.rf.get('/slash?test=1')
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertEqual(r.url, '/slash/?test=1')
 
     @override_settings(APPEND_SLASH=True, DEBUG=True)
@@ -92,17 +90,16 @@ class CommonMiddlewareTest(SimpleTestCase):
         msg = "maintaining %s data. Change your form to point to testserver/slash/"
         request = self.rf.get('/slash')
         request.method = 'POST'
-        response = HttpResponseNotFound()
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
-            CommonMiddleware().process_response(request, response)
+            CommonMiddleware().process_request(request)
         request = self.rf.get('/slash')
         request.method = 'PUT'
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
-            CommonMiddleware().process_response(request, response)
+            CommonMiddleware().process_request(request)
         request = self.rf.get('/slash')
         request.method = 'PATCH'
         with self.assertRaisesMessage(RuntimeError, msg % request.method):
-            CommonMiddleware().process_response(request, response)
+            CommonMiddleware().process_request(request)
 
     @override_settings(APPEND_SLASH=False)
     def test_append_slash_disabled(self):
@@ -119,8 +116,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         URLs which require quoting should be redirected to their slash version.
         """
         request = self.rf.get(quote('/needsquoting#'))
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/needsquoting%23/')
 
@@ -188,8 +184,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertIsNotNone(r, "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/customurlconf/slash/')
@@ -204,9 +199,8 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get('/customurlconf/slash')
         request.urlconf = 'middleware.extra_urls'
         request.method = 'POST'
-        response = HttpResponseNotFound()
         with self.assertRaisesMessage(RuntimeError, 'end in a slash'):
-            CommonMiddleware().process_response(request, response)
+            CommonMiddleware().process_request(request)
 
     @override_settings(APPEND_SLASH=False)
     def test_append_slash_disabled_custom_urlconf(self):
@@ -226,8 +220,7 @@ class CommonMiddlewareTest(SimpleTestCase):
         """
         request = self.rf.get(quote('/customurlconf/needsquoting#'))
         request.urlconf = 'middleware.extra_urls'
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertIsNotNone(r, "CommonMiddleware failed to return APPEND_SLASH redirect using request.urlconf")
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/customurlconf/needsquoting%23/')
@@ -301,15 +294,12 @@ class CommonMiddlewareTest(SimpleTestCase):
         request = self.rf.get('/slash')
         request.META['QUERY_STRING'] = force_str('drink=café')
         r = CommonMiddleware().process_request(request)
-        self.assertIsNone(r)
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
         self.assertEqual(r.status_code, 301)
+        self.assertEqual(r.url, '/slash/?drink=caf%C3%A9')
 
     def test_response_redirect_class(self):
         request = self.rf.get('/slash')
-        response = HttpResponseNotFound()
-        r = CommonMiddleware().process_response(request, response)
+        r = CommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 301)
         self.assertEqual(r.url, '/slash/')
         self.assertIsInstance(r, HttpResponsePermanentRedirect)
@@ -319,8 +309,7 @@ class CommonMiddlewareTest(SimpleTestCase):
             response_redirect_class = HttpResponseRedirect
 
         request = self.rf.get('/slash')
-        response = HttpResponseNotFound()
-        r = MyCommonMiddleware().process_response(request, response)
+        r = MyCommonMiddleware().process_request(request)
         self.assertEqual(r.status_code, 302)
         self.assertEqual(r.url, '/slash/')
         self.assertIsInstance(r, HttpResponseRedirect)

@@ -52,19 +52,26 @@ class CommonMiddleware(object):
                     raise PermissionDenied('Forbidden user agent')
 
         # Check for a redirect based on settings.PREPEND_WWW
+        redirect = False
+        redirect_with_host = False
         host = request.get_host()
 
         if settings.PREPEND_WWW and host and not host.startswith('www.'):
+            redirect = True
             host = 'www.' + host
+            redirect_with_host = True
 
-            # Check if we also need to append a slash so we can do it all
-            # with a single redirect.
-            if self.should_redirect_with_slash(request):
-                path = self.get_full_path_with_slash(request)
-            else:
-                path = request.get_full_path()
+        # Check if we also need to append a slash so we can do it all
+        # with a single redirect.
+        if self.should_redirect_with_slash(request):
+            redirect = True
+            path = self.get_full_path_with_slash(request)
+        else:
+            path = request.get_full_path()
 
-            return self.response_redirect_class('%s://%s%s' % (request.scheme, host, path))
+        if redirect:
+            redirect_url = '%s://%s%s' % (request.scheme, host, path) if redirect_with_host else path
+            return self.response_redirect_class(redirect_url)
 
     def should_redirect_with_slash(self, request):
         """
@@ -107,12 +114,6 @@ class CommonMiddleware(object):
         When the status code of the response is 404, it may redirect to a path
         with an appended slash if should_redirect_with_slash() returns True.
         """
-        # If the given URL is "Not Found", then check if we should redirect to
-        # a path with a slash appended.
-        if response.status_code == 404:
-            if self.should_redirect_with_slash(request):
-                return self.response_redirect_class(self.get_full_path_with_slash(request))
-
         if settings.USE_ETAGS:
             if not response.has_header('ETag'):
                 set_response_etag(response)
