@@ -114,11 +114,20 @@ class ModelTable(object):
             return self.schema == other.schema and self.table == other.table
         return False
 
+    def __ne__(self, other):
+        return not self == other
+
     def __hash__(self):
         return hash((self.schema, self.table))
 
     def deconstruct(self):
-        return ("django.db.models.ModelTable", [self.table, self.schema], {})
+        return ("django.db.models.ModelTable", [self.schema, self.table], {})
+
+    def __str__(self):
+        if self.schema:
+            return "%s.%s" % (self.schema, self.table)
+        else:
+            return "%s" % self.table
 
 
 @python_2_unicode_compatible
