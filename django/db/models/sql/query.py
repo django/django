@@ -1288,7 +1288,7 @@ class Query(object):
             assert q_object.connector != OR
             path = [0]
         if tuple(path) in found_splits:
-            q_object.pust_to_subquery = True
+            q_object.push_to_subquery = True
             return q_object
         for pos, obj in enumerate(q_object.children):
             path.append(pos)

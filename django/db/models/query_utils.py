@@ -88,6 +88,7 @@ class Q(tree.Node):
                 clone.children.append(child.clone())
             else:
                 clone.children.append(child)
+        clone.push_to_subquery = self.push_to_subquery
         return clone
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
