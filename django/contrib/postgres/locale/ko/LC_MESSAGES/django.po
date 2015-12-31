@@ -2,13 +2,14 @@
 #
 # Translators:
 # Jun-Gu Kang <chr0m3.kr@gmail.com>, 2015
+# minsung kang, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:55+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-17 13:01+0000\n"
+"Last-Translator: minsung kang\n"
 "Language-Team: Korean (http://www.transifex.com/django/django/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,17 +35,17 @@ msgid "The value of \"%(key)s\" is not a string."
 msgstr "값 \"%(key)s\"은/는 문자열이 아닙니다."
 
 msgid "A JSON object"
-msgstr ""
+msgstr "JSON 객체"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "올바른 JSON 형식이여야 합니다."
 
 msgid "Could not load JSON data."
 msgstr "JSON 데이터를 불러오지 못했습니다."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr ""
+msgstr "'%(value)s' 값은 올바른 JSON 형식이여야 합니다."
 
 msgid "Enter two valid values."
 msgstr "유효한 두 값을 입력하세요."
@@ -72,6 +73,8 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
+"리스트는 %(show_value)d 아이템들을 포함하며, %(limit_value)d를 초과해서 포함"
+"할 수 없습니다."
 
 #, python-format
 msgid ""
@@ -81,14 +84,16 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no fewer than "
 "%(limit_value)d."
 msgstr[0] ""
+"리스트는 %(show_value)d 아이템들을 포함하며, %(limit_value)d 이상 포함해야 합"
+"니다."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
-msgstr ""
+msgstr "일부 키가 누락되어있습니다: %(keys)s"
 
 #, python-format
 msgid "Some unknown keys were provided: %(keys)s"
-msgstr ""
+msgstr "일부 알 수 없는 키가 제공되었습니다. : %(keys)s"
 
 #, python-format
 msgid ""

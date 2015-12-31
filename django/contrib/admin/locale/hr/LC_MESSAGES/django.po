@@ -4,7 +4,7 @@
 # aljosa <aljosa.mohorovic@gmail.com>, 2011,2013
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2013,2015
 # Ylodi <stjepan@gmail.com>, 2015
 # Ylodi <stjepan@gmail.com>, 2011
 msgid ""
@@ -12,8 +12,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-15 11:06+0100\n"
-"PO-Revision-Date: 2015-11-16 08:16+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-11 09:11+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -83,10 +83,10 @@ msgid "action time"
 msgstr "vrijeme akcije"
 
 msgid "user"
-msgstr ""
+msgstr "korisnik"
 
 msgid "content type"
-msgstr ""
+msgstr "tip sadržaja"
 
 msgid "object id"
 msgstr "id objekta"
@@ -131,7 +131,7 @@ msgstr ""
 "objekta. "
 
 msgid "Added."
-msgstr ""
+msgstr "Dodano."
 
 #, python-format
 msgid "Changed %s."
@@ -493,6 +493,8 @@ msgid ""
 "You are authenticated as %(username)s, but are not authorized to access this "
 "page. Would you like to login to a different account?"
 msgstr ""
+"Prijavljeni ste kao %(username)s, ali nemate dopuštenje za pristup traženoj "
+"stranici. Želite li se prijaviti drugim korisničkim računom?"
 
 msgid "Forgotten your password or username?"
 msgstr "Zaboravili ste lozinku ili korisničko ime?"
@@ -520,7 +522,7 @@ msgid "Save"
 msgstr "Spremi"
 
 msgid "Popup closing..."
-msgstr ""
+msgstr "Zatvaranje popup-a..."
 
 #, python-format
 msgid "Change selected %(model)s"

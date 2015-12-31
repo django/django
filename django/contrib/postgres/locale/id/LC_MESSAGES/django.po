@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Fery Setiawan <gembelweb@gmail.com>, 2015
 # M Asep Indrayana <me@drayanaindra.com>, 2015
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
@@ -8,8 +9,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-10-10 08:55+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-15 22:41+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgid "Item %(nth)s in the array did not validate: "
 msgstr "butir %(nth)s di dalam susunan tidak disahkan:"
 
 msgid "Nested arrays must have the same length."
-msgstr ""
+msgstr "Array bersarang harus mempunyai panjang sama."
 
 msgid "Map of strings to strings"
 msgstr ""
@@ -36,23 +37,23 @@ msgid "The value of \"%(key)s\" is not a string."
 msgstr "Sebuah nilai dari \"%(key)s\" bukan sebuah untaian."
 
 msgid "A JSON object"
-msgstr ""
+msgstr "Sebuah obyek JSON"
 
 msgid "Value must be valid JSON."
-msgstr ""
+msgstr "Nilai harus JSON sah."
 
 msgid "Could not load JSON data."
 msgstr "Tidak dapat memuat data JSON."
 
 #, python-format
 msgid "'%(value)s' value must be valid JSON."
-msgstr ""
+msgstr "Nilai '%(value)s' harus JSON sah."
 
 msgid "Enter two valid values."
 msgstr "Masukkan dua nilai yang benar"
 
 msgid "The start of the range must not exceed the end of the range."
-msgstr ""
+msgstr "Awal jangkauan harus tidak melebihi akhir dari jangkauan."
 
 msgid "Enter two whole numbers."
 msgstr "Masukkan dua buah bilangan bulat."
@@ -74,6 +75,8 @@ msgid_plural ""
 "List contains %(show_value)d items, it should contain no more than "
 "%(limit_value)d."
 msgstr[0] ""
+"Daftar mengandung barang %(show_value)d, dia harus mengandung tidak lebih "
+"dari %(limit_value)d."
 
 #, python-format
 msgid ""
@@ -98,9 +101,13 @@ msgstr "Suatu kunci yang tidak di ketahui sumbernya: %(keys)s"
 msgid ""
 "Ensure that this range is completely less than or equal to %(limit_value)s."
 msgstr ""
+"Pastikan bahwa jangkauan ini sepenuhnya kurang dari atau sama dengan "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
 "Ensure that this range is completely greater than or equal to "
 "%(limit_value)s."
 msgstr ""
+"Pastikan bahwa jangkauan ini sepenuhnya lebih besar dari atau sama dengan "
+"%(limit_value)s."
