@@ -1252,7 +1252,7 @@ class LiveServerThread(threading.Thread):
             self.is_ready.set()
 
     def _create_server(self, port):
-        return WSGIServer((self.host, port), QuietWSGIRequestHandler)
+        return WSGIServer((self.host, port), QuietWSGIRequestHandler, allow_reuse_address=False)
 
     def terminate(self):
         if hasattr(self, 'httpd'):
