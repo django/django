@@ -5,6 +5,7 @@
 # berislavlopac <berislav.lopac@gmail.com>, 2013
 # Bojan Mihelač <bmihelac@mihelac.org>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Mislav Cimperšak <mislav.cimpersak@gmail.com>, 2015
 # Nino <ninonandroid@gmail.com>, 2013
 # senko <senko.rasic@dobarkod.hr>, 2012
 # Ylodi <stjepan@gmail.com>, 2011
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2015-11-27 09:35+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"PO-Revision-Date: 2015-12-11 09:04+0000\n"
+"Last-Translator: Mislav Cimperšak <mislav.cimpersak@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/django/django/language/"
 "hr/)\n"
 "MIME-Version: 1.0\n"
@@ -74,7 +75,7 @@ msgid "English"
 msgstr "Engleski"
 
 msgid "Australian English"
-msgstr ""
+msgstr "Australski engleski"
 
 msgid "British English"
 msgstr "Britanski engleski"
@@ -89,7 +90,7 @@ msgid "Argentinian Spanish"
 msgstr "Argentinski španjolski"
 
 msgid "Colombian Spanish"
-msgstr ""
+msgstr "Kolumbijski španjolski"
 
 msgid "Mexican Spanish"
 msgstr "Meksički španjolski"
@@ -146,7 +147,7 @@ msgid "Indonesian"
 msgstr "Indonezijski"
 
 msgid "Ido"
-msgstr ""
+msgstr "Ido"
 
 msgid "Icelandic"
 msgstr "Islandski"
@@ -191,10 +192,10 @@ msgid "Mongolian"
 msgstr "Mongolski"
 
 msgid "Marathi"
-msgstr ""
+msgstr "Marathi"
 
 msgid "Burmese"
-msgstr ""
+msgstr "Burmanski"
 
 msgid "Norwegian Bokmal"
 msgstr "Norveški Bokmal"
@@ -209,7 +210,7 @@ msgid "Norwegian Nynorsk"
 msgstr "Norveški Nynorsk"
 
 msgid "Ossetic"
-msgstr ""
+msgstr "Osetski"
 
 msgid "Punjabi"
 msgstr "Pendžabljanin"
@@ -284,19 +285,19 @@ msgid "Traditional Chinese"
 msgstr "Tradicionalni kineski"
 
 msgid "Messages"
-msgstr ""
+msgstr "Poruke"
 
 msgid "Site Maps"
 msgstr ""
 
 msgid "Static Files"
-msgstr ""
+msgstr "Statične datoteke"
 
 msgid "Syndication"
 msgstr ""
 
 msgid "Web Design"
-msgstr ""
+msgstr "Web dizajn"
 
 msgid "Enter a valid value."
 msgstr "Unesite ispravnu vrijednost."
@@ -305,7 +306,7 @@ msgid "Enter a valid URL."
 msgstr "Unesite ispravan URL."
 
 msgid "Enter a valid integer."
-msgstr ""
+msgstr "Unesite vrijednost u obliku cijelog broja."
 
 msgid "Enter a valid email address."
 msgstr "Unesite ispravnu e-mail adresu."
@@ -320,6 +321,8 @@ msgid ""
 "Enter a valid 'slug' consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
+"Unesite ispravan 'slug' koji se sastoji samo od Unicode slova, brojeva, "
+"povlaka ili crtica."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Unesite ispravnu IPv4 adresu."
@@ -384,16 +387,16 @@ msgstr[2] ""
 #, python-format
 msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Osigurajte da nema više od ukupno %(max)s numeričkog znaka."
+msgstr[1] "Osigurajte da nema više od ukupno %(max)s numerička znaka."
+msgstr[2] "Osigurajte da nema više od ukupno %(max)s numeričkih znakova."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Osigurajte da nema više od ukupno %(max)s decimalnog mjesta."
+msgstr[1] "Osigurajte da nema više od ukupno %(max)s decimalna mjesta."
+msgstr[2] "Osigurajte da nema više od ukupno %(max)s decimalnih mjesta."
 
 #, python-format
 msgid ""
@@ -401,19 +404,25 @@ msgid ""
 msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] ""
+"Osigurajte da nema više od ukupno %(max)s numberičkog znaka prije decimalne "
+"točke."
 msgstr[1] ""
+"Osigurajte da nema više od ukupno %(max)s numberička znaka prije decimalne "
+"točke."
 msgstr[2] ""
+"Osigurajte da nema više od ukupno %(max)s numberičkih znakova prije "
+"decimalne točke."
 
 msgid "and"
 msgstr "i"
 
 #, python-format
 msgid "%(model_name)s with this %(field_labels)s already exists."
-msgstr ""
+msgstr "%(model_name)s sa navedenim %(field_labels)s već postoji."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
-msgstr ""
+msgstr "Vrijednost %(value)r nije jedna od raspoloživih opcija."
 
 msgid "This field cannot be null."
 msgstr "Ovo polje ne može biti null."
@@ -431,6 +440,8 @@ msgstr "%(model_name)s sa navedenim %(field_label)s već postoji."
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
 msgstr ""
+"%(field_label)s mora biti jedinstven pojam za %(date_field_label)s "
+"%(lookup_type)s."
 
 #, python-format
 msgid "Field of type: %(field_type)s"
@@ -441,11 +452,11 @@ msgstr "Cijeli broj"
 
 #, python-format
 msgid "'%(value)s' value must be an integer."
-msgstr ""
+msgstr "'%(value)s' vrijednost mora biti cijeli broj."
 
 #, python-format
 msgid "'%(value)s' value must be either True or False."
-msgstr ""
+msgstr "'%(value)s' vrijednost treba biti ili \"True\" ili \"False\"."
 
 msgid "Boolean (Either True or False)"
 msgstr "Boolean (True ili False)"
@@ -462,12 +473,16 @@ msgid ""
 "'%(value)s' value has an invalid date format. It must be in YYYY-MM-DD "
 "format."
 msgstr ""
+"'%(value)s' vrijednost je neispravno formatiran datum. Treba biti u YYYY-MM-"
+"DD formatu."
 
 #, python-format
 msgid ""
 "'%(value)s' value has the correct format (YYYY-MM-DD) but it is an invalid "
 "date."
 msgstr ""
+"'%(value)s' vrijednost ima ispravan format (YYYY-MM-DD) ali je nevaljan "
+"datum."
 
 msgid "Date (without time)"
 msgstr "Datum (bez vremena/sati)"
@@ -489,7 +504,7 @@ msgstr "Datum (sa vremenom/satima)"
 
 #, python-format
 msgid "'%(value)s' value must be a decimal number."
-msgstr ""
+msgstr "'%(value)s' vrijednost mora biti decimalni broj."
 
 msgid "Decimal number"
 msgstr "Decimalni broj"
@@ -499,9 +514,11 @@ msgid ""
 "'%(value)s' value has an invalid format. It must be in [DD] [HH:[MM:]]ss[."
 "uuuuuu] format."
 msgstr ""
+"'%(value)s' vrijednost je neispravno formatirana. Treba biti u [DD] [HH:"
+"[MM:]]ss[.uuuuuu] formatu."
 
 msgid "Duration"
-msgstr ""
+msgstr "Trajanje"
 
 msgid "Email address"
 msgstr "E-mail adresa"
@@ -511,7 +528,7 @@ msgstr "Put do datoteke"
 
 #, python-format
 msgid "'%(value)s' value must be a float."
-msgstr ""
+msgstr "'%(value)s' vrijednost mora biti broj s pomičnim zarezom."
 
 msgid "Floating point number"
 msgstr "Broj s pomičnim zarezom (floating point number)"
@@ -527,7 +544,7 @@ msgstr "IP adresa"
 
 #, python-format
 msgid "'%(value)s' value must be either None, True or False."
-msgstr ""
+msgstr "'%(value)s' vrijednost mora biti \"None\", \"True\" ili \"False\"."
 
 msgid "Boolean (Either True, False or None)"
 msgstr "Boolean (True, False ili None)"
@@ -571,7 +588,7 @@ msgstr ""
 
 #, python-format
 msgid "'%(value)s' is not a valid UUID."
-msgstr ""
+msgstr "'%(value)s' nije ispravan UUID."
 
 msgid "File"
 msgstr "Datoteka"
@@ -617,7 +634,7 @@ msgid "Enter a valid date/time."
 msgstr "Unesite ispravan datum/vrijeme."
 
 msgid "Enter a valid duration."
-msgstr ""
+msgstr "Unesite ispravno trajanje."
 
 msgid "No file was submitted. Check the encoding type on the form."
 msgstr "Datoteka nije poslana. Provjerite 'encoding type' forme."
@@ -657,7 +674,7 @@ msgid "Enter a complete value."
 msgstr ""
 
 msgid "Enter a valid UUID."
-msgstr ""
+msgstr "Unesite ispravan UUID."
 
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
@@ -680,9 +697,9 @@ msgstr[2] "Molimo unesite %d ili manje obrazaca."
 #, python-format
 msgid "Please submit %d or more forms."
 msgid_plural "Please submit %d or more forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Molimo unesite %d ili više obrazaca."
+msgstr[1] "Molimo unesite %d ili više obrazaca."
+msgstr[2] "Molimo unesite %d ili više obrazaca."
 
 msgid "Order"
 msgstr "Redoslijed:"
@@ -719,7 +736,7 @@ msgstr "Izaberite ispravnu opciju. Ta opcija nije jedna od dostupnih opcija."
 
 #, python-format
 msgid "\"%(pk)s\" is not a valid value for a primary key."
-msgstr ""
+msgstr "\"%(pk)s\" nije ispravna vrijednost za primarni ključ."
 
 #, python-format
 msgid ""
@@ -1006,7 +1023,7 @@ msgid "December"
 msgstr "prosinca"
 
 msgid "This is not a valid IPv6 address."
-msgstr ""
+msgstr "To nije ispravna IPv6 adresa."
 
 #, python-format
 msgctxt "String to return when truncating text"
@@ -1102,7 +1119,7 @@ msgid "Welcome to Django"
 msgstr ""
 
 msgid "It worked!"
-msgstr ""
+msgstr "Radi!"
 
 msgid "Congratulations on your first Django-powered page."
 msgstr ""
