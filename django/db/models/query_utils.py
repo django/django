@@ -51,10 +51,13 @@ class Q(tree.Node):
     AND = 'AND'
     OR = 'OR'
     default = AND
-    subq_split_pos = False
 
     def __init__(self, *args, **kwargs):
         super(Q, self).__init__(children=list(args) + list(kwargs.items()))
+        # Should the branch starting from this node be pushed in to a subquery?
+        # Used by Django to push negated filters over multivalued relations to
+        # subqueries.
+        self.push_to_subquery = False
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):

@@ -1288,18 +1288,18 @@ class Query(object):
             assert q_object.connector != OR
             path = [0]
         if tuple(path) in found_splits:
-            q_object.subq_split_pos = True
+            q_object.pust_to_subquery = True
             return q_object
         for pos, obj in enumerate(q_object.children):
             path.append(pos)
             if isinstance(obj, tuple):
                 if tuple(path) in found_splits:
                     obj = Q(obj)
-                    obj.subq_split_pos = True
+                    obj.push_to_subquery = True
                     q_object.children[pos] = obj
             else:
                 if tuple(path) in found_splits:
-                    obj.subq_split_pos = True
+                    obj.push_to_subquery = True
                 else:
                     self.mark_split_nodes(obj, found_splits, path)
             path.pop()
@@ -1485,7 +1485,7 @@ class Query(object):
         """
         Adds a Q-object to the current filter.
         """
-        if split_exclude and q_object.subq_split_pos:
+        if split_exclude and q_object.push_to_subquery:
             q_object = self._add_subq(q_object)
         connector = q_object.connector
         target_clause = self.where_class(connector=connector,
