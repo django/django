@@ -73,7 +73,7 @@ use for reversing. By default, the root URLconf for the current thread is used.
     As part of working out which URL names map to which patterns, the
     ``reverse()`` function has to import all of your URLconf files and examine
     the name of each view. This involves importing each view function. If
-    there are *any* errors whilst importing any of your view functions, it
+    there are *any* errors while importing any of your view functions, it
     will cause ``reverse()`` to raise an error, even if that view function is
     not the one you are trying to reverse.
 

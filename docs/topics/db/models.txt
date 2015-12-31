@@ -917,7 +917,7 @@ model, since it is an abstract base class. It does not generate a database
 table or have a manager, and cannot be instantiated or saved directly.
 
 For many uses, this type of model inheritance will be exactly what you want.
-It provides a way to factor out common information at the Python level, whilst
+It provides a way to factor out common information at the Python level, while
 still only creating one database table per child model at the database level.
 
 ``Meta`` inheritance
@@ -1000,7 +1000,7 @@ Along with another app ``rare/models.py``::
         pass
 
 The reverse name of the ``common.ChildA.m2m`` field will be
-``common_childa_related``, whilst the reverse name of the
+``common_childa_related``, while the reverse name of the
 ``common.ChildB.m2m`` field will be ``common_childb_related``, and finally the
 reverse name of the ``rare.ChildB.m2m`` field will be ``rare_childb_related``.
 It is up to you how you use the ``'%(class)s'`` and ``'%(app_label)s`` portion

@@ -12,7 +12,7 @@ class SimpleTests(TestCase):
         """
         The main test here is that the all the models can be created without
         any database errors. We can also do some more simple insertion and
-        lookup tests whilst we're here to show that the second of models do
+        lookup tests while we're here to show that the second of models do
         refer to the tables from the first set.
         """
         # Insert some data into one set of models.

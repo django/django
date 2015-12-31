@@ -606,7 +606,7 @@ Handling exceptions within PostgreSQL transactions
 Inside a transaction, when a call to a PostgreSQL cursor raises an exception
 (typically ``IntegrityError``), all subsequent SQL in the same transaction
 will fail with the error "current transaction is aborted, queries ignored
-until end of transaction block". Whilst simple use of ``save()`` is unlikely
+until end of transaction block". While simple use of ``save()`` is unlikely
 to raise an exception in PostgreSQL, there are more advanced usage patterns
 which might, such as saving objects with unique fields, saving using the
 force_insert/force_update flag, or invoking custom SQL.
