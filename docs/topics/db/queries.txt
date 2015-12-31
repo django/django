@@ -525,7 +525,6 @@ those latter objects, you could write::
     Blog.objects.filter(entry__authors__isnull=False,
             entry__authors__name__isnull=True)
 
-
 .. _spanning-multi-valued-relationships:
 
 Spanning multi-valued relationships
@@ -549,7 +548,8 @@ find entries linked to tags called *"music"* and *"bands"* or we might want an
 entry that contains a tag with a name of *"music"* and a status of *"public"*.
 
 To handle both of these situations, Django has a consistent way of processing
-:meth:`~django.db.models.query.QuerySet.filter` calls. Everything inside a
+:meth:`~django.db.models.query.QuerySet.filter` and
+:meth:`~django.db.models.query.QuerySet.exclude` calls. Everything inside a
 single :meth:`~django.db.models.query.QuerySet.filter` call is applied
 simultaneously to filter out items matching all those requirements. Successive
 :meth:`~django.db.models.query.QuerySet.filter` calls further restrict the set
@@ -583,10 +583,19 @@ that were published in 2008. The entries selected by the second filter may or
 may not be the same as the entries in the first filter. We are filtering the
 ``Blog`` items with each filter statement, not the ``Entry`` items.
 
+All of this behavior also applies to
+:meth:`~django.db.models.query.QuerySet.exclude`: all the conditions in a
+single :meth:`~django.db.models.query.QuerySet.exclude` statement apply to a
+single instance (if those conditions are talking about the same multi-valued
+relation). Conditions in subsequent
+:meth:`~django.db.models.query.QuerySet.filter` or
+:meth:`~django.db.models.query.QuerySet.exclude` calls that refer to the same
+relation may end up filtering on different linked objects.
+
 .. versionchanged:: 1.10
 
-Previously ``exclude()`` queries and negated ``Q-object`` queries didn't use
-the same rules than ``filter()``.
+    Previously, ``exclude()`` queries and negated ``Q`` object queries didn't
+    use the same rules as ``filter()``.
 
 .. _using-f-expressions-in-filters:
 
