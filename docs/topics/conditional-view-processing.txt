@@ -184,7 +184,7 @@ Comparison with middleware conditional processing
 You may notice that Django already provides simple and straightforward
 conditional ``GET`` handling via the
 :class:`django.middleware.http.ConditionalGetMiddleware` and
-:class:`~django.middleware.common.CommonMiddleware`. Whilst certainly being
+:class:`~django.middleware.common.CommonMiddleware`. While certainly being
 easy to use and suitable for many situations, those pieces of middleware
 functionality have limitations for advanced usage:
 
