@@ -392,9 +392,13 @@ def serializerTest(format, self):
 
     # Create all the objects defined in the test data
     objects = []
+    tables = set()
     instance_count = {}
-    for (func, pk, klass, datum) in test_data:
-        with connection.constraint_checks_disabled():
+    for (_, _, klass, _) in test_data:
+        tables.add(klass._meta.db_table)
+
+    with connection.constraint_checks_disabled(tables):
+        for (func, pk, klass, datum) in test_data:
             objects.extend(func[0](pk, klass, datum))
 
     # Get a count of the number of objects created for each class

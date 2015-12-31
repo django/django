@@ -22,6 +22,10 @@ except ImportError:
 
 NO_DB_ALIAS = '__no_db__'
 
+tables_seen = 0
+max_seen = 0
+times = 0
+
 
 class BaseDatabaseWrapper(object):
     """
@@ -432,26 +436,34 @@ class BaseDatabaseWrapper(object):
     # ##### Foreign key constraints checks handling #####
 
     @contextmanager
-    def constraint_checks_disabled(self):
+    def constraint_checks_disabled(self, table_names):
         """
         Context manager that disables foreign key constraint checking.
         """
-        disabled = self.disable_constraint_checking()
+        disabled = self.disable_constraint_checking(table_names)
         try:
             yield
         finally:
             if disabled:
-                self.enable_constraint_checking()
+                self.enable_constraint_checking(table_names)
 
-    def disable_constraint_checking(self):
+    def disable_constraint_checking(self, table_names):
         """
         Backends can implement as needed to temporarily disable foreign key
         constraint checking. Should return True if the constraints were
         disabled and will need to be reenabled.
         """
+        global tables_seen
+        global max_seen
+        global times
+        tables_seen += len(table_names)
+        max_seen = max(max_seen, len(table_names))
+        times += 1
+        print("Tables seen: %s, called %s times, max seen %s, this time seen %s" %
+              (tables_seen, times, max_seen, len(table_names)))
         return False
 
-    def enable_constraint_checking(self):
+    def enable_constraint_checking(self, table_names):
         """
         Backends can implement as needed to re-enable foreign key constraint
         checking.

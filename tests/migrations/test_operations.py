@@ -60,18 +60,19 @@ class OperationTestBase(MigrationTestBase):
             # Then standard model tables
             '_pony', '_stable', '_van',
         ]
-        tables = [(app_label + table_name) for table_name in table_names]
+        tables_to_delete = [(app_label + table_name) for table_name in table_names]
         with connection.cursor() as cursor:
-            table_names = connection.introspection.table_names(cursor)
-            connection.disable_constraint_checking()
+            all_table_names = connection.introspection.table_names(cursor)
+            tables_to_delete_set = set(tables_to_delete).intersection(set(all_table_names))
+            connection.disable_constraint_checking(tables_to_delete_set)
             sql_delete_table = connection.schema_editor().sql_delete_table
             with transaction.atomic():
-                for table in tables:
-                    if table in table_names:
+                for table in tables_to_delete:
+                    if table in all_table_names:
                         cursor.execute(sql_delete_table % {
                             "table": connection.ops.quote_name(table),
                         })
-            connection.enable_constraint_checking()
+            connection.enable_constraint_checking(tables_to_delete_set)
 
         # Make the "current" state
         model_options = {

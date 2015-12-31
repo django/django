@@ -379,8 +379,9 @@ class SerializersTransactionTestBase(object):
         # The deserialization process needs to run in a transaction in order
         # to test forward reference handling.
         with transaction.atomic():
-            objs = serializers.deserialize(self.serializer_name, self.fwd_ref_str)
-            with connection.constraint_checks_disabled():
+            objs = list(serializers.deserialize(self.serializer_name, self.fwd_ref_str))
+            tables = set([obj.object._meta.db_table for obj in objs])
+            with connection.constraint_checks_disabled(tables):
                 for obj in objs:
                     obj.save()
 
