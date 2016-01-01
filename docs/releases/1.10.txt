@@ -382,6 +382,8 @@ Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
 Miscellaneous
 ~~~~~~~~~~~~~
 
+* QuerySet.bulk_create sets pk on objects when using the PostgreSQL backend.
+
 * The ``repr()`` of a ``QuerySet`` is wrapped in ``<QuerySet >`` to
   disambiguate it from a plain list when debugging.
 
