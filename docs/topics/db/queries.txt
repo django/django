@@ -522,8 +522,7 @@ will return ``Blog`` objects that have an empty ``name`` on the ``author`` and
 also those which have an empty ``author`` on the ``entry``. If you don't want
 those latter objects, you could write::
 
-    Blog.objects.filter(entry__authors__isnull=False,
-            entry__authors__name__isnull=True)
+    Blog.objects.filter(entry__authors__isnull=False, entry__authors__name__isnull=True)
 
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -559,14 +558,12 @@ select all blogs that contain entries with both *"Lennon"* in the headline
 and that were published in 2008 (the same entry satisfying both conditions),
 we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon',
-            entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
 
 To select all blogs that contain an entry with *"Lennon"* in the headline
 **as well as** an entry that was published in 2008, we would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon').filter(
-            entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
 
 Suppose there is only one blog that had both entries containing *"Lennon"* and
 entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.

@@ -35,7 +35,8 @@ your :class:`Form` class constructor::
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
 
 In this dictionary, the keys are the field names, which correspond to the
@@ -86,7 +87,8 @@ and return a boolean designating whether the data was valid::
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
@@ -98,7 +100,8 @@ email address::
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
     ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
@@ -259,7 +262,8 @@ form data has been changed from the initial data.
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data, initial=data)
     >>> f.has_changed()
     False
@@ -341,7 +345,8 @@ it, you can access the clean data via its ``cleaned_data`` attribute::
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
@@ -358,7 +363,8 @@ only the valid fields::
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
     ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
@@ -376,7 +382,8 @@ but ``cleaned_data`` contains only the form's fields::
     ...         'cc_myself': True,
     ...         'extra_field_1': 'foo',
     ...         'extra_field_2': 'bar',
-    ...         'extra_field_3': 'baz'}
+    ...         'extra_field_3': 'baz',
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
@@ -393,12 +400,12 @@ fields. In this example, the data dictionary doesn't include a value for the
     ...     first_name = CharField()
     ...     last_name = CharField()
     ...     nick_name = CharField(required=False)
-    >>> data = {'first_name': 'John', 'last_name': 'Lennon'}
+    >>> data = {'first_name': 'John', 'last_name': 'Lennon',}
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
     True
     >>> f.cleaned_data
-    {'nick_name': '', 'first_name': 'John', 'last_name': 'Lennon'}
+    {'nick_name': '', 'first_name': 'John', 'last_name': 'Lennon',}
 
 In this above example, the ``cleaned_data`` value for ``nick_name`` is set to an
 empty string, because ``nick_name`` is ``CharField``, and ``CharField``\s treat
@@ -435,7 +442,8 @@ include ``checked="checked"`` if appropriate::
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data)
     >>> print(f)
     <tr><th><label for="id_subject">Subject:</label></th><td><input id="id_subject" type="text" name="subject" maxlength="100" value="hello" /></td></tr>
@@ -738,7 +746,8 @@ method you're using::
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
     ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    ...         'cc_myself': True,
+    ... }
     >>> f = ContactForm(data, auto_id=False)
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" /></td></tr>

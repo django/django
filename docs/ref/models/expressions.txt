@@ -200,7 +200,9 @@ directly support ``output_field`` you will need to wrap the expression with
 
     Ticket.objects.annotate(
         expires=ExpressionWrapper(
-            F('active_at') + F('duration'), output_field=DateTimeField()))
+            F('active_at') + F('duration'), output_field=DateTimeField()
+        )
+    )
 
 .. _func-expressions:
 
@@ -347,7 +349,8 @@ SQL that is generated. Here's a brief example::
                 expression,
                 distinct='DISTINCT ' if distinct else '',
                 output_field=IntegerField(),
-                **extra)
+                **extra
+            )
 
 
 ``Value()`` expressions
@@ -631,8 +634,10 @@ Let's see how it works::
     ...        F('motto'),
     ...        F('ticker_name'),
     ...        F('description'),
-    ...        Value('No Tagline')
-    ...        ], output_field=CharField()))
+    ...        Value('No Tagline'),
+    ...        ], output_field=CharField()
+    ...     )
+    ... )
     >>> for c in qs:
     ...     print("%s: %s" % (c.name, c.tagline))
     ...
