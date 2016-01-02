@@ -47,8 +47,8 @@ class Dispatcher(object):
             if pattern.is_view():
                 value = list(constraints), kwargs.flatten()
                 self.reverse_dict.appendlist(namespace_root + (pattern.target.view,), value)
-                if pattern.target.name:
-                    self.reverse_dict.appendlist(namespace_root + (pattern.target.name,), value)
+                if pattern.target.url_name:
+                    self.reverse_dict.appendlist(namespace_root + (pattern.target.url_name,), value)
                 self._callbacks.add(pattern.target.lookup_str)
             elif not pattern.target.namespace and not pattern.target.app_name:
                 self._load(pattern, namespace_root, app_root, list(constraints), kwargs)
@@ -85,7 +85,8 @@ class Dispatcher(object):
             self._loaded.add(namespace)
 
     def load(self, lookup):
-        # The last entry is the view, not a namespace. Load up to namespace[:-1].
+        # The last entry is the view, not a namespace. This loads everything
+        # up to namespace[:-1].
         for i, _ in enumerate(lookup):
             if lookup[:i] not in self._loaded:
                 self.load_namespace(lookup[:i])

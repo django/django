@@ -98,9 +98,9 @@ def url(regex, view, kwargs=None, name=None, decorators=None):
 
 
 class Endpoint(object):
-    def __init__(self, view, name=None, kwargs=None, decorators=None):
+    def __init__(self, view, url_name=None, kwargs=None, decorators=None):
         self.view = view
-        self.name = name
+        self.url_name = url_name
         self.kwargs = kwargs or {}
         self.decorators = list(decorators) if decorators is not None else []
 

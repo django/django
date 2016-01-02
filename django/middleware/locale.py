@@ -1,10 +1,10 @@
 "This is the locale selecting middleware that will look at accept headers"
 
+from importlib import import_module
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.urls import (
-    LocalePrefix, get_resolver, get_script_prefix, is_valid_path,
-)
+from django.urls import LocalePrefix, get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property
@@ -65,7 +65,8 @@ class LocaleMiddleware(object):
         Returns `True` if the `LocaleRegexURLResolver` is used
         at root level of the urlpatterns, else it returns `False`.
         """
-        for resolver in get_resolver(None).resolvers:
-            if resolver.constraints and isinstance(resolver.constraints[0], LocalePrefix):
+        urlconf = import_module(settings.ROOT_URLCONF)
+        for urlpattern in urlconf.urlpatterns:
+            if urlpattern.constraints and isinstance(urlpattern.constraints[0], LocalePrefix):
                 return True
         return False

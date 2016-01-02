@@ -187,7 +187,7 @@ class ResolverEndpoint(BaseResolver):
         super(ResolverEndpoint, self).__init__(pattern, *args, **kwargs)
         self.func = pattern.target.view
         self.lookup_str = pattern.target.lookup_str
-        self.url_name = pattern.target.name
+        self.url_name = pattern.target.url_name
 
     def is_endpoint(self):
         return True

@@ -714,7 +714,7 @@ class UnchangeableObjectAdmin(admin.ModelAdmin):
         urlpatterns = super(UnchangeableObjectAdmin, self).get_urls()
         return [
             p for p in urlpatterns
-            if p.is_view() and p.target.name and not p.target.name.endswith("_change")
+            if p.is_view() and p.target.url_name and not p.target.url_name.endswith("_change")
         ]
 
 
