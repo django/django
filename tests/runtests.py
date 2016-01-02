@@ -270,8 +270,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     return failures
 
 
-def bisect_tests(bisection_label, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def bisect_tests(bisection_label, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -328,8 +328,8 @@ def bisect_tests(bisection_label, options, test_labels):
     teardown(state)
 
 
-def paired_tests(paired_test, options, test_labels):
-    state = setup(options.verbosity, test_labels)
+def paired_tests(paired_test, options, test_labels, parallel):
+    state = setup(options.verbosity, test_labels, parallel)
 
     test_labels = test_labels or get_installed()
 
@@ -440,9 +440,9 @@ if __name__ == "__main__":
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
 
     if options.bisect:
-        bisect_tests(options.bisect, options, options.modules)
+        bisect_tests(options.bisect, options, options.modules, options.parallel)
     elif options.pair:
-        paired_tests(options.pair, options, options.modules)
+        paired_tests(options.pair, options, options.modules, options.parallel)
     else:
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
