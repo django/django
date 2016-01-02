@@ -408,6 +408,9 @@ Miscellaneous
 * Support for ``skip_validation`` in ``BaseCommand.execute(**options)`` is
   removed. Use ``skip_checks`` (added in Django 1.7) instead.
 
+* :djadmin:`loaddata` now raises a ``CommandError`` instead of showing a
+  warning when the specified fixture file is not found.
+
 .. _deprecated-features-1.10:
 
 Features deprecated in 1.10
