@@ -175,7 +175,7 @@ class Resolver(BaseResolver):
                     tried.append([resolver])
                 continue
             return ResolverMatch.from_submatch(sub_match, args, kwargs, self.app_name, self.namespace)
-        raise Resolver404(path=new_path, tried=tried)
+        raise Resolver404({'path': new_path, 'tried': tried})
 
     @cached_property
     def urlconf_module(self):

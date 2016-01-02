@@ -7,9 +7,17 @@ class Resolver404(Http404):
     """
     Raised when an url cannot be resolved to a view.
     """
-    def __init__(self, path=None, tried=None):
-        self.path = path
-        self.tried = tried or []
+    @property
+    def path(self):
+        if self.args:
+            return self.args[0].get('path', '')
+        return ''
+
+    @property
+    def tried(self):
+        if self.args:
+            return self.args[0].get('tried', [])
+        return []
 
 
 class NoReverseMatch(Exception):
