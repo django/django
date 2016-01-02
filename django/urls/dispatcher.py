@@ -1,5 +1,6 @@
 from collections import defaultdict
 from importlib import import_module
+from threading import Lock
 
 from django.conf import urls
 from django.template.context import BaseContext
@@ -26,17 +27,18 @@ def get_dispatcher(urlconf=None):
 
 class Dispatcher(object):
     def __init__(self, urlconf):
-        self.ready = False
         self.urlconf_name = urlconf
         self.resolver = get_resolver(urlconf)
 
-        self._namespaces = {}
+        self._lock = Lock()
+        self._namespaces = {
+            (): ((), urls.URLPattern([ScriptPrefix()], urls.Include(urls.URLConf(self.urlconf_name)))),
+        }
         self._loaded = set()
         self._callbacks = set()
+
         self.reverse_dict = MultiValueDict()
         self.app_dict = defaultdict(list)
-
-        self.load_root()
 
     def _load(self, root, namespace_root, app_root, constraints, kwargs):
         for pattern in reversed(root.target.urlconf.urlpatterns):
@@ -64,35 +66,35 @@ class Dispatcher(object):
             constraints = constraints[:-len(pattern.constraints)]
             kwargs.pop()
 
-    def load(self, namespace_root):
-        if namespace_root not in self._namespaces:
-            raise NoReverseMatch(
-                "%s is not a registered namespace inside '%s'" %
-                (namespace_root[-1], ':'.join(namespace_root[:-1]))
-            )
-
-        app_root, pattern = self._namespaces.pop(namespace_root)
-        constraints = list(pattern.constraints)
-        kwargs = BaseContext()
-        kwargs.dicts[0] = pattern.target.kwargs
-        self._load(pattern, namespace_root, app_root, constraints, kwargs)
-        self._loaded.add(namespace_root)
-
-    def load_root(self):
-        self._namespaces[()] = (), urls.URLPattern([ScriptPrefix()], urls.Include(urls.URLConf(self.urlconf_name)))
-        self.load(())
-        self.ready = True
-
     def load_namespace(self, namespace):
-        for i, _ in enumerate(namespace, start=1):
-            if namespace[:i] not in self._loaded:
-                self.load(namespace[:i])
+        with self._lock:
+            if namespace in self._loaded:
+                return
+
+            if namespace not in self._namespaces:
+                raise NoReverseMatch(
+                    "'%s' is not a registered namespace inside '%s'" %
+                    (namespace[-1], ':'.join(namespace[:-1]))
+                )
+
+            app, pattern = self._namespaces.pop(namespace)
+            constraints = list(pattern.constraints)
+            kwargs = BaseContext()
+            kwargs.dicts[0] = pattern.target.kwargs
+            self._load(pattern, namespace, app, constraints, kwargs)
+            self._loaded.add(namespace)
+
+    def load(self, lookup):
+        # The last entry is the view, not a namespace. Load up to namespace[:-1].
+        for i, _ in enumerate(lookup):
+            if lookup[:i] not in self._loaded:
+                self.load_namespace(lookup[:i])
 
     def resolve(self, path, request=None):
         return self.resolver.resolve(path, request)
 
     def reverse(self, viewname, *args, **kwargs):
-        if isinstance(viewname, (list, tuple)):
+        if isinstance(viewname, (list, tuple)):  # Common case: resolved by self.resolve_namespace().
             lookup = tuple(viewname)
         elif isinstance(viewname, six.string_types):
             lookup = tuple(viewname.split(':'))
@@ -104,7 +106,7 @@ class Dispatcher(object):
         text_args = [force_text(x) for x in args]
         text_kwargs = {k: force_text(v) for k, v in kwargs.items()}
 
-        self.load_namespace(lookup[:-1])
+        self.load(lookup)
 
         patterns = []
         for value in self.reverse_dict.getlist(lookup):
@@ -141,7 +143,7 @@ class Dispatcher(object):
         )
 
     def _resolve_lookup(self, root, lookup, current_app=None):
-        if len(lookup) == 1:
+        if not lookup:
             return lookup
 
         self.load_namespace(root)
@@ -164,13 +166,6 @@ class Dispatcher(object):
 
         return [namespace] + self._resolve_lookup(root, lookup[1:], current_app[1:])
 
-    @lru_cache.lru_cache(maxsize=None)
-    def _resolve_namespace(self, lookup, current_app):
-        lookup = list(lookup)
-        if current_app is not None:
-            current_app = list(current_app)
-        return self._resolve_lookup((), lookup, current_app)
-
     def resolve_namespace(self, viewname, current_app=None):
         if isinstance(viewname, six.string_types):
             lookup = viewname.split(':')
@@ -182,9 +177,7 @@ class Dispatcher(object):
         if current_app:
             current_app = current_app.split(':')
 
-        # lookup = tuple(lookup)
-        # current_app = tuple(current_app) if current_app is not None else ()
-        return self._resolve_lookup((), lookup, current_app)
+        return self._resolve_lookup((), lookup[:-1], current_app) + lookup[-1:]
 
     @cached_property
     def urlconf_module(self):

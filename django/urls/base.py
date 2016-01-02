@@ -31,16 +31,10 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
         urlconf = get_urlconf()
 
     dispatcher = get_dispatcher(urlconf)
-    if not dispatcher.ready:
-        raise RuntimeError(
-            "Can't reverse urls when the url dispatcher hasn't "
-            "been loaded. Use reverse_lazy() instead."
-        )
     args = args or ()
     kwargs = kwargs or {}
 
     lookup = dispatcher.resolve_namespace(viewname, current_app)
-
     return dispatcher.reverse(lookup, *args, **kwargs)
 
 
