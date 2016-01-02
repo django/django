@@ -1,18 +1,11 @@
-from order_with_respect_to.tests import (
-    OrderWithRespectToTests, OrderWithRespectToTests2,
-)
+from order_with_respect_to.base_tests import BaseOrderWithRespectToTests
+
+from django.test import TestCase
 
 from .models import Answer, Post, Question
 
 
-class OrderWithRespectToGFKTests(OrderWithRespectToTests):
+class OrderWithRespectToGFKTests(BaseOrderWithRespectToTests, TestCase):
     Answer = Answer
-    Question = Question
-
-del OrderWithRespectToTests
-
-
-class OrderWithRespectToGFKTests2(OrderWithRespectToTests2):
     Post = Post
-
-del OrderWithRespectToTests2
+    Question = Question
