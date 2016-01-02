@@ -101,12 +101,18 @@ Channels and Messages
 ---------------------
 
 All communication in an ASGI stack uses *messages* sent over *channels*.
-All messages must be a ``dict`` at the top level of the object, and be
-serializable by the built-in ``json`` serializer module (though the
-actual serialization a channel layer uses is up to the implementation;
-we use ``json`` as the lowest common denominator).
+All messages must be a ``dict`` at the top level of the object, and
+contain only the following types to ensure serializability:
 
-Channels are identified by a byte string name consisting only of ASCII
+* Byte strings
+* Unicode strings
+* Integers (no longs)
+* Lists (tuples should be treated as lists)
+* Dicts (keys must be unicode strings)
+* Booleans
+* None
+
+Channels are identified by a unicode string name consisting only of ASCII
 letters, numbers, numerical digits, periods (``.``), dashes (``-``)
 and underscores (``_``), plus an optional prefix character (see below).
 
@@ -270,20 +276,20 @@ A *channel layer* should provide an object with these attributes
 (all function arguments are positional):
 
 * ``send(channel, message)``, a callable that takes two arguments; the
-  channel to send on, as a byte string, and the message
+  channel to send on, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
 * ``receive_many(channels, block=False)``, a callable that takes a list of channel
-  names as byte strings, and returns with either ``(None, None)``
+  names as unicode strings, and returns with either ``(None, None)``
   or ``(channel, message)`` if a message is available. If ``block`` is True, then
   it will not return until after a built-in timeout or a message arrives; if
   ``block`` is false, it will always return immediately. It is perfectly
   valid to ignore ``block`` and always return immediately.
 
-* ``new_channel(pattern)``, a callable that takes a byte string pattern,
+* ``new_channel(pattern)``, a callable that takes a unicode string pattern,
   and returns a new valid channel name that does not already exist, by
   substituting any occurrences of the question mark character ``?`` in
-  ``pattern`` with a single random byte string and checking for
+  ``pattern`` with a single random unicode string and checking for
   existence of that name in the channel layer. This is NOT called prior to
   a message being sent on a channel, and should not be used for channel
   initialization.
@@ -298,14 +304,14 @@ A *channel layer* should provide an object with these attributes
 A channel layer implementing the ``groups`` extension must also provide:
 
 * ``group_add(group, channel)``, a callable that takes a ``channel`` and adds
-  it to the group given by ``group``. Both are byte strings. If the channel
+  it to the group given by ``group``. Both are unicode strings. If the channel
   is already in the group, the function should return normally.
 
 * ``group_discard(group, channel)``, a callable that removes the ``channel``
   from the ``group`` if it is in it, and does nothing otherwise.
 
 * ``send_group(group, message)``, a callable that takes two positional
-  arguments; the group to send to, as a byte string, and the message
+  arguments; the group to send to, as a unicode string, and the message
   to send, as a serializable ``dict``.
 
 A channel layer implementing the ``statistics`` extension must also provide:
@@ -423,11 +429,11 @@ Keys:
 * ``reply_channel``: Channel name for responses and server pushes, in
   format ``http.response.?``
 
-* ``http_version``: Byte string, one of ``1.0``, ``1.1`` or ``2``.
+* ``http_version``: Unicode string, one of ``1.0``, ``1.1`` or ``2``.
 
-* ``method``: Byte string HTTP method name, uppercased.
+* ``method``: Unicode string HTTP method name, uppercased.
 
-* ``scheme``: Byte string URL scheme portion (likely ``http`` or ``https``).
+* ``scheme``: Unicode string URL scheme portion (likely ``http`` or ``https``).
   Optional (but must not be empty), default is ``http``.
 
 * ``path``: Byte string HTTP path from URL.
@@ -442,18 +448,44 @@ Keys:
 * ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
   HTTP header name as byte string and ``value`` is the header value as a byte
   string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per .
+  be concatenated into a single header as per RFC 2616.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to empty
-  string.
+  string. If ``body_channel`` is set, treat as start of body and concatenate
+  on further chunks.
 
-* ``client``: List of ``[host, port]`` where ``host`` is a byte string of the
+* ``body_channel``: Single-reader unicode string channel name that contains
+  Request Body Chunk messages representing a large request body.
+  Optional, defaults to None. Chunks append to ``body`` if set. Presence of
+  a channel indicates at least one Request Body Chunk message needs to be read,
+  and then further consumption keyed off of the ``more_content`` key in those
+  messages.
+
+* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
   remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
   integer. Optional, defaults to ``None``.
 
 * ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a byte string, and ``port`` is the integer listening port.
+  for this server as a unicode string, and ``port`` is the integer listening port.
   Optional, defaults to ``None``.
+
+
+Request Body Chunk
+''''''''''''''''''
+
+Must be sent after an initial Response.
+
+Channel: ``http.request.body.?``
+
+Keys:
+
+* ``content``: Byte string of HTTP body content, will be concatenated onto
+  previously received ``content`` values and ``body`` key in Request.
+
+* ``more_content``: Boolean value signifying if there is additional content
+  to come (as part of a Request Body Chunk message). If ``False``, request will
+  be taken as complete, and any further messages on the channel
+  will be ignored. Optional, defaults to ``False``.
 
 
 Response
@@ -475,7 +507,8 @@ Keys:
   string header name, and ``value`` is the byte string header value. Order
   should be preserved in the HTTP response.
 
-* ``content``: Byte string of HTTP body content
+* ``content``: Byte string of HTTP body content.
+  Optional, defaults to empty string.
 
 * ``more_content``: Boolean value signifying if there is additional content
   to come (as part of a Response Chunk message). If ``False``, response will
@@ -534,7 +567,7 @@ Keys:
 * ``reply_channel``: Channel name for sending data, in
   format ``websocket.send.?``
 
-* ``scheme``: Byte string URL scheme portion (likely ``ws`` or ``wss``).
+* ``scheme``: Unicode string URL scheme portion (likely ``ws`` or ``wss``).
   Optional (but must not be empty), default is ``ws``.
 
 * ``path``: Byte string HTTP path from URL.
@@ -551,12 +584,12 @@ Keys:
   string. If multiple headers with the same name are received, they should
   be concatenated into a single header as per .
 
-* ``client``: List of ``[host, port]`` where ``host`` is a byte string of the
+* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
   remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
   integer. Optional, defaults to ``None``.
 
 * ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a byte string, and ``port`` is the integer listening port.
+  for this server as a unicode string, and ``port`` is the integer listening port.
   Optional, defaults to ``None``.
 
 
@@ -644,12 +677,12 @@ Keys:
 
 * ``data``: Byte string of UDP datagram payload.
 
-* ``client``: List of ``[host, port]`` where ``host`` is a byte string of the
+* ``client``: List of ``[host, port]`` where ``host`` is a unicode string of the
   remote host's IPv4 or IPv6 address, and ``port`` is the remote port as an
   integer.
 
 * ``server``: List of ``[host, port]`` where ``host`` is the listening address
-  for this server as a byte string, and ``port`` is the integer listening port.
+  for this server as a unicode string, and ``port`` is the integer listening port.
   Optional, defaults to ``None``.
 
 
@@ -700,8 +733,13 @@ underlying implementation, then any values should be kept within the lower
 This document will never specify just *string* - all strings are one of the
 two types.
 
-Channel and group names are always byte strings, with the additional limitation
-that they only use the following characters:
+Some serializers, such as ``json``, cannot differentiate between byte
+strings and unicode strings; these should include logic to box one type as
+the other (for example, encoding byte strings as base64 unicode strings with
+a preceding special character, e.g. U+FFFF).
+
+Channel and group names are always unicode strings, with the additional
+limitation that they only use the following characters:
 
 * ASCII letters
 * The digits ``0`` through ``9``
@@ -747,7 +785,7 @@ WSGI's ``environ`` variable to the Request message:
 * ``CONTENT_TYPE`` can be extracted from ``headers``
 * ``CONTENT_LENGTH`` can be extracted from ``headers``
 * ``SERVER_NAME`` and ``SERVER_PORT`` are in ``server``
-* ``REMOTE_HOST`` and ``REMOTE_PORT`` are in ``client``
+* ``REMOTE_HOST``/``REMOTE_ADDR`` and ``REMOTE_PORT`` are in ``client``
 * ``SERVER_PROTOCOL`` is encoded in ``http_version``
 * ``wsgi.url_scheme`` is ``scheme``
 * ``wsgi.input`` is a StringIO around ``body``

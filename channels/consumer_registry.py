@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import importlib
 
 from django.core.exceptions import ImproperlyConfigured
@@ -35,6 +37,11 @@ class ConsumerRegistry(object):
         # Upconvert if you just pass in a string for channels
         if isinstance(channels, six.string_types):
             channels = [channels]
+        # Make sure all channels are byte strings
+        channels = [
+            channel.decode("ascii") if isinstance(channel, six.binary_type) else channel
+            for channel in channels
+        ]
         # Import any consumer referenced as string
         if isinstance(consumer, six.string_types):
             module_name, variable_name = consumer.rsplit(".", 1)

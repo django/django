@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from .channel import Channel
 
 
@@ -17,9 +19,9 @@ class Message(object):
         """
         pass
 
-    def __init__(self, content, channel, channel_backend, reply_channel=None):
+    def __init__(self, content, channel, channel_layer, reply_channel=None):
         self.content = content
         self.channel = channel
-        self.channel_backend = channel_backend
+        self.channel_layer = channel_layer
         if reply_channel:
-            self.reply_channel = Channel(reply_channel, channel_backend=self.channel_backend)
+            self.reply_channel = Channel(reply_channel, channel_layer=self.channel_layer)

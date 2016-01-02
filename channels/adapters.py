@@ -1,27 +1,7 @@
 import functools
 
-from django.core.handlers.base import BaseHandler
 from django.http import HttpRequest, HttpResponse
-
 from channels import Channel
-
-
-class UrlConsumer(object):
-    """
-    Dispatches channel HTTP requests into django's URL system.
-    """
-
-    def __init__(self):
-        self.handler = BaseHandler()
-        self.handler.load_middleware()
-
-    def __call__(self, message):
-        request = HttpRequest.channel_decode(message.content)
-        try:
-            response = self.handler.get_response(request)
-        except HttpResponse.ResponseLater:
-            return
-        message.reply_channel.send(response.channel_encode())
 
 
 def view_producer(channel_name):

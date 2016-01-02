@@ -1,7 +1,7 @@
-import random
-import string
+from __future__ import unicode_literals
 
-from channels import DEFAULT_CHANNEL_BACKEND, channel_backends
+from django.utils import six
+from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 
 
 class Channel(object):
@@ -16,15 +16,17 @@ class Channel(object):
     "default" one by default.
     """
 
-    def __init__(self, name, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
+    def __init__(self, name, alias=DEFAULT_CHANNEL_LAYER, channel_layer=None):
         """
         Create an instance for the channel named "name"
         """
+        if isinstance(name, six.binary_type):
+            name = name.decode("ascii")
         self.name = name
-        if channel_backend:
-            self.channel_backend = channel_backend
+        if channel_layer:
+            self.channel_layer = channel_layer
         else:
-            self.channel_backend = channel_backends[alias]
+            self.channel_layer = channel_layers[alias]
 
     def send(self, content):
         """
@@ -32,17 +34,7 @@ class Channel(object):
         """
         if not isinstance(content, dict):
             raise ValueError("You can only send dicts as content on channels.")
-        self.channel_backend.send(self.name, content)
-
-    @classmethod
-    def new_name(self, prefix):
-        """
-        Returns a new channel name that's unique and not closed
-        with the given prefix. Does not need to be called before sending
-        on a channel name - just provides a way to avoid clashing for
-        response channels.
-        """
-        return "%s.%s" % (prefix, "".join(random.choice(string.ascii_letters) for i in range(32)))
+        self.channel_layer.send(self.name, content)
 
     def as_view(self):
         """
@@ -63,27 +55,29 @@ class Group(object):
     of the group after an expiry time (keep re-adding to keep them in).
     """
 
-    def __init__(self, name, alias=DEFAULT_CHANNEL_BACKEND, channel_backend=None):
+    def __init__(self, name, alias=DEFAULT_CHANNEL_LAYER, channel_layer=None):
+        if isinstance(name, six.binary_type):
+            name = name.decode("ascii")
         self.name = name
-        if channel_backend:
-            self.channel_backend = channel_backend
+        if channel_layer:
+            self.channel_layer = channel_layer
         else:
-            self.channel_backend = channel_backends[alias]
+            self.channel_layer = channel_layers[alias]
 
     def add(self, channel):
         if isinstance(channel, Channel):
             channel = channel.name
-        self.channel_backend.group_add(self.name, channel)
+        self.channel_layer.group_add(self.name, channel)
 
     def discard(self, channel):
         if isinstance(channel, Channel):
             channel = channel.name
-        self.channel_backend.group_discard(self.name, channel)
+        self.channel_layer.group_discard(self.name, channel)
 
     def channels(self):
-        return self.channel_backend.group_channels(self.name)
+        return self.channel_layer.group_channels(self.name)
 
     def send(self, content):
         if not isinstance(content, dict):
             raise ValueError("You can only send dicts as content on channels.")
-        self.channel_backend.send_group(self.name, content)
+        self.channel_layer.send_group(self.name, content)
