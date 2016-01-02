@@ -2,7 +2,7 @@
 Django 1.8.8 release notes
 ==========================
 
-*Under development*
+*January 2, 2016*
 
 Django 1.8.8 fixes several bugs in 1.8.7.
 

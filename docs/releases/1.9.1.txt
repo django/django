@@ -2,7 +2,7 @@
 Django 1.9.1 release notes
 ==========================
 
-*Under development*
+*January 2, 2016*
 
 Django 1.9.1 fixes several bugs in 1.9.
 
