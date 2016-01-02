@@ -239,8 +239,7 @@ class Command(BaseCommand):
             fixture_files.extend(fixture_files_in_dir)
 
         if not fixture_files:
-            # Warning kept for backwards-compatibility; why not an exception?
-            warnings.warn("No fixture named '%s' found." % fixture_name)
+            raise CommandError("No fixture named '%s' found." % fixture_name)
 
         return fixture_files
 

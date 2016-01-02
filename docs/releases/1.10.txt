@@ -312,6 +312,9 @@ Backwards incompatible changes in 1.10
     your code within the deprecation timeline for a given feature, its removal
     may appear as a backwards incompatible change.
 
+* Made :djadmin:`loaddata` raise a ``CommandError`` instead of showing
+  a warning when fixture file is not found (:ticket:`21549`).
+
 Database backend API
 ~~~~~~~~~~~~~~~~~~~~
 
