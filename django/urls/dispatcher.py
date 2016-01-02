@@ -182,9 +182,9 @@ class Dispatcher(object):
         if current_app:
             current_app = current_app.split(':')
 
-        lookup = tuple(lookup)
-        current_app = tuple(current_app) if current_app is not None else ()
-        return self._resolve_namespace(lookup, current_app)
+        # lookup = tuple(lookup)
+        # current_app = tuple(current_app) if current_app is not None else ()
+        return self._resolve_lookup((), lookup, current_app)
 
     @cached_property
     def urlconf_module(self):
