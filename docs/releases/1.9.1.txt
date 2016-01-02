@@ -76,3 +76,6 @@ Bugfixes
 
 * Made ``loaddata`` skip disabling and enabling database constraints when it
   doesn't load any fixtures (:ticket:`23372`).
+
+* Restored ``contrib.auth`` hashers compatibility with py-bcrypt
+  (:ticket:`26016`).
