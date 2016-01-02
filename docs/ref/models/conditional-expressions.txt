@@ -56,10 +56,12 @@ Some examples::
     >>> from datetime import date
     >>> When(registered_on__gt=date(2014, 1, 1),
     ...      registered_on__lt=date(2015, 1, 1),
-    ...      then='account_type')
+    ...      then='account_type'
+    ... )
     >>> # Complex conditions can be created using Q objects
     >>> When(Q(name__startswith="John") | Q(name__startswith="Paul"),
-    ...      then='name')
+    ...      then='name'
+    ... )
 
 Keep in mind that each of these values can be an expression.
 
@@ -93,15 +95,18 @@ A simple example::
     >>> Client.objects.create(
     ...     name='Jane Doe',
     ...     account_type=Client.REGULAR,
-    ...     registered_on=date.today() - timedelta(days=36))
+    ...     registered_on=date.today() - timedelta(days=36)
+    ... )
     >>> Client.objects.create(
     ...     name='James Smith',
     ...     account_type=Client.GOLD,
-    ...     registered_on=date.today() - timedelta(days=5))
+    ...     registered_on=date.today() - timedelta(days=5)
+    ... )
     >>> Client.objects.create(
     ...     name='Jack Black',
     ...     account_type=Client.PLATINUM,
-    ...     registered_on=date.today() - timedelta(days=10 * 365))
+    ...     registered_on=date.today() - timedelta(days=10 * 365)
+    ...)
     >>> # Get the discount for each Client based on the account type
     >>> Client.objects.annotate(
     ...     discount=Case(
@@ -182,15 +187,18 @@ What if we want to find out how many clients there are for each
     >>> Client.objects.create(
     ...     name='Jean Grey',
     ...     account_type=Client.REGULAR,
-    ...     registered_on=date.today())
+    ...     registered_on=date.today()
+    ... )
     >>> Client.objects.create(
     ...     name='James Bond',
     ...     account_type=Client.PLATINUM,
-    ...     registered_on=date.today())
+    ...     registered_on=date.today()
+    ... )
     >>> Client.objects.create(
     ...     name='Jane Porter',
     ...     account_type=Client.PLATINUM,
-    ...     registered_on=date.today())
+    ...     registered_on=date.today()
+    ... )
     >>> # Get counts for each value of account_type
     >>> from django.db.models import IntegerField, Sum
     >>> Client.objects.aggregate(

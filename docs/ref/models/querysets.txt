@@ -891,8 +891,10 @@ For example, suppose you have these models::
         toppings = models.ManyToManyField(Topping)
 
         def __str__(self):              # __unicode__ on Python 2
-            return "%s (%s)" % (self.name, ", ".join(topping.name
-                                                     for topping in self.toppings.all()))
+            return "%s (%s)" % (
+                self.name,
+                ", ".join(topping.name or topping in self.toppings.all()),
+            )
 
 and run::
 
@@ -1636,8 +1638,11 @@ This is meant as a shortcut to boilerplatish code. For example::
 This pattern gets quite unwieldy as the number of fields in a model goes up.
 The above example can be rewritten using ``get_or_create()`` like so::
 
-    obj, created = Person.objects.get_or_create(first_name='John', last_name='Lennon',
-                      defaults={'birthday': date(1940, 10, 9)})
+    obj, created = Person.objects.get_or_create(
+        first_name='John',
+        last_name='Lennon',
+        defaults={'birthday': date(1940, 10, 9)},
+    )
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
 called ``defaults`` — will be used in a :meth:`get()` call. If an object is

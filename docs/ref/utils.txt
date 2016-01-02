@@ -318,7 +318,7 @@ Sample usage::
     >>> feed.add_item(
     ...     title="Hello",
     ...     link="http://www.holovaty.com/test/",
-    ...     description="Testing."
+    ...     description="Testing.",
     ... )
     >>> with open('test.rss', 'w') as fp:
     ...     feed.write(fp, 'utf-8')
@@ -630,15 +630,19 @@ escaping HTML.
 
     So, instead of writing::
 
-        mark_safe("%s <b>%s</b> %s" % (some_html,
-                                        escape(some_text),
-                                        escape(some_other_text),
-                                        ))
+        mark_safe("%s <b>%s</b> %s" % (
+            some_html,
+            escape(some_text),
+            escape(some_other_text),
+        ))
 
     You should instead use::
 
         format_html("{} <b>{}</b> {}",
-                    mark_safe(some_html), some_text, some_other_text)
+            mark_safe(some_html),
+            some_text,
+            some_other_text,
+        )
 
     This has the advantage that you don't need to apply :func:`escape` to each
     argument and risk a bug and an XSS vulnerability if you forget one.
@@ -661,8 +665,10 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join('\n', "<li>{} {}</li>", ((u.first_name, u.last_name)
-                                                    for u in users))
+        format_html_join(
+            '\n', "<li>{} {}</li>",
+            ((u.first_name, u.last_name) for u in users)
+        )
 
 .. function:: strip_tags(value)
 
