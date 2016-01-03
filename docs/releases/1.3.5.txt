@@ -14,7 +14,7 @@ the other we've chosen to take further steps to tighten up Django's code in
 response to independent discovery of potential problems from multiple sources.
 
 Host header poisoning
----------------------
+=====================
 
 Several earlier Django security releases focused on the issue of poisoning the
 HTTP Host header, causing Django to generate URLs pointing to arbitrary,
@@ -35,7 +35,7 @@ Any deviation from this will now be rejected, raising the exception
 :exc:`django.core.exceptions.SuspiciousOperation`.
 
 Redirect poisoning
-------------------
+==================
 
 Also following up on a previous issue: in July of this year, we made changes to
 Django's HTTP redirect classes, performing additional validation of the scheme

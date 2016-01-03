@@ -5,7 +5,7 @@
 .. module:: django.conf.urls
 
 static()
---------
+========
 
 .. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
@@ -19,7 +19,7 @@ Helper function to return a URL pattern for serving files in debug mode::
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 url()
------
+=====
 
 .. function:: url(regex, view, kwargs=None, name=None)
 
@@ -37,7 +37,7 @@ See :ref:`Naming URL patterns <naming-url-patterns>` for why the ``name``
 parameter is useful.
 
 include()
----------
+=========
 
 .. function:: include(module, namespace=None, app_name=None)
               include(pattern_list)
@@ -86,7 +86,7 @@ See :ref:`including-other-urlconfs` and :ref:`namespaces-and-include`.
     application namespace or remove the instance namespace.
 
 handler400
-----------
+==========
 
 .. data:: handler400
 
@@ -102,7 +102,7 @@ See the documentation about :ref:`the 400 (bad request) view
 <http_bad_request_view>` for more information.
 
 handler403
-----------
+==========
 
 .. data:: handler403
 
@@ -118,7 +118,7 @@ See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
 
 handler404
-----------
+==========
 
 .. data:: handler404
 
@@ -133,7 +133,7 @@ See the documentation about :ref:`the 404 (HTTP Not Found) view
 <http_not_found_view>` for more information.
 
 handler500
-----------
+==========
 
 .. data:: handler500
 

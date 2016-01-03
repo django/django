@@ -7,7 +7,7 @@ problems (``contrib.*``). For easier maintenance and to trim the size of the
 codebase, a few of those applications have been moved out to separate projects.
 
 Localflavor
-~~~~~~~~~~~
+===========
 
 ``django-localflavor`` is a collection of utilities for particular countries
 and cultures.
@@ -17,7 +17,7 @@ and cultures.
 * `PyPI <https://pypi.python.org/pypi/django-localflavor>`__
 
 Comments
-~~~~~~~~
+========
 
 ``django-contrib-comments`` can be used to attach comments to any model, so you
 can use it for comments on blog entries, photos, book chapters, or anything
@@ -29,7 +29,7 @@ product like Disqus.
 * `PyPI <https://pypi.python.org/pypi/django-contrib-comments>`__
 
 Formtools
-~~~~~~~~~
+=========
 
 ``django-formtools`` is a collection of assorted utilities to work with forms.
 

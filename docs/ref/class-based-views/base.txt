@@ -14,7 +14,7 @@ ancestor classes are  documented under the section title of **Ancestors (MRO)**.
 MRO is an acronym for Method Resolution Order.
 
 View
-----
+====
 
 .. class:: django.views.generic.base.View
 
@@ -103,7 +103,7 @@ View
         list of the allowed HTTP method names for the view.
 
 TemplateView
-------------
+============
 
 .. class:: django.views.generic.base.TemplateView
 
@@ -155,7 +155,7 @@ TemplateView
       the keyword arguments captured from the URL pattern that served the view.
 
 RedirectView
-------------
+============
 
 .. class:: django.views.generic.base.RedirectView
 

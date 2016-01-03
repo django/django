@@ -158,7 +158,7 @@ It's easy, no matter which way you choose.
 .. _installing-official-release:
 
 Installing an official release with ``pip``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 This is the recommended way to install Django.
 
@@ -183,7 +183,7 @@ This is the recommended way to install Django.
 .. _standalone pip installer: https://pip.pypa.io/en/latest/installing.html#install-pip
 
 Installing a distribution-specific package
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 Check the :doc:`distribution specific notes </misc/distributions>` to see if
 your platform/distribution provides official Django packages/installers.
@@ -194,7 +194,7 @@ contain the latest release of Django.
 .. _installing-development-version:
 
 Installing the development version
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 .. admonition:: Tracking Django development
 

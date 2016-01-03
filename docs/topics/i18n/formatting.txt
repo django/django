@@ -1,5 +1,3 @@
-.. _format-localization:
-
 ===================
 Format localization
 ===================

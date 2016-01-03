@@ -11,7 +11,7 @@ to get started? This is the section for you.
     tutorial will give you an introduction to the tools and the workflow.
 
 First steps
------------
+===========
 
 Start with these easy tasks to discover Django's development process.
 
@@ -70,7 +70,7 @@ Start with these easy tasks to discover Django's development process.
 
 
 Guidelines
-----------
+==========
 
 As a newcomer on a large project, it's easy to experience frustration. Here's
 some advice to make your work on Django more useful and rewarding.
@@ -138,7 +138,7 @@ some advice to make your work on Django more useful and rewarding.
 .. _new-contributors-faq:
 
 FAQ
----
+===
 
 1. **This ticket I care about has been ignored for days/weeks/months! What can
    I do to get it committed?**

@@ -16,7 +16,7 @@ Class-based views API reference. For introductory material, see the
    flattened-index
 
 Specification
--------------
+=============
 
 Each request served by a class-based view has an independent state; therefore,
 it is safe to store state variables on the instance (i.e., ``self.foo = 3`` is
@@ -44,7 +44,7 @@ previous example, this means that every request on ``MyView`` is able to use
 the class (return ``True`` on a ``hasattr`` check).
 
 Base vs Generic views
----------------------
+=====================
 
 Base class-based views can be thought of as *parent* views, which can be
 used by themselves or inherited from. They may not provide all the

@@ -19,7 +19,7 @@ This section explains how writers can craft their documentation changes
 in the most useful and least error-prone ways.
 
 Getting the raw documentation
------------------------------
+=============================
 
 Though Django's documentation is intended to be read as HTML at
 https://docs.djangoproject.com/, we edit it as a collection of text files for
@@ -36,7 +36,7 @@ to have the docs for the last release be up-to-date and correct (see
 :ref:`differences-between-doc-versions`).
 
 Getting started with Sphinx
----------------------------
+===========================
 
 Django's documentation uses the Sphinx__ documentation system, which in turn
 is based on docutils__. The basic idea is that lightly-formatted plain-text
@@ -66,7 +66,7 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 metadata, indexing, and cross-references.
 
 How the documentation is organized
-----------------------------------
+==================================
 
 The documentation is organized into several categories:
 
@@ -117,7 +117,7 @@ The documentation is organized into several categories:
   repeat the same material.
 
 Writing style
--------------
+=============
 
 When using pronouns in reference to a hypothetical person, such as "a user with
 a session cookie", gender neutral pronouns (they/their/them) should be used.
@@ -130,7 +130,7 @@ Instead of:
 * himself or herself... use themselves.
 
 Commonly used terms
--------------------
+===================
 
 Here are some style guidelines on commonly used terms throughout the
 documentation:
@@ -160,7 +160,7 @@ documentation:
 * **website** -- use one word, without capitalization.
 
 Django-specific terminology
----------------------------
+===========================
 
 * **model** -- it's not capitalized.
 
@@ -172,7 +172,7 @@ Django-specific terminology
 * **view** -- it's not capitalized.
 
 Guidelines for reStructuredText files
--------------------------------------
+=====================================
 
 These guidelines regulate the format of our reST (reStructuredText)
 documentation:
@@ -199,8 +199,26 @@ documentation:
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
 
+* Use these heading styles::
+
+    ===
+    One
+    ===
+
+    Two
+    ===
+
+    Three
+    -----
+
+    Four
+    ~~~~
+
+    Five
+    ^^^^
+
 Django-specific markup
-----------------------
+======================
 
 Besides the `Sphinx built-in markup`__, Django's docs defines some extra
 description units:
@@ -251,7 +269,7 @@ __ http://sphinx-doc.org/markup/
 .. _documenting-new-features:
 
 Documenting new features
-------------------------
+========================
 
 Our policy for new features is:
 
@@ -309,7 +327,7 @@ We can simply remove the ``.. versionadded:: A.B`` annotation without any
 indentation changes when the time comes.
 
 Minimizing images
------------------
+=================
 
 Optimize image compression where possible. For PNG files, use OptiPNG and
 AdvanceCOMP's ``advpng``:
@@ -324,7 +342,7 @@ This is based on OptiPNG version 0.7.5. Older versions may complain about the
 ``--strip all`` option being lossy.
 
 An example
-----------
+==========
 
 For a quick example of how it all fits together, consider this hypothetical
 example:
@@ -377,7 +395,7 @@ example:
     .. setting:: ADMINS
 
     ADMINS
-    ------
+    ======
 
     Default: ``[]`` (Empty list)
 
@@ -400,7 +418,7 @@ That's basically how everything fits together.
 .. _improving-the-documentation:
 
 Improving the documentation
----------------------------
+===========================
 
 A few small improvements can be made to make the documentation read and
 look better:
@@ -451,7 +469,7 @@ look better:
 .. _documentation-spelling-check:
 
 Spelling check
---------------
+==============
 
 Before you commit your docs, it's a good idea to run the spelling checker.
 You'll need to install a couple packages first:
@@ -475,7 +493,7 @@ one of the following:
   to ``docs/spelling_wordlist`` (please keep the list in alphabetical order).
 
 Translating documentation
--------------------------
+=========================
 
 See :ref:`Localizing the Django documentation <translating-documentation>` if
 you'd like to help translate the documentation into another language.
@@ -483,7 +501,7 @@ you'd like to help translate the documentation into another language.
 .. _django-admin-manpage:
 
 ``django-admin`` man page
--------------------------
+=========================
 
 Sphinx can generate a manual page for the
 :doc:`django-admin </ref/django-admin>` command. This is configured in

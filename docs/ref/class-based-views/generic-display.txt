@@ -6,7 +6,7 @@ The two following generic class-based views are designed to display data. On
 many projects they are typically the most commonly used views.
 
 DetailView
-----------
+==========
 
 .. class:: django.views.generic.detail.DetailView
 
@@ -73,7 +73,7 @@ DetailView
         <p>Date: {{ now|date }}</p>
 
 ListView
---------
+========
 
 .. class:: django.views.generic.list.ListView
 

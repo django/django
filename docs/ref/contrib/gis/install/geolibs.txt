@@ -120,10 +120,10 @@ script, compile, and install::
     $ cd ..
 
 Troubleshooting
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 Can't find GEOS library
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 When GeoDjango can't find GEOS, this error is raised:
 
@@ -139,7 +139,7 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 .. _geoslibrarypath:
 
 ``GEOS_LIBRARY_PATH``
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
@@ -222,10 +222,10 @@ __ https://trac.osgeo.org/gdal/wiki/GdalOgrInPython
 .. _gdaltrouble:
 
 Troubleshooting
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 Can't find GDAL library
-~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^
 
 When GeoDjango can't find the GDAL library, the ``HAS_GDAL`` flag
 will be false:
@@ -242,7 +242,7 @@ The solution is to properly configure your :ref:`libsettings` *or* set
 .. _gdallibrarypath:
 
 ``GDAL_LIBRARY_PATH``
-~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^
 
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`

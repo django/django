@@ -1,6 +1,6 @@
-########################
+========================
 One-to-one relationships
-########################
+========================
 
 To define a one-to-one relationship, use :ref:`ref-onetoone`.
 
