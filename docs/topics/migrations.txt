@@ -618,6 +618,8 @@ After this has been done, you must then transition the squashed migration to
 a normal initial migration, by:
 
 - Deleting all the migration files it replaces
+- Updating all migrations that depend on the deleted files to depend on
+  the squashed migration instead
 - Removing the ``replaces`` argument in the ``Migration`` class of the
   squashed migration (this is how Django tells that it is a squashed migration)
 
