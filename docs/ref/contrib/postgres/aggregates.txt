@@ -19,17 +19,17 @@ These functions are described in more detail in the `PostgreSQL docs
         {'arr': [0, 1, 2]}
 
 General-purpose aggregation functions
--------------------------------------
+=====================================
 
 ArrayAgg
-~~~~~~~~
+--------
 
 .. class:: ArrayAgg(expression, **extra)
 
     Returns a list of values, including nulls, concatenated into an array.
 
 BitAnd
-~~~~~~
+------
 
 .. class:: BitAnd(expression, **extra)
 
@@ -37,7 +37,7 @@ BitAnd
     ``None`` if all values are null.
 
 BitOr
-~~~~~
+-----
 
 .. class:: BitOr(expression, **extra)
 
@@ -45,7 +45,7 @@ BitOr
     ``None`` if all values are null.
 
 BoolAnd
-~~~~~~~~
+-------
 
 .. class:: BoolAnd(expression, **extra)
 
@@ -53,7 +53,7 @@ BoolAnd
     null or if there are no values, otherwise ``False`` .
 
 BoolOr
-~~~~~~
+------
 
 .. class:: BoolOr(expression, **extra)
 
@@ -61,7 +61,7 @@ BoolOr
     values are null or if there are no values, otherwise ``False``.
 
 StringAgg
-~~~~~~~~~
+---------
 
 .. class:: StringAgg(expression, delimiter)
 
@@ -73,16 +73,16 @@ StringAgg
         Required argument. Needs to be a string.
 
 Aggregate functions for statistics
-----------------------------------
+==================================
 
 ``y`` and ``x``
-~~~~~~~~~~~~~~~
+---------------
 
 The arguments ``y`` and ``x`` for all these functions can be the name of a
 field or an expression returning a numeric data. Both are required.
 
 Corr
-~~~~
+----
 
 .. class:: Corr(y, x)
 
@@ -90,7 +90,7 @@ Corr
     aren't any matching rows.
 
 CovarPop
-~~~~~~~~
+--------
 
 .. class:: CovarPop(y, x, sample=False)
 
@@ -106,7 +106,7 @@ CovarPop
         population covariance.
 
 RegrAvgX
-~~~~~~~~
+--------
 
 .. class:: RegrAvgX(y, x)
 
@@ -114,7 +114,7 @@ RegrAvgX
     ``float``, or ``None`` if there aren't any matching rows.
 
 RegrAvgY
-~~~~~~~~
+--------
 
 .. class:: RegrAvgY(y, x)
 
@@ -122,7 +122,7 @@ RegrAvgY
     ``float``, or ``None`` if there aren't any matching rows.
 
 RegrCount
-~~~~~~~~~
+---------
 
 .. class:: RegrCount(y, x)
 
@@ -130,7 +130,7 @@ RegrCount
     are not null.
 
 RegrIntercept
-~~~~~~~~~~~~~
+-------------
 
 .. class:: RegrIntercept(y, x)
 
@@ -139,7 +139,7 @@ RegrIntercept
     matching rows.
 
 RegrR2
-~~~~~~
+------
 
 .. class:: RegrR2(y, x)
 
@@ -147,7 +147,7 @@ RegrR2
     ``None`` if there aren't any matching rows.
 
 RegrSlope
-~~~~~~~~~
+---------
 
 .. class:: RegrSlope(y, x)
 
@@ -156,7 +156,7 @@ RegrSlope
     matching rows.
 
 RegrSXX
-~~~~~~~
+-------
 
 .. class:: RegrSXX(y, x)
 
@@ -164,7 +164,7 @@ RegrSXX
     variable) as a ``float``, or ``None`` if there aren't any matching rows.
 
 RegrSXY
-~~~~~~~
+-------
 
 .. class:: RegrSXY(y, x)
 
@@ -173,7 +173,7 @@ RegrSXY
     matching rows.
 
 RegrSYY
-~~~~~~~
+-------
 
 .. class:: RegrSYY(y, x)
 
@@ -181,7 +181,7 @@ RegrSYY
     variable)  as a ``float``, or ``None`` if there aren't any matching rows.
 
 Usage examples
---------------
+==============
 
 We will use this example table::
 

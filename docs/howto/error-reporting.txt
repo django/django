@@ -1,3 +1,4 @@
+===============
 Error reporting
 ===============
 
@@ -12,10 +13,10 @@ You need to keep track of errors that occur in deployed sites, so Django can be
 configured to create reports with details about those errors.
 
 Email reports
--------------
+=============
 
 Server errors
-~~~~~~~~~~~~~
+-------------
 
 When :setting:`DEBUG` is ``False``, Django will email the users listed in the
 :setting:`ADMINS` setting whenever your code raises an unhandled exception and
@@ -49,7 +50,7 @@ To activate this behavior, put the email addresses of the recipients in the
     </topics/logging>`.
 
 404 errors
-~~~~~~~~~~
+----------
 
 Django can also be configured to email errors about broken links (404 "page
 not found" errors). Django sends emails about 404 errors when:
@@ -119,7 +120,7 @@ and override its methods.
 .. _filtering-error-reports:
 
 Filtering error reports
------------------------
+=======================
 
 .. warning::
 
@@ -130,7 +131,7 @@ Filtering error reports
     through email).
 
 Filtering sensitive information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 .. currentmodule:: django.views.decorators.debug
 
@@ -231,7 +232,7 @@ production environment (that is, where :setting:`DEBUG` is set to ``False``):
 .. _custom-error-reports:
 
 Custom error reports
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 All :func:`sensitive_variables` and :func:`sensitive_post_parameters` do is,
 respectively, annotate the decorated function with the names of sensitive

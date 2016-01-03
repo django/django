@@ -141,7 +141,7 @@ All file upload handlers should be subclasses of
 handlers wherever you wish.
 
 Required methods
-~~~~~~~~~~~~~~~~
+----------------
 
 Custom file upload handlers **must** define the following methods:
 
@@ -175,7 +175,7 @@ Custom file upload handlers **must** define the following methods:
     the ``UploadedFile`` object should come from subsequent upload handlers.
 
 Optional methods
-~~~~~~~~~~~~~~~~
+----------------
 
 Custom upload handlers may also define any of the following optional methods or
 attributes:

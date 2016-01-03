@@ -180,7 +180,7 @@ Related objects reference
 .. _direct-assignment:
 
 Direct Assignment
------------------
+=================
 
 A related object set can be replaced in bulk with one operation by assigning a
 new iterable of objects to it::

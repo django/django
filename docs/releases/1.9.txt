@@ -29,7 +29,7 @@ What's new in Django 1.9
 ========================
 
 Performing actions after a transaction commit
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 The new :func:`~django.db.transaction.on_commit` hook allows performing actions
 after a database transaction is successfully committed. This is useful for
@@ -42,7 +42,7 @@ integrated into Django.
 .. _django-transaction-hooks: https://pypi.python.org/pypi/django-transaction-hooks
 
 Password validation
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 Django now offers password validation to help prevent the usage of weak
 passwords by users. The validation is integrated in the included password
@@ -82,7 +82,7 @@ the included auth forms for your project, you could set, for example::
 See :ref:`password-validation` for more details.
 
 Permission mixins for class-based views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 Django now ships with the mixins
 :class:`~django.contrib.auth.mixins.AccessMixin`,
@@ -119,7 +119,7 @@ though:
 .. _django-braces: http://django-braces.readthedocs.org/en/latest/index.html
 
 New styling for ``contrib.admin``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The admin sports a modern, flat design with new SVG icons which look perfect
 on HiDPI screens. It still provides a fully-functional experience to `YUI's
@@ -129,7 +129,7 @@ degradation.
 .. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
 
 Running tests in parallel
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 The :djadmin:`test` command now supports a :djadminopt:`--parallel` option to
 run a project's tests in multiple processes in parallel.
@@ -144,10 +144,10 @@ This option is enabled by default for Django's own test suite provided:
 - the database backend supports it (all the built-in backends but Oracle)
 
 Minor features
-~~~~~~~~~~~~~~
+--------------
 
 :mod:`django.contrib.admin`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Admin views now have ``model_admin`` or ``admin_site`` attributes.
 
@@ -185,13 +185,13 @@ Minor features
 * JavaScript slug generation now supports Romanian characters.
 
 :mod:`django.contrib.admindocs`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The model section of the ``admindocs`` now also describes methods that take
   arguments, rather than ignoring them.
 
 :mod:`django.contrib.auth`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher has been increased
   by 20%. This backwards compatible change will not affect users who have
@@ -219,14 +219,14 @@ Minor features
   ``extra_email_context`` parameter.
 
 :mod:`django.contrib.contenttypes`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * It's now possible to use
   :attr:`~django.db.models.Options.order_with_respect_to` with a
   ``GenericForeignKey``.
 
 :mod:`django.contrib.gis`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * All ``GeoQuerySet`` methods have been deprecated and replaced by
   :doc:`equivalent database functions </ref/contrib/gis/functions>`. As soon
@@ -256,7 +256,7 @@ Minor features
   MaxMind's GeoLite2 databases which includes support for IPv6 addresses.
 
 :mod:`django.contrib.postgres`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Added support for the :lookup:`rangefield.contained_by` lookup for some built
   in fields which correspond to the range fields.
@@ -269,7 +269,7 @@ Minor features
   function.
 
 :mod:`django.contrib.sessions`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The session model and ``SessionStore`` classes for the ``db`` and
   ``cached_db`` backends are refactored to allow a custom database session
@@ -277,7 +277,7 @@ Minor features
   :ref:`extending-database-backed-session-engines` for more details.
 
 :mod:`django.contrib.sites`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :func:`~django.contrib.sites.shortcuts.get_current_site` now handles the case
   where ``request.get_host()`` returns ``domain:port``, e.g.
@@ -286,14 +286,14 @@ Minor features
   lookup is retried with the domain part only.
 
 :mod:`django.contrib.syndication`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Support for multiple enclosures per feed item has been added. If multiple
   enclosures are defined on a RSS feed, an exception is raised as RSS feeds,
   unlike Atom feeds, do not support multiple enclosures per feed item.
 
 Cache
-^^^^^
+~~~~~
 
 * ``django.core.cache.backends.base.BaseCache`` now has a ``get_or_set()``
   method.
@@ -303,7 +303,7 @@ Cache
   to better prevent caching. This was also added in Django 1.8.8.
 
 CSRF
-^^^^
+~~~~
 
 * The request header's name used for CSRF authentication can be customized
   with :setting:`CSRF_HEADER_NAME`.
@@ -316,14 +316,14 @@ CSRF
   cross-origin unsafe requests (e.g. ``POST``) over HTTPS.
 
 Database backends
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 * The PostgreSQL backend (``django.db.backends.postgresql_psycopg2``) is also
   available as ``django.db.backends.postgresql``. The old name will continue to
   be available for backwards compatibility.
 
 File Storage
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 * :meth:`Storage.get_valid_name()
   <django.core.files.storage.Storage.get_valid_name>` is now called when
@@ -333,7 +333,7 @@ File Storage
   Python 3.
 
 Forms
-^^^^^
+~~~~~
 
 * :class:`~django.forms.ModelForm` accepts the new ``Meta`` option
   ``field_classes`` to customize the type of the fields. See
@@ -365,7 +365,7 @@ Forms
   :meth:`~django.forms.Field.get_bound_field()` method.
 
 Generic Views
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 * Class-based views generated using ``as_view()`` now have ``view_class``
   and ``view_initkwargs`` attributes.
@@ -375,7 +375,7 @@ Generic Views
   of methods <decorating-class-based-views>`.
 
 Internationalization
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 * The :func:`django.views.i18n.set_language` view now properly redirects to
   :ref:`translated URLs <url-internationalization>`, when available.
@@ -411,7 +411,7 @@ Internationalization
 * Two new languages are available: Colombian Spanish and Scottish Gaelic.
 
 Management Commands
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 * The new :djadmin:`sendtestemail` command lets you send a test email to
   easily confirm that email sending through Django is working.
@@ -444,7 +444,7 @@ Management Commands
   ``--no-input`` as an alias for that option.
 
 Migrations
-^^^^^^^^^^
+~~~~~~~~~~
 
 * Initial migrations are now marked with an :attr:`initial = True
   <django.db.migrations.Migration.initial>` class attribute which allows
@@ -476,7 +476,7 @@ Migrations
   migration from which migrations will be squashed.
 
 Models
-^^^^^^
+~~~~~~
 
 * :meth:`QuerySet.bulk_create() <django.db.models.query.QuerySet.bulk_create>`
   now works on proxy models.
@@ -548,7 +548,7 @@ Models
   ``bulk_create()``.
 
 Requests and Responses
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 * Unless :attr:`HttpResponse.reason_phrase
   <django.http.HttpResponse.reason_phrase>` is explicitly set, it now is
@@ -592,7 +592,7 @@ Requests and Responses
   the requested URL.
 
 Templates
-^^^^^^^^^
+~~~~~~~~~
 
 * Template tags created with the :meth:`~django.template.Library.simple_tag`
   helper can now store results in a template variable by using the ``as``
@@ -636,7 +636,7 @@ Templates
   rendering, speeding up reuse in places such as for loops.
 
 Tests
-^^^^^
+~~~~~
 
 * Added the :meth:`json() <django.test.Response.json>` method to test client
   responses to give access to the response body as JSON.
@@ -647,7 +647,7 @@ Tests
   :meth:`~django.test.Client.login()`.
 
 URLs
-^^^^
+~~~~
 
 * Regular expression lookaround assertions are now allowed in URL patterns.
 
@@ -659,7 +659,7 @@ URLs
 * System checks have been added for common URL pattern mistakes.
 
 Validators
-^^^^^^^^^^
+~~~~~~~~~~
 
 * Added :func:`django.core.validators.int_list_validator` to generate
   validators of strings containing integers separated with a custom character.
@@ -682,7 +682,7 @@ Backwards incompatible changes in 1.9
     may appear as a backwards incompatible change.
 
 Database backend API
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 * A couple of new tests rely on the ability of the backend to introspect column
   defaults (returning the result as ``Field.default``). You can set the
@@ -727,13 +727,13 @@ Database backend API
   ``DatabaseCreation.get_test_db_clone_settings()``.
 
 Default settings that were tuples are now lists
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------
 
 The default settings in ``django.conf.global_settings`` were a combination of
 lists and tuples. All settings that were formerly tuples are now lists.
 
 ``is_usable`` attribute on template loaders is removed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------------
 
 Django template loaders previously required an ``is_usable`` attribute to be
 defined. If a loader was configured in the template settings and this attribute
@@ -743,7 +743,7 @@ attribute is now removed and the egg loader instead fails at runtime if
 setuptools is not installed.
 
 Related set direct assignment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 :ref:`Direct assignment <direct-assignment>` of related objects in the ORM used
 to perform a ``clear()`` followed by a call to ``add()``. This caused
@@ -763,7 +763,7 @@ assignment for many-to-many relations and as a consequence now use the new
 behavior.
 
 Filesystem-based template loaders catch more specific exceptions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------------
 
 When using the :class:`filesystem.Loader <django.template.loaders.filesystem.Loader>`
 or :class:`app_directories.Loader <django.template.loaders.app_directories.Loader>`
@@ -776,7 +776,7 @@ does not exist. All other situations result in the original ``IOError`` being
 raised.
 
 HTTP redirects no longer forced to absolute URIs
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------------
 
 Relative redirects are no longer converted to absolute URIs. :rfc:`2616`
 required the ``Location`` header in redirect responses to be an absolute URI,
@@ -791,19 +791,19 @@ replaced by ``self.assertRedirects(response, '/some-url/')`` (unless the
 redirection specifically contained an absolute URL, of course).
 
 Dropped support for PostgreSQL 9.0
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------
 
 Upstream support for PostgreSQL 9.0 ended in September 2015. As a consequence,
 Django 1.9 sets 9.1 as the minimum PostgreSQL version it officially supports.
 
 Dropped support for Oracle 11.1
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Upstream support for Oracle 11.1 ended in August 2015. As a consequence, Django
 1.9 sets 11.2 as the minimum Oracle version it officially supports.
 
 Bulk behavior of ``add()`` method of related managers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 To improve performance, the ``add()`` methods of the related managers created
 by ``ForeignKey`` and ``GenericForeignKey`` changed from a series of
@@ -812,7 +812,7 @@ that ``pre_save`` and ``post_save`` signals aren't sent anymore. You can use
 the ``bulk=False`` keyword argument to revert to the previous behavior.
 
 Template ``LoaderOrigin`` and ``StringOrigin`` are removed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------
 
 In previous versions of Django, when a template engine was initialized with
 debug as ``True``, an instance of ``django.template.loader.LoaderOrigin`` or
@@ -826,7 +826,7 @@ Django 2.0.
 .. _default-logging-changes-19:
 
 Changes to the default logging configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------
 
 To make it easier to write custom logging configurations, Django's default
 logging configuration no longer defines 'django.request' and 'django.security'
@@ -845,7 +845,7 @@ If you are overriding Django's default logging, you should check to see how
 your configuration merges with the new defaults.
 
 ``HttpRequest`` details in error reporting
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------------------
 
 It was redundant to display the full details of the
 :class:`~django.http.HttpRequest` each time it appeared as a stack frame
@@ -860,7 +860,7 @@ traceback of the same structure as in the case of AJAX requests. The traceback
 details are rendered by the ``ExceptionReporter.get_traceback_text()`` method.
 
 Removal of time zone aware global adapters and converters for datetimes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------------------
 
 Django no longer registers global adapters and converters for managing time
 zone information on :class:`~datetime.datetime` values sent to the database as
@@ -895,7 +895,7 @@ even if you're using :meth:`raw() <django.db.models.query.QuerySet.raw>`
 queries. The ORM takes care of managing time zone information.
 
 Template tag modules are imported when templates are configured
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------------
 
 The :class:`~django.template.backends.django.DjangoTemplates` backend now
 performs discovery on installed template tag modules when instantiated. This
@@ -907,7 +907,7 @@ rather than when a template with a :ttag:`{% load %}<load>` tag is first
 compiled.
 
 ``django.template.base.add_to_builtins()`` is removed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 Although it was a private API, projects commonly used ``add_to_builtins()`` to
 make template tags and filters available without using the
@@ -919,7 +919,7 @@ define built-in libraries via the ``'builtins'`` key of :setting:`OPTIONS
 .. _simple-tag-conditional-escape-fix:
 
 ``simple_tag`` now wraps tag output in ``conditional_escape``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------
 
 In general, template tags do not autoescape their contents, and this behavior is
 :ref:`documented <tags-auto-escaping>`. For tags like
@@ -960,7 +960,7 @@ Tags that follow these rules will be correct and safe whether they are run on
 Django 1.9+ or earlier.
 
 ``Paginator.page_range``
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 :attr:`Paginator.page_range <django.core.paginator.Paginator.page_range>` is
 now an iterator instead of a list.
@@ -973,7 +973,7 @@ Existing code that depends on ``list`` specific features, such as indexing,
 can be ported by converting the iterator into a ``list`` using ``list()``.
 
 Implicit ``QuerySet`` ``__in`` lookup removed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------
 
 In earlier versions, queries such as::
 
@@ -991,7 +991,7 @@ subquery returns multiple results, at least some databases will throw an error.
 .. _admin-browser-support-19:
 
 ``contrib.admin`` browser support
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The admin no longer supports Internet Explorer 8 and below, as these browsers
 have reached end-of-life.
@@ -1014,7 +1014,7 @@ a Django application with this structure::
 .. _syntax-error-old-setuptools-django-19:
 
 ``SyntaxError`` when installing Django setuptools 5.5.x
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------
 
 When installing Django 1.9+ with setuptools 5.5.x, you'll see::
 
@@ -1036,7 +1036,7 @@ using pip, you can upgrade pip using ``pip install -U pip`` which will also
 upgrade setuptools.
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
 * The jQuery static files in ``contrib.admin`` have been moved into a
   ``vendor/jquery`` subdirectory.
@@ -1159,7 +1159,7 @@ Features deprecated in 1.9
 ==========================
 
 ``assignment_tag()``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 Django 1.4 added the ``assignment_tag`` helper to ease the creation of
 template tags that store results in a template variable. The
@@ -1168,7 +1168,7 @@ ability, making the ``assignment_tag`` obsolete. Tags that use
 ``assignment_tag`` should be updated to use ``simple_tag``.
 
 ``{% cycle %}`` syntax with comma-separated arguments
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 The :ttag:`cycle` tag supports an inferior old syntax from previous Django
 versions:
@@ -1181,7 +1181,7 @@ Its parsing caused bugs with the current syntax, so support for the old syntax
 will be removed in Django 1.10 following an accelerated deprecation.
 
 ``ForeignKey`` and ``OneToOneField`` ``on_delete`` argument
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------------
 
 In order to increase awareness about cascading model deletion, the
 ``on_delete`` argument of ``ForeignKey`` and ``OneToOneField`` will be required
@@ -1194,7 +1194,7 @@ can also pass it as the second positional argument if you don't care about
 compatibility with older versions of Django.
 
 ``Field.rel`` changes
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 ``Field.rel`` and its methods and attributes have changed to match the related
 fields API. The ``Field.rel`` attribute is renamed to ``remote_field`` and many
@@ -1203,7 +1203,7 @@ of its methods and attributes are either changed or renamed.
 The aim of these changes is to provide a documented API for relation fields.
 
 ``GeoManager`` and ``GeoQuerySet`` custom methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------
 
 All custom ``GeoQuerySet`` methods (``area()``, ``distance()``, ``gml()``, ...)
 have been replaced by equivalent geographic expressions in annotations (see in
@@ -1213,7 +1213,7 @@ methods, you can simply remove the ``objects = GeoManager()`` lines from your
 models.
 
 Template loader APIs have changed
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 Django template loaders have been updated to allow recursive template
 extending. This change necessitated a new template loader API. The old
@@ -1222,7 +1222,7 @@ Details about the new API can be found :ref:`in the template loader
 documentation <custom-template-loaders>`.
 
 Passing a 3-tuple or an ``app_name`` to :func:`~django.conf.urls.include()`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------------------------
 
 The instance namespace part of passing a tuple as an argument to ``include()``
 has been replaced by passing the ``namespace`` argument to ``include()``. For
@@ -1291,7 +1291,7 @@ is deprecated. Instead, pass ``admin.site.urls`` directly to
     ]
 
 URL application namespace required if setting an instance namespace
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
 In the past, an instance namespace without an application namespace
 would serve the same purpose as the application namespace, but it was
@@ -1300,7 +1300,7 @@ with the same name. Includes that specify an instance namespace require that
 the included URLconf sets an application namespace.
 
 ``current_app`` parameter to ``contrib.auth`` views
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------
 
 All views in ``django.contrib.auth.views`` have the following structure::
 
@@ -1318,14 +1318,14 @@ consistency, these views will require the caller to set ``current_app`` on the
 ``request`` instead of passing it in a separate argument.
 
 ``django.contrib.gis.geoip``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 The :mod:`django.contrib.gis.geoip2` module supersedes
 ``django.contrib.gis.geoip``. The new module provides a similar API except that
 it doesn't provide the legacy GeoIP-Python API compatibility methods.
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
 * The ``weak`` argument to ``django.dispatch.signals.Signal.disconnect()`` has
   been deprecated as it has no effect.

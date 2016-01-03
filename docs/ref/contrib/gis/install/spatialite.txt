@@ -20,13 +20,13 @@ __ http://www.gaia-gis.it/gaia-sins/
 .. _spatialite_source:
 
 Installing from source
-~~~~~~~~~~~~~~~~~~~~~~
+======================
 
 :doc:`GEOS and PROJ.4</ref/contrib/gis/install/geolibs>` should be installed
 prior to building SpatiaLite.
 
 SQLite
-^^^^^^
+------
 
 Check first if SQLite is compiled with the `R*Tree module`__. Run the sqlite3
 command line interface and enter the following query::
@@ -57,7 +57,7 @@ __ https://www.sqlite.org/download.html
 .. _spatialitebuild:
 
 SpatiaLite library (``libspatialite``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------------------
 
 Get the latest SpatiaLite library source bundle from the
 `download page`__::
@@ -81,13 +81,13 @@ __ http://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 .. _spatialite_macosx:
 
 Mac OS X-specific instructions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==============================
 
 To install the SpatiaLite library and tools, Mac OS X users can choose between
 :ref:`kyngchaos` and `Homebrew`_.
 
 KyngChaos
-^^^^^^^^^
+---------
 
 First, follow the instructions in the :ref:`kyngchaos` section.
 
@@ -109,7 +109,7 @@ add the following to your ``settings.py``::
 __ http://www.gaia-gis.it/spatialite-2.3.1/binaries.html
 
 Homebrew
-^^^^^^^^
+--------
 
 `Homebrew`_ handles all the SpatiaLite related packages on your behalf,
 including SQLite3, SpatiaLite, PROJ, and GEOS. Install them like this::
@@ -128,7 +128,7 @@ following to your ``settings.py``::
 .. _create_spatialite_db:
 
 Creating a spatial database for SpatiaLite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================================
 
 When running ``manage.py migrate`` with a SQLite or SpatiaLite database, the
 database file will be automatically created if it doesn't exist. Django will

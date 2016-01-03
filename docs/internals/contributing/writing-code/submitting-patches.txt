@@ -7,7 +7,7 @@ with associated patches will get fixed *far* more quickly than those
 without patches.
 
 Typo fixes and trivial documentation changes
---------------------------------------------
+============================================
 
 If you are fixing a really trivial issue, for example changing a word in the
 documentation, the preferred way to provide the patch is using GitHub pull
@@ -16,7 +16,7 @@ requests without a Trac ticket.
 See the :doc:`working-with-git` for more details on how to use pull requests.
 
 "Claiming" tickets
-------------------
+==================
 
 In an open-source project with hundreds of contributors around the world, it's
 important to manage communication efficiently so that work doesn't get
@@ -62,7 +62,7 @@ and time availability), claim it by following these steps:
 .. _Contributor License Agreement: https://www.djangoproject.com/foundation/cla/
 
 Ticket claimers' responsibility
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Once you've claimed a ticket, you have a responsibility to work on that ticket
 in a reasonably timely fashion. If you don't have time to work on it, either
@@ -80,7 +80,7 @@ your claim on the ticket may be revoked.
 As always, more communication is better than less communication!
 
 Which tickets should be claimed?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------
 
 Of course, going through the steps of claiming tickets is overkill in some
 cases.
@@ -96,7 +96,7 @@ or not, to submit patches to a ticket if you happen to have a patch ready.
 .. _patch-style:
 
 Patch style
------------
+===========
 
 Make sure that any contribution you do fulfills at least the following
 requirements:
@@ -143,7 +143,7 @@ Regardless of the way you submit your work, follow these steps.
 .. _Development dashboard: https://dashboard.djangoproject.com/
 
 Non-trivial patches
--------------------
+===================
 
 A "non-trivial" patch is one that is more than a simple bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
@@ -157,7 +157,7 @@ ask.
 .. _deprecating-a-feature:
 
 Deprecating a feature
----------------------
+=====================
 
 There are a couple reasons that code in Django might be deprecated:
 
@@ -239,7 +239,7 @@ In each :term:`feature release`, all ``RemovedInDjangoXXWarning``\s matching
 the new version are removed.
 
 JavaScript patches
-------------------
+==================
 
 For information on JavaScript patches, see the :ref:`javascript-patches`
 documentation.
@@ -247,7 +247,7 @@ documentation.
 .. _patch-review-checklist:
 
 Patch review checklist
-----------------------
+======================
 
 Use this checklist to review a pull request. If you are reviewing a pull
 request that is not your own and it passes all the criteria below, please set
@@ -266,7 +266,7 @@ Looking to get your patch reviewed? Ensure the Trac flags on the ticket are
 set so that the ticket appears in that queue.
 
 Documentation
-~~~~~~~~~~~~~
+-------------
 
 * Does the documentation build without any errors (``make html``, or
   ``make.bat html`` on Windows, from the ``docs`` directory)?
@@ -275,13 +275,13 @@ Documentation
 * Are there any :ref:`spelling errors <documentation-spelling-check>`?
 
 Bugs
-~~~~
+----
 
 * Is there a proper regression test (the test should fail before the fix
   is applied)?
 
 New Features
-~~~~~~~~~~~~
+------------
 
 * Are there tests to "exercise" all of the new code?
 * Is there a release note in ``docs/releases/A.B.txt``?
@@ -290,12 +290,12 @@ New Features
   ``.. versionadded:: A.B`` or ``.. versionchanged:: A.B``?
 
 Deprecating a feature
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 See the :ref:`deprecating-a-feature` guide.
 
 All code changes
-~~~~~~~~~~~~~~~~
+----------------
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
@@ -306,7 +306,7 @@ All code changes
   to build the pull request against our continuous integration server.
 
 All tickets
-~~~~~~~~~~~
+-----------
 
 * Is the pull request a single squashed commit with a message that follows our
   :ref:`commit message format <committing-guidelines>`?

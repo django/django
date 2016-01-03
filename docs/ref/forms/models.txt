@@ -66,8 +66,8 @@ Model Form API reference. For introductory material about model forms, see the
 
     Arguments ``formset``, ``extra``, ``max_num``, ``can_order``,
     ``can_delete`` and ``validate_max`` are passed through to
-    :func:`~django.forms.formsets.formset_factory`. See :ref:`formsets` for
-    details.
+    :func:`~django.forms.formsets.formset_factory`. See :doc:`formsets
+    </topics/forms/formsets>` for details.
 
     See :ref:`model-formsets` for example usage.
 

@@ -697,7 +697,7 @@ GeoDjango extends :doc:`Django's admin application </ref/contrib/admin/index>`
 with support for editing geometry fields.
 
 Basics
-^^^^^^
+~~~~~~
 
 GeoDjango also supplements the Django admin by allowing users to create
 and modify geometries on a JavaScript slippy map (powered by `OpenLayers`_).
@@ -744,7 +744,7 @@ position.
 .. _osmgeoadmin-intro:
 
 ``OSMGeoAdmin``
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~
 
 With the :class:`~django.contrib.gis.admin.OSMGeoAdmin`, GeoDjango uses
 a `Open Street Map`_ layer in the admin.

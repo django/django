@@ -5,7 +5,7 @@
 .. module:: django.core.urlresolvers
 
 reverse()
----------
+=========
 
 If you need to use something similar to the :ttag:`url` template tag in
 your code, Django provides the following function:
@@ -94,7 +94,7 @@ use for reversing. By default, the root URLconf for the current thread is used.
     results.
 
 reverse_lazy()
---------------
+==============
 
 A lazily evaluated version of `reverse()`_.
 
@@ -114,7 +114,7 @@ URLConf is loaded. Some common cases where this function is necessary are:
   signature.
 
 resolve()
----------
+=========
 
 The ``resolve()`` function can be used for resolving URL paths to the
 corresponding view functions. It has the following signature:
@@ -217,7 +217,7 @@ whether a view would raise a ``Http404`` error before redirecting to it::
         return response
 
 get_script_prefix()
--------------------
+===================
 
 .. function:: get_script_prefix()
 

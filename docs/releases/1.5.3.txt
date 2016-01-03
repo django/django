@@ -10,6 +10,8 @@ of :mod:`django.contrib.sessions`.
 
 Directory traversal vulnerability in :ttag:`ssi` template tag
 -------------------------------------------------------------
+Directory traversal vulnerability in ``ssi`` template tag
+=========================================================
 
 In previous versions of Django it was possible to bypass the
 :setting:`ALLOWED_INCLUDE_ROOTS` setting used for security with the :ttag:`ssi`
@@ -26,7 +28,7 @@ author to put the :ttag:`ssi` file in a user-controlled variable, but it's
 possible in principle.
 
 Mitigating a remote-code execution vulnerability in :mod:`django.contrib.sessions`
-----------------------------------------------------------------------------------
+==================================================================================
 
 :mod:`django.contrib.sessions` currently uses :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed

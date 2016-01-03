@@ -1,3 +1,4 @@
+================================
 PostgreSQL specific model fields
 ================================
 
@@ -7,7 +8,7 @@ module.
 .. currentmodule:: django.contrib.postgres.fields
 
 ArrayField
-----------
+==========
 
 .. class:: ArrayField(base_field, size=None, **options)
 
@@ -91,7 +92,7 @@ ArrayField
     nullable and the values padded with ``None``.
 
 Querying ArrayField
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 There are a number of custom lookups and transforms for :class:`ArrayField`.
 We will use the following example model::
@@ -242,7 +243,7 @@ lookups available after the transform do not change. For example::
     fashion by Django.
 
 Indexing ArrayField
-^^^^^^^^^^^^^^^^^^^
+-------------------
 
 At present using :attr:`~django.db.models.Field.db_index` will create a
 ``btree`` index. This does not offer particularly significant help to querying.
@@ -250,7 +251,7 @@ A more useful index is a ``GIN`` index, which you should create using a
 :class:`~django.db.migrations.operations.RunSQL` operation.
 
 HStoreField
------------
+===========
 
 .. class:: HStoreField(**options)
 
@@ -292,7 +293,7 @@ HStoreField
     :class:`~django.contrib.postgres.validators.KeysValidator`.
 
 Querying HStoreField
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 In addition to the ability to query by key, there are a number of custom
 lookups available for ``HStoreField``.
@@ -457,7 +458,7 @@ using in conjunction with lookups on
     [<Dog: Meg>]
 
 JSONField
----------
+=========
 
 .. versionadded:: 1.9
 
@@ -492,7 +493,7 @@ JSONField
     **As a result, this field requires PostgreSQL ≥ 9.4 and Psycopg2 ≥ 2.5.4**.
 
 Querying JSONField
-^^^^^^^^^^^^^^^^^^
+------------------
 
 We will use the following example model::
 
@@ -575,7 +576,7 @@ containment and keys with :class:`~django.contrib.postgres.fields.HStoreField`.
 .. _range-fields:
 
 Range Fields
-------------
+============
 
 There are five range field types, corresponding to the built-in range types in
 PostgreSQL. These fields are used to store a range of values; for example the
@@ -588,7 +589,7 @@ information is necessary. The default is lower bound included, upper bound
 excluded.
 
 IntegerRangeField
-^^^^^^^^^^^^^^^^^
+-----------------
 
 .. class:: IntegerRangeField(**options)
 
@@ -598,7 +599,7 @@ IntegerRangeField
     Python.
 
 BigIntegerRangeField
-^^^^^^^^^^^^^^^^^^^^
+--------------------
 
 .. class:: BigIntegerRangeField(**options)
 
@@ -608,7 +609,7 @@ BigIntegerRangeField
     Python.
 
 FloatRangeField
-^^^^^^^^^^^^^^^
+---------------
 
 .. class:: FloatRangeField(**options)
 
@@ -617,7 +618,7 @@ FloatRangeField
     database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in Python.
 
 DateTimeRangeField
-^^^^^^^^^^^^^^^^^^
+------------------
 
 .. class:: DateTimeRangeField(**options)
 
@@ -627,7 +628,7 @@ DateTimeRangeField
     Python.
 
 DateRangeField
-^^^^^^^^^^^^^^
+--------------
 
 .. class:: DateRangeField(**options)
 
@@ -636,7 +637,7 @@ DateRangeField
     database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
 
 Querying Range Fields
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
 
 There are a number of custom lookups and transforms for range fields. They are
 available on all the above fields, but we will use the following example
@@ -675,7 +676,7 @@ operators ``@>``, ``<@``, and ``&&`` respectively.
 .. fieldlookup:: rangefield.contains
 
 contains
-''''''''
+^^^^^^^^
 
     >>> Event.objects.filter(ages__contains=NumericRange(4, 5))
     [<Event: Soft play>]
@@ -683,7 +684,7 @@ contains
 .. fieldlookup:: rangefield.contained_by
 
 contained_by
-''''''''''''
+^^^^^^^^^^^^
 
     >>> Event.objects.filter(ages__contained_by=NumericRange(0, 15))
     [<Event: Soft play>]
@@ -707,7 +708,7 @@ contained_by
 .. fieldlookup:: rangefield.overlap
 
 overlap
-'''''''
+^^^^^^^
 
     >>> Event.objects.filter(ages__overlap=NumericRange(8, 12))
     [<Event: Soft play>]
@@ -724,7 +725,7 @@ the specific range comparison operators.
 .. fieldlookup:: rangefield.fully_lt
 
 fully_lt
-''''''''
+^^^^^^^^
 
 The returned ranges are strictly less than the passed range. In other words,
 all the points in the returned range are less than all those in the passed
@@ -736,7 +737,7 @@ range.
 .. fieldlookup:: rangefield.fully_gt
 
 fully_gt
-''''''''
+^^^^^^^^
 
 The returned ranges are strictly greater than the passed range. In other words,
 the all the points in the returned range are greater than all those in the
@@ -748,7 +749,7 @@ passed range.
 .. fieldlookup:: rangefield.not_lt
 
 not_lt
-''''''
+^^^^^^
 
 The returned ranges do not contain any points less than the passed range, that
 is the lower bound of the returned range is at least the lower bound of the
@@ -760,7 +761,7 @@ passed range.
 .. fieldlookup:: rangefield.not_gt
 
 not_gt
-''''''
+^^^^^^
 
 The returned ranges do not contain any points greater than the passed range, that
 is the upper bound of the returned range is at most the upper bound of the
@@ -772,7 +773,7 @@ passed range.
 .. fieldlookup:: rangefield.adjacent_to
 
 adjacent_to
-'''''''''''
+^^^^^^^^^^^
 
 The returned ranges share a bound with the passed range.
 
@@ -788,7 +789,7 @@ lower or upper bound, or query based on emptiness.
 .. fieldlookup:: rangefield.startswith
 
 startswith
-''''''''''
+^^^^^^^^^^
 
 Returned objects have the given lower bound. Can be chained to valid lookups
 for the base field.
@@ -799,7 +800,7 @@ for the base field.
 .. fieldlookup:: rangefield.endswith
 
 endswith
-''''''''
+^^^^^^^^
 
 Returned objects have the given upper bound. Can be chained to valid lookups
 for the base field.
@@ -810,7 +811,7 @@ for the base field.
 .. fieldlookup:: rangefield.isempty
 
 isempty
-'''''''
+^^^^^^^
 
 Returned objects are empty ranges. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.

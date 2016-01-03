@@ -33,14 +33,14 @@ exception or returns the clean value::
 .. _core-field-arguments:
 
 Core field arguments
---------------------
+====================
 
 Each ``Field`` class constructor takes at least these arguments. Some
 ``Field`` classes take additional, field-specific arguments, but the following
 should *always* be accepted:
 
 ``required``
-~~~~~~~~~~~~
+------------
 
 .. attribute:: Field.required
 
@@ -93,7 +93,7 @@ For other ``Field`` classes, it might be ``None``. (This varies from field to
 field.)
 
 ``label``
-~~~~~~~~~
+---------
 
 .. attribute:: Field.label
 
@@ -120,7 +120,7 @@ We've specified ``auto_id=False`` to simplify the output::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 ``label_suffix``
-~~~~~~~~~~~~~~~~
+----------------
 
 .. attribute:: Field.label_suffix
 
@@ -140,7 +140,7 @@ The ``label_suffix`` argument lets you override the form's
     <p><label for="id_captcha_answer">2 + 2 =</label> <input id="id_captcha_answer" name="captcha_answer" type="number" /></p>
 
 ``initial``
-~~~~~~~~~~~
+-----------
 
 .. attribute:: Field.initial
 
@@ -208,7 +208,7 @@ Instead of a constant, you can also pass any callable::
 The callable will be evaluated only when the unbound form is displayed, not when it is defined.
 
 ``widget``
-~~~~~~~~~~
+----------
 
 .. attribute:: Field.widget
 
@@ -216,7 +216,7 @@ The ``widget`` argument lets you specify a ``Widget`` class to use when
 rendering this ``Field``. See :doc:`/ref/forms/widgets` for more information.
 
 ``help_text``
-~~~~~~~~~~~~~
+-------------
 
 .. attribute:: Field.help_text
 
@@ -255,7 +255,7 @@ fields. We've specified ``auto_id=False`` to simplify the output::
     <p>Cc myself: <input type="checkbox" name="cc_myself" /></p>
 
 ``error_messages``
-~~~~~~~~~~~~~~~~~~
+------------------
 
 .. attribute:: Field.error_messages
 
@@ -282,7 +282,7 @@ In the `built-in Field classes`_ section below, each ``Field`` defines the
 error message keys it uses.
 
 ``validators``
-~~~~~~~~~~~~~~
+--------------
 
 .. attribute:: Field.validators
 
@@ -292,18 +292,18 @@ for this field.
 See the :doc:`validators documentation </ref/validators>` for more information.
 
 ``localize``
-~~~~~~~~~~~~
+------------
 
 .. attribute:: Field.localize
 
 The ``localize`` argument enables the localization of form data input, as well
 as the rendered output.
 
-See the :ref:`format localization <format-localization>` documentation for
+See the :doc:`format localization </topics/i18n/formatting>` documentation for
 more information.
 
 ``disabled``
-~~~~~~~~~~~~
+------------
 
 .. attribute:: Field.disabled
 
@@ -315,10 +315,10 @@ Even if a user tampers with the field's value submitted to the server, it will
 be ignored in favor of the value from the form's initial data.
 
 Checking if the field data has changed
---------------------------------------
+======================================
 
 ``has_changed()``
-~~~~~~~~~~~~~~~~~~
+-----------------
 
 .. method:: Field.has_changed()
 
@@ -334,7 +334,7 @@ See the :class:`Form.has_changed()` documentation for more information.
 .. _built-in-fields:
 
 Built-in ``Field`` classes
---------------------------
+==========================
 
 Naturally, the ``forms`` library comes with a set of ``Field`` classes that
 represent common validation needs. This section documents each built-in field.
@@ -344,7 +344,7 @@ For each field, we describe the default widget used if you don't specify
 (see the section on ``required`` above to understand what that means).
 
 ``BooleanField``
-~~~~~~~~~~~~~~~~
+----------------
 
 .. class:: BooleanField(**kwargs)
 
@@ -364,7 +364,7 @@ For each field, we describe the default widget used if you don't specify
         creating the ``BooleanField``.
 
 ``CharField``
-~~~~~~~~~~~~~
+-------------
 
 .. class:: CharField(**kwargs)
 
@@ -391,7 +391,7 @@ For each field, we describe the default widget used if you don't specify
        trailing whitespace.
 
 ``ChoiceField``
-~~~~~~~~~~~~~~~
+---------------
 
 .. class:: ChoiceField(**kwargs)
 
@@ -420,7 +420,7 @@ For each field, we describe the default widget used if you don't specify
             The ability to pass a callable to ``choices`` was added.
 
 ``TypedChoiceField``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. class:: TypedChoiceField(**kwargs)
 
@@ -452,7 +452,7 @@ For each field, we describe the default widget used if you don't specify
         accordingly.
 
 ``DateField``
-~~~~~~~~~~~~~
+-------------
 
 .. class:: DateField(**kwargs)
 
@@ -488,10 +488,10 @@ For each field, we describe the default widget used if you don't specify
          '%d %B %Y',      # '25 October 2006'
          '%d %B, %Y']     # '25 October, 2006'
 
-    See also :ref:`format localization <format-localization>`.
+    See also :doc:`format localization </topics/i18n/formatting>`.
 
 ``DateTimeField``
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. class:: DateTimeField(**kwargs)
 
@@ -521,10 +521,10 @@ For each field, we describe the default widget used if you don't specify
          '%m/%d/%y %H:%M',       # '10/25/06 14:30'
          '%m/%d/%y']             # '10/25/06'
 
-    See also :ref:`format localization <format-localization>`.
+    See also :doc:`format localization </topics/i18n/formatting>`.
 
 ``DecimalField``
-~~~~~~~~~~~~~~~~
+----------------
 
 .. class:: DecimalField(**kwargs)
 
@@ -562,7 +562,7 @@ For each field, we describe the default widget used if you don't specify
         The maximum number of decimal places permitted.
 
 ``DurationField``
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. versionadded:: 1.8
 
@@ -579,7 +579,7 @@ For each field, we describe the default widget used if you don't specify
     :func:`~django.utils.dateparse.parse_duration`.
 
 ``EmailField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: EmailField(**kwargs)
 
@@ -595,7 +595,7 @@ For each field, we describe the default widget used if you don't specify
     given length.
 
 ``FileField``
-~~~~~~~~~~~~~
+-------------
 
 .. class:: FileField(**kwargs)
 
@@ -623,7 +623,7 @@ For each field, we describe the default widget used if you don't specify
     length and ``%(length)d`` will be replaced with the current filename length.
 
 ``FilePathField``
-~~~~~~~~~~~~~~~~~
+-----------------
 
 .. class:: FilePathField(**kwargs)
 
@@ -666,7 +666,7 @@ For each field, we describe the default widget used if you don't specify
 
 
 ``FloatField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: FloatField(**kwargs)
 
@@ -683,7 +683,7 @@ For each field, we describe the default widget used if you don't specify
     These control the range of values permitted in the field.
 
 ``ImageField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: ImageField(**kwargs)
 
@@ -720,7 +720,7 @@ For each field, we describe the default widget used if you don't specify
 .. _Image: https://pillow.readthedocs.org/en/latest/reference/Image.html
 
 ``IntegerField``
-~~~~~~~~~~~~~~~~
+----------------
 
 .. class:: IntegerField(**kwargs)
 
@@ -744,7 +744,7 @@ For each field, we describe the default widget used if you don't specify
     These control the range of values permitted in the field.
 
 ``GenericIPAddressField``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 .. class:: GenericIPAddressField(**kwargs)
 
@@ -779,7 +779,7 @@ For each field, we describe the default widget used if you don't specify
         when ``protocol`` is set to ``'both'``.
 
 ``MultipleChoiceField``
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 .. class:: MultipleChoiceField(**kwargs)
 
@@ -796,7 +796,7 @@ For each field, we describe the default widget used if you don't specify
     Takes one extra required argument, ``choices``, as for :class:`ChoiceField`.
 
 ``TypedMultipleChoiceField``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. class:: TypedMultipleChoiceField(**kwargs)
 
@@ -818,7 +818,7 @@ For each field, we describe the default widget used if you don't specify
     :class:`TypedChoiceField`.
 
 ``NullBooleanField``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. class:: NullBooleanField(**kwargs)
 
@@ -828,7 +828,7 @@ For each field, we describe the default widget used if you don't specify
     * Validates nothing (i.e., it never raises a ``ValidationError``).
 
 ``RegexField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: RegexField(**kwargs)
 
@@ -865,7 +865,7 @@ For each field, we describe the default widget used if you don't specify
         message as the value.
 
 ``SlugField``
-~~~~~~~~~~~~~
+-------------
 
 .. class:: SlugField(**kwargs)
 
@@ -889,7 +889,7 @@ For each field, we describe the default widget used if you don't specify
        to ASCII letters. Defaults to ``False``.
 
 ``TimeField``
-~~~~~~~~~~~~~
+-------------
 
 .. class:: TimeField(**kwargs)
 
@@ -913,7 +913,7 @@ For each field, we describe the default widget used if you don't specify
         '%H:%M',        # '14:30'
 
 ``URLField``
-~~~~~~~~~~~~
+------------
 
 .. class:: URLField(**kwargs)
 
@@ -931,7 +931,7 @@ For each field, we describe the default widget used if you don't specify
     These are the same as ``CharField.max_length`` and ``CharField.min_length``.
 
 ``UUIDField``
-~~~~~~~~~~~~~
+-------------
 
 .. versionadded:: 1.8
 
@@ -946,10 +946,10 @@ For each field, we describe the default widget used if you don't specify
     to the :class:`~python:uuid.UUID` constructor.
 
 Slightly complex built-in ``Field`` classes
--------------------------------------------
+===========================================
 
 ``ComboField``
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: ComboField(**kwargs)
 
@@ -977,7 +977,7 @@ Slightly complex built-in ``Field`` classes
             ValidationError: ['Ensure this value has at most 20 characters (it has 28).']
 
 ``MultiValueField``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. class:: MultiValueField(fields=(), **kwargs)
 
@@ -1060,7 +1060,7 @@ Slightly complex built-in ``Field`` classes
         This method must be implemented in the subclasses.
 
 ``SplitDateTimeField``
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 .. class:: SplitDateTimeField(**kwargs)
 
@@ -1091,7 +1091,7 @@ Slightly complex built-in ``Field`` classes
     for :class:`TimeField` are used.
 
 Fields which handle relationships
----------------------------------
+=================================
 
 Two fields are available for representing relationships between
 models: :class:`ModelChoiceField` and
@@ -1114,7 +1114,7 @@ method::
             self.fields['foo_select'].queryset = ...
 
 ``ModelChoiceField``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 .. class:: ModelChoiceField(**kwargs)
 
@@ -1207,7 +1207,7 @@ method::
                 return "My Object #%i" % obj.id
 
 ``ModelMultipleChoiceField``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. class:: ModelMultipleChoiceField(**kwargs)
 
@@ -1235,7 +1235,7 @@ method::
         user's selection.
 
 Creating custom fields
-----------------------
+======================
 
 If the built-in ``Field`` classes don't meet your needs, you can easily create
 custom ``Field`` classes. To do this, just create a subclass of

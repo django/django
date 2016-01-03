@@ -12,4 +12,4 @@ Formset API reference. For introductory material about formsets, see the
 
     Returns a ``FormSet`` class for the given ``form`` class.
 
-    See :ref:`formsets` for example usage.
+    See :doc:`formsets </topics/forms/formsets>` for example usage.

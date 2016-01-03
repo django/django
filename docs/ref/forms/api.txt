@@ -13,7 +13,7 @@ The Forms API
 .. _ref-forms-api-bound-unbound:
 
 Bound and unbound forms
------------------------
+=======================
 
 A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
 
@@ -69,7 +69,7 @@ another :class:`Form` instance. There is no way to change data in a
 should consider its data immutable, whether it has data or not.
 
 Using forms to validate data
-----------------------------
+============================
 
 .. method:: Form.clean()
 
@@ -203,7 +203,7 @@ This includes ``ValidationError``\s that are raised in :meth:`Form.clean()
 "...") <django.forms.Form.add_error>`.
 
 Behavior of unbound forms
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 It's meaningless to validate a form with no data, but, for the record, here's
 what happens with unbound forms::
@@ -215,7 +215,7 @@ what happens with unbound forms::
     {}
 
 Dynamic initial values
-----------------------
+======================
 
 .. attribute:: Form.initial
 
@@ -251,7 +251,7 @@ precedence::
     <tr><th>Comment:</th><td><input type="text" name="comment" /></td></tr>
 
 Checking which form data has changed
-------------------------------------
+====================================
 
 .. method:: Form.has_changed()
 
@@ -288,7 +288,7 @@ provided in :attr:`~Form.initial`. It returns an empty list if no data differs.
     ...     print("The following fields changed: %s" % ", ".join(f.changed_data))
 
 Accessing the fields from the form
-----------------------------------
+==================================
 
 .. attribute:: Form.fields
 
@@ -322,7 +322,7 @@ process::
     '<tr><th>Username:</th><td><input name="name" type="text" value="class" /></td></tr>'
 
 Accessing "clean" data
-----------------------
+======================
 
 .. attribute:: Form.cleaned_data
 
@@ -416,7 +416,7 @@ fields). More information about this is in :doc:`/ref/forms/validation`.
 .. _ref-forms-api-outputting-html:
 
 Outputting forms as HTML
-------------------------
+========================
 
 The second task of a ``Form`` object is to render itself as HTML. To do so,
 simply ``print`` it::
@@ -478,7 +478,7 @@ form, other output styles are available. Each style is available as a method on
 a form object, and each rendering method returns a Unicode object.
 
 ``as_p()``
-~~~~~~~~~~
+----------
 
 .. method:: Form.as_p()
 
@@ -495,7 +495,7 @@ containing one field::
     <p><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></p>
 
 ``as_ul()``
-~~~~~~~~~~~
+-----------
 
 .. method:: Form.as_ul()
 
@@ -514,7 +514,7 @@ flexibility::
     <li><label for="id_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_cc_myself" /></li>
 
 ``as_table()``
-~~~~~~~~~~~~~~
+--------------
 
 .. method:: Form.as_table()
 
@@ -534,7 +534,7 @@ it calls its ``as_table()`` method behind the scenes::
 .. _ref-forms-api-styling-form-rows:
 
 Styling required or erroneous form rows
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------
 
 .. attribute:: Form.error_css_class
 .. attribute:: Form.required_css_class
@@ -578,7 +578,7 @@ classes, as needed. The HTML will look something like::
 .. _ref-forms-api-configuring-label:
 
 Configuring form elements' HTML ``id`` attributes and ``<label>`` tags
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------------------------
 
 .. attribute:: Form.auto_id
 
@@ -702,7 +702,7 @@ using the ``label_suffix`` parameter to
 :meth:`~django.forms.BoundField.label_tag`.
 
 Notes on field ordering
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 In the ``as_p()``, ``as_ul()`` and ``as_table()`` shortcuts, the fields are
 displayed in the order in which you define them in your form class. For
@@ -736,7 +736,7 @@ You may rearrange the fields any time using ``order_fields()`` with a list of
 field names as in :attr:`~django.forms.Form.field_order`.
 
 How errors are displayed
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
@@ -770,7 +770,7 @@ method you're using::
 .. _ref-forms-error-list-format:
 
 Customizing the error list format
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 By default, forms use ``django.forms.utils.ErrorList`` to format validation
 errors. If you'd like to use an alternate class for displaying errors, you can
@@ -794,7 +794,7 @@ Python 2)::
     <p>Cc myself: <input checked="checked" type="checkbox" name="cc_myself" /></p>
 
 More granular output
---------------------
+====================
 
 The ``as_p()``, ``as_ul()``, and ``as_table()`` methods are simply shortcuts --
 they're not the only way a form object can be displayed.
@@ -833,7 +833,7 @@ The field-specific output honors the form object's ``auto_id`` setting::
     <input type="text" name="message" id="id_message" />
 
 Attributes of ``BoundField``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 .. attribute:: BoundField.data
 
@@ -931,7 +931,7 @@ Attributes of ``BoundField``
         message
 
 Methods of ``BoundField``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
@@ -1008,7 +1008,7 @@ Methods of ``BoundField``
         hi
 
 Customizing ``BoundField``
---------------------------
+==========================
 
 .. versionadded:: 1.9
 
@@ -1052,7 +1052,7 @@ Now you can access the country in a template with
 .. _binding-uploaded-files:
 
 Binding uploaded files to a form
---------------------------------
+================================
 
 Dealing with forms that have ``FileField`` and ``ImageField`` fields
 is a little more complicated than a normal form.
@@ -1093,7 +1093,7 @@ form data *and* file data::
     >>> f = ContactFormWithMugshot()
 
 Testing for multipart forms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. method:: Form.is_multipart()
 
@@ -1116,7 +1116,7 @@ Here's an example of how you might use this in a template::
     </form>
 
 Subclassing forms
------------------
+=================
 
 If you have multiple ``Form`` classes that share fields, you can use
 subclassing to remove redundancy.
@@ -1177,7 +1177,7 @@ by setting the name of the field to ``None`` on the subclass. For example::
 .. _form-prefix:
 
 Prefixes for forms
-------------------
+==================
 
 .. attribute:: Form.prefix
 

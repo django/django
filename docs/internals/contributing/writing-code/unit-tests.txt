@@ -16,10 +16,10 @@ how to write new tests.
 .. _running-unit-tests:
 
 Running the unit tests
-----------------------
+======================
 
 Quickstart
-~~~~~~~~~~
+----------
 
 If you are on Python 2, you'll first need to install a backport of the
 ``unittest.mock`` module that's available in Python 3. See
@@ -48,7 +48,7 @@ Having problems? See :ref:`troubleshooting-unit-tests` for some common issues.
 .. _running-unit-tests-settings:
 
 Using another ``settings`` module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 The included settings module allows you to run the test suite using
 SQLite. If you want to test behavior using a different database (and
@@ -92,7 +92,7 @@ test settings dictionary for the applicable database.
 .. _runtests-specifying-labels:
 
 Running only some of the tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------------
 
 Django's entire test suite takes a while to run, and running every single test
 could be redundant if, say, you just added a test to Django that you want to
@@ -119,7 +119,7 @@ Going beyond that, you can specify an individual test method like this::
    $ ./runtests.py --settings=path.to.settings i18n.tests.TranslationTests.test_lazy_objects
 
 Running the Selenium tests
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------
 
 Some tests require Selenium and a Web browser (Firefox, Google Chrome, or
 Internet Explorer). To allow those tests to be run rather than skipped, you must
@@ -131,7 +131,7 @@ install the selenium_ package into your Python path and run the tests with the
 .. _running-unit-tests-dependencies:
 
 Running all the tests
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
@@ -186,7 +186,7 @@ associated tests will be skipped.
 .. _pip requirements files: https://pip.pypa.io/en/latest/user_guide.html#requirements-files
 
 Code coverage
-~~~~~~~~~~~~~
+-------------
 
 Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
@@ -209,7 +209,7 @@ and also excludes several directories not relevant to the results
 .. _contrib-apps:
 
 Contrib apps
-------------
+============
 
 Tests for contrib apps can be found in the ``tests/`` directory, typically
 under ``<app_name>_tests``. For example, tests for ``contrib.auth`` are located
@@ -218,10 +218,10 @@ in ``tests/auth_tests``.
 .. _troubleshooting-unit-tests:
 
 Troubleshooting
----------------
+===============
 
 Many test failures with ``UnicodeEncodeError``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------
 
 If the ``locales`` package is not installed, some tests will fail with a
 ``UnicodeEncodeError``.
@@ -232,7 +232,7 @@ You can resolve this on Debian-based systems, for example, by running::
     $ dpkg-reconfigure locales
 
 Tests that only fail in combination
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------
 
 In case a test passes when run in isolation but fails within the whole suite,
 we have some tools to help analyze the problem.
@@ -277,7 +277,7 @@ cause any trouble::
     $ ./runtests.py basic --reverse
 
 Seeing the SQL queries run during a test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 If you wish to examine the SQL being run in failing tests, you can turn on
 :ref:`SQL logging <django-db-logger>` using the ``--debug-sql`` option. If you
@@ -290,7 +290,7 @@ combine this with ``--verbosity=2``, all SQL queries will be output::
     The ``--reverse`` and ``--debug-sql`` options were added.
 
 Seeing the full traceback of a test failure
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------
 
 By default tests are run in parallel with one process per core. When the tests
 are run in parallel, however, you'll only see a truncated traceback for any

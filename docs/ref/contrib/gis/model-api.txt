@@ -104,7 +104,7 @@ __ https://en.wikipedia.org/wiki/WGS84
 .. _selecting-an-srid:
 
 Selecting an SRID
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 Choosing an appropriate SRID for your model is an important decision that the
 developer should consider carefully.  The SRID is an integer specifier that
@@ -213,7 +213,7 @@ details.
 .. _geography-type:
 
 Geography Type
-^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 The geography type provides native support for spatial features represented
 with geographic coordinates (e.g., WGS84 longitude/latitude). [#fngeography]_

@@ -309,7 +309,7 @@ Django's :doc:`internationalization framework </topics/i18n/index>` has been exp
 with locale-aware formatting and form processing. That means, if enabled, dates
 and numbers on templates will be displayed using the format specified for the
 current locale. Django will also use localized formats when parsing data in
-forms. See :ref:`Format localization <format-localization>` for more details.
+forms. See :doc:`/topics/i18n/formatting` for more details.
 
 ``readonly_fields`` in ``ModelAdmin``
 -------------------------------------
@@ -1073,10 +1073,10 @@ to provide localizers the possibility to translate date and time formats. They
 were translatable :term:`translation strings <translation string>` that could
 be recognized because they were all upper case (for example
 :setting:`DATETIME_FORMAT`, :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT`).
-They have been deprecated in favor of the new :ref:`Format localization
-<format-localization>` infrastructure that allows localizers to specify that
-information in a ``formats.py`` file in the corresponding
-``django/conf/locale/<locale name>/`` directory.
+They have been deprecated in favor of the new :doc:`/topics/i18n/formatting` 
+infrastructure that allows localizers to specify that information in a 
+``formats.py`` file in the corresponding ``django/conf/locale/<locale name>/`` 
+directory.
 
 GeoDjango
 ---------
@@ -1090,7 +1090,7 @@ following sections provide information on the most-popular APIs that
 were affected by these changes.
 
 ``SpatialBackend``
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 Prior to the creation of the separate spatial backends, the
 ``django.contrib.gis.db.backend.SpatialBackend`` object was
@@ -1118,7 +1118,7 @@ Would need to be changed::
     PostGISAdaptor = connection.ops.Adapter
 
 ``SpatialRefSys`` and ``GeometryColumns`` models
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In previous versions of GeoDjango, :mod:`django.contrib.gis.db.models`
 had ``SpatialRefSys`` and ``GeometryColumns`` models for querying

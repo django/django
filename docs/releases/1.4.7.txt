@@ -9,6 +9,8 @@ the 1.4 series.
 
 Directory traversal vulnerability in :ttag:`ssi` template tag
 -------------------------------------------------------------
+Directory traversal vulnerability in ``ssi`` template tag
+=========================================================
 
 In previous versions of Django it was possible to bypass the
 :setting:`ALLOWED_INCLUDE_ROOTS` setting used for security with the :ttag:`ssi`

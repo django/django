@@ -26,7 +26,7 @@ allows the field to have two "empty values", but it's important for the
 ``Coalesce`` example below.
 
 Coalesce
---------
+========
 
 .. class:: Coalesce(*expressions, **extra)
 
@@ -67,7 +67,7 @@ Usage examples::
     >>> Coalesce('updated', now_sql)
 
 Concat
-------
+======
 
 .. class:: Concat(*expressions, **extra)
 
@@ -94,7 +94,7 @@ Usage example::
     Margaret Smith (Maggie)
 
 Greatest
---------
+========
 
 .. class:: Greatest(*expressions, **extra)
 
@@ -138,7 +138,7 @@ and ``comment.modified``.
     a sensible minimum value to provide as a default.
 
 Least
------
+=====
 
 .. class:: Least(*expressions, **extra)
 
@@ -162,7 +162,7 @@ will result in a database error.
     a sensible maximum value to provide as a default.
 
 Length
-------
+======
 
 .. class:: Length(expression, **extra)
 
@@ -193,7 +193,7 @@ It can also be registered as a transform. For example::
     The ability to register the function as a transform was added.
 
 Lower
-------
+=====
 
 .. class:: Lower(expression, **extra)
 
@@ -215,7 +215,7 @@ Usage example::
     The ability to register the function as a transform was added.
 
 Now
----
+===
 
 .. class:: Now()
 
@@ -238,7 +238,7 @@ Usage example::
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
 Substr
-------
+======
 
 .. class:: Substr(expression, pos, length=None, **extra)
 
@@ -257,7 +257,7 @@ Usage example::
     marga
 
 Upper
-------
+=====
 
 .. class:: Upper(expression, **extra)
 

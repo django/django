@@ -9,7 +9,7 @@ migrations, see :doc:`the topic guide </topics/migrations>`.
 .. _data-migrations-and-multiple-databases:
 
 Data migrations and multiple databases
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================
 
 When using multiple databases, you may need to figure out whether or not to
 run a migration against a particular database. For example, you may want to
@@ -74,7 +74,7 @@ practice to pass ``model_name`` as a hint to make it as transparent as possible
 to the router. This is especially important for reusable and third-party apps.
 
 Migrations that add unique fields
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=================================
 
 Applying a "plain" migration that adds a unique non-nullable field to a table
 with existing rows will raise an error because the value used to populate
@@ -187,7 +187,7 @@ the respective field according to your needs.
   ``RunPython`` will have their original ``uuid``’s overwritten.
 
 Controlling the order of migrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===================================
 
 Django determines the order in which migrations should be applied not by the
 filename of each migration, but by building a graph using two properties on the

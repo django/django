@@ -221,7 +221,7 @@ Building a form in Django
 -------------------------
 
 The :class:`Form` class
-^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 We already know what we want our HTML form to look like. Our starting point for
 it in Django is this:
@@ -267,7 +267,7 @@ We'll have to provide those ourselves in the template.
 .. _using-a-form-in-a-view:
 
 The view
-^^^^^^^^
+~~~~~~~~
 
 Form data sent back to a Django website is processed by a view, generally the
 same view which published the form. This allows us to reuse some of the same
@@ -324,7 +324,7 @@ telling it where to go next.
 .. _topics-forms-index-basic-form-template:
 
 The template
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 We don't need to do much in our ``name.html`` template. The simplest example
 is:
@@ -420,7 +420,7 @@ this case, our form has four fields: ``subject``, ``message``, ``sender`` and
 can be found in :doc:`/ref/forms/fields`.
 
 Widgets
-^^^^^^^
+~~~~~~~
 
 Each form field has a corresponding :doc:`Widget class </ref/forms/widgets/>`,
 which in turn corresponds to an HTML form widget such as ``<input
@@ -433,7 +433,7 @@ instead, you'd specify the appropriate widget when defining your form field,
 as we have done for the ``message`` field.
 
 Field data
-^^^^^^^^^^
+~~~~~~~~~~
 
 Whatever the data submitted with a form, once it has been successfully
 validated by calling ``is_valid()`` (and ``is_valid()`` has returned ``True``),
@@ -573,7 +573,7 @@ Complete ``<label>`` elements can also be generated using the
 
 
 Rendering form error messages
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Of course, the price of this flexibility is more work. Until now we haven't had
 to worry about how to display form errors, because that's taken care of for us.
@@ -699,7 +699,7 @@ Useful attributes on ``{{ field }}`` include:
     :class:`~django.forms.BoundField`.
 
 Looping over hidden and visible fields
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you're manually laying out a form in a template, as opposed to relying on
 Django's default form layout, you might want to treat ``<input type="hidden">``

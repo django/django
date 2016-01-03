@@ -1,3 +1,4 @@
+=================================
 Form Assets (the ``Media`` class)
 =================================
 
@@ -42,7 +43,7 @@ in a form suitable for easy inclusion on your Web page.
 .. _assets-as-a-static-definition:
 
 Assets as a static definition
------------------------------
+=============================
 
 The easiest way to define assets is as a static definition. Using this
 method, the declaration is an inner ``Media`` class. The properties of the
@@ -77,7 +78,7 @@ can be retrieved through this property::
 Here's a list of all possible ``Media`` options. There are no required options.
 
 ``css``
-~~~~~~~
+-------
 
 A dictionary describing the CSS files required for various forms of output
 media.
@@ -118,14 +119,14 @@ If this last CSS definition were to be rendered, it would become the following H
     <link href="http://static.example.com/newspaper.css" type="text/css" media="print" rel="stylesheet" />
 
 ``js``
-~~~~~~
+------
 
 A tuple describing the required JavaScript files. See :ref:`the
 section on paths <form-asset-paths>` for details of how to specify
 paths to these files.
 
 ``extend``
-~~~~~~~~~~
+----------
 
 A boolean defining inheritance behavior for ``Media`` declarations.
 
@@ -174,7 +175,7 @@ complete control over which files are inherited, and which are not.
 .. _dynamic-property:
 
 ``Media`` as a dynamic property
--------------------------------
+===============================
 
 If you need to perform some more sophisticated manipulation of asset
 requirements, you can define the ``media`` property directly. This is
@@ -198,7 +199,7 @@ return values for dynamic ``media`` properties.
 .. _form-asset-paths:
 
 Paths in asset definitions
---------------------------
+==========================
 
 Paths used to specify assets can be either relative or absolute. If a
 path starts with ``/``, ``http://`` or ``https://``, it will be
@@ -240,7 +241,7 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
 
 
 ``Media`` objects
------------------
+=================
 
 When you interrogate the ``media`` attribute of a widget or form, the
 value that is returned is a ``forms.Media`` object. As we have already
@@ -251,7 +252,7 @@ HTML page.
 However, ``Media`` objects have some other interesting properties.
 
 Subsets of assets
-~~~~~~~~~~~~~~~~~
+-----------------
 
 If you only want files of a particular type, you can use the subscript
 operator to filter out a medium of interest. For example::
@@ -269,7 +270,7 @@ When you use the subscript operator, the value that is returned is a
 new ``Media`` object -- but one that only contains the media of interest.
 
 Combining ``Media`` objects
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 ``Media`` objects can also be added together. When two ``Media`` objects are
 added, the resulting ``Media`` object contains the union of the assets
@@ -296,7 +297,7 @@ specified by both::
     <script type="text/javascript" src="http://static.example.com/whizbang.js"></script>
 
 ``Media`` on Forms
-------------------
+==================
 
 Widgets aren't the only objects that can have ``media`` definitions --
 forms can also define ``media``. The rules for ``media`` definitions

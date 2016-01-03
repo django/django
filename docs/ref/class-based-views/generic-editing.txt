@@ -25,7 +25,7 @@ editing content:
                 return reverse('author-detail', kwargs={'pk': self.pk})
 
 FormView
---------
+========
 
 .. class:: django.views.generic.edit.FormView
 
@@ -81,7 +81,7 @@ FormView
 
 
 CreateView
-----------
+==========
 
 .. class:: django.views.generic.edit.CreateView
 
@@ -136,7 +136,7 @@ CreateView
         </form>
 
 UpdateView
-----------
+==========
 
 .. class:: django.views.generic.edit.UpdateView
 
@@ -193,7 +193,7 @@ UpdateView
         </form>
 
 DeleteView
-----------
+==========
 
 .. class:: django.views.generic.edit.DeleteView
 
