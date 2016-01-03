@@ -100,18 +100,20 @@ team <core-team>`.
     .. _russell keith-magee: http://cecinestpasun.com/
 
 `James Bennett`_
-    James is one of Django's release managers, and also contributes to the
-    documentation and provide the occasional bugfix.
+    James has been one of Django's release managers, and also
+    contributes to the documentation and provide the occasional
+    bugfix.
 
     James came to Web development from philosophy when he discovered
     that programmers get to argue just as much while collecting much
-    better pay. He lives in Lawrence, Kansas and previously worked at
-    World Online; currently, he's part of the Web development team at
-    Mozilla.
+    better pay. He lives in San Mateo, California and previously
+    worked at World Online and Mozilla; currently, he's part of the
+    Web engineering team at `Clover`_.
 
     He `keeps a blog`_, and enjoys fine port and talking to his car.
 
     .. _james bennett: http://b-list.org/
+    .. _Clover: https://www.cloverhealth.com/
     .. _keeps a blog: `james bennett`_
 
 Justin Bronn
