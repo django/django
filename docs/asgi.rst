@@ -484,7 +484,7 @@ Channel: ``http.response.?``
 
 Keys:
 
-* ``status``: Integer HTTP status code. 
+* ``status``: Integer HTTP status code.
 
 * ``status_text``: Byte string HTTP reason-phrase, e.g. ``OK`` from ``200 OK``.
   Ignored for HTTP/2 clients. Optional, default should be based on ``status``
@@ -524,9 +524,16 @@ Keys:
 Server Push
 '''''''''''
 
-Send before any Response or Response Chunk. HTTP/2 only.
+Must be sent before any Response or Response Chunk messages.
 
-TODO
+Channel: ``http.response.?``
+
+Keys:
+
+* ``request``: A Request message. Both the ``body`` and ``body_channel`` fields
+  MUST be absent: bodies are not allowed on server-pushed requests. The
+  ``reply_channel`` set on this object will be used for all further messages
+  relating to the pushed response.
 
 
 WebSocket
