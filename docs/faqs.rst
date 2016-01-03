@@ -125,18 +125,3 @@ which is the unique channel representing the connection, but remember that
 whatever you store in must be **network-transparent** - storing things in a
 global variable won't work outside of development.
 
-
-Would you support messagepack or any other format?
---------------------------------------------------
-
-Although we've evaluated msgpack it does not offer enough over JSON to be
-reasonable - the encoding/decoding is often slower, the language support is
-much poorer, and in general we would rather just have one version of a standard,
-especially since there's plans to write parts of the Channels system in other
-languages.
-
-That said, at some point it's up to the individual channel backend to support
-whatever it likes, as long as it spits out dicts at either end. So this is
-something that could be implemented by someone else as a pluggable backend to
-see. We might always come back and revisit this if message size/bandwidth turns
-out to be a limiting factor, though.
