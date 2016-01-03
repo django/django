@@ -772,7 +772,7 @@ This would display as "It is the 4th of September".
     :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
     :setting:`SHORT_DATE_FORMAT` or :setting:`SHORT_DATETIME_FORMAT`.
     The predefined formats may vary depending on the current locale and
-    if :ref:`format-localization` is enabled, e.g.::
+    if :doc:`format-localization </topics/i18n/formatting>` is enabled, e.g.::
 
         It is {% now "SHORT_DATETIME_FORMAT" %}
 

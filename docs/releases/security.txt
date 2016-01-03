@@ -1,5 +1,3 @@
-.. _security-releases:
-
 ==========================
 Archive of security issues
 ==========================

@@ -322,6 +322,29 @@ AdvanceCOMP's ``advpng``:
 This is based on OptiPNG version 0.7.5. Older versions may complain about the
 ``--strip all`` option being lossy.
 
+Heading styles
+--------------
+
+The heading styles for different levels is as follows:
+
+.. code-block:: rst
+ 
+   ===
+   One
+   ===
+  
+   Two
+   ===
+   
+   Three
+   -----
+
+   Four
+   ~~~~
+
+   Five
+   ^^^^
+
 An example
 ----------
 
