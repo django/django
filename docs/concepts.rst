@@ -38,9 +38,10 @@ alternative is *at-least-once*, where normally one consumer gets the message
 but when things crash it's sent to more than one, which is not the trade-off
 we want.
 
-There are a couple of other limitations - messages must be JSON serializable,
-and not be more than 1MB in size - but these are to make the whole thing
-practical, and not too important to think about up front.
+There are a couple of other limitations - messages must be made of
+serializable types, and stay under a certain size limit - but these are
+implementation details you won't need to worry about until you get to more
+advanced usage.
 
 The channels have capacity, so a load of producers can write lots of messages
 into a channel with no consumers and then a consumer can come along later and

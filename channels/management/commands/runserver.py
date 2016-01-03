@@ -5,7 +5,6 @@ from django.core.management.commands.runserver import \
 
 from channels import DEFAULT_CHANNEL_LAYER, channel_layers
 from channels.handler import ViewConsumer
-from channels.interfaces.wsgi import WSGIInterface
 from channels.log import setup_logger
 from channels.worker import Worker
 
@@ -17,32 +16,28 @@ class Command(RunserverCommand):
         self.logger = setup_logger('django.channels', self.verbosity)
         super(Command, self).handle(*args, **options)
 
-    def get_handler(self, *args, **options):
-        """
-        Returns the default WSGI handler for the runner.
-        """
-        return WSGIInterface(self.channel_layer)
-
     def run(self, *args, **options):
-        # Run the rest
-        return super(Command, self).run(*args, **options)
+        # Don't autoreload for now
+        self.inner_run(None, **options)
 
     def inner_run(self, *args, **options):
-        # Check a handler is registered for http reqs
+        # Check a handler is registered for http reqs; if not, add default one
         self.channel_layer = channel_layers[DEFAULT_CHANNEL_LAYER]
         if not self.channel_layer.registry.consumer_for_channel("http.request"):
-            # Register the default one
             self.channel_layer.registry.add_consumer(ViewConsumer(), ["http.request"])
-        # Note that this is the right one on the console
+        # Note that this is the channel-enabled one on the console
         self.logger.info("Worker thread running, channels enabled")
-        if self.channel_layer.local_only:
-            self.logger.info("Local channel backend detected, no remote channels support")
         # Launch a worker thread
         worker = WorkerThread(self.channel_layer)
         worker.daemon = True
         worker.start()
-        # Run rest of inner run
-        super(Command, self).inner_run(*args, **options)
+        # Launch server in main thread
+        from daphne.server import Server
+        Server(
+            channel_layer=self.channel_layer,
+            host=self.addr,
+            port=int(self.port),
+        ).run()
 
 
 class WorkerThread(threading.Thread):
