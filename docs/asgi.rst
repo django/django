@@ -2,10 +2,8 @@
 Draft ASGI Spec
 ===============
 
-**NOTE: This is still heavily in-progress, and should not even be
-considered draft yet. Even the name might change; this is being written
-as development progresses.**
-
+**NOTE: This is still in-progress, and may change substantially as development
+progresses.**
 
 Abstract
 ========
@@ -287,7 +285,7 @@ A *channel layer* should provide an object with these attributes
 
 * ``extensions``, a list of unicode string names indicating which
   extensions this layer provides, or empty if it supports none.
-  The only valid extension name is ``groups``.
+  The only valid extension names are ``groups`` and ``statistics`.
 
 A channel layer implementing the ``groups`` extension must also provide:
 
