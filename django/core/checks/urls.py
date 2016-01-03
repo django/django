@@ -18,7 +18,7 @@ def check_urlconf(urlconf):
     """
     warnings = []
     for urlpattern in urlconf.urlpatterns:
-        if urlpattern.is_view():
+        if urlpattern.is_endpoint():
             warnings.extend(check_pattern_name(urlpattern))
         else:
             warnings.extend(check_include_trailing_dollar(urlpattern))

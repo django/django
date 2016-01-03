@@ -45,7 +45,7 @@ class Dispatcher(object):
         for pattern in reversed(root.target.urlpatterns):
             constraints += pattern.constraints
             kwargs.push(pattern.target.kwargs)
-            if pattern.is_view():
+            if pattern.is_endpoint():
                 value = list(constraints), kwargs.flatten()
                 self.reverse_dict.appendlist(namespace_root + (pattern.target.view,), value)
                 if pattern.target.url_name:

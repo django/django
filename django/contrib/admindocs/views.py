@@ -371,10 +371,10 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
     views = []
     for urlpattern in urlpatterns:
         try:
-            name = urlpattern.target.namespace if not urlpattern.is_view() else None
+            name = urlpattern.target.namespace if not urlpattern.is_endpoint() else None
         except AttributeError:
             raise TypeError(_("%s does not appear to be a URLPattern object") % urlpattern)
-        if urlpattern.is_view():
+        if urlpattern.is_endpoint():
             views.append((
                 urlpattern.target.view, base + ''.join(c.describe() for c in urlpattern.constraints),
                 namespace, urlpattern.target.url_name,
