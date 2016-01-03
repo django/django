@@ -36,6 +36,9 @@ class AsgiRequest(http.HttpRequest):
         self.META = {
             "REQUEST_METHOD": self.method,
             "QUERY_STRING": self.message.get('query_string', ''),
+            # Old code will need these for a while
+            "wsgi.multithread": True,
+            "wsgi.multiprocess": True,
         }
         if self.message.get('client', None):
             self.META['REMOTE_ADDR'] = self.message['client'][0]
