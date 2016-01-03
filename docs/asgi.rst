@@ -783,8 +783,10 @@ The ``start_response`` callable maps similarly to Response:
 * The ``status`` argument becomes ``status`` and ``status_text``
 * ``response_headers`` maps to ``headers``
 
-The main difference is that ASGI is incapable of performing streaming
-of HTTP body input, and instead must buffer it all into a message first.
+It may even be possible to map Request Body Chunks in a way that allows
+streaming of body data, though it would likely be easier and sufficient for
+many applications to simply buffer the whole body into memory before calling
+the WSGI application.
 
 
 Common Questions
@@ -801,13 +803,7 @@ Common Questions
 TODOs
 =====
 
-* Work out if we really can just leave HTTP body as byte string. Seems too big.
-  Might need some reverse-single-reader chunking? Or just say channel layer
-  message size dictates body size.
-
 * Maybe remove ``http_version`` and replace with ``supports_server_push``?
-
-* Be sure we want to leave HTTP ``get`` and ``post`` out.
 
 * ``receive_many`` can't easily be implemented with async/cooperative code
   behind it as it's nonblocking - possible alternative call type?
