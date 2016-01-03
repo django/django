@@ -174,11 +174,11 @@ number).
 Extensions
 ----------
 
-ASGI has the concept of *extensions*, of which one is specified in this
-document. Extensions are functionality that is
+Extensions are functionality that is
 not required for basic application code and nearly all protocol server
-code, and so has been made optional in order to encourage lighter-weight
-channel layers to be written.
+code, and so has been made optional in order to enable lightweight
+channel layers for applications that don't need the full feature set defined
+here.
 
 There are two extensions defined here: the ``groups`` extension, which
 is expanded on below, and the ``statistics`` extension, which allows
