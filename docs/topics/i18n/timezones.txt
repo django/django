@@ -1,5 +1,3 @@
-.. _time-zones:
-
 ==========
 Time zones
 ==========

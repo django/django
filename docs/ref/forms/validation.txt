@@ -1,7 +1,7 @@
 .. currentmodule:: django.forms
 
-.. _form-and-field-validation:
 
+=========================
 Form and field validation
 =========================
 

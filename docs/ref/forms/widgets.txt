@@ -496,7 +496,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATE_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`format-localization </topics/i18n/formatting>`.
 
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
@@ -513,7 +513,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`format-localization </topics/i18n/formatting>`.
 
     By default, the microseconds part of the time value is always set to ``0``.
     If microseconds are required, use a subclass with the
@@ -534,7 +534,7 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`TIME_INPUT_FORMATS` and respects
-    :ref:`format-localization`.
+    :doc:`format-localization </topics/i18n/formatting>`.
 
     For the treatment of microseconds, see :class:`DateTimeInput`.
 
