@@ -129,7 +129,7 @@ an environment variable, or by configuring the library path for the entire
 system.
 
 ``LD_LIBRARY_PATH`` environment variable
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A user may set this environment variable to customize the library paths
 they want to use.  The typical library directory for software
@@ -140,7 +140,7 @@ could place the following in their bash profile::
     export LD_LIBRARY_PATH=/usr/local/lib
 
 Setting system library path
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
 additional paths from files in another directory, such as ``/etc/ld.so.conf.d``.
@@ -160,7 +160,7 @@ modifying the system library path::
 .. _binutils:
 
 Install ``binutils``
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 GeoDjango uses the ``find_library`` function (from the ``ctypes.util`` Python
 module) to discover libraries.  The ``find_library`` routine uses a program
@@ -203,7 +203,7 @@ Foundation, however, this is not required.
 .. _macosx_python:
 
 Python
-^^^^^^
+~~~~~~
 
 Although OS X comes with Python installed, users can use `framework
 installers`__ provided by the Python Software Foundation.  An advantage to
@@ -223,7 +223,7 @@ __ https://www.python.org/ftp/python/
 .. _postgresapp:
 
 Postgres.app
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 `Postgres.app <http://postgresapp.com/>`_ is a standalone PostgreSQL server
 that includes the PostGIS extension. You will also need to install ``gdal`` and
@@ -243,7 +243,7 @@ terminal prompt.
 .. _homebrew:
 
 Homebrew
-^^^^^^^^
+~~~~~~~~
 
 `Homebrew`__ provides "recipes" for building binaries and packages from source.
 It provides recipes for the GeoDjango prerequisites on Macintosh computers
@@ -263,7 +263,7 @@ __ http://brew.sh/
 .. _kyngchaos:
 
 KyngChaos packages
-^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~
 
 William Kyngesburye provides a number of `geospatial library binary packages`__
 that make it simple to get GeoDjango installed on OS X without compiling
@@ -306,7 +306,7 @@ __ http://www.kyngchaos.com/software/postgres
 .. _psycopg2_kyngchaos:
 
 psycopg2
-~~~~~~~~
+^^^^^^^^
 
 After you've installed the KyngChaos binaries and modified your ``PATH``, as
 described above, ``psycopg2`` may be installed using the following command::
@@ -334,7 +334,7 @@ __ http://pdb.finkproject.org/pdb/browse.php?summary=django-gis
 .. _macports:
 
 MacPorts
-^^^^^^^^
+~~~~~~~~
 
 `MacPorts`__ may be used to install GeoDjango prerequisites on Macintosh
 computers running OS X.  Because MacPorts still builds the software from source,
@@ -379,7 +379,7 @@ GeoDjango on Windows.
     GEOS and GDAL, are not yet provided by the :ref:`OSGeo4W` installer.
 
 Python
-^^^^^^
+~~~~~~
 
 First, download the latest `Python 2.7 installer`__ from the Python website.
 Next, run the installer and keep the defaults -- for example, keep
@@ -395,7 +395,7 @@ Next, run the installer and keep the defaults -- for example, keep
 __ https://python.org/download/
 
 PostgreSQL
-^^^^^^^^^^
+~~~~~~~~~~
 
 First, download the latest `PostgreSQL 9.x installer`__ from the
 `EnterpriseDB`__ website.  After downloading, simply run the installer,
@@ -427,7 +427,7 @@ __ http://www.enterprisedb.com
 .. _postgisasb:
 
 PostGIS
-^^^^^^^
+~~~~~~~
 
 From within the Application Stack Builder (to run outside of the installer,
 :menuselection:`Start --> Programs --> PostgreSQL 9.x`), select
@@ -446,7 +446,7 @@ default PostGIS database).
     password in the 'Database Connection Information' dialog.
 
 psycopg2
-^^^^^^^^
+~~~~~~~~
 
 The ``psycopg2`` Python module provides the interface between Python and the
 PostgreSQL database.  Download the latest `Windows installer`__ for your version
@@ -457,7 +457,7 @@ __ http://www.stickpeople.com/projects/python/win-psycopg/
 .. _osgeo4w:
 
 OSGeo4W
-^^^^^^^
+~~~~~~~
 
 The `OSGeo4W installer`_ makes it simple to install the PROJ.4, GDAL, and GEOS
 libraries required by GeoDjango.  First, download the `OSGeo4W installer`_,
@@ -471,7 +471,7 @@ installer.
 .. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 
 Modify Windows environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to use GeoDjango, you will need to add your Python and OSGeo4W
 directories to your Windows system ``Path``, as well as create ``GDAL_DATA``
@@ -506,7 +506,7 @@ script, :download:`geodjango_setup.bat`.
     variables accordingly.
 
 Install Django and set up database
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Finally, :ref:`install Django <installing-official-release>` on your system.
 

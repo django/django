@@ -13,7 +13,7 @@ serializer to handle any format (text-based or not).
     form, you could use the :djadmin:`dumpdata` management command.
 
 Serializing data
-----------------
+================
 
 At the highest level, serializing data is a very simple operation::
 
@@ -50,7 +50,7 @@ This is useful if you want to serialize data directly to a file-like object
 .. _subset-of-fields:
 
 Subset of fields
-~~~~~~~~~~~~~~~~
+----------------
 
 If you only want a subset of fields to be serialized, you can
 specify a ``fields`` argument to the serializer::
@@ -69,7 +69,7 @@ be serialized.
     model, the deserializer will not be able to save deserialized instances.
 
 Inherited Models
-~~~~~~~~~~~~~~~~
+----------------
 
 If you have a model that is defined using an :ref:`abstract base class
 <abstract-base-classes>`, you don't have to do anything special to serialize
@@ -102,7 +102,7 @@ serialize the ``Place`` models as well::
     data = serializers.serialize('xml', all_objects)
 
 Deserializing data
-------------------
+==================
 
 Deserializing data is also a fairly simple operation::
 
@@ -147,7 +147,7 @@ argument is passed in as ``True``::
 .. _serialization-formats:
 
 Serialization formats
----------------------
+=====================
 
 Django supports a number of serialization formats, some of which require you
 to install third-party Python modules:
@@ -167,7 +167,7 @@ Identifier  Information
 .. _PyYAML: http://www.pyyaml.org/
 
 XML
-~~~
+---
 
 The basic XML serialization format is quite simple::
 
@@ -226,7 +226,7 @@ This example links the given user with the permission models with PKs 46 and 47.
 .. _serialization-formats-json:
 
 JSON
-~~~~
+----
 
 When staying with the same example data as before it would be serialized as
 JSON in the following way::
@@ -275,7 +275,7 @@ Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 .. _ecma-262: http://www.ecma-international.org/ecma-262/5.1/#sec-15.9.1.15
 
 YAML
-~~~~
+----
 
 YAML serialization looks quite similar to JSON. The object list is serialized
 as a sequence mappings with the keys "pk", "model" and "fields". Each field is
@@ -290,7 +290,7 @@ Referential fields are again just represented by the PK or sequence of PKs.
 .. _topics-serialization-natural-keys:
 
 Natural keys
-------------
+============
 
 The default serialization strategy for foreign keys and many-to-many relations
 is to serialize the value of the primary key(s) of the objects in the relation.
@@ -326,7 +326,7 @@ key is a tuple of values that can be used to uniquely identify an
 object instance without using the primary key value.
 
 Deserialization of natural keys
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------
 
 Consider the following two models::
 
@@ -419,7 +419,7 @@ model's manager has a ``get_by_natural_key()`` method and if so, use it to
 populate the deserialized object's primary key.
 
 Serialization of natural keys
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------
 
 So how do you get Django to emit a natural key when serializing an object?
 Firstly, you need to add another method -- this time to the model itself::
@@ -487,7 +487,7 @@ line flags to generate natural keys.
     key values, just don't define the ``get_by_natural_key()`` method.
 
 Dependencies during serialization
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------
 
 Since natural keys rely on database lookups to resolve references, it
 is important that the data exists before it is referenced. You can't make

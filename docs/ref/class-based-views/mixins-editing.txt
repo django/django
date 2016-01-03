@@ -15,7 +15,7 @@ The following mixins are used to construct Django's editing views:
     the documentation on :doc:`/ref/class-based-views/generic-editing`.
 
 FormMixin
----------
+=========
 
 .. class:: django.views.generic.edit.FormMixin
 
@@ -95,7 +95,7 @@ FormMixin
         name 'form'.
 
 ModelFormMixin
---------------
+==============
 
 .. class:: django.views.generic.edit.ModelFormMixin
 
@@ -181,7 +181,7 @@ ModelFormMixin
 
 
 ProcessFormView
----------------
+===============
 
 .. class:: django.views.generic.edit.ProcessFormView
 
@@ -221,7 +221,7 @@ ProcessFormView
 
 
 DeletionMixin
--------------
+=============
 
 .. class:: django.views.generic.edit.DeletionMixin
 

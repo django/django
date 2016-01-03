@@ -330,7 +330,7 @@ cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
 immediately escalates to a remote code execution vulnerability.
 
 Bundled Serializers
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 .. class:: serializers.JSONSerializer
 
@@ -360,7 +360,7 @@ Bundled Serializers
 .. _custom-serializers:
 
 Write Your Own Serializer
-^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
 the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle

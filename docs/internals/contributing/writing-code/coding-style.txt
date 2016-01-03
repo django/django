@@ -5,7 +5,7 @@ Coding style
 Please follow these coding standards when writing code for inclusion in Django.
 
 Python style
-------------
+============
 
 * Please conform to the indentation style dictated in the ``.editorconfig``
   file. We recommend using a text editor with `EditorConfig`_ support to avoid
@@ -52,7 +52,7 @@ Python style
   to use regular expression matching.
 
 Imports
--------
+=======
 
 * Use `isort <https://github.com/timothycrosley/isort#readme>`_ to automate
   import sorting using the guidelines below.
@@ -132,7 +132,7 @@ Imports
       from django.views.generic.base import View
 
 Template style
---------------
+==============
 
 * In Django template code, put one (and only one) space between the curly
   brackets and the tag contents.
@@ -150,7 +150,7 @@ Template style
       {{foo}}
 
 View style
-----------
+==========
 
 * In Django views, the first parameter in a view function should be called
   ``request``.
@@ -166,7 +166,7 @@ View style
           # ...
 
 Model style
------------
+===========
 
 * Field names should be all lowercase, using underscores instead of
   camelCase.
@@ -240,7 +240,7 @@ Model style
         )
 
 Use of ``django.conf.settings``
--------------------------------
+===============================
 
 Modules should not in general use settings stored in ``django.conf.settings``
 at the top level (i.e. evaluated when the module is imported). The explanation
@@ -276,7 +276,7 @@ such as ``django.utils.functional.LazyObject``,
 ``django.utils.functional.lazy()`` or ``lambda``.
 
 Miscellaneous
--------------
+=============
 
 * Mark all strings for internationalization; see the :doc:`i18n
   documentation </topics/i18n/index>` for details.
@@ -299,7 +299,7 @@ Miscellaneous
   single trivial change.
 
 JavaScript style
-----------------
+================
 
 For details about the JavaScript code style used by Django, see
 :doc:`javascript`.

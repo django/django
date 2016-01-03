@@ -24,7 +24,7 @@ Field access API
 ================
 
 Retrieving a single field instance of a model by name
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------------------
 
 .. method:: Options.get_field(field_name)
 
@@ -62,7 +62,7 @@ Retrieving a single field instance of a model by name
         FieldDoesNotExist: User has no field named 'does_not_exist'
 
 Retrieving all field instances of a model
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 .. method:: Options.get_fields(include_parents=True, include_hidden=False)
 

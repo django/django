@@ -9,7 +9,7 @@ Django provides a small set of tools that come in handy when writing tests.
 .. _test-client:
 
 The test client
----------------
+===============
 
 The test client is a Python class that acts as a dummy Web browser, allowing
 you to test your views and interact with your Django-powered application
@@ -42,7 +42,7 @@ short:
 A comprehensive test suite should use a combination of both test types.
 
 Overview and a quick example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------
 
 To use the test client, instantiate ``django.test.Client`` and retrieve
 Web pages::
@@ -105,7 +105,7 @@ Note a few important things about how the test client works:
       >>> csrf_client = Client(enforce_csrf_checks=True)
 
 Making requests
-~~~~~~~~~~~~~~~
+---------------
 
 Use the ``django.test.Client`` class to make requests.
 
@@ -415,7 +415,7 @@ Use the ``django.test.Client`` class to make requests.
         to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
 
 Testing responses
-~~~~~~~~~~~~~~~~~
+-----------------
 
 The ``get()`` and ``post()`` methods both return a ``Response`` object. This
 ``Response`` object is *not* the same as the ``HttpResponse`` object returned
@@ -526,7 +526,7 @@ of any settings in the HTTP headers. For example, you could determine the
 content type of a response using ``response['Content-Type']``.
 
 Exceptions
-~~~~~~~~~~
+----------
 
 If you point the test client at a view that raises an exception, that exception
 will be visible in the test case. You can then use a standard ``try ... except``
@@ -540,7 +540,7 @@ exceptions internally and converts them into the appropriate HTTP response
 codes. In these cases, you can check ``response.status_code`` in your test.
 
 Persistent state
-~~~~~~~~~~~~~~~~
+----------------
 
 The test client is stateful. If a response returns a cookie, then that cookie
 will be stored in the test client and sent with all subsequent ``get()`` and
@@ -574,7 +574,7 @@ can access these properties as part of a test condition.
             session.save()
 
 Example
-~~~~~~~
+-------
 
 The following is a simple unit test using the test client::
 
@@ -603,7 +603,7 @@ The following is a simple unit test using the test client::
 .. _django-testcase-subclasses:
 
 Provided test case classes
---------------------------
+==========================
 
 Normal Python unit test classes extend a base class of
 :class:`unittest.TestCase`. Django provides a few extensions of this base class:
@@ -618,7 +618,7 @@ Normal Python unit test classes extend a base class of
    Hierarchy of Django unit testing classes
 
 SimpleTestCase
-~~~~~~~~~~~~~~
+--------------
 
 .. class:: SimpleTestCase()
 
@@ -702,7 +702,7 @@ then you should use :class:`~django.test.TransactionTestCase` or
     calling ``super()`` to avoid this.
 
 TransactionTestCase
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. class:: TransactionTestCase()
 
@@ -743,7 +743,7 @@ to test the effects of commit and rollback:
 ``TransactionTestCase`` inherits from :class:`~django.test.SimpleTestCase`.
 
 TestCase
-~~~~~~~~
+--------
 
 .. class:: TestCase()
 
@@ -812,7 +812,7 @@ additions, including:
 .. _live-test-server:
 
 LiveServerTestCase
-~~~~~~~~~~~~~~~~~~
+------------------
 
 .. class:: LiveServerTestCase()
 
@@ -966,10 +966,10 @@ out the `full reference`_ for more details.
     .. _Selenium documentation: http://seleniumhq.org/docs/04_webdriver_advanced.html#explicit-waits
 
 Test cases features
--------------------
+===================
 
 Default test client
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. attribute:: SimpleTestCase.client
 
@@ -1008,7 +1008,7 @@ This means, instead of instantiating a ``Client`` in each test::
             self.assertEqual(response.status_code, 200)
 
 Customizing the test client
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 .. attribute:: SimpleTestCase.client_class
 
@@ -1032,7 +1032,7 @@ attribute::
 .. _topics-testing-fixtures:
 
 Fixture loading
-~~~~~~~~~~~~~~~
+---------------
 
 .. attribute:: TransactionTestCase.fixtures
 
@@ -1089,7 +1089,7 @@ using multiple databases and set :attr:`multi_db=True
 <TransactionTestCase.multi_db>`, fixtures will be loaded into all databases.
 
 URLconf configuration
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 If your application provides views, you may want to include tests that use the
 test client to exercise those views. However, an end user is free to deploy the
@@ -1101,7 +1101,7 @@ particular URL. Decorate your test class or test method with
 .. _emptying-test-outbox:
 
 Multi-database support
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 .. attribute:: TransactionTestCase.multi_db
 
@@ -1139,7 +1139,7 @@ If ``multi_db=True``, fixtures are loaded into all databases.
 .. _overriding-settings:
 
 Overriding settings
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 .. warning::
 
@@ -1315,7 +1315,7 @@ MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
 ================================ ========================
 
 Emptying the test outbox
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
 If you use any of Django's custom ``TestCase`` classes, the test runner will
 clear the contents of the test email outbox at the start of each test case.
@@ -1325,7 +1325,7 @@ For more detail on email services during tests, see `Email services`_ below.
 .. _assertions:
 
 Assertions
-~~~~~~~~~~
+----------
 
 As Python's normal :class:`unittest.TestCase` class implements assertion methods
 such as :meth:`~unittest.TestCase.assertTrue` and
@@ -1616,7 +1616,7 @@ your test suite.
 .. _topics-testing-email:
 
 Email services
---------------
+==============
 
 If any of your Django views send email using :doc:`Django's email
 functionality </topics/email>`, you probably don't want to send email each time
@@ -1673,7 +1673,7 @@ manually, assign the empty list to ``mail.outbox``::
 .. _topics-testing-management-commands:
 
 Management Commands
--------------------
+===================
 
 Management commands can be tested with the
 :func:`~django.core.management.call_command` function. The output can be
@@ -1692,7 +1692,7 @@ redirected into a ``StringIO`` instance::
 .. _skipping-tests:
 
 Skipping tests
---------------
+==============
 
 .. currentmodule:: django.test
 

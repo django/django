@@ -27,10 +27,10 @@ What's new in Django 1.10
 ...
 
 Minor features
-~~~~~~~~~~~~~~
+--------------
 
 :mod:`django.contrib.admin`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * For sites running on a subpath, the default :attr:`URL for the "View site"
   link <django.contrib.admin.AdminSite.site_url>` at the top of each admin page
@@ -52,12 +52,12 @@ Minor features
   This makes it easier to add custom tools in this case.
 
 :mod:`django.contrib.admindocs`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.auth`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The default iteration count for the PBKDF2 password hasher has been increased
   by 25%. This backwards compatible change will not affect users who have
@@ -69,12 +69,12 @@ Minor features
   being able to log out.
 
 :mod:`django.contrib.contenttypes`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.gis`
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :ref:`Distance lookups <distance-lookups>` now accept expressions as the
   distance value parameter.
@@ -114,39 +114,39 @@ Minor features
   <django.contrib.gis.geos.MultiLineString.closed>` properties.
 
 :mod:`django.contrib.messages`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.postgres`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.redirects`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.sessions`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :djadmin:`clearsessions` management command now removes file-based
   sessions.
 
 :mod:`django.contrib.sitemaps`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 :mod:`django.contrib.sites`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :class:`~django.contrib.sites.models.Site` model now supports
   :ref:`natural keys <topics-serialization-natural-keys>`.
 
 :mod:`django.contrib.staticfiles`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :ttag:`static` template tag now uses ``django.contrib.staticfiles``
   if it's in ``INSTALLED_APPS``. This is especially useful for third-party apps
@@ -155,60 +155,60 @@ Minor features
   not worry about whether or not the ``staticfiles`` app is installed.
 
 :mod:`django.contrib.syndication`
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 Cache
-^^^^^
+~~~~~
 
 * The file-based cache backend now uses the highest pickling protocol.
 
 CSRF
-^^^^
+~~~~
 
 * The default :setting:`CSRF_FAILURE_VIEW`, ``views.csrf.csrf_failure()`` now
   accepts an optional ``template_name`` parameter, defaulting to
   ``'403_csrf.html'``, to control the template used to render the page.
 
 Database backends
-^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 * ...
 
 Email
-^^^^^
+~~~~~
 
 * ...
 
 File Storage
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 * ...
 
 File Uploads
-^^^^^^^^^^^^
+~~~~~~~~~~~~
 
 * ...
 
 Forms
-^^^^^
+~~~~~
 
 * Form and widget ``Media`` is now served using
   :mod:`django.contrib.staticfiles` if installed.
 
 Generic Views
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 * ...
 
 Internationalization
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~
 
 * ...
 
 Management Commands
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 * The new :djadminopt:`--fail-level` option of the :djadmin:`check` command
   allows specifying the message level that will cause the command to exit with
@@ -225,12 +225,12 @@ Management Commands
   use of the "plain" Python interpreter.
 
 Migrations
-^^^^^^^^^^
+~~~~~~~~~~
 
 * Added support for serialization of ``enum.Enum`` objects.
 
 Models
-^^^^^^
+~~~~~~
 
 * Reverse foreign keys from proxy models are now propagated to their
   concrete class. The reverse relation attached by a
@@ -254,7 +254,7 @@ Models
   may be called without any arguments to return all objects in the queryset.
 
 Requests and Responses
-^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~
 
 * Added ``request.user`` to the debug view.
 
@@ -264,30 +264,30 @@ Requests and Responses
   stream-like object and allow wrapping it with :py:class:`io.TextIOWrapper`.
 
 Serialization
-^^^^^^^^^^^^^
+~~~~~~~~~~~~~
 
 * The ``django.core.serializers.json.DjangoJSONEncoder`` now knows how to
   serialize lazy strings, typically used for translatable content.
 
 Signals
-^^^^^^^
+~~~~~~~
 
 * ...
 
 Templates
-^^^^^^^^^
+~~~~~~~~~
 
 * Added the ``autoescape`` option to the
   :class:`~django.template.backends.django.DjangoTemplates` backend and the
   :class:`~django.template.Engine` class.
 
 Tests
-^^^^^
+~~~~~
 
 * ...
 
 URLs
-^^^^
+~~~~
 
 * An addition in :func:`django.setup()` allows URL resolving that happens
   outside of the request/response cycle (e.g. in management commands and
@@ -295,7 +295,7 @@ URLs
   is set.
 
 Validators
-^^^^^^^^^^
+~~~~~~~~~~
 
 * :class:`~django.core.validators.URLValidator` now limits the length of
   domain name labels to 63 characters and the total length of domain
@@ -313,7 +313,7 @@ Backwards incompatible changes in 1.10
     may appear as a backwards incompatible change.
 
 Database backend API
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 * ...
 
@@ -414,7 +414,7 @@ Features deprecated in 1.10
 ===========================
 
 Direct assignment to a reverse foreign key or many-to-many relation
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------------------------------------------------
 
 Instead of assigning related objects using direct assignment::
 
@@ -429,7 +429,7 @@ added in Django 1.9::
 This prevents confusion about an assignment resulting in an implicit save.
 
 :mod:`django.contrib.gis`
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 * The ``get_srid()`` and ``set_srid()`` methods of
   :class:`~django.contrib.gis.geos.GEOSGeometry` are deprecated in favor
@@ -448,7 +448,7 @@ This prevents confusion about an assignment resulting in an implicit save.
   :attr:`~django.contrib.gis.geos.GEOSGeometry.unary_union` property.
 
 Miscellaneous
-~~~~~~~~~~~~~
+-------------
 
 * The ``makemigrations --exit`` option is deprecated in favor of the
   :djadminopt:`--check` option.

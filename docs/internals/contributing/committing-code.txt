@@ -10,7 +10,7 @@ who wants to contribute code to Django, have a look at
 .. _handling-pull-requests:
 
 Handling pull requests
-----------------------
+======================
 
 Since Django is now hosted at GitHub, most patches are provided in the form of
 pull requests.
@@ -101,7 +101,7 @@ community, getting work done, and having a usable commit history.
 .. _committing-guidelines:
 
 Committing guidelines
----------------------
+=====================
 
 In addition, please follow the following guidelines when committing code to
 Django's Git repository:
@@ -200,7 +200,7 @@ Django's Git repository:
   to automate this.
 
 Reverting commits
------------------
+=================
 
 Nobody's perfect; mistakes will be committed.
 

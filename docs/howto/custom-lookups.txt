@@ -10,7 +10,7 @@ explains how to write custom lookups and how to alter the working of existing
 lookups. For the API references of lookups, see the :doc:`/ref/models/lookups`.
 
 A simple lookup example
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
 
 Let's start with a simple custom lookup. We will write a custom lookup ``ne``
 which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
@@ -93,7 +93,7 @@ the parameters for the query. We then return a tuple containing the generated
 SQL string and the parameters.
 
 A simple transformer example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 The custom lookup above is great, but in some cases you may want to be able to
 chain lookups together. For example, let's suppose we are building an
@@ -160,7 +160,7 @@ This ensures that further lookups like ``abs__lte`` behave as they would for
 a ``FloatField``.
 
 Writing an efficient abs__lt lookup
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===================================
 
 When using the above written ``abs`` lookup, the SQL produced will not use
 indexes efficiently in some cases. In particular, when we use
@@ -211,7 +211,7 @@ transformations in Python.
     be very efficient.
 
 A bilateral transformer example
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================
 
 The ``AbsoluteValue`` example we discussed previously is a transformation which
 applies to the left-hand side of the lookup. There may be some cases where you
@@ -248,7 +248,7 @@ insensitive query like this::
     SELECT ... WHERE UPPER("author"."name") = UPPER('doe')
 
 Writing alternative implementations for existing lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+========================================================
 
 Sometimes different database vendors require different SQL for the same
 operation. For this example we will rewrite a custom implementation for
@@ -276,7 +276,7 @@ methods, and then falls back to ``as_sql``. The vendor names for the in-built
 backends are ``sqlite``, ``postgresql``, ``oracle`` and ``mysql``.
 
 How Django determines the lookups and transforms which are used
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+===============================================================
 
 In some cases you may wish to dynamically change which ``Transform`` or
 ``Lookup`` is returned based on the name passed in, rather than fixing it. As

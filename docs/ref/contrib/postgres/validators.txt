@@ -5,7 +5,7 @@ Validators
 .. module:: django.contrib.postgres.validators
 
 ``KeysValidator``
------------------
+=================
 
 .. class:: KeysValidator(keys, strict=False, messages=None)
 
@@ -20,7 +20,7 @@ Validators
         the value of a key is non-empty.
 
 Range validators
-----------------
+================
 
 .. class:: RangeMaxValueValidator(limit_value, message=None)
 

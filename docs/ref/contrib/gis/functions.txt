@@ -36,7 +36,7 @@ Measurement         Relationships             Operations              Editors   
 ==================  =======================   ======================  ===================  ==================  =====================
 
 Area
-----
+====
 
 .. class:: Area(expression, **extra)
 
@@ -48,7 +48,7 @@ float value is returned, as it's not possible to automatically determine the
 unit of the field.
 
 AsGeoJSON
----------
+=========
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
@@ -80,7 +80,7 @@ Keyword Argument       Description
 =====================  =====================================================
 
 AsGML
------
+=====
 
 .. class:: AsGML(expression, version=2, precision=8, **extra)
 
@@ -111,7 +111,7 @@ Keyword Argument       Description
 __ https://en.wikipedia.org/wiki/Geography_Markup_Language
 
 AsKML
------
+=====
 
 .. class:: AsKML(expression, precision=8, **extra)
 
@@ -138,7 +138,7 @@ Keyword Argument       Description
 __ https://developers.google.com/kml/documentation/
 
 AsSVG
------
+=====
 
 .. class:: AsSVG(expression, relative=False, precision=8, **extra)
 
@@ -162,7 +162,7 @@ Keyword Argument       Description
 __ http://www.w3.org/Graphics/SVG/
 
 BoundingCircle
---------------
+==============
 
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
@@ -172,7 +172,7 @@ Accepts a single geographic field or expression and returns the smallest circle
 polygon that can fully contain the geometry.
 
 Centroid
---------
+========
 
 .. class:: Centroid(expression, **extra)
 
@@ -182,7 +182,7 @@ Accepts a single geographic field or expression and returns the ``centroid``
 value of the geometry.
 
 Difference
-----------
+==========
 
 .. class:: Difference(expr1, expr2, **extra)
 
@@ -197,7 +197,7 @@ geometry B.
     MySQL support was added.
 
 Distance
---------
+========
 
 .. class:: Distance(expr1, expr2, spheroid=None, **extra)
 
@@ -241,7 +241,7 @@ queryset is calculated::
     :ref:`supported_units`.
 
 Envelope
---------
+========
 
 .. class:: Envelope(expression, **extra)
 
@@ -251,7 +251,7 @@ Accepts a single geographic field or expression and returns the geometry
 representing the bounding box of the geometry.
 
 ForceRHR
---------
+========
 
 .. class:: ForceRHR(expression, **extra)
 
@@ -262,7 +262,7 @@ of the polygon/multipolygon in which all of the vertices follow the
 right-hand rule.
 
 GeoHash
--------
+=======
 
 .. class:: GeoHash(expression, **extra)
 
@@ -278,7 +278,7 @@ representation of the geometry.
 __ https://en.wikipedia.org/wiki/Geohash
 
 Intersection
-------------
+============
 
 .. class:: Intersection(expr1, expr2, **extra)
 
@@ -292,7 +292,7 @@ intersection between them.
     MySQL support was added.
 
 Length
-------
+======
 
 .. class:: Length(expression, spheroid=True, **extra)
 
@@ -309,7 +309,7 @@ accurate, less resource-intensive) or on a spheroid (more accurate, more
 resource-intensive) with the ``spheroid`` keyword argument.
 
 MemSize
--------
+=======
 
 .. class:: MemSize(expression, **extra)
 
@@ -319,7 +319,7 @@ Accepts a single geographic field or expression and returns the memory size
 (number of bytes) that the geometry field takes.
 
 NumGeometries
--------------
+=============
 
 .. class:: NumGeometries(expression, **extra)
 
@@ -330,7 +330,7 @@ geometries if the geometry field is a collection (e.g., a ``GEOMETRYCOLLECTION``
 or ``MULTI*`` field); otherwise returns ``None``.
 
 NumPoints
----------
+=========
 
 .. class:: NumPoints(expression, **extra)
 
@@ -340,7 +340,7 @@ Accepts a single geographic field or expression and returns the number of points
 in the first linestring in the geometry field; otherwise returns ``None``.
 
 Perimeter
----------
+=========
 
 .. class:: Perimeter(expression, **extra)
 
@@ -352,7 +352,7 @@ MySQL, a raw float value is returned, as it's not possible to automatically
 determine the unit of the field.
 
 PointOnSurface
---------------
+==============
 
 .. class:: PointOnSurface(expression, **extra)
 
@@ -362,7 +362,7 @@ Accepts a single geographic field or expression and returns a ``Point`` geometry
 guaranteed to lie on the surface of the field; otherwise returns ``None``.
 
 Reverse
--------
+=======
 
 .. class:: Reverse(expression, **extra)
 
@@ -372,7 +372,7 @@ Accepts a single geographic field or expression and returns a geometry with
 reversed coordinates.
 
 Scale
------
+=====
 
 .. class:: Scale(expression, x, y, z=0.0, **extra)
 
@@ -383,7 +383,7 @@ scaled coordinates by multiplying them with the ``x``, ``y``, and optionally
 ``z`` parameters.
 
 SnapToGrid
-----------
+==========
 
 .. class:: SnapToGrid(expression, *args, **extra)
 
@@ -403,7 +403,7 @@ Number of Arguments  Description
 ===================  =====================================================
 
 SymDifference
--------------
+=============
 
 .. class:: SymDifference(expr1, expr2, **extra)
 
@@ -418,7 +418,7 @@ parameters.
     MySQL support was added.
 
 Transform
----------
+=========
 
 .. class:: Transform(expression, srid, **extra)
 
@@ -435,7 +435,7 @@ the transformed geometry to the spatial reference system specified by the
     are not necessarily the same as those used by PostGIS.
 
 Translate
----------
+=========
 
 .. class:: Translate(expression, x, y, z=0.0, **extra)
 
@@ -446,7 +446,7 @@ its coordinates offset by the ``x``, ``y``, and optionally ``z`` numeric
 parameters.
 
 Union
------
+=====
 
 .. class:: Union(expr1, expr2, **extra)
 
