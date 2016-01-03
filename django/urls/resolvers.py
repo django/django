@@ -23,8 +23,8 @@ class ResolverMatch(object):
         self.endpoint = endpoint
         self.args = args
         self.kwargs = kwargs
-        self.app_names = [x for x in app_names if x] if app_names else []
-        self.namespaces = [x for x in namespaces if x] if namespaces else []
+        self.app_names = app_names or []
+        self.namespaces = namespaces or []
 
     @cached_property
     def func(self):
