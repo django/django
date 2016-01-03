@@ -263,10 +263,7 @@ Paul McMillan
     a continuous integration server, and likes proving that Django is a good
     choice for enterprise software.
 
-    He's the CTO of Oscaro_, an e-commerce company based in Paris, France.
-
     .. _Aymeric Augustin: https://myks.org/
-    .. _Oscaro: http://www.oscaro.com/
 
 `Claude Paroz`_
     Claude is a former teacher who fell in love with free software at the
