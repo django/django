@@ -448,13 +448,14 @@ Keys:
 * ``headers``: Dict of ``{name: value}``, where ``name`` is the lowercased
   HTTP header name as byte string and ``value`` is the header value as a byte
   string. If multiple headers with the same name are received, they should
-  be concatenated into a single header as per RFC 2616.
+  be concatenated into a single header as per RFC 2616. Header names containing
+  underscores should be discarded by the server.
 
 * ``body``: Body of the request, as a byte string. Optional, defaults to empty
   string. If ``body_channel`` is set, treat as start of body and concatenate
   on further chunks.
 
-* ``body_channel``: Single-reader unicode string channel name that contains
+* ``body_channel``: Single-reader channel name that contains
   Request Body Chunk messages representing a large request body.
   Optional, defaults to None. Chunks append to ``body`` if set. Presence of
   a channel indicates at least one Request Body Chunk message needs to be read,
