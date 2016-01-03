@@ -3,6 +3,7 @@ from importlib import import_module
 from threading import Lock
 
 from django.conf import urls
+from django.conf.urls import URLConf, URLPattern
 from django.template.context import BaseContext
 from django.utils import lru_cache, six
 from django.utils.datastructures import MultiValueDict
@@ -32,7 +33,7 @@ class Dispatcher(object):
 
         self._lock = Lock()
         self._namespaces = {
-            (): ((), urls.URLPattern([ScriptPrefix()], urls.Include(urls.URLConf(self.urlconf_name)))),
+            (): ((), URLPattern([ScriptPrefix()], URLConf(self.urlconf_name))),
         }
         self._loaded = set()
         self._callbacks = set()
@@ -41,7 +42,7 @@ class Dispatcher(object):
         self.app_dict = defaultdict(list)
 
     def _load(self, root, namespace_root, app_root, constraints, kwargs):
-        for pattern in reversed(root.target.urlconf.urlpatterns):
+        for pattern in reversed(root.target.urlpatterns):
             constraints += pattern.constraints
             kwargs.push(pattern.target.kwargs)
             if pattern.is_view():
@@ -57,11 +58,13 @@ class Dispatcher(object):
                 self.app_dict[app_name].append(pattern.target.namespace)
                 self._namespaces[namespace_root + (pattern.target.namespace,)] = (
                     app_name,
-                    urls.URLPattern(list(constraints), urls.Include(
-                        urls.URLConf(list(pattern.target.urlconf.urlpatterns), pattern.target.app_name),
-                        namespace=pattern.target.namespace,
-                        kwargs=kwargs.flatten(),
-                    ))
+                    URLPattern(
+                        list(constraints),
+                        URLConf(
+                            list(pattern.target.urlpatterns), pattern.target.app_name,
+                            namespace=pattern.target.namespace, kwargs=kwargs.flatten(),
+                        ),
+                    ),
                 )
             constraints = constraints[:-len(pattern.constraints)]
             kwargs.pop()

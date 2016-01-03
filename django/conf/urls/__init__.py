@@ -47,10 +47,13 @@ def include(arg, namespace=None, app_name=None):
         # No namespace hint - use manually provided namespace
         urlconf_module = arg
 
-    urlconf = URLConf(urlconf_module, app_name)
-    namespace = namespace or urlconf.app_name
+    if isinstance(urlconf_module, six.string_types):
+        urlconf_module = import_module(urlconf_module)
+    urlpatterns = getattr(urlconf_module, 'urlpatterns', urlconf_module)
+    app_name = getattr(urlconf_module, 'app_name', app_name)
+    namespace = namespace or app_name
 
-    if namespace and not urlconf.app_name:
+    if namespace and not app_name:
         warnings.warn(
             'Specifying a namespace in django.conf.urls.include() without '
             'providing an app_name is deprecated. Set the app_name attribute '
@@ -61,18 +64,14 @@ def include(arg, namespace=None, app_name=None):
 
     # Make sure we can iterate through the patterns (without this, some
     # testcases will break).
-    try:
-        urlconf.urlpatterns
-    except ImproperlyConfigured:
-        pass
-    else:
-        for pattern in urlconf.urlpatterns:
+    if isinstance(urlpatterns, (list, tuple)):
+        for urlpattern in urlpatterns:
             # Test if the LocaleRegexURLResolver is used within the include;
             # this should throw an error since this is not allowed!
-            if any(isinstance(constraint, LocalePrefix) for constraint in pattern.constraints):
+            if any(isinstance(constraint, LocalePrefix) for constraint in urlpattern.constraints):
                 raise ImproperlyConfigured('Using i18n_patterns in an included URLconf is not allowed.')
 
-    return urlconf, namespace
+    return urlconf_module, app_name, namespace
 
 
 def url(regex, view, kwargs=None, name=None, decorators=None, resolver_cls=None):
@@ -89,20 +88,20 @@ def url(regex, view, kwargs=None, name=None, decorators=None, resolver_cls=None)
         constraints = regex
 
     if isinstance(view, (list, tuple)):
-        urlconf, namespace = view
-        return URLPattern(constraints, Include(urlconf, namespace, kwargs, decorators), resolver_cls)
+        return URLPattern(constraints, URLConf(*view, kwargs=kwargs, decorators=decorators, resolver_cls=resolver_cls))
     elif callable(view):
-        return URLPattern(constraints, Endpoint(view, name, kwargs=kwargs, decorators=decorators), resolver_cls)
+        return URLPattern(constraints, Endpoint(view, name, kwargs, decorators, resolver_cls))
     else:
         raise TypeError('view must be a callable or a list/tuple in the case of include().')
 
 
 class Endpoint(object):
-    def __init__(self, view, url_name=None, kwargs=None, decorators=None):
+    def __init__(self, view, url_name=None, kwargs=None, decorators=None, resolver_cls=None):
         self.view = view
         self.url_name = url_name
         self.kwargs = kwargs or {}
         self.decorators = list(decorators) if decorators is not None else []
+        self._resolver_cls = resolver_cls
 
     @cached_property
     def lookup_str(self):
@@ -118,31 +117,33 @@ class Endpoint(object):
         else:
             return func.__module__ + "." + func.__name__
 
+    @cached_property
+    def resolver_cls(self):
+        from django.urls import ResolverEndpoint
+        return self._resolver_cls or ResolverEndpoint
+
 
 class URLPattern(object):
-    def __init__(self, constraints, target, resolver_cls=None):
+    def __init__(self, constraints, target):
         self.constraints = constraints
         self.target = target
-        self.resolver_cls = resolver_cls
 
     def is_view(self):
         return isinstance(self.target, Endpoint)
 
     def as_resolver(self, **kwargs):
-        from django.urls import Resolver, ResolverEndpoint
-        if self.resolver_cls is None:
-            cls = ResolverEndpoint if self.is_view() else Resolver
-        else:
-            cls = self.resolver_cls
-
+        cls = self.target.resolver_cls
         return cls(self, **kwargs)
 
 
 class URLConf(object):
-    def __init__(self, urlconf, app_name=None, decorators=None):
+    def __init__(self, urlconf, app_name=None, namespace=None, kwargs=None, decorators=None, resolver_cls=None):
         self.urlconf_name = urlconf
-        self._app_name = app_name
-        self._decorators = decorators
+        self.app_name = app_name
+        self.namespace = namespace
+        self.kwargs = kwargs or {}
+        self._decorators = decorators or []
+        self._resolver_cls = resolver_cls
 
     @cached_property
     def urlconf_module(self):
@@ -167,24 +168,72 @@ class URLConf(object):
 
     @cached_property
     def decorators(self):
-        return self._decorators or getattr(self.urlconf_module, 'decorators', [])
+        return self._decorators + getattr(self.urlconf_module, 'decorators', [])
 
     @cached_property
-    def app_name(self):
-        return self._app_name or getattr(self.urlconf_module, 'app_name', None)
+    def resolver_cls(self):
+        from django.urls import Resolver
+        return self._resolver_cls or getattr(self.urlconf_module, 'resolver_cls', Resolver)
 
 
-class Include(object):
-    def __init__(self, urlconf, namespace=None, kwargs=None, decorators=None):
-        self.urlconf = urlconf
-        self.kwargs = kwargs or {}
-        self._decorators = list(decorators) if decorators is not None else []
-        self.namespace = namespace or self.app_name
+# class URLConf(object):
+#     def __init__(self, urlconf, app_name=None, decorators=None, resolver_cls=None):
+#         self.urlconf_name = urlconf
+#         self._app_name = app_name
+#         self._decorators = decorators
+#         self._resolver_cls = resolver_cls
 
-    @cached_property
-    def app_name(self):
-        return self.urlconf.app_name
+#     @cached_property
+#     def urlconf_module(self):
+#         if isinstance(self.urlconf_name, six.string_types):
+#             return import_module(self.urlconf_name)
+#         else:
+#             return self.urlconf_name
 
-    @cached_property
-    def decorators(self):
-        return self._decorators + self.urlconf.decorators
+#     @property
+#     def urlpatterns(self):
+#         urlpatterns = getattr(self.urlconf_module, 'urlpatterns', self.urlconf_module)
+#         try:
+#             iter(urlpatterns)
+#         except TypeError:
+#             msg = (
+#                 "The included URLconf '{name}' does not appear to have any "
+#                 "patterns in it. If you see valid patterns in the file then "
+#                 "the issue is probably caused by a circular import."
+#             )
+#             raise ImproperlyConfigured(msg.format(name=self.urlconf_name))
+#         return urlpatterns
+
+#     @cached_property
+#     def app_name(self):
+#         return self._app_name or getattr(self.urlconf_module, 'app_name', None)
+
+#     @cached_property
+#     def decorators(self):
+#         return self._decorators or getattr(self.urlconf_module, 'decorators', [])
+
+#     @cached_property
+#     def resolver_cls(self):
+#         return self._resolver_cls or getattr(self.urlconf_module, 'resolver_cls', None)
+
+
+# class Include(object):
+#     def __init__(self, urlconf, namespace=None, kwargs=None, decorators=None, resolver_cls=None):
+#         self.urlconf = urlconf
+#         self.kwargs = kwargs or {}
+#         self._decorators = list(decorators) if decorators is not None else []
+#         self._resolver_cls = resolver_cls
+#         self.namespace = namespace or self.app_name
+
+#     @cached_property
+#     def app_name(self):
+#         return self.urlconf.app_name
+
+#     @cached_property
+#     def decorators(self):
+#         return self._decorators + self.urlconf.decorators
+
+#     @cached_property
+#     def resolver_cls(self):
+#         from django.urls import Resolver
+#         return self._resolver_cls or self.urlconf.resolver_cls or Resolver

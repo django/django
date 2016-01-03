@@ -986,65 +986,57 @@ class IncludeTests(SimpleTestCase):
     ]
     app_urls = URLObject('inc-app')
 
-    def assertIncludeEqual(self, include, patterns, app_name, namespace):
-        self.assertIsInstance(include, tuple, "include() did not return a 2-tuple.")
-        self.assertEqual(len(include), 2, "include() did not return a 2-tuple.")
-        urlconf, ns = include
-        self.assertEqual(urlconf.urlpatterns, patterns)
-        self.assertEqual(urlconf.app_name, app_name)
-        self.assertEqual(ns, namespace)
-
     def test_include_app_name_but_no_namespace(self):
         msg = "Must specify a namespace if specifying app_name."
         with self.assertRaisesMessage(ValueError, msg):
             include(self.url_patterns, app_name='bar')
 
     def test_include_urls(self):
-        self.assertIncludeEqual(include(self.url_patterns), self.url_patterns, None, None)
+        self.assertEqual(include(self.url_patterns), (self.url_patterns, None, None))
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace(self):
         # no app_name -> deprecated
-        self.assertIncludeEqual(include(self.url_patterns, 'namespace'), self.url_patterns, None, 'namespace')
+        self.assertEqual(include(self.url_patterns, 'namespace'), (self.url_patterns, None, 'namespace'))
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_namespace_app_name(self):
         # app_name argument to include -> deprecated
-        self.assertIncludeEqual(
+        self.assertEqual(
             include(self.url_patterns, 'namespace', 'app_name'),
-            self.url_patterns, 'app_name', 'namespace'
+            (self.url_patterns, 'app_name', 'namespace')
         )
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_include_3_tuple(self):
         # 3-tuple -> deprecated
-        self.assertIncludeEqual(
+        self.assertEqual(
             include((self.url_patterns, 'app_name', 'namespace')),
-            self.url_patterns, 'app_name', 'namespace'
+            (self.url_patterns, 'app_name', 'namespace')
         )
 
     def test_include_2_tuple(self):
-        self.assertIncludeEqual(
+        self.assertEqual(
             include((self.url_patterns, 'app_name')),
-            self.url_patterns, 'app_name', 'app_name'
+            (self.url_patterns, 'app_name', 'app_name')
         )
 
     def test_include_2_tuple_namespace(self):
-        self.assertIncludeEqual(
+        self.assertEqual(
             include((self.url_patterns, 'app_name'), namespace='namespace'),
-            self.url_patterns, 'app_name', 'namespace'
+            (self.url_patterns, 'app_name', 'namespace')
         )
 
     def test_include_app_name(self):
-        self.assertIncludeEqual(
+        self.assertEqual(
             include(self.app_urls),
-            self.app_urls.urlpatterns, 'inc-app', 'inc-app'
+            (self.app_urls, 'inc-app', 'inc-app')
         )
 
     def test_include_app_name_namespace(self):
-        self.assertIncludeEqual(
+        self.assertEqual(
             include(self.app_urls, 'namespace'),
-            self.app_urls.urlpatterns, 'inc-app', 'namespace'
+            (self.app_urls, 'inc-app', 'namespace')
         )
 
 

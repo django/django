@@ -2,7 +2,6 @@ from functools import update_wrapper
 
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import URLConf
 from django.contrib.admin import ModelAdmin, actions
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -301,7 +300,7 @@ class AdminSite(object):
 
     @property
     def urls(self):
-        return URLConf(self.get_urls(), 'admin'), self.name
+        return self.get_urls(), 'admin', self.name
 
     def each_context(self, request):
         """

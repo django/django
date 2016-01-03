@@ -23,7 +23,7 @@ def check_urlconf(urlconf):
         else:
             warnings.extend(check_include_trailing_dollar(urlpattern))
             # check resolver recursively
-            warnings.extend(check_urlconf(urlpattern.target.urlconf))
+            warnings.extend(check_urlconf(urlpattern.target))
 
         warnings.extend(check_pattern_startswith_slash(urlpattern))
 

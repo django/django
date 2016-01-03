@@ -9,7 +9,7 @@ from __future__ import unicode_literals
 
 from functools import partial, update_wrapper
 
-from django.conf.urls import Include, URLConf, URLPattern
+from django.conf.urls import URLConf, URLPattern
 from django.utils import lru_cache
 from django.utils.decorators import available_attrs
 from django.utils.functional import cached_property
@@ -104,7 +104,7 @@ def get_resolver(urlconf=None):
     if urlconf is None:
         from django.conf import settings
         urlconf = settings.ROOT_URLCONF
-    return Resolver(URLPattern([ScriptPrefix()], Include(URLConf(urlconf))))
+    return Resolver(URLPattern([ScriptPrefix()], URLConf(urlconf)))
 
 
 class BaseResolver(object):
@@ -139,9 +139,9 @@ class BaseResolver(object):
 class Resolver(BaseResolver):
     def __init__(self, pattern, *args, **kwargs):
         super(Resolver, self).__init__(pattern, *args, **kwargs)
-        self.urlconf = pattern.target.urlconf
+        self.urlconf = pattern.target
         self.namespace = pattern.target.namespace
-        self.app_name = pattern.target.urlconf.app_name
+        self.app_name = pattern.target.app_name
 
     def is_endpoint(self):
         return False
@@ -156,7 +156,7 @@ class Resolver(BaseResolver):
     @cached_property
     def resolvers(self):
         return [
-            pattern.as_resolver(self.decorators)
+            pattern.as_resolver(decorators=self.decorators)
             for pattern in self.urlconf.urlpatterns
         ]
 

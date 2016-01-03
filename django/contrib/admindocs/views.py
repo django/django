@@ -381,7 +381,7 @@ def extract_views_from_urlpatterns(urlpatterns, base='', namespace=None):
             ))
         else:
             try:
-                sub_urlpatterns = urlpattern.target.urlconf.urlpatterns
+                sub_urlpatterns = urlpattern.target.urlpatterns
             except ImportError:
                 continue
             views.extend(extract_views_from_urlpatterns(

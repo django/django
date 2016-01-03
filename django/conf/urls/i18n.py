@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import Include, URLConf, URLPattern, url
+from django.conf.urls import URLConf, URLPattern, url
 from django.urls import LocalePrefix
 from django.views.i18n import set_language
 
@@ -12,7 +12,7 @@ def i18n_patterns(*urls):
     """
     if not settings.USE_I18N:
         return urls
-    return [URLPattern([LocalePrefix()], Include(URLConf(urls)))]
+    return [URLPattern([LocalePrefix()], URLConf(urls))]
 
 
 urlpatterns = [
