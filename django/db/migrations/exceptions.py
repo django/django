@@ -39,6 +39,13 @@ class IrreversibleError(RuntimeError):
     pass
 
 
+class InconsistentMigrationHistory(Exception):
+    """
+    Raised when migrations are applied before their dependencies
+    """
+    pass
+
+
 @python_2_unicode_compatible
 class NodeNotFoundError(LookupError):
     """

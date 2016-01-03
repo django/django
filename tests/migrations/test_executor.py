@@ -1,6 +1,8 @@
 from django.apps.registry import apps as global_apps
 from django.db import connection
-from django.db.migrations.exceptions import InvalidMigrationPlan
+from django.db.migrations.exceptions import (
+    InconsistentMigrationHistory, InvalidMigrationPlan,
+)
 from django.db.migrations.executor import MigrationExecutor
 from django.db.migrations.graph import MigrationGraph
 from django.db.migrations.recorder import MigrationRecorder
@@ -701,3 +703,32 @@ class ExecutorUnitTests(TestCase):
         plan = executor.migration_plan({a1})
 
         self.assertEqual(plan, [])
+
+    def test_reject_holes_in_history(self):
+        """
+        If the history is inconsistent with the sources, cry foul
+        a: 1 <--- 2 <--- 3
+        If a2 is applied already and a1 is not, and we're asked to migrate to
+        a3, then something is very wrong and we should not proceed
+        """
+        a1_impl = FakeMigration('a1')
+        a1 = ('a', '1')
+        a2_impl = FakeMigration('a2')
+        a2 = ('a', '2')
+        a3_impl = FakeMigration('a3')
+        a3 = ('a', '3')
+        graph = MigrationGraph()
+        graph.add_node(a1, a1_impl)
+        graph.add_node(a2, a2_impl)
+        graph.add_node(a3, a3_impl)
+        graph.add_dependency(None, a2, a1)
+        graph.add_dependency(None, a3, a2)
+
+        executor = MigrationExecutor(None)
+        executor.loader = FakeLoader(graph, {a2})
+
+        msg = 'You have some migrations applied before their dependencies.'
+        with self.assertRaisesMessage(InconsistentMigrationHistory, msg) as cm:
+            executor.migration_plan({a3})
+
+        self.assertSequenceEqual(cm.exception.args[1], [graph.node_map[a2]])

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.apps.registry import apps as global_apps
 from django.db import migrations
 
-from .exceptions import InvalidMigrationPlan
+from .exceptions import InconsistentMigrationHistory, InvalidMigrationPlan
 from .loader import MigrationLoader
 from .recorder import MigrationRecorder
 from .state import ProjectState
@@ -59,6 +59,15 @@ class MigrationExecutor(object):
             else:
                 for migration in self.loader.graph.forwards_plan(target):
                     if migration not in applied:
+                        # Check if migrations were applied before their dependencies
+                        applied_children = [x for x in
+                                            self.loader.graph.node_map[migration].children
+                                            if x in applied]
+                        if applied_children:
+                            raise InconsistentMigrationHistory(
+                                "You have some migrations applied before their dependencies.",
+                                applied_children
+                            )
                         plan.append((self.loader.graph.nodes[migration], False))
                         applied.add(migration)
         return plan
