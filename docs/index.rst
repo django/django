@@ -27,7 +27,6 @@ Contents:
    getting-started
    deploying
    integration-changes
-   message-standards
    scaling
    backends
    integration-plan

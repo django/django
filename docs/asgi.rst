@@ -6,18 +6,6 @@ Draft ASGI Spec
 considered draft yet. Even the name might change; this is being written
 as development progresses.**
 
-::
-
-    PEP: XXX
-    Title: ASGI (Asynchronous Server Gateway Interface)
-    Version: $Revision$
-    Last-Modified: $Date$
-    Author: Andrew Godwin <andrew@aeracode.org>
-    Status: Draft
-    Type: Informational
-    Content-Type: text/x-rst
-    Created: ?
-    Post-History: ?
 
 Abstract
 ========
