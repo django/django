@@ -42,31 +42,31 @@ class Dispatcher(object):
         self.app_dict = defaultdict(list)
 
     def _load(self, root, namespace_root, app_root, constraints, kwargs):
-        for pattern in reversed(root.target.urlpatterns):
-            constraints += pattern.constraints
-            kwargs.push(pattern.target.kwargs)
-            if pattern.is_endpoint():
+        for urlpattern in reversed(root.target.urlpatterns):
+            constraints += urlpattern.constraints
+            kwargs.push(urlpattern.target.kwargs)
+            if urlpattern.is_endpoint():
                 value = list(constraints), kwargs.flatten()
-                self.reverse_dict.appendlist(namespace_root + (pattern.target.view,), value)
-                if pattern.target.url_name:
-                    self.reverse_dict.appendlist(namespace_root + (pattern.target.url_name,), value)
-                self._callbacks.add(pattern.target.lookup_str)
-            elif not pattern.target.namespace and not pattern.target.app_name:
-                self._load(pattern, namespace_root, app_root, list(constraints), kwargs)
+                self.reverse_dict.appendlist(namespace_root + (urlpattern.target.view,), value)
+                if urlpattern.target.url_name:
+                    self.reverse_dict.appendlist(namespace_root + (urlpattern.target.url_name,), value)
+                self._callbacks.add(urlpattern.target.lookup_str)
+            elif not urlpattern.target.namespace and not urlpattern.target.app_name:
+                self._load(urlpattern, namespace_root, app_root, list(constraints), kwargs)
             else:
-                app_name = app_root + (pattern.target.app_name or pattern.target.namespace,)
-                self.app_dict[app_name].append(pattern.target.namespace)
-                self._namespaces[namespace_root + (pattern.target.namespace,)] = (
+                app_name = app_root + (urlpattern.target.app_name or urlpattern.target.namespace,)
+                self.app_dict[app_name].append(urlpattern.target.namespace)
+                self._namespaces[namespace_root + (urlpattern.target.namespace,)] = (
                     app_name,
                     URLPattern(
                         list(constraints),
                         URLConf(
-                            list(pattern.target.urlpatterns), pattern.target.app_name,
-                            namespace=pattern.target.namespace, kwargs=kwargs.flatten(),
+                            list(urlpattern.target.urlpatterns), urlpattern.target.app_name,
+                            namespace=urlpattern.target.namespace, kwargs=kwargs.flatten(),
                         ),
                     ),
                 )
-            constraints = constraints[:-len(pattern.constraints)]
+            constraints = constraints[:-len(urlpattern.constraints)]
             kwargs.pop()
 
     def load_namespace(self, namespace):
@@ -80,11 +80,11 @@ class Dispatcher(object):
                     (namespace[-1], ':'.join(namespace[:-1]))
                 )
 
-            app, pattern = self._namespaces.pop(namespace)
-            constraints = list(pattern.constraints)
+            app, urlpattern = self._namespaces.pop(namespace)
+            constraints = list(urlpattern.constraints)
             kwargs = BaseContext()
-            kwargs.dicts[0] = pattern.target.kwargs
-            self._load(pattern, namespace, app, constraints, kwargs)
+            kwargs.dicts[0] = urlpattern.target.kwargs
+            self._load(urlpattern, namespace, app, constraints, kwargs)
             self._loaded.add(namespace)
 
     def load(self, lookup):

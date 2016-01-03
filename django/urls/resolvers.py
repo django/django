@@ -108,11 +108,11 @@ def get_resolver(urlconf=None):
 
 
 class BaseResolver(object):
-    def __init__(self, pattern, decorators=None):
-        self.constraints = list(pattern.constraints)
-        self.kwargs = pattern.target.kwargs.copy()
+    def __init__(self, urlpattern, decorators=None):
+        self.constraints = list(urlpattern.constraints)
+        self.kwargs = urlpattern.target.kwargs.copy()
         self.decorators = list(decorators or [])
-        self.decorators.extend(pattern.target.decorators)
+        self.decorators.extend(urlpattern.target.decorators)
 
     def is_endpoint(self):
         raise NotImplementedError("Subclasses of 'BaseResolver' must implement the 'is_endpoint' method.")
@@ -137,11 +137,11 @@ class BaseResolver(object):
 
 
 class Resolver(BaseResolver):
-    def __init__(self, pattern, *args, **kwargs):
-        super(Resolver, self).__init__(pattern, *args, **kwargs)
-        self.urlconf = pattern.target
-        self.namespace = pattern.target.namespace
-        self.app_name = pattern.target.app_name
+    def __init__(self, urlpattern, *args, **kwargs):
+        super(Resolver, self).__init__(urlpattern, *args, **kwargs)
+        self.urlconf = urlpattern.target
+        self.namespace = urlpattern.target.namespace
+        self.app_name = urlpattern.target.app_name
 
     def is_endpoint(self):
         return False
@@ -156,8 +156,8 @@ class Resolver(BaseResolver):
     @cached_property
     def resolvers(self):
         return [
-            pattern.as_resolver(decorators=self.decorators)
-            for pattern in self.urlconf.urlpatterns
+            urlpattern.as_resolver(decorators=self.decorators)
+            for urlpattern in self.urlconf.urlpatterns
         ]
 
     def resolve(self, path, request=None):
@@ -178,11 +178,11 @@ class Resolver(BaseResolver):
 
 
 class ResolverEndpoint(BaseResolver):
-    def __init__(self, pattern, *args, **kwargs):
-        super(ResolverEndpoint, self).__init__(pattern, *args, **kwargs)
-        self.func = pattern.target.view
-        self.lookup_str = pattern.target.lookup_str
-        self.url_name = pattern.target.url_name
+    def __init__(self, urlpattern, *args, **kwargs):
+        super(ResolverEndpoint, self).__init__(urlpattern, *args, **kwargs)
+        self.func = urlpattern.target.view
+        self.lookup_str = urlpattern.target.lookup_str
+        self.url_name = urlpattern.target.url_name
 
     def is_endpoint(self):
         return True
