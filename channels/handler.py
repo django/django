@@ -46,9 +46,9 @@ class AsgiRequest(http.HttpRequest):
             self.META['SERVER_PORT'] = self.message['server'][1]
         # Headers go into META
         for name, value in self.message.get('headers', {}).items():
-            if name == "content_length":
+            if name == "content-length":
                 corrected_name = "CONTENT_LENGTH"
-            elif name == "content_type":
+            elif name == "content-type":
                 corrected_name = "CONTENT_TYPE"
             else:
                 corrected_name = 'HTTP_%s' % name.upper().replace("-", "_")
@@ -59,8 +59,22 @@ class AsgiRequest(http.HttpRequest):
                 self._content_length = int(self.META['CONTENT_LENGTH'])
             except (ValueError, TypeError):
                 pass
-        # TODO: body handling
-        self._body = ""
+        # Body handling
+        self._body = message.get("body", "")
+        if message.get("body_channel", None):
+            while True:
+                # Get the next chunk from the request body channel
+                chunk = None
+                while chunk is None:
+                    _, chunk = message.channel_layer.receive_many(
+                        [message['body_channel']],
+                        block=True,
+                    )
+                # Add content to body
+                self._body += chunk.get("content", "")
+                # Exit loop if this was the last
+                if not chunk.get("more_content", False):
+                    break
         # Other bits
         self.resolver_match = None
 
@@ -73,6 +87,7 @@ class AsgiRequest(http.HttpRequest):
 
     def _get_post(self):
         if not hasattr(self, '_post'):
+            self._read_started = False
             self._load_post_and_files()
         return self._post
 
