@@ -75,7 +75,7 @@ def include(arg, namespace=None, app_name=None):
     return urlconf, namespace
 
 
-def url(regex, view, kwargs=None, name=None, decorators=None):
+def url(regex, view, kwargs=None, name=None, decorators=None, resolver_cls=None):
     from django.urls import RegexPattern, LocalizedRegexPattern
 
     if isinstance(regex, six.string_types):
@@ -90,9 +90,9 @@ def url(regex, view, kwargs=None, name=None, decorators=None):
 
     if isinstance(view, (list, tuple)):
         urlconf, namespace = view
-        return URLPattern(constraints, Include(urlconf, namespace, kwargs, decorators))
+        return URLPattern(constraints, Include(urlconf, namespace, kwargs, decorators), resolver_cls)
     elif callable(view):
-        return URLPattern(constraints, Endpoint(view, name, kwargs=kwargs, decorators=decorators))
+        return URLPattern(constraints, Endpoint(view, name, kwargs=kwargs, decorators=decorators), resolver_cls)
     else:
         raise TypeError('view must be a callable or a list/tuple in the case of include().')
 
@@ -120,12 +120,22 @@ class Endpoint(object):
 
 
 class URLPattern(object):
-    def __init__(self, constraints, target):
+    def __init__(self, constraints, target, resolver_cls=None):
         self.constraints = constraints
         self.target = target
+        self.resolver_cls = resolver_cls
 
     def is_view(self):
         return isinstance(self.target, Endpoint)
+
+    def as_resolver(self, **kwargs):
+        from django.urls import Resolver, ResolverEndpoint
+        if self.resolver_cls is None:
+            cls = ResolverEndpoint if self.is_view() else Resolver
+        else:
+            cls = self.resolver_cls
+
+        return cls(self, **kwargs)
 
 
 class URLConf(object):

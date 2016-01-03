@@ -156,8 +156,7 @@ class Resolver(BaseResolver):
     @cached_property
     def resolvers(self):
         return [
-            ResolverEndpoint(pattern, decorators=self.decorators) if pattern.is_view()
-            else Resolver(pattern, decorators=self.decorators)
+            pattern.as_resolver(self.decorators)
             for pattern in self.urlconf.urlpatterns
         ]
 
@@ -176,10 +175,6 @@ class Resolver(BaseResolver):
                 continue
             return ResolverMatch.from_submatch(sub_match, args, kwargs, self.app_name, self.namespace)
         raise Resolver404({'path': new_path, 'tried': tried})
-
-    @cached_property
-    def urlconf_module(self):
-        return self.urlconf.urlconf_module
 
 
 class ResolverEndpoint(BaseResolver):

@@ -295,9 +295,6 @@ class BaseHandler(object):
         if settings.DEBUG:
             return debug.technical_500_response(request, *exc_info)
 
-        # If Http500 handler is not installed, re-raise last exception
-        if dispatcher.urlconf_module is None:
-            six.reraise(*exc_info)
         # Return an HttpResponse that displays a friendly error message.
         callback, param_dict = dispatcher.resolve_error_handler(500)
         return callback(request, **param_dict)
