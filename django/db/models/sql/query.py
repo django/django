@@ -1113,7 +1113,7 @@ class Query(object):
         negated or not and this will be used to determine if IS NULL filtering
         is needed.
 
-        The difference between current_netageted and branch_negated is that
+        The difference between current_negated and branch_negated is that
         branch_negated is set on first negation, but current_negated is
         flipped for each negation.
 
