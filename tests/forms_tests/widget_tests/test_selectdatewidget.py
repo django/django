@@ -384,8 +384,8 @@ class SelectDateWidgetTest(WidgetTest):
             """,
         )
 
-        self.assertRaisesMessage(ValueError, 'empty_label list/tuple must have 3 elements.',
-            SelectDateWidget, years=('2014',), empty_label=('not enough', 'values'))
+        with self.assertRaisesMessage(ValueError, 'empty_label list/tuple must have 3 elements.'):
+            SelectDateWidget(years=('2014',), empty_label=('not enough', 'values'))
 
     @override_settings(USE_L10N=True)
     @translation.override('nl')

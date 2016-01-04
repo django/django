@@ -431,16 +431,10 @@ class Queries1Tests(BaseQuerysetTest):
     def test_heterogeneous_qs_combination(self):
         # Combining querysets built on different models should behave in a well-defined
         # fashion. We raise an error.
-        self.assertRaisesMessage(
-            AssertionError,
-            'Cannot combine queries on two different base models.',
-            lambda: Author.objects.all() & Tag.objects.all()
-        )
-        self.assertRaisesMessage(
-            AssertionError,
-            'Cannot combine queries on two different base models.',
-            lambda: Author.objects.all() | Tag.objects.all()
-        )
+        with self.assertRaisesMessage(AssertionError, 'Cannot combine queries on two different base models.'):
+            Author.objects.all() & Tag.objects.all()
+        with self.assertRaisesMessage(AssertionError, 'Cannot combine queries on two different base models.'):
+            Author.objects.all() | Tag.objects.all()
 
     def test_ticket3141(self):
         self.assertEqual(Author.objects.extra(select={'foo': '1'}).count(), 4)
@@ -759,11 +753,8 @@ class Queries1Tests(BaseQuerysetTest):
                 []
             )
             q.query.low_mark = 1
-            self.assertRaisesMessage(
-                AssertionError,
-                'Cannot change a query once a slice has been taken',
-                q.extra, select={'foo': "1"}
-            )
+            with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken'):
+                q.extra(select={'foo': "1"})
             self.assertQuerysetEqual(q.reverse(), [])
             self.assertQuerysetEqual(q.defer('meal'), [])
             self.assertQuerysetEqual(q.only('meal'), [])
@@ -790,16 +781,10 @@ class Queries1Tests(BaseQuerysetTest):
         )
 
         # Multi-valued values() and values_list() querysets should raise errors.
-        self.assertRaisesMessage(
-            TypeError,
-            'Cannot use multi-field values as a filter value.',
-            lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values('name', 'id'))
-        )
-        self.assertRaisesMessage(
-            TypeError,
-            'Cannot use multi-field values as a filter value.',
-            lambda: Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values_list('name', 'id'))
-        )
+        with self.assertRaisesMessage(TypeError, 'Cannot use multi-field values as a filter value.'):
+            Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values('name', 'id'))
+        with self.assertRaisesMessage(TypeError, 'Cannot use multi-field values as a filter value.'):
+            Tag.objects.filter(name__in=Tag.objects.filter(parent=self.t1).values_list('name', 'id'))
 
     def test_ticket9985(self):
         # qs.values_list(...).values(...) combinations should work.
@@ -1329,11 +1314,8 @@ class Queries3Tests(BaseQuerysetTest):
     def test_ticket8683(self):
         # An error should be raised when QuerySet.datetimes() is passed the
         # wrong type of field.
-        self.assertRaisesMessage(
-            AssertionError,
-            "'name' isn't a DateTimeField.",
-            Item.objects.datetimes, 'name', 'month'
-        )
+        with self.assertRaisesMessage(AssertionError, "'name' isn't a DateTimeField."):
+            Item.objects.datetimes('name', 'month')
 
     def test_ticket22023(self):
         with self.assertRaisesMessage(TypeError,
@@ -2413,11 +2395,8 @@ class WeirdQuerysetSlicingTests(BaseQuerysetTest):
         self.assertQuerysetEqual(Article.objects.all()[0:0], [])
         self.assertQuerysetEqual(Article.objects.all()[0:0][:10], [])
         self.assertEqual(Article.objects.all()[:0].count(), 0)
-        self.assertRaisesMessage(
-            AssertionError,
-            'Cannot change a query once a slice has been taken.',
-            Article.objects.all()[:0].latest, 'created'
-        )
+        with self.assertRaisesMessage(AssertionError, 'Cannot change a query once a slice has been taken.'):
+            Article.objects.all()[:0].latest('created')
 
     def test_empty_resultset_sql(self):
         # ticket #12192
@@ -2528,16 +2507,10 @@ class ConditionalTests(BaseQuerysetTest):
     def test_infinite_loop(self):
         # If you're not careful, it's possible to introduce infinite loops via
         # default ordering on foreign keys in a cycle. We detect that.
-        self.assertRaisesMessage(
-            FieldError,
-            'Infinite loop caused by ordering.',
-            lambda: list(LoopX.objects.all())  # Force queryset evaluation with list()
-        )
-        self.assertRaisesMessage(
-            FieldError,
-            'Infinite loop caused by ordering.',
-            lambda: list(LoopZ.objects.all())  # Force queryset evaluation with list()
-        )
+        with self.assertRaisesMessage(FieldError, 'Infinite loop caused by ordering.'):
+            list(LoopX.objects.all())  # Force queryset evaluation with list()
+        with self.assertRaisesMessage(FieldError, 'Infinite loop caused by ordering.'):
+            list(LoopZ.objects.all())  # Force queryset evaluation with list()
 
         # Note that this doesn't cause an infinite loop, since the default
         # ordering on the Tag model is empty (and thus defaults to using "id"

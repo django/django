@@ -1107,8 +1107,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend(
             username='not empty username', password='not empty password')
         try:
-            self.assertRaisesMessage(SMTPException,
-                'SMTP AUTH extension not supported by server.', backend.open)
+            with self.assertRaisesMessage(SMTPException, 'SMTP AUTH extension not supported by server.'):
+                backend.open()
         finally:
             backend.close()
 
@@ -1183,8 +1183,8 @@ class SMTPBackendTests(BaseEmailBackendTests, SMTPBackendTestsBase):
         backend = smtp.EmailBackend()
         self.assertTrue(backend.use_tls)
         try:
-            self.assertRaisesMessage(SMTPException,
-                'STARTTLS extension not supported by server.', backend.open)
+            with self.assertRaisesMessage(SMTPException, 'STARTTLS extension not supported by server.'):
+                backend.open()
         finally:
             backend.close()
 

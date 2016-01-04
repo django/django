@@ -88,27 +88,24 @@ class GetObjectOr404Tests(TestCase):
     def test_bad_class(self):
         # Given an argument klass that is not a Model, Manager, or Queryset
         # raises a helpful ValueError message
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             ValueError,
             "Object is of type 'str', but must be a Django Model, Manager, "
-            "or QuerySet",
-            get_object_or_404, str("Article"), title__icontains="Run"
-        )
+                "or QuerySet"):
+            get_object_or_404(str("Article"), title__icontains="Run")
 
         class CustomClass(object):
             pass
 
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             ValueError,
             "Object is of type 'CustomClass', but must be a Django Model, "
-            "Manager, or QuerySet",
-            get_object_or_404, CustomClass, title__icontains="Run"
-        )
+                "Manager, or QuerySet"):
+            get_object_or_404(CustomClass, title__icontains="Run")
 
         # Works for lists too
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             ValueError,
             "Object is of type 'list', but must be a Django Model, Manager, "
-            "or QuerySet",
-            get_list_or_404, [Article], title__icontains="Run"
-        )
+                "or QuerySet"):
+            get_list_or_404([Article], title__icontains="Run")

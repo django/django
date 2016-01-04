@@ -537,14 +537,8 @@ class TestFixtures(TestCase):
         settings.FIXTURE_DIRS cannot contain duplicates in order to avoid
         repeated fixture loading.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
-            "settings.FIXTURE_DIRS contains duplicates.",
-            management.call_command,
-            'loaddata',
-            'absolute.json',
-            verbosity=0,
-        )
+        with self.assertRaisesMessage(ImproperlyConfigured, "settings.FIXTURE_DIRS contains duplicates."):
+            management.call_command('loaddata', 'absolute.json', verbosity=0)
 
     @skipIfNonASCIIPath
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures')])
@@ -553,16 +547,13 @@ class TestFixtures(TestCase):
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
         for application (app/fixtures) in order to avoid repeated fixture loading.
         """
-        self.assertRaisesMessage(
-            ImproperlyConfigured,
+        msg = (
             "'%s' is a default fixture directory for the '%s' app "
             "and cannot be listed in settings.FIXTURE_DIRS."
-            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress'),
-            management.call_command,
-            'loaddata',
-            'absolute.json',
-            verbosity=0,
+            % (os.path.join(_cur_dir, 'fixtures'), 'fixtures_regress')
         )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            management.call_command('loaddata', 'absolute.json', verbosity=0)
 
     @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, 'fixtures_1'),
                                      os.path.join(_cur_dir, 'fixtures_2')])
@@ -734,41 +725,33 @@ class NaturalKeyFixtureTests(TestCase):
         )
 
     def test_dependency_sorting_tight_circular(self):
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             RuntimeError,
             "Can't resolve dependencies for fixtures_regress.Circle1, "
-            "fixtures_regress.Circle2 in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Person, Circle2, Circle1, Store, Book])],
-        )
+                "fixtures_regress.Circle2 in serialized app list."):
+            serializers.sort_dependencies([('fixtures_regress', [Person, Circle2, Circle1, Store, Book])])
 
     def test_dependency_sorting_tight_circular_2(self):
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             RuntimeError,
             "Can't resolve dependencies for fixtures_regress.Circle1, "
-            "fixtures_regress.Circle2 in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Circle1, Book, Circle2])],
-        )
+                "fixtures_regress.Circle2 in serialized app list."):
+            serializers.sort_dependencies([('fixtures_regress', [Circle1, Book, Circle2])])
 
     def test_dependency_self_referential(self):
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             RuntimeError,
             "Can't resolve dependencies for fixtures_regress.Circle3 in "
-            "serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Book, Circle3])],
-        )
+                "serialized app list."):
+            serializers.sort_dependencies([('fixtures_regress', [Book, Circle3])])
 
     def test_dependency_sorting_long(self):
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             RuntimeError,
             "Can't resolve dependencies for fixtures_regress.Circle1, "
-            "fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized "
-            "app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])],
-        )
+                "fixtures_regress.Circle2, fixtures_regress.Circle3 in serialized "
+                "app list."):
+            serializers.sort_dependencies([('fixtures_regress', [Person, Circle2, Circle1, Circle3, Store, Book])])
 
     def test_dependency_sorting_normal(self):
         sorted_deps = serializers.sort_dependencies(
@@ -830,13 +813,11 @@ class M2MNaturalKeyFixtureTests(TestCase):
         Resolving circular M2M relations without explicit through models should
         fail loudly
         """
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             RuntimeError,
-            "Can't resolve dependencies for fixtures_regress.M2MSimpleCircularA, "
-            "fixtures_regress.M2MSimpleCircularB in serialized app list.",
-            serializers.sort_dependencies,
-            [('fixtures_regress', [M2MSimpleCircularA, M2MSimpleCircularB])]
-        )
+                "Can't resolve dependencies for fixtures_regress.M2MSimpleCircularA, "
+                "fixtures_regress.M2MSimpleCircularB in serialized app list."):
+            serializers.sort_dependencies([('fixtures_regress', [M2MSimpleCircularA, M2MSimpleCircularB])])
 
     def test_dependency_sorting_m2m_complex(self):
         """
