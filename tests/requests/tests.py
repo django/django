@@ -772,11 +772,8 @@ class HostValidationTests(SimpleTestCase):
         ]:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            self.assertRaisesMessage(
-                SuspiciousOperation,
-                msg_suggestion % (host, host),
-                request.get_host
-            )
+            with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion % (host, host)):
+                request.get_host()
 
         for domain, port in [  # Valid-looking hosts with a port number
             ('example.com', 80),
@@ -786,28 +783,19 @@ class HostValidationTests(SimpleTestCase):
             host = '%s:%s' % (domain, port)
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            self.assertRaisesMessage(
-                SuspiciousOperation,
-                msg_suggestion % (host, domain),
-                request.get_host
-            )
+            with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion % (host, domain)):
+                request.get_host()
 
         for host in self.poisoned_hosts:
             request = HttpRequest()
             request.META = {'HTTP_HOST': host}
-            self.assertRaisesMessage(
-                SuspiciousOperation,
-                msg_invalid_host % host,
-                request.get_host
-            )
+            with self.assertRaisesMessage(SuspiciousOperation, msg_invalid_host % host):
+                request.get_host()
 
         request = HttpRequest()
         request.META = {'HTTP_HOST': "invalid_hostname.com"}
-        self.assertRaisesMessage(
-            SuspiciousOperation,
-            msg_suggestion2 % "invalid_hostname.com",
-            request.get_host
-        )
+        with self.assertRaisesMessage(SuspiciousOperation, msg_suggestion2 % "invalid_hostname.com"):
+            request.get_host()
 
 
 class BuildAbsoluteURITestCase(SimpleTestCase):

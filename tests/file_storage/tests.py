@@ -574,10 +574,8 @@ class FileFieldStorageTests(TestCase):
             # Testing exception is raised when filename is too short to truncate.
             filename = 'short.longext'
             objs[0].limited_length.save(filename, ContentFile('Same Content'))
-            self.assertRaisesMessage(
-                SuspiciousFileOperation, 'Storage can not find an available filename',
-                objs[1].limited_length.save, *(filename, ContentFile('Same Content'))
-            )
+            with self.assertRaisesMessage(SuspiciousFileOperation, 'Storage can not find an available filename'):
+                objs[1].limited_length.save(*(filename, ContentFile('Same Content')))
         finally:
             for o in objs:
                 o.delete()

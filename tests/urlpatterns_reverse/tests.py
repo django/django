@@ -252,13 +252,13 @@ class NoURLPatternsTests(SimpleTestCase):
         """
         resolver = RegexURLResolver(r'^$', settings.ROOT_URLCONF)
 
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             ImproperlyConfigured,
             "The included URLconf 'urlpatterns_reverse.no_urls' does not "
             "appear to have any patterns in it. If you see valid patterns in "
-            "the file then the issue is probably caused by a circular import.",
-            getattr, resolver, 'url_patterns'
-        )
+            "the file then the issue is probably caused by a circular import."
+        ):
+            getattr(resolver, 'url_patterns')
 
 
 @override_settings(ROOT_URLCONF='urlpatterns_reverse.urls')

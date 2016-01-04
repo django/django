@@ -801,7 +801,8 @@ class AssertRaisesMsgTest(SimpleTestCase):
         """assertRaisesMessage shouldn't interpret RE special chars."""
         def func1():
             raise ValueError("[.*x+]y?")
-        self.assertRaisesMessage(ValueError, "[.*x+]y?", func1)
+        with self.assertRaisesMessage(ValueError, "[.*x+]y?"):
+            func1()
 
     @ignore_warnings(category=RemovedInDjango20Warning)
     def test_callable_obj_param(self):

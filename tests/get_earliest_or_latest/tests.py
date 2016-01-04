@@ -58,12 +58,12 @@ class EarliestOrLatestTests(TestCase):
         # Ensure that error is raised if the user forgot to add a get_latest_by
         # in the Model.Meta
         Article.objects.model._meta.get_latest_by = None
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             AssertionError,
             "earliest() and latest() require either a field_name parameter or "
-            "'get_latest_by' in the model",
-            lambda: Article.objects.earliest(),
-        )
+            "'get_latest_by' in the model"
+        ):
+            Article.objects.earliest()
 
     def test_latest(self):
         # Because no Articles exist yet, latest() raises ArticleDoesNotExist.
@@ -109,12 +109,11 @@ class EarliestOrLatestTests(TestCase):
         # Ensure that error is raised if the user forgot to add a get_latest_by
         # in the Model.Meta
         Article.objects.model._meta.get_latest_by = None
-        self.assertRaisesMessage(
+        with self.assertRaisesMessage(
             AssertionError,
-            "earliest() and latest() require either a field_name parameter or "
-            "'get_latest_by' in the model",
-            lambda: Article.objects.latest(),
-        )
+                "earliest() and latest() require either a field_name parameter or "
+                "'get_latest_by' in the model"):
+            Article.objects.latest()
 
     def test_latest_manual(self):
         # You can still use latest() with a model that doesn't have

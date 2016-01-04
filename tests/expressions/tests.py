@@ -318,7 +318,8 @@ class BasicExpressionsTests(TestCase):
             'expressions.Company.num_employees. F() expressions can only be '
             'used to update, not to insert.'
         )
-        self.assertRaisesMessage(ValueError, msg, acme.save)
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
         acme.num_employees = 12
         acme.name = Lower(F('name'))
@@ -327,7 +328,8 @@ class BasicExpressionsTests(TestCase):
             'expressions.Company.name))" on expressions.Company.name. F() '
             'expressions can only be used to update, not to insert.'
         )
-        self.assertRaisesMessage(ValueError, msg, acme.save)
+        with self.assertRaisesMessage(ValueError, msg):
+            acme.save()
 
     def test_ticket_11722_iexact_lookup(self):
         Employee.objects.create(firstname="John", lastname="Doe")
