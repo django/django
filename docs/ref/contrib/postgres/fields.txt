@@ -467,6 +467,12 @@ JSONField
     its Python native format: dictionaries, lists, strings, numbers, booleans
     and ``None``.
 
+    If you want to store other data types, you'll need to serialize them first.
+    For example, you might cast a ``datetime`` to a string. You might also want
+    to convert the string back to a ``datetime`` when you retrieve the data
+    from the database. There are some third-party ``JSONField`` implementations
+    which do this sort of thing automatically.
+
     If you give the field a :attr:`~django.db.models.Field.default`, ensure
     it's a callable such as ``dict`` (for an empty default) or a callable that
     returns a dict (such as a function). Incorrectly using ``default={}``
