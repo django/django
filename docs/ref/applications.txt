@@ -26,11 +26,13 @@ package with ``settings.py``, ``urls.py``, and ``wsgi.py``. The project package
 is often extended to include things like fixtures, CSS, and templates which
 aren't tied to a particular application.
 
+A **project's root directory** (the one that contains ``manage.py``) is usually
+the container for all of a project's applications which aren't installed
+separately.
+
 The term **application** describes a Python package that provides some set of
 features. Applications :doc:`may be reused </intro/reusable-apps/>` in various
-projects. A project's root directory (the one that contains ``manage.py``) is
-usually the container for all of a project's applications which aren't
-installed separately.
+projects.
 
 Applications include some combination of models, views, templates, template
 tags, static files, URLs, middleware, etc. They're generally wired into
