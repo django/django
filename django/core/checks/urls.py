@@ -23,8 +23,7 @@ def check_resolver(resolver):
             warnings.extend(check_resolver(pattern))
         elif isinstance(pattern, RegexURLPattern):
             warnings.extend(check_pattern_name(pattern))
-
-        warnings.extend(check_pattern_startswith_slash(pattern))
+            warnings.extend(check_pattern_startswith_slash(pattern))
 
     return warnings
 
