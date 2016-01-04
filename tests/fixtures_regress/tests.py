@@ -7,6 +7,7 @@ import os
 import re
 import unittest
 import warnings
+from curses.ascii import isascii
 
 import django
 from django.core import management, serializers
@@ -37,7 +38,7 @@ _cur_dir = os.path.dirname(os.path.abspath(upath(__file__)))
 
 
 def is_ascii(s):
-    return all(ord(c) < 128 for c in s)
+    return all(isascii(c) for c in s)
 
 
 skipIfNonASCIIPath = unittest.skipIf(
