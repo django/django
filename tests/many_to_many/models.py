@@ -24,11 +24,21 @@ class Publication(models.Model):
 
 
 @python_2_unicode_compatible
+class Tag(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+
+@python_2_unicode_compatible
 class Article(models.Model):
     headline = models.CharField(max_length=100)
     # Assign a unicode string as name to make sure the intermediary model is
     # correctly created. Refs #20207
     publications = models.ManyToManyField(Publication, name='publications')
+    tags = models.ManyToManyField(Tag, related_name='tags')
 
     def __str__(self):
         return self.headline

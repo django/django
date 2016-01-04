@@ -426,7 +426,7 @@ class URLNode(Node):
         self.asvar = asvar
 
     def render(self, context):
-        from django.core.urlresolvers import reverse, NoReverseMatch
+        from django.urls import reverse, NoReverseMatch
         args = [arg.resolve(context) for arg in self.args]
         kwargs = {
             smart_text(k, 'ascii'): v.resolve(context)

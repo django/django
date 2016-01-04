@@ -98,7 +98,7 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 .. snippet::
     :filename: models.py
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.db import models
 
     class Author(models.Model):
@@ -115,7 +115,7 @@ here; we don't have to write any logic ourselves:
     :filename: views.py
 
     from django.views.generic.edit import CreateView, UpdateView, DeleteView
-    from django.core.urlresolvers import reverse_lazy
+    from django.urls import reverse_lazy
     from myapp.models import Author
 
     class AuthorCreate(CreateView):
@@ -131,8 +131,8 @@ here; we don't have to write any logic ourselves:
         success_url = reverse_lazy('author-list')
 
 .. note::
-    We have to use :func:`~django.core.urlresolvers.reverse_lazy` here, not
-    just ``reverse`` as the urls are not loaded when the file is imported.
+    We have to use :func:`~django.urls.reverse_lazy` here, not just
+    ``reverse()`` as the urls are not loaded when the file is imported.
 
 The ``fields`` attribute works the same way as the ``fields`` attribute on the
 inner ``Meta`` class on :class:`~django.forms.ModelForm`. Unless you define the

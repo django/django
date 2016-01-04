@@ -11,7 +11,6 @@ from io import BytesIO
 
 from django.apps import apps
 from django.conf import settings
-from django.core import urlresolvers
 from django.core.handlers.base import BaseHandler
 from django.core.handlers.wsgi import ISO_8859_1, UTF_8, WSGIRequest
 from django.core.signals import (
@@ -22,6 +21,7 @@ from django.http import HttpRequest, QueryDict, SimpleCookie
 from django.template import TemplateDoesNotExist
 from django.test import signals
 from django.test.utils import ContextList
+from django.urls import resolve
 from django.utils import six
 from django.utils.encoding import force_bytes, force_str, uri_to_iri
 from django.utils.functional import SimpleLazyObject, curry
@@ -477,8 +477,7 @@ class Client(RequestFactory):
             response.json = curry(self._parse_json, response)
 
             # Attach the ResolverMatch instance to the response
-            response.resolver_match = SimpleLazyObject(
-                lambda: urlresolvers.resolve(request['PATH_INFO']))
+            response.resolver_match = SimpleLazyObject(lambda: resolve(request['PATH_INFO']))
 
             # Flatten a single context. Not really necessary anymore thanks to
             # the __getattr__ flattening in ContextList, but has some edge-case

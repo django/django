@@ -13,7 +13,7 @@ from django.core.files.temp import NamedTemporaryFile
 from django.core.serializers.base import ProgressBar
 from django.db import IntegrityError, connection
 from django.test import (
-    TestCase, TransactionTestCase, ignore_warnings, skipUnlessDBFeature,
+    TestCase, TransactionTestCase, ignore_warnings, mock, skipUnlessDBFeature,
 )
 from django.utils import six
 from django.utils.encoding import force_text
@@ -642,6 +642,18 @@ class NonExistentFixtureTests(TestCase):
         self.assertEqual(len(w), 1)
         self.assertEqual(force_text(w[0].message),
             "No fixture named 'this_fixture_doesnt_exist' found.")
+
+    @mock.patch('django.db.connection.enable_constraint_checking')
+    @mock.patch('django.db.connection.disable_constraint_checking')
+    def test_nonexistent_fixture_no_constraint_checking(self,
+            disable_constraint_checking, enable_constraint_checking):
+        """
+        If no fixtures match the loaddata command, constraints checks on the
+        database shouldn't be disabled. This is performance critical on MSSQL.
+        """
+        management.call_command('loaddata', 'this_fixture_doesnt_exist', verbosity=0)
+        disable_constraint_checking.assert_not_called()
+        enable_constraint_checking.assert_not_called()
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):

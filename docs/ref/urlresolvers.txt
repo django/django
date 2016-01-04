@@ -1,8 +1,14 @@
-==============================================
-``django.core.urlresolvers`` utility functions
-==============================================
+=================================
+``django.urls`` utility functions
+=================================
 
-.. module:: django.core.urlresolvers
+.. module:: django.urls
+
+.. deprecated:: 1.10
+
+    In older versions, these functions are located in
+    ``django.core.urlresolvers``. Importing from the old location will continue
+    to work until Django 2.0.
 
 reverse()
 ---------
@@ -31,7 +37,7 @@ you can use any of the following to reverse the URL::
 
 If the URL accepts arguments, you may pass them in ``args``. For example::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
 
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
@@ -44,7 +50,7 @@ You can also pass ``kwargs`` instead of ``args``. For example::
 ``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.
 
 If no match can be made, ``reverse()`` raises a
-:class:`~django.core.urlresolvers.NoReverseMatch` exception.
+:class:`~django.urls.NoReverseMatch` exception.
 
 The ``reverse()`` function can reverse a large variety of regular expression
 patterns for URLs, but not every possible one. The main restriction at the
@@ -103,13 +109,12 @@ corresponding view functions. It has the following signature:
 .. function:: resolve(path, urlconf=None)
 
 ``path`` is the URL path you want to resolve. As with
-:func:`~django.core.urlresolvers.reverse`, you don't need to
-worry about the ``urlconf`` parameter. The function returns a
-:class:`ResolverMatch` object that allows you
-to access various meta-data about the resolved URL.
+:func:`~django.urls.reverse`, you don't need to worry about the ``urlconf``
+parameter. The function returns a :class:`ResolverMatch` object that allows you
+to access various metadata about the resolved URL.
 
 If the URL does not resolve, the function raises a
-:exc:`~django.core.urlresolvers.Resolver404` exception (a subclass of
+:exc:`~django.urls.Resolver404` exception (a subclass of
 :class:`~django.http.Http404`) .
 
 .. class:: ResolverMatch
@@ -175,10 +180,10 @@ A :class:`ResolverMatch` object can also be assigned to a triple::
 
     func, args, kwargs = resolve('/some/path/')
 
-One possible use of :func:`~django.core.urlresolvers.resolve` would be to test
-whether a view would raise a ``Http404`` error before redirecting to it::
+One possible use of :func:`~django.urls.resolve` would be to test whether a
+view would raise a ``Http404`` error before redirecting to it::
 
-    from django.core.urlresolvers import resolve
+    from django.urls import resolve
     from django.http import HttpResponseRedirect, Http404
     from django.utils.six.moves.urllib.parse import urlparse
 
@@ -202,12 +207,11 @@ get_script_prefix()
 
 .. function:: get_script_prefix()
 
-Normally, you should always use :func:`~django.core.urlresolvers.reverse` to
-define URLs within your application. However, if your application constructs
-part of the URL hierarchy itself, you may occasionally need to generate URLs.
-In that case, you need to be able to find the base URL of the Django project
-within its Web server (normally, :func:`~django.core.urlresolvers.reverse`
-takes care of this for you). In that case, you can call
-``get_script_prefix()``, which will return the script prefix portion of the URL
-for your Django project. If your Django project is at the root of its web
-server, this is always ``"/"``.
+Normally, you should always use :func:`~django.urls.reverse` to define URLs
+within your application. However, if your application constructs part of the
+URL hierarchy itself, you may occasionally need to generate URLs. In that
+case, you need to be able to find the base URL of the Django project within
+its Web server (normally, :func:`~django.urls.reverse` takes care of this for
+you). In that case, you can call ``get_script_prefix()``, which will return
+the script prefix portion of the URL for your Django project. If your Django
+project is at the root of its web server, this is always ``"/"``.

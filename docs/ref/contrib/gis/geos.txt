@@ -189,14 +189,14 @@ given ``geo_input`` argument, and then assumes the proper geometry subclass
 The following input formats, along with their corresponding Python types,
 are accepted:
 
-=============  ======================
-Format         Input Type
-=============  ======================
-WKT / EWKT     ``str`` or ``unicode``
-HEX / HEXEWKB  ``str`` or ``unicode``
-WKB / EWKB     ``buffer``
-GeoJSON        ``str`` or ``unicode``
-=============  ======================
+=======================  ======================
+Format                   Input Type
+=======================  ======================
+WKT / EWKT               ``str`` or ``unicode``
+HEX / HEXEWKB            ``str`` or ``unicode``
+WKB / EWKB               ``buffer``
+GeoJSON (requires GDAL)  ``str`` or ``unicode``
+=======================  ======================
 
 Properties
 ~~~~~~~~~~
@@ -329,10 +329,6 @@ that are a part of this geometry.
 Returns the GeoJSON representation of the geometry. Note that the result is not
 a complete GeoJSON structure but only the ``geometry`` key content of a
 GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
-
-.. note::
-
-    Requires GDAL.
 
 .. attribute:: GEOSGeometry.geojson
 

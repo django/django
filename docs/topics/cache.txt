@@ -1114,11 +1114,12 @@ The headers you pass to ``vary_on_headers`` are not case sensitive;
 You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
 directly. This function sets, or adds to, the ``Vary header``. For example::
 
+    from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
     def my_view(request):
         # ...
-        response = render_to_response('template_name', context)
+        response = render(request, 'template_name', context)
         patch_vary_headers(response, ['Cookie'])
         return response
 

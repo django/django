@@ -206,6 +206,9 @@ class Difference(OracleToleranceMixin, GeoFuncWithGeoParam):
 
 
 class DistanceResultMixin(object):
+    def source_is_geography(self):
+        return self.get_source_fields()[0].geography and self.srid == 4326
+
     def convert_value(self, value, expression, connection, context):
         if value is None:
             return None
@@ -236,9 +239,7 @@ class Distance(DistanceResultMixin, OracleToleranceMixin, GeoFuncWithGeoParam):
 
     def as_postgresql(self, compiler, connection):
         geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
-        src_field = self.get_source_fields()[0]
-        geography = src_field.geography and self.srid == 4326
-        if geography:
+        if self.source_is_geography():
             # Set parameters as geography if base field is geography
             for pos, expr in enumerate(
                     self.source_expressions[self.geom_param_pos + 1:], start=self.geom_param_pos + 1):
@@ -297,9 +298,7 @@ class Length(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
 
     def as_postgresql(self, compiler, connection):
         geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
-        src_field = self.get_source_fields()[0]
-        geography = src_field.geography and self.srid == 4326
-        if geography:
+        if self.source_is_geography():
             self.source_expressions.append(Value(self.spheroid))
         elif geo_field.geodetic(connection):
             # Geometry fields with geodetic (lon/lat) coordinates need length_spheroid
@@ -346,9 +345,18 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     arity = 1
 
     def as_postgresql(self, compiler, connection):
+        geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
+        if geo_field.geodetic(connection) and not self.source_is_geography():
+            raise NotImplementedError("ST_Perimeter cannot use a non-projected non-geography field.")
         dim = min(f.dim for f in self.get_source_fields())
         if dim > 2:
             self.function = connection.ops.perimeter3d
+        return super(Perimeter, self).as_sql(compiler, connection)
+
+    def as_sqlite(self, compiler, connection):
+        geo_field = GeometryField(srid=self.srid)  # Fake field to get SRID info
+        if geo_field.geodetic(connection):
+            raise NotImplementedError("Perimeter cannot use a non-projected field.")
         return super(Perimeter, self).as_sql(compiler, connection)
 
 

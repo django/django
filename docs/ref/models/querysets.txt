@@ -1836,10 +1836,11 @@ database query like ``count()`` would.
 in_bulk
 ~~~~~~~
 
-.. method:: in_bulk(id_list)
+.. method:: in_bulk(id_list=None)
 
 Takes a list of primary-key values and returns a dictionary mapping each
-primary-key value to an instance of the object with the given ID.
+primary-key value to an instance of the object with the given ID. If a list
+isn't provided, all objects in the queryset are returned.
 
 Example::
 
@@ -1849,8 +1850,14 @@ Example::
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>}
     >>> Blog.objects.in_bulk([])
     {}
+    >>> Blog.objects.in_bulk()
+    {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
+
+.. versionchanged:: 1.10
+
+    In older versions, ``id_list`` was a required argument.
 
 iterator
 ~~~~~~~~

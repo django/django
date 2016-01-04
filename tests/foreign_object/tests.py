@@ -395,6 +395,18 @@ class MultiColumnFKTests(TestCase):
         objs = [Person(name="abcd_%s" % i, person_country=self.usa) for i in range(0, 5)]
         Person.objects.bulk_create(objs, 10)
 
+    def test_isnull_lookup(self):
+        Membership.objects.create(membership_country=self.usa, person=self.bob, group_id=None)
+        Membership.objects.create(membership_country=self.usa, person=self.bob, group=self.cia)
+        self.assertQuerysetEqual(
+            Membership.objects.filter(group__isnull=True),
+            ['<Membership: Bob is a member of NULL>']
+        )
+        self.assertQuerysetEqual(
+            Membership.objects.filter(group__isnull=False),
+            ['<Membership: Bob is a member of CIA>']
+        )
+
 
 class TestModelCheckTests(SimpleTestCase):
 

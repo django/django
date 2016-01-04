@@ -47,6 +47,10 @@ Minor features
   classes on inline fieldsets. Inlines with a ``collapse`` class will be
   initially collapsed and their header will have a small "show" link.
 
+* If a user doesn't have the add permission, the ``object-tools`` block on a
+  model's changelist will now be rendered (without the add button, of course).
+  This makes it easier to add custom tools in this case.
+
 :mod:`django.contrib.admindocs`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -242,6 +246,13 @@ Models
   :class:`~django.db.models.Func`. This attribute can be used to set the number
   of arguments the function accepts.
 
+* Added :class:`~django.db.models.BigAutoField` which acts much like an
+  :class:`~django.db.models.AutoField` except that it is guaranteed
+  to fit numbers from ``1`` to ``9223372036854775807``.
+
+* :meth:`QuerySet.in_bulk() <django.db.models.query.QuerySet.in_bulk>`
+  may be called without any arguments to return all objects in the queryset.
+
 Requests and Responses
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -362,6 +373,12 @@ to use this form::
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
 
+Dropped support for PostgreSQL 9.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
+Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
@@ -443,6 +460,9 @@ Miscellaneous
 * The ``shell --plain`` option is deprecated in favor of ``-i python`` or
   ``--interface python``.
 
+* Importing from the ``django.core.urlresolvers`` module is deprecated in
+  favor of its new location, :mod:`django.urls`.
+
 .. _removed-features-1.10:
 
 Features removed in 1.10
@@ -468,8 +488,8 @@ removed in Django 1.10 (please see the :ref:`deprecation timeline
 * Using an incorrect count of unpacked values in the ``for`` template tag
   raises an exception rather than failing silently.
 
-* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
-  Python path is removed.
+* The ability to :func:`~django.urls.reverse` URLs using a dotted Python path
+  is removed.
 
 * Support for ``optparse`` is dropped for custom management commands.
 

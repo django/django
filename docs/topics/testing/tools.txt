@@ -507,9 +507,8 @@ Specifically, a ``Response`` object has the following attributes:
 
     .. attribute:: resolver_match
 
-        An instance of :class:`~django.core.urlresolvers.ResolverMatch` for the
-        response. You can use the
-        :attr:`~django.core.urlresolvers.ResolverMatch.func` attribute, for
+        An instance of :class:`~django.urls.ResolverMatch` for the response.
+        You can use the :attr:`~django.urls.ResolverMatch.func` attribute, for
         example, to verify the view that served the response::
 
             # my_view here is a function based view
@@ -520,7 +519,7 @@ Specifically, a ``Response`` object has the following attributes:
             self.assertEqual(response.resolver_match.func.__name__, MyView.as_view().__name__)
 
         If the given URL is not found, accessing this attribute will raise a
-        :exc:`~django.core.urlresolvers.Resolver404` exception.
+        :exc:`~django.urls.Resolver404` exception.
 
 You can also use dictionary syntax on the response object to query the value
 of any settings in the HTTP headers. For example, you could determine the
@@ -1345,9 +1344,9 @@ your test suite.
 
     Asserts that execution of ``callable`` raises ``expected_exception`` and
     that ``expected_message`` is found in the exception's message. Any other
-    outcome is reported as a failure. Similar to unittest's
-    :meth:`~unittest.TestCase.assertRaisesRegex` with the difference that
-    ``expected_message`` isn't a regular expression.
+    outcome is reported as a failure. It's a simpler version of
+    :meth:`unittest.TestCase.assertRaisesRegex` with the difference that
+    ``expected_message`` isn't treated as a regular expression.
 
     If only the ``expected_exception`` and ``expected_message`` parameters are
     given, returns a context manager so that the code being tested can be

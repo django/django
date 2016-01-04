@@ -128,6 +128,8 @@ details on these changes.
 
 * The ``shell --plain`` option will be removed.
 
+* The ``django.core.urlresolvers`` module will be removed.
+
 .. _deprecation-removed-in-1.10:
 
 1.10
@@ -152,8 +154,7 @@ details on these changes.
 * Using an incorrect count of unpacked values in the ``for`` template tag
   will raise an exception rather than fail silently.
 
-* The ability to :func:`~django.core.urlresolvers.reverse` URLs using a dotted
-  Python path will be removed.
+* The ability to reverse URLs using a dotted Python path will be removed.
 
 * Support for :py:mod:`optparse` will be dropped for custom management commands
   (replaced by :py:mod:`argparse`).
@@ -553,8 +554,8 @@ details on these changes.
   :class:`~django.template.response.SimpleTemplateResponse`, and
   :class:`~django.template.response.TemplateResponse`, will be removed.
   ``content_type`` should be used instead. This also applies to the
-  :func:`~django.shortcuts.render_to_response` shortcut and
-  the sitemap views, :func:`~django.contrib.sitemaps.views.index` and
+  ``render_to_response()`` shortcut and the sitemap views,
+  :func:`~django.contrib.sitemaps.views.index` and
   :func:`~django.contrib.sitemaps.views.sitemap`.
 
 * When :class:`~django.http.HttpResponse` is instantiated with an iterator,

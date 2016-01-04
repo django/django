@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls import url
-from django.core.urlresolvers import LocaleRegexURLResolver
+from django.urls import LocaleRegexURLResolver
 from django.views.i18n import set_language
 
 

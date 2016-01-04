@@ -303,7 +303,7 @@ Cache
 
 * :func:`django.views.decorators.cache.never_cache` now sends more persuasive
   headers (added ``no-cache, no-store, must-revalidate`` to ``Cache-Control``)
-  to better prevent caching.
+  to better prevent caching. This was also added in Django 1.8.8.
 
 CSRF
 ^^^^
@@ -1083,12 +1083,10 @@ Miscellaneous
   :attr:`~django.test.SimpleTestCase.allow_database_queries` class attribute
   to ``True`` on your test class.
 
-* :attr:`ResolverMatch.app_name
-  <django.core.urlresolvers.ResolverMatch.app_name>` was changed to contain
-  the full namespace path in the case of nested namespaces. For consistency
-  with :attr:`ResolverMatch.namespace
-  <django.core.urlresolvers.ResolverMatch.namespace>`, the empty value is now
-  an empty string instead of ``None``.
+* ``ResolverMatch.app_name`` was changed to contain the full namespace path in
+  the case of nested namespaces. For consistency with
+  ``ResolverMatch.namespace``, the empty value is now an empty string instead
+  of ``None``.
 
 * For security hardening, session keys must be at least 8 characters.
 

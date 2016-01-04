@@ -533,8 +533,7 @@ layers where URLs are needed:
 
 * In templates: Using the :ttag:`url` template tag.
 
-* In Python code: Using the :func:`django.core.urlresolvers.reverse`
-  function.
+* In Python code: Using the :func:`~django.urls.reverse` function.
 
 * In higher level code related to handling of URLs of Django model instances:
   The :meth:`~django.db.models.Model.get_absolute_url` method.
@@ -571,7 +570,7 @@ You can obtain these in template code by using:
 
 Or in Python code::
 
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     from django.http import HttpResponseRedirect
 
     def redirect_to_year(request):
@@ -671,8 +670,8 @@ the fully qualified name into parts and then tries the following lookup:
 
 2. If there is a current application defined, Django finds and returns the URL
    resolver for that instance. The current application can be specified with
-   the ``current_app`` argument to the
-   :func:`~django.core.urlresolvers.reverse()` function.
+   the ``current_app`` argument to the :func:`~django.urls.reverse()`
+   function.
 
    The :ttag:`url` template tag uses the namespace of the currently resolved
    view as the current application in a

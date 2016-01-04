@@ -15,9 +15,9 @@ from django.contrib.admin.tests import AdminSeleniumWebDriverTestCase
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.urlresolvers import reverse
 from django.db.models import CharField, DateField
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
 from django.utils import six, translation
 
 from . import models
@@ -1140,6 +1140,32 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         self.assertEqual(list(self.school.alumni.all()),
                          [self.jason, self.peter])
 
+    def test_back_button_bug(self):
+        """
+        Some browsers had a bug where navigating away from the change page
+        and then clicking the browser's back button would clear the
+        filter_horizontal/filter_vertical widgets (#13614).
+        """
+        self.school.students.set([self.lisa, self.peter])
+        self.school.alumni.set([self.lisa, self.peter])
+        self.admin_login(username='super', password='secret', login_url='/')
+        change_url = reverse('admin:admin_widgets_school_change', args=(self.school.id,))
+        self.selenium.get(self.live_server_url + change_url)
+        # Navigate away and go back to the change form page.
+        self.selenium.find_element_by_link_text('Home').click()
+        self.selenium.back()
+        self.wait_for('#id_students_from')
+        expected_unselected_values = [
+            str(self.arthur.id), str(self.bob.id), str(self.cliff.id),
+            str(self.jason.id), str(self.jenny.id), str(self.john.id),
+        ]
+        expected_selected_values = [str(self.lisa.id), str(self.peter.id)]
+        # Check that everything is still in place
+        self.assertSelectOptions('#id_students_from', expected_unselected_values)
+        self.assertSelectOptions('#id_students_to', expected_selected_values)
+        self.assertSelectOptions('#id_alumni_from', expected_unselected_values)
+        self.assertSelectOptions('#id_alumni_to', expected_selected_values)
+
 
 class HorizontalVerticalFilterSeleniumChromeTests(HorizontalVerticalFilterSeleniumFirefoxTests):
     webdriver_class = 'selenium.webdriver.chrome.webdriver.WebDriver'
@@ -1256,6 +1282,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.selenium.find_element_by_id('add_id_user').click()
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
+        self.wait_for('#id_password')
         password_field = self.selenium.find_element_by_id('id_password')
         password_field.send_keys('password')
 
@@ -1274,6 +1301,7 @@ class RelatedFieldWidgetSeleniumFirefoxTests(SeleniumDataMixin, AdminSeleniumWeb
         self.wait_for_popup()
         self.selenium.switch_to.window('id_user')
 
+        self.wait_for('#id_username')
         username_field = self.selenium.find_element_by_id('id_username')
         username_value = 'changednewuser'
         username_field.clear()

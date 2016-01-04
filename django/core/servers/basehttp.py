@@ -70,6 +70,7 @@ class WSGIServer(simple_server.WSGIServer, object):
     def __init__(self, *args, **kwargs):
         if kwargs.pop('ipv6', False):
             self.address_family = socket.AF_INET6
+        self.allow_reuse_address = kwargs.pop('allow_reuse_address', True)
         super(WSGIServer, self).__init__(*args, **kwargs)
 
     def server_bind(self):

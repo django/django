@@ -10,15 +10,17 @@ import os
 
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.core.urlresolvers import NoReverseMatch, reverse
 from django.http import HttpResponse
-from django.template import Context, TemplateSyntaxError, engines
+from django.template import (
+    Context, RequestContext, TemplateSyntaxError, engines,
+)
 from django.template.response import SimpleTemplateResponse
 from django.test import (
     Client, SimpleTestCase, TestCase, ignore_warnings, override_settings,
 )
 from django.test.client import RedirectCycleError, RequestFactory, encode_file
 from django.test.utils import ContextList, str_prefix
+from django.urls import NoReverseMatch, reverse
 from django.utils._os import upath
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.translation import ugettext_lazy
@@ -1021,7 +1023,7 @@ class ContextTests(TestDataMixin, TestCase):
     def test_single_context(self):
         "Context variables can be retrieved from a single context"
         response = self.client.get("/request_data/", data={'foo': 'whiz'})
-        self.assertEqual(response.context.__class__, Context)
+        self.assertIsInstance(response.context, RequestContext)
         self.assertIn('get-foo', response.context)
         self.assertEqual(response.context['get-foo'], 'whiz')
         self.assertEqual(response.context['data'], 'sausage')
@@ -1083,7 +1085,7 @@ class ContextTests(TestDataMixin, TestCase):
         response.context is not lost when view call another view.
         """
         response = self.client.get("/nested_view/")
-        self.assertEqual(response.context.__class__, Context)
+        self.assertIsInstance(response.context, RequestContext)
         self.assertEqual(response.context['nested'], 'yes')
 
 

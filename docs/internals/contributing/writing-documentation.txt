@@ -65,6 +65,57 @@ Primer <sphinx:rst-primer>`. After that, you'll want to read about the
 :ref:`Sphinx-specific markup <sphinx:sphinxmarkup>` that's used to manage
 metadata, indexing, and cross-references.
 
+How the documentation is organized
+----------------------------------
+
+The documentation is organized into several categories:
+
+* :doc:`Tutorials </intro/index>` take the reader by the hand through a series
+  of steps to create something.
+
+  The important thing in a tutorial is to help the reader achieve something
+  useful, preferably as early as possible, in order to give them confidence.
+
+  Explain the nature of the problem we're solving, so that the reader
+  understands what we're trying to achieve. Don't feel that you need to begin
+  with explanations of how things work - what matters is what the reader does,
+  not what you explain. It can be helpful to refer back to what you've done and
+  explain afterwards.
+
+* :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
+  fairly high level.
+
+  Link to reference material rather than repeat it. Use examples and don't be
+  reluctant to explain things that seem very basic to you - it might be the
+  explanation someone else needs.
+
+  Providing background context helps a newcomer connect the topic to things
+  that they already know.
+
+* :doc:`Reference guides </ref/index>` contain technical reference for APIs.
+  They describe the functioning of Django's internal machinery and instruct in
+  its use.
+
+  Keep reference material tightly focused on the subject. Assume that the
+  reader already understands the basic concepts involved but needs to know or
+  be reminded of how Django does it.
+
+  Reference guides aren't the place for general explanation. If you find
+  yourself explaining basic concepts, you may want to move that material to a
+  topic guide.
+
+* :doc:`How-to guides </howto/index>` are recipes that take the reader through
+  steps in key subjects.
+
+  What matters most in a how-to guide is what a user wants to achieve.
+  A how-to should always be result-oriented rather than focused on internal
+  details of how Django implements whatever is being discussed.
+
+  These guides are more advanced than tutorials and assume some knowledge about
+  how Django works. Assume that the reader has followed the tutorials and don't
+  hesitate to refer the reader back to the appropriate tutorial rather than
+  repeat the same material.
+
 Writing style
 -------------
 

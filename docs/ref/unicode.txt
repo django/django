@@ -290,8 +290,8 @@ Taking care in ``get_absolute_url()``
 
 URLs can only contain ASCII characters. If you're constructing a URL from
 pieces of data that might be non-ASCII, be careful to encode the results in a
-way that is suitable for a URL. The :func:`~django.core.urlresolvers.reverse`
-function handles this for you automatically.
+way that is suitable for a URL. The :func:`~django.urls.reverse` function
+handles this for you automatically.
 
 If you're constructing a URL manually (i.e., *not* using the ``reverse()``
 function), you'll need to take care of the encoding yourself. In this case,

@@ -61,7 +61,7 @@ def condition(etag_func=None, last_modified_func=None):
     The parameters are callables to compute the ETag and last modified time for
     the requested resource, respectively. The callables are passed the same
     parameters as the view itself. The Etag function should return a string (or
-    None if the resource doesn't exist), whilst the last_modified function
+    None if the resource doesn't exist), while the last_modified function
     should return a datetime object (or None if the resource doesn't exist).
 
     If both parameters are provided, all the preconditions must be met before
