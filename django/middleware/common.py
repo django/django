@@ -8,6 +8,7 @@ from django.core.mail import mail_managers
 from django.urls import is_valid_path
 from django.utils.cache import get_conditional_response, set_response_etag
 from django.utils.encoding import force_text
+from django.utils.http import unquote_etag
 from django.utils.six.moves.urllib.parse import urlparse
 
 logger = logging.getLogger('django.request')
@@ -120,9 +121,7 @@ class CommonMiddleware(object):
             if response.has_header('ETag'):
                 return get_conditional_response(
                     request,
-                    # get_conditional_response() requires an unquoted version
-                    # of the response's ETag.
-                    etag=response['ETag'].strip('"'),
+                    etag=unquote_etag(response['ETag']),
                     response=response,
                 )
 
