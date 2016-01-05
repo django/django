@@ -94,8 +94,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the HTTP client has sent a request that caused an error
 condition and a response with a status code of 400.
 
-By default, this is ``'django.views.defaults.bad_request'``. That default
-value should suffice.
+By default, this is ``'django.views.defaults.bad_request'``. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseBadRequest`.
 
 See the documentation about :ref:`the 400 (bad request) view
 <http_bad_request_view>` for more information.
@@ -109,8 +110,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called if the user doesn't have the permissions required to
 access a resource.
 
-By default, this is ``'django.views.defaults.permission_denied'``. That default
-value should suffice.
+By default, this is ``'django.views.defaults.permission_denied'``. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseForbidden`.
 
 See the documentation about :ref:`the 403 (HTTP Forbidden) view
 <http_forbidden_view>` for more information.
@@ -123,8 +125,9 @@ handler404
 A callable, or a string representing the full Python import path to the view
 that should be called if none of the URL patterns match.
 
-By default, this is ``'django.views.defaults.page_not_found'``. That default
-value should suffice.
+By default, this is ``'django.views.defaults.page_not_found'``. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseNotFound`.
 
 See the documentation about :ref:`the 404 (HTTP Not Found) view
 <http_not_found_view>` for more information.
@@ -138,8 +141,9 @@ A callable, or a string representing the full Python import path to the view
 that should be called in case of server errors. Server errors happen when you
 have runtime errors in view code.
 
-By default, this is ``'django.views.defaults.server_error'``. That default
-value should suffice.
+By default, this is ``'django.views.defaults.server_error'``. If you
+implement a custom view, be sure it returns an
+:class:`~django.http.HttpResponseServerError`.
 
 See the documentation about :ref:`the 500 (HTTP Internal Server Error) view
 <http_internal_server_error_view>` for more information.
