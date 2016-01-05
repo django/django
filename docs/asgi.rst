@@ -484,7 +484,7 @@ Channel: ``http.response.?``
 
 Keys:
 
-* ``status``: Integer HTTP status code. 
+* ``status``: Integer HTTP status code.
 
 * ``status_text``: Byte string HTTP reason-phrase, e.g. ``OK`` from ``200 OK``.
   Ignored for HTTP/2 clients. Optional, default should be based on ``status``
@@ -524,9 +524,34 @@ Keys:
 Server Push
 '''''''''''
 
-Send before any Response or Response Chunk. HTTP/2 only.
+Must be sent before any Response or Response Chunk messages.
 
-TODO
+When a server receives this message, it must treat the Request message in the
+``request`` field of the Server Push as though it were a new HTTP request being
+received from the network. A server may, if it chooses, apply all of its
+internal logic to handling this request (e.g. the server may want to try to
+satisfy the request from a cache). Regardless, if the server is unable to
+satisfy the request itself it must create a new ``http.response.?`` channel for
+the application to send the Response message on, fill that channel in on the
+``reply_channel`` field of the message, and then send the Request back to the
+application on the ``http.request`` channel.
+
+This approach limits the amount of knowledge the application has to have about
+pushed responses: they essentially appear to the application like a normal HTTP
+request, with the difference being that the application itself triggered the
+request.
+
+If the remote peer does not support server push, either because it's not a
+HTTP/2 peer or because SETTINGS_ENABLE_PUSH is set to 0, the server must do
+nothing in response to this message.
+
+Channel: ``http.response.?``
+
+Keys:
+
+* ``request``: A Request message. The ``body``, ``body_channel``, and
+  ``reply_channel`` fields MUST be absent: bodies are not allowed on
+  server-pushed requests, and applications should not create reply channels.
 
 
 WebSocket
