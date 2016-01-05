@@ -367,7 +367,13 @@ class AdminSite(object):
         """
         from django.contrib.auth.views import logout
         defaults = {
-            'extra_context': dict(self.each_context(request), **(extra_context or {})),
+            'extra_context': dict(
+                self.each_context(request),
+                # Since the user isn't logged out at this point, the value of
+                # has_permission must be overridden.
+                has_permission=False,
+                **(extra_context or {})
+            ),
         }
         if self.logout_template is not None:
             defaults['template_name'] = self.logout_template

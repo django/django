@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression in ``ConditionalGetMiddleware`` causing ``If-None-Match`` checks
   to always return HTTP 200 (:ticket:`26024`).
+
+* Fixed a regression that caused the "user-tools" items to display on the
+  admin's logout page (:ticket:`26035`).
