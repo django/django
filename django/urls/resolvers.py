@@ -135,7 +135,7 @@ class RegexURLPattern(LocaleRegexProvider):
         'path.to.ClassBasedView').
         """
         callback = self.callback
-        if isinstance(callback, functools.partial):
+        while isinstance(callback, functools.partial):
             callback = callback.func
         if not hasattr(callback, '__name__'):
             return callback.__module__ + "." + callback.__class__.__name__
