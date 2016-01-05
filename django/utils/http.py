@@ -253,6 +253,16 @@ def quote_etag(etag):
     return '"%s"' % etag.replace('\\', '\\\\').replace('"', '\\"')
 
 
+def unquote_etag(etag):
+    """
+    Unquotes an ETag string, reverts ``quote_etag``.
+    """
+    if etag:
+        return etag.strip('"').replace('\\"', '"').replace('\\\\', '\\')
+    else:
+        return etag
+
+
 def is_same_domain(host, pattern):
     """
     Return ``True`` if the host is either an exact match or a match
