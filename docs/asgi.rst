@@ -1,6 +1,6 @@
-===============
-Draft ASGI Spec
-===============
+=======================================================
+ASGI (Asynchronous Server Gateway Interface) Draft Spec
+=======================================================
 
 **NOTE: This is still in-progress, and may change substantially as development
 progresses.**
