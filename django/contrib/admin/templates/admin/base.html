@@ -24,7 +24,7 @@
         {% block branding %}{% endblock %}
         </div>
         {% block usertools %}
-        {% if has_permission %}
+        {% if has_permission and user.is_authenticated %}
         <div id="user-tools">
             {% block welcome-msg %}
                 {% trans 'Welcome,' %}
