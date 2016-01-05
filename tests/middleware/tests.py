@@ -470,6 +470,11 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
         self.assertEqual(self.resp.status_code, 304)
 
+    def test_if_none_match_and_same_etag_with_quotes(self):
+        self.req.META['HTTP_IF_NONE_MATCH'] = self.resp['ETag'] = '"spam"'
+        self.resp = ConditionalGetMiddleware().process_response(self.req, self.resp)
+        self.assertEqual(self.resp.status_code, 304)
+
     def test_if_none_match_and_different_etag(self):
         self.req.META['HTTP_IF_NONE_MATCH'] = 'spam'
         self.resp['ETag'] = 'eggs'
