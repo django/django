@@ -9,4 +9,5 @@ Django 1.8.9 fixes several bugs in 1.8.8.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression that caused the "user-tools" items to display on the
+  admin's logout page (:ticket:`26035`).
