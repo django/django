@@ -10,6 +10,7 @@ import logging
 import os
 import re
 import threading
+import traceback
 from ctypes import CDLL, CFUNCTYPE, POINTER, Structure, c_char_p
 from ctypes.util import find_library
 
@@ -143,7 +144,9 @@ class GEOSContextHandle(object):
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
 
     def __del__(self):
+        print(self.ptr, id(self.ptr))
         if self.ptr and lgeos:
+            traceback.print_stack()
             lgeos.finishGEOS_r(self.ptr)
 
 
