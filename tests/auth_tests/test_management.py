@@ -18,7 +18,7 @@ from django.core import checks, exceptions
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import (
-    SimpleTestCase, TestCase, override_settings, override_system_checks,
+    SimpleTestCase, TestCase, override_settings, override_system_checks, mock
 )
 from django.utils import six
 from django.utils.encoding import force_str
@@ -733,3 +733,9 @@ class PermissionTestCase(TestCase):
                 create_permissions(auth_app_config, verbosity=0)
         finally:
             models.Permission._meta.permissions = []
+
+    def test_create_permissions_calls_clear_cache(self):
+        auth_app_config = apps.get_app_config('auth')
+        with mock.patch('django.contrib.contenttypes.models.ContentTypeManager.clear_cache') as fake_clear_cache:
+            create_permissions(auth_app_config, verbosity=0)
+            fake_clear_cache.assert_called_with()

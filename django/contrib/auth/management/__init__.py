@@ -70,6 +70,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
         return
 
     from django.contrib.contenttypes.models import ContentType
+    ContentType.objects.clear_cache()
 
     permission_name_max_length = Permission._meta.get_field('name').max_length
     verbose_name_max_length = permission_name_max_length - 11  # len('Can change ') prefix
