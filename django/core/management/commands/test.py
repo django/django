@@ -48,6 +48,12 @@ class Command(BaseCommand):
             help='Overrides the default address where the live server (used '
                  'with LiveServerTestCase) is expected to run from. The '
                  'default value is localhost:8081-8179.'),
+        parser.add_argument('--tag', action='append', dest='tags',
+            help='Run only tests with the specified tag.'
+                 'You can use this option multiple times.')
+        parser.add_argument('--exclude-tag', action='append', dest='exclude_tags',
+            help='Do not run tests with the specified tag.'
+                 'You can use this option multiple times.')
 
         test_runner_class = get_runner(settings, self.test_runner)
 
@@ -79,8 +85,10 @@ class Command(BaseCommand):
             os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = options['liveserver']
             del options['liveserver']
 
+        tags = set(options.get('tags') or [])
+        exclude_tags = set(options.get('exclude_tags') or [])
         test_runner = TestRunner(**options)
-        failures = test_runner.run_tests(test_labels)
+        failures = test_runner.run_tests(test_labels, tags=tags, exclude_tags=exclude_tags)
 
         if failures:
             sys.exit(bool(failures))

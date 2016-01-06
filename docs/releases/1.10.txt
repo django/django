@@ -284,7 +284,9 @@ Templates
 Tests
 ^^^^^
 
-* ...
+* Tests and test cases can be marked with tags and :djadminopt:`--tag` and
+:djadminopt:`--exclude-tag` options can be used when running tests to run
+just a subset of tests.
 
 URLs
 ^^^^

@@ -244,7 +244,7 @@ def actual_test_processes(parallel):
 
 
 def django_tests(verbosity, interactive, failfast, keepdb, reverse,
-                 test_labels, debug_sql, parallel):
+                 test_labels, debug_sql, parallel, tags, exclude_tags):
     state = setup(verbosity, test_labels, parallel)
     extra_tests = []
 
@@ -265,6 +265,8 @@ def django_tests(verbosity, interactive, failfast, keepdb, reverse,
     failures = test_runner.run_tests(
         test_labels or get_installed(),
         extra_tests=extra_tests,
+        tags=tags,
+        exclude_tags=exclude_tags,
     )
     teardown(state)
     return failures
@@ -293,6 +295,10 @@ def bisect_tests(bisection_label, options, test_labels, parallel):
         subprocess_args.append('--verbosity=%s' % options.verbosity)
     if not options.interactive:
         subprocess_args.append('--noinput')
+    if options.tags:
+        subprocess_args.append('--tags=%s' % options.tags)
+    if options.exclude_tags:
+        subprocess_args.append('--exclude_tags=%s' % options.exclude_tags)
 
     iteration = 1
     while len(test_labels) > 1:
@@ -351,6 +357,10 @@ def paired_tests(paired_test, options, test_labels, parallel):
         subprocess_args.append('--verbosity=%s' % options.verbosity)
     if not options.interactive:
         subprocess_args.append('--noinput')
+    if options.tags:
+        subprocess_args.append('--tags=%s' % options.tags)
+    if options.exclude_tags:
+        subprocess_args.append('--exclude_tags=%s' % options.exclude_tags)
 
     for i, label in enumerate(test_labels):
         print('***** %d of %d: Check test pairing with %s' % (
@@ -410,6 +420,14 @@ if __name__ == "__main__":
         '--parallel', dest='parallel', nargs='?', default=0, type=int,
         const=default_test_processes(), metavar='N',
         help='Run tests using up to N parallel processes.')
+    parser.add_argument(
+        '--tag', dest='tags', action='append',
+        help='Run only tests with the specified tag.'
+             'You can use this option multiple times.')
+    parser.add_argument(
+        '--exclude-tag', dest='exclude_tags', action='append',
+        help='Do not run tests with the specified tag.'
+             'You can use this option multiple times.')
 
     options = parser.parse_args()
 
@@ -438,7 +456,8 @@ if __name__ == "__main__":
 
     if options.selenium:
         os.environ['DJANGO_SELENIUM_TESTS'] = '1'
-
+    tags = set(options.tags or [])
+    exclude_tags = set(options.exclude_tags or [])
     if options.bisect:
         bisect_tests(options.bisect, options, options.modules, options.parallel)
     elif options.pair:
@@ -447,6 +466,7 @@ if __name__ == "__main__":
         failures = django_tests(options.verbosity, options.interactive,
                                 options.failfast, options.keepdb,
                                 options.reverse, options.modules,
-                                options.debug_sql, options.parallel)
+                                options.debug_sql, options.parallel,
+                                tags, exclude_tags)
         if failures:
             sys.exit(bool(failures))

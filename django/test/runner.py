@@ -400,11 +400,10 @@ class DiscoverRunner(object):
         settings.DEBUG = False
         unittest.installHandler()
 
-    def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
+    def build_suite(self, test_labels=None, extra_tests=None, tags=None, exclude_tags=None, **kwargs):
         suite = self.test_suite()
         test_labels = test_labels or ['.']
         extra_tests = extra_tests or []
-
         discover_kwargs = {}
         if self.pattern is not None:
             discover_kwargs['pattern'] = self.pattern
@@ -459,6 +458,8 @@ class DiscoverRunner(object):
         for test in extra_tests:
             suite.addTest(test)
 
+        if tags or exclude_tags:
+            suite = filter_tests_by_tags(suite, tags, exclude_tags)
         suite = reorder_suite(suite, self.reorder_by, self.reverse)
 
         if self.parallel > 1:
@@ -515,7 +516,7 @@ class DiscoverRunner(object):
     def suite_result(self, suite, result, **kwargs):
         return len(result.failures) + len(result.errors)
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, extra_tests=None, tags=None, exclude_tags=None, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
 
@@ -528,7 +529,7 @@ class DiscoverRunner(object):
         Returns the number of tests that failed.
         """
         self.setup_test_environment()
-        suite = self.build_suite(test_labels, extra_tests)
+        suite = self.build_suite(test_labels, extra_tests, tags, exclude_tags)
         old_config = self.setup_databases()
         result = self.run_suite(suite)
         self.teardown_databases(old_config)
@@ -747,3 +748,24 @@ def setup_databases(verbosity, interactive, keepdb=False, debug_sql=False, paral
             connections[alias].force_debug_cursor = True
 
     return old_names
+
+
+def filter_tests_by_tags(suite, tags, exclude_tags):
+    suite_class = type(suite)
+    filtered_suite = suite_class()
+    tags = tags or set()
+    exclude_tags = exclude_tags or set()
+    for test in suite:
+        if isinstance(test, suite_class):
+            filtered_suite.addTests(filter_tests_by_tags(test, tags, exclude_tags))
+        else:
+            test_tags = set(getattr(test, 'tags', set()))
+            test_fn_name = getattr(test, '_testMethodName', str(test))
+            test_fn = getattr(test, test_fn_name, test)
+            test_fn_tags = set(getattr(test_fn, 'tags', set()))
+            all_tags = test_tags.union(test_fn_tags)
+            matched_tags = all_tags.intersection(tags)
+            if (matched_tags or not tags) and not all_tags.intersection(exclude_tags):
+                filtered_suite.addTest(test)
+
+    return filtered_suite

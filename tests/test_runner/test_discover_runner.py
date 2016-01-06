@@ -25,7 +25,7 @@ class DiscoverRunnerTest(TestCase):
             ["test_discovery_sample.tests_sample"],
         ).countTestCases()
 
-        self.assertEqual(count, 4)
+        self.assertEqual(count, 6)
 
     def test_dotted_test_class_vanilla_unittest(self):
         count = DiscoverRunner().build_suite(
@@ -61,7 +61,7 @@ class DiscoverRunnerTest(TestCase):
                 ["test_discovery_sample/"],
             ).countTestCases()
 
-        self.assertEqual(count, 5)
+        self.assertEqual(count, 7)
 
     def test_empty_label(self):
         """
@@ -165,3 +165,42 @@ class DiscoverRunnerTest(TestCase):
 
     def test_overridable_test_loader(self):
         self.assertEqual(DiscoverRunner().test_loader, defaultTestLoader)
+
+    def test_tags(self):
+        core_count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            tags=['core']
+        ).countTestCases()
+        fast_count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            tags=['fast']
+        ).countTestCases()
+        slow_count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            tags=['slow']
+        ).countTestCases()
+        self.assertEqual(core_count, 1)
+        self.assertEqual(fast_count, 2)
+        self.assertEqual(slow_count, 2)
+
+    def test_exclude_tags(self):
+        core_count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            tags=['fast'],
+            exclude_tags=['core']
+        ).countTestCases()
+
+        exclusion_count = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            tags=['fast'],
+            exclude_tags=['slow']
+        ).countTestCases()
+
+        exclusion_count_2 = DiscoverRunner().build_suite(
+            ["test_discovery_sample.tests_sample"],
+            exclude_tags=['slow']
+        ).countTestCases()
+
+        self.assertEqual(core_count, 1)
+        self.assertEqual(exclusion_count, 0)
+        self.assertEqual(exclusion_count_2, 4)
