@@ -186,15 +186,20 @@ class MigrationLoader(object):
         # This is just for dependency re-pointing when applying replacements,
         # so we ignore run_before here.
         reverse_dependencies = {}
-        for key, migration in normal.items():
+        reverse_dependencies_normal = {}
+        for key, migration in self.disk_migrations.items():
             for parent in migration.dependencies:
                 reverse_dependencies.setdefault(parent, set()).add(key)
+                if key in normal:
+                    reverse_dependencies_normal.setdefault(parent, set()).add(key)
         # Remember the possible replacements to generate more meaningful error
         # messages
         reverse_replacements = {}
         for key, migration in replacing.items():
             for replaced in migration.replaces:
                 reverse_replacements.setdefault(replaced, set()).add(key)
+        # Set to store all replacing migrations that cannot be applied.
+        inapplicable_replacing = set()
         # Carry out replacements if we can - that is, if all replaced migrations
         # are either unapplied or missing.
         for key, migration in replacing.items():
@@ -205,6 +210,7 @@ class MigrationLoader(object):
             applied_statuses = [(target in self.applied_migrations) for target in migration.replaces]
             can_replace = all(applied_statuses) or (not any(applied_statuses))
             if not can_replace:
+                inapplicable_replacing.add(key)
                 continue
             # Alright, time to replace. Step through the replaced migrations
             # and remove, repointing dependencies if needs be.
@@ -213,7 +219,7 @@ class MigrationLoader(object):
                     # We don't care if the replaced migration doesn't exist;
                     # the usage pattern here is to delete things after a while.
                     del normal[replaced]
-                for child_key in reverse_dependencies.get(replaced, set()):
+                for child_key in reverse_dependencies_normal.get(replaced, set()):
                     if child_key in migration.replaces:
                         continue
                     # List of migrations whose dependency on `replaced` needs
@@ -243,6 +249,38 @@ class MigrationLoader(object):
             # Mark the replacement as applied if all its replaced ones are
             if all(applied_statuses):
                 self.applied_migrations.add(key)
+        # Map of inapplicable migrations rerouted to normal migrations.
+        # Anything that depends on an inapplicable migration can be rerouted
+        # to depend on applicable migrations via this map.
+        rerouted_dependencies = {}
+
+        def _reroute_to_dependencies_and_replaces(key):
+            if key in rerouted_dependencies:
+                return rerouted_dependencies[key]
+
+            replacement_deps = set()
+            for dep in replacing[key].dependencies:
+                if dep not in inapplicable_replacing:
+                    replacement_deps.add(dep)
+                else:
+                    # Drill down recursively.
+                    replacement_deps.update(_reroute_to_dependencies_and_replaces(dep))
+            # These will always be normal migrations.
+            replacement_deps.update(replacing[key].replaces)
+
+            rerouted_dependencies[key] = replacement_deps
+            return replacement_deps
+
+        # Carry out replacements where replacing migrations cannot be applied.
+        for key in inapplicable_replacing:
+            # Check if any migrations are attempting to refer to this migration.
+            if key in reverse_dependencies:
+                replacement_deps = _reroute_to_dependencies_and_replaces(key)
+                for rev_dep in reverse_dependencies[key]:
+                    # Remove this migration as a dependency and add normal
+                    # migrations in its stead.
+                    self.disk_migrations[rev_dep].dependencies.remove(key)
+                    self.disk_migrations[rev_dep].dependencies.extend(replacement_deps)
         # Store the replacement migrations for later checks
         self.replacements = replacing
         # Finally, make a graph and load everything into it
