@@ -4,7 +4,10 @@ from importlib import import_module
 
 from django.core.exceptions import ViewDoesNotExist
 from django.utils import lru_cache, six
+from django.utils.encoding import escape_query_string, iri_to_uri
+from django.utils.http import RFC3986_SUBDELIMS, urlquote
 from django.utils.module_loading import module_has_submodule
+from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 
 
 @lru_cache.lru_cache(maxsize=None)
@@ -62,3 +65,49 @@ def get_mod_func(callback):
     except ValueError:
         return callback, ''
     return callback[:dot], callback[dot + 1:]
+
+
+class URL(object):
+    __slots__ = ['scheme', 'host', 'path', 'query_string', 'fragment']
+
+    def __init__(self, scheme='', host='', path='', query_string='', fragment=''):
+        self.scheme = scheme
+        self.host = host
+        self.path = path
+        self.query_string = query_string
+        self.fragment = fragment
+
+    @classmethod
+    def from_location(cls, location):
+        return cls(*urlsplit(location))
+
+    @classmethod
+    def from_request(cls, request):
+        return cls(
+            request.scheme,
+            request.get_host(),
+            request.path,
+            request.META.get('QUERY_STRING', ''),
+            ''
+        )
+
+    def __repr__(self):
+        return "<URL '%s'>" % str(self)
+
+    def __str__(self):
+        path = urlquote(self.path, safe=RFC3986_SUBDELIMS + str('/~:@'))
+        if path.startswith('//'):
+            path = '/%%2F%s' % path[2:]
+        return urlunsplit((
+            self.scheme,
+            self.host,
+            path,
+            escape_query_string(self.query_string) if self.query_string else '',
+            iri_to_uri(self.fragment) if self.fragment else ''
+        ))
+
+    def copy(self):
+        return type(self)(
+            self.scheme, self.host, self.path,
+            self.query_string, self.fragment
+        )

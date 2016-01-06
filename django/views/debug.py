@@ -450,13 +450,13 @@ class ExceptionReporter(object):
 def technical_404_response(request, exception):
     "Create a technical 404 error response. The exception should be the Http404."
     try:
-        error_url = exception.args[0]['path']
-    except (IndexError, TypeError, KeyError):
+        error_url = exception.path
+    except AttributeError:
         error_url = request.path_info[1:]  # Trim leading slash
 
     try:
-        tried = exception.args[0]['tried']
-    except (IndexError, TypeError, KeyError):
+        tried = exception.tried
+    except AttributeError:
         tried = []
     else:
         if (not tried                           # empty URLconf
@@ -472,7 +472,7 @@ def technical_404_response(request, exception):
 
     caller = ''
     try:
-        resolver_match = resolve(request.path)
+        resolver_match = resolve(request.path, request=request)
     except Resolver404:
         pass
     else:
@@ -1176,9 +1176,9 @@ TECHNICAL_404_TEMPLATE = """
       <ol>
         {% for pattern in urlpatterns %}
           <li>
-            {% for pat in pattern %}
-                {{ pat.regex.pattern }}
-                {% if forloop.last and pat.name %}[name='{{ pat.name }}']{% endif %}
+            {% for resolver in pattern %}
+                {% for c in resolver.constraints %}{{ c.describe }}{% endfor %}
+                {% if forloop.last and resolver.is_endpoint and resolver.name %}[name='{{ name }}']{% endif %}
             {% endfor %}
           </li>
         {% endfor %}

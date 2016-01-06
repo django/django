@@ -1,10 +1,10 @@
 "This is the locale selecting middleware that will look at accept headers"
 
+from importlib import import_module
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.urls import (
-    LocaleRegexURLResolver, get_resolver, get_script_prefix, is_valid_path,
-)
+from django.urls import LocalePrefix, get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
 from django.utils.functional import cached_property
@@ -33,11 +33,11 @@ class LocaleMiddleware(object):
                 and self.is_language_prefix_patterns_used):
             urlconf = getattr(request, 'urlconf', None)
             language_path = '/%s%s' % (language, request.path_info)
-            path_valid = is_valid_path(language_path, urlconf)
+            path_valid = is_valid_path(language_path, urlconf, request)
             path_needs_slash = (
                 not path_valid and (
                     settings.APPEND_SLASH and not language_path.endswith('/')
-                    and is_valid_path('%s/' % language_path, urlconf)
+                    and is_valid_path('%s/' % language_path, urlconf, request)
                 )
             )
 
@@ -65,7 +65,8 @@ class LocaleMiddleware(object):
         Returns `True` if the `LocaleRegexURLResolver` is used
         at root level of the urlpatterns, else it returns `False`.
         """
-        for url_pattern in get_resolver(None).url_patterns:
-            if isinstance(url_pattern, LocaleRegexURLResolver):
+        urlconf = import_module(settings.ROOT_URLCONF)
+        for urlpattern in urlconf.urlpatterns:
+            if urlpattern.constraints and isinstance(urlpattern.constraints[0], LocalePrefix):
                 return True
         return False
