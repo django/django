@@ -277,6 +277,7 @@ class JavascriptI18nTests(LiveServerTestCase):
         except Exception as e:
             raise unittest.SkipTest('Selenium webdriver "%s" not installed or '
                                     'not operational: %s' % (cls.webdriver_class, str(e)))
+        cls.selenium.implicitly_wait(10)
         super(JavascriptI18nTests, cls).setUpClass()
 
     @classmethod
