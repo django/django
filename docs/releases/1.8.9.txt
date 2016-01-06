@@ -11,3 +11,6 @@ Bugfixes
 
 * Fixed a regression that caused the "user-tools" items to display on the
   admin's logout page (:ticket:`26035`).
+
+* Fixed a crash in the translations system when the current language has no
+  translations (:ticket:`26046`).

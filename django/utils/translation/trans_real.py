@@ -121,6 +121,9 @@ class DjangoTranslation(gettext_module.GNUTranslations):
             # default lang should have at least one translation file available.
             raise IOError("No translation files found for default language %s." % settings.LANGUAGE_CODE)
         self._add_fallback()
+        if self._catalog is None:
+            # No catalogs found for this language, set an empty catalog.
+            self._catalog = {}
 
     def __repr__(self):
         return "<DjangoTranslation lang:%s>" % self.__language
