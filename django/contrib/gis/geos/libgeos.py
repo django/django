@@ -135,6 +135,7 @@ def get_pointer_arr(n):
 
 
 lgeos = SimpleLazyObject(load_geos)
+logfile = open(os.path.expanduser('~/log'), 'a')
 
 
 class GEOSContextHandle(object):
@@ -144,9 +145,10 @@ class GEOSContextHandle(object):
         self.ptr = lgeos.initGEOS_r(notice_h, error_h)
 
     def __del__(self):
-        print(self.ptr, id(self.ptr))
+        print(self.ptr, id(self.ptr), file=logfile)
         if self.ptr and lgeos:
-            traceback.print_stack()
+            traceback.print_stack(file=logfile)
+            logfile.flush()
             lgeos.finishGEOS_r(self.ptr)
 
 
