@@ -367,6 +367,7 @@ class ModelTest(TestCase):
         with self.assertRaises(TypeError):
             EmptyQuerySet()
         self.assertIsInstance(Article.objects.none(), EmptyQuerySet)
+        self.assertFalse(isinstance('', EmptyQuerySet))
 
     def test_emptyqs_values(self):
         # test for #15959
