@@ -375,15 +375,16 @@ CSRF_FAILURE_VIEW
 
 Default: ``'django.views.csrf.csrf_failure'``
 
-A dotted path to the view function to be used when an incoming request
-is rejected by the CSRF protection.  The function should have this signature::
+A dotted path to the view function to be used when an incoming request is
+rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
+this signature::
 
     def csrf_failure(request, reason=""):
         ...
 
-where ``reason`` is a short message (intended for developers or logging, not for
-end users) indicating the reason the request was rejected.  See
-:doc:`/ref/csrf`.
+where ``reason`` is a short message (intended for developers or logging, not
+for end users) indicating the reason the request was rejected. It should return
+an :class:`~django.http.HttpResponseForbidden`.
 
 ``django.views.csrf.csrf_failure()`` accepts an additional ``template_name``
 parameter that defaults to ``'403_csrf.html'``. If a template with that name
