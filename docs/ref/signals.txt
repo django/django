@@ -405,6 +405,15 @@ Arguments sent with this signal:
 ``using``
     The alias of database on which a command will operate.
 
+``plan``
+    .. versionadded:: 1.10
+
+    The migration plan that was used for the migration run. While the plan is
+    not public API, this allows for the rare cases when it is critical to know
+    the plan. A plan is a list of two-tuples with the first item being the
+    instance of a migration class and the second item showing if the migration
+    was rolled back (``True``) or applied (``False``).
+
 post_migrate
 ------------
 
@@ -446,6 +455,15 @@ Arguments sent with this signal:
 ``using``
     The database alias used for synchronization. Defaults to the ``default``
     database.
+
+``plan``
+    .. versionadded:: 1.10
+
+    The migration plan that was used for the migration run. While the plan is
+    not public API, this allows for the rare cases when it is critical to know
+    the plan. A plan is a list of two-tuples with the first item being the
+    instance of a migration class and the second item showing if the migration
+    was rolled back (``True``) or applied (``False``).
 
 For example, you could register a callback in an
 :class:`~django.apps.AppConfig` like this::

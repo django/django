@@ -65,5 +65,5 @@ m2m_changed = ModelSignal(
     use_caching=True,
 )
 
-pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using"])
-post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using"])
+pre_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "plan"])
+post_migrate = Signal(providing_args=["app_config", "verbosity", "interactive", "using", "plan"])

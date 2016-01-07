@@ -20,7 +20,9 @@ def sql_flush(style, connection, only_django=False, reset_sequences=True, allow_
     return statements
 
 
-def emit_pre_migrate_signal(verbosity, interactive, db):
+def emit_pre_migrate_signal(verbosity, interactive, db, plan=None):
+    if plan is None:
+        plan = []
     # Emit the pre_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -32,10 +34,14 @@ def emit_pre_migrate_signal(verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            plan=plan,
+        )
 
 
-def emit_post_migrate_signal(verbosity, interactive, db):
+def emit_post_migrate_signal(verbosity, interactive, db, plan=None):
+    if plan is None:
+        plan = []
     # Emit the post_migrate signal for every application.
     for app_config in apps.get_app_configs():
         if app_config.models_module is None:
@@ -47,4 +53,6 @@ def emit_post_migrate_signal(verbosity, interactive, db):
             app_config=app_config,
             verbosity=verbosity,
             interactive=interactive,
-            using=db)
+            using=db,
+            plan=plan,
+        )
