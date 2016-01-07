@@ -21,3 +21,7 @@ Bugfixes
 * Fixed a regression that caused the incorrect day to be selected when opening
   the admin calendar widget for timezones from GMT+0100 to GMT+1200
   (:ticket:`24980`).
+
+* Fixed a regression in the admin's edit related model popup that caused an
+  escaped value to be displayed in the select dropdown of the parent window
+  (:ticket:`25997`).

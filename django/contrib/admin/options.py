@@ -38,7 +38,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils import six
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.html import escape, escapejs
+from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.text import capfirst, get_text_list
@@ -1113,9 +1113,9 @@ class ModelAdmin(BaseModelAdmin):
             new_value = obj.serializable_value(attr)
             return SimpleTemplateResponse('admin/popup_response.html', {
                 'action': 'change',
-                'value': escape(value),
-                'obj': escapejs(obj),
-                'new_value': escape(new_value),
+                'value': value,
+                'obj': obj,
+                'new_value': new_value,
             })
 
         opts = self.model._meta
