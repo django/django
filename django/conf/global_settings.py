@@ -587,6 +587,32 @@ STATICFILES_FINDERS = [
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 ]
 
+FILE_STORAGES = {
+    'media': {
+        'BACKEND': DEFAULT_FILE_STORAGE,
+        'OPTIONS': {
+            'location': MEDIA_ROOT,
+            'base_url': MEDIA_URL,
+        },
+        'CHARSET': FILE_CHARSET,
+    },
+    'static': {
+        'BACKEND': STATICFILES_STORAGE,
+        'OPTIONS': {
+            'location': STATIC_ROOT,
+            'base_url': STATIC_URL,
+        },
+        # analogue of STATICFILES_DIRS and STATICFILES_FINDERS
+        'DIRS': [],
+        'FINDERS': [
+            'django.contrib.staticfiles.finders.FileSystemFinder',
+            'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+            # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
+        ]
+        'CHARSET': FILE_CHARSET,
+    }
+}
+
 ##############
 # MIGRATIONS #
 ##############
