@@ -69,7 +69,7 @@ Minor features
   being able to log out.
 
 * Added the optional ``backend`` argument to :func:`~django.contrib.auth.login`
-  to allowing using it without credentials.
+  to allow using it without credentials.
 
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
