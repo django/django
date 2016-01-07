@@ -68,6 +68,10 @@ Minor features
   to prevent an issue where Safari caches redirects and prevents a user from
   being able to log out.
 
+* The new ``redirect_authenticated_user`` parameter for the
+  :func:`~django.contrib.auth.views.login` view allows to redirect
+  authenticated users visiting the login page.
+
 :mod:`django.contrib.contenttypes`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

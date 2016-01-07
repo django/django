@@ -55,21 +55,28 @@ def deprecate_current_app(func):
 def login(request, template_name='registration/login.html',
           redirect_field_name=REDIRECT_FIELD_NAME,
           authentication_form=AuthenticationForm,
-          extra_context=None):
+          extra_context=None, redirect_authenticated_user=False):
     """
     Displays the login form and handles the login action.
     """
     redirect_to = request.POST.get(redirect_field_name,
                                    request.GET.get(redirect_field_name, ''))
 
-    if request.method == "POST":
+    # Ensure the user-originating redirection url is safe.
+    if not is_safe_url(url=redirect_to, host=request.get_host()):
+        redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+    if redirect_authenticated_user and request.user.is_authenticated():
+        if redirect_to == request.path:
+            raise ValueError(
+                "Redirection loop for authenticated user detected. Check that "
+                "your LOGIN_REDIRECT_URL doesn't point to a login page")
+        return HttpResponseRedirect(redirect_to)
+
+    elif request.method == "POST":
         form = authentication_form(request, data=request.POST)
+
         if form.is_valid():
-
-            # Ensure the user-originating redirection url is safe.
-            if not is_safe_url(url=redirect_to, host=request.get_host()):
-                redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
-
             # Okay, security check complete. Log the user in.
             auth_login(request, form.get_user())
 

@@ -946,7 +946,7 @@ All authentication views
 This is a list with all the views ``django.contrib.auth`` provides. For
 implementation details see :ref:`using-the-views`.
 
-.. function:: login(request, template_name=`registration/login.html`, redirect_field_name=, authentication_form, current_app, extra_context)
+.. function:: login(request, template_name=`registration/login.html`, redirect_field_name=, authentication_form, current_app, extra_context, redirect_authenticated_user=False)
 
     **URL name:** ``login``
 
@@ -972,10 +972,18 @@ implementation details see :ref:`using-the-views`.
     * ``extra_context``: A dictionary of context data that will be added to the
       default context data passed to the template.
 
+    * ``redirect_authenticated_user``: A boolean that controls whether or not
+      authenticated users accessing the login page will be redirected as if
+      they had just successfully logged in. Defaults to `False`.
+
     .. deprecated:: 1.9
 
         The ``current_app`` parameter is deprecated and will be removed in
         Django 2.0. Callers should set ``request.current_app`` instead.
+
+    .. versionadded:: 1.10
+
+        The ``redirect_authenticated_user`` parameter was added.
 
     Here's what ``django.contrib.auth.views.login`` does:
 
