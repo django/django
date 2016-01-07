@@ -1619,6 +1619,18 @@ templates used by the :class:`ModelAdmin` views:
     ``Car`` foreign key field to only display the cars owned by the ``User``
     instance.
 
+    .. note::
+
+        To filter a field's :class:`~django.db.models.query.QuerySet` based on
+        an instance of your model, you can define a
+        :class:`~django.forms.ModelForm` using the
+        :attr:`~django.contrib.admin.ModelAdmin.form` attribute.
+
+        You can find an example of queryset filtering in
+        :ref:`fields-relationship-handling`. An introductory material for
+        :class:`~django.forms.ModelForm` is available at
+        :doc:`/topics/forms/modelforms`.
+
 .. method:: ModelAdmin.formfield_for_manytomany(db_field, request, **kwargs)
 
     Like the ``formfield_for_foreignkey`` method, the

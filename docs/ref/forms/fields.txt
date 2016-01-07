@@ -1063,6 +1063,8 @@ Slightly complex built-in ``Field`` classes
     If no ``input_time_formats`` argument is provided, the default input formats
     for :class:`TimeField` are used.
 
+.. _fields-relationship-handling:
+
 Fields which handle relationships
 ---------------------------------
 
@@ -1077,14 +1079,24 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 
 For more complex uses, you can specify ``queryset=None`` when declaring the
 form field and then populate the ``queryset`` in the form's ``__init__()``
-method::
+method:
 
-    class FooMultipleChoiceForm(forms.Form):
-        foo_select = forms.ModelMultipleChoiceField(queryset=None)
+.. code-block:: python
 
-        def __init__(self, *args, **kwargs):
-            super(FooMultipleChoiceForm, self).__init__(*args, **kwargs)
-            self.fields['foo_select'].queryset = ...
+    class Country(models.Model):
+        name = models.CharField(max_length=100)
+        capital = models.ForeignKey('City', on_delete=models.CASCADE)
+
+    class City(models.Model):
+        name = models.CharField(max_length=100)
+        country = models.ForeignKey(Country, on_delete=models.CASCADE)
+
+    class CountryForm(forms.Form):
+        capital = forms.ModelChoiceField(queryset=City.objects.none())
+
+        def __init__(*args, **kwargs):
+            super(CountryForm, self).__init__(*args, **kwargs)
+            self.fields['capital'].queryset = City.objects.filter(country=self.instance.pk)
 
 ``ModelChoiceField``
 ~~~~~~~~~~~~~~~~~~~~

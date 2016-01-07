@@ -612,6 +612,16 @@ the field declaratively and setting its ``validators`` parameter::
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
+Filtering fields that handle relationships
+------------------------------------------
+
+When instantiating a :class:`ModelForm`, you can filter the
+:class:`~django.db.models.query.QuerySet` for fields that handle relationships
+with other models (such as :class:`~django.forms.ModelChoiceField`,
+:class:`~django.forms.ModelMultipleChoiceField`, ...) based on the underlying
+:class:`~django.db.models.Model` instance.
+
+An example is available in the section :ref:`fields-relationship-handling`.
 
 Enabling localization of fields
 -------------------------------
