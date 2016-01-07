@@ -4,6 +4,9 @@ from __future__ import unicode_literals
 import datetime
 import os
 import tempfile
+import uuid
+from random import sample, shuffle
+from string import ascii_lowercase
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import (
@@ -952,3 +955,36 @@ class ReferencedByGenRel(models.Model):
 
 class GenRelReference(models.Model):
     references = GenericRelation(ReferencedByGenRel)
+
+
+class ParentWithUUIDPK(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return str(self.id)
+
+
+class RelatedWithUUIDPKModel(models.Model):
+    parent = models.ForeignKey(ParentWithUUIDPK, on_delete=models.CASCADE)
+
+
+# Models for #25997
+def generate_random_string():
+    """Function to generate string with letters and chars, escaped in django.utils.html.escapejs"""
+    chars = ['\\', '\'', '"', '>', '<', '&', '=', '-', ';']
+    chars += sample(ascii_lowercase, 10)
+    shuffle(chars)
+    return ''.join(chars)
+
+
+class ParentWithCharPK(models.Model):
+    name = models.CharField(max_length=100, default=generate_random_string, editable=False)
+    title = models.CharField(max_length=200)
+
+    def __str__(self):
+        return str(self.name)
+
+
+class RelatedWithCharPKModel(models.Model):
+    parent = models.ForeignKey(ParentWithCharPK, on_delete=models.CASCADE)

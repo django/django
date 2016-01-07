@@ -51,10 +51,11 @@ from .models import (
     ExternalSubscriber, Fabric, FancyDoodad, FieldOverridePost,
     FilteredManager, FooAccount, FoodDelivery, FunkyTag, Gallery, Grommet,
     Inquisition, Language, Link, MainPrepopulated, ModelWithStringPrimaryKey,
-    OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
-    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, Promo, Question, Recommendation, Recommender,
-    RelatedPrepopulated, Report, Restaurant, RowLevelChangePermissionModel,
+    OtherStory, Paper, Parent, ParentWithCharPK, ParentWithDependentChildren,
+    ParentWithUUIDPK, Person, Persona, Picture, Pizza, Plot, PlotDetails,
+    PluggableSearchPerson, Podcast, Post, PrePopulatedPost, Promo, Question,
+    Recommendation, Recommender, RelatedPrepopulated, RelatedWithCharPKModel,
+    RelatedWithUUIDPKModel, Report, Restaurant, RowLevelChangePermissionModel,
     SecretHideout, Section, ShortMessage, Simple, State, Story, Subscriber,
     SuperSecretHideout, SuperVillain, Telegram, TitleTranslation, Topping,
     UnchangeableObject, UndeletableObject, UnorderedObject, Villain, Vodcast,
@@ -4568,6 +4569,77 @@ class SeleniumAdminViewsFirefoxTests(AdminSeleniumWebDriverTestCase):
         self.wait_for_text('#content h1', 'Add section')
         self.selenium.close()
         self.selenium.switch_to.window(self.selenium.window_handles[0])
+
+    def test_inline_char_fk_edit_with_popup(self):
+        from selenium.webdriver.support.ui import Select
+
+        parent = ParentWithCharPK.objects.create(title='test')
+        related_with_parent = RelatedWithCharPKModel.objects.create(parent=parent)
+
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithcharpkmodel_change',
+            args=(related_with_parent.id,)))
+        self.selenium.find_element_by_id('change_id_parent').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        select_element = Select(self.selenium.find_element_by_id('id_parent'))
+        inner_text = select_element.first_selected_option.text
+        self.assertEqual(str(inner_text), str(parent.name))
+
+    def test_inline_uuid_pk_edit_with_popup(self):
+        from selenium.webdriver.support.ui import Select
+
+        parent = ParentWithUUIDPK.objects.create(title='test')
+        related_with_parent = RelatedWithUUIDPKModel.objects.create(parent=parent)
+
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithuuidpkmodel_change',
+            args=(related_with_parent.id,)))
+
+        self.selenium.find_element_by_id('change_id_parent').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        select_element = Select(self.selenium.find_element_by_id('id_parent'))
+        inner_text = select_element.first_selected_option.text
+        self.assertEqual(str(inner_text), str(parent.id))
+
+    def test_inline_char_fk_add_with_popup(self):
+        from selenium.webdriver.support.ui import Select
+
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithcharpkmodel_add'))
+
+        self.selenium.find_element_by_id('add_id_parent').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        select_element = Select(self.selenium.find_element_by_id('id_parent'))
+        inner_text = select_element.first_selected_option.text
+        parent = ParentWithCharPK.objects.first()
+        self.assertEqual(str(inner_text), str(parent.name))
+
+    def test_inline_uuid_pk_add_with_popup(self):
+        from selenium.webdriver.support.ui import Select
+
+        self.admin_login(username='super', password='secret', login_url=reverse('admin:index'))
+        self.selenium.get(self.live_server_url + reverse('admin:admin_views_relatedwithuuidpkmodel_add'))
+
+        self.selenium.find_element_by_id('add_id_parent').click()
+        self.wait_for_popup()
+        self.selenium.switch_to.window(self.selenium.window_handles[-1])
+        self.selenium.find_element_by_id('id_title').send_keys('test')
+        self.selenium.find_element_by_xpath('//input[@value="Save"]').click()
+        self.selenium.switch_to.window(self.selenium.window_handles[0])
+        select_element = Select(self.selenium.find_element_by_id('id_parent'))
+        inner_text = select_element.first_selected_option.text
+        parent = ParentWithUUIDPK.objects.first()
+        self.assertEqual(str(inner_text), str(parent.id))
 
 
 class SeleniumAdminViewsChromeTests(SeleniumAdminViewsFirefoxTests):

@@ -17,3 +17,7 @@ Bugfixes
 
 * Fixed a crash in the translations system when the current language has no
   translations (:ticket:`26046`).
+* Fixed a regression in ``ConditionalGetMiddleware`` causing ``If-None-Match`` checks
+  to always return HTTP 200 (:ticket:`26024`).
+* Fixed a regression in the admin when popup edit of related model returned escaped
+  value into select dropdown of the parent window (:ticket:`25997`).
