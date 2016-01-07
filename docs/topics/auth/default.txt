@@ -322,7 +322,7 @@ How to log a user in
 If you have an authenticated user you want to attach to the current session
 - this is done with a :func:`~django.contrib.auth.login` function.
 
-.. function:: login(request, user)
+.. function:: login(request, user, backend=None)
 
     To log a user in, from a view, use :func:`~django.contrib.auth.login()`. It
     takes an :class:`~django.http.HttpRequest` object and a
@@ -354,18 +354,40 @@ If you have an authenticated user you want to attach to the current session
                 # Return an 'invalid login' error message.
                 ...
 
-.. admonition:: Calling ``authenticate()`` first
+    .. versionchanged:: 1.10
 
-    When you're manually logging a user in, you *must* successfully authenticate
-    the user with :func:`~django.contrib.auth.authenticate()` before you call
-    :func:`~django.contrib.auth.login()`.
-    :func:`~django.contrib.auth.authenticate()`
-    sets an attribute on the :class:`~django.contrib.auth.models.User` noting
-    which authentication backend successfully authenticated that user (see the
-    :ref:`backends documentation <authentication-backends>` for details), and
-    this information is needed later during the login process. An error will be
-    raised if you try to login a user object retrieved from the database
-    directly.
+        In older versions, when you're manually logging a user in, you *must* 
+        successfully authenticate the user with 
+        :func:`~django.contrib.auth.authenticate()` before you call
+        :func:`~django.contrib.auth.login()`.
+
+        Now you can set the backend using the optional ``backend`` argument. 
+
+Selecting the :ref:`authentication backend <authentication-backends>`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When a user is logged in, Django persists both the user's ID and the 
+authentication backend used to authenticate them in their session, so 
+the same authentication backend can be used to fetch their details 
+on a future request. The authentication backend to persist is selected 
+as follows:
+
+#. Use the value of the optional ``backend`` argument, if provided.
+#. Use the value of the ``user.backend`` annotation, if present. 
+   This is for backwards-compatible pairing of 
+   :func:`~django.contrib.auth.authenticate()` and 
+   :func:`~django.contrib.auth.login()`: 
+   :func:`~django.contrib.auth.authenticate()` 
+   sets the ``user.backend`` annotation on the ``User`` object it returns.
+#. Use the only configured ``backend`` in :setting:`AUTHENTICATION_BACKENDS`,
+   if there is only one.
+#. Otherwise, raise an exception.
+
+In cases 1 and 2, the value of the ``backend`` argument or ``user.backend``
+should be a dotted import path string 
+(like that found in :setting:`AUTHENTICATION_BACKENDS`), 
+not the actual backend class.
+
 
 How to log a user out
 ---------------------
