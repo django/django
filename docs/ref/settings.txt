@@ -2474,7 +2474,9 @@ Default: ``False``
 A boolean that specifies whether to display numbers using a thousand separator.
 When :setting:`USE_L10N` is set to ``True`` and if this is also set to
 ``True``, Django will use the values of :setting:`THOUSAND_SEPARATOR` and
-:setting:`NUMBER_GROUPING` to format numbers.
+:setting:`NUMBER_GROUPING` to format numbers unless the locale already has an existing thousands operator.
+
+Note that if :setting:`USE_L10N` is set to ``True``, and there is a thousands separator in the locale dictated format, it will have higher precedence and will be applied instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
