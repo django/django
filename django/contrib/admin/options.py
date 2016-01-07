@@ -1135,9 +1135,9 @@ class ModelAdmin(BaseModelAdmin):
             new_value = obj.serializable_value(attr)
             popup_response_data = json.dumps({
                 'action': 'change',
-                'value': value,
+                'value': six.text_type(value),
                 'obj': six.text_type(obj),
-                'new_value': new_value,
+                'new_value': six.text_type(new_value),
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
                 'popup_response_data': popup_response_data,
