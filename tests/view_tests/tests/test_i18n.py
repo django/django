@@ -12,6 +12,7 @@ from django.test import (
     LiveServerTestCase, SimpleTestCase, TestCase, modify_settings,
     override_settings,
 )
+from django.test.selenium import SeleniumHelpers
 from django.urls import reverse
 from django.utils import six
 from django.utils._os import upath
@@ -261,7 +262,7 @@ skip_selenium = not os.environ.get('DJANGO_SELENIUM_TESTS', False)
 
 @unittest.skipIf(skip_selenium, 'Selenium tests not requested')
 @override_settings(ROOT_URLCONF='view_tests.urls')
-class JavascriptI18nTests(LiveServerTestCase):
+class JavascriptI18nTests(SeleniumHelpers, LiveServerTestCase):
 
     # The test cases use fixtures & translations from these apps.
     available_apps = [
@@ -288,7 +289,7 @@ class JavascriptI18nTests(LiveServerTestCase):
     @override_settings(LANGUAGE_CODE='de')
     def test_javascript_gettext(self):
         self.selenium.get('%s%s' % (self.live_server_url, '/jsi18n_template/'))
-
+        self.wait_for("#gettext")
         elem = self.selenium.find_element_by_id("gettext")
         self.assertEqual(elem.text, "Entfernen")
         elem = self.selenium.find_element_by_id("ngettext_sing")
