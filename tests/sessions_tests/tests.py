@@ -722,7 +722,6 @@ class SessionMiddlewareTests(TestCase):
         # Simulate a request that ends the session
         request, response = self.run_middleware(request, modifier=modifier)
 
-
         # Check that the cookie was deleted, not recreated.
         # A deleted cookie header with a custom domain looks like:
         #  Set-Cookie: sessionid=; Domain=.example.local;
@@ -755,7 +754,6 @@ class SessionMiddlewareTests(TestCase):
         """
         request = RequestFactory().get('/')
         response = HttpResponse('Session test')
-        middleware = SessionMiddleware()
 
         request, response = self.run_middleware()
 
