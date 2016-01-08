@@ -10,7 +10,8 @@ from django.utils.http import cookie_date
 
 
 class SessionMiddleware(MiddlewareMixin):
-    def __init__(self):
+    def __init__(self, get_response=None):
+        super(SessionMiddleware, self).__init__(get_response)
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
 
