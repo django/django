@@ -23,3 +23,6 @@ Bugfixes
   ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
   already had the other specified, or when removing one of them from a field
   that had both (:ticket:`26034`).
+
+* Fixed a crash when using an ``__in`` lookup inside a ``Case`` expression
+  (:ticket:`26071`).
