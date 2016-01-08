@@ -35,7 +35,7 @@ class BaseHandler(object):
         self._template_response_middleware = None
         self._response_middleware = None
         self._exception_middleware = None
-        self._middleware = None
+        self._middleware_chain = None
 
     def load_middleware(self):
         """
@@ -47,7 +47,6 @@ class BaseHandler(object):
         self._template_response_middleware = []
         self._response_middleware = []
         self._exception_middleware = []
-        self._middleware = []
 
         request_middleware = []
 
@@ -75,10 +74,12 @@ class BaseHandler(object):
                 if hasattr(mw_instance, 'process_exception'):
                     self._exception_middleware.insert(0, mw_instance.process_exception)
         else:
-            for middleware_path in settings.MIDDLEWARES:
+            handler = self._get_response
+
+            for middleware_path in settings.MIDDLEWARES[::-1]:
                 middleware = import_string(middleware_path)
                 try:
-                    mw_instance = middleware(self._response_factory)
+                    mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
                     if settings.DEBUG:
                         if six.text_type(exc):
@@ -90,14 +91,14 @@ class BaseHandler(object):
                 if not mw_instance:  # If the factory returns None
                     continue
 
-                self._middleware.append(mw_instance)
-
                 if hasattr(mw_instance, 'process_view'):
-                    self._view_middleware.append(mw_instance.process_view)
+                    self._view_middleware.insert(0, mw_instance.process_view)
                 if hasattr(mw_instance, 'process_template_response'):
-                    self._template_response_middleware.insert(0, mw_instance.process_template_response)
+                    self._template_response_middleware.append(mw_instance.process_template_response)
 
-            self._middleware.reverse()
+                handler = mw_instance
+
+            self._middleware_chain = handler
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -132,22 +133,11 @@ class BaseHandler(object):
 
         return response
 
-    def _response_factory(self, request):
-        middlewares = request.middlewares
-        if request.middlewares:
-            return middlewares.pop()(request)
-        else:
-            return self._get_response(request)
-
     def get_response(self, request):
         if settings.MIDDLEWARES is None:
             return self._get_response(request)
 
-        # Prepare the request
-        request.middlewares = self._middleware[:]
-        # TODO: Put all middlewares onto the request? would allow for interesting stuff, ie adding middlewares per request?!
-
-        return self._response_factory(request)
+        return self._middleware_chain(request)
 
     def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
