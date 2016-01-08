@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.core.exceptions import FieldError
 from django.db import connection, models
-from django.db.models import F, Q, Max, Min, Value
+from django.db.models import F, Q, Max, Min, Sum, Value
 from django.db.models.expressions import Case, When
 from django.test import TestCase
 from django.utils import six
@@ -117,6 +117,17 @@ class CaseExpressionTests(TestCase):
             )).order_by('pk'),
             [(1, 2), (2, 5), (3, 3), (2, 5), (3, 3), (3, 3), (4, 1)],
             transform=attrgetter('integer', 'join_test')
+        )
+
+    def test_annotate_with_in_clause(self):
+        fk_rels = FKCaseTestModel.objects.filter(integer__in=[5])
+        self.assertQuerysetEqual(
+            CaseTestModel.objects.only('pk', 'integer').annotate(in_test=Sum(Case(
+                When(fk_rel__in=fk_rels, then=F('fk_rel__integer')),
+                default=Value(0),
+            ))).order_by('pk'),
+            [(1, 0), (2, 0), (3, 0), (2, 0), (3, 0), (3, 0), (4, 5)],
+            transform=attrgetter('integer', 'in_test')
         )
 
     def test_annotate_with_join_in_condition(self):

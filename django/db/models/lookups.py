@@ -92,6 +92,10 @@ class Transform(RegisterLookupMixin):
             bilateral_transforms.append((self.__class__, self.init_lookups))
         return bilateral_transforms
 
+    @cached_property
+    def contains_aggregate(self):
+        return self.lhs.contains_aggregate
+
 
 class Lookup(RegisterLookupMixin):
     lookup_name = None
@@ -193,6 +197,10 @@ class Lookup(RegisterLookupMixin):
 
     def as_sql(self, compiler, connection):
         raise NotImplementedError
+
+    @cached_property
+    def contains_aggregate(self):
+        return self.lhs.contains_aggregate or getattr(self.rhs, 'contains_aggregate', False)
 
 
 class BuiltinLookup(Lookup):
