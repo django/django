@@ -117,8 +117,7 @@ class BaseHandler(object):
     def get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
         # Setup default url resolver for this thread
-        urlconf = settings.ROOT_URLCONF
-        set_urlconf(urlconf)
+        set_urlconf(settings.ROOT_URLCONF)
 
         try:
             response = self._middleware_chain(request)
