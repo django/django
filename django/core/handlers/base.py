@@ -44,12 +44,11 @@ class BaseHandler(object):
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
+        self._request_middleware = []
         self._view_middleware = []
         self._template_response_middleware = []
         self._response_middleware = []
         self._exception_middleware = []
-
-        request_middleware = []
 
         handler = self._get_response
 
@@ -67,7 +66,7 @@ class BaseHandler(object):
                     continue
 
                 if hasattr(mw_instance, 'process_request'):
-                    request_middleware.append(mw_instance.process_request)
+                    self._request_middleware.append(mw_instance.process_request)
                 if hasattr(mw_instance, 'process_view'):
                     self._view_middleware.append(mw_instance.process_view)
                 if hasattr(mw_instance, 'process_template_response'):
@@ -101,11 +100,9 @@ class BaseHandler(object):
 
                 handler = mw_instance
 
-        self._middleware_chain = handler
-
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
-        self._request_middleware = request_middleware
+        self._middleware_chain = handler
 
     def make_view_atomic(self, view):
         non_atomic_requests = getattr(view, '_non_atomic_requests', set())
