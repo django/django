@@ -1592,3 +1592,45 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Note, new_field, old_field, strict=True)
         self.assertEqual(self.get_constraints_for_column(Note, 'info'), [])
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_unique_to_charfield_with_db_index(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(BookWithoutAuthor)
+        self.assertEqual(len(self.get_constraints_for_column(BookWithoutAuthor, 'title')), 2)
+        # Alter to add unique=True (should add 1 index)
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, db_index=True, unique=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(len(self.get_constraints_for_column(BookWithoutAuthor, 'title')), 3)
+        # Alter to remove unique=True (should drop unique index) # XXX: bug!
+        old_field = BookWithoutAuthor._meta.get_field('title')
+        new_field = CharField(max_length=100, db_index=True)
+        new_field.set_attributes_from_name('title')
+        with connection.schema_editor() as editor:
+            editor.alter_field(BookWithoutAuthor, old_field, new_field, strict=True)
+        self.assertEqual(len(self.get_constraints_for_column(BookWithoutAuthor, 'title')), 3)
+
+    @unittest.skipUnless(connection.vendor == 'postgresql', "PostgreSQL specific")
+    def test_alter_field_add_db_index_to_charfield_with_unique(self):
+        # Create the table and verify initial indexes.
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+        self.assertEqual(len(self.get_constraints_for_column(Tag, 'slug')), 2)
+        # Alter to add db_index=True
+        old_field = Tag._meta.get_field('slug')
+        new_field = SlugField(db_index=True, unique=True)
+        new_field.set_attributes_from_name('slug')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Tag, old_field, new_field, strict=True)
+        self.assertEqual(len(self.get_constraints_for_column(Tag, 'slug')), 2)
+        # Alter to remove db_index=True
+        old_field = Tag._meta.get_field('slug')
+        new_field = SlugField(unique=True)
+        new_field.set_attributes_from_name('slug')
+        with connection.schema_editor() as editor:
+            editor.alter_field(Tag, old_field, new_field, strict=True)
+        self.assertEqual(len(self.get_constraints_for_column(Tag, 'slug')), 2)
