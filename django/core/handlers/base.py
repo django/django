@@ -48,39 +48,56 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
         self._middleware = []
-        self._new_style_middleware = False
 
         request_middleware = []
-        middleware_count = 0
-        for middleware_path in settings.MIDDLEWARE_CLASSES:
-            mw_class = import_string(middleware_path)
-            try:
-                mw_instance = mw_class()
-            except MiddlewareNotUsed as exc:
-                if settings.DEBUG:
-                    if six.text_type(exc):
-                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
-                    else:
-                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
-                continue
-            else:
-                middleware_count += 1
 
-            if hasattr(mw_instance, 'process_request'):
-                request_middleware.append(mw_instance.process_request)
-            if hasattr(mw_instance, 'process_view'):
-                self._view_middleware.append(mw_instance.process_view)
-            if hasattr(mw_instance, 'process_template_response'):
-                self._template_response_middleware.insert(0, mw_instance.process_template_response)
-            if hasattr(mw_instance, 'process_response'):
-                self._response_middleware.insert(0, mw_instance.process_response)
-            if hasattr(mw_instance, 'process_exception'):
-                self._exception_middleware.insert(0, mw_instance.process_exception)
-            if callable(mw_instance):
-                self._middleware.insert(0, mw_instance)
+        if settings.MIDDLEWARES is None:
+            for middleware_path in settings.MIDDLEWARE_CLASSES:
+                mw_class = import_string(middleware_path)
+                try:
+                    mw_instance = mw_class()
+                except MiddlewareNotUsed as exc:
+                    if settings.DEBUG:
+                        if six.text_type(exc):
+                            logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                        else:
+                            logger.debug('MiddlewareNotUsed: %r', middleware_path)
+                    continue
 
-        if middleware_count == len(self._middleware):
-            self._new_style_middleware = True
+                if hasattr(mw_instance, 'process_request'):
+                    request_middleware.append(mw_instance.process_request)
+                if hasattr(mw_instance, 'process_view'):
+                    self._view_middleware.append(mw_instance.process_view)
+                if hasattr(mw_instance, 'process_template_response'):
+                    self._template_response_middleware.insert(0, mw_instance.process_template_response)
+                if hasattr(mw_instance, 'process_response'):
+                    self._response_middleware.insert(0, mw_instance.process_response)
+                if hasattr(mw_instance, 'process_exception'):
+                    self._exception_middleware.insert(0, mw_instance.process_exception)
+        else:
+            for middleware_path in settings.MIDDLEWARES:
+                middleware = import_string(middleware_path)
+                try:
+                    mw_instance = middleware(self._response_factory)
+                except MiddlewareNotUsed as exc:
+                    if settings.DEBUG:
+                        if six.text_type(exc):
+                            logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                        else:
+                            logger.debug('MiddlewareNotUsed: %r', middleware_path)
+                    continue
+
+                if not mw_instance:  # If the factory returns None
+                    continue
+
+                self._middleware.append(mw_instance)
+
+                if hasattr(mw_instance, 'process_view'):
+                    self._view_middleware.append(mw_instance.process_view)
+                if hasattr(mw_instance, 'process_template_response'):
+                    self._template_response_middleware.insert(0, mw_instance.process_template_response)
+
+            self._middleware.reverse()
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -115,19 +132,22 @@ class BaseHandler(object):
 
         return response
 
-    def get_response(self, request):
-        if not self._new_style_middleware:
+    def _response_factory(self, request):
+        middlewares = request.middlewares
+        if request.middlewares:
+            return middlewares.pop()(request)
+        else:
             return self._get_response(request)
 
-        callables = self._middleware[:]
+    def get_response(self, request):
+        if settings.MIDDLEWARES is None:
+            return self._get_response(request)
 
-        def response_factory(request):
-            if callables:
-                return callables.pop()(request, response_factory)
-            else:
-                return self._get_response(request)
+        # Prepare the request
+        request.middlewares = self._middleware[:]
+        # TODO: Put all middlewares onto the request? would allow for interesting stuff, ie adding middlewares per request?!
 
-        return response_factory(request)
+        return self._response_factory(request)
 
     def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
@@ -145,7 +165,7 @@ class BaseHandler(object):
         try:
             response = None
             # Apply request middleware
-            if not self._new_style_middleware:
+            if settings.MIDDLEWARES is None:
                 for middleware_method in self._request_middleware:
                     response = middleware_method(request)
                     if response:
@@ -256,7 +276,7 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
-        if not self._new_style_middleware:
+        if settings.MIDDLEWARES is None:
             try:
                 # Apply response middleware, regardless of the response
                 for middleware_method in self._response_middleware:
