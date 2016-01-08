@@ -50,9 +50,8 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
 
-        handler = self._get_response
-
         if settings.MIDDLEWARE is None:
+            handler = self._get_response_old
             for middleware_path in settings.MIDDLEWARE_CLASSES:
                 mw_class = import_string(middleware_path)
                 try:
@@ -76,6 +75,7 @@ class BaseHandler(object):
                 if hasattr(mw_instance, 'process_exception'):
                     self._exception_middleware.insert(0, mw_instance.process_exception)
         else:
+            handler = self._get_response_new
             for middleware_path in settings.MIDDLEWARE[::-1]:
                 middleware = import_string(middleware_path)
                 try:
@@ -129,7 +129,7 @@ class BaseHandler(object):
                 response = callback(request, **param_dict)
         except Exception:
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, sys.exc_info())
 
         return response
 
@@ -143,6 +143,34 @@ class BaseHandler(object):
         if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
 
             response = response.render()
+
+        try:
+            response = self.apply_response_fixes(request, response)
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, sys.exc_info())
+
+        return response
+
+    def _get_response_new(self, request):
+        return self._get_response(request)
+
+    def _get_response_old(self, request):
+        response = self._get_response(request)
+        try:
+            # Apply response middleware, regardless of the response
+            if settings.MIDDLEWARE is None:
+                for middleware_method in self._response_middleware:
+                    response = middleware_method(request, response)
+                    # Complain if the response middleware returned None (a common error).
+                    if response is None:
+                        raise ValueError(
+                            "%s.process_response didn't return an "
+                            "HttpResponse object. It returned None instead."
+                            % (middleware_method.__self__.__class__.__name__))
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, sys.exc_info())
 
         return response
 
@@ -266,23 +294,7 @@ class BaseHandler(object):
         except Exception:  # Handle everything else.
             # Get the exception info now, in case another exception is thrown later.
             signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-
-        try:
-            # Apply response middleware, regardless of the response
-            if settings.MIDDLEWARE is None:
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                    # Complain if the response middleware returned None (a common error).
-                    if response is None:
-                        raise ValueError(
-                            "%s.process_response didn't return an "
-                            "HttpResponse object. It returned None instead."
-                            % (middleware_method.__self__.__class__.__name__))
-            response = self.apply_response_fixes(request, response)
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.handle_uncaught_exception(request, sys.exc_info())
 
         return response
 
@@ -297,7 +309,7 @@ class BaseHandler(object):
                 return response
         raise
 
-    def handle_uncaught_exception(self, request, resolver, exc_info):
+    def handle_uncaught_exception(self, request, exc_info):
         """
         Processing for any otherwise uncaught exceptions (those that will
         generate HTTP 500 responses). Can be overridden by subclasses who want
@@ -307,6 +319,7 @@ class BaseHandler(object):
         caused by anything, so assuming something like the database is always
         available would be an error.
         """
+        resolver = get_resolver()
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
