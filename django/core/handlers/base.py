@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import contextlib
 import logging
 import sys
 import types
@@ -14,7 +15,7 @@ from django.core.exceptions import (
 )
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
-from django.urls import get_resolver, set_urlconf
+from django.urls import get_resolver, get_urlconf, set_urlconf
 from django.utils import six
 from django.utils.deprecation import RemovedInDjango20Warning
 from django.utils.encoding import force_text
@@ -75,7 +76,7 @@ class BaseHandler(object):
                 if hasattr(mw_instance, 'process_exception'):
                     self._exception_middleware.insert(0, mw_instance.process_exception)
         else:
-            handler = self._get_response_new
+            handler = self._get_response
             for middleware_path in settings.MIDDLEWARE[::-1]:
                 middleware = import_string(middleware_path)
                 try:
@@ -113,7 +114,7 @@ class BaseHandler(object):
         return view
 
     def get_exception_response(self, request, status_code, exception):
-        resolver = get_resolver()
+        resolver = get_resolver(get_urlconf())
         try:
             callback, param_dict = resolver.resolve_error_handler(status_code)
             # Unfortunately, inspect.getargspec result is not trustable enough
@@ -135,109 +136,13 @@ class BaseHandler(object):
         return response
 
     def get_response(self, request):
-        response = self._middleware_chain(request)
-
-        response._closable_objects.append(request)
-
-        # If the exception handler returns a TemplateResponse that has not
-        # been rendered, force it to be rendered.
-        if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
-
-            response = response.render()
-
-        try:
-            response = self.apply_response_fixes(request, response)
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
-
-        return response
-
-    def _get_response_new(self, request):
-        return self._get_response(request)
-
-    def _get_response_old(self, request):
-        response = self._get_response(request)
-        try:
-            # Apply response middleware, regardless of the response
-            if settings.MIDDLEWARE is None:
-                for middleware_method in self._response_middleware:
-                    response = middleware_method(request, response)
-                    # Complain if the response middleware returned None (a common error).
-                    if response is None:
-                        raise ValueError(
-                            "%s.process_response didn't return an "
-                            "HttpResponse object. It returned None instead."
-                            % (middleware_method.__self__.__class__.__name__))
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
-
-        return response
-
-    def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
+        # Setup default url resolver for this thread
+        urlconf = settings.ROOT_URLCONF
+        set_urlconf(urlconf)
 
         try:
-            response = None
-            # Apply request middleware
-            if settings.MIDDLEWARE is None:
-                for middleware_method in self._request_middleware:
-                    response = middleware_method(request)
-                    if response:
-                        break
-
-            if response is None:
-                if hasattr(request, 'urlconf'):
-                    urlconf = request.urlconf
-                else:
-                    urlconf = settings.ROOT_URLCONF
-
-                set_urlconf(urlconf)
-                resolver = get_resolver(urlconf)
-
-                resolver_match = resolver.resolve(request.path_info)
-                callback, callback_args, callback_kwargs = resolver_match
-                request.resolver_match = resolver_match
-
-                # Apply view middleware
-                for middleware_method in self._view_middleware:
-                    response = middleware_method(request, callback, callback_args, callback_kwargs)
-                    if response:
-                        break
-
-            if response is None:
-                wrapped_callback = self.make_view_atomic(callback)
-                try:
-                    response = wrapped_callback(request, *callback_args, **callback_kwargs)
-                except Exception as e:
-                    response = self.process_exception_by_middleware(e, request)
-
-            # Complain if the view returned None (a common error).
-            if response is None:
-                if isinstance(callback, types.FunctionType):    # FBV
-                    view_name = callback.__name__
-                else:                                           # CBV
-                    view_name = callback.__class__.__name__ + '.__call__'
-                raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
-                                 % (callback.__module__, view_name))
-
-            # If the response supports deferred rendering, apply template
-            # response middleware and then render the response
-            if hasattr(response, 'render') and callable(response.render):
-                for middleware_method in self._template_response_middleware:
-                    response = middleware_method(request, response)
-                    # Complain if the template response middleware returned None (a common error).
-                    if response is None:
-                        raise ValueError(
-                            "%s.process_template_response didn't return an "
-                            "HttpResponse object. It returned None instead."
-                            % (middleware_method.__self__.__class__.__name__))
-                try:
-                    response = response.render()
-                except Exception as e:
-                    response = self.process_exception_by_middleware(e, request)
-
+            response = self._middleware_chain(request)
         except http.Http404 as exc:
             logger.warning('Not Found: %s', request.path,
                         extra={
@@ -292,18 +197,88 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, sys.exc_info())
 
+        # This is a noop with new style middlewares!
+        response = self._apply_old_response_middleware(request, response)
+
+        try:
+            response = self.apply_response_fixes(request, response)
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, sys.exc_info())
+
+        response._closable_objects.append(request)
+
+        # If the exception handler returns a TemplateResponse that has not
+        # been rendered, force it to be rendered.
+        if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
+
+            response = response.render()
+
         return response
 
-    def process_exception_by_middleware(self, exception, request):
-        """
-        Pass the exception to the exception middleware. If no middleware
-        return a response for this exception, raise it.
-        """
-        for middleware_method in self._exception_middleware:
-            response = middleware_method(request, exception)
+    def _get_response(self, request):
+        "Returns an HttpResponse object for the given HttpRequest"
+        response = None
+
+        if hasattr(request, 'urlconf'):
+            urlconf = request.urlconf
+            set_urlconf(urlconf)
+            resolver = get_resolver(urlconf)
+        else:
+            resolver = get_resolver()
+
+        resolver_match = resolver.resolve(request.path_info)
+        callback, callback_args, callback_kwargs = resolver_match
+        request.resolver_match = resolver_match
+
+        # Apply view middleware
+        for middleware_method in self._view_middleware:
+            response = middleware_method(request, callback, callback_args, callback_kwargs)
             if response:
                 return response
-        raise
+
+        wrapped_callback = self.make_view_atomic(callback)
+
+        # TODO: It would be nice if we could move the try/except in _get_response_old,
+        # but that would break semantics.
+        try:
+            response = wrapped_callback(request, *callback_args, **callback_kwargs)
+        except Exception as e:
+            response = self.process_exception_by_middleware(e, request)
+
+        # Complain if the view returned None (a common error).
+        # TODO: New style middlewares will actually be able to handle that, good or not?!
+        if response is None:
+            if isinstance(callback, types.FunctionType):    # FBV
+                view_name = callback.__name__
+            else:                                           # CBV
+                view_name = callback.__class__.__name__ + '.__call__'
+
+            raise ValueError("The view %s.%s didn't return an HttpResponse object. It returned None instead."
+                             % (callback.__module__, view_name))
+
+        # If the response supports deferred rendering, apply template
+        # response middleware and then render the response
+        elif hasattr(response, 'render') and callable(response.render):
+            for middleware_method in self._template_response_middleware:
+                response = middleware_method(request, response)
+                # Complain if the template response middleware returned None (a common error).
+                # TODO: See TODOs above this one.
+                if response is None:
+                    raise ValueError("%s.process_template_response didn't return an "
+                        "HttpResponse object. It returned None instead."
+                        % (middleware_method.__self__.__class__.__name__))
+
+            # TODO: See TODOs above this one.
+            try:
+                response = response.render()
+            except Exception as e:
+                response = self.process_exception_by_middleware(e, request)
+
+        if response is None:
+            raise ValueError(msg)
+
+        return response
 
     def handle_uncaught_exception(self, request, exc_info):
         """
@@ -315,7 +290,7 @@ class BaseHandler(object):
         caused by anything, so assuming something like the database is always
         available would be an error.
         """
-        resolver = get_resolver()
+        resolver = get_resolver(get_urlconf())
         if settings.DEBUG_PROPAGATE_EXCEPTIONS:
             raise
 
@@ -345,4 +320,45 @@ class BaseHandler(object):
         """
         for func in self.response_fixes:
             response = func(request, response)
+        return response
+
+    # LEGACY methods, remove after old style middlewares are removed.
+    def process_exception_by_middleware(self, exception, request):
+        """
+        Pass the exception to the exception middleware. If no middleware
+        return a response for this exception, raise it.
+        """
+        for middleware_method in self._exception_middleware:
+            response = middleware_method(request, exception)
+            if response:
+                return response
+        raise
+
+    def _apply_old_response_middleware(self, request, response):
+        try:
+            # Apply response middleware, regardless of the response
+            for middleware_method in self._response_middleware:
+                response = middleware_method(request, response)
+                # Complain if the response middleware returned None (a common error).
+                if response is None:
+                    raise ValueError(
+                        "%s.process_response didn't return an "
+                        "HttpResponse object. It returned None instead."
+                        % (middleware_method.__self__.__class__.__name__))
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, sys.exc_info())
+
+        return response
+
+    def _get_response_old(self, request):
+        response = None
+        # Apply request middleware
+        for middleware_method in self._request_middleware:
+            response = middleware_method(request)
+            if response:
+                break
+
+        if response is None:
+            response = self._get_response(request)
         return response
