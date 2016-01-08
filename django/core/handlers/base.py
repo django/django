@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import contextlib
 import logging
 import sys
 import types
@@ -175,7 +174,6 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, sys.exc_info())
 
-
         try:
             # This is a noop with new style middlewares!
             response = self._apply_old_response_middleware(request, response)
@@ -252,9 +250,6 @@ class BaseHandler(object):
                 response = response.render()
             except Exception as e:
                 response = self.process_exception_by_middleware(e, request)
-
-        if response is None:
-            raise ValueError(msg)
 
         return response
 
