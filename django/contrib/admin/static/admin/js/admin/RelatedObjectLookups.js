@@ -5,16 +5,6 @@
 (function($) {
     'use strict';
 
-    function html_unescape(text) {
-        // Unescape a string that was escaped using django.utils.html.escape.
-        text = text.replace(/&lt;/g, '<');
-        text = text.replace(/&gt;/g, '>');
-        text = text.replace(/&quot;/g, '"');
-        text = text.replace(/&#39;/g, "'");
-        text = text.replace(/&amp;/g, '&');
-        return text;
-    }
-
     // IE doesn't accept periods or dashes in the window name, but the element IDs
     // we use to generate popup window names may contain them, therefore we map them
     // to allowed characters in a reversible way so that we can locate the correct
@@ -84,10 +74,6 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
-        // newId and newRepr are expected to have previously been escaped by
-        // django.utils.html.escape.
-        newId = html_unescape(newId);
-        newRepr = html_unescape(newRepr);
         var name = windowname_to_id(win.name);
         var elem = document.getElementById(name);
         if (elem) {
@@ -113,8 +99,6 @@
     }
 
     function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
-        objId = html_unescape(objId);
-        newRepr = html_unescape(newRepr);
         var id = windowname_to_id(win.name).replace(/^edit_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         var selects = $(selectsSelector);
@@ -128,7 +112,6 @@
     }
 
     function dismissDeleteRelatedObjectPopup(win, objId) {
-        objId = html_unescape(objId);
         var id = windowname_to_id(win.name).replace(/^delete_/, '');
         var selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         var selects = $(selectsSelector);
@@ -141,7 +124,6 @@
     }
 
     // Global for testing purposes
-    window.html_unescape = html_unescape;
     window.id_to_windowname = id_to_windowname;
     window.windowname_to_id = windowname_to_id;
 
