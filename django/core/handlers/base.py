@@ -175,10 +175,10 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, sys.exc_info())
 
-        # This is a noop with new style middlewares!
-        response = self._apply_old_response_middleware(request, response)
 
         try:
+            # This is a noop with new style middlewares!
+            response = self._apply_old_response_middleware(request, response)
             response = self.apply_response_fixes(request, response)
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
@@ -313,19 +313,15 @@ class BaseHandler(object):
         raise
 
     def _apply_old_response_middleware(self, request, response):
-        try:
-            # Apply response middleware, regardless of the response
-            for middleware_method in self._response_middleware:
-                response = middleware_method(request, response)
-                # Complain if the response middleware returned None (a common error).
-                if response is None:
-                    raise ValueError(
-                        "%s.process_response didn't return an "
-                        "HttpResponse object. It returned None instead."
-                        % (middleware_method.__self__.__class__.__name__))
-        except Exception:  # Any exception should be gathered and handled
-            signals.got_request_exception.send(sender=self.__class__, request=request)
-            response = self.handle_uncaught_exception(request, sys.exc_info())
+        # Apply response middleware, regardless of the response
+        for middleware_method in self._response_middleware:
+            response = middleware_method(request, response)
+            # Complain if the response middleware returned None (a common error).
+            if response is None:
+                raise ValueError(
+                    "%s.process_response didn't return an "
+                    "HttpResponse object. It returned None instead."
+                    % (middleware_method.__self__.__class__.__name__))
 
         return response
 
