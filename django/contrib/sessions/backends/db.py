@@ -1,8 +1,10 @@
 import logging
 
-from django.contrib.sessions.backends.base import CreateError, SessionBase
+from django.contrib.sessions.backends.base import (
+    CreateError, SessionBase, UpdateError,
+)
 from django.core.exceptions import SuspiciousOperation
-from django.db import IntegrityError, router, transaction
+from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
@@ -83,10 +85,14 @@ class SessionStore(SessionBase):
         using = router.db_for_write(self.model, instance=obj)
         try:
             with transaction.atomic(using=using):
-                obj.save(force_insert=must_create, using=using)
+                obj.save(force_insert=must_create, force_update=not must_create, using=using)
         except IntegrityError:
             if must_create:
                 raise CreateError
+            raise
+        except DatabaseError:
+            if not must_create:
+                raise UpdateError
             raise
 
     def delete(self, session_key=None):
