@@ -157,10 +157,9 @@ If, however, you have no option but to serve media files on the same Apache
 ``VirtualHost`` as Django, you can set up Apache to serve some URLs as
 static media, and others using the mod_wsgi interface to Django.
 
-This example sets up Django at the site root, but explicitly serves
-``robots.txt``, ``favicon.ico``, any CSS file, and anything in the
-``/static/`` and ``/media/`` URL space as a static file. All other URLs
-will be served using mod_wsgi:
+This example sets up Django at the site root, but serves ``robots.txt``,
+``favicon.ico``, and anything in the ``/static/`` and ``/media/`` URL space as
+a static file. All other URLs will be served using mod_wsgi:
 
 .. code-block:: apache
 
