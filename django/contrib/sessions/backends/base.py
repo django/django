@@ -28,6 +28,13 @@ class CreateError(Exception):
     pass
 
 
+class UpdateError(Exception):
+    """
+    Occurs if Django tries to update a session that was deleted.
+    """
+    pass
+
+
 class SessionBase(object):
     """
     Base class for all Session classes.
@@ -301,7 +308,8 @@ class SessionBase(object):
         key = self.session_key
         self.create()
         self._session_cache = data
-        self.delete(key)
+        if key:
+            self.delete(key)
 
     # Methods that child classes must implement.
 
@@ -323,7 +331,8 @@ class SessionBase(object):
         """
         Saves the session data. If 'must_create' is True, a new session object
         is created (otherwise a CreateError exception is raised). Otherwise,
-        save() can update an existing object with the same key.
+        save() only updates an existing object and does not create one
+        (an UpdateError is raised).
         """
         raise NotImplementedError('subclasses of SessionBase must provide a save() method')
 

@@ -2,6 +2,8 @@ import time
 from importlib import import_module
 
 from django.conf import settings
+from django.contrib.sessions.backends.base import UpdateError
+from django.shortcuts import redirect
 from django.utils.cache import patch_vary_headers
 from django.utils.http import cookie_date
 
@@ -47,7 +49,13 @@ class SessionMiddleware(object):
                     # Save the session data and refresh the client cookie.
                     # Skip session save for 500 responses, refs #3881.
                     if response.status_code != 500:
-                        request.session.save()
+                        try:
+                            request.session.save()
+                        except UpdateError:
+                            # The user is now logged out; redirecting to same
+                            # page will result in a redirect to the login page
+                            # if required.
+                            return redirect(request.path)
                         response.set_cookie(settings.SESSION_COOKIE_NAME,
                                 request.session.session_key, max_age=max_age,
                                 expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
