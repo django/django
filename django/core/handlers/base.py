@@ -112,7 +112,8 @@ class BaseHandler(object):
                 view = transaction.atomic(using=db.alias)(view)
         return view
 
-    def get_exception_response(self, request, resolver, status_code, exception):
+    def get_exception_response(self, request, status_code, exception):
+        resolver = get_resolver()
         try:
             callback, param_dict = resolver.resolve_error_handler(status_code)
             # Unfortunately, inspect.getargspec result is not trustable enough
@@ -177,13 +178,6 @@ class BaseHandler(object):
     def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
 
-        # Setup default url resolver for this thread, this code is outside
-        # the try/except so we don't get a spurious "unbound local
-        # variable" exception in the event an exception is raised before
-        # resolver is set
-        urlconf = settings.ROOT_URLCONF
-        set_urlconf(urlconf)
-        resolver = get_resolver(urlconf)
         try:
             response = None
             # Apply request middleware
@@ -195,10 +189,12 @@ class BaseHandler(object):
 
             if response is None:
                 if hasattr(request, 'urlconf'):
-                    # Reset url resolver with a custom URLconf.
                     urlconf = request.urlconf
-                    set_urlconf(urlconf)
-                    resolver = get_resolver(urlconf)
+                else:
+                    urlconf = settings.ROOT_URLCONF
+
+                set_urlconf(urlconf)
+                resolver = get_resolver(urlconf)
 
                 resolver_match = resolver.resolve(request.path_info)
                 callback, callback_args, callback_kwargs = resolver_match
@@ -251,7 +247,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 response = debug.technical_404_response(request, exc)
             else:
-                response = self.get_exception_response(request, resolver, 404, exc)
+                response = self.get_exception_response(request, 404, exc)
 
         except PermissionDenied as exc:
             logger.warning(
@@ -260,7 +256,7 @@ class BaseHandler(object):
                     'status_code': 403,
                     'request': request
                 })
-            response = self.get_exception_response(request, resolver, 403, exc)
+            response = self.get_exception_response(request, 403, exc)
 
         except MultiPartParserError as exc:
             logger.warning(
@@ -269,7 +265,7 @@ class BaseHandler(object):
                     'status_code': 400,
                     'request': request
                 })
-            response = self.get_exception_response(request, resolver, 400, exc)
+            response = self.get_exception_response(request, 400, exc)
 
         except SuspiciousOperation as exc:
             # The request logger receives events for any problematic request
@@ -285,7 +281,7 @@ class BaseHandler(object):
             if settings.DEBUG:
                 return debug.technical_500_response(request, *sys.exc_info(), status_code=400)
 
-            response = self.get_exception_response(request, resolver, 400, exc)
+            response = self.get_exception_response(request, 400, exc)
 
         except SystemExit:
             # Allow sys.exit() to actually exit. See tickets #1023 and #4701
