@@ -134,7 +134,17 @@ class BaseHandler(object):
         return response
 
     def get_response(self, request):
-        return self._middleware_chain(request)
+        response = self._middleware_chain(request)
+
+        response._closable_objects.append(request)
+
+        # If the exception handler returns a TemplateResponse that has not
+        # been rendered, force it to be rendered.
+        if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
+
+            response = response.render()
+
+        return response
 
     def _get_response(self, request):
         "Returns an HttpResponse object for the given HttpRequest"
@@ -146,9 +156,6 @@ class BaseHandler(object):
         urlconf = settings.ROOT_URLCONF
         set_urlconf(urlconf)
         resolver = get_resolver(urlconf)
-        # Use a flag to check if the response was rendered to prevent
-        # multiple renderings or to force rendering if necessary.
-        response_is_rendered = False
         try:
             response = None
             # Apply request middleware
@@ -206,8 +213,6 @@ class BaseHandler(object):
                     response = response.render()
                 except Exception as e:
                     response = self.process_exception_by_middleware(e, request)
-
-                response_is_rendered = True
 
         except http.Http404 as exc:
             logger.warning('Not Found: %s', request.path,
@@ -278,13 +283,6 @@ class BaseHandler(object):
         except Exception:  # Any exception should be gathered and handled
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
-
-        response._closable_objects.append(request)
-
-        # If the exception handler returns a TemplateResponse that has not
-        # been rendered, force it to be rendered.
-        if not response_is_rendered and callable(getattr(response, 'render', None)):
-            response = response.render()
 
         return response
 
