@@ -9,7 +9,8 @@ from django import http
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import (
-    MiddlewareNotUsed, PermissionDenied, SuspiciousOperation,
+    ImproperlyConfigured, MiddlewareNotUsed, PermissionDenied,
+    SuspiciousOperation,
 )
 from django.db import connections, transaction
 from django.http.multipartparser import MultiPartParserError
@@ -50,7 +51,9 @@ class BaseHandler(object):
 
         request_middleware = []
 
-        if settings.MIDDLEWARES is None:
+        handler = self._get_response
+
+        if settings.MIDDLEWARE is None:
             for middleware_path in settings.MIDDLEWARE_CLASSES:
                 mw_class = import_string(middleware_path)
                 try:
@@ -74,9 +77,7 @@ class BaseHandler(object):
                 if hasattr(mw_instance, 'process_exception'):
                     self._exception_middleware.insert(0, mw_instance.process_exception)
         else:
-            handler = self._get_response
-
-            for middleware_path in settings.MIDDLEWARES[::-1]:
+            for middleware_path in settings.MIDDLEWARE[::-1]:
                 middleware = import_string(middleware_path)
                 try:
                     mw_instance = middleware(handler)
@@ -88,8 +89,10 @@ class BaseHandler(object):
                             logger.debug('MiddlewareNotUsed: %r', middleware_path)
                     continue
 
-                if not mw_instance:  # If the factory returns None
-                    continue
+                if mw_instance is None:
+                    raise ImproperlyConfigured(
+                        'Middleware factory %s returned None.' % middleware_path
+                    )
 
                 if hasattr(mw_instance, 'process_view'):
                     self._view_middleware.insert(0, mw_instance.process_view)
@@ -98,7 +101,7 @@ class BaseHandler(object):
 
                 handler = mw_instance
 
-            self._middleware_chain = handler
+        self._middleware_chain = handler
 
         # We only assign to this when initialization is complete as it is used
         # as a flag for initialization being complete.
@@ -134,9 +137,6 @@ class BaseHandler(object):
         return response
 
     def get_response(self, request):
-        if settings.MIDDLEWARES is None:
-            return self._get_response(request)
-
         return self._middleware_chain(request)
 
     def _get_response(self, request):
@@ -155,7 +155,7 @@ class BaseHandler(object):
         try:
             response = None
             # Apply request middleware
-            if settings.MIDDLEWARES is None:
+            if settings.MIDDLEWARE is None:
                 for middleware_method in self._request_middleware:
                     response = middleware_method(request)
                     if response:
@@ -266,9 +266,9 @@ class BaseHandler(object):
             signals.got_request_exception.send(sender=self.__class__, request=request)
             response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
-        if settings.MIDDLEWARES is None:
-            try:
-                # Apply response middleware, regardless of the response
+        try:
+            # Apply response middleware, regardless of the response
+            if settings.MIDDLEWARE is None:
                 for middleware_method in self._response_middleware:
                     response = middleware_method(request, response)
                     # Complain if the response middleware returned None (a common error).
@@ -277,10 +277,10 @@ class BaseHandler(object):
                             "%s.process_response didn't return an "
                             "HttpResponse object. It returned None instead."
                             % (middleware_method.__self__.__class__.__name__))
-                response = self.apply_response_fixes(request, response)
-            except Exception:  # Any exception should be gathered and handled
-                signals.got_request_exception.send(sender=self.__class__, request=request)
-                response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
+            response = self.apply_response_fixes(request, response)
+        except Exception:  # Any exception should be gathered and handled
+            signals.got_request_exception.send(sender=self.__class__, request=request)
+            response = self.handle_uncaught_exception(request, resolver, sys.exc_info())
 
         response._closable_objects.append(request)
 
