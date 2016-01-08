@@ -25,3 +25,8 @@ Bugfixes
 * Fixed a regression in the admin's edit related model popup that caused an
   escaped value to be displayed in the select dropdown of the parent window
   (:ticket:`25997`).
+
+* Fixed incorrect index handling in migrations on PostgreSQL when adding
+  ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
+  already had the other specified, or when removing one of them from a field
+  that had both (:ticket:`26034`).

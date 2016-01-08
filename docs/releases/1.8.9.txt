@@ -18,3 +18,8 @@ Bugfixes
 * Fixed a regression that caused the incorrect day to be selected when opening
   the admin calendar widget for timezones from GMT+0100 to GMT+1200
   (:ticket:`24980`).
+
+* Fixed incorrect index handling in migrations on PostgreSQL when adding
+  ``db_index=True`` or ``unique=True`` to a ``CharField`` or ``TextField`` that
+  already had the other specified, or when removing one of them from a field
+  that had both (:ticket:`26034`).
