@@ -1083,7 +1083,7 @@ class ModelAdmin(BaseModelAdmin):
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
             popup_response_data = json.dumps({
-                'value': value,
+                'value': six.text_type(value),
                 'obj': six.text_type(obj),
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
