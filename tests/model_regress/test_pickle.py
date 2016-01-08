@@ -19,6 +19,8 @@ class ModelPickleTestCase(TestCase):
         #21430 -- Verifies a warning is raised for models that are
         unpickled without a Django version
         """
+        # The model is registered globally to make sure the default
+        # registry is used when unpickling takes place.
         class MissingDjangoVersion(models.Model):
             title = models.CharField(max_length=10)
 
@@ -38,6 +40,8 @@ class ModelPickleTestCase(TestCase):
         #21430 -- Verifies a warning is raised for models that are
         unpickled with a different Django version than the current
         """
+        # The model is registered globally to make sure the default
+        # registry is used when unpickling takes place.
         class DifferentDjangoVersion(models.Model):
             title = models.CharField(max_length=10)
 

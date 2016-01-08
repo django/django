@@ -55,6 +55,9 @@ class NonAutoPKBook(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=50)
 
+    class Meta:
+        managed = False
+
     def save(self, *args, **kwargs):
         while not self.rand_pk:
             test_pk = random.randint(1, 99999)
@@ -67,6 +70,9 @@ class EditablePKBook(models.Model):
     manual_pk = models.IntegerField(primary_key=True)
     author = models.ForeignKey(Author, models.CASCADE)
     title = models.CharField(max_length=50)
+
+    class Meta:
+        managed = False
 
 
 class Holder(models.Model):
@@ -139,13 +145,17 @@ class ShoppingWeakness(models.Model):
 
 
 class TitleCollection(models.Model):
-    pass
+    class Meta:
+        managed = False
 
 
 class Title(models.Model):
     collection = models.ForeignKey(TitleCollection, models.SET_NULL, blank=True, null=True)
     title1 = models.CharField(max_length=100)
     title2 = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
 
 # Models for #15424
 
@@ -180,20 +190,32 @@ class FootNote(models.Model):
 class CapoFamiglia(models.Model):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        managed = False
+
 
 class Consigliere(models.Model):
     name = models.CharField(max_length=100, help_text='Help text for Consigliere')
     capo_famiglia = models.ForeignKey(CapoFamiglia, models.CASCADE, related_name='+')
+
+    class Meta:
+        managed = False
 
 
 class SottoCapo(models.Model):
     name = models.CharField(max_length=100)
     capo_famiglia = models.ForeignKey(CapoFamiglia, models.CASCADE, related_name='+')
 
+    class Meta:
+        managed = False
+
 
 class ReadOnlyInline(models.Model):
     name = models.CharField(max_length=100, help_text='Help text for ReadOnlyInline')
     capo_famiglia = models.ForeignKey(CapoFamiglia, models.CASCADE)
+
+    class Meta:
+        managed = False
 
 
 # Models for #18433

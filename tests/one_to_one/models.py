@@ -97,6 +97,9 @@ class Pointer2(models.Model):
 class HiddenPointer(models.Model):
     target = models.OneToOneField(Target, models.CASCADE, related_name='hidden+')
 
+    class Meta:
+        managed = False
+
 
 # Test related objects visibility.
 class SchoolManager(models.Manager):

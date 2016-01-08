@@ -190,6 +190,9 @@ class RefToNKChild(models.Model):
 class Circle1(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
     def natural_key(self):
         return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle2']
@@ -197,6 +200,9 @@ class Circle1(models.Model):
 
 class Circle2(models.Model):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
 
     def natural_key(self):
         return (self.name,)
@@ -206,6 +212,9 @@ class Circle2(models.Model):
 class Circle3(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
     def natural_key(self):
         return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle3']
@@ -213,6 +222,9 @@ class Circle3(models.Model):
 
 class Circle4(models.Model):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
 
     def natural_key(self):
         return (self.name,)
@@ -222,6 +234,9 @@ class Circle4(models.Model):
 class Circle5(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
     def natural_key(self):
         return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle6']
@@ -230,6 +245,9 @@ class Circle5(models.Model):
 class Circle6(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
     def natural_key(self):
         return (self.name,)
     natural_key.dependencies = ['fixtures_regress.circle4']
@@ -237,6 +255,9 @@ class Circle6(models.Model):
 
 class ExternalDependency(models.Model):
     name = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
 
     def natural_key(self):
         return (self.name,)
@@ -281,60 +302,97 @@ class M2MSimpleB(BaseNKModel):
 class M2MSimpleCircularA(BaseNKModel):
     b_set = models.ManyToManyField("M2MSimpleCircularB")
 
+    class Meta:
+        managed = False
+
 
 class M2MSimpleCircularB(BaseNKModel):
     a_set = models.ManyToManyField("M2MSimpleCircularA")
+
+    class Meta:
+        managed = False
 
 
 class M2MComplexA(BaseNKModel):
     b_set = models.ManyToManyField("M2MComplexB", through="M2MThroughAB")
 
+    class Meta:
+        managed = False
+
 
 class M2MComplexB(BaseNKModel):
-    pass
+    class Meta:
+        managed = False
 
 
 class M2MThroughAB(BaseNKModel):
     a = models.ForeignKey(M2MComplexA, models.CASCADE)
     b = models.ForeignKey(M2MComplexB, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class M2MComplexCircular1A(BaseNKModel):
     b_set = models.ManyToManyField("M2MComplexCircular1B",
                                    through="M2MCircular1ThroughAB")
+
+    class Meta:
+        managed = False
 
 
 class M2MComplexCircular1B(BaseNKModel):
     c_set = models.ManyToManyField("M2MComplexCircular1C",
                                    through="M2MCircular1ThroughBC")
 
+    class Meta:
+        managed = False
+
 
 class M2MComplexCircular1C(BaseNKModel):
     a_set = models.ManyToManyField("M2MComplexCircular1A",
                                    through="M2MCircular1ThroughCA")
+
+    class Meta:
+        managed = False
 
 
 class M2MCircular1ThroughAB(BaseNKModel):
     a = models.ForeignKey(M2MComplexCircular1A, models.CASCADE)
     b = models.ForeignKey(M2MComplexCircular1B, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class M2MCircular1ThroughBC(BaseNKModel):
     b = models.ForeignKey(M2MComplexCircular1B, models.CASCADE)
     c = models.ForeignKey(M2MComplexCircular1C, models.CASCADE)
+
+    class Meta:
+        managed = False
 
 
 class M2MCircular1ThroughCA(BaseNKModel):
     c = models.ForeignKey(M2MComplexCircular1C, models.CASCADE)
     a = models.ForeignKey(M2MComplexCircular1A, models.CASCADE)
 
+    class Meta:
+        managed = False
+
 
 class M2MComplexCircular2A(BaseNKModel):
     b_set = models.ManyToManyField("M2MComplexCircular2B",
                                    through="M2MCircular2ThroughAB")
 
+    class Meta:
+        managed = False
+
 
 class M2MComplexCircular2B(BaseNKModel):
+    class Meta:
+        managed = False
+
     def natural_key(self):
         return (self.data,)
     # Fake the dependency for a circularity
@@ -344,3 +402,6 @@ class M2MComplexCircular2B(BaseNKModel):
 class M2MCircular2ThroughAB(BaseNKModel):
     a = models.ForeignKey(M2MComplexCircular2A, models.CASCADE)
     b = models.ForeignKey(M2MComplexCircular2B, models.CASCADE)
+
+    class Meta:
+        managed = False

@@ -8,13 +8,22 @@ from django.db import models
 class Company(models.Model):
     name = models.CharField(max_length=200)
 
+    class Meta:
+        managed = False
+
 
 class Group(models.Model):
     name = models.CharField(max_length=200)
 
+    class Meta:
+        managed = False
+
 
 class Family(models.Model):
     last_name = models.CharField(max_length=200)
+
+    class Meta:
+        managed = False
 
 
 class Person(models.Model):
@@ -40,6 +49,9 @@ class Person(models.Model):
     company = models.ForeignKey(Company, models.CASCADE, help_text="place of work")
     family = models.ForeignKey(Family, models.SET_NULL, related_name='+', null=True)
     groups = models.ManyToManyField(Group, help_text="has membership")
+
+    class Meta:
+        managed = False
 
     def _get_full_name(self):
         return "%s %s" % (self.first_name, self.last_name)

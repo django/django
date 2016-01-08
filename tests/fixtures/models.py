@@ -43,8 +43,6 @@ class Article(models.Model):
 class Blog(models.Model):
     name = models.CharField(max_length=100)
     featured = models.ForeignKey(Article, models.CASCADE, related_name='fixtures_featured_set')
-    articles = models.ManyToManyField(Article, blank=True,
-                                      related_name='fixtures_articles_set')
 
     def __str__(self):
         return self.name

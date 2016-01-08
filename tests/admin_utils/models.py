@@ -7,6 +7,9 @@ from django.utils.encoding import python_2_unicode_compatible
 class Site(models.Model):
     domain = models.CharField(max_length=100)
 
+    class Meta:
+        managed = False
+
     def __str__(self):
         return self.domain
 
@@ -19,6 +22,9 @@ class Article(models.Model):
     title = models.CharField(max_length=100)
     title2 = models.CharField(max_length=100, verbose_name="another name")
     created = models.DateTimeField()
+
+    class Meta:
+        managed = False
 
     def test_from_model(self):
         return "nothing"

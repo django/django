@@ -11,6 +11,9 @@ new_apps = Apps(['apps'])
 class TotallyNormal(models.Model):
     name = models.CharField(max_length=255)
 
+    class Meta:
+        managed = False
+
 
 class SoAlternative(models.Model):
     name = models.CharField(max_length=255)

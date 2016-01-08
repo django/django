@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from django.apps.registry import Apps
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
@@ -292,9 +293,11 @@ class LazyModelRefTest(BaseSignalTest):
             self.receiver, sender='signals.Created', weak=False
         )
 
+        test_apps = Apps(['signals'])
         try:
             class Created(models.Model):
-                pass
+                class Meta:
+                    apps = test_apps
 
             instance = Created()
             self.assertEqual(self.received, [{

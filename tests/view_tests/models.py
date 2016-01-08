@@ -55,3 +55,6 @@ class DateArticle(BaseArticle):
     for testing #7602
     """
     date_created = models.DateField()
+
+    class Meta:
+        managed = False

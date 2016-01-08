@@ -32,10 +32,14 @@ class Store(models.Model):
 class BookStore(Store):
     available_books = models.ManyToManyField(Book)
 
+# Set manually since we're testing Meta inheritance above.
+BookStore._meta.managed = False
+
 
 class EditorStore(Store):
     editor = models.ForeignKey(Editor, models.CASCADE)
     available_books = models.ManyToManyField(Book)
 
     class Meta:
+        managed = False
         default_related_name = "editor_stores"

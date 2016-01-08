@@ -8,9 +8,13 @@ from django.db import models
 class Person(models.Model):
     name = models.CharField(max_length=200)
 
+    class Meta:
+        managed = False
+
 
 class Traveler(Person):
-    pass
+    class Meta:
+        managed = False
 
 
 class Location(models.Model):
@@ -20,3 +24,6 @@ class Location(models.Model):
 
 class Place(Location):
     name = models.CharField(max_length=200)
+
+    class Meta:
+        managed = False

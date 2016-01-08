@@ -199,6 +199,9 @@ class Sketch(models.Model):
         related_name='as_defendant1',
     )
 
+    class Meta:
+        managed = False
+
     def __str__(self):
         return self.title
 
@@ -230,6 +233,9 @@ class StumpJoke(models.Model):
         related_name="+",
     )
     has_fooled_today = models.ManyToManyField(Character, limit_choices_to=today_callable_q, related_name="+")
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return self.variation
@@ -626,6 +632,9 @@ class Reservation(models.Model):
     start_date = models.DateTimeField()
     price = models.IntegerField()
 
+    class Meta:
+        managed = False
+
 
 DRIVER_CHOICES = (
     ('bill', 'Bill G'),
@@ -708,6 +717,9 @@ class PrePopulatedPostLargeSlug(models.Model):
     # `db_index=False` because MySQL cannot index large CharField (#21196).
     slug = models.SlugField(max_length=1000, db_index=False)
 
+    class Meta:
+        managed = False
+
 
 class AdminOrderedField(models.Model):
     order = models.IntegerField()
@@ -736,6 +748,9 @@ class AdminOrderedCallable(models.Model):
 @python_2_unicode_compatible
 class Report(models.Model):
     title = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return self.title
@@ -842,13 +857,22 @@ class FilteredManager(models.Model):
 class EmptyModelVisible(models.Model):
     """ See ticket #11277. """
 
+    class Meta:
+        managed = False
+
 
 class EmptyModelHidden(models.Model):
     """ See ticket #11277. """
 
+    class Meta:
+        managed = False
+
 
 class EmptyModelMixin(models.Model):
     """ See ticket #11277. """
+
+    class Meta:
+        managed = False
 
 
 class State(models.Model):
@@ -890,9 +914,13 @@ class ParentWithFK(models.Model):
         related_name='hidden+',
     )
 
+    class Meta:
+        managed = False
+
 
 class ChildOfReferer(ParentWithFK):
-    pass
+    class Meta:
+        managed = False
 
 
 # Models for #23431
@@ -908,9 +936,15 @@ class InlineReference(models.Model):
         related_name='hidden+',
     )
 
+    class Meta:
+        managed = False
+
 
 class InlineReferer(models.Model):
     refs = models.ManyToManyField(InlineReference)
+
+    class Meta:
+        managed = False
 
 
 # Models for #23604 and #23915
@@ -926,6 +960,9 @@ class Ingredient(models.Model):
 class RecipeIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, models.CASCADE, to_field='iname')
     recipe = models.ForeignKey(Recipe, models.CASCADE, to_field='rname')
+
+    class Meta:
+        managed = False
 
 
 # Model for #23839
@@ -949,6 +986,12 @@ class ReferencedByGenRel(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
+    class Meta:
+        managed = False
+
 
 class GenRelReference(models.Model):
     references = GenericRelation(ReferencedByGenRel)
+
+    class Meta:
+        managed = False

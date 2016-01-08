@@ -55,4 +55,5 @@ class Contact(models.Model):
 # Generic inline with can_delete=False
 #
 class EpisodePermanent(Episode):
-    pass
+    class Meta:
+        managed = False

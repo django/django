@@ -56,9 +56,15 @@ class District(models.Model):
 class First(models.Model):
     second = models.IntegerField()
 
+    class Meta:
+        managed = False
+
 
 class Second(models.Model):
     first = models.ForeignKey(First, models.CASCADE, related_name='the_first')
+
+    class Meta:
+        managed = False
 
 
 # Protect against repetition of #1839, #2415 and #2536.
@@ -79,6 +85,9 @@ class Child(models.Model):
 
 class ToFieldChild(models.Model):
     parent = models.ForeignKey(Parent, models.CASCADE, to_field='name')
+
+    class Meta:
+        managed = False
 
 
 # Multiple paths to the same model (#7110, #7125)

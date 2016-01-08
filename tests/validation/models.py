@@ -48,6 +48,9 @@ class UniqueFieldsModel(models.Model):
 class CustomPKModel(models.Model):
     my_pk_field = models.CharField(max_length=100, primary_key=True)
 
+    class Meta:
+        managed = False
+
 
 class UniqueTogetherModel(models.Model):
     cfield = models.CharField(max_length=100)
@@ -55,6 +58,7 @@ class UniqueTogetherModel(models.Model):
     efield = models.EmailField()
 
     class Meta:
+        managed = False
         unique_together = (('ifield', 'cfield',), ['ifield', 'efield'])
 
 
@@ -65,6 +69,9 @@ class UniqueForDateModel(models.Model):
     order = models.IntegerField(unique_for_month="end_date")
     name = models.CharField(max_length=100)
 
+    class Meta:
+        managed = False
+
 
 class CustomMessagesModel(models.Model):
     other = models.IntegerField(blank=True, null=True)
@@ -72,6 +79,9 @@ class CustomMessagesModel(models.Model):
         error_messages={'null': 'NULL', 'not42': 'AAARGH', 'not_equal': '%s != me'},
         validators=[validate_answer_to_universe]
     )
+
+    class Meta:
+        managed = False
 
 
 class Author(models.Model):

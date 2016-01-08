@@ -187,6 +187,9 @@ class CustomField(models.TextField):
 class CustomModel(models.Model):
     field = CustomField()
 
+    class Meta:
+        managed = False
+
 
 # We will register this class temporarily in the test method.
 

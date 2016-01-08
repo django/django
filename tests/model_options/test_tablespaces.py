@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from django.apps import apps
 from django.conf import settings
 from django.db import connection
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -24,23 +23,6 @@ def sql_for_index(model):
 # because they're evaluated when the model class is defined. As a consequence,
 # @override_settings doesn't work, and the tests depend
 class TablespacesTests(TestCase):
-
-    def setUp(self):
-        # The unmanaged models need to be removed after the test in order to
-        # prevent bad interactions with the flush operation in other tests.
-        self._old_models = apps.app_configs['model_options'].models.copy()
-
-        for model in Article, Authors, Reviewers, Scientist:
-            model._meta.managed = True
-
-    def tearDown(self):
-        for model in Article, Authors, Reviewers, Scientist:
-            model._meta.managed = False
-
-        apps.app_configs['model_options'].models = self._old_models
-        apps.all_models['model_options'] = self._old_models
-        apps.clear_cache()
-
     def assertNumContains(self, haystack, needle, count):
         real_count = haystack.count(needle)
         self.assertEqual(real_count, count, "Found %d instances of '%s', "

@@ -7,3 +7,6 @@ from django.db import models
 class SimpleModel(models.Model):
     field = models.IntegerField()
     manager = models.manager.Manager()
+
+    class Meta:
+        managed = False

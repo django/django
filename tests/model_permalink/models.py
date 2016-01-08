@@ -12,6 +12,9 @@ class Guitarist(models.Model):
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=50)
 
+    class Meta:
+        managed = False
+
     @models.permalink
     def url(self):
         "Returns the URL for this guitarist."

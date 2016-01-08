@@ -7,6 +7,9 @@ class PersonWithDefaultMaxLengths(models.Model):
     homepage = models.URLField()
     avatar = models.FilePathField()
 
+    class Meta:
+        managed = False
+
 
 class PersonWithCustomMaxLengths(models.Model):
     email = models.EmailField(max_length=250)

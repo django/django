@@ -40,9 +40,15 @@ class ValidationTestModel(models.Model):
     # This field is intentionally 2 characters long (#16080).
     no = models.IntegerField(verbose_name="Number", blank=True, null=True)
 
+    class Meta:
+        managed = False
+
     def decade_published_in(self):
         return self.pub_date.strftime('%Y')[:3] + "0's"
 
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel, models.CASCADE)
+
+    class Meta:
+        managed = False

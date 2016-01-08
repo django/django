@@ -39,6 +39,8 @@ class VeryLongModelNameZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ(models.Model):
 
 
 class Tag(models.Model):
+    # Used for a sequence reset issue test involving GFKs
+    # refs #13941
     name = models.CharField(max_length=30)
     content_type = models.ForeignKey(ContentType, models.CASCADE, related_name='backend_tags')
     object_id = models.PositiveIntegerField()
@@ -90,6 +92,9 @@ class Item(models.Model):
     date = models.DateField()
     time = models.TimeField()
     last_modified = models.DateTimeField()
+
+    class Meta:
+        managed = False
 
     def __str__(self):
         return self.name

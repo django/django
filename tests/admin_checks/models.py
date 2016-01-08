@@ -11,6 +11,9 @@ from django.utils.encoding import python_2_unicode_compatible
 class Album(models.Model):
     title = models.CharField(max_length=150)
 
+    class Meta:
+        managed = False
+
 
 @python_2_unicode_compatible
 class Song(models.Model):
@@ -20,6 +23,7 @@ class Song(models.Model):
 
     class Meta:
         ordering = ('title',)
+        managed = False
 
     def __str__(self):
         return self.title
@@ -34,9 +38,15 @@ class TwoAlbumFKAndAnE(models.Model):
     album2 = models.ForeignKey(Album, models.CASCADE, related_name="album2_set")
     e = models.CharField(max_length=1)
 
+    class Meta:
+        managed = False
+
 
 class Author(models.Model):
     name = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
 
 
 class Book(models.Model):
@@ -45,19 +55,31 @@ class Book(models.Model):
     price = models.FloatField()
     authors = models.ManyToManyField(Author, through='AuthorsBooks')
 
+    class Meta:
+        managed = False
+
 
 class AuthorsBooks(models.Model):
     author = models.ForeignKey(Author, models.CASCADE)
     book = models.ForeignKey(Book, models.CASCADE)
     featured = models.BooleanField()
 
+    class Meta:
+        managed = False
+
 
 class State(models.Model):
     name = models.CharField(max_length=15)
 
+    class Meta:
+        managed = False
+
 
 class City(models.Model):
     state = models.ForeignKey(State, models.CASCADE)
+
+    class Meta:
+        managed = False
 
 
 class Influence(models.Model):
@@ -66,3 +88,6 @@ class Influence(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
+
+    class Meta:
+        managed = False
