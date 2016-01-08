@@ -53,28 +53,7 @@ class BaseHandler(object):
 
         if settings.MIDDLEWARE is None:
             handler = self._get_response_old
-            for middleware_path in settings.MIDDLEWARE_CLASSES:
-                mw_class = import_string(middleware_path)
-                try:
-                    mw_instance = mw_class()
-                except MiddlewareNotUsed as exc:
-                    if settings.DEBUG:
-                        if six.text_type(exc):
-                            logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
-                        else:
-                            logger.debug('MiddlewareNotUsed: %r', middleware_path)
-                    continue
-
-                if hasattr(mw_instance, 'process_request'):
-                    self._request_middleware.append(mw_instance.process_request)
-                if hasattr(mw_instance, 'process_view'):
-                    self._view_middleware.append(mw_instance.process_view)
-                if hasattr(mw_instance, 'process_template_response'):
-                    self._template_response_middleware.insert(0, mw_instance.process_template_response)
-                if hasattr(mw_instance, 'process_response'):
-                    self._response_middleware.insert(0, mw_instance.process_response)
-                if hasattr(mw_instance, 'process_exception'):
-                    self._exception_middleware.insert(0, mw_instance.process_exception)
+            self._load_middleware_old()
         else:
             handler = self._get_response
             for middleware_path in settings.MIDDLEWARE[::-1]:
@@ -362,3 +341,27 @@ class BaseHandler(object):
         if response is None:
             response = self._get_response(request)
         return response
+
+    def _load_middleware_old(self):
+        for middleware_path in settings.MIDDLEWARE_CLASSES:
+            mw_class = import_string(middleware_path)
+            try:
+                mw_instance = mw_class()
+            except MiddlewareNotUsed as exc:
+                if settings.DEBUG:
+                    if six.text_type(exc):
+                        logger.debug('MiddlewareNotUsed(%r): %s', middleware_path, exc)
+                    else:
+                        logger.debug('MiddlewareNotUsed: %r', middleware_path)
+                continue
+
+            if hasattr(mw_instance, 'process_request'):
+                self._request_middleware.append(mw_instance.process_request)
+            if hasattr(mw_instance, 'process_view'):
+                self._view_middleware.append(mw_instance.process_view)
+            if hasattr(mw_instance, 'process_template_response'):
+                self._template_response_middleware.insert(0, mw_instance.process_template_response)
+            if hasattr(mw_instance, 'process_response'):
+                self._response_middleware.insert(0, mw_instance.process_response)
+            if hasattr(mw_instance, 'process_exception'):
+                self._exception_middleware.insert(0, mw_instance.process_exception)
