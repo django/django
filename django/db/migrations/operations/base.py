@@ -111,6 +111,14 @@ class Operation(object):
 
         return router.allow_migrate_model(connection_alias, model)
 
+    def reduce(self, operation, in_between, app_label=None):
+        """
+        Return either a list of operations the actual operation should be
+        replaced with or a boolean that indicates whether or not the specified
+        operation can be optimized across.
+        """
+        return False
+
     def __repr__(self):
         return "<%s %s%s>" % (
             self.__class__.__name__,
