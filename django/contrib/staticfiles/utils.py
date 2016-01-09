@@ -51,8 +51,8 @@ def check_settings(base_url=None):
     if 'media' not in settings.FILE_STORAGES:
         raise ImproperlyConfigured("File storage for media files is not configured.")
 
-    static_storage_settings = settings.FILE_STORAGES['static']
-    media_storage_settings = settings.FILE_STORAGES['media']
+    static_storage_settings = settings.FILE_STORAGES['static']['OPTIONS']
+    media_storage_settings = settings.FILE_STORAGES['media']['OPTIONS']
 
     if base_url is None:
         base_url = static_storage_settings.get('url', None)

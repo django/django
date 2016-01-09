@@ -30,10 +30,11 @@ class StaticFilesStorage(FileSystemStorage):
     ``STATIC_ROOT`` and ``STATIC_URL``.
     """
     def __init__(self, location=None, base_url=None, *args, **kwargs):
+        storage_backend_options = settings['static']['OPTIONS']
         if location is None:
-            location = settings.STATIC_ROOT
+            location = storage_backend_options['location']
         if base_url is None:
-            base_url = settings.STATIC_URL
+            base_url = storage_backend_options['url']
         check_settings(base_url)
         super(StaticFilesStorage, self).__init__(location, base_url,
                                                  *args, **kwargs)
@@ -396,6 +397,6 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
 
 class ConfiguredStorage(LazyObject):
     def _setup(self):
-        self._wrapped = get_storage_class(settings.STATICFILES_STORAGE)()
+        self._wrapped = get_storage_class(settings.FILE_STORAGES['static']['BACKEND'])()
 
 staticfiles_storage = ConfiguredStorage()

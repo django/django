@@ -166,12 +166,13 @@ class FileSystemStorage(Storage):
 
     def __init__(self, location=None, base_url=None, file_permissions_mode=None,
             directory_permissions_mode=None):
+        storage_backend_options = settings['media']['OPTIONS']
         if location is None:
-            location = settings.MEDIA_ROOT
+            location = storage_backend_options['location']
         self.base_location = location
         self.location = abspathu(self.base_location)
         if base_url is None:
-            base_url = settings.MEDIA_URL
+            base_url = storage_backend_options['url']
         elif not base_url.endswith('/'):
             base_url += '/'
         self.base_url = base_url
@@ -312,7 +313,8 @@ class FileSystemStorage(Storage):
 
 
 def get_storage_class(import_path=None):
-    return import_string(import_path or settings.DEFAULT_FILE_STORAGE)
+    default_storage_backend = settings.FILE_STORAGES['media']['BACKEND'] or settings.DEFAULT_FILE_STORAGE
+    return import_string(import_path or default_storage_backend)
 
 
 class DefaultStorage(LazyObject):

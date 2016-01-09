@@ -22,7 +22,7 @@ class StaticFilesHandler(WSGIHandler):
 
     def get_base_url(self):
         utils.check_settings()
-        return settings.STATIC_URL
+        return settings.FILE_STORAGES['static']['OPTIONS']['url']
 
     def _should_handle(self, path):
         """
