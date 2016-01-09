@@ -426,6 +426,18 @@ class LastExecutedQueryTest(TestCase):
         substituted = "SELECT '\"''\\'"
         self.assertEqual(connection.queries[-1]['sql'], substituted)
 
+    @unittest.skipUnless(connection.vendor == 'sqlite',
+                         "This test is specific to SQLite.")
+    def test_large_number_of_parameters_on_sqlite(self):
+        # If SQLITE_MAX_VARIABLE_NUMBER (default = 999) has been changed to be
+        # greater than SQLITE_MAX_COLUMN (default = 2000), last_executed_query
+        # can hit the SQLITE_MAX_COLUMN limit. See #26063.
+        cursor = connection.cursor()
+        sql = "SELECT MAX(%s)" % ", ".join(["%s"] * 2001)
+        params = list(range(2001))
+        # This should not raise an exception.
+        cursor.db.ops.last_executed_query(cursor.cursor, sql, params)
+
 
 class ParameterHandlingTest(TestCase):
 
