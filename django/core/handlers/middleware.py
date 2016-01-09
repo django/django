@@ -1,5 +1,5 @@
 class MiddlewareMixin(object):
-    def __init__(self, get_response):
+    def __init__(self, get_response=None):
         self.get_response = get_response
         super(MiddlewareMixin, self).__init__()
 

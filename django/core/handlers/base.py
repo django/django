@@ -50,6 +50,7 @@ class BaseHandler(object):
         self._response_middleware = []
         self._exception_middleware = []
 
+        settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
         if settings.MIDDLEWARE is None:
             handler = self._get_response_old
             self._load_middleware_old()
