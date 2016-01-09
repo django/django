@@ -34,15 +34,15 @@ from .models import (
     InlineReference, InlineReferer, Inquisition, Language, Link,
     MainPrepopulated, ModelWithStringPrimaryKey, NotReferenced, OldSubscriber,
     OtherStory, Paper, Parent, ParentWithDependentChildren, Person, Persona,
-    Picture, Pizza, Plot, PlotDetails, PluggableSearchPerson, Podcast, Post,
-    PrePopulatedPost, PrePopulatedPostLargeSlug, PrePopulatedSubPost, Promo,
-    Question, Recipe, Recommendation, Recommender, ReferencedByGenRel,
-    ReferencedByInline, ReferencedByParent, RelatedPrepopulated, Report,
-    Reservation, Restaurant, RowLevelChangePermissionModel, Section,
-    ShortMessage, Simple, Sketch, State, Story, StumpJoke, Subscriber,
-    SuperVillain, Telegram, Thing, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, UserMessenger, Villain, Vodcast,
-    Whatsit, Widget, Worker, WorkHour,
+    Picture, Pizza, Plot, PlotDetails, PlotProxy, PluggableSearchPerson,
+    Podcast, Post, PrePopulatedPost, PrePopulatedPostLargeSlug,
+    PrePopulatedSubPost, Promo, Question, Recipe, Recommendation, Recommender,
+    ReferencedByGenRel, ReferencedByInline, ReferencedByParent,
+    RelatedPrepopulated, Report, Reservation, Restaurant,
+    RowLevelChangePermissionModel, Section, ShortMessage, Simple, Sketch,
+    State, Story, StumpJoke, Subscriber, SuperVillain, Telegram, Thing,
+    Topping, UnchangeableObject, UndeletableObject, UnorderedObject,
+    UserMessenger, Villain, Vodcast, Whatsit, Widget, Worker, WorkHour,
 )
 
 
@@ -853,6 +853,10 @@ class InlineRefererAdmin(admin.ModelAdmin):
     inlines = [InlineReferenceInline]
 
 
+class PlotReadonlyAdmin(admin.ModelAdmin):
+    readonly_fields = ('plotdetails',)
+
+
 class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
     fields = ['name']
 
@@ -907,6 +911,7 @@ site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)
 site.register(PlotDetails)
+site.register(PlotProxy, PlotReadonlyAdmin)
 site.register(CyclicOne)
 site.register(CyclicTwo)
 site.register(WorkHour, WorkHourAdmin)

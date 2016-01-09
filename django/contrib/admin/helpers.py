@@ -203,7 +203,7 @@ class AdminReadonlyField(object):
                     else:
                         result_repr = linebreaksbr(result_repr)
             else:
-                if isinstance(f.rel, ManyToManyRel) and value is not None:
+                if isinstance(getattr(f, 'rel', None), ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(six.text_type, value.all()))
                 else:
                     result_repr = display_for_field(value, f)

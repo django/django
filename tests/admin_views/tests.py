@@ -52,16 +52,54 @@ from .models import (
     FoodDelivery, FunkyTag, Gallery, Grommet, Inquisition, Language, Link,
     MainPrepopulated, ModelWithStringPrimaryKey, OtherStory, Paper, Parent,
     ParentWithDependentChildren, Person, Persona, Picture, Pizza, Plot,
-    PluggableSearchPerson, Podcast, Post, Promo, Question, RelatedPrepopulated,
-    Report, Restaurant, RowLevelChangePermissionModel, Section, ShortMessage,
-    Simple, Story, Subscriber, Telegram, Topping, UnchangeableObject,
-    UndeletableObject, UnorderedObject, Vodcast, Whatsit, Widget, Worker,
-    WorkHour,
+    PlotDetails, PluggableSearchPerson, Podcast, Post, Promo, Question,
+    RelatedPrepopulated, Report, Restaurant, RowLevelChangePermissionModel,
+    Section, ShortMessage, Simple, Story, Subscriber, Telegram, Topping,
+    UnchangeableObject, UndeletableObject, UnorderedObject, Villain, Vodcast,
+    Whatsit, Widget, Worker, WorkHour,
 )
 
 
 ERROR_MESSAGE = "Please enter the correct username and password \
 for a staff account. Note that both fields may be case-sensitive."
+
+
+class AdminFieldExtractionMixin(object):
+    """
+    Helper methods for extracting data from AdminForm.
+    """
+    def get_admin_form_fields(self, response):
+        """
+        Return a list of AdminFields for the AdminForm in the response.
+        """
+        admin_form = response.context['adminform']
+        fieldsets = list(admin_form)
+
+        field_lines = []
+        for fieldset in fieldsets:
+            field_lines += list(fieldset)
+
+        fields = []
+        for field_line in field_lines:
+            fields += list(field_line)
+
+        return fields
+
+    def get_admin_fields(self, response):
+        """
+        Return the fields for the response's AdminForm.
+        """
+        return [f for f in self.get_admin_form_fields(response)]
+
+    def get_admin_field(self, response, field_name):
+        """
+        Return the field for the given field_name.
+        """
+        fields = self.get_admin_fields(response)
+        for field in fields:
+            name = field.field['name'] if isinstance(field.field, dict) else field.field.name
+            if name == field_name:
+                return field
 
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
@@ -4029,7 +4067,7 @@ class SeleniumAdminViewsIETests(SeleniumAdminViewsFirefoxTests):
 
 @override_settings(PASSWORD_HASHERS=('django.contrib.auth.hashers.SHA1PasswordHasher',),
     ROOT_URLCONF="admin_views.urls")
-class ReadonlyTest(TestCase):
+class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     fixtures = ['admin-views-users.xml']
 
     def setUp(self):
@@ -4126,7 +4164,7 @@ class ReadonlyTest(TestCase):
         self.assertContains(response, '<p>No opinion</p>', html=True)
         self.assertNotContains(response, '<p>(None)</p>')
 
-    def test_readonly_backwards_ref(self):
+    def test_readonly_manytomany_backwards_ref(self):
         """
         Regression test for #16433 - backwards references for related objects
         broke if the related field is read-only due to the help_text attribute
@@ -4136,6 +4174,26 @@ class ReadonlyTest(TestCase):
         pizza.toppings.add(topping)
         response = self.client.get(reverse('admin:admin_views_topping_add'))
         self.assertEqual(response.status_code, 200)
+
+    def test_readonly_onetoone_backwards_ref(self):
+        """
+        Can reference a reverse OneToOneField in ModelAdmin.readonly_fields.
+        """
+        v1 = Villain.objects.create(name='Adam')
+        pl = Plot.objects.create(name='Test Plot', team_leader=v1, contact=v1)
+        pd = PlotDetails.objects.create(details='Brand New Plot', plot=pl)
+
+        response = self.client.get(reverse('admin:admin_views_plotproxy_change', args=(pl.pk,)))
+        field = self.get_admin_field(response, 'plotdetails')
+        self.assertEqual(field.contents(), 'Brand New Plot')
+
+        # The reverse relation also works if the OneToOneField is null.
+        pd.plot = None
+        pd.save()
+
+        response = self.client.get(reverse('admin:admin_views_plotproxy_change', args=(pl.pk,)))
+        field = self.get_admin_field(response, 'plotdetails')
+        self.assertEqual(force_text(field.contents()), '(None)')
 
     def test_readonly_field_overrides(self):
         """
