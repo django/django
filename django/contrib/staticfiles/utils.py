@@ -45,16 +45,31 @@ def check_settings(base_url=None):
     """
     Checks if the staticfiles settings have sane values.
     """
+    if 'static' not in settings.FILE_STORAGES:
+        raise ImproperlyConfigured("File storage for static files is not configured.")
+
+    if 'media' not in settings.FILE_STORAGES:
+        raise ImproperlyConfigured("File storage for media files is not configured.")
+
+    static_storage_settings = settings.FILE_STORAGES['static']
+    media_storage_settings = settings.FILE_STORAGES['media']
+
     if base_url is None:
-        base_url = settings.STATIC_URL
+        base_url = static_storage_settings.get('url', None)
+
     if not base_url:
         raise ImproperlyConfigured(
             "You're using the staticfiles app "
-            "without having set the required STATIC_URL setting.")
-    if settings.MEDIA_URL == base_url:
-        raise ImproperlyConfigured("The MEDIA_URL and STATIC_URL "
-                                   "settings must have different values")
-    if ((settings.MEDIA_ROOT and settings.STATIC_ROOT) and
-            (settings.MEDIA_ROOT == settings.STATIC_ROOT)):
-        raise ImproperlyConfigured("The MEDIA_ROOT and STATIC_ROOT "
-                                   "settings must have different values")
+            "without having set the url setting in the options for static files "
+            "storage backend.")
+
+    if media_storage_settings.get('url', None) == base_url:
+        raise ImproperlyConfigured("URL settings for static and media file storages "
+                                   "must have different values")
+
+    media_storage_location = media_storage_settings.get('location', None)
+    static_storage_location = static_storage_settings.get('location', None)
+    if ((media_storage_location and static_storage_location) and
+            (media_storage_location == static_storage_location)):
+        raise ImproperlyConfigured("Location settings for static and media files storages "
+                                   "must have different values")
