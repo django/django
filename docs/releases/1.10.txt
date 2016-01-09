@@ -208,7 +208,8 @@ Forms
 Generic Views
 ^^^^^^^^^^^^^
 
-* ...
+* The :class:`~django.views.generic.base.View` can now be imported from
+  ``django.views``.
 
 Internationalization
 ^^^^^^^^^^^^^^^^^^^^
