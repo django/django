@@ -27,7 +27,10 @@ class FieldOperation(Operation):
         return self.is_same_model_operation(operation) and self.name_lower == operation.name_lower
 
     def reduce(self, operation, in_between, app_label=None):
-        return not operation.references_field(self.model_name, self.name, app_label)
+        return (
+            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_field(self.model_name, self.name, app_label)
+        )
 
 
 class AddField(FieldOperation):
@@ -333,4 +336,9 @@ class RenameField(FieldOperation):
                     operation.new_name,
                 ),
             ]
-        return not operation.references_field(self.model_name, self.new_name, app_label)
+        # Skip `FieldOperation.reduce` as we want to run `references_field`
+        # against self.new_name.
+        return (
+            super(FieldOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_field(self.model_name, self.new_name, app_label)
+        )

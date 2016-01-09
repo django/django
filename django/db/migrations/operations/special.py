@@ -71,11 +71,12 @@ class RunSQL(Operation):
     """
     noop = ''
 
-    def __init__(self, sql, reverse_sql=None, state_operations=None, hints=None):
+    def __init__(self, sql, reverse_sql=None, state_operations=None, hints=None, elidable=False):
         self.sql = sql
         self.reverse_sql = reverse_sql
         self.state_operations = state_operations or []
         self.hints = hints or {}
+        self.elidable = elidable
 
     def deconstruct(self):
         kwargs = {
@@ -138,7 +139,7 @@ class RunPython(Operation):
 
     reduces_to_sql = False
 
-    def __init__(self, code, reverse_code=None, atomic=True, hints=None):
+    def __init__(self, code, reverse_code=None, atomic=True, hints=None, elidable=False):
         self.atomic = atomic
         # Forwards code
         if not callable(code):
@@ -152,6 +153,7 @@ class RunPython(Operation):
                 raise ValueError("RunPython must be supplied with callable arguments")
             self.reverse_code = reverse_code
         self.hints = hints or {}
+        self.elidable = elidable
 
     def deconstruct(self):
         kwargs = {

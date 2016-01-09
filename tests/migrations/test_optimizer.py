@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import migrations, models
+from django.db.migrations import operations
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.test import SimpleTestCase
 
@@ -629,5 +630,24 @@ class OptimizerTests(SimpleTestCase):
             ],
             [
                 migrations.CreateModel("Bar", [("width", models.IntegerField())]),
+            ],
+        )
+
+    def test_optimize_elidable_operation(self):
+        elidable_operation = operations.base.Operation()
+        elidable_operation.elidable = True
+        self.assertOptimizesTo(
+            [
+                elidable_operation,
+                migrations.CreateModel("Foo", [("name", models.CharField(max_length=255))]),
+                elidable_operation,
+                migrations.CreateModel("Bar", [("size", models.IntegerField())]),
+                elidable_operation,
+                migrations.RenameModel("Foo", "Phou"),
+                migrations.DeleteModel("Bar"),
+                elidable_operation,
+            ],
+            [
+                migrations.CreateModel("Phou", [("name", models.CharField(max_length=255))]),
             ],
         )

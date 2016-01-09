@@ -21,7 +21,10 @@ class ModelOperation(Operation):
         return self.name.lower()
 
     def reduce(self, operation, in_between, app_label=None):
-        return not operation.references_model(self.name, app_label)
+        return (
+            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_model(self.name, app_label)
+        )
 
 
 class CreateModel(ModelOperation):
@@ -365,7 +368,12 @@ class RenameModel(ModelOperation):
                     operation.new_name,
                 ),
             ]
-        return not operation.references_model(self.new_name, app_label)
+        # Skip `ModelOperation.reduce` as we want to run `references_model`
+        # against self.new_name.
+        return (
+            super(ModelOperation, self).reduce(operation, in_between, app_label=app_label) or
+            not operation.references_model(self.new_name, app_label)
+        )
 
 
 class AlterModelTable(ModelOperation):

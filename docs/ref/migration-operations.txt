@@ -196,7 +196,7 @@ Special Operations
 RunSQL
 ------
 
-.. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None)
+.. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None, elidable=False)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
 features of database backends that Django doesn't support directly, like
@@ -249,6 +249,9 @@ The optional ``hints`` argument will be passed as ``**hints`` to the
 routing decisions. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
 
+The optional ``elidable`` argument determines whether or not the operation will
+be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
+
 .. attribute:: RunSQL.noop
 
     Pass the ``RunSQL.noop`` attribute to ``sql`` or ``reverse_sql`` when you
@@ -257,10 +260,14 @@ database hints.
 
 .. _sqlparse: https://pypi.python.org/pypi/sqlparse
 
+.. versionadded:: 1.10
+
+    The ``elidable`` argument was added.
+
 RunPython
 ---------
 
-.. class:: RunPython(code, reverse_code=None, atomic=True, hints=None)
+.. class:: RunPython(code, reverse_code=None, atomic=True, hints=None, elidable=False)
 
 Runs custom Python code in a historical context. ``code`` (and ``reverse_code``
 if supplied) should be callable objects that accept two arguments; the first is
@@ -277,6 +284,9 @@ The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
 routing decision. See :ref:`topics-db-multi-db-hints` for more details on
 database hints.
+
+The optional ``elidable`` argument determines whether or not the operation will
+be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and just pass it to ``RunPython``. Here's an
@@ -365,6 +375,10 @@ attribute.
     Pass the ``RunPython.noop`` method to ``code`` or ``reverse_code`` when
     you want the operation not to do anything in the given direction. This is
     especially useful in making the operation reversible.
+
+.. versionadded:: 1.10
+
+    The ``elidable`` argument was added.
 
 SeparateDatabaseAndState
 ------------------------

@@ -239,6 +239,11 @@ Migrations
 
 * Added support for serialization of ``enum.Enum`` objects.
 
+* Added the ``elidable`` argument to the
+  :class:`~django.db.migrations.operations.RunSQL` and
+  :class:`~django.db.migrations.operations.RunPython` operations to allow them
+  to be removed when squashing migrations.
+
 Models
 ~~~~~~
 

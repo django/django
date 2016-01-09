@@ -30,6 +30,9 @@ class Operation(object):
     # DDL transaction support (i.e., does it have no DDL, like RunPython)
     atomic = False
 
+    # Should this operation be considered safe to elide and optimize across?
+    elidable = False
+
     serialization_expand_args = []
 
     def __new__(cls, *args, **kwargs):
@@ -117,6 +120,10 @@ class Operation(object):
         replaced with or a boolean that indicates whether or not the specified
         operation can be optimized across.
         """
+        if self.elidable:
+            return [operation]
+        elif operation.elidable:
+            return [self]
         return False
 
     def __repr__(self):
