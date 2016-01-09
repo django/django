@@ -33,6 +33,7 @@ release. Some fields require higher versions.
     aggregates
     fields
     forms
+    expressions
     functions
     lookups
     operations

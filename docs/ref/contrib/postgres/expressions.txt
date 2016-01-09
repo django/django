@@ -1,0 +1,39 @@
+PostgreSQL specific database expressions
+========================================
+
+All of these expressions are available from the ``django.contrib.postgres.expressions`` module.
+
+.. currentmodule:: django.contrib.postgres.expressions
+
+FilterAgg
+---------
+
+.. class:: FilterAgg()
+
+.. versionadded:: 1.9
+
+Allows use of `filtered`_ aggregate expressions, added in Postgres 9.4.  These allow you to generate aggregates over a sub-set of records in the group.
+
+.. code-block:: sql
+
+   SELECT
+       count(*) AS unfiltered,
+       count(*) FILTER (WHERE i < 5) AS filtered
+
+   FROM generate_series(1,10) AS s(i);
+    unfiltered | filtered
+   ------------+----------
+            10 |        4
+   (1 row)
+
+.. code-block:: python
+
+   from django.contrib.postgres.expressions import FilterAgg
+
+
+   qset = Topic.objects.annotate(
+       all_posts=Count('post'),
+       new_posts=FilterAgg(Count('post'), Q(post__post_date__gte=today)
+   )
+
+.. _filtered: http://www.postgresql.org/docs/9.4/static/sql-expressions.html
