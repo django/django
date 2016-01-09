@@ -1319,7 +1319,7 @@ class ModelAdmin(BaseModelAdmin):
         if IS_POPUP_VAR in request.POST:
             popup_response_data = json.dumps({
                 'action': 'delete',
-                'value': obj_id,
+                'value': str(obj_id),
             })
             return SimpleTemplateResponse('admin/popup_response.html', {
                 'popup_response_data': popup_response_data,

@@ -968,4 +968,4 @@ class ParentWithUUIDPK(models.Model):
 
 
 class RelatedWithUUIDPKModel(models.Model):
-    parent = models.ForeignKey(ParentWithUUIDPK, on_delete=models.CASCADE)
+    parent = models.ForeignKey(ParentWithUUIDPK, on_delete=models.SET_NULL, null=True, blank=True)
