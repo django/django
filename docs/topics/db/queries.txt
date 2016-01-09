@@ -1227,7 +1227,7 @@ To assign the members of a related set, use the ``set()`` method with an
 iterable of object instances or a list of primary key values. For example::
 
     b = Blog.objects.get(id=1)
-    b.entry_set.set([e1, e2]
+    b.entry_set.set([e1, e2])
 
 In this example, ``e1`` and ``e2`` can be full Entry instances, or integer
 primary key values.
