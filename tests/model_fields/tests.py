@@ -251,6 +251,25 @@ class ForeignKeyTests(test.TestCase):
             "Pending lookup added for a foreign key on an abstract model"
         )
 
+    @isolate_apps('model_fields', 'model_fields.tests')
+    def test_abstract_model_app_relative_foreign_key(self):
+        class Refered(models.Model):
+            class Meta:
+                app_label = 'model_fields'
+
+        class AbstractReferent(models.Model):
+            reference = models.ForeignKey('Refered', on_delete=models.CASCADE)
+
+            class Meta:
+                app_label = 'model_fields'
+                abstract = True
+
+        class ConcreteReferent(AbstractReferent):
+            class Meta:
+                app_label = 'tests'
+
+        self.assertEqual(ConcreteReferent._meta.get_field('reference').related_model, Refered)
+
 
 class ManyToManyFieldTests(test.SimpleTestCase):
     def test_abstract_model_pending_operations(self):
@@ -272,6 +291,30 @@ class ManyToManyFieldTests(test.SimpleTestCase):
             list(apps._pending_operations.items()),
             "Pending lookup added for a many-to-many field on an abstract model"
         )
+
+    @isolate_apps('model_fields', 'model_fields.tests')
+    def test_abstract_model_app_relative_foreign_key(self):
+        class Refered(models.Model):
+            class Meta:
+                app_label = 'model_fields'
+
+        class Through(models.Model):
+            refered = models.ForeignKey('Refered', on_delete=models.CASCADE)
+            referent = models.ForeignKey('tests.ConcreteReferent', on_delete=models.CASCADE)
+
+        class AbstractReferent(models.Model):
+            reference = models.ManyToManyField('Refered', through='Through')
+
+            class Meta:
+                app_label = 'model_fields'
+                abstract = True
+
+        class ConcreteReferent(AbstractReferent):
+            class Meta:
+                app_label = 'tests'
+
+        self.assertEqual(ConcreteReferent._meta.get_field('reference').related_model, Refered)
+        self.assertEqual(ConcreteReferent.reference.through, Through)
 
 
 class TextFieldTests(test.TestCase):
