@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib.redirects.models import Redirect
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ImproperlyConfigured
+from django.core.handlers.middleware import MiddlewareMixin
 
 
-class RedirectFallbackMiddleware(object):
+class RedirectFallbackMiddleware(MiddlewareMixin):
 
     # Defined as class-level attributes to be subclassing-friendly.
     response_gone_class = http.HttpResponseGone
