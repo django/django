@@ -15,15 +15,17 @@ class RedirectFallbackMiddleware(MiddlewareMixin):
     response_gone_class = http.HttpResponseGone
     response_redirect_class = http.HttpResponsePermanentRedirect
 
-    def __init__(self):
+    def __init__(self, get_response=None):
         if not apps.is_installed('django.contrib.sites'):
             raise ImproperlyConfigured(
                 "You cannot use RedirectFallbackMiddleware when "
                 "django.contrib.sites is not installed."
             )
+        super(RedirectFallbackMiddleware, self).__init__(get_response)
 
     def process_response(self, request, response):
         # No need to check for a redirect for non-404 responses.
+        print response, type(response), response.status_code
         if response.status_code != 404:
             return response
 

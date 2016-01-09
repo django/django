@@ -51,6 +51,7 @@ class BaseHandler(object):
         self._exception_middleware = []
 
         settings.MIDDLEWARE = settings.MIDDLEWARE_CLASSES
+        print settings.MIDDLEWARE
         if settings.MIDDLEWARE is None:
             handler = self._get_response_old
             self._load_middleware_old()
@@ -58,6 +59,7 @@ class BaseHandler(object):
             handler = self._get_response
             for middleware_path in settings.MIDDLEWARE[::-1]:
                 middleware = import_string(middleware_path)
+                print middleware_path
                 try:
                     mw_instance = middleware(handler)
                 except MiddlewareNotUsed as exc:
