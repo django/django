@@ -608,7 +608,7 @@ FILE_STORAGES = {
             'django.contrib.staticfiles.finders.FileSystemFinder',
             'django.contrib.staticfiles.finders.AppDirectoriesFinder',
             # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-        ]
+        ],
         'CHARSET': FILE_CHARSET,
     }
 }
