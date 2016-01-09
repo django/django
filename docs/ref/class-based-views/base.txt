@@ -19,7 +19,12 @@ View
 .. class:: django.views.generic.base.View
 
     The master class-based base view. All other class-based views inherit from
-    this base class.
+    this base class. It isn't strictly a generic view and thus can also be
+    imported from ``django.views``.
+
+    .. versionchanged:: 1.10
+
+        The ability to import from ``django.views`` was added.
 
     **Method Flowchart**
 
@@ -30,7 +35,7 @@ View
     **Example views.py**::
 
         from django.http import HttpResponse
-        from django.views.generic import View
+        from django.views import View
 
         class MyView(View):
 
