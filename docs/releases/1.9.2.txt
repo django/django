@@ -49,3 +49,6 @@ Bugfixes
   SQLite with more than 2000 parameters when :setting:`DEBUG` is ``True`` on
   distributions that increase the ``SQLITE_MAX_VARIABLE_NUMBER`` compile-time
   limit to over 2000, such as Debian (:ticket:`26063`).
+
+* Fixed a crash when using a reverse ``OneToOneField`` in
+  ``ModelAdmin.readonly_fields`` (:ticket:`26060`).
