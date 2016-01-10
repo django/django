@@ -221,7 +221,7 @@ When a mistaken commit is discovered, please follow these guidelines:
 
 * If the original author can't be reached (within a reasonable amount
   of time -- a day or so) and the problem is severe -- crashing bug,
-  major test failures, etc -- then ask for objections on the
+  major test failures, etc. -- then ask for objections on the
   |django-developers| mailing list then revert if there are none.
 
 * If the problem is small (a feature commit after feature freeze,
