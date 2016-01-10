@@ -227,7 +227,7 @@ class BaseDatabaseOperations(object):
     def lookup_cast(self, lookup_type, internal_type=None):
         """
         Returns the string to use in a query when performing lookups
-        ("contains", "like", etc). The resulting string should contain a '%s'
+        ("contains", "like", etc.). The resulting string should contain a '%s'
         placeholder for the column being searched against.
         """
         return "%s"

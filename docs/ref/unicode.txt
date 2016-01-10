@@ -251,7 +251,7 @@ Models
 ======
 
 Because all strings are returned from the database as Unicode strings, model
-fields that are character based (CharField, TextField, URLField, etc) will
+fields that are character based (CharField, TextField, URLField, etc.) will
 contain Unicode values when Django retrieves data from the database. This
 is *always* the case, even if the data could fit into an ASCII bytestring.
 

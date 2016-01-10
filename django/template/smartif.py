@@ -123,7 +123,7 @@ class Literal(TokenBase):
     """
     # IfParser uses Literal in create_var, but TemplateIfParser overrides
     # create_var so that a proper implementation that actually resolves
-    # variables, filters etc is used.
+    # variables, filters etc. is used.
     id = "literal"
     lbp = 0
 

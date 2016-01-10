@@ -888,7 +888,7 @@ def yesno(value, arg=None):
 def filesizeformat(bytes):
     """
     Formats the value like a 'human-readable' file size (i.e. 13 KB, 4.1 MB,
-    102 bytes, etc).
+    102 bytes, etc.).
     """
     try:
         bytes = float(bytes)
