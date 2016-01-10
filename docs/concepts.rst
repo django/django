@@ -14,7 +14,7 @@ could easily offload until after a response has been sent - like saving things
 into a cache or thumbnailing newly-uploaded images.
 
 Channels changes the way Django runs to be "event oriented" - rather than 
-just responding to requests, instead Django responses to a wide array of events
+just responding to requests, instead Django responds to a wide array of events
 sent on *channels*. There's still no persistent state - each event handler,
 or *consumer* as we call them, is called independently in a way much like a
 view is called.
