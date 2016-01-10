@@ -168,7 +168,7 @@ used template filters:
 
 :tfilter:`filesizeformat`
     Formats the value like a "human-readable" file size (i.e. ``'13 KB'``,
-    ``'4.1 MB'``, ``'102 bytes'``, etc). For example::
+    ``'4.1 MB'``, ``'102 bytes'``, etc.). For example::
 
         {{ value|filesizeformat }}
 
