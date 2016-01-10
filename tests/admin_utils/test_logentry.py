@@ -61,7 +61,7 @@ class LogEntryTests(TestCase):
         change_url = reverse('admin:admin_utils_article_change', args=[quote(self.a1.pk)])
         response = self.client.post(change_url, post_data)
         self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
-        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('action_time')
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
         self.assertEqual(logentry.get_change_message(), 'Changed title and hist.')
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Modification de title et hist.')
@@ -70,7 +70,7 @@ class LogEntryTests(TestCase):
         post_data['title'] = 'New'
         response = self.client.post(add_url, post_data)
         self.assertRedirects(response, reverse('admin:admin_utils_article_changelist'))
-        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('action_time')
+        logentry = LogEntry.objects.filter(content_type__model__iexact='article').latest('id')
         self.assertEqual(logentry.get_change_message(), 'Added.')
         with translation.override('fr'):
             self.assertEqual(logentry.get_change_message(), 'Ajout.')
