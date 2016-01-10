@@ -1564,8 +1564,8 @@ It serves two purposes:
 * If the locale middleware isn't in use, it decides which translation is served
   to all users.
 * If the locale middleware is active, it provides a fallback language in case the
-  user's preferred language can't be determined or is not supported by the Web
-  site. It also provides the fallback translation when a translation for a
+  user's preferred language can't be determined or is not supported by the
+  website. It also provides the fallback translation when a translation for a
   given literal doesn't exist for the user's preferred language.
 
 See :ref:`how-django-discovers-language-preference` for more details.

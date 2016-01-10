@@ -39,10 +39,9 @@ Journal-World`_ of Lawrence, Kansas, USA.
 
 `Wilson Miner`_
     Wilson's design-fu is what makes Django look so nice. He created the design
-    that was used for nearly the first ten years on the Django Project Web
-    site, as well as the current design for Django's acclaimed admin interface.
-    Wilson was the designer for EveryBlock and Rdio_. He now designs for
-    Facebook.
+    that was used for nearly the first ten years on the Django Project website,
+    as well as the current design for Django's acclaimed admin interface. Wilson
+    was the designer for EveryBlock and Rdio_. He now designs for Facebook.
 
     Wilson lives in San Francisco, USA.
 
