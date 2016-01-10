@@ -150,7 +150,7 @@ actual project.
 
 If settings, URLconfs and apps within the project are imported or referenced
 using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
-"myproject.urls"``, etc), the new ``manage.py`` will need to be moved one
+"myproject.urls"``, etc.), the new ``manage.py`` will need to be moved one
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
 
