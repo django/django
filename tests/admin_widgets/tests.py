@@ -1068,9 +1068,9 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
         for field_name in ['students', 'alumni']:
             from_box = '#id_%s_from' % field_name
             to_box = '#id_%s_to' % field_name
-            choose_link = '#id_%s_add_link' % field_name
-            remove_link = '#id_%s_remove_link' % field_name
-            input = self.selenium.find_element_by_css_selector('#id_%s_input' % field_name)
+            choose_link = 'id_%s_add_link' % field_name
+            remove_link = 'id_%s_remove_link' % field_name
+            input = self.selenium.find_element_by_id('id_%s_input' % field_name)
 
             # Initial values
             self.assertSelectOptions(from_box,
@@ -1099,14 +1099,14 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
             input.send_keys('a')
             self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.jason.id)])
             self.get_select_option(from_box, str(self.jason.id)).click()
-            self.selenium.find_element_by_css_selector(choose_link).click()
+            self.selenium.find_element_by_id(choose_link).click()
             self.assertSelectOptions(from_box, [str(self.arthur.id)])
             self.assertSelectOptions(to_box,
                         [str(self.lisa.id), str(self.peter.id),
                          str(self.jason.id)])
 
             self.get_select_option(to_box, str(self.lisa.id)).click()
-            self.selenium.find_element_by_css_selector(remove_link).click()
+            self.selenium.find_element_by_id(remove_link).click()
             self.assertSelectOptions(from_box,
                         [str(self.arthur.id), str(self.lisa.id)])
             self.assertSelectOptions(to_box,
@@ -1124,7 +1124,7 @@ class HorizontalVerticalFilterSeleniumFirefoxTests(SeleniumDataMixin, AdminSelen
             # Check that pressing enter on a filtered option sends it properly
             # to the 'to' box.
             self.get_select_option(to_box, str(self.jason.id)).click()
-            self.selenium.find_element_by_css_selector(remove_link).click()
+            self.selenium.find_element_by_id(remove_link).click()
             input.send_keys('ja')
             self.assertSelectOptions(from_box, [str(self.jason.id)])
             input.send_keys([Keys.ENTER])
