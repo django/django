@@ -1908,7 +1908,7 @@ Default: ``''`` (Empty string)
 
 A secret key for a particular Django installation. This is used to provide
 :doc:`cryptographic signing </topics/signing>`, and should be set to a unique,
-unpredictable value.
+unpredictable, valid unicode string.
 
 :djadmin:`django-admin startproject <startproject>` automatically adds a
 randomly-generated ``SECRET_KEY`` to each new project.

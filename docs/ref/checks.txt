@@ -539,6 +539,8 @@ of the :djadmin:`check` command:
   for your site to serve other parts of itself in a frame, you should change
   it to ``'DENY'``.
 * **security.W020**: :setting:`ALLOWED_HOSTS` must not be empty in deployment.
+* **security.W020**: Your :setting:`SECRET_KEY` is invalid Unicode.
+  Please generate a valid Unicode string.
 
 Sites
 -----
