@@ -893,6 +893,15 @@ class GenericIPAddressFieldTests(test.TestCase):
         loaded = GenericIPAddress.objects.get()
         self.assertEqual(loaded.ip, instance.ip)
 
+    def test_normalize_ipv4_address(self):
+        """
+        normalized ipv4 address (#25456).
+        """
+        model_field = models.GenericIPAddressField(protocol='IPv4')
+        form_field = model_field.formfield()
+        self.assertEqual(form_field.clean('127.0.00.010'), '127.0.0.10')
+        self.assertEqual(form_field.clean('127.0.0.1'), '127.0.0.1')
+
 
 class PromiseTest(test.SimpleTestCase):
     def test_AutoField(self):

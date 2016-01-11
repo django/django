@@ -30,6 +30,7 @@ from django.utils import formats, six
 from django.utils.dateparse import parse_duration
 from django.utils.duration import duration_string
 from django.utils.encoding import force_str, force_text, smart_text
+from django.utils.ipv4 import clean_ipv4_address
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.six.moves.urllib.parse import urlsplit, urlunsplit
 from django.utils.translation import ugettext_lazy as _, ungettext_lazy
@@ -1176,8 +1177,11 @@ class GenericIPAddressField(CharField):
         if value in self.empty_values:
             return ''
         value = value.strip()
-        if value and ':' in value:
-            return clean_ipv6_address(value, self.unpack_ipv4)
+        if value:
+            if ':' in value:
+                return clean_ipv6_address(value, self.unpack_ipv4)
+            else:
+                return clean_ipv4_address(value)
         return value
 
 
