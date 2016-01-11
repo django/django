@@ -827,6 +827,14 @@ with its own :ref:`runserver<staticfiles-runserver>` command.
 If :djadmin:`migrate` was not previously executed, the table that stores the
 history of migrations is created at first run of ``runserver``.
 
+Logging of each request and response of the server is sent to the
+:ref:`django-server-logger` logger.
+
+.. versionchanged:: 1.10
+
+    In older versions, log messages were written to ``sys.stderr`` instead of
+    being handled through Python logging.
+
 .. django-admin-option:: --noreload
 
 Use the ``--noreload`` option to disable the use of the auto-reloader. This

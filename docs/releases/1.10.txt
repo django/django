@@ -397,6 +397,36 @@ Dropped support for PostgreSQL 9.1
 Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
 Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
 
+``runserver`` output goes through logging
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Request and response handling of the ``runserver`` command is sent to the
+:ref:`django-server-logger` logger instead of to ``sys.stderr``. If you
+disable Django's logging configuration or override it with your own, you'll
+need to add the appropriate logging configuration if you want to see that
+output::
+
+    'formatters': {
+        'django.server': {
+            '()': 'django.utils.log.ServerFormatter',
+            'format': '[%(server_time)s] %(message)s',
+        }
+    },
+    'handlers': {
+        'django.server': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+    },
+    'loggers': {
+        'django.server': {
+            'handlers': ['django.server'],
+            'level': 'INFO',
+            'propagate': False,
+        }
+    }
+
 Miscellaneous
 ~~~~~~~~~~~~~
 
