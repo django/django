@@ -397,6 +397,31 @@ Dropped support for PostgreSQL 9.1
 Upstream support for PostgreSQL 9.1 ends in September 2016. As a consequence,
 Django 1.10 sets PostgreSQL 9.2 as the minimum version it officially supports.
 
+``QuerySet.exclude()`` behavior is changed for some queries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When issuing multiple negated conditions to the same relation in single
+``filter()`` or ``exclude()`` call, Django now consistently applies the
+conditions against the same set of related objects for all the conditions.
+Previously in the ``exclude()`` case, different sets were used for the
+different conditions.
+
+For example, consider the query::
+
+    Author.objects.exclude(friends__age__gte=20, friends__age__lte=40)
+
+In Django 1.10, any author with a friend age 20 to 40 will be removed from the
+results. In previous versions, any author with a friend over age 20 and a
+(**possibly different**) friend under age 40 are removed from the results.
+
+If you want a query that matches the old behavior of the above query and works
+equivalently on both older and newer version of Django, try::
+
+    Author.objects.exclude(friends__age__gte=20).filter(friends__age__lte=40)
+
+See :ref:`spanning-multi-valued-relationships` for details. This change is a
+bug fix to make ``exclude()`` function similarly to ``filter()``.
+
 Miscellaneous
 ~~~~~~~~~~~~~
 

@@ -139,8 +139,6 @@ class Query(object):
         self.default_cols = True
         self.default_ordering = True
         self.standard_ordering = True
-        self.used_aliases = set()
-        self.filter_is_sticky = False
 
         # SQL-related attributes
         # Select and related select clauses are expressions to use in the
@@ -310,11 +308,6 @@ class Query(object):
         obj.extra_tables = self.extra_tables
         obj.extra_order_by = self.extra_order_by
         obj.deferred_loading = copy.copy(self.deferred_loading[0]), self.deferred_loading[1]
-        if self.filter_is_sticky and self.used_aliases:
-            obj.used_aliases = self.used_aliases.copy()
-        else:
-            obj.used_aliases = set()
-        obj.filter_is_sticky = False
         if 'alias_prefix' in self.__dict__:
             obj.alias_prefix = self.alias_prefix
         if 'subq_aliases' in self.__dict__:
@@ -1099,23 +1092,15 @@ class Query(object):
                 "permitted." %
                 (name, lhs.output_field.__class__.__name__))
 
-    def build_filter(self, filter_expr, branch_negated=False, current_negated=False,
-                     can_reuse=None, connector=AND, allow_joins=True, split_subq=True):
+    def build_filter(self, filter_expr, current_negated=False, can_reuse=None, allow_joins=True):
         """
         Builds a WhereNode for a single filter clause, but doesn't add it
         to this Query. Query.add_q() will then add this filter to the where
         Node.
 
-        The 'branch_negated' tells us if the current branch contains any
-        negations. This will be used to determine if subqueries are needed.
-
         The 'current_negated' is used to determine if the current filter is
         negated or not and this will be used to determine if IS NULL filtering
         is needed.
-
-        The difference between current_netageted and branch_negated is that
-        branch_negated is set on first negation, but current_negated is
-        flipped for each negation.
 
         Note that add_filter will not do any negating itself, that is done
         upper in the code by add_q().
@@ -1126,8 +1111,6 @@ class Query(object):
         query. However, if the filter isn't added to the query then the caller
         is responsible for unreffing the joins used.
         """
-        if isinstance(filter_expr, dict):
-            raise FieldError("Cannot parse keyword query as dict")
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
@@ -1147,23 +1130,10 @@ class Query(object):
 
         opts = self.get_meta()
         alias = self.get_initial_alias()
-        allow_many = not branch_negated or not split_subq
-
-        try:
-            field, sources, opts, join_list, path = self.setup_joins(
-                parts, opts, alias, can_reuse=can_reuse, allow_many=allow_many)
-
-            # Prevent iterator from being consumed by check_related_objects()
-            if isinstance(value, Iterator):
-                value = list(value)
-            self.check_related_objects(field, value, opts)
-
-            # split_exclude() needs to know which joins were generated for the
-            # lookup parts
-            self._lookup_joins = join_list
-        except MultiJoin as e:
-            return self.split_exclude(filter_expr, LOOKUP_SEP.join(parts[:e.level]),
-                                      can_reuse, e.names_with_path)
+        field, sources, opts, join_list, path = self.setup_joins(parts, opts, alias, can_reuse=can_reuse)
+        if isinstance(value, Iterator):
+            value = list(value)
+        self.check_related_objects(field, value, opts)
 
         if can_reuse is not None:
             can_reuse.update(join_list)
@@ -1212,7 +1182,179 @@ class Query(object):
     def add_filter(self, filter_clause):
         self.add_q(Q(**{filter_clause[0]: filter_clause[1]}))
 
-    def add_q(self, q_object):
+    def find_base_splits(self, q_object, in_negated=False, path=None):
+        """
+        Find those Q-objects that have a reference to a multivalued join.
+        """
+        if isinstance(q_object, dict):
+            raise FieldError("Cannot parse keyword query as dict")
+        found_splits = {}
+        if q_object.negated:
+            in_negated = True
+        if path is None:
+            path = [0]
+        for pos, obj in enumerate(q_object.children):
+            path.append(pos)
+            if isinstance(obj, tuple):
+                if in_negated:
+                    # obj if of form (somefield__lte, value)
+                    try:
+                        self.names_to_path(
+                            obj[0].split(LOOKUP_SEP),
+                            self.get_meta(),
+                            fail_on_missing=False,
+                            allow_many=False,
+                        )
+                    except FieldError:
+                        # Erroneous filters will be reported to the user later.
+                        pass
+                    except MultiJoin as e:
+                        found_splits[tuple(path)] = LOOKUP_SEP.join(i[0] for i in e.names_with_path)
+            else:
+                found_splits.update(self.find_base_splits(obj, in_negated, path))
+            path.pop()
+        return found_splits
+
+    def find_common_multirefs(self, q_object, found_prefixes, found_paths, path=None):
+        """
+        Find those Q-objects that references a multivalued join mentioned in
+        for_prefixes. The for_prefixes is a set of lookup paths like
+        ('friends', 'best_friend__books').
+        """
+        if isinstance(q_object, dict):
+            raise FieldError("Cannot parse keyword query as dict")
+        found_splits = {}
+        if path is None:
+            path = [0]
+        for pos, obj in enumerate(q_object.children):
+            path.append(pos)
+            if isinstance(obj, tuple):
+                if tuple(path) not in found_paths:
+                    try:
+                        self.names_to_path(
+                            obj[0].split(LOOKUP_SEP),
+                            self.get_meta(),
+                            fail_on_missing=False,
+                            allow_many=False,
+                        )
+                    except FieldError:
+                        # Erroneous filters will be reported to the user later.
+                        pass
+                    except MultiJoin as e:
+                        # Check if this is a reference to a path passed in
+                        # prefixes.
+                        lookup_path = LOOKUP_SEP.join(i[0] for i in e.names_with_path)
+                        if lookup_path in found_prefixes:
+                            found_splits[tuple(path)] = lookup_path
+            else:
+                found_splits.update(self.find_common_multirefs(obj, found_prefixes, found_paths, path))
+            path.pop()
+        return found_splits
+
+    def find_ancestors(self, found_splits):
+        """
+        Find the upmost node combining the items in found_splits.
+        """
+        # For example, if found_splits is:
+        #    (0, 1, 0) => 'friends'
+        #    (0, 2, 0) => 'friends'
+        # this method results in path (0,). If found_splits is:
+        #    (0, 1, 0) => 'friends'
+        #    (0, 1, 1) => 'friends'
+        #    (0, 2) => 'books'
+        # it results in path (0, 1), (0, 2)
+        seen_names = {}
+        for path, names in found_splits.items():
+            if names in seen_names:
+                path2 = seen_names[names]
+                common_path = []
+                for p1, p2 in zip(path, path2):
+                    if p1 == p2:
+                        common_path.append(p1)
+                    else:
+                        break
+                seen_names[names] = tuple(common_path)
+            else:
+                seen_names[names] = path
+        return set(seen_names.values())
+
+    def mark_split_nodes(self, q_object, found_splits, path=None):
+        """
+        Given a q_object and found split positions as a list of node paths,
+        return a single q_object that can be included in the query's where
+        clause and a list of Q-objects that need to be pushed to subqueries.
+        """
+        if path is None:
+            assert q_object.connector != OR
+            path = [0]
+        if tuple(path) in found_splits:
+            q_object.push_to_subquery = True
+            return q_object
+        for pos, obj in enumerate(q_object.children):
+            path.append(pos)
+            if isinstance(obj, tuple):
+                if tuple(path) in found_splits:
+                    obj = Q(obj)
+                    obj.push_to_subquery = True
+                    q_object.children[pos] = obj
+            else:
+                if tuple(path) in found_splits:
+                    obj.push_to_subquery = True
+                else:
+                    self.mark_split_nodes(obj, found_splits, path)
+            path.pop()
+        return q_object
+
+    def mark_q_for_subqueries(self, q_object):
+        """
+        Return a q_object to be used directly with .filter() and another
+        q_object that needs to be pushed into a subquery.
+        """
+        # The rules for when a clause needs to be changed to an subquery clause:
+        # A. If a base case is a negated reference to multivalued join, e.g.
+        #    (~Q(books__pages__lte=100))
+        # B. If two clauses refer to the *same* multivalued join and at least
+        #    one of them matches case A, then the upmost node combining the
+        #    clauses must be pushed to the subquery clause.
+        #
+        # The found_splits variable is a dictionary of the node's path
+        # (expressed as node.children positions, for example [0, 1] -> first
+        # node's second child) mapped to the lookup name found and if the
+        # clause requires a subquery.
+        #
+        # Note that we are aiming for a transform like:
+        #   qs.exclude(m2m_join__foo=bar) == qs.exclude(pk__in=qs.filter(m2m_join__foo=bar))
+        #
+        # That is, if we assume we generate the correct filter() for the
+        # m2m_join__foo=bar, then we can always generate a correct exclude by
+        # using exclude(pk__in=filtered_qs).
+        #
+        # If we have more than one clause targeting the same multijoin, then
+        # all such clauses must be pushed to the same subquery.
+        #
+        # An example:
+        #   qs.filter(Q(authors__age__lte=20), ~Q(authors__height__gte=180))
+        #
+        # The second Q-object matches case A. The first Q-object targets the
+        # same relation, so it must also be pushed to the subquery by case B.
+
+        # Find the cases matching A.
+        found_splits = self.find_base_splits(q_object)
+        if not found_splits:
+            return q_object
+        # Add in the cases matching B.
+        found_splits.update(
+            self.find_common_multirefs(
+                q_object,
+                set(found_splits.values()),
+                set(found_splits.keys()),
+            )
+        )
+        # Find the upmost node combining the clauses.
+        found_split_paths = self.find_ancestors(found_splits)
+        return self.mark_split_nodes(q_object.clone(), found_split_paths)
+
+    def add_q(self, q_object, reuse_joins=False):
         """
         A preprocessor for the internal _add_q(). Responsible for doing final
         join promotion.
@@ -1225,33 +1367,141 @@ class Query(object):
         # So, demotion is OK.
         existing_inner = set(
             (a for a in self.alias_map if self.alias_map[a].join_type == INNER))
-        clause, _ = self._add_q(q_object, self.used_aliases)
+        # Determine which clauses must be pushed to the same subquery, the base
+        # model for that subquery, and trimmed subquery path.
+        q_object = self.mark_q_for_subqueries(q_object)
+        clause, _ = self._add_q(q_object, set() if not reuse_joins else set(self.tables))
         if clause:
             self.where.add(clause, AND)
         self.demote_joins(existing_inner)
 
-    def _add_q(self, q_object, used_aliases, branch_negated=False,
-               current_negated=False, allow_joins=True, split_subq=True):
+    def add_subquery(self, subq):
+        """
+        The idea is that we are adding a subquery to self like this:
+            self.filter(pk__in=subq)
+        But, when possible we try to remove as many leading joins from the
+        subq and move them to the outer query's filter.
+        """
+        # The split position (the position to which joins are moved to the
+        # outer query) is the first one of the following for the subquery:
+        #   - LOUTER join
+        #   - position after which there is multiple joins from it
+        #   - m2m or o2m join
+        #
+        # Check which joins we can move to the outer query's filter. We can
+        # trim tables as long as they aren't along multi-valued joins, or if
+        # they aren't LOUTER joins (removing those would miss rows for cases
+        # where the LOUTER join produces null).
+        trim_tables = []
+        joins_from = {}  # alias -> list of joins from it
+        for table in subq.tables:
+            joins_from[table] = []
+            for join in subq.alias_map.values():
+                if join.parent_alias == table:
+                    joins_from[table].append(join)
+        for pos, table in enumerate(subq.tables):
+            split_join = subq.alias_map[table]
+            split_table = table
+            # If the table has multiple childs or no childs at all, then this
+            # is our split position. No childs means this is the last table in
+            # the chain, so the split position can't be any further. Multiple
+            # child joins means we should have multiple base tables in the
+            # inner query and that is impossible to do in SQL.
+            child_table_cnt = len(joins_from[table])
+            if child_table_cnt != 1:
+                break
+            # If the child table is joined as a LOUTER join, then we must also
+            # break at this position. Otherwise NULL rows would be missed in
+            # the inner query.
+            next_join = joins_from[table].pop()
+            if next_join.join_type == LOUTER:
+                break
+            # Finally, if the child join is multivalued, then we must break
+            # (otherwise we would be adding a multijoin to the outer query
+            # which is what we want to avoid with the subquery construct).
+            if (hasattr(split_join, 'join_field') and (
+                    split_join.join_field.many_to_many or split_join.join_field.one_to_many)):
+                break
+            trim_tables.append(table)
+        if not trim_tables:
+            # We couldn't trim any tables from the inner query.
+            subq.add_fields(['pk'])
+            return Q(pk__in=subq)
+        outer_path = []
+        # Build a filter path for the outer query and remove the joins from the
+        # inner query.
+        for table in trim_tables:
+            # Note that moving along the reverse direction of a join needs
+            # different handling than direct joins.
+            join = subq.alias_map[table]
+            subq.unref_alias(table, subq.alias_refcount[table])
+            if not hasattr(join, 'join_field'):
+                # For the base table in the query we don't need any handling
+                # (and base tables do not have a join_field attribute).
+                continue
+            outer_path.append(join.join_field.name)
+        # Again, different handling for "along field" than "against the field".
+        if hasattr(split_join.join_field, 'foreign_related_fields'):
+            subq_fields = split_join.join_field.foreign_related_fields
+            outerq_field_names = [o.name for o in split_join.join_field.local_related_fields]
+        else:
+            subq_fields = split_join.join_field.field.local_related_fields
+            outerq_field_names = [o.name for o in split_join.join_field.field.foreign_related_fields]
+        if len(outerq_field_names) > 1:
+            raise FieldError("Can't subquery on multicolumn join")
+        # Make sure the subquery is selecting the correct fields, and that
+        # nulls are removed from the subquery (the problem being 1 NOT IN [2, null]
+        # will not match.)
+        for f in subq_fields:
+            subq.add_select(f.get_col(alias=split_table))
+            if split_join.join_type == LOUTER or self.is_nullable(f):
+                subq.where.add(f.get_lookup('isnull')(f.get_col(alias=split_table), False), AND)
+        # Handle ForeignObject extra restrictions for the relation.
+        if hasattr(split_join.join_field, 'field'):
+            extra_restriction = split_join.join_field.field.get_extra_restriction(
+                subq.where_class, None, split_table)
+        else:
+            extra_restriction = split_join.join_field.get_extra_restriction(
+                subq.where_class, None, split_table)
+        if extra_restriction:
+            subq.where.add(extra_restriction, AND)
+        # The "start table" in the subquery must be a BaseTable instance.
+        subq.alias_map[split_table] = BaseTable(subq.alias_map[split_table].table_name, split_table)
+        # Finally, filter on the subquery's values.
+        outer_path.append(outerq_field_names[0])
+        outer_path.append('in')
+        return Q(**{LOOKUP_SEP.join(outer_path): subq})
+
+    def _add_subq(self, q_object):
+        new_q = Query(self.model)
+        new_q._annotations = self._annotations
+        new_q.annotation_select_mask = set()
+        where, _ = new_q._add_q(q_object, set(), split_exclude=False)
+        new_q.where = where
+        new_q.clear_ordering(force_empty=True)
+        return self.add_subquery(new_q)
+
+    def _add_q(self, q_object, used_aliases, current_negated=False, allow_joins=True, split_exclude=True):
         """
         Adds a Q-object to the current filter.
         """
+        if split_exclude and q_object.push_to_subquery:
+            q_object = self._add_subq(q_object)
         connector = q_object.connector
-        current_negated = current_negated ^ q_object.negated
-        branch_negated = branch_negated or q_object.negated
         target_clause = self.where_class(connector=connector,
                                          negated=q_object.negated)
+        current_negated = current_negated ^ q_object.negated
         joinpromoter = JoinPromoter(q_object.connector, len(q_object.children), current_negated)
         for child in q_object.children:
             if isinstance(child, Node):
                 child_clause, needed_inner = self._add_q(
-                    child, used_aliases, branch_negated,
-                    current_negated, allow_joins, split_subq)
+                    child, used_aliases, current_negated, allow_joins,
+                )
                 joinpromoter.add_votes(needed_inner)
             else:
                 child_clause, needed_inner = self.build_filter(
-                    child, can_reuse=used_aliases, branch_negated=branch_negated,
-                    current_negated=current_negated, connector=connector,
-                    allow_joins=allow_joins, split_subq=split_subq,
+                    child, can_reuse=used_aliases,
+                    current_negated=current_negated, allow_joins=allow_joins,
                 )
                 joinpromoter.add_votes(needed_inner)
             if child_clause:
@@ -1455,73 +1705,6 @@ class Query(object):
                 reuse.update(join_list)
             col = targets[0].get_col(join_list[-1], sources[0])
             return col
-
-    def split_exclude(self, filter_expr, prefix, can_reuse, names_with_path):
-        """
-        When doing an exclude against any kind of N-to-many relation, we need
-        to use a subquery. This method constructs the nested query, given the
-        original exclude filter (filter_expr) and the portion up to the first
-        N-to-many relation field.
-
-        As an example we could have original filter ~Q(child__name='foo').
-        We would get here with filter_expr = child__name, prefix = child and
-        can_reuse is a set of joins usable for filters in the original query.
-
-        We will turn this into equivalent of:
-            WHERE NOT (pk IN (SELECT parent_id FROM thetable
-                              WHERE name = 'foo' AND parent_id IS NOT NULL))
-
-        It might be worth it to consider using WHERE NOT EXISTS as that has
-        saner null handling, and is easier for the backend's optimizer to
-        handle.
-        """
-        # Generate the inner query.
-        query = Query(self.model)
-        query.add_filter(filter_expr)
-        query.clear_ordering(True)
-        # Try to have as simple as possible subquery -> trim leading joins from
-        # the subquery.
-        trimmed_prefix, contains_louter = query.trim_start(names_with_path)
-
-        # Add extra check to make sure the selected field will not be null
-        # since we are adding an IN <subquery> clause. This prevents the
-        # database from tripping over IN (...,NULL,...) selects and returning
-        # nothing
-        col = query.select[0]
-        select_field = col.target
-        alias = col.alias
-        if self.is_nullable(select_field):
-            lookup_class = select_field.get_lookup('isnull')
-            lookup = lookup_class(select_field.get_col(alias), False)
-            query.where.add(lookup, AND)
-        if alias in can_reuse:
-            pk = select_field.model._meta.pk
-            # Need to add a restriction so that outer query's filters are in effect for
-            # the subquery, too.
-            query.bump_prefix(self)
-            lookup_class = select_field.get_lookup('exact')
-            # Note that the query.select[0].alias is different from alias
-            # due to bump_prefix above.
-            lookup = lookup_class(pk.get_col(query.select[0].alias),
-                                  pk.get_col(alias))
-            query.where.add(lookup, AND)
-            query.external_aliases.add(alias)
-
-        condition, needed_inner = self.build_filter(
-            ('%s__in' % trimmed_prefix, query),
-            current_negated=True, branch_negated=True, can_reuse=can_reuse)
-        if contains_louter:
-            or_null_condition, _ = self.build_filter(
-                ('%s__isnull' % trimmed_prefix, True),
-                current_negated=True, branch_negated=True, can_reuse=can_reuse)
-            condition.add(or_null_condition, OR)
-            # Note that the end result will be:
-            # (outercol NOT IN innerq AND outercol IS NOT NULL) OR outercol IS NULL.
-            # This might look crazy but due to how IN works, this seems to be
-            # correct. If the IS NOT NULL check is removed then outercol NOT
-            # IN will return UNKNOWN. If the IS NULL check is removed, then if
-            # outercol IS NULL we will not match the row.
-        return condition, needed_inner
 
     def set_empty(self):
         self.where.add(NothingNode(), AND)
@@ -1867,73 +2050,6 @@ class Query(object):
             return self._extra_select_cache
         else:
             return self.extra
-
-    def trim_start(self, names_with_path):
-        """
-        Trims joins from the start of the join path. The candidates for trim
-        are the PathInfos in names_with_path structure that are m2m joins.
-
-        Also sets the select column so the start matches the join.
-
-        This method is meant to be used for generating the subquery joins &
-        cols in split_exclude().
-
-        Returns a lookup usable for doing outerq.filter(lookup=self). Returns
-        also if the joins in the prefix contain a LEFT OUTER join.
-        _"""
-        all_paths = []
-        for _, paths in names_with_path:
-            all_paths.extend(paths)
-        contains_louter = False
-        # Trim and operate only on tables that were generated for
-        # the lookup part of the query. That is, avoid trimming
-        # joins generated for F() expressions.
-        lookup_tables = [t for t in self.tables if t in self._lookup_joins or t == self.tables[0]]
-        for trimmed_paths, path in enumerate(all_paths):
-            if path.m2m:
-                break
-            if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type == LOUTER:
-                contains_louter = True
-            alias = lookup_tables[trimmed_paths]
-            self.unref_alias(alias)
-        # The path.join_field is a Rel, lets get the other side's field
-        join_field = path.join_field.field
-        # Build the filter prefix.
-        paths_in_prefix = trimmed_paths
-        trimmed_prefix = []
-        for name, path in names_with_path:
-            if paths_in_prefix - len(path) < 0:
-                break
-            trimmed_prefix.append(name)
-            paths_in_prefix -= len(path)
-        trimmed_prefix.append(
-            join_field.foreign_related_fields[0].name)
-        trimmed_prefix = LOOKUP_SEP.join(trimmed_prefix)
-        # Lets still see if we can trim the first join from the inner query
-        # (that is, self). We can't do this for LEFT JOINs because we would
-        # miss those rows that have nothing on the outer side.
-        if self.alias_map[lookup_tables[trimmed_paths + 1]].join_type != LOUTER:
-            select_fields = [r[0] for r in join_field.related_fields]
-            select_alias = lookup_tables[trimmed_paths + 1]
-            self.unref_alias(lookup_tables[trimmed_paths])
-            extra_restriction = join_field.get_extra_restriction(
-                self.where_class, None, lookup_tables[trimmed_paths + 1])
-            if extra_restriction:
-                self.where.add(extra_restriction, AND)
-        else:
-            # TODO: It might be possible to trim more joins from the start of the
-            # inner query if it happens to have a longer join chain containing the
-            # values in select_fields. Lets punt this one for now.
-            select_fields = [r[1] for r in join_field.related_fields]
-            select_alias = lookup_tables[trimmed_paths]
-        # The found starting point is likely a Join instead of a BaseTable reference.
-        # But the first entry in the query's FROM clause must not be a JOIN.
-        for table in self.tables:
-            if self.alias_refcount[table] > 0:
-                self.alias_map[table] = BaseTable(self.alias_map[table].table_name, table)
-                break
-        self.set_select([f.get_col(select_alias) for f in select_fields])
-        return trimmed_prefix, contains_louter
 
     def is_nullable(self, field):
         """

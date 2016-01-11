@@ -54,6 +54,10 @@ class Q(tree.Node):
 
     def __init__(self, *args, **kwargs):
         super(Q, self).__init__(children=list(args) + list(kwargs.items()))
+        # Should the branch starting from this node be pushed in to a subquery?
+        # Used by Django to push negated filters over multivalued relations to
+        # subqueries.
+        self.push_to_subquery = False
 
     def _combine(self, other, conn):
         if not isinstance(other, Q):
@@ -84,12 +88,13 @@ class Q(tree.Node):
                 clone.children.append(child.clone())
             else:
                 clone.children.append(child)
+        clone.push_to_subquery = self.push_to_subquery
         return clone
 
     def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
         # We must promote any new joins to left outer joins so that when Q is
         # used as an expression, rows aren't filtered due to joins.
-        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_subq=False)
+        clause, joins = query._add_q(self, reuse, allow_joins=allow_joins, split_exclude=False)
         query.promote_joins(joins)
         return clause
 
