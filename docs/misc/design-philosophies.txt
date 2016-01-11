@@ -74,7 +74,7 @@ Explicit is better than implicit
 --------------------------------
 
 This is a core Python principle listed in :pep:`20`, and it means Django
-shouldn't do too much "magic". Magic shouldn't happen unless there's a really
+shouldn't do too much "magic." Magic shouldn't happen unless there's a really
 good reason for it. Magic is worth using only if it creates a huge convenience
 unattainable in other ways, and it isn't implemented in a way that confuses
 developers who are trying to learn how to use the feature.
@@ -102,7 +102,7 @@ the type of the field.
 Include all relevant domain logic
 ---------------------------------
 
-Models should encapsulate every aspect of an "object", following Martin
+Models should encapsulate every aspect of an "object," following Martin
 Fowler's `Active Record`_ design pattern.
 
 This is why both the data represented by a model and information about
@@ -128,7 +128,7 @@ framework saving things behind the scenes silently.
 
 This is also why the ``select_related()`` ``QuerySet`` method exists. It's an
 optional performance booster for the common case of selecting "every related
-object".
+object."
 
 Terse, powerful syntax
 ----------------------
