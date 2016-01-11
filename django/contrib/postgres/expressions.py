@@ -7,6 +7,7 @@ class FilterAgg(Expression):
     Allow generation of PostgreSQL "AGG(expre) FILTER (WHERE ...)"
     '''
     template = '%(agg)s FILTER(WHERE %(condition)s)'
+    contains_aggregate = True
 
     def __init__(self, agg, condition, **extra):
         if not agg.contains_aggregate:
